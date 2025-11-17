@@ -661,3 +661,18 @@ void SnesDebugger::StopDiztinguishServer()
 		_diztinguishBridge->StopServer();
 	}
 }
+
+bool SnesDebugger::IsDiztinguishServerRunning() const
+{
+	return _diztinguishBridge && _diztinguishBridge->IsServerRunning();
+}
+
+uint16_t SnesDebugger::GetDiztinguishServerPort() const
+{
+	return _diztinguishBridge ? _diztinguishBridge->GetServerPort() : 0;
+}
+
+bool SnesDebugger::IsDiztinguishClientConnected() const
+{
+	return _diztinguishBridge && _diztinguishBridge->IsClientConnected();
+}

@@ -89,6 +89,7 @@ public:
 	bool IsServerRunning() const { return _serverRunning; }
 	bool IsClientConnected() const { return _clientConnected; }
 	uint16_t GetPort() const { return _port; }
+	uint16_t GetServerPort() const { return _port; } // Alias for Lua API clarity
 
 	// Called by emulator core
 	void OnFrameStart(uint32_t frameNumber);

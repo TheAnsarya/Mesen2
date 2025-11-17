@@ -28,6 +28,8 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/magic_enum.hpp"
+#include "SNES/Debugger/SnesDebugger.h"
+#include "SNES/SnesConsole.h"
 #include "Shared/MemoryOperationType.h"
 
 #ifdef _MSC_VER
@@ -158,6 +160,10 @@ int LuaApi::GetLibrary(lua_State *lua)
 		{ "getScriptDataFolder", LuaApi::GetScriptDataFolder },
 		{ "getRomInfo", LuaApi::GetRomInfo },
 		{ "getLogWindowLog", LuaApi::GetLogWindowLog },
+		
+		{ "startDiztinguishServer", LuaApi::StartDiztinguishServer },
+		{ "stopDiztinguishServer", LuaApi::StopDiztinguishServer },
+		{ "getDiztinguishServerStatus", LuaApi::GetDiztinguishServerStatus },
 		{ NULL,NULL }
 	};
 
@@ -1146,4 +1152,78 @@ int LuaApi::SetState(lua_State* lua)
 
 	s.Stream(*_emu->GetConsole().get(), "", -1);
 	return 0;
+}
+
+int LuaApi::StartDiztinguishServer(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	int port = l.ReadInteger(9998); // Default port 9998
+	checkminparams(0);
+	
+	// Only supported for SNES console
+	if(_emu->GetConsoleType() != ConsoleType::Snes) {
+		error("DiztinGUIsh streaming is only supported for SNES");
+	}
+	
+	// Get SNES debugger
+	SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(_debugger->GetDebugger(CpuType::Snes));
+	if(!snesDebugger) {
+		error("SNES debugger not available");
+	}
+	
+	bool success = snesDebugger->StartDiztinguishServer(port);
+	l.Return(success);
+	return l.ReturnCount();
+}
+
+int LuaApi::StopDiztinguishServer(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	checkparams();
+	
+	// Only supported for SNES console
+	if(_emu->GetConsoleType() != ConsoleType::Snes) {
+		error("DiztinGUIsh streaming is only supported for SNES");
+	}
+	
+	// Get SNES debugger
+	SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(_debugger->GetDebugger(CpuType::Snes));
+	if(!snesDebugger) {
+		error("SNES debugger not available");
+	}
+	
+	snesDebugger->StopDiztinguishServer();
+	return l.ReturnCount();
+}
+
+int LuaApi::GetDiztinguishServerStatus(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	checkparams();
+	
+	// Only supported for SNES console
+	if(_emu->GetConsoleType() != ConsoleType::Snes) {
+		lua_newtable(lua);
+		lua_pushboolvalue(running, false);
+		lua_pushintvalue(port, 0);
+		lua_pushboolvalue(clientConnected, false);
+		return 1;
+	}
+	
+	// Get SNES debugger
+	SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(_debugger->GetDebugger(CpuType::Snes));
+	if(!snesDebugger) {
+		lua_newtable(lua);
+		lua_pushboolvalue(running, false);
+		lua_pushintvalue(port, 0);
+		lua_pushboolvalue(clientConnected, false);
+		return 1;
+	}
+	
+	// Get status from debugger
+	lua_newtable(lua);
+	lua_pushboolvalue(running, snesDebugger->IsDiztinguishServerRunning());
+	lua_pushintvalue(port, snesDebugger->GetDiztinguishServerPort());
+	lua_pushboolvalue(clientConnected, snesDebugger->IsDiztinguishClientConnected());
+	return 1;
 }

@@ -130,4 +130,7 @@ public:
 	DiztinguishBridge* GetDiztinguishBridge();
 	bool StartDiztinguishServer(uint16_t port = 9998);
 	void StopDiztinguishServer();
+	bool IsDiztinguishServerRunning() const;
+	uint16_t GetDiztinguishServerPort() const;
+	bool IsDiztinguishClientConnected() const;
 };
