@@ -14,10 +14,7 @@ can I add a second project folder to this chat so you can make the changes to Di
 ok, continue
 I have added the diztinguish folder to the workspace
 make sure to update session/chat logs; update the `Mesen2` giuthub issues with our progress and then continue work on remaining issues
-
-
-
-
+make git commits with good descriptions for all of our changes and then push them; update all of the github issues at `https://github.com/TheAnsarya/Mesen2/issues` and then after updating todo-lists, figure out your work to do and update or create issues for that work; Big issue is that Mesen 2 won't compile so we want to fix those problems in the `Core` namespace: 3 errors in `Mesen2\Core\Debugger\LuaApi.cpp` with `'Debugger::GetDebugger': no matching overloaded function found`, and one error in `Mesen2\Core\SNES\Debugger\SnesDebugger.cpp` with `'Log': identifier not found`; did we make these errors? fix them so we can compile, and then build and manually test our debug-streaming process;
 
 
 
