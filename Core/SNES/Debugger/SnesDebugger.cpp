@@ -648,7 +648,7 @@ DiztinguishBridge* SnesDebugger::GetDiztinguishBridge()
 bool SnesDebugger::StartDiztinguishServer(uint16_t port)
 {
 	if(!_diztinguishBridge) {
-		Log("[SnesDebugger] DiztinGUIsh bridge not available (SA-1 debugger?)");
+		_debugger->Log("[SnesDebugger] DiztinGUIsh bridge not available (SA-1 debugger?)");
 		return false;
 	}
 

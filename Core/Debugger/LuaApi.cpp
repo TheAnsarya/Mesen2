@@ -1166,7 +1166,7 @@ int LuaApi::StartDiztinguishServer(lua_State* lua)
 	}
 	
 	// Get SNES debugger
-	SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(_debugger->GetDebugger(CpuType::Snes));
+	SnesDebugger* snesDebugger = _debugger->GetDebugger<CpuType::Snes, SnesDebugger>();
 	if(!snesDebugger) {
 		error("SNES debugger not available");
 	}
@@ -1187,7 +1187,7 @@ int LuaApi::StopDiztinguishServer(lua_State* lua)
 	}
 	
 	// Get SNES debugger
-	SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(_debugger->GetDebugger(CpuType::Snes));
+	SnesDebugger* snesDebugger = _debugger->GetDebugger<CpuType::Snes, SnesDebugger>();
 	if(!snesDebugger) {
 		error("SNES debugger not available");
 	}
@@ -1211,7 +1211,7 @@ int LuaApi::GetDiztinguishServerStatus(lua_State* lua)
 	}
 	
 	// Get SNES debugger
-	SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(_debugger->GetDebugger(CpuType::Snes));
+	SnesDebugger* snesDebugger = _debugger->GetDebugger<CpuType::Snes, SnesDebugger>();
 	if(!snesDebugger) {
 		lua_newtable(lua);
 		lua_pushboolvalue(running, false);
