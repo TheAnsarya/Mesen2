@@ -28,10 +28,21 @@ Keep this running in a separate terminal.
 1. Launch Mesen2
 2. Open any SNES ROM
 3. Open debugger window (Debug → Debugger)
-4. In Lua console or debugger, call:
+4. Load Lua script:
+   - Debug → Script Window
+   - File → Open → `~docs/test_server.lua`
+   - Click "Run"
+   
+   **OR** use Lua console directly:
    ```lua
    emu.startDiztinguishServer(9998)
    ```
+
+The test_server.lua script will:
+- Start server on port 9998
+- Display connection status
+- Monitor for client connections
+- Log statistics every second
 
 ### Expected Output
 
