@@ -16,11 +16,43 @@ I have added the diztinguish folder to the workspace
 make sure to update session/chat logs; update the `Mesen2` giuthub issues with our progress and then continue work on remaining issues
 make git commits with good descriptions for all of our changes and then push them; update all of the github issues at `https://github.com/TheAnsarya/Mesen2/issues` and then after updating todo-lists, figure out your work to do and update or create issues for that work; Big issue is that Mesen 2 won't compile so we want to fix those problems in the `Core` namespace: 3 errors in `Mesen2\Core\Debugger\LuaApi.cpp` with `'Debugger::GetDebugger': no matching overloaded function found`, and one error in `Mesen2\Core\SNES\Debugger\SnesDebugger.cpp` with `'Log': identifier not found`; did we make these errors? fix them so we can compile, and then build and manually test our debug-streaming process;
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+make sure to commit the changes to the Diztinguish projects as well with proper descriptions; In the `Mesen2` repos, in the the `InteropDLL` cs-project there are a bunch of build errors, fix them; the error list dump is: Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error	C2039	'function': is not a member of 'std'	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	11		
+Error	C2039	'function': is not a member of 'std'	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	24		
+Error	C2065	'function': undeclared identifier	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	11		
+Error	C2065	'snesDebugger': undeclared identifier	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	11		
+Error	C2065	'func': undeclared identifier	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	11		
+Error	C2065	'function': undeclared identifier	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	24		
+Error	C2065	'snesDebugger': undeclared identifier	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	24		
+Error	C2065	'func': undeclared identifier	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	24		
+Error	C2182	'WrapSnesDebuggerCall': this use of 'void' is not valid	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	24		
+Error	C2275	'SnesDebugger': expected an expression instead of a type	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	11		
+Error	C2275	'SnesDebugger': expected an expression instead of a type	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	24		
+Error	C2371	'WrapSnesDebuggerCall': redefinition; different basic types	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	24		
+Error	C2447	'{': missing function header (old-style formal list?)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	12		
+Error	C2447	'{': missing function header (old-style formal list?)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	25		
+Error	C7532	'WrapSnesDebuggerCall': a specialization of variable template cannot have type 'void'	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.cpp	45		
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+make sure to commit the changes to the Diztinguish projects as well with proper descriptions; there shouldn't be any git changes that haven't been commited and pushed; make sure to update session/chat logs; and then continue
 
-
-
-
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error	LNK2019	unresolved external symbol "public: bool __cdecl DiztinguishBridge::StartServer(unsigned short)" (?StartServer@DiztinguishBridge@@QEAA_NG@Z) referenced in function "public: __cdecl <lambda_f6b6fb6b8b153c11c3b1c0cd2a5392b3>::operator()(class SnesDebugger *)const " (??R<lambda_f6b6fb6b8b153c11c3b1c0cd2a5392b3>@@QEBA@PEAVSnesDebugger@@@Z)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.obj	1		
+Error	LNK2001	unresolved external symbol "public: bool __cdecl DiztinguishBridge::StartServer(unsigned short)" (?StartServer@DiztinguishBridge@@QEAA_NG@Z)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK2019	unresolved external symbol "public: void __cdecl DiztinguishBridge::StopServer(void)" (?StopServer@DiztinguishBridge@@QEAAXXZ) referenced in function "public: __cdecl <lambda_cc94df3853a5c3cf5d50b57bc03fcbfe>::operator()(class SnesDebugger *)const " (??R<lambda_cc94df3853a5c3cf5d50b57bc03fcbfe>@@QEBA@PEAVSnesDebugger@@@Z)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.obj	1		
+Error	LNK2001	unresolved external symbol "public: void __cdecl DiztinguishBridge::StopServer(void)" (?StopServer@DiztinguishBridge@@QEAAXXZ)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK2019	unresolved external symbol "public: unsigned __int64 __cdecl DiztinguishBridge::GetConnectionDuration(void)const " (?GetConnectionDuration@DiztinguishBridge@@QEBA_KXZ) referenced in function "public: __cdecl <lambda_8c7d386c057ba96e485d95bf13caa000>::operator()(class SnesDebugger *)const " (??R<lambda_8c7d386c057ba96e485d95bf13caa000>@@QEBA@PEAVSnesDebugger@@@Z)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.obj	1		
+Error	LNK2019	unresolved external symbol "public: double __cdecl DiztinguishBridge::GetBandwidthKBps(void)const " (?GetBandwidthKBps@DiztinguishBridge@@QEBANXZ) referenced in function "public: __cdecl <lambda_363ff498d1cc0982fff4c914da5f02ba>::operator()(class SnesDebugger *)const " (??R<lambda_363ff498d1cc0982fff4c914da5f02ba>@@QEBA@PEAVSnesDebugger@@@Z)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\DiztinguishApiWrapper.obj	1		
+Error	LNK2019	unresolved external symbol "public: __cdecl DiztinguishBridge::DiztinguishBridge(class SnesConsole *,class SnesDebugger *)" (??0DiztinguishBridge@@QEAA@PEAVSnesConsole@@PEAVSnesDebugger@@@Z) referenced in function "public: __cdecl SnesDebugger::SnesDebugger(class Debugger *,enum CpuType)" (??0SnesDebugger@@QEAA@PEAVDebugger@@W4CpuType@@@Z)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK2019	unresolved external symbol "public: __cdecl DiztinguishBridge::~DiztinguishBridge(void)" (??1DiztinguishBridge@@QEAA@XZ) referenced in function "public: void * __cdecl DiztinguishBridge::`scalar deleting destructor'(unsigned int)" (??_GDiztinguishBridge@@QEAAPEAXI@Z)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK2019	unresolved external symbol "public: void __cdecl DiztinguishBridge::OnFrameStart(unsigned int)" (?OnFrameStart@DiztinguishBridge@@QEAAXI@Z) referenced in function "public: void __cdecl SnesDebugger::ProcessInstruction(void)" (?ProcessInstruction@SnesDebugger@@QEAAXXZ)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK2019	unresolved external symbol "public: void __cdecl DiztinguishBridge::OnFrameEnd(void)" (?OnFrameEnd@DiztinguishBridge@@QEAAXXZ) referenced in function "public: void __cdecl SnesDebugger::ProcessInstruction(void)" (?ProcessInstruction@SnesDebugger@@QEAAXXZ)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK2019	unresolved external symbol "public: void __cdecl DiztinguishBridge::OnCpuExec(unsigned int,unsigned char,bool,bool,unsigned char,unsigned short,unsigned int)" (?OnCpuExec@DiztinguishBridge@@QEAAXIE_N0EGI@Z) referenced in function "public: void __cdecl SnesDebugger::ProcessInstruction(void)" (?ProcessInstruction@SnesDebugger@@QEAAXXZ)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK2019	unresolved external symbol "public: void __cdecl DiztinguishBridge::OnCdlChanged(unsigned int,unsigned char)" (?OnCdlChanged@DiztinguishBridge@@QEAAXIE@Z) referenced in function "public: void __cdecl SnesDebugger::ProcessInstruction(void)" (?ProcessInstruction@SnesDebugger@@QEAAXXZ)	InteropDLL	C:\Users\me\source\repos\Mesen2\InteropDLL\Core.lib(SnesDebugger.obj)	1		
+Error	LNK1120	10 unresolved externals	InteropDLL	C:\Users\me\source\repos\Mesen2\bin\win-x64\Debug\MesenCore.dll	1		
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 

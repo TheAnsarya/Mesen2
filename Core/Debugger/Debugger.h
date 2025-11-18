@@ -90,7 +90,6 @@ private:
 
 	__noinline bool ProcessStepBack(IDebugger* debugger);
 
-	template<CpuType type, typename DebuggerType> DebuggerType* GetDebugger();
 	template<CpuType type> uint64_t GetCpuCycleCount();
 	template<CpuType type, typename T> void ProcessScripts(uint32_t addr, T& value, MemoryOperationType opType);
 	template<CpuType type, typename T> void ProcessScripts(uint32_t addr, T& value, MemoryType memType, MemoryOperationType opType);
@@ -107,6 +106,8 @@ public:
 	Debugger(Emulator* emu, IConsole* console);
 	~Debugger();
 	void Release();
+
+	template<CpuType type, typename DebuggerType> DebuggerType* GetDebugger();
 
 	template<CpuType type> void ProcessInstruction();
 	template<CpuType type, uint8_t accessWidth = 1, MemoryAccessFlags flags = MemoryAccessFlags::None, typename T> void ProcessMemoryRead(uint32_t addr, T& value, MemoryOperationType opType);
