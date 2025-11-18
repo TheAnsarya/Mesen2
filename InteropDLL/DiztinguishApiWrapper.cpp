@@ -4,6 +4,7 @@
 #include "Core/Debugger/Debugger.h"
 #include "Core/SNES/Debugger/SnesDebugger.h"
 #include "Core/Debugger/DiztinguishBridge.h"
+#include <functional>
 
 extern unique_ptr<Emulator> _emu;
 
@@ -12,7 +13,7 @@ T WrapSnesDebuggerCall(std::function<T(SnesDebugger* snesDebugger)> func)
 {
 	DebuggerRequest dbgRequest = _emu->GetDebugger(true);
 	if(dbgRequest.GetDebugger()) {
-		SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(dbgRequest.GetDebugger()->GetDebugger(CpuType::Snes));
+		SnesDebugger* snesDebugger = dbgRequest.GetDebugger()->GetDebugger<CpuType::Snes, SnesDebugger>();
 		if(snesDebugger) {
 			return func(snesDebugger);
 		}
@@ -21,11 +22,11 @@ T WrapSnesDebuggerCall(std::function<T(SnesDebugger* snesDebugger)> func)
 }
 
 template<>
-void WrapSnesDebuggerCall(std::function<void(SnesDebugger* snesDebugger)> func)
+void WrapSnesDebuggerCall<void>(std::function<void(SnesDebugger* snesDebugger)> func)
 {
 	DebuggerRequest dbgRequest = _emu->GetDebugger(true);
 	if(dbgRequest.GetDebugger()) {
-		SnesDebugger* snesDebugger = dynamic_cast<SnesDebugger*>(dbgRequest.GetDebugger()->GetDebugger(CpuType::Snes));
+		SnesDebugger* snesDebugger = dbgRequest.GetDebugger()->GetDebugger<CpuType::Snes, SnesDebugger>();
 		if(snesDebugger) {
 			func(snesDebugger);
 		}
