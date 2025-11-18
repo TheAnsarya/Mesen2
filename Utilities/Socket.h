@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include <mutex>
 
 class Socket
 {
@@ -12,6 +13,10 @@ private:
 	uintptr_t _socket = (uintptr_t)~0;
 	bool _connectionError = false;
 	int32_t _UPnPPort = -1;
+	
+	// Send buffer for BufferedSend/SendBuffer
+	std::vector<char> _sendBuffer;
+	std::mutex _sendBufferMutex;
 
 public:
 	Socket();

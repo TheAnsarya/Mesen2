@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <cstring>
 #include <thread>
+#include <mutex>
 #include "Utilities/Socket.h"
 #include "Utilities/UPnPPortMapper.h"
 using namespace std;
@@ -261,4 +262,43 @@ int Socket::Recv(char *buf, int len, int flags)
 	}
 
 	return returnVal;
+}
+
+void Socket::BufferedSend(char *buf, int len)
+{
+	if(_connectionError || _socket == INVALID_SOCKET) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(_sendBufferMutex);
+	_sendBuffer.insert(_sendBuffer.end(), buf, buf + len);
+}
+
+void Socket::SendBuffer()
+{
+	if(_connectionError || _socket == INVALID_SOCKET) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(_sendBufferMutex);
+	
+	if(_sendBuffer.empty()) {
+		return;
+	}
+
+	int totalSent = 0;
+	int bufferSize = (int)_sendBuffer.size();
+	
+	while(totalSent < bufferSize) {
+		int sent = Send(_sendBuffer.data() + totalSent, bufferSize - totalSent, 0);
+		if(sent <= 0) {
+			// Error or connection closed
+			SetConnectionErrorFlag();
+			break;
+		}
+		totalSent += sent;
+	}
+
+	// Clear the buffer after sending (or on error)
+	_sendBuffer.clear();
 }
