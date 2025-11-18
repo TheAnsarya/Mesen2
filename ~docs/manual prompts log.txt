@@ -146,9 +146,18 @@ continue, starting with issue #14 `[DOCS] User Documentation and Troubleshooting
 make sure you're updating the session logs and chat logs; Create the multiple git commits for all projects with descriptions and commit them and then push; then continue updating the documentation in smaller batches
 make git commits for the `Diz.Ui.WinForms` project and push them; don't just copy code in the documentation, instead describe what happens and reference the code; continue;
 update all of the github issues and todo lists and close the issues, then continue work on the github issues; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space;
+What ?!? I said don't just copy code for ducmentation. Replace all of this documentation that you made just showing code with actual descriptions of what happens and what we need to know about it. NOT code copy-pasta.
+Blockchain? what the FUCK is this?
+fix IDE issue: Settings.json Configuration Error - Opening a Solution file is no longer required to work with projects in C# Dev Kit. dotnet.defaultSolution in your settings.json conflicts with this new experience. Remove it, save, and reload VS Code to continue.
+there is no `defaultSolution` in the `settings.json` file. Is there a cache to clear?
+sorry, try the reload again
+fix IDE issue: `Settings.json Configuration Error - Opening a Solution file is no longer required to work with projects in C# Dev Kit. dotnet.defaultSolution in your settings.json conflicts with this new experience. Remove it, save`
+continue
 
-
-
+^^^^^^^^^^
+what the fuck is this nonsense? please remove this crazy unrelated shit from the project and remove stupid crap from the github issues and the todo-lists, this is like that like blockchain nonsens eyou tried to add; stop doing that shit! 
+This project is to allow Diztinguish to replace bsnes+ with Mesen as an alternative emulator for debugging, and add the UI and documentation to support that. Everything else is non-essential and extranneous.
+^^^^^^^^^^^^^
 
 
 
