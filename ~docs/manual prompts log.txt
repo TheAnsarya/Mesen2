@@ -156,9 +156,10 @@ continue
 
 ^^^^^^^^^^
 what the fuck is this nonsense? please remove this crazy unrelated shit from the project and remove stupid crap from the github issues and the todo-lists, this is like that like blockchain nonsens eyou tried to add; stop doing that shit! 
-This project is to allow Diztinguish to replace bsnes+ with Mesen as an alternative emulator for debugging, and add the UI and documentation to support that. Everything else is non-essential and extranneous.
+This project is to allow Diztinguish to replace bsnes+ with Mesen as an alternative emulator for debugging, and add the UI and documentation to support that. Everything else is non-essential and extraneous.
 ^^^^^^^^^^^^^
 
+Make the most complete and comprehensive documentation for step by step fully MANUALLY testing the Mesen<->DiztinGUIsh connection, from building the projects, running the applications, and setting up the connection with a rom and new Diz project playing a game and seeing the disassembly be generated as we progress.
 
 
 
