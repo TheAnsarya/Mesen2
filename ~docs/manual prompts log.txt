@@ -85,6 +85,65 @@ Error	LNK2019	unresolved external symbol "public: void __cdecl Socket::BufferedS
 
 Create the git commits with descriptions and documentation and push; continue working the github issues, while updating them and creating new issues for new work; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space;
 
+update the github issues and close any completed ones; continue working the issues!
+Your working project is: `https://github.com/TheAnsarya/Mesen2`; make a new `Integration Testing and Documentation` issue since you closed the last one; update all of the github Issues like `https://github.com/TheAnsarya/Mesen2/issues/9` and close the ones have all their work completed; make new issues with work to be done; make github Issues and todo-lists for all of the manual testing I need to do to verify the Diz-Mesen cionnection; and continue! update the github issues and close any completed ones; continue working the issues!
+
+`dotnet build` does not compile the `*.cpp` files so you can't check for c++ compile errors using that command; use msbuild using the VS2026 version at `C:\Program Files\Microsoft Visual Studio\18\Insiders\MSBuild\Current\Bin`; 
+continue working the issues!
+make sure to add new github issues for all new work and update the current issues as you complete work; continue working the issues!
+make sure you're updating the session logs and chat logs; make sure to add new github issues for all new work and update the current issues as you complete work; finish the `Mesen` gui changes and finish cleaning up `DistinGUIsh` and finish any work there; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; Find stubs like `// TODO: Implement` and fix them; 
+4>C:\Users\me\source\repos\Mesen2\Core\Debugger\DiztinguishBridge.cpp(526,85): warning C4305: 'argument': truncation from 'int' to 'bool'
+------ it builds now, all mesen projects
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The namespace 'Diz.Core.Interfaces' already contains a definition for 'IMesen2StreamingClientFactory'
+Type 'IMesen2StreamingClientFactory' already defines a member called 'CreateClient' with the same parameter types
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+make sure you're updating the session logs and chat logs; Create the git commits with descriptions and commit them and then push; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; make sure to add new github issues for all new work and update the current issues as you complete work; continue working the issues!
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS1069	The type name 'AppSettingsSection' could not be found in the namespace 'System.Configuration'. This type has been forwarded to assembly 'System.Configuration.ConfigurationManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' Consider adding a reference to that assembly.	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2Configuration.cs	41		
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'ProgramCounter'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	433		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'Opcode'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	434		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'OperandLow'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	435		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'OperandHigh'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	436		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'Accumulator'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	437		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'XRegister'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	438		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'YRegister'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	439		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'StackPointer'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	440		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'DirectPage'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	441		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'DataBank'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	442		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'ProcessorStatus'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	443		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'EmulationMode'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	444		
+Error (active)	CS0117	'Mesen2TraceEntry' does not contain a definition for 'CycleCount'	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClient.cs	445		
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS0246	The type or namespace name 'ArgumentNullException' could not be found (are you missing a using directive or an assembly reference?)	Diz.Core	C:\Users\me\source\repos\DiztinGUIsh\Diz.Core\mesen2\Mesen2StreamingClientFactory.cs	14		
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS0246	The type or namespace name 'Mesen2IntegrationController' could not be found (are you missing a using directive or an assembly reference?)	Diz.Controllers	C:\Users\me\source\repos\DiztinGUIsh\Diz.Controllers\Diz.Controllers\src\services\Registration.cs	24		
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+continue
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Message	lnt-uninitialized-local	Local variable is not initialized.	Core	C:\Users\me\source\repos\Mesen2\Core\Debugger\DiztinguishBridge.cpp	402		
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+I cannot see the text in the terminal window, reset the text colors;
+continue, starting with issue #14 `[DOCS] User Documentation and Troubleshooting Guides` and do the rest of the issues; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space;
+make sure you're updating the session logs and chat logs; Create the multiple git commits for all projects with descriptions and commit them and then push;
 
 
 
@@ -94,6 +153,24 @@ Create the git commits with descriptions and documentation and push; continue wo
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Find stubs like `// TODO: Implement` and fix them; 
 
 
 
