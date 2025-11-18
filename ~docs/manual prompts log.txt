@@ -54,7 +54,9 @@ Error	LNK2019	unresolved external symbol "public: void __cdecl DiztinguishBridge
 Error	LNK1120	10 unresolved externals	InteropDLL	C:\Users\me\source\repos\Mesen2\bin\win-x64\Debug\MesenCore.dll	1		
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Create the git commits with descriptions and documenttation for all of the `DiztinGUIsh` github git repos and commit them and then oush, there shouldn't be any uncommitted files; then continue updating and working github issues;
+Create the git commits with descriptions and documentation for all of the `DiztinGUIsh` github git repos and commit them and then push, there shouldn't be any uncommitted files; then continue updating and working github issues; `dotnet build` does not compile the `*.cpp` files so you can't check for compile errors using that command; 
+don't commit to the original github repos, we don't have permission, only commit to my forks using the github account `TheAnsarya`; if a sub-github project is at stake, fork it and pull it to local and update that;
+https://github.com/TheAnsarya/Diz.Ui.Winforms.git
 
 
 
