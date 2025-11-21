@@ -34,7 +34,7 @@
 				<TextBlock Text="Server Control" FontWeight="Bold" Margin="0,0,0,10" />
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="50" />
 						<ColumnDefinition Width="100" />
 						<ColumnDefinition Width="20" />
 						<ColumnDefinition Width="*" />
@@ -49,10 +49,10 @@
 					<TextBox Grid.Row="0" Grid.Column="1" Name="txtPort" Text="9998" VerticalAlignment="Center" />
 					
 					<Button Grid.Row="0" Grid.Column="3" Name="btnStartStop" Content="Start Server" 
-							Click="StartStop_OnClick" HorizontalAlignment="Left" MinWidth="100" />
+							Click="StartStop_OnClick" HorizontalAlignment="Left" MinWidth="120" />
 
 					<TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Name="lblStatus" 
-							   Text="Server stopped" FontWeight="Bold" />
+							   Text="Server stopped" FontWeight="Bold" Foreground="Gray" />
 				</Grid>
 			</StackPanel>
 		</Border>
@@ -63,7 +63,7 @@
 				<TextBlock Text="Connection Status" FontWeight="Bold" Margin="0,0,0,10" />
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="150" />
 						<ColumnDefinition Width="*" />
 					</Grid.ColumnDefinitions>
 					<Grid.RowDefinitions>
@@ -74,14 +74,14 @@
 						<RowDefinition Height="Auto" />
 					</Grid.RowDefinitions>
 
-					<TextBlock Grid.Row="0" Grid.Column="0" Text="Client Connected:" />
-					<TextBlock Grid.Row="0" Grid.Column="1" Name="lblClientConnected" Text="No" FontWeight="Bold" />
+					<TextBlock Grid.Row="0" Grid.Column="0" Text="Client Connected:" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="0" Grid.Column="1" Name="lblClientConnected" Text="No" FontWeight="Bold" VerticalAlignment="Center" />
 
-					<TextBlock Grid.Row="2" Grid.Column="0" Text="Connection Duration:" />
-					<TextBlock Grid.Row="2" Grid.Column="1" Name="lblConnectionDuration" Text="--" />
+					<TextBlock Grid.Row="2" Grid.Column="0" Text="Connection Duration:" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="2" Grid.Column="1" Name="lblConnectionDuration" Text="--" VerticalAlignment="Center" />
 
-					<TextBlock Grid.Row="4" Grid.Column="0" Text="Bandwidth:" />
-					<TextBlock Grid.Row="4" Grid.Column="1" Name="lblBandwidth" Text="--" />
+					<TextBlock Grid.Row="4" Grid.Column="0" Text="Bandwidth:" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="4" Grid.Column="1" Name="lblBandwidth" Text="--" VerticalAlignment="Center" />
 				</Grid>
 			</StackPanel>
 		</Border>
@@ -92,40 +92,40 @@
 				<TextBlock Text="Statistics" FontWeight="Bold" Margin="0,0,0,10" />
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="20" />
-						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="130" />
+						<ColumnDefinition Width="70" />
+						<ColumnDefinition Width="30" />
+						<ColumnDefinition Width="140" />
 						<ColumnDefinition Width="*" />
 					</Grid.ColumnDefinitions>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto" />
 						<RowDefinition Height="5" />
 						<RowDefinition Height="Auto" />
-						<RowDefinition Height="5" />
+						<RowDefinition Height="10" />
 						<RowDefinition Height="Auto" />
-						<RowDefinition Height="5" />
+						<RowDefinition Height="10" />
 						<RowDefinition Height="Auto" />
 					</Grid.RowDefinitions>
 
-					<TextBlock Grid.Row="0" Grid.Column="0" Text="Messages Sent:" />
-					<TextBlock Grid.Row="0" Grid.Column="1" Name="lblMessagesSent" Text="0" />
+					<TextBlock Grid.Row="0" Grid.Column="0" Text="Messages Sent:" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="0" Grid.Column="1" Name="lblMessagesSent" Text="0" VerticalAlignment="Center" />
 
-					<TextBlock Grid.Row="0" Grid.Column="3" Text="Messages Received:" />
-					<TextBlock Grid.Row="0" Grid.Column="4" Name="lblMessagesReceived" Text="0" />
+					<TextBlock Grid.Row="0" Grid.Column="3" Text="Messages Received:" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="0" Grid.Column="4" Name="lblMessagesReceived" Text="0" VerticalAlignment="Center" />
 
-					<TextBlock Grid.Row="2" Grid.Column="0" Text="Bytes Sent:" />
-					<TextBlock Grid.Row="2" Grid.Column="1" Name="lblBytesSent" Text="0" />
+					<TextBlock Grid.Row="2" Grid.Column="0" Text="Bytes Sent:" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="2" Grid.Column="1" Name="lblBytesSent" Text="0" VerticalAlignment="Center" />
 
-					<TextBlock Grid.Row="2" Grid.Column="3" Text="Bytes Received:" />
-					<TextBlock Grid.Row="2" Grid.Column="4" Name="lblBytesReceived" Text="0" />
+					<TextBlock Grid.Row="2" Grid.Column="3" Text="Bytes Received:" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="2" Grid.Column="4" Name="lblBytesReceived" Text="0" VerticalAlignment="Center" />
 
 					<TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" 
 							   Text="Note: Statistics update only when client is connected" 
-							   FontStyle="Italic" FontSize="11" />
+							   FontStyle="Italic" FontSize="11" Margin="0,5,0,5" />
 
 					<Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5" Name="btnReset" 
-							Content="Reset Statistics" Click="Reset_OnClick" HorizontalAlignment="Center" />
+							Content="Reset Statistics" Click="Reset_OnClick" HorizontalAlignment="Center" MinWidth="120" />
 				</Grid>
 			</StackPanel>
 		</Border>
