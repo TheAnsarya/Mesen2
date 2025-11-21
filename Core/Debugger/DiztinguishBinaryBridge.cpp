@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "DiztinguishBinaryBridge.h"
 #include "../SNES/SnesConsole.h"
-#include "SnesDebugger.h"
+#include "../SNES/Debugger/SnesDebugger.h"
 #include "Debugger.h"
-#include "../Shared/Socket.h"
+#include "../../Utilities/Socket.h"
 
 DiztinguishBinaryBridge::DiztinguishBinaryBridge(SnesConsole* console, SnesDebugger* snesDebugger, Debugger* debugger)
     : _console(console)
@@ -148,7 +148,7 @@ bool DiztinguishBinaryBridge::SendBinaryPacket(const BsnesBinaryPacket& packet)
 
     try {
         // Send raw 22-byte packet directly (no headers, no protocols)
-        _clientSocket->BufferedSend((const char*)&packet, sizeof(packet));
+        _clientSocket->BufferedSend((char*)&packet, sizeof(packet));
         _clientSocket->SendBuffer();  // Flush immediately for low latency
         
         _packetsStreamed++;

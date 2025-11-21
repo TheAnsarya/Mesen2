@@ -698,8 +698,8 @@ void DiztinguishBridge::SendCpuState()
 			state.p = cpuState.PS;
 			state.emulationMode = cpuState.EmulationMode ? true : false;
 			
-			_debugger->Log("[DiztinGUIsh] Sending CPU state: A=$" + HexUtilities::ToHex(state.a, 4) + 
-				" X=$" + HexUtilities::ToHex(state.x, 4) + " Y=$" + HexUtilities::ToHex(state.y, 4) + 
+			_debugger->Log("[DiztinGUIsh] Sending CPU state: A=$" + HexUtilities::ToHex((uint16_t)state.a) + 
+				" X=$" + HexUtilities::ToHex((uint16_t)state.x) + " Y=$" + HexUtilities::ToHex((uint16_t)state.y) + 
 				" PC=$" + HexUtilities::ToHex24(state.pc) + " P=$" + HexUtilities::ToHex((uint8_t)state.p));
 		} else {
 			_debugger->Log("[DiztinGUIsh] Warning: CPU not available for state snapshot");

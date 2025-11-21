@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "../Shared/Socket.h"
+#include "../../Utilities/Socket.h"
 #include <mutex>
 
 // DiztinGUIsh Binary Bridge - BSNES-compatible streaming
