@@ -216,8 +216,11 @@ Fix this god-damned UI is Mesen!
 the window title and the close button title are both garbage referencing their code-behind, fix that
 move the log statement earlier in the shutdown sequence before closing sockets/threads AND ALSO make the logging conditional
 
+No, no no, it's just that the window height is too low! make the wundow height automatically showing all of the content!
 
-
+Thank you for finally fixing that UI issue! By looking at a different way, we finally found the issue, so take a different perspective look at the Mesen-Diz connection and figure out why we aren't actually streaming  the point is: a ROM should emulate and be played in Mesen, the emulated instructions and state should be pushed out of a socket, Diz should have a socket that consumes the Mesen stuff, and the Diz instance should consume the data and update the `*.diz` file just like it streams data from bsnes+ only with a better inferface;;
+The connection didn't work, see screenshots of attempted usage, connecting to the server errors out, trying to stream closes immediately; we have tried a bunch of times to make live streaming work, so go crazy and try different shit, just make it work;
+git commit all updated and new files in all projects with descriptions and broken into batches by intent or purpose; where are the Mesen Debugger log files? I need to read them; Is the GUI connecting to the socket only for the the lifespan of the GUI command? does it need a worker thread holding the connection reference or something? (which can then be contacted to pause or end the connection or whatever)
 
 
 
