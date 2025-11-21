@@ -210,6 +210,21 @@ The Mesen `DiztinGUIsh Server` UI is borked, fix it (see screenshot #1); The Diz
 
 git commit ***ALL** updated and new files in all projects with descriptions and broken into batches by intent or purpose
 
+connecting live streaming from Diz to Mesen, does not transfer any information; review the code and fix it so Mesen actually sends information to Diz and the connection is not closed immediately; and don't just crash when the connection is closed;
+Fix this god-damned UI is Mesen!
+---- image-1763757035405.png
+the window title and the close button title are both garbage referencing their code-behind, fix that
+move the log statement earlier in the shutdown sequence before closing sockets/threads AND ALSO make the logging conditional
+
+
+
+
+
+
+
+
+
+
 
 
 
