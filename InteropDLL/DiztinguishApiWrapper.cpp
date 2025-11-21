@@ -36,6 +36,14 @@ void WrapSnesDebuggerCall<void>(std::function<void(SnesDebugger* snesDebugger)> 
 extern "C" {
 	// DiztinGUIsh Bridge Server Control
 	DllExport bool __stdcall DiztinguishApi_StartServer(uint16_t port) {
+		// Only supported for SNES console
+		if(_emu->GetConsoleType() != ConsoleType::Snes) {
+			return false;
+		}
+		
+		// Ensure debugger is initialized first
+		_emu->InitDebugger();
+		
 		return WrapSnesDebuggerCall<bool>([&](SnesDebugger* dbg) {
 			DiztinguishBridge* bridge = dbg->GetDiztinguishBridge();
 			return bridge ? bridge->StartServer(port) : false;
@@ -52,6 +60,11 @@ extern "C" {
 	}
 
 	DllExport bool __stdcall DiztinguishApi_IsServerRunning() {
+		// Only supported for SNES console
+		if(_emu->GetConsoleType() != ConsoleType::Snes) {
+			return false;
+		}
+		
 		return WrapSnesDebuggerCall<bool>([&](SnesDebugger* dbg) {
 			DiztinguishBridge* bridge = dbg->GetDiztinguishBridge();
 			return bridge ? bridge->IsServerRunning() : false;
