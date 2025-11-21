@@ -166,11 +166,21 @@ An exception of type 'System.ArgumentOutOfRangeException' occurred in System.Win
 Value of '9998' is not valid for 'Value'. 'Value' should be between 'Minimum' and 'Maximum'.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+git commit and push all projects; In DiztinGUIsh the Mesen server for live streaming connects and immediately completes without doing anything, fix this, it needs to stream until it is turned off;
+try again and continue
 
+Fix this issue by concentrating on Mesen and making sure the diz-connection server is properly implemented and is actually turned on correctly by the UI, by checking the code. The UI code I know is incorrect (see screenshot) so maybe it's implementation code is incorect too
+---- Copy-Item -Path "C:\Users\me\AppData\Roaming\Code\User\workspaceStorage\vscode-chat-images\image-1763731124031.png" -Destination "C:\Users\me\source\repos\Mesen2\~docs\manual prompts log screenshot - 2025-11-21 0819.png"
 
+OK, so the handahke exists now? (retest) then fix the issue where no data streams, and fix the MEsen UI for the Diz server window (see previous screenshot)
 
+Fix the UI display issues first; There is already a ROM loaded in Mesen, there has been the whole time. Make sure the emulation code is actually calling the live-streaming code
 
+format files, git commit and push all projects at the end of each session or big effort; I am tired of hearing about `handshake` errors; you designed the Mesen-DiztinGUIsh bridge and live streaming, so fucking fix it; reconsider the entire mesen-diz live stream bridge and make sure it is implemented correctly from Mesen toi diztinguish and make sure they match, Diztinguish comsumption obviously being the primary goal so start with the current diz consumption of bsnes+ and adapt it to the Mesen interface. I just need this to work;
 
+OK, you found a way to tap into the bsnes pipeline (add an option in Mesen and the UI for which interface to use), but our goal is to create a better pipeline for Mesen that doesn't crash as much so fix the Mesen-Diz bridge and create code in Diz that is similar to the bsnes pipeline (ignore top-level specifics, but call the "add to diz file" stuff) but is for Mesen as we tried before;
+
+test Mesen/DiztinGUIsh intregration through the secondary modern pipeline for live streaming the executed code and state; and continue fixing it; also, the Diztinguish Mesen integration UI is just a bunch of placeholders, implement them;
 
 
 
