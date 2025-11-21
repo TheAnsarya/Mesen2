@@ -18,6 +18,7 @@
 #include "SNES/Debugger/SnesPpuTools.h"
 #include "Debugger/CdlManager.h"
 #include "Debugger/DiztinguishBridge.h"
+#include "Debugger/DiztinguishBinaryBridge.h"
 #include "Debugger/DebugTypes.h"
 #include "Debugger/DisassemblyInfo.h"
 #include "Debugger/Disassembler.h"
@@ -90,6 +91,7 @@ SnesDebugger::SnesDebugger(Debugger* debugger, CpuType cpuType) : IDebugger(debu
 	// Initialize DiztinGUIsh Bridge (only for main SNES CPU)
 	if(cpuType == CpuType::Snes) {
 		_diztinguishBridge.reset(new DiztinguishBridge(_console, this, _debugger));
+		_diztinguishBinaryBridge.reset(new DiztinguishBinaryBridge(_console, this, _debugger));
 	}
 }
 
@@ -236,6 +238,28 @@ void SnesDebugger::ProcessInstruction()
 		uint32_t effectiveAddr = 0;
 		
 		_diztinguishBridge->OnCpuExec(pc, opCode, mFlag, xFlag, state.DBR, state.D, effectiveAddr);
+	}
+
+	// DiztinGUIsh binary streaming: Send BSNES-compatible binary packet
+	if(_diztinguishBinaryBridge && _diztinguishBinaryBridge->IsClientConnected()) {
+		// Get instruction length and operands
+		uint8_t cpuFlags = state.PS & (ProcFlags::IndexMode8 | ProcFlags::MemoryMode8);
+		uint8_t opcodeLen = SnesDisUtils::GetOpSize(opCode, cpuFlags);
+		
+		// Peek ahead to get operand bytes (without consuming them from execution)
+		uint8_t operands[3] = {0, 0, 0};
+		for(int i = 1; i < opcodeLen && i <= 3; i++) {
+			operands[i-1] = _memoryMappings->Peek(pc + i);
+		}
+		
+		// Extract M and X flags from processor status
+		bool mFlag = (state.PS & ProcFlags::MemoryMode8) != 0;
+		bool xFlag = (state.PS & ProcFlags::IndexMode8) != 0;
+		
+		// Send to binary bridge with all required CPU register state
+		_diztinguishBinaryBridge->OnCpuExec(pc, opCode, opcodeLen, operands, 
+			mFlag, xFlag, state.DBR, state.D, state.A, state.X, 
+			state.Y, state.SP, state.EmulationMode);
 	}
 }
 
@@ -675,4 +699,42 @@ uint16_t SnesDebugger::GetDiztinguishServerPort() const
 bool SnesDebugger::IsDiztinguishClientConnected() const
 {
 	return _diztinguishBridge && _diztinguishBridge->IsClientConnected();
+}
+
+// DiztinGUIsh binary streaming integration API
+DiztinguishBinaryBridge* SnesDebugger::GetDiztinguishBinaryBridge()
+{
+	return _diztinguishBinaryBridge.get();
+}
+
+bool SnesDebugger::StartDiztinguishBinaryServer(uint16_t port)
+{
+	if(!_diztinguishBinaryBridge) {
+		_debugger->Log("[SnesDebugger] DiztinGUIsh binary bridge not available (SA-1 debugger?)");
+		return false;
+	}
+
+	return _diztinguishBinaryBridge->StartServer(port);
+}
+
+void SnesDebugger::StopDiztinguishBinaryServer()
+{
+	if(_diztinguishBinaryBridge) {
+		_diztinguishBinaryBridge->StopServer();
+	}
+}
+
+bool SnesDebugger::IsDiztinguishBinaryServerRunning() const
+{
+	return _diztinguishBinaryBridge && _diztinguishBinaryBridge->IsServerRunning();
+}
+
+uint16_t SnesDebugger::GetDiztinguishBinaryServerPort() const
+{
+	return _diztinguishBinaryBridge ? _diztinguishBinaryBridge->GetServerPort() : 0;
+}
+
+bool SnesDebugger::IsDiztinguishBinaryClientConnected() const
+{
+	return _diztinguishBinaryBridge && _diztinguishBinaryBridge->IsClientConnected();
 }

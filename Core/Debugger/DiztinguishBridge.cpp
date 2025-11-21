@@ -20,7 +20,6 @@ DiztinguishBridge::DiztinguishBridge(SnesConsole* console, SnesDebugger* snesDeb
 	: _console(console)
 	, _snesDebugger(snesDebugger)
 	, _debugger(debugger)
-	, _cart(nullptr)
 	, _port(0)
 	, _serverRunning(false)
 	, _clientConnected(false)
@@ -275,25 +274,36 @@ void DiztinguishBridge::ProcessIncomingMessage(MessageType type, const std::vect
 
 void DiztinguishBridge::SendHandshake()
 {
-	if(!_clientConnected || !_cart) {
+	if(!_clientConnected) {
 		return;
 	}
 
-	HandshakeMessage msg = {};
-	msg.protocolVersionMajor = PROTOCOL_VERSION_MAJOR;
-	msg.protocolVersionMinor = PROTOCOL_VERSION_MINOR;
+	try {
+		// Create a minimal handshake message with no external dependencies
+		HandshakeMessage msg = {};
+		msg.protocolVersionMajor = 1;  // Hardcode to avoid any constant issues
+		msg.protocolVersionMinor = 0;
+		msg.romChecksum = 0;          // Always 0 for now
+		msg.romSize = 0;              // Always 0 for now
+		strcpy_s(msg.romName, sizeof(msg.romName), "Test ROM");  // Hardcode for testing
+		
+		_debugger->Log("[DiztinGUIsh] SendHandshake: Creating message");
 
-	// Get ROM checksum
-	// TODO: Get actual ROM data and calculate CRC32
-	msg.romChecksum = 0;  // Placeholder
-	msg.romSize = 0;      // Placeholder
-
-	// Get ROM name
-	// TODO: Get actual ROM name from cart
-	strncpy_s(msg.romName, sizeof(msg.romName), "Unknown ROM", _TRUNCATE);
-
-	SendMessage(MessageType::Handshake, &msg, sizeof(msg));
-	_debugger->Log("[DiztinGUIsh] Sent handshake");
+		// Send via the standard message queue
+		SendMessage(MessageType::Handshake, &msg, sizeof(msg));
+		_debugger->Log("[DiztinGUIsh] SendHandshake: Message queued");
+		
+		// Flush immediately 
+		FlushOutgoingMessages();
+		_debugger->Log("[DiztinGUIsh] SendHandshake: Messages flushed");
+		
+	}
+	catch(const std::exception& e) {
+		_debugger->Log("[DiztinGUIsh] Error in SendHandshake: " + std::string(e.what()));
+	}
+	catch(...) {
+		_debugger->Log("[DiztinGUIsh] Unknown error in SendHandshake");
+	}
 }
 
 void DiztinguishBridge::SendMessage(MessageType type, const void* payload, uint32_t length)
@@ -320,18 +330,23 @@ void DiztinguishBridge::SendMessage(MessageType type, const void* payload, uint3
 void DiztinguishBridge::FlushOutgoingMessages()
 {
 	if(!_clientConnected || !_clientSocket) {
+		_debugger->Log("[DiztinGUIsh] FlushOutgoingMessages: Not connected or no socket");
 		return;
 	}
 
 	std::lock_guard<std::mutex> lock(_queueMutex);
 
+	_debugger->Log("[DiztinGUIsh] Flushing " + std::to_string(_outgoingMessages.size()) + " queued messages");
+
 	while(!_outgoingMessages.empty()) {
 		const auto& message = _outgoingMessages.front();
 
 		try {
+			_debugger->Log("[DiztinGUIsh] Sending message, size: " + std::to_string(message.size()));
 			_clientSocket->BufferedSend((char*)message.data(), (int)message.size());
 			_messagesSent++;
 			_bytesSent += message.size();
+			_debugger->Log("[DiztinGUIsh] Message sent successfully");
 		}
 		catch(const std::exception& e) {
 			_debugger->Log("[DiztinGUIsh] Error sending message: " + std::string(e.what()));
@@ -344,7 +359,14 @@ void DiztinguishBridge::FlushOutgoingMessages()
 
 	// Flush socket send buffer
 	if(_clientSocket) {
-		_clientSocket->SendBuffer();
+		try {
+			_clientSocket->SendBuffer();
+			_debugger->Log("[DiztinGUIsh] Socket buffer flushed");
+		}
+		catch(const std::exception& e) {
+			_debugger->Log("[DiztinGUIsh] Error flushing socket: " + std::string(e.what()));
+			_clientConnected = false;
+		}
 	}
 }
 
@@ -429,8 +451,8 @@ void DiztinguishBridge::OnCpuExec(uint32_t pc, uint8_t opcode, bool mFlag, bool 
 	ExecTraceEntry entry;
 	entry.pc = pc;
 	entry.opcode = opcode;
-	entry.mFlag = mFlag ? 1 : 0;
-	entry.xFlag = xFlag ? 1 : 0;
+	entry.mFlag = mFlag ? true : false;
+	entry.xFlag = xFlag ? true : false;
 	entry.dbRegister = db;
 	entry.dpRegister = dp;
 	entry.effectiveAddr = effectiveAddr;
@@ -674,7 +696,7 @@ void DiztinguishBridge::SendCpuState()
 			state.db = cpuState.DBR;
 			state.pc = (cpuState.K << 16) | cpuState.PC;  // 24-bit address (bank + PC)
 			state.p = cpuState.PS;
-			state.emulationMode = cpuState.EmulationMode ? 1 : 0;
+			state.emulationMode = cpuState.EmulationMode ? true : false;
 			
 			_debugger->Log("[DiztinGUIsh] Sending CPU state: A=$" + HexUtilities::ToHex(state.a, 4) + 
 				" X=$" + HexUtilities::ToHex(state.x, 4) + " Y=$" + HexUtilities::ToHex(state.y, 4) + 

@@ -35,6 +35,7 @@
     <ClInclude Include="Debugger\CdlManager.h" />
     <ClInclude Include="Debugger\DisassemblySearch.h" />
     <ClInclude Include="Debugger\DiztinguishBridge.h" />
+    <ClInclude Include="Debugger\DiztinguishBinaryBridge.h" />
     <ClInclude Include="Debugger\FrozenAddressManager.h" />
     <ClInclude Include="Debugger\StepBackManager.h" />
     <ClInclude Include="Gameboy\APU\GbChannelDac.h" />
@@ -810,6 +811,7 @@
     <ClCompile Include="Debugger\CdlManager.cpp" />
     <ClCompile Include="Debugger\DisassemblySearch.cpp" />
     <ClCompile Include="Debugger\DiztinguishBridge.cpp" />
+    <ClCompile Include="Debugger\DiztinguishBinaryBridge.cpp" />
     <ClCompile Include="Debugger\ExpressionEvaluator.St018.cpp" />
     <ClCompile Include="Debugger\ExpressionEvaluator.Ws.cpp" />
     <ClCompile Include="Debugger\ExpressionEvaluator.Cx4.cpp" />

@@ -28,6 +28,7 @@ class SnesPpuTools;
 class PpuTools;
 class DummySnesCpu;
 class DiztinguishBridge;
+class DiztinguishBinaryBridge;
 enum class MemoryOperationType;
 
 class SnesDebugger final : public IDebugger
@@ -56,6 +57,7 @@ class SnesDebugger final : public IDebugger
 	unique_ptr<SnesPpuTools> _ppuTools;
 	unique_ptr<DummySnesCpu> _dummyCpu;
 	unique_ptr<DiztinguishBridge> _diztinguishBridge;
+	unique_ptr<DiztinguishBinaryBridge> _diztinguishBinaryBridge;
 
 	ITraceLogger* _spcTraceLogger = nullptr;
 	ITraceLogger* _dspTraceLogger = nullptr;
@@ -133,4 +135,12 @@ public:
 	bool IsDiztinguishServerRunning() const;
 	uint16_t GetDiztinguishServerPort() const;
 	bool IsDiztinguishClientConnected() const;
+
+	// DiztinGUIsh binary streaming integration
+	DiztinguishBinaryBridge* GetDiztinguishBinaryBridge();
+	bool StartDiztinguishBinaryServer(uint16_t port = 9999);
+	void StopDiztinguishBinaryServer();
+	bool IsDiztinguishBinaryServerRunning() const;
+	uint16_t GetDiztinguishBinaryServerPort() const;
+	bool IsDiztinguishBinaryClientConnected() const;
 };
