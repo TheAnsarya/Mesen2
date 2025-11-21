@@ -82,6 +82,14 @@ void DiztinguishBridge::StopServer()
 		return;
 	}
 
+	// Log before any cleanup to avoid use-after-free during destruction
+	// Only log if we're not in the middle of destructor chain
+	try {
+		_debugger->Log("[DiztinGUIsh] Server stopped");
+	} catch(...) {
+		// Silently ignore if logging fails during destruction
+	}
+
 	_serverRunning = false;
 	_clientConnected = false;
 
@@ -102,8 +110,6 @@ void DiztinguishBridge::StopServer()
 	if(_receiveThread && _receiveThread->joinable()) {
 		_receiveThread->join();
 	}
-
-	_debugger->Log("[DiztinGUIsh] Server stopped");
 }
 
 void DiztinguishBridge::ServerThreadMain()
