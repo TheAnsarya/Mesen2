@@ -161,6 +161,10 @@ This project is to allow Diztinguish to replace bsnes+ with Mesen as an alternat
 
 Make the most complete and comprehensive documentation for step by step fully MANUALLY testing the Mesen<->DiztinGUIsh connection, from building the projects, running the applications, and setting up the connection with a rom and new Diz project playing a game and seeing the disassembly be generated as we progress.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+An exception of type 'System.ArgumentOutOfRangeException' occurred in System.Windows.Forms.dll but was not handled in user code
+Value of '9998' is not valid for 'Value'. 'Value' should be between 'Minimum' and 'Maximum'.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
