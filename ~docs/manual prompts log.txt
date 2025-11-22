@@ -222,6 +222,19 @@ Thank you for finally fixing that UI issue! By looking at a different way, we fi
 The connection didn't work, see screenshots of attempted usage, connecting to the server errors out, trying to stream closes immediately; we have tried a bunch of times to make live streaming work, so go crazy and try different shit, just make it work;
 git commit all updated and new files in all projects with descriptions and broken into batches by intent or purpose; where are the Mesen Debugger log files? I need to read them; Is the GUI connecting to the socket only for the the lifespan of the GUI command? does it need a worker thread holding the connection reference or something? (which can then be contacted to pause or end the connection or whatever)
 
+Hey, examine this code! `ProjectController.cs:393-426`; The finally block closes the connection, this is the connection we want this is why the connection closes immediately between diz and mesen; Store this connection somewhere with a long lifespan but available for us to call pause and stop and cleanup etc; store it in like a worker thread or someting, do the normal thing to keep a socket alive and make a descructor and document everything, etc;
+
+there are errors in the Diz prject:Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS0426	The type name 'TraceLogImporterStats' does not exist in the type 'BsnesTraceLogImporter'	Diz.Controllers	C:\Users\me\source\repos\DiztinGUIsh\Diz.Controllers\Diz.Controllers\src\controllers\ProjectController.cs	543		Error (active)	CS0535	'ProjectController' does not implement interface member 'ITraceLogImporters.ImportMesenTraceLive(string, int, CancellationToken)'	Diz.Controllers	C:\Users\me\source\repos\DiztinGUIsh\Diz.Controllers\Diz.Controllers\src\controllers\ProjectController.cs	37		
+
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS0426	The type name 'ImportStats' does not exist in the type 'MesenTraceLogImporter'	Diz.Controllers	C:\Users\me\source\repos\DiztinGUIsh\Diz.Controllers\Diz.Controllers\src\controllers\ProjectController.cs	543		
+Error (active)	CS1501	No overload for method 'ImportMesenTraceLive' takes 3 arguments	Diz.Ui.Winforms	C:\Users\me\source\repos\DiztinGUIsh\Diz.Ui.Winforms\Diz.Ui.Winforms\window\MainWindow.Importers.cs	155		
+
+The connection showed up and sustained in both Mesen and DiztinGUIsh! Great job! but therte was no data transfered; Focus in Diztinguish and make sure incomming data is being processed; and also focus on mesen: make sure you're sending trace logging;
+continue
+
+open the folder for `The diagnostic logs`; the apps are both running and connected; diagnose the current connection and why data is not being sent/and-or/received;
 
 
 
