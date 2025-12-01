@@ -64,6 +64,7 @@ namespace Mesen.Config
 		[Reactive] public bool ShowGameTimer { get; set; } = false;
 		[Reactive] public bool ShowLagCounter { get; set; } = false;
 		[Reactive] public bool ShowRerecordCounter { get; set; } = false;
+		[Reactive] public bool ShowLagFrameIndicator { get; set; } = false;
 		[Reactive] public bool ShowTitleBarInfo { get; set; } = false;
 		[Reactive] public bool ShowDebugInfo { get; set; } = false;
 		[Reactive] public bool DisableOsd { get; set; } = false;
@@ -239,6 +240,7 @@ namespace Mesen.Config
 				ShowDebugInfo = ShowDebugInfo,
 				ShowLagCounter = ShowLagCounter,
 				ShowRerecordCounter = ShowRerecordCounter,
+				ShowLagFrameIndicator = ShowLagFrameIndicator,
 				DisableOsd = DisableOsd,
 				AllowBackgroundInput = AllowBackgroundInput,
 				PauseOnMovieEnd = PauseOnMovieEnd,
@@ -288,6 +290,7 @@ namespace Mesen.Config
 		[MarshalAs(UnmanagedType.I1)] public bool ShowGameTimer;
 		[MarshalAs(UnmanagedType.I1)] public bool ShowLagCounter;
 		[MarshalAs(UnmanagedType.I1)] public bool ShowRerecordCounter;
+		[MarshalAs(UnmanagedType.I1)] public bool ShowLagFrameIndicator;
 		[MarshalAs(UnmanagedType.I1)] public bool ShowDebugInfo;
 		[MarshalAs(UnmanagedType.I1)] public bool DisableOsd;
 		[MarshalAs(UnmanagedType.I1)] public bool AllowBackgroundInput;

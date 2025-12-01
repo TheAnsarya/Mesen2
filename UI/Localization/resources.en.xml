@@ -749,6 +749,7 @@
 			<Control ID="chkShowLagCounter">Show lag counter</Control>
 			<Control ID="btnResetLagCounter">Reset lag counter</Control>
 			<Control ID="chkShowRerecordCounter">Show rerecord counter (TAS)</Control>
+			<Control ID="chkShowLagFrameIndicator">Flash screen on lag frames (TAS)</Control>
 			<Control ID="chkShowVsConfigOnLoad">Show game configuration dialog when loading VS System games</Control>
 
 			<Control ID="lblFontSettings">Font Settings</Control>
@@ -1943,6 +1944,7 @@ E
 			<Value ID="ToggleGameTimer">Toggle Game Timer</Value>
 			<Value ID="ToggleFrameCounter">Toggle Frame Counter</Value>
 			<Value ID="ToggleLagCounter">Toggle Lag Counter</Value>
+			<Value ID="ToggleLagFrameIndicator">Toggle Lag Frame Indicator (TAS)</Value>
 			<Value ID="ResetLagCounter">Reset Lag Counter</Value>
 			<Value ID="ToggleRerecordCounter">Toggle Rerecord Counter (TAS)</Value>
 			<Value ID="TasFrameAdvance">TAS Frame Advance</Value>

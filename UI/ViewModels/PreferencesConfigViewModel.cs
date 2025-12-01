@@ -79,6 +79,7 @@ namespace Mesen.ViewModels
 				EmulatorShortcut.EnableAllLayers,
 				
 				EmulatorShortcut.ToggleLagCounter,
+				EmulatorShortcut.ToggleLagFrameIndicator,
 				EmulatorShortcut.ResetLagCounter,
 
 				EmulatorShortcut.ToggleAudio,

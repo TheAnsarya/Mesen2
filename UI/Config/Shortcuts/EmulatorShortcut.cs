@@ -71,6 +71,7 @@ namespace Mesen.Config.Shortcuts
 		ToggleGameTimer,
 		ToggleFrameCounter,
 		ToggleLagCounter,
+		ToggleLagFrameIndicator,
 		ToggleOsd,
 		ToggleAlwaysOnTop,
 		ToggleDebugInfo,
