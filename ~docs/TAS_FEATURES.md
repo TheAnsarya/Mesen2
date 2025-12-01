@@ -2,7 +2,7 @@
 
 This document describes the TAS features implemented in Mesen2, including movie recording/playback, rerecording, and format conversion.
 
-> **Status:** TAS epic is ~90% complete. Core features implemented, some UI polish remaining.
+> **Status:** TAS epic is ~95% complete. Core features implemented, Export UI complete.
 > 
 > **Last Updated:** December 1, 2025
 
@@ -17,6 +17,7 @@ Mesen2 now supports comprehensive TAS (Tool-Assisted Speedrun/Superplay) feature
 5. **Movie Format Conversion** - Convert between Mesen, SMV, LSMV, FM2, and BK2 formats ✅
 6. **Read-Only Mode** - Toggle between read-only playback and read-write editing ✅
 7. **TAS Lua API** - Script access to TAS state information ✅
+8. **Import/Export UI** - UI dialogs for importing and exporting TAS movies ✅
 
 ## TAS Settings
 
@@ -98,8 +99,15 @@ MovieConverter --list-formats
 
 ### Import/Export in Mesen2
 
-- **Tools → Import Movie** - Import movie files from other emulators
-- **Tools → Export Movie** - Export the current movie to another format
+- **Tools → Movies → Import Movie...** - Import movie files from other emulators (SMV, LSMV, FM2, BK2)
+  - Automatically converts to Mesen native format (.mmo) before playback
+  - Converted files are saved in the Movies folder
+- **Tools → Movies → Export Movie...** - Export the current movie to another format
+  - Opens MovieExportWindow dialog
+  - Select source .mmo file and target format
+  - Supports export to SMV, LSMV, FM2, BK2 formats
+
+**Note:** The MovieConverter CLI tool (MesenMovieConverter.exe) must be present in the same directory as Mesen for Import/Export to work.
 
 ## TAS State Information
 

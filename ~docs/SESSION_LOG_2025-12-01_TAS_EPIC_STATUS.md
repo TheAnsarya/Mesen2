@@ -2,13 +2,13 @@
 ## TAS Epic Status Assessment and Documentation Update
 
 ### Session Overview
-Reviewed the TAS (Tool-Assisted Speedrun) epic implementation status, updated GitHub issues with completion comments, and refreshed documentation.
+Reviewed the TAS (Tool-Assisted Speedrun) epic implementation status, updated GitHub issues with completion comments, and refreshed documentation. In a follow-up session, implemented the MovieExportWindow UI.
 
 ### Key Findings
 
-#### TAS Epic Completion: ~85-90%
+#### TAS Epic Completion: ~95%
 
-The TAS epic has significant implementation completed across Core, InteropDLL, and UI layers.
+The TAS epic has comprehensive implementation completed across Core, InteropDLL, and UI layers.
 
 ### Completed Features ✅
 
@@ -23,12 +23,13 @@ The TAS epic has significant implementation completed across Core, InteropDLL, a
 | TAS Lua API | - | 4 functions: getTasState, isMoviePlaying, isMovieRecording, getRerecordCount |
 | TasState struct | - | In MovieTypes.h with frame/rerecord/lag counts |
 | InteropDLL Exports | - | 7 TAS functions exported |
+| Movie Export UI | #23 | MovieExportWindow with format selection ✅ |
+| Movie Import Logic | - | Auto-converts external formats before playback ✅ |
 
 ### Remaining Work 📋
 
 | Feature | Issue | Status |
 |---------|-------|--------|
-| Movie Export UI | #23 | Core library done, UI dialog needed |
 | Lag Frame Display | #25 | Detection exists, visual indicator needed |
 | Full TAS HUD | #22 | Frame counter, lag counter display needed |
 
@@ -78,18 +79,41 @@ The TAS epic has significant implementation completed across Core, InteropDLL, a
 
 ### Recommended Next Steps
 
-1. **Complete MovieExportWindow (#23)**
-   - Create Avalonia dialog for format selection
-   - Wire up to MovieConverter library
-   - Add compatibility warnings
-
-2. **Add Lag Frame Visual Indicator (#25)**
+1. **Add Lag Frame Visual Indicator (#25)**
    - Flash/color change on lag frames
    - Counter in TAS HUD
 
-3. **Extend TAS HUD (#22)**
+2. **Extend TAS HUD (#22)**
    - Add frame counter display
    - Add lag frame counter
+
+### Follow-up Session: MovieExportWindow Implementation
+
+In a follow-up session, the MovieExportWindow UI was implemented:
+
+#### New Files Created
+- `UI/Windows/MovieExportWindow.axaml` - Avalonia dialog UI
+- `UI/Windows/MovieExportWindow.axaml.cs` - Code-behind
+- `UI/ViewModels/MovieExportViewModel.cs` - ViewModel with export logic
+
+#### Files Modified
+- `MovieConverter/Converters/MesenMovieConverter.cs` - Fixed to use .mmo extension
+- `UI/ViewModels/MainMenuViewModel.cs` - Wired up Export menu, added Import conversion
+- `UI/Localization/resources.en.xml` - Added MovieExportWindow localization strings
+
+#### Features Implemented
+1. **Export Movie Dialog**
+   - Source movie file selection (.mmo)
+   - Target format dropdown (SMV, LSMV, FM2, BK2)
+   - Export path selection with auto-naming
+   - Status feedback during conversion
+   - Uses MesenMovieConverter CLI for conversion
+
+2. **Import Movie Enhancement**
+   - Auto-detects if file is native .mmo or external format
+   - Converts external formats (smv, lsmv, fm2, bk2) to .mmo
+   - Converted files saved to Movies folder
+   - Automatically plays converted movie
 
 ### Technical Notes
 
