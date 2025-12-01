@@ -27,6 +27,7 @@ protected:
 	uint32_t _pollCounter = 0;
 	uint32_t _lagCounter = 0;
 	bool _wasInputRead = false;
+	bool _wasLastFrameLag = false;
 
 	void RegisterControlDevice(shared_ptr<BaseControlDevice> controlDevice);
 
@@ -48,6 +49,7 @@ public:
 	void SetInputReadFlag();
 	uint32_t GetLagCounter();
 	void ResetLagCounter();
+	bool WasLastFrameLag();
 
 	bool HasControlDevice(ControllerType type);
 	virtual bool IsKeyboardConnected() { return false; }

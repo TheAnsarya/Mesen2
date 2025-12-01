@@ -22,6 +22,12 @@ void SystemHud::Draw(DebugHud* hud, uint32_t width, uint32_t height) const
 {
 	DrawCounters(hud, width);
 	DrawMessages(hud, width, height);
+	
+	// Draw lag frame visual indicator if enabled
+	PreferencesConfig cfg = _emu->GetSettings()->GetPreferences();
+	if(cfg.ShowLagFrameIndicator) {
+		DrawLagFrameIndicator(hud, width, height);
+	}
 
 	if(_emu->IsRunning()) {
 		EmuSettings* settings = _emu->GetSettings();
@@ -318,6 +324,26 @@ void SystemHud::DrawTasReadWriteIndicator(DebugHud* hud, int xOffset) const
 	// Draw "R" or "W"
 	string indicator = isReadOnly ? "R" : "W";
 	hud->DrawString(x + 1, y, indicator, textColor, 0, 1, -1, 8, true);
+}
+
+void SystemHud::DrawLagFrameIndicator(DebugHud* hud, uint32_t screenWidth, uint32_t screenHeight) const
+{
+	// Draw a red border around the screen when the last frame was a lag frame
+	if(_emu->WasLastFrameLag()) {
+		int borderWidth = 4;
+		int color = 0xFF0000; // Red for lag frame
+		int opacity = 0x80; // Semi-transparent
+		int argb = (opacity << 24) | color;
+		
+		// Draw top border
+		hud->DrawRectangle(0, 0, screenWidth, borderWidth, argb, true, 1);
+		// Draw bottom border
+		hud->DrawRectangle(0, screenHeight - borderWidth, screenWidth, borderWidth, argb, true, 1);
+		// Draw left border
+		hud->DrawRectangle(0, 0, borderWidth, screenHeight, argb, true, 1);
+		// Draw right border
+		hud->DrawRectangle(screenWidth - borderWidth, 0, borderWidth, screenHeight, argb, true, 1);
+	}
 }
 
 void SystemHud::UpdateHud()

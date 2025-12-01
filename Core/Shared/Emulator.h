@@ -240,7 +240,8 @@ public:
 	uint32_t GetFrameCount();
 
 	uint32_t GetLagCounter();
-	void ResetLagCounter();	
+	void ResetLagCounter();
+	bool WasLastFrameLag();
 	bool HasControlDevice(ControllerType type);
 	void RegisterInputRecorder(IInputRecorder* recorder);
 	void UnregisterInputRecorder(IInputRecorder* recorder);

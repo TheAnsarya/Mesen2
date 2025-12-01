@@ -705,6 +705,12 @@ void Emulator::ResetLagCounter()
 	}
 }
 
+bool Emulator::WasLastFrameLag()
+{
+	shared_ptr<IConsole> console = GetConsole();
+	return console ? console->GetControlManager()->WasLastFrameLag() : false;
+}
+
 bool Emulator::HasControlDevice(ControllerType type)
 {
 	shared_ptr<IConsole> console = GetConsole();

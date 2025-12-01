@@ -190,8 +190,20 @@ void BaseControlManager::UpdateInputState()
 	_pollCounter++;
 }
 
+/**
+ * ProcessEndOfFrame - Called at the end of each frame to track lag frames.
+ * 
+ * A "lag frame" is a frame where the game did not poll the controller inputs.
+ * This typically indicates the game is processing something (loading, AI, etc.)
+ * and the player's inputs would have no effect on that frame.
+ * 
+ * TAS runners use lag frame tracking to optimize their runs by minimizing
+ * frames where input has no effect.
+ */
 void BaseControlManager::ProcessEndOfFrame()
 {
+	// Track if this frame was a lag frame (no input was read)
+	_wasLastFrameLag = !_wasInputRead;
 	if(!_wasInputRead) {
 		_lagCounter++;
 	}
@@ -200,7 +212,7 @@ void BaseControlManager::ProcessEndOfFrame()
 
 void BaseControlManager::SetInputReadFlag()
 {
-	//Used for lag counter - any frame where the input is read does not count as lag
+	// Used for lag counter - any frame where the input is read does not count as lag
 	_wasInputRead = true;
 }
 
@@ -212,6 +224,18 @@ uint32_t BaseControlManager::GetLagCounter()
 void BaseControlManager::ResetLagCounter()
 {
 	_lagCounter = 0;
+}
+
+/**
+ * WasLastFrameLag - Returns true if the previous frame was a lag frame.
+ * 
+ * Used by the TAS HUD to show a visual indicator (red border) when
+ * the last frame was a lag frame, helping TAS runners identify
+ * frames where their inputs had no effect.
+ */
+bool BaseControlManager::WasLastFrameLag()
+{
+	return _wasLastFrameLag;
 }
 
 bool BaseControlManager::HasControlDevice(ControllerType type)
