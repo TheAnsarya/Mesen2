@@ -25,6 +25,8 @@
 #include "Shared/Interfaces/IKeyManager.h"
 #include "Shared/ControllerHub.h"
 #include "Shared/BaseControlManager.h"
+#include "Shared/Movies/MovieManager.h"
+#include "Shared/Movies/MovieTypes.h"
 #include "Utilities/HexUtilities.h"
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/magic_enum.hpp"
@@ -140,6 +142,12 @@ int LuaApi::GetLibrary(lua_State *lua)
 		{ "isKeyPressed", LuaApi::IsKeyPressed },
 		{ "getInput", LuaApi::GetInput },
 		{ "setInput", LuaApi::SetInput },
+
+		// TAS functions
+		{ "getTasState", LuaApi::GetTasState },
+		{ "isMoviePlaying", LuaApi::IsMoviePlaying },
+		{ "isMovieRecording", LuaApi::IsMovieRecording },
+		{ "getRerecordCount", LuaApi::GetRerecordCount },
 
 		{ "getAccessCounters", LuaApi::GetAccessCounters },
 		{ "resetAccessCounters", LuaApi::ResetAccessCounters },
@@ -912,6 +920,66 @@ int LuaApi::SetInput(lua_State* lua)
 	
 	lua_pop(lua, 1);
 
+	return l.ReturnCount();
+}
+
+int LuaApi::GetTasState(lua_State *lua)
+{
+	LuaCallHelper l(lua);
+	checkparams();
+	
+	TasState state = _emu->GetMovieManager()->GetTasState();
+	
+	lua_newtable(lua);
+	lua_pushstring(lua, "frameCount");
+	lua_pushinteger(lua, state.FrameCount);
+	lua_settable(lua, -3);
+	
+	lua_pushstring(lua, "rerecordCount");
+	lua_pushinteger(lua, state.RerecordCount);
+	lua_settable(lua, -3);
+	
+	lua_pushstring(lua, "lagFrameCount");
+	lua_pushinteger(lua, state.LagFrameCount);
+	lua_settable(lua, -3);
+	
+	lua_pushstring(lua, "isRecording");
+	lua_pushboolean(lua, state.IsRecording);
+	lua_settable(lua, -3);
+	
+	lua_pushstring(lua, "isPlaying");
+	lua_pushboolean(lua, state.IsPlaying);
+	lua_settable(lua, -3);
+	
+	lua_pushstring(lua, "isReadOnly");
+	lua_pushboolean(lua, state.IsReadOnly);
+	lua_settable(lua, -3);
+	
+	return 1;
+}
+
+int LuaApi::IsMoviePlaying(lua_State *lua)
+{
+	LuaCallHelper l(lua);
+	checkparams();
+	l.Return(_emu->GetMovieManager()->Playing());
+	return l.ReturnCount();
+}
+
+int LuaApi::IsMovieRecording(lua_State *lua)
+{
+	LuaCallHelper l(lua);
+	checkparams();
+	l.Return(_emu->GetMovieManager()->Recording());
+	return l.ReturnCount();
+}
+
+int LuaApi::GetRerecordCount(lua_State *lua)
+{
+	LuaCallHelper l(lua);
+	checkparams();
+	TasState state = _emu->GetMovieManager()->GetTasState();
+	l.Return((int)state.RerecordCount);
 	return l.ReturnCount();
 }
 

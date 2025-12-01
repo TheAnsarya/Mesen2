@@ -77,6 +77,12 @@ public:
 	static int GetInput(lua_State *lua);
 	static int SetInput(lua_State *lua);
 
+	// TAS functions
+	static int GetTasState(lua_State *lua);
+	static int IsMoviePlaying(lua_State *lua);
+	static int IsMovieRecording(lua_State *lua);
+	static int GetRerecordCount(lua_State *lua);
+
 	static int AddCheat(lua_State *lua);
 	static int ClearCheats(lua_State *lua);
 
