@@ -4,11 +4,11 @@ using System.Text;
 namespace Mesen.MovieConverter.Converters;
 
 /// <summary>
-/// Converter for Mesen2 native movie format (.mmm)
+/// Converter for Mesen2 native movie format (.mmo)
 /// </summary>
 public class MesenMovieConverter : MovieConverterBase
 {
-    public override string[] Extensions => new[] { ".mmm" };
+    public override string[] Extensions => new[] { ".mmo" };
     public override string FormatName => "Mesen Movie";
     public override MovieFormat Format => MovieFormat.Mesen;
 

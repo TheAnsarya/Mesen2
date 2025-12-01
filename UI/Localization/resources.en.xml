@@ -915,6 +915,19 @@
 			<Control ID="btnOK">Record</Control>
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
+		<Form ID="MovieExportWindow">
+			<Control ID="wndTitle">Export Movie</Control>
+			<Control ID="lblSourceMovie">Source Movie:</Control>
+			<Control ID="lblTargetFormat">Target Format:</Control>
+			<Control ID="lblSaveTo">Save to:</Control>
+			<Control ID="btnBrowse">Browse...</Control>
+			<Control ID="btnExport">Export</Control>
+			<Control ID="btnCancel">Cancel</Control>
+			<Message ID="MovieSourceNotFound">Source movie file not found</Message>
+			<Message ID="MovieConverterNotFound">Movie converter tool not found</Message>
+			<Message ID="MovieExporting">Exporting movie...</Message>
+			<Message ID="MovieExportSuccess">Movie exported successfully!</Message>
+		</Form>
 		<Form ID="HdPackBuilderWindow">
 			<Control ID="wndTitle">HD Pack Builder</Control>
 			
@@ -1759,6 +1772,7 @@
 		<Message ID="MovieExportSpecificRange">Export specific range...</Message>
 		<Message ID="MovieSaveError">An error occurred while trying to save the movie file.</Message>
 		<Message ID="MovieRerecord">Rerecord #{0}</Message>
+		<Message ID="MovieConverterNotFound">The movie converter tool could not be found. Please ensure MesenMovieConverter is installed.</Message>
 		<Message ID="FileSaveError">An error occurred while trying to save the file.</Message>
 
 		<Message ID="SetKeyHint">Press any key on your keyboard to set a new binding.</Message>

@@ -737,17 +737,27 @@ namespace Mesen.ViewModels
 						OnClick = async () => {
 							string? filename = await FileDialogHelper.OpenFile(ConfigManager.MovieFolder, wnd, FileDialogHelper.TasMovieExt);
 							if(filename != null) {
-								// Import external movie format and convert to Mesen format
-								// For now, just play it if it's a supported format
-								RecordApi.MoviePlay(filename);
+								// Check if it's a native .mmo file or needs conversion
+								string ext = Path.GetExtension(filename).ToLower();
+								if(ext == ".mmo") {
+									RecordApi.MoviePlay(filename);
+								} else {
+									// External format - convert to .mmo first
+									string? convertedPath = await ConvertMovieToMesen(filename, wnd);
+									if(convertedPath != null) {
+										RecordApi.MoviePlay(convertedPath);
+									}
+								}
 							}
 						}
 					},
 					new MainMenuAction() {
 						ActionType = ActionType.ExportMovie,
-						IsEnabled = () => false, // TODO: Enable when export is implemented
-						OnClick = async () => {
-							// TODO: Implement export dialog to select target format
+						IsEnabled = () => IsGameRunning,
+						OnClick = () => {
+							new MovieExportWindow() {
+								DataContext = new MovieExportViewModel()
+							}.ShowCenteredDialog((Control)wnd);
 						}
 					}
 				}
@@ -1346,6 +1356,77 @@ namespace Mesen.ViewModels
 			_selectControllerAction.SubActions = controllerActions;
 
 			return true;
+		}
+
+		private async Task<string?> ConvertMovieToMesen(string sourceFile, Window wnd)
+		{
+			try
+			{
+				string converterPath = GetConverterPath();
+				if(!File.Exists(converterPath)) {
+					await MesenMsgBox.Show(wnd, "MovieConverterNotFound", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return null;
+				}
+
+				// Create output path in the Movies folder with .mmo extension
+				string outputPath = Path.Combine(
+					ConfigManager.MovieFolder, 
+					Path.GetFileNameWithoutExtension(sourceFile) + "_converted.mmo"
+				);
+
+				var startInfo = new System.Diagnostics.ProcessStartInfo
+				{
+					FileName = converterPath,
+					Arguments = $"\"{sourceFile}\" \"{outputPath}\"",
+					UseShellExecute = false,
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					CreateNoWindow = true
+				};
+
+				using var process = new System.Diagnostics.Process { StartInfo = startInfo };
+				process.Start();
+				
+				string error = await process.StandardError.ReadToEndAsync();
+				await process.WaitForExitAsync();
+
+				if(process.ExitCode == 0 && File.Exists(outputPath)) {
+					return outputPath;
+				} else {
+					string message = string.IsNullOrEmpty(error) ? "Movie conversion failed" : error;
+					await MessageBox.Show(wnd, message, "Mesen", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return null;
+				}
+			}
+			catch(Exception ex)
+			{
+				await MessageBox.Show(wnd, ex.Message, "Mesen", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return null;
+			}
+		}
+
+		private string GetConverterPath()
+		{
+			string exeDir = AppContext.BaseDirectory;
+			
+			string[] possiblePaths = new[]
+			{
+				Path.Combine(exeDir, "MesenMovieConverter.exe"),
+				Path.Combine(exeDir, "MesenMovieConverter"),
+				Path.Combine(exeDir, "..", "MovieConverter", "MesenMovieConverter.exe"),
+				Path.Combine(exeDir, "..", "MovieConverter", "MesenMovieConverter"),
+			};
+
+			foreach(string path in possiblePaths)
+			{
+				string fullPath = Path.GetFullPath(path);
+				if(File.Exists(fullPath))
+				{
+					return fullPath;
+				}
+			}
+
+			return Path.Combine(exeDir, "MesenMovieConverter.exe");
 		}
 	}
 }
