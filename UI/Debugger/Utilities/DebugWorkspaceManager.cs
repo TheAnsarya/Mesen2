@@ -243,8 +243,10 @@ namespace Mesen.Debugger.Utilities
 			_workspace?.Save(_path, _romInfo.CpuTypes);
 			
 			// Auto-export Pansy file with CDL data when saving workspace
-			var memoryType = _romInfo.ConsoleType.GetMainCpuType().GetPrgRomMemoryType();
-			PansyExporter.AutoExport(_romInfo, memoryType);
+			if(!string.IsNullOrEmpty(_romInfo.RomPath)) {
+				var memoryType = _romInfo.ConsoleType.GetMainCpuType().GetPrgRomMemoryType();
+				PansyExporter.AutoExport(_romInfo, memoryType);
+			}
 			
 			if(releaseWorkspace) {
 				_workspace = null;
@@ -256,7 +258,7 @@ namespace Mesen.Debugger.Utilities
 		{
 			//Automatically save when changing a label/breakpoint/watch to avoid losing progress if a crash occurs
 			if((DateTime.Now - _previousAutoSave).TotalSeconds >= 60) {
-				_workspace?.Save(_path, _romInfo.CpuTypes);
+				Save(); // Use Save() to include Pansy export
 				_previousAutoSave = DateTime.Now;
 			}
 		}

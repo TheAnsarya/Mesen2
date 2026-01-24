@@ -180,12 +180,17 @@ namespace Mesen.Debugger.Labels
 		/// <param name="memoryType">Memory type for CDL</param>
 		public static void AutoExport(RomInfo romInfo, MemoryType memoryType)
 		{
+			System.Diagnostics.Debug.WriteLine($"[Pansy] AutoExport called - AutoExportPansy={ConfigManager.Config.Debug.Integration.AutoExportPansy}");
+			
 			if (!ConfigManager.Config.Debug.Integration.AutoExportPansy) {
+				System.Diagnostics.Debug.WriteLine("[Pansy] Auto-export disabled, skipping");
 				return;
 			}
 
 			string pansyPath = GetPansyFilePath(romInfo.GetRomName());
-			Export(pansyPath, romInfo, memoryType);
+			System.Diagnostics.Debug.WriteLine($"[Pansy] Exporting to: {pansyPath}");
+			bool success = Export(pansyPath, romInfo, memoryType);
+			System.Diagnostics.Debug.WriteLine($"[Pansy] Export result: {success}");
 		}
 
 		/// <summary>
