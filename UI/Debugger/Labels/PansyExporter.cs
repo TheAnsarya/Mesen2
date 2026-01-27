@@ -7,6 +7,7 @@ using Mesen.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Hashing;
 using System.Linq;
 using System.Text;
 
@@ -56,33 +57,9 @@ namespace Mesen.Debugger.Labels
 			{ RomFormat.Ws, 0x0B },     // WonderSwan
 		};
 
-		// CRC32 lookup table (IEEE polynomial 0xEDB88320)
-		private static readonly uint[] Crc32Table = InitCrc32Table();
-
-		private static uint[] InitCrc32Table()
-		{
-			var table = new uint[256];
-			for (uint i = 0; i < 256; i++) {
-				uint crc = i;
-				for (int j = 0; j < 8; j++) {
-					crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320 : crc >> 1;
-				}
-				table[i] = crc;
-			}
-			return table;
-		}
-
-		private static uint ComputeCrc32(byte[] data)
-		{
-			uint crc = 0xFFFFFFFF;
-			foreach (byte b in data) {
-				crc = Crc32Table[(crc ^ b) & 0xFF] ^ (crc >> 8);
-			}
-			return ~crc;
-		}
-
 		/// <summary>
 		/// Calculate CRC32 of the ROM data for integrity verification.
+		/// Uses System.IO.Hashing.Crc32 for standard IEEE polynomial.
 		/// </summary>
 		/// <param name="romInfo">ROM information containing console type</param>
 		/// <returns>CRC32 hash of the ROM data, or 0 if unavailable</returns>
@@ -94,7 +71,7 @@ namespace Mesen.Debugger.Labels
 				byte[] romData = DebugApi.GetMemoryState(memType);
 				if (romData == null || romData.Length == 0)
 					return 0;
-				return ComputeCrc32(romData);
+				return Crc32.HashToUInt32(romData);
 			} catch (Exception ex) {
 				System.Diagnostics.Debug.WriteLine($"[PansyExporter] CRC32 calculation failed: {ex.Message}");
 				return 0;

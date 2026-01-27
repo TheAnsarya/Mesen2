@@ -197,6 +197,57 @@
 - [ ] Create example `.pansy` files
 - [ ] Integration with popular tools
 
+## 🚀 Phase 8: Modernization (NEW)
+
+**Target:** 2026-01-26 to 2026-02-05  
+**Priority:** HIGH  
+**Branch:** `modernization` (sub-branch of `pansy-export`)  
+**Baseline Tag:** `v2.0.0-pansy-phase3`
+
+### Platform Modernization
+- [ ] **Upgrade to .NET 10** - net8.0 → net10.0
+  - Update all .csproj files
+  - Fix breaking changes
+  - Test on all platforms
+  
+- [ ] **Update Avalonia** - 11.3.1 → 11.3.11+
+  - Update all Avalonia packages
+  - Update Dock.Avalonia
+  - Update AvaloniaEdit
+  - Fix any XAML/API changes
+
+- [ ] **Update Lua Runtime** - Latest 5.4.7+
+  - Update embedded Lua
+  - Test all scripts
+  - Update documentation
+
+### Modern Libraries
+- [ ] **Replace Custom CRC32** - Use System.IO.Hashing.Crc32
+  - Update PansyExporter
+  - Update any other CRC32 usage
+  - Verify identical output
+
+- [ ] **Modernize JSON** - Use source generators
+- [ ] **Collection Expressions** - Use modern C# syntax
+
+### Comprehensive Testing
+- [ ] **Expand Test Coverage**
+  - PansyExporter: 90%
+  - BackgroundPansyExporter: 90%
+  - LabelManager: 80%
+  - CDL Processing: 80%
+
+### Code Modernization
+- [ ] Nullable reference types everywhere
+- [ ] File-scoped namespaces
+- [ ] Pattern matching
+- [ ] Primary constructors
+- [ ] Analyzers and warnings
+
+See: [MODERNIZATION-ROADMAP.md](modernization/MODERNIZATION-ROADMAP.md)
+
+---
+
 ## Success Metrics
 
 ### Adoption Goals

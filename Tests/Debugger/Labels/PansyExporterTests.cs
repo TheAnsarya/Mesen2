@@ -1,6 +1,7 @@
 using Xunit;
 using System;
 using System.IO;
+using System.IO.Hashing;
 using System.Text;
 
 namespace Mesen.Tests.Debugger.Labels;
@@ -240,22 +241,23 @@ public class PansyExporterTests
 		
 		try {
 			// Create a minimal valid pansy file
-			using var stream = new FileStream(tempPath, FileMode.Create);
-			using var writer = new BinaryWriter(stream);
+			using (var stream = new FileStream(tempPath, FileMode.Create))
+			using (var writer = new BinaryWriter(stream)) {
+				writer.Write(Encoding.ASCII.GetBytes(MAGIC));
+				writer.Write(VERSION);
+				writer.Write((byte)0x02); // SNES
+				writer.Write((byte)0x00); // Flags
+				writer.Write((uint)0x100000); // ROM size
+				writer.Write((uint)0x12345678); // ROM CRC
+				writer.Write((long)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+				writer.Write((uint)0); // Reserved
+				writer.Write((uint)0); // Section count
+				writer.Write((uint)0); // Footer CRC1
+				writer.Write((uint)0); // Footer CRC2
+				writer.Write((uint)0); // Footer CRC3
+			}
 			
-			writer.Write(Encoding.ASCII.GetBytes(MAGIC));
-			writer.Write(VERSION);
-			writer.Write((byte)0x02); // SNES
-			writer.Write((byte)0x00); // Flags
-			writer.Write((uint)0x100000); // ROM size
-			writer.Write((uint)0x12345678); // ROM CRC
-			writer.Write((long)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-			writer.Write((uint)0); // Reserved
-			writer.Write((uint)0); // Section count
-			writer.Write((uint)0); // Footer CRC1
-			writer.Write((uint)0); // Footer CRC2
-			writer.Write((uint)0); // Footer CRC3
-			
+			// Asserts after streams are closed
 			Assert.True(File.Exists(tempPath));
 			Assert.True(new FileInfo(tempPath).Length >= 32);
 		} finally {
@@ -267,29 +269,14 @@ public class PansyExporterTests
 
 	#region Helper Methods (mirroring PansyExporter implementation)
 
-	private static readonly uint[] Crc32Table = InitCrc32Table();
-
-	private static uint[] InitCrc32Table()
-	{
-		var table = new uint[256];
-		for (uint i = 0; i < 256; i++) {
-			uint crc = i;
-			for (int j = 0; j < 8; j++) {
-				crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320 : crc >> 1;
-			}
-			table[i] = crc;
-		}
-		return table;
-	}
-
+	/// <summary>
+	/// Calculate CRC32 using System.IO.Hashing.Crc32 (IEEE polynomial).
+	/// Returns 0 for empty arrays to match PansyExporter behavior.
+	/// </summary>
 	private static uint ComputeCrc32(byte[] data)
 	{
 		if (data.Length == 0) return 0;
-		uint crc = 0xFFFFFFFF;
-		foreach (byte b in data) {
-			crc = Crc32Table[(crc ^ b) & 0xFF] ^ (crc >> 8);
-		}
-		return ~crc;
+		return Crc32.HashToUInt32(data);
 	}
 
 	private record TestHeader(ushort Version, byte Platform, byte Flags, uint RomSize, uint RomCrc32, long Timestamp);
