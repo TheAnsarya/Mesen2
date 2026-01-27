@@ -400,11 +400,13 @@ Complete documentation and prepare for upstream PR.
 
 ### Issue #11: 📁 Folder-Based Debug Storage - Phase 7.5a
 
-**Status:** ⏳ TODO  
+**Status:** ✅ COMPLETED  
 **Labels:** enhancement, storage, phase-7.5  
 **Milestone:** Pansy Integration v2.0  
 **Estimate:** 6 hours  
-**Dependencies:** Issue #5 (Performance)
+**Dependencies:** Issue #5 (Performance)  
+**Completed:** 2026-01-27 13:46 UTC  
+**Commit:** `794d74c7`
 
 **Description:**
 Implement folder-based storage for debug data. Each ROM gets a dedicated folder containing Pansy, MLB, and CDL files.
@@ -420,34 +422,44 @@ Implement folder-based storage for debug data. Each ROM gets a dedicated folder 
 ```
 
 **Tasks:**
-- [ ] Create `DebugFolderManager` class
-- [ ] Implement folder naming convention (sanitize special chars)
-- [ ] Create folder on first save
-- [ ] Migrate existing auto-save to folder structure
-- [ ] Add config option for debug folder location
-- [ ] Support custom folder paths
+- [x] Create `DebugFolderManager` class
+- [x] Implement folder naming convention (sanitize special chars)
+- [x] Create folder on first save
+- [x] Migrate existing auto-save to folder structure
+- [x] Add config option for debug folder location
+- [x] Support custom folder paths
 
 **Files:**
-- NEW: `UI/Debugger/Labels/DebugFolderManager.cs`
+- NEW: `UI/Debugger/Labels/DebugFolderManager.cs` (414 lines)
 - MOD: `UI/Config/IntegrationConfig.cs`
-- MOD: `UI/Debugger/Labels/BackgroundPansyExporter.cs`
+- MOD: `UI/Debugger/Labels/PansyExporter.cs`
 
 ---
 
 ### Issue #12: 🔄 MLB File Sync - Phase 7.5b
 
-**Status:** ⏳ TODO  
+**Status:** ✅ COMPLETED  
 **Labels:** enhancement, sync, phase-7.5  
 **Milestone:** Pansy Integration v2.0  
 **Estimate:** 4 hours  
-**Dependencies:** Issue #11
+**Dependencies:** Issue #11  
+**Completed:** 2026-01-27 13:46 UTC  
+**Commit:** `794d74c7`
 
 **Description:**
 Keep MLB (Mesen Label) files in sync with Pansy files.
 
 **Tasks:**
-- [ ] Export MLB alongside Pansy file
-- [ ] Import MLB when loading ROM
+- [x] Export MLB alongside Pansy file
+- [x] Import MLB when loading ROM
+- [x] Detect MLB changes and update Pansy
+- [x] Round-trip test: Pansy → MLB → Pansy
+- [x] Handle label format differences
+- [x] Preserve multi-byte labels
+
+**Files:**
+- MOD: `UI/Debugger/Labels/DebugFolderManager.cs`
+- MOD: `UI/Debugger/Labels/PansyExporter.cs`
 - [ ] Detect MLB changes and update Pansy
 - [ ] Round-trip test: Pansy → MLB → Pansy
 - [ ] Handle label format differences
@@ -462,11 +474,13 @@ Keep MLB (Mesen Label) files in sync with Pansy files.
 
 ### Issue #13: 📊 CDL File Sync - Phase 7.5c
 
-**Status:** ⏳ TODO  
+**Status:** ✅ COMPLETED  
 **Labels:** enhancement, sync, phase-7.5  
 **Milestone:** Pansy Integration v2.0  
 **Estimate:** 4 hours  
-**Dependencies:** Issue #11
+**Dependencies:** Issue #11  
+**Completed:** 2026-01-27 13:46 UTC  
+**Commit:** `794d74c7`
 
 **Description:**
 Keep CDL (Code Data Logger) files in sync with Pansy files.
@@ -480,17 +494,16 @@ Keep CDL (Code Data Logger) files in sync with Pansy files.
 ```
 
 **Tasks:**
-- [ ] Export CDL alongside Pansy file
-- [ ] Auto-load CDL if config enabled
-- [ ] Sync CDL flags to/from Pansy CODE_DATA_MAP
-- [ ] Handle different ROM sizes
-- [ ] Verify flag mapping accuracy
-- [ ] Support platform-specific CDL formats
+- [x] Export CDL alongside Pansy file
+- [x] Auto-load CDL if config enabled
+- [x] Sync CDL flags to/from Pansy CODE_DATA_MAP
+- [x] Handle different ROM sizes
+- [x] Verify flag mapping accuracy
+- [x] Support platform-specific CDL formats
 
 **Files:**
-- NEW: `UI/Debugger/Labels/CdlFileManager.cs`
-- MOD: `UI/Debugger/Labels/PansyExporter.cs`
 - MOD: `UI/Debugger/Labels/DebugFolderManager.cs`
+- MOD: `UI/Debugger/Labels/PansyExporter.cs`
 
 ---
 
@@ -564,11 +577,12 @@ Manage bidirectional sync between Pansy and native Mesen files.
 | Phase 5 | #6 | 6h | ⏳ TODO |
 | Phase 6 | #7, #8, #9 | 26h | ⏳ TODO |
 | Phase 7 | #10 | 8h | ⏳ TODO |
-| Phase 7.5 | #11, #12, #13, #14, #15 | 28h | ⏳ TODO |
-| **Total** | **16** | **110h** | 25% |
+| Phase 7.5a/b/c | #11, #12, #13 | 14h | ✅ Complete |
+| Phase 7.5d/e | #14, #15 | 14h | ⏳ TODO |
+| **Total** | **16** | **110h** | 50% |
 
 ---
 
 **Document Created:** 2026-01-19 18:48 UTC  
-**Last Updated:** 2026-01-27 14:00 UTC  
+**Last Updated:** 2026-01-27 14:30 UTC  
 **Repository:** https://github.com/TheAnsarya/Mesen2
