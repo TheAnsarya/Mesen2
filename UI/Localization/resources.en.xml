@@ -1597,6 +1597,21 @@
 			<Control ID="tabMisc">Misc.</Control>
 		</Form>
 
+		<Form ID="PansyExportProgressWindow">
+			<Control ID="wndPansyExportProgress">Pansy Export</Control>
+			<Control ID="lblExportingPansy">Exporting Pansy Metadata...</Control>
+			<Control ID="lblInitializing">Initializing...</Control>
+			<Control ID="lblExportComplete">Export Complete</Control>
+			<Control ID="lblExportSuccessful">Export completed successfully.</Control>
+			<Control ID="lblExportFailed">Export Failed</Control>
+			<Control ID="lblSymbolsExported">Symbols exported:</Control>
+			<Control ID="lblCommentsExported">Comments exported:</Control>
+			<Control ID="lblCodeBytesMarked">Code bytes marked:</Control>
+			<Control ID="lblDataBytesMarked">Data bytes marked:</Control>
+			<Control ID="lblFileSize">File size:</Control>
+			<Control ID="lblExportTime">Export time:</Control>
+		</Form>
+
 		<Form ID="WatchWindow">
 			<Control ID="wndTitle">Watch Window</Control>
 		</Form>
@@ -1822,6 +1837,7 @@ E
 		<Message ID="ImportLabelsWithErrors">Import completed: {0} labels imported (and {1} errors.)</Message>
 		<Message ID="ImportLabelsWithMissingFiles">Import completed: {0} labels imported.&#xA;&#xA;The following files could not be found:&#xA;{1}</Message>
 		<Message ID="ImportLabelsWithErrorsAndMissingFiles">Import completed: {0} labels imported (and {1} errors.)&#xA;&#xA;The following files could not be found:&#xA;{2}</Message>
+		<Message ID="PansyImportComplete">Pansy import complete.&#xA;&#xA;{0}</Message>
 		<Message ID="RandomGameNoGameFound">Mesen could not find any games to load.</Message>
 
 		<Message ID="InvalidPaletteFile">Invalid palette file (too small or too large.)</Message>
