@@ -1,4 +1,11 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Reactive;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Dock.Model.Controls;
@@ -19,18 +26,9 @@ using Mesen.ViewModels;
 using Mesen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Reactive;
-using System.Threading.Tasks;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class DebuggerWindowViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class DebuggerWindowViewModel : DisposableViewModel {
 		[Reactive] public string Title { get; private set; } = "Debugger";
 		[Reactive] public WindowIcon? Icon { get; private set; } = null;
 		[Reactive] public bool IsMainCpuDebugger { get; private set; } = true;
@@ -60,7 +58,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public string CdlStats { get; private set; } = "";
 
 		[Reactive] public List<ContextMenuAction> ToolbarItems { get; private set; } = new();
-		
+
 		[Reactive] public List<ContextMenuAction> FileMenuItems { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> SearchMenuItems { get; private set; } = new();
@@ -76,22 +74,21 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public DebuggerWindowViewModel() : this(null) { }
 
-		public DebuggerWindowViewModel(CpuType? cpuType)
-		{
-			if(!Design.IsDesignMode) {
+		public DebuggerWindowViewModel(CpuType? cpuType) {
+			if (!Design.IsDesignMode) {
 				DebugApi.InitializeDebugger();
 			}
 
 			ConsoleType consoleType;
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				CpuType = CpuType.Snes;
 				consoleType = ConsoleType.Snes;
 			} else {
 				RomInfo romInfo = EmuApi.GetRomInfo();
 				consoleType = romInfo.ConsoleType;
-				if(cpuType != null) {
+				if (cpuType != null) {
 					CpuType = cpuType.Value;
-					if(consoleType.GetMainCpuType() != CpuType) {
+					if (consoleType.GetMainCpuType() != CpuType) {
 						Title = ResourceHelper.GetEnumText(CpuType) + " Debugger";
 						Icon = new WindowIcon(ImageUtilities.BitmapFromAsset("Assets/" + CpuType.ToString() + "Debugger.png"));
 						IsMainCpuDebugger = false;
@@ -112,9 +109,10 @@ namespace Mesen.Debugger.ViewModels
 			LabelList = AddDisposable(new LabelListViewModel(CpuType, this));
 			FindResultList = AddDisposable(new FindResultListViewModel(this));
 			ControllerList = new ControllerListViewModel(consoleType);
-			if(CpuType.SupportsFunctionList()) {
+			if (CpuType.SupportsFunctionList()) {
 				FunctionList = AddDisposable(new FunctionListViewModel(CpuType, this));
 			}
+
 			CallStack = AddDisposable(new CallStackViewModel(CpuType, this));
 			WatchList = AddDisposable(new WatchListViewModel(CpuType));
 			ConsoleStatus = CpuType switch {
@@ -150,13 +148,13 @@ namespace Mesen.Debugger.ViewModels
 			DockLayout = DockFactory.CreateLayout();
 			InitDock();
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, Config_PropertyChanged));
 
-			if(CpuType.SupportsMemoryMappings()) {
+			if (CpuType.SupportsMemoryMappings()) {
 				MemoryMappings = new MemoryMappingViewModel(CpuType);
 			}
 
@@ -167,23 +165,21 @@ namespace Mesen.Debugger.ViewModels
 			ConfigApi.SetDebuggerFlag(CpuType.GetDebuggerFlag(), true);
 		}
 
-		private void InitDock()
-		{
+		private void InitDock() {
 			DockFactory.InitLayout(DockLayout);
 
-			if(FunctionList == null) {
+			if (FunctionList == null) {
 				DockFactory.CloseDockable(DockFactory.FunctionListTool);
 			}
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			UpdateSourceViewState();
 		}
 
-		public void ScrollToAddress(int address)
-		{
+		public void ScrollToAddress(int address) {
 			Disassembly.SetSelectedRow(address, true, true);
 			SourceView?.GoToRelativeAddress(address, true);
 
@@ -191,13 +187,11 @@ namespace Mesen.Debugger.ViewModels
 			DockFactory.SetFocusedDockable(DockLayout, codeTool);
 		}
 
-		private void DebugWorkspaceManager_SymbolProviderChanged(object? sender, EventArgs e)
-		{
+		private void DebugWorkspaceManager_SymbolProviderChanged(object? sender, EventArgs e) {
 			UpdateSourceViewState();
 		}
 
-		public void Init()
-		{
+		public void Init() {
 			WatchList.UpdateWatch();
 			CallStack.UpdateCallStack();
 			LabelList.UpdateLabelList();
@@ -205,8 +199,7 @@ namespace Mesen.Debugger.ViewModels
 			BreakpointList.UpdateBreakpoints();
 		}
 
-		protected override void DisposeView()
-		{
+		protected override void DisposeView() {
 			Config.SavedDockLayout = DockFactory.ToDockDefinition(DockLayout);
 
 			DebugWorkspaceManager.SymbolProviderChanged -= DebugWorkspaceManager_SymbolProviderChanged;
@@ -216,30 +209,28 @@ namespace Mesen.Debugger.ViewModels
 			ConfigApi.SetDebuggerFlag(CpuType.GetDebuggerFlag(), false);
 		}
 
-		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-		{
+		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			ConfigManager.Config.Debug.ApplyConfig();
 			UpdateDisassembly(false);
 		}
 
-		private void UpdateSourceViewState()
-		{
+		private void UpdateSourceViewState() {
 			ISymbolProvider? provider = DebugWorkspaceManager.SymbolProvider;
-			if(provider != null) {
+			if (provider != null) {
 				SourceView = new SourceViewViewModel(this, provider, CpuType);
 				DockFactory.SourceViewTool.Model = SourceView;
 				SourceView.SetActiveAddress(Disassembly.ActiveAddress);
-				if(!IsToolVisible(DockFactory.SourceViewTool)) {
-					if(DockFactory.SourceViewTool.Owner is IDock dock && IsDockVisible(dock)) {
+				if (!IsToolVisible(DockFactory.SourceViewTool)) {
+					if (DockFactory.SourceViewTool.Owner is IDock dock && IsDockVisible(dock)) {
 						DockFactory.AddDockable(dock, DockFactory.SourceViewTool);
-					} else if(DockFactory.DisassemblyTool.Owner is IDock disassemblyDock) {
+					} else if (DockFactory.DisassemblyTool.Owner is IDock disassemblyDock) {
 						DockFactory.AddDockable(disassemblyDock, DockFactory.SourceViewTool);
 					}
 				}
 			} else {
 				SourceView = null;
 				DockFactory.SourceViewTool.Model = null;
-				if(IsToolVisible(DockFactory.SourceViewTool)) {
+				if (IsToolVisible(DockFactory.SourceViewTool)) {
 					DockFactory.SourceViewTool.CanClose = true;
 					DockFactory.CloseDockable(DockFactory.SourceViewTool);
 					DockFactory.SourceViewTool.CanClose = false;
@@ -247,18 +238,15 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void UpdateConsoleState()
-		{
+		public void UpdateConsoleState() {
 			ConsoleStatus?.UpdateConsoleState();
 		}
 
-		private void Manager_WatchChanged(object? sender, EventArgs e)
-		{
+		private void Manager_WatchChanged(object? sender, EventArgs e) {
 			WatchList.UpdateWatch();
 		}
 
-		private void LabelManager_OnLabelUpdated(object? sender, EventArgs e)
-		{
+		private void LabelManager_OnLabelUpdated(object? sender, EventArgs e) {
 			LabelList.UpdateLabelList();
 			BreakpointList.RefreshBreakpointList();
 			CallStack.RefreshCallStack();
@@ -266,21 +254,20 @@ namespace Mesen.Debugger.ViewModels
 			Disassembly.Refresh();
 		}
 
-		private void BreakpointManager_BreakpointsChanged(object? sender, EventArgs e)
-		{
+		private void BreakpointManager_BreakpointsChanged(object? sender, EventArgs e) {
 			Disassembly.InvalidateVisual();
 			SourceView?.InvalidateVisual();
 			BreakpointList.UpdateBreakpoints();
 		}
 
-		public void UpdateDebugger(bool forBreak = false, BreakEvent? evt = null)
-		{
+		public void UpdateDebugger(bool forBreak = false, BreakEvent? evt = null) {
 			ConsoleStatus?.UpdateUiState();
 
-			if(forBreak) {
-				if(ConsoleStatus?.EditAllowed == false) {
+			if (forBreak) {
+				if (ConsoleStatus?.EditAllowed == false) {
 					ConsoleStatus.EditAllowed = true;
 				}
+
 				UpdateStatusBar(evt);
 			}
 
@@ -293,30 +280,29 @@ namespace Mesen.Debugger.ViewModels
 			CallStack.UpdateCallStack();
 		}
 
-		public void PartialRefresh(bool refreshWatch)
-		{
+		public void PartialRefresh(bool refreshWatch) {
 			ConsoleStatus?.UpdateUiState(true);
 			MemoryMappings?.Refresh();
 			UpdateCdlStats();
-			if(refreshWatch) {
+			if (refreshWatch) {
 				WatchList.UpdateWatch();
 			}
 		}
 
-		private void UpdateStatusBar(BreakEvent? evt)
-		{
-			if(ConsoleStatus?.ElapsedCycles > 0) {
+		private void UpdateStatusBar(BreakEvent? evt) {
+			if (ConsoleStatus?.ElapsedCycles > 0) {
 				string elapsedCycles = $"{CodeTooltipHelper.FormatValue(ConsoleStatus.ElapsedCycles, 999999)} cycles elapsed";
 				string tooltip = $"{ConsoleStatus.ElapsedCycles:N0} cycles elapsed";
 
-				if(CpuType == CpuType.Snes) {
+				if (CpuType == CpuType.Snes) {
 					UInt64 prevMasterClock = _masterClock;
 					_masterClock = EmuApi.GetTimingInfo(CpuType).MasterClock;
-					if(prevMasterClock > 0 && prevMasterClock < _masterClock) {
+					if (prevMasterClock > 0 && prevMasterClock < _masterClock) {
 						elapsedCycles += $" ({CodeTooltipHelper.FormatValue(_masterClock - prevMasterClock, 999999)} master clocks)";
 						tooltip += $" ({_masterClock - prevMasterClock:N0} master clocks)";
 					}
 				}
+
 				BreakElapsedCycles = elapsedCycles;
 				BreakElapsedCyclesTooltip = tooltip;
 			} else {
@@ -326,63 +312,63 @@ namespace Mesen.Debugger.ViewModels
 
 			UpdateCdlStats();
 
-			if(evt != null) {
+			if (evt != null) {
 				string breakReason = "";
 				BreakEvent brkEvent = evt.Value;
-				if(brkEvent.Source != BreakSource.Unspecified) {
+				if (brkEvent.Source != BreakSource.Unspecified) {
 					breakReason = ResourceHelper.GetEnumText(brkEvent.Source);
-					if(brkEvent.Source == BreakSource.Breakpoint) {
+					if (brkEvent.Source == BreakSource.Breakpoint) {
 						Breakpoint? bp = BreakpointManager.GetBreakpointById(brkEvent.BreakpointId);
-						if(bp?.IsAssert == true) {
+						if (bp?.IsAssert == true) {
 							breakReason = "Assert failed: " + bp.Condition.Substring(2, bp.Condition.Length - 3);
 						} else {
-							breakReason += (
+							breakReason += 
 								": " +
 								ResourceHelper.GetEnumText(brkEvent.Operation.Type) + " " +
 								brkEvent.Operation.MemType.GetShortName() +
 								" ($" + brkEvent.Operation.Address.ToString("X4") +
 								":$" + brkEvent.Operation.Value.ToString("X2") + ")"
-							);
+							;
 						}
 					}
 				}
+
 				BreakReason = breakReason;
 			} else {
 				BreakReason = "";
 			}
 		}
 
-		private void UpdateCdlStats()
-		{
+		private void UpdateCdlStats() {
 			string statsString = "";
-			if(CpuType.ToMemoryType().SupportsCdl()) {
+			if (CpuType.ToMemoryType().SupportsCdl()) {
 				CdlStatistics stats = DebugApi.GetCdlStatistics(CpuType.GetPrgRomMemoryType());
-				if(stats.TotalBytes > 0) {
+				if (stats.TotalBytes > 0) {
 					statsString = $"Code: {(double)stats.CodeBytes / stats.TotalBytes * 100:0.00}% Data: {(double)stats.DataBytes / stats.TotalBytes * 100:0.00}%";
-					if(stats.TotalChrBytes > 0) {
+					if (stats.TotalChrBytes > 0) {
 						statsString += $" Drawn (CHR ROM): {(double)stats.DrawnChrBytes / stats.TotalChrBytes * 100:0.00}%";
 					}
 				}
 			}
+
 			CdlStats = statsString;
 		}
 
-		public void UpdateActiveAddress(bool scrollToAddress)
-		{
-			if(scrollToAddress) {
+		public void UpdateActiveAddress(bool scrollToAddress) {
+			if (scrollToAddress) {
 				//Scroll to the active address and highlight it
 				int activeAddress = (int)DebugApi.GetProgramCounter(CpuType, true);
 				Disassembly.SetActiveAddress(activeAddress);
 
-				if(SourceView != null) {
+				if (SourceView != null) {
 					bool sourceMappingFound = SourceView.SetActiveAddress(activeAddress);
-					if(!sourceMappingFound) {
+					if (!sourceMappingFound) {
 						//If location is not found in source mappings, swap to disassembly view
-						if(IsToolVisible(DockFactory.SourceViewTool) && IsToolActive(DockFactory.SourceViewTool)) {
+						if (IsToolVisible(DockFactory.SourceViewTool) && IsToolActive(DockFactory.SourceViewTool)) {
 							_autoSwitchToSourceView = true;
 							OpenTool(DockFactory.DisassemblyTool);
 						}
-					} else if(_autoSwitchToSourceView) {
+					} else if (_autoSwitchToSourceView) {
 						//If we previously auto-switched to disassembly view, go back to the
 						//source view automatically if the current address is mapped to a source file
 						OpenTool(DockFactory.SourceViewTool);
@@ -390,7 +376,7 @@ namespace Mesen.Debugger.ViewModels
 					}
 				}
 
-				if(!EmuApi.IsPaused()) {
+				if (!EmuApi.IsPaused()) {
 					//Clear the highlight if the emulation is still running
 					Disassembly.SetActiveAddress(null);
 					SourceView?.SetActiveAddress(null);
@@ -398,26 +384,24 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void UpdateDisassembly(bool scrollToActiveAddress)
-		{
+		public void UpdateDisassembly(bool scrollToActiveAddress) {
 			UpdateActiveAddress(scrollToActiveAddress);
 			Disassembly.Refresh();
 			SourceView?.Refresh();
 		}
 
-		public void ProcessResumeEvent(Window wnd)
-		{
-			if(ConsoleStatus != null) {
+		public void ProcessResumeEvent(Window wnd) {
+			if (ConsoleStatus != null) {
 				//Disable status fields in 50ms (if the debugger isn't paused by then)
 				//This improves performance when stepping through code, etc.
 				Task.Run(() => {
 					System.Threading.Thread.Sleep(50);
 					Dispatcher.UIThread.Post(() => {
 						BaseConsoleStatusViewModel status = ConsoleStatus;
-						if(status != null && status.EditAllowed && !EmuApi.IsPaused()) {
+						if (status != null && status.EditAllowed && !EmuApi.IsPaused()) {
 							status.EditAllowed = false;
 
-							if(DockFactory.StatusTool.Owner is IDock parent && parent.IsActive && parent.ActiveDockable == DockFactory.StatusTool) {
+							if (DockFactory.StatusTool.Owner is IDock parent && parent.IsActive && parent.ActiveDockable == DockFactory.StatusTool) {
 								//If status tool is active when it gets disabled, give window focus to avoid focus issues in Avalonia
 								//Disabling focused controls by setting IsEnabled=false on a parent does not appear to behave properly
 								//The controls keep their focus and can be modified
@@ -434,20 +418,19 @@ namespace Mesen.Debugger.ViewModels
 			SourceView?.InvalidateVisual();
 		}
 
-		private ToolDock? FindToolDock(IDock dock)
-		{
-			if(dock is ToolDock) {
+		private ToolDock? FindToolDock(IDock dock) {
+			if (dock is ToolDock) {
 				return (ToolDock)dock;
 			}
 
-			if(dock.VisibleDockables == null) {
+			if (dock.VisibleDockables == null) {
 				return null;
 			}
 
-			foreach(IDockable dockable in dock.VisibleDockables) {
-				if(dockable is IDock) {
+			foreach (IDockable dockable in dock.VisibleDockables) {
+				if (dockable is IDock) {
 					ToolDock? result = FindToolDock((IDock)dockable);
-					if(result != null) {
+					if (result != null) {
 						return result;
 					}
 				}
@@ -456,39 +439,34 @@ namespace Mesen.Debugger.ViewModels
 			return null;
 		}
 
-		private bool IsToolActive(Tool tool)
-		{
+		private bool IsToolActive(Tool tool) {
 			return (tool.Owner as IDock)?.ActiveDockable == tool;
 		}
 
-		private bool IsDockVisible(IDock? dock)
-		{
-			return dock is RootDock || (dock != null && (dock.Owner as IDock)?.VisibleDockables?.Contains(dock) == true && (dock.Owner == null || !(dock.Owner is IDock) || IsDockVisible(dock.Owner as IDock)));
+		private bool IsDockVisible(IDock? dock) {
+			return dock is RootDock || (dock != null && (dock.Owner as IDock)?.VisibleDockables?.Contains(dock) == true && (dock.Owner == null || dock.Owner is not IDock || IsDockVisible(dock.Owner as IDock)));
 		}
 
-		private bool IsToolVisible(Tool tool)
-		{
+		private bool IsToolVisible(Tool tool) {
 			return (tool.Owner as IDock)?.VisibleDockables?.Contains(tool) == true && IsDockVisible(tool.Owner as IDock);
 		}
 
-		private void ToggleTool(Tool tool)
-		{
-			if(IsToolVisible(tool)) {
+		private void ToggleTool(Tool tool) {
+			if (IsToolVisible(tool)) {
 				DockFactory.CloseDockable(tool);
 			} else {
 				OpenTool(tool);
 			}
 		}
 
-		public void OpenTool(Tool tool)
-		{
-			if(!IsToolVisible(tool)) {
+		public void OpenTool(Tool tool) {
+			if (!IsToolVisible(tool)) {
 				IDockable? visibleTool = DockFactory.FindDockable(DockLayout, x => x is BaseToolContainerViewModel && x != DockFactory.DisassemblyTool && x.Owner is IDock owner && owner.VisibleDockables?.Contains(x) == true);
-				if(visibleTool?.Owner is IDock dock) {
+				if (visibleTool?.Owner is IDock dock) {
 					DockFactory.AddDockable(dock, tool);
 				} else {
 					//Couldn't find any where else to open tool, create a new section
-					if(DockLayout.VisibleDockables?.Count > 0 && DockLayout.VisibleDockables[0] is IDock mainDock) {
+					if (DockLayout.VisibleDockables?.Count > 0 && DockLayout.VisibleDockables[0] is IDock mainDock) {
 						DockFactory.SplitToDock(mainDock, new ToolDock {
 							Proportion = 0.33,
 							VisibleDockables = DockFactory.CreateList<IDockable>(tool)
@@ -501,8 +479,7 @@ namespace Mesen.Debugger.ViewModels
 			DockFactory.SetFocusedDockable(DockLayout, tool);
 		}
 
-		public void InitializeMenu(Window wnd)
-		{
+		public void InitializeMenu(Window wnd) {
 			DebuggerConfig cfg = ConfigManager.Config.Debug.Debugger;
 
 			_gotoSubActions = new() {
@@ -679,26 +656,24 @@ namespace Mesen.Debugger.ViewModels
 			DebugShortcutManager.RegisterActions(wnd, OptionMenuItems);
 		}
 
-		private void InitGoToCpuVectorActions()
-		{
+		private void InitGoToCpuVectorActions() {
 			DebuggerFeatures features = DebugApi.GetDebuggerFeatures(CpuType);
 
-			if(features.CpuVectorCount == 0) {
+			if (features.CpuVectorCount == 0) {
 				return;
 			}
 
-			int getAddress(CpuVectorDefinition def)
-			{
-				if(def.Type == VectorType.Indirect) {
+			int getAddress(CpuVectorDefinition def) {
+				if (def.Type == VectorType.Indirect) {
 					byte[] vector = DebugApi.GetMemoryValues(CpuType.ToMemoryType(), def.Address, def.Address + 1);
 					return vector[0] | (vector[1] << 8);
-				} else if(def.Type == VectorType.Direct) {
+				} else if (def.Type == VectorType.Direct) {
 					return (int)def.Address;
 				} else {
 					byte[] vector = Array.Empty<byte>();
-					if(def.Type == VectorType.x86) {
+					if (def.Type == VectorType.x86) {
 						vector = DebugApi.GetMemoryValues(CpuType.ToMemoryType(), def.Address, def.Address + 3);
-					} else if(def.Type == VectorType.x86WithOffset) {
+					} else if (def.Type == VectorType.x86WithOffset) {
 						byte irqVectorOffset = DebugApi.GetDebuggerFeatures(CpuType).IrqVectorOffset;
 						uint baseAddr = (irqVectorOffset + def.Address) * 4;
 						vector = DebugApi.GetMemoryValues(CpuType.ToMemoryType(), baseAddr, baseAddr + 3);
@@ -710,21 +685,21 @@ namespace Mesen.Debugger.ViewModels
 				}
 			}
 
-			Func<DbgShortKeys>? getShortcut(int index)
-			{
-				switch(index) {
+			Func<DbgShortKeys>? getShortcut(int index) {
+				switch (index) {
 					case 0: return () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.GoToCpuVector1);
 					case 1: return () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.GoToCpuVector2);
 					case 2: return () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.GoToCpuVector3);
 					case 3: return () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.GoToCpuVector4);
 					case 4: return () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.GoToCpuVector5);
 				}
+
 				return null;
 			}
 
 			_gotoSubActions.Add(new ContextMenuSeparator());
 
-			for(int i = 0; i < features.CpuVectorCount; i++) {
+			for (int i = 0; i < features.CpuVectorCount; i++) {
 				CpuVectorDefinition def = features.CpuVectors[i];
 				string name = Utf8Utilities.GetStringFromArray(features.CpuVectors[i].Name);
 				_gotoSubActions.Add(new ContextMenuAction() {
@@ -737,12 +712,11 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private List<ContextMenuAction> GetDebugMenu(Control wnd, bool forToolbar)
-		{
+		private List<ContextMenuAction> GetDebugMenu(Control wnd, bool forToolbar) {
 			List<ContextMenuAction> debugMenu = new();
 			debugMenu.AddRange(DebugSharedActions.GetStepActions(wnd, () => CpuType));
 
-			if(!forToolbar) {
+			if (!forToolbar) {
 				debugMenu.AddRange(new List<ContextMenuAction> {
 					new ContextMenuSeparator(),
 
@@ -762,13 +736,14 @@ namespace Mesen.Debugger.ViewModels
 						OnClick = () => ShortcutHandler.ReloadRom()
 					}
 				});
-			};
+			}
+
+			;
 
 			return debugMenu;
 		}
 
-		private ContextMenuAction GetCdlActionMenu(Window wnd)
-		{
+		private ContextMenuAction GetCdlActionMenu(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.CodeDataLogger,
 				IsEnabled = () => CpuType.ToMemoryType().SupportsCdl(),
@@ -823,8 +798,7 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private ContextMenuAction GetWorkspaceActionMenu(Window wnd)
-		{
+		private ContextMenuAction GetWorkspaceActionMenu(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.Workspace,
 				SubActions = new() {
@@ -903,37 +877,36 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private BaseToolContainerViewModel GetActiveCodeTool()
-		{
-			if(DockLayout.ActiveDockable == DockFactory.SourceViewTool) {
+		private BaseToolContainerViewModel GetActiveCodeTool() {
+			if (DockLayout.ActiveDockable == DockFactory.SourceViewTool) {
 				return DockFactory.SourceViewTool;
-			} else if(DockLayout.ActiveDockable == DockFactory.DisassemblyTool) {
+			} else if (DockLayout.ActiveDockable == DockFactory.DisassemblyTool) {
 				return DockFactory.DisassemblyTool;
-			} else if(IsToolActive(DockFactory.DisassemblyTool)) {
+			} else if (IsToolActive(DockFactory.DisassemblyTool)) {
 				return DockFactory.DisassemblyTool;
-			} else if(IsToolActive(DockFactory.SourceViewTool)) {
+			} else if (IsToolActive(DockFactory.SourceViewTool)) {
 				return DockFactory.SourceViewTool;
 			}
+
 			return DockFactory.DisassemblyTool;
 		}
 
-		private QuickSearchViewModel GetActiveQuickSearch()
-		{
-			if(DockLayout.ActiveDockable == DockFactory.SourceViewTool) {
+		private QuickSearchViewModel GetActiveQuickSearch() {
+			if (DockLayout.ActiveDockable == DockFactory.SourceViewTool) {
 				return SourceView?.QuickSearch ?? Disassembly.QuickSearch;
-			} else if(DockLayout.ActiveDockable == DockFactory.DisassemblyTool) {
+			} else if (DockLayout.ActiveDockable == DockFactory.DisassemblyTool) {
 				return Disassembly.QuickSearch;
-			} else if(IsToolActive(DockFactory.DisassemblyTool)) {
+			} else if (IsToolActive(DockFactory.DisassemblyTool)) {
 				return Disassembly.QuickSearch;
-			} else if(IsToolActive(DockFactory.SourceViewTool)) {
+			} else if (IsToolActive(DockFactory.SourceViewTool)) {
 				return SourceView?.QuickSearch ?? Disassembly.QuickSearch;
 			}
+
 			return Disassembly.QuickSearch;
 		}
 
-		public void Step(StepType type, int instructionCount = 1)
-		{
-			switch(type) {
+		public void Step(StepType type, int instructionCount = 1) {
+			switch (type) {
 				case StepType.PpuStep:
 				case StepType.PpuScanline:
 				case StepType.PpuFrame:
@@ -946,13 +919,12 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void FindAllOccurrences(string search, DisassemblySearchOptions options)
-		{
-			if(!options.MatchCase) {
+		public void FindAllOccurrences(string search, DisassemblySearchOptions options) {
+			if (!options.MatchCase) {
 				search = search.ToLower();
 			}
 
-			if(SourceView != null && GetActiveCodeTool() == DockFactory.SourceViewTool) {
+			if (SourceView != null && GetActiveCodeTool() == DockFactory.SourceViewTool) {
 				FindResultList.SetResults(SourceView.FindAllOccurrences(search, options));
 			} else {
 				CodeLineData[] results = DebugApi.FindOccurrences(CpuType, search.Trim(), options);
@@ -960,10 +932,9 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void RunToLocation(LocationInfo actionLocation)
-		{
+		public void RunToLocation(LocationInfo actionLocation) {
 			AddressInfo? addr = actionLocation.AbsAddress ?? actionLocation.RelAddress;
-			if(addr == null) {
+			if (addr == null) {
 				return;
 			}
 
@@ -976,7 +947,7 @@ namespace Mesen.Debugger.ViewModels
 				EndAddress = (uint)addr.Value.Address
 			});
 
-			if(EmuApi.IsPaused()) {
+			if (EmuApi.IsPaused()) {
 				DebugApi.ResumeExecution();
 			}
 		}

@@ -1,18 +1,16 @@
-﻿using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Config;
+using Mesen.Debugger.Controls;
+using Mesen.Debugger.Labels;
+using Mesen.Interop;
 
-namespace Mesen.Debugger
-{
-	public class CodeLineData
-	{
+namespace Mesen.Debugger {
+	public class CodeLineData {
 		public CpuType CpuType { get; private set; }
 
 		public string Text = "";
@@ -25,22 +23,20 @@ namespace Mesen.Debugger
 		public byte OpSize = 0;
 		public byte[] ByteCode = Array.Empty<byte>();
 
-		private string _byteCodeString = "";
-		public string ByteCodeStr 
-		{
-			get
-			{
-				if(OpSize > 0 && _byteCodeString == "") {
+		public string ByteCodeStr {
+			get {
+				if (OpSize > 0 && field == "") {
 					string output = "";
-					for(int i = 0; i < OpSize && i < ByteCode.Length; i++) {
+					for (int i = 0; i < OpSize && i < ByteCode.Length; i++) {
 						output += ByteCode[i].ToString("X2") + " ";
 					}
-					_byteCodeString = output;
+
+					field = output;
 				}
 
-				return _byteCodeString;
+				return field;
 			}
-		}
+		} = "";
 
 		public string Comment = "";
 
@@ -50,26 +46,27 @@ namespace Mesen.Debugger
 		public UInt32 Value = 0;
 		public byte ValueSize = 0;
 
-		public string GetEffectiveAddressString(string format, out CodeSegmentType segmentType)
-		{
-			if(ShowEffectiveAddress && EffectiveAddress >= 0) {
+		public string GetEffectiveAddressString(string format, out CodeSegmentType segmentType) {
+			if (ShowEffectiveAddress && EffectiveAddress >= 0) {
 				AddressInfo relAddress = new() { Address = (Int32)EffectiveAddress, Type = EffectiveAddressType };
 				CodeLabel? label = LabelManager.GetLabel(relAddress);
-				if(label != null && !string.IsNullOrWhiteSpace(label.Label)) {
+				if (label != null && !string.IsNullOrWhiteSpace(label.Label)) {
 					segmentType = CodeSegmentType.Label;
-					if(label.Length > 1) {
+					if (label.Length > 1) {
 						int gap = DebugApi.GetAbsoluteAddress(relAddress).Address - label.GetAbsoluteAddress().Address;
-						if(gap > 0) {
+						if (gap > 0) {
 							return "[" + label.Label + "+" + gap.ToString() + "]";
 						}
 					}
+
 					return "[" + label.Label + "]";
 				} else {
 					segmentType = CodeSegmentType.EffectiveAddress;
-					if(EffectiveAddressType.IsUnmapped()) {
+					if (EffectiveAddressType.IsUnmapped()) {
 						//Default to a single byte for I/O ports (SMS/WS)
 						format = ConfigManager.Config.Debug.Debugger.UseLowerCaseDisassembly ? "x2" : "X2";
 					}
+
 					return "[$" + EffectiveAddress.ToString(format) + "]";
 				}
 			} else {
@@ -78,40 +75,35 @@ namespace Mesen.Debugger
 			}
 		}
 
-		public string GetValueString()
-		{
-			if(ValueSize == 1) {
+		public string GetValueString() {
+			if (ValueSize == 1) {
 				return " = $" + Value.ToString(ConfigManager.Config.Debug.Debugger.UseLowerCaseDisassembly ? "x2" : "X2");
-			} else if(ValueSize == 2) {
+			} else if (ValueSize == 2) {
 				return " = $" + Value.ToString(ConfigManager.Config.Debug.Debugger.UseLowerCaseDisassembly ? "x4" : "X4");
-			} else if(ValueSize == 4) {
+			} else if (ValueSize == 4) {
 				return " = $" + Value.ToString(ConfigManager.Config.Debug.Debugger.UseLowerCaseDisassembly ? "x8" : "X8");
 			} else {
 				return "";
 			}
 		}
 
-		public bool IsAddressHidden
-		{
-			get
-			{
-				return (
+		public bool IsAddressHidden {
+			get {
+				return 
 					Flags.HasFlag(LineFlags.Empty) || //block start/end, etc.
 					(Flags.HasFlag(LineFlags.Comment) && Text.Length == 0) || //multi-line comment
 					Flags.HasFlag(LineFlags.Label) //label definition
-				);
+				;
 			}
 		}
 
 		public bool HasAddress => Address >= 0 && !IsAddressHidden;
 
-		public CodeLineData(CpuType cpuType)
-		{
+		public CodeLineData(CpuType cpuType) {
 			CpuType = cpuType;
 		}
 
-		public CodeLineData(InteropCodeLineData data)
-		{
+		public CodeLineData(InteropCodeLineData data) {
 			this.CpuType = data.LineCpuType;
 
 			this.Text = ConvertString(data.Text);
@@ -129,33 +121,31 @@ namespace Mesen.Debugger
 			this.ValueSize = data.EffectiveAddress.ValueSize;
 		}
 
-		private string ConvertString(byte[] stringArray)
-		{
+		private string ConvertString(byte[] stringArray) {
 			int length = 0;
-			for(int i = 0; i < 1000; i++) {
-				if(stringArray[i] == 0) {
+			for (int i = 0; i < 1000; i++) {
+				if (stringArray[i] == 0) {
 					length = i;
 					break;
 				}
 			}
+
 			return Encoding.UTF8.GetString(stringArray, 0, length);
 		}
 
-		public override string ToString()
-		{
+		public override string ToString() {
 			return "$" + this.Address.ToString("X6") + "  " + this.ByteCodeStr?.PadRight(12) + "  " + this.Text;
 		}
 
-		public string GetByteCode(int byteCodeSize)
-		{
-			if(ByteCodeStr.Length > byteCodeSize * 3) {
+		public string GetByteCode(int byteCodeSize) {
+			if (ByteCodeStr.Length > byteCodeSize * 3) {
 				return ByteCodeStr.Substring(0, (byteCodeSize - 1) * 3) + "..";
 			}
+
 			return ByteCodeStr;
 		}
 
-		public string GetAddressText(AddressDisplayType addressDisplayType, string addrFormat)
-		{
+		public string GetAddressText(AddressDisplayType addressDisplayType, string addrFormat) {
 			string addressText = HasAddress ? Address.ToString(addrFormat) : "";
 			string absAddress = AbsoluteAddress.Address >= 0 && !IsAddressHidden ? AbsoluteAddress.Address.ToString(addrFormat) : "";
 			string compactAbsAddress = AbsoluteAddress.Address >= 0 && !IsAddressHidden ? (AbsoluteAddress.Address >> 12).ToString("X") : "";
@@ -169,16 +159,14 @@ namespace Mesen.Debugger
 		}
 	}
 
-	public struct EffectiveAddressInfo
-	{
+	public struct EffectiveAddressInfo {
 		public Int64 Address;
 		public MemoryType Type;
 		public byte ValueSize;
 		[MarshalAs(UnmanagedType.I1)] public bool ShowAddress;
 	}
 
-	public struct InteropCodeLineData
-	{
+	public struct InteropCodeLineData {
 		public Int32 Address;
 		public AddressInfo AbsoluteAddress;
 		public byte OpSize;
@@ -198,8 +186,7 @@ namespace Mesen.Debugger
 		public byte[] Comment;
 	}
 
-	public enum LineFlags : UInt16
-	{
+	public enum LineFlags : UInt16 {
 		None = 0,
 		PrgRom = 0x01,
 		WorkRam = 0x02,

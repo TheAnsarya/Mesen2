@@ -1,16 +1,14 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Mesen.Debugger.Controls;
 using Mesen.Interop;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class MemoryMappingViewModel : ViewModelBase
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class MemoryMappingViewModel : ViewModelBase {
 		private CpuType _cpuType;
 
 		[Reactive] public List<MemoryMappingBlock> CpuMappings { get; private set; } = new();
@@ -21,47 +19,44 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public MemoryMappingViewModel() : this(CpuType.Nes) { }
 
-		public MemoryMappingViewModel(CpuType cpuType)
-		{
+		public MemoryMappingViewModel(CpuType cpuType) {
 			_cpuType = cpuType;
 			CpuMemType = cpuType.ToMemoryType();
 			PpuMemType = cpuType.GetVramMemoryType();
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			Refresh();
 		}
 
-		public void Refresh()
-		{
+		public void Refresh() {
 			try {
-				if(_cpuType == CpuType.Nes) {
+				if (_cpuType == CpuType.Nes) {
 					NesCartridgeState state = DebugApi.GetConsoleState<NesState>(ConsoleType.Nes).Cartridge;
 					CpuMappings = UpdateMappings(CpuMappings, GetNesCpuMappings(state));
 					PpuMappings = UpdateMappings(PpuMappings, GetNesPpuMappings(state));
-				} else if(_cpuType == CpuType.Gameboy) {
+				} else if (_cpuType == CpuType.Gameboy) {
 					CpuMappings = UpdateMappings(CpuMappings, GetGameboyCpuMappings(DebugApi.GetConsoleState<GbState>(ConsoleType.Gameboy)));
-				} else if(_cpuType == CpuType.Pce) {
+				} else if (_cpuType == CpuType.Pce) {
 					CpuMappings = UpdateMappings(CpuMappings, GetPceCpuMappings(DebugApi.GetConsoleState<PceState>(ConsoleType.PcEngine).MemoryManager));
-				} else if(_cpuType == CpuType.Sms) {
+				} else if (_cpuType == CpuType.Sms) {
 					CpuMappings = UpdateMappings(CpuMappings, GetSmsCpuMappings(DebugApi.GetConsoleState<SmsState>(ConsoleType.Sms).MemoryManager));
-				} else if(_cpuType == CpuType.Ws) {
+				} else if (_cpuType == CpuType.Ws) {
 					CpuMappings = UpdateMappings(CpuMappings, GetWsCpuMappings(DebugApi.GetConsoleState<WsState>(ConsoleType.Ws).MemoryManager));
 				}
 			} catch { }
 		}
 
-		private List<MemoryMappingBlock> UpdateMappings(List<MemoryMappingBlock>? oldMappings, List<MemoryMappingBlock> newMappings)
-		{
+		private List<MemoryMappingBlock> UpdateMappings(List<MemoryMappingBlock>? oldMappings, List<MemoryMappingBlock> newMappings) {
 			//Only update the mappings if the new mappings are not the same as the old ones (for performance)
-			if(oldMappings?.Count != newMappings.Count) {
+			if (oldMappings?.Count != newMappings.Count) {
 				return newMappings;
 			}
 
-			for(int i = 0; i < oldMappings.Count; i++) {
-				if(oldMappings[i] != newMappings[i]) {
+			for (int i = 0; i < oldMappings.Count; i++) {
+				if (oldMappings[i] != newMappings[i]) {
 					return newMappings;
 				}
 			}
@@ -69,8 +64,7 @@ namespace Mesen.Debugger.ViewModels
 			return oldMappings;
 		}
 
-		private List<MemoryMappingBlock> GetNesCpuMappings(NesCartridgeState state)
-		{
+		private List<MemoryMappingBlock> GetNesCpuMappings(NesCartridgeState state) {
 			Dictionary<NesPrgMemoryType, Color> mainColors = new() {
 				{ NesPrgMemoryType.WorkRam, Color.FromRgb(0xCD, 0xDC, 0xFA) },
 				{ NesPrgMemoryType.SaveRam, Color.FromRgb(0xFA, 0xDC, 0xCD) },
@@ -109,14 +103,13 @@ namespace Mesen.Debugger.ViewModels
 			NesMemoryAccessType accessType = NesMemoryAccessType.Unspecified;
 			int currentSize = -0x20;
 
-			void addBlock(int i)
-			{
+			void addBlock(int i) {
 				int startIndex = i - (currentSize / 0x100);
 
-				if(memoryType.HasValue) {
+				if (memoryType.HasValue) {
 					Color color = mainColors[memoryType.Value];
 
-					if(mappings[^1].Color == color) {
+					if (mappings[^1].Color == color) {
 						//Use alternative color if the previous color is identical
 						color = altColors[memoryType.Value];
 					}
@@ -132,39 +125,42 @@ namespace Mesen.Debugger.ViewModels
 				} else {
 					mappings.Add(new MemoryMappingBlock() { Length = currentSize, Name = "N/A", Note = accessNotes[accessType], Color = Color.FromRgb(222, 222, 222) });
 				}
+
 				currentSize = 0;
 			}
 
-			for(int i = 0x40; i < 0x100; i++) {
-				if(state.PrgMemoryAccess[i] != NesMemoryAccessType.NoAccess) {
-					bool forceNewBlock = (
+			for (int i = 0x40; i < 0x100; i++) {
+				if (state.PrgMemoryAccess[i] != NesMemoryAccessType.NoAccess) {
+					bool forceNewBlock = 
 						(memoryType == NesPrgMemoryType.PrgRom && state.PrgMemoryOffset[i] % state.PrgPageSize == 0) ||
 						(memoryType == NesPrgMemoryType.WorkRam && state.PrgMemoryOffset[i] % state.WorkRamPageSize == 0) ||
 						(memoryType == NesPrgMemoryType.SaveRam && state.PrgMemoryOffset[i] % state.SaveRamPageSize == 0)
-					);
+					;
 
-					if(forceNewBlock || memoryType != state.PrgMemoryType[i] || state.PrgMemoryOffset[i] - state.PrgMemoryOffset[i - 1] != 0x100) {
+					if (forceNewBlock || memoryType != state.PrgMemoryType[i] || state.PrgMemoryOffset[i] - state.PrgMemoryOffset[i - 1] != 0x100) {
 						addBlock(i);
 					}
 
 					memoryType = state.PrgMemoryType[i];
 					accessType = state.PrgMemoryAccess[i];
 				} else {
-					if(memoryType != null) {
+					if (memoryType != null) {
 						addBlock(i);
 					}
+
 					memoryType = null;
 					accessType = NesMemoryAccessType.Unspecified;
 				}
+
 				currentSize += 0x100;
 			}
+
 			addBlock(0x100);
 
 			return mappings;
 		}
 
-		private List<MemoryMappingBlock> GetNesPpuMappings(NesCartridgeState state)
-		{
+		private List<MemoryMappingBlock> GetNesPpuMappings(NesCartridgeState state) {
 			List<MemoryMappingBlock> mappings = new();
 
 			Dictionary<NesChrMemoryType, Color> mainColors = new() {
@@ -193,14 +189,13 @@ namespace Mesen.Debugger.ViewModels
 			NesMemoryAccessType accessType = NesMemoryAccessType.Unspecified;
 			int currentSize = 0;
 
-			void addBlock(int i)
-			{
+			void addBlock(int i) {
 				int startIndex = i - (currentSize / 0x100);
 
-				if(memoryType.HasValue) {
+				if (memoryType.HasValue) {
 					Color color = mainColors[memoryType.Value];
 
-					if(mappings[^1].Color == color) {
+					if (mappings[^1].Color == color) {
 						//Use alternative color if the previous color is identical
 						color = altColors[memoryType.Value];
 					}
@@ -213,10 +208,10 @@ namespace Mesen.Debugger.ViewModels
 					};
 
 					string name = "";
-					if(memoryType == NesChrMemoryType.NametableRam) {
+					if (memoryType == NesChrMemoryType.NametableRam) {
 						name = "NT" + page.ToString();
 						page = -1;
-					} else if(memoryType == NesChrMemoryType.MapperRam) {
+					} else if (memoryType == NesChrMemoryType.MapperRam) {
 						name = "EXRAM";
 					}
 
@@ -224,39 +219,42 @@ namespace Mesen.Debugger.ViewModels
 				} else {
 					mappings.Add(new MemoryMappingBlock() { Length = currentSize, Name = "N/A", Note = accessNotes[accessType], Color = Color.FromRgb(222, 222, 222) });
 				}
+
 				currentSize = 0;
 			}
 
-			for(int i = 0x00; i < 0x30; i++) {
-				if(state.ChrMemoryAccess[i] != NesMemoryAccessType.NoAccess) {
-					bool forceNewBlock = (
+			for (int i = 0x00; i < 0x30; i++) {
+				if (state.ChrMemoryAccess[i] != NesMemoryAccessType.NoAccess) {
+					bool forceNewBlock = 
 						(memoryType == NesChrMemoryType.NametableRam && state.ChrMemoryOffset[i] % 0x400 == 0) ||
 						(memoryType == NesChrMemoryType.ChrRom && state.ChrMemoryOffset[i] % state.ChrPageSize == 0) ||
 						(memoryType == NesChrMemoryType.ChrRam && state.ChrMemoryOffset[i] % state.ChrRamPageSize == 0)
-					);
+					;
 
-					if(forceNewBlock || memoryType != state.ChrMemoryType[i] || state.ChrMemoryOffset[i] - state.ChrMemoryOffset[i - 1] != 0x100) {
+					if (forceNewBlock || memoryType != state.ChrMemoryType[i] || state.ChrMemoryOffset[i] - state.ChrMemoryOffset[i - 1] != 0x100) {
 						addBlock(i);
 					}
 
 					memoryType = state.ChrMemoryType[i];
 					accessType = state.ChrMemoryAccess[i];
 				} else {
-					if(memoryType != null) {
+					if (memoryType != null) {
 						addBlock(i);
 					}
+
 					memoryType = null;
 					accessType = NesMemoryAccessType.Unspecified;
 				}
+
 				currentSize += 0x100;
 			}
+
 			addBlock(0x30);
 
 			return mappings;
 		}
 
-		private List<MemoryMappingBlock> GetGameboyCpuMappings(GbState gbState)
-		{
+		private List<MemoryMappingBlock> GetGameboyCpuMappings(GbState gbState) {
 			GbMemoryManagerState state = gbState.MemoryManager;
 			List<MemoryMappingBlock> mappings = new();
 
@@ -291,18 +289,17 @@ namespace Mesen.Debugger.ViewModels
 			GbMemoryType memoryType = GbMemoryType.None;
 			GbRegisterAccess accessType = GbRegisterAccess.None;
 			int currentSize = 0;
-			
+
 			const int prgBankSize = 0x4000;
 			const int cartBankSize = 0x2000;
 			int wramBankSize = gbState.Ppu.CgbEnabled ? 0x1000 : 0x2000;
 
-			void addBlock(int i)
-			{
+			void addBlock(int i) {
 				int startIndex = i - (currentSize / 0x100);
 
-				if(memoryType != GbMemoryType.None) {
+				if (memoryType != GbMemoryType.None) {
 					Color color = mainColors[memoryType];
-					if(mappings[^1].Color == color) {
+					if (mappings[^1].Color == color) {
 						//Use alternative color if the previous color is identical
 						color = altColors[memoryType];
 					}
@@ -312,11 +309,12 @@ namespace Mesen.Debugger.ViewModels
 				} else {
 					mappings.Add(new MemoryMappingBlock() { Length = currentSize, Name = "N/A", Note = accessNotes[accessType], Color = Color.FromRgb(222, 222, 222) });
 				}
+
 				currentSize = 0;
 			}
 
-			for(int i = 0; i < 0xFE; i++) {
-				if(i == 0x80) {
+			for (int i = 0; i < 0xFE; i++) {
+				if (i == 0x80) {
 					addBlock(i);
 					mappings.Add(new MemoryMappingBlock() { Name = "VRAM", Length = 0x2000, Color = Color.FromRgb(0xFA, 0xDC, 0xCD) });
 					memoryType = GbMemoryType.None;
@@ -325,28 +323,31 @@ namespace Mesen.Debugger.ViewModels
 					i += 0x20;
 				}
 
-				if(state.MemoryAccessType[i] != GbRegisterAccess.None) {
-					bool forceNewBlock = (
+				if (state.MemoryAccessType[i] != GbRegisterAccess.None) {
+					bool forceNewBlock = 
 						(memoryType == GbMemoryType.PrgRom && state.MemoryOffset[i] % prgBankSize == 0) ||
 						(memoryType == GbMemoryType.WorkRam && state.MemoryOffset[i] % wramBankSize == 0) ||
 						(memoryType == GbMemoryType.CartRam && state.MemoryOffset[i] % cartBankSize == 0)
-					);
+					;
 
-					if(forceNewBlock || memoryType != state.MemoryType[i] || state.MemoryOffset[i] - state.MemoryOffset[i - 1] != 0x100) {
+					if (forceNewBlock || memoryType != state.MemoryType[i] || state.MemoryOffset[i] - state.MemoryOffset[i - 1] != 0x100) {
 						addBlock(i);
 					}
 
 					memoryType = state.MemoryType[i];
 					accessType = state.MemoryAccessType[i];
 				} else {
-					if(memoryType != GbMemoryType.None) {
+					if (memoryType != GbMemoryType.None) {
 						addBlock(i);
 					}
+
 					memoryType = GbMemoryType.None;
 					accessType = GbRegisterAccess.None;
 				}
+
 				currentSize += 0x100;
 			}
+
 			addBlock(0xFE);
 
 			mappings.Add(new MemoryMappingBlock() { Name = "OAM/Registers/High RAM", Length = 0x200, Color = Color.FromRgb(222, 222, 222) });
@@ -354,8 +355,7 @@ namespace Mesen.Debugger.ViewModels
 			return mappings;
 		}
 
-		private List<MemoryMappingBlock> GetPceCpuMappings(PceMemoryManagerState state)
-		{
+		private List<MemoryMappingBlock> GetPceCpuMappings(PceMemoryManagerState state) {
 			//TODOv2 improve/complete logic for save ram, etc.
 			List<MemoryMappingBlock> mappings = new();
 
@@ -386,19 +386,20 @@ namespace Mesen.Debugger.ViewModels
 				{ MemoryType.PcePrgRom, "R" },
 			};
 
-			for(int i = 0; i < 8; i++) {
+			for (int i = 0; i < 8; i++) {
 				AddressInfo absAddr = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = i * 0x2000, Type = MemoryType.PceMemory });
-				if(!mainColors.ContainsKey(absAddr.Type)) {
+				if (!mainColors.ContainsKey(absAddr.Type)) {
 					//Prevent crash when power cycling caused by core returning { 0, MemoryType.SnesMemory } (default value)
 					absAddr.Address = -1;
 				}
 
-				if(absAddr.Address >= 0) {
+				if (absAddr.Address >= 0) {
 					MemoryType memType = absAddr.Type;
 					string note = "";
-					if(memType == MemoryType.PcePrgRom && state.Mpr[i] != absAddr.Address / 0x2000) {
+					if (memType == MemoryType.PcePrgRom && state.Mpr[i] != absAddr.Address / 0x2000) {
 						note = " ($" + (absAddr.Address / 0x2000).ToString("X2") + ")";
 					}
+
 					mappings.Add(new MemoryMappingBlock() {
 						Length = 0x2000,
 						Name = memType.GetShortName(),
@@ -406,7 +407,7 @@ namespace Mesen.Debugger.ViewModels
 						Note = accessNotes[memType] + note,
 						Color = (i % 2 == 0) ? mainColors[memType] : altColors[memType]
 					});
-				} else if(state.Mpr[i] == 0xFF) {
+				} else if (state.Mpr[i] == 0xFF) {
 					MemoryType memType = MemoryType.None;
 					mappings.Add(new MemoryMappingBlock() {
 						Length = 0x2000,
@@ -428,8 +429,7 @@ namespace Mesen.Debugger.ViewModels
 			return mappings;
 		}
 
-		private List<MemoryMappingBlock> GetSmsCpuMappings(SmsMemoryManagerState state)
-		{
+		private List<MemoryMappingBlock> GetSmsCpuMappings(SmsMemoryManagerState state) {
 			List<MemoryMappingBlock> mappings = new();
 
 			Dictionary<MemoryType, Color> mainColors = new() {
@@ -458,17 +458,17 @@ namespace Mesen.Debugger.ViewModels
 
 			AddressInfo prevAddr = new();
 			bool isUnmapped = false;
-			for(int i = 0; i < 64; i++) {
+			for (int i = 0; i < 64; i++) {
 				AddressInfo absAddr = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = i * 0x400, Type = MemoryType.SmsMemory });
-				if(!mainColors.ContainsKey(absAddr.Type)) {
+				if (!mainColors.ContainsKey(absAddr.Type)) {
 					//Prevent crash when power cycling caused by core returning { 0, MemoryType.SnesMemory } (default value)
 					absAddr.Address = -1;
 				}
 
-				if(prevAddr.Type == absAddr.Type && prevAddr.Address + 0x400 == absAddr.Address && mappings[^1].Length < 0x4000) {
+				if (prevAddr.Type == absAddr.Type && prevAddr.Address + 0x400 == absAddr.Address && mappings[^1].Length < 0x4000) {
 					mappings[^1].Length += 0x400;
 					mappings[^1].Page = (absAddr.Address + 0x400 - mappings[^1].Length) / mappings[^1].Length;
-				} else if(absAddr.Address >= 0) {
+				} else if (absAddr.Address >= 0) {
 					MemoryType memType = absAddr.Type;
 					mappings.Add(new MemoryMappingBlock() {
 						Length = 0x400,
@@ -479,7 +479,7 @@ namespace Mesen.Debugger.ViewModels
 					});
 					isUnmapped = false;
 				} else {
-					if(isUnmapped) {
+					if (isUnmapped) {
 						mappings[^1].Length += 0x400;
 					} else {
 						mappings.Add(new MemoryMappingBlock() {
@@ -491,14 +491,14 @@ namespace Mesen.Debugger.ViewModels
 						isUnmapped = true;
 					}
 				}
+
 				prevAddr = absAddr;
 			}
 
 			return mappings;
 		}
 
-		private List<MemoryMappingBlock> GetWsCpuMappings(WsMemoryManagerState state)
-		{
+		private List<MemoryMappingBlock> GetWsCpuMappings(WsMemoryManagerState state) {
 			List<MemoryMappingBlock> mappings = new();
 
 			const int minSize = 0x1000;
@@ -529,17 +529,17 @@ namespace Mesen.Debugger.ViewModels
 
 			AddressInfo prevAddr = new();
 			bool isUnmapped = false;
-			for(int i = 0; i < 16*16; i++) {
+			for (int i = 0; i < 16 * 16; i++) {
 				AddressInfo absAddr = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = i * minSize, Type = MemoryType.WsMemory });
-				if(!mainColors.ContainsKey(absAddr.Type)) {
+				if (!mainColors.ContainsKey(absAddr.Type)) {
 					//Prevent crash when power cycling caused by core returning { 0, MemoryType.SnesMemory } (default value)
 					absAddr.Address = -1;
 				}
 
-				if(prevAddr.Type == absAddr.Type && prevAddr.Address + minSize == absAddr.Address && mappings[^1].Length < 0x10000) {
+				if (prevAddr.Type == absAddr.Type && prevAddr.Address + minSize == absAddr.Address && mappings[^1].Length < 0x10000) {
 					mappings[^1].Length += minSize;
 					mappings[^1].Page = (absAddr.Address + minSize - mappings[^1].Length) / 0x10000;
-				} else if(absAddr.Address >= 0) {
+				} else if (absAddr.Address >= 0) {
 					MemoryType memType = absAddr.Type;
 					mappings.Add(new MemoryMappingBlock() {
 						Length = minSize,
@@ -550,7 +550,7 @@ namespace Mesen.Debugger.ViewModels
 					});
 					isUnmapped = false;
 				} else {
-					if(isUnmapped) {
+					if (isUnmapped) {
 						mappings[^1].Length += minSize;
 					} else {
 						mappings.Add(new MemoryMappingBlock() {
@@ -562,6 +562,7 @@ namespace Mesen.Debugger.ViewModels
 						isUnmapped = true;
 					}
 				}
+
 				prevAddr = absAddr;
 			}
 

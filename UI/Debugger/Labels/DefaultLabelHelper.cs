@@ -1,40 +1,36 @@
-﻿using Mesen.Config;
-using Mesen.Interop;
 using System;
 using System.Collections.Generic;
+using Mesen.Config;
+using Mesen.Interop;
 
-namespace Mesen.Debugger.Labels
-{
-	public class DefaultLabelHelper
-	{
-		public static void SetDefaultLabels()
-		{
-			if(ConfigManager.Config.Debug.Debugger.DisableDefaultLabels) {
+namespace Mesen.Debugger.Labels {
+	public class DefaultLabelHelper {
+		public static void SetDefaultLabels() {
+			if (ConfigManager.Config.Debug.Debugger.DisableDefaultLabels) {
 				return;
 			}
 
 			HashSet<CpuType> cpuTypes = EmuApi.GetRomInfo().CpuTypes;
-			if(cpuTypes.Contains(CpuType.Gameboy)) {
+			if (cpuTypes.Contains(CpuType.Gameboy)) {
 				SetGameboyDefaultLabels();
 			}
 
-			if(cpuTypes.Contains(CpuType.Snes)) {
+			if (cpuTypes.Contains(CpuType.Snes)) {
 				SetSnesDefaultLabels();
-			} else if(cpuTypes.Contains(CpuType.Nes)) {
+			} else if (cpuTypes.Contains(CpuType.Nes)) {
 				SetDefaultNesLabels();
-			} else if(cpuTypes.Contains(CpuType.Pce)) {
+			} else if (cpuTypes.Contains(CpuType.Pce)) {
 				SetPceDefaultLabels();
-			} else if(cpuTypes.Contains(CpuType.Sms)) {
+			} else if (cpuTypes.Contains(CpuType.Sms)) {
 				SetSmsDefaultLabels();
-			} else if(cpuTypes.Contains(CpuType.Gba)) {
+			} else if (cpuTypes.Contains(CpuType.Gba)) {
 				SetGbaDefaultLabels();
-			} else if(cpuTypes.Contains(CpuType.Ws)) {
+			} else if (cpuTypes.Contains(CpuType.Ws)) {
 				SetWsDefaultLabels();
 			}
 		}
 
-		private static void SetSnesDefaultLabels()
-		{
+		private static void SetSnesDefaultLabels() {
 			//B-Bus registers
 			LabelManager.SetLabel(0x2100, MemoryType.SnesRegister, "INIDISP", "Screen Display Register");
 			LabelManager.SetLabel(0x2101, MemoryType.SnesRegister, "OBSEL", "Object Size and Character Size Register");
@@ -145,18 +141,18 @@ namespace Mesen.Debugger.Labels
 			LabelManager.SetLabel(0x421F, MemoryType.SnesRegister, "JOY4H", "Controller Port Data Registers (Pad 4 - High)");
 
 			//DMA registers
-			for(uint i = 0; i < 8; i++) {
-				LabelManager.SetLabel(0x4300 + i * 0x10, MemoryType.SnesRegister, "DMAP" + i.ToString(), "(H)DMA Control");
-				LabelManager.SetLabel(0x4301 + i * 0x10, MemoryType.SnesRegister, "BBAD" + i.ToString(), "(H)DMA B-Bus Address");
-				LabelManager.SetLabel(0x4302 + i * 0x10, MemoryType.SnesRegister, "A1T" + i.ToString() + "L", "DMA A-Bus Address / HDMA Table Address (Low)");
-				LabelManager.SetLabel(0x4303 + i * 0x10, MemoryType.SnesRegister, "A1T" + i.ToString() + "H", "DMA A-Bus Address / HDMA Table Address (High)");
-				LabelManager.SetLabel(0x4304 + i * 0x10, MemoryType.SnesRegister, "A1B" + i.ToString(), "DMA A-Bus Address / HDMA Table Address (Bank)");
-				LabelManager.SetLabel(0x4305 + i * 0x10, MemoryType.SnesRegister, "DAS" + i.ToString() + "L", "DMA Size / HDMA Indirect Address (Low)");
-				LabelManager.SetLabel(0x4306 + i * 0x10, MemoryType.SnesRegister, "DAS" + i.ToString() + "H", "DMA Size / HDMA Indirect Address (High)");
-				LabelManager.SetLabel(0x4307 + i * 0x10, MemoryType.SnesRegister, "DAS" + i.ToString() + "B", "HDMA Indirect Address (Bank)");
-				LabelManager.SetLabel(0x4308 + i * 0x10, MemoryType.SnesRegister, "A2A" + i.ToString() + "L", "HDMA Mid Frame Table Address (Low)");
-				LabelManager.SetLabel(0x4309 + i * 0x10, MemoryType.SnesRegister, "A2A" + i.ToString() + "H", "HDMA Mid Frame Table Address (High)");
-				LabelManager.SetLabel(0x430A + i * 0x10, MemoryType.SnesRegister, "NTLR" + i.ToString(), "HDMA Line Counter");
+			for (uint i = 0; i < 8; i++) {
+				LabelManager.SetLabel(0x4300 + (i * 0x10), MemoryType.SnesRegister, "DMAP" + i.ToString(), "(H)DMA Control");
+				LabelManager.SetLabel(0x4301 + (i * 0x10), MemoryType.SnesRegister, "BBAD" + i.ToString(), "(H)DMA B-Bus Address");
+				LabelManager.SetLabel(0x4302 + (i * 0x10), MemoryType.SnesRegister, "A1T" + i.ToString() + "L", "DMA A-Bus Address / HDMA Table Address (Low)");
+				LabelManager.SetLabel(0x4303 + (i * 0x10), MemoryType.SnesRegister, "A1T" + i.ToString() + "H", "DMA A-Bus Address / HDMA Table Address (High)");
+				LabelManager.SetLabel(0x4304 + (i * 0x10), MemoryType.SnesRegister, "A1B" + i.ToString(), "DMA A-Bus Address / HDMA Table Address (Bank)");
+				LabelManager.SetLabel(0x4305 + (i * 0x10), MemoryType.SnesRegister, "DAS" + i.ToString() + "L", "DMA Size / HDMA Indirect Address (Low)");
+				LabelManager.SetLabel(0x4306 + (i * 0x10), MemoryType.SnesRegister, "DAS" + i.ToString() + "H", "DMA Size / HDMA Indirect Address (High)");
+				LabelManager.SetLabel(0x4307 + (i * 0x10), MemoryType.SnesRegister, "DAS" + i.ToString() + "B", "HDMA Indirect Address (Bank)");
+				LabelManager.SetLabel(0x4308 + (i * 0x10), MemoryType.SnesRegister, "A2A" + i.ToString() + "L", "HDMA Mid Frame Table Address (Low)");
+				LabelManager.SetLabel(0x4309 + (i * 0x10), MemoryType.SnesRegister, "A2A" + i.ToString() + "H", "HDMA Mid Frame Table Address (High)");
+				LabelManager.SetLabel(0x430A + (i * 0x10), MemoryType.SnesRegister, "NTLR" + i.ToString(), "HDMA Line Counter");
 			}
 
 			//SPC registers
@@ -178,8 +174,7 @@ namespace Mesen.Debugger.Labels
 			LabelManager.SetLabel(0xFF, MemoryType.SpcRam, "T2OUT", "Timer 2 output");
 		}
 
-		private static void SetGameboyDefaultLabels()
-		{
+		private static void SetGameboyDefaultLabels() {
 			//LCD
 			LabelManager.SetLabel(0xFF40, MemoryType.GameboyMemory, "LCDC_FF40", "LCD Control");
 			LabelManager.SetLabel(0xFF41, MemoryType.GameboyMemory, "STAT_FF41", "LCD Status");
@@ -238,8 +233,7 @@ namespace Mesen.Debugger.Labels
 			LabelManager.SetLabel(0xFF46, MemoryType.GameboyMemory, "DMA_FF46", "OAM DMA Start");
 		}
 
-		private static void SetDefaultNesLabels()
-		{
+		private static void SetDefaultNesLabels() {
 			LabelManager.SetLabel(0x2000, MemoryType.NesMemory, "PpuControl_2000", $"7  bit  0{Environment.NewLine}---- ----{Environment.NewLine}VPHB SINN{Environment.NewLine}|||| ||||{Environment.NewLine}|||| ||++- Base nametable address{Environment.NewLine}|||| ||    (0 = $2000; 1 = $2400; 2 = $2800; 3 = $2C00){Environment.NewLine}|||| |+--- VRAM address increment per CPU read/write of PPUDATA{Environment.NewLine}|||| |     (0: add 1, going across; 1: add 32, going down){Environment.NewLine}|||| +---- Sprite pattern table address for 8x8 sprites{Environment.NewLine}||||       (0: $0000; 1: $1000; ignored in 8x16 mode){Environment.NewLine}|||+------ Background pattern table address (0: $0000; 1: $1000){Environment.NewLine}||+------- Sprite size (0: 8x8; 1: 8x16){Environment.NewLine}|+-------- PPU master/slave select{Environment.NewLine}|          (0: read backdrop from EXT pins; 1: output color on EXT pins){Environment.NewLine}+--------- Generate an NMI at the start of the{Environment.NewLine}           vertical blanking interval (0: off; 1: on)");
 			LabelManager.SetLabel(0x2001, MemoryType.NesMemory, "PpuMask_2001", $"7  bit  0{Environment.NewLine}---- ----{Environment.NewLine}BGRs bMmG{Environment.NewLine}|||| ||||{Environment.NewLine}|||| |||+- Display type: (0: color, 1: grayscale){Environment.NewLine}|||| ||+-- 1: Show background in leftmost 8 pixels of screen, 0: Hide{Environment.NewLine}|||| |+--- 1: Show sprites in leftmost 8 pixels of screen, 0: Hide{Environment.NewLine}|||| +---- 1: Show background{Environment.NewLine}|||+------ 1: Show sprites{Environment.NewLine}||+------- Emphasize red{Environment.NewLine}|+-------- Emphasize green{Environment.NewLine}+--------- Emphasize blue");
 			LabelManager.SetLabel(0x2002, MemoryType.NesMemory, "PpuStatus_2002", $"7  bit  0{Environment.NewLine}---- ----{Environment.NewLine}VSO. ....{Environment.NewLine}|||| ||||{Environment.NewLine}|||+-++++- Least significant bits previously written into a PPU register{Environment.NewLine}|||        (due to register not being updated for this address){Environment.NewLine}||+------- Sprite overflow. The intent was for this flag to be set{Environment.NewLine}||         whenever more than eight sprites appear on a scanline, but a{Environment.NewLine}||         hardware bug causes the actual behavior to be more complicated{Environment.NewLine}||         and generate false positives as well as false negatives; see{Environment.NewLine}||         PPU sprite evaluation. This flag is set during sprite{Environment.NewLine}||         evaluation and cleared at dot 1 (the second dot) of the{Environment.NewLine}||         pre-render line.{Environment.NewLine}|+-------- Sprite 0 Hit.  Set when a nonzero pixel of sprite 0 overlaps{Environment.NewLine}|          a nonzero background pixel; cleared at dot 1 of the pre-render{Environment.NewLine}|          line.  Used for raster timing.{Environment.NewLine}+--------- Vertical blank has started (0: not in vblank; 1: in vblank).{Environment.NewLine}           Set at dot 1 of line 241 (the line *after* the post-render{Environment.NewLine}           line); cleared after reading $2002 and at dot 1 of the{Environment.NewLine}           pre-render line.");
@@ -279,7 +273,7 @@ namespace Mesen.Debugger.Labels
 			LabelManager.SetLabel(0x4016, MemoryType.NesMemory, "Ctrl1_4016", $"Read (NES - input):{Environment.NewLine}---4 3210{Environment.NewLine}Read data from controller port #1.{Environment.NewLine}{Environment.NewLine}Write:{Environment.NewLine}---- ---A{Environment.NewLine}Output data (strobe) to both controllers.");
 			LabelManager.SetLabel(0x4017, MemoryType.NesMemory, "Ctrl2_FrameCtr_4017", $"Read (NES - input):{Environment.NewLine}---4 3210{Environment.NewLine}Read data from controller port #2.{Environment.NewLine}{Environment.NewLine}Write (Frame counter): MI-- ----{Environment.NewLine}Mode (M, 0 = 4-step, 1 = 5-step), IRQ inhibit flag (I)");
 
-			if(EmuApi.GetRomInfo().Format == RomFormat.Fds) {
+			if (EmuApi.GetRomInfo().Format == RomFormat.Fds) {
 				LabelManager.SetLabel(0x01F8, MemoryType.NesPrgRom, "LoadFiles", "Input: Pointer to Disk ID, Pointer to File List" + Environment.NewLine + "Output: A = error #, Y = # of files loaded" + Environment.NewLine + "Desc: Loads files specified by DiskID into memory from disk. Load addresses are decided by the file's header.");
 				LabelManager.SetLabel(0x0237, MemoryType.NesPrgRom, "AppendFile", "Input: Pointer to Disk ID, Pointer to File Header" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Appends the file data given by DiskID to the disk. This means that the file is tacked onto the end of the disk, and the disk file count is incremented. The file is then read back to verify the write. If an error occurs during verification, the disk's file count is decremented (logically hiding the written file).");
 				LabelManager.SetLabel(0x0239, MemoryType.NesPrgRom, "WriteFile", "Input: Pointer to Disk ID, Pointer to File Header, A = file #" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Same as \"Append File\", but instead of writing the file to the end of the disk, A specifies the sequential position on the disk to write the file (0 is the first). This also has the effect of setting the disk's file count to the A value, therefore logically hiding any other files that may reside after the written one.");
@@ -332,8 +326,7 @@ namespace Mesen.Debugger.Labels
 			}
 		}
 
-		private static void SetPceDefaultLabels()
-		{
+		private static void SetPceDefaultLabels() {
 			LabelManager.SetLabel(0x000, MemoryType.PceMemory, "VDC_AR_0000", "Address Register (W) / Status Register (R)");
 			LabelManager.SetLabel(0x002, MemoryType.PceMemory, "VDC_DATA_LO_0002", "Data (low byte)");
 			LabelManager.SetLabel(0x003, MemoryType.PceMemory, "VDC_DATA_HI_0003", "Data (high byte) + Latch");
@@ -364,8 +357,7 @@ namespace Mesen.Debugger.Labels
 			LabelManager.SetLabel(0x1403, MemoryType.PceMemory, "IRQ_STATUS_1403", "IRQ Status (Read); Acknowledge Timer interrupt (write)");
 		}
 
-		private static void SetSmsDefaultLabels()
-		{
+		private static void SetSmsDefaultLabels() {
 			LabelManager.SetLabel(0x3E, MemoryType.SmsPort, "MEMORY_ENABLE_3E", "");
 			LabelManager.SetLabel(0x3F, MemoryType.SmsPort, "IO_3F", "");
 			LabelManager.SetLabel(0x7E, MemoryType.SmsPort, "VDP_V_COUNTER_7E", "");
@@ -376,17 +368,14 @@ namespace Mesen.Debugger.Labels
 			LabelManager.SetLabel(0xDD, MemoryType.SmsPort, "JOY2_DD", "");
 		}
 
-		private static void SetGbaDefaultLabels()
-		{
-			Action<uint, uint, string, string> addLabel = (addr, length, label, desc) => {
-				LabelManager.SetLabel(new CodeLabel() {
-					Address = 0x4000000 | addr,
-					Length = length,
-					MemoryType = MemoryType.GbaMemory,
-					Label = label,
-					Comment = desc
-				}, false);
-			};
+		private static void SetGbaDefaultLabels() {
+			Action<uint, uint, string, string> addLabel = (addr, length, label, desc) => LabelManager.SetLabel(new CodeLabel() {
+				Address = 0x4000000 | addr,
+				Length = length,
+				MemoryType = MemoryType.GbaMemory,
+				Label = label,
+				Comment = desc
+			}, false);
 
 			addLabel(0x000, 2, "DISPCNT", "Display Control");
 			addLabel(0x002, 1, "GREENSWAP", "");
@@ -407,7 +396,7 @@ namespace Mesen.Debugger.Labels
 			addLabel(0x01A, 2, "BG2VOFS", "BG2 Y Scroll Offset");
 			addLabel(0x01C, 2, "BG3HOFS", "BG3 X Scroll Offset");
 			addLabel(0x01E, 2, "BG3VOFS", "BG3 Y Scroll Offset");
-			
+
 			addLabel(0x020, 2, "BG2PA", "BG2 Transform Param A");
 			addLabel(0x022, 2, "BG2PB", "BG2 Transform Param B");
 			addLabel(0x024, 2, "BG2PC", "BG2 Transform Param C");
@@ -427,10 +416,10 @@ namespace Mesen.Debugger.Labels
 
 			addLabel(0x044, 2, "WIN0V", "Window 0 Start/End Y");
 			addLabel(0x046, 2, "WIN1V", "Window 1 Start/End Y");
-			
+
 			addLabel(0x048, 2, "WININ", "Window 0/1 Config");
 			addLabel(0x04A, 2, "WINOUT", "OBJ Window/Outside Window Config");
-			
+
 			addLabel(0x04C, 2, "MOSAIC", "Mosaic Size");
 			addLabel(0x050, 2, "BLDCNT", "Blend Control");
 			addLabel(0x052, 2, "BLDALPHA", "Blend Coefficients");
@@ -500,16 +489,16 @@ namespace Mesen.Debugger.Labels
 			addLabel(0x126, 2, "SIOMULTI3", "Serial I/O Multiplayer Data 3");
 			addLabel(0x128, 2, "SIOCNT", "Serial I/O Control");
 			addLabel(0x12A, 2, "SIODATA8", "Serial I/O Data (8-bit)");
-			
+
 			addLabel(0x130, 2, "KEYINPUT", "Key Status");
 			addLabel(0x132, 2, "KEYCNT", "Key IRQ Control");
-			
+
 			addLabel(0x134, 2, "RNT", "Serial I/O Mode Select");
 			addLabel(0x140, 2, "JOYCNT", "Serial I/O JOY Bus Control");
 			addLabel(0x150, 4, "JOYRECV", "Serial I/O JOY Bus Receive Data");
 			addLabel(0x154, 4, "JOYSEND", "Serial I/O JOY Bus Send Data");
 			addLabel(0x158, 2, "JOYSTAT", "Serial I/O JOY Bus Status");
-			
+
 			addLabel(0x200, 2, "IE", "IRQ Enable");
 			addLabel(0x202, 2, "IF", "IRQ Flags");
 			addLabel(0x204, 2, "WAITCNT", "Waitstate Control");
@@ -518,16 +507,13 @@ namespace Mesen.Debugger.Labels
 			addLabel(0x301, 1, "HALTCNT", "Halt Control");
 		}
 
-		private static void SetWsDefaultLabels()
-		{
-			Action<uint, uint, string> addLabel = (addr, length, label) => {
-				LabelManager.SetLabel(new CodeLabel() {
-					Address = addr,
-					Length = length,
-					MemoryType = MemoryType.WsPort,
-					Label = label
-				}, false);
-			};
+		private static void SetWsDefaultLabels() {
+			Action<uint, uint, string> addLabel = (addr, length, label) => LabelManager.SetLabel(new CodeLabel() {
+				Address = addr,
+				Length = length,
+				MemoryType = MemoryType.WsPort,
+				Label = label
+			}, false);
 
 			addLabel(0x00, 1, "IO_DISPLAY_CTRL");
 			addLabel(0x01, 1, "IO_DISPLAY_BACK");

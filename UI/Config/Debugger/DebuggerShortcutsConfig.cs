@@ -1,74 +1,62 @@
-﻿using Avalonia.Input;
-using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using Avalonia.Input;
+using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class DebuggerShortcutsConfig : BaseConfig<DebuggerShortcutsConfig>, IJsonOnDeserialized
-	{
-		private List<DebuggerShortcutInfo> _shortcuts = new();
+namespace Mesen.Config {
+	public class DebuggerShortcutsConfig : BaseConfig<DebuggerShortcutsConfig>, IJsonOnDeserialized {
 		private Dictionary<DebuggerShortcut, DebuggerShortcutInfo> _lookup = new();
 
-		public DebuggerShortcutsConfig()
-		{
+		public DebuggerShortcutsConfig() {
 			Init();
 		}
 
-		public List<DebuggerShortcutInfo> Shortcuts
-		{
-			get => _shortcuts;
-			set
-			{
-				_shortcuts = value;
+		public List<DebuggerShortcutInfo> Shortcuts {
+			get;
+			set {
+				field = value;
 				InitLookup();
 			}
-		}
+		} = new();
 
-		private void InitLookup()
-		{
+		private void InitLookup() {
 			_lookup = new();
-			foreach(DebuggerShortcutInfo shortcut in _shortcuts) {
+			foreach (DebuggerShortcutInfo shortcut in Shortcuts) {
 				_lookup[shortcut.Shortcut] = shortcut;
 			}
 		}
 
-		public DbgShortKeys Get(DebuggerShortcut shortcut)
-		{
-			if(_lookup.TryGetValue(shortcut, out DebuggerShortcutInfo? info)) {
+		public DbgShortKeys Get(DebuggerShortcut shortcut) {
+			if (_lookup.TryGetValue(shortcut, out DebuggerShortcutInfo? info)) {
 				return info.KeyBinding;
 			} else {
 				throw new Exception("Invalid shortcut");
 			}
 		}
 
-		internal DebuggerShortcutInfo GetBindable(DebuggerShortcut shortcut)
-		{
-			if(_lookup.TryGetValue(shortcut, out DebuggerShortcutInfo? info)) {
+		internal DebuggerShortcutInfo GetBindable(DebuggerShortcut shortcut) {
+			if (_lookup.TryGetValue(shortcut, out DebuggerShortcutInfo? info)) {
 				return info;
 			} else {
 				throw new Exception("Invalid shortcut");
 			}
 		}
 
-		private void Add(DebuggerShortcutInfo info)
-		{
-			if(!_lookup.ContainsKey(info.Shortcut)) {
+		private void Add(DebuggerShortcutInfo info) {
+			if (!_lookup.ContainsKey(info.Shortcut)) {
 				Shortcuts.Add(info);
 				_lookup[info.Shortcut] = info;
 			}
 		}
 
-		public void OnDeserialized()
-		{
+		public void OnDeserialized() {
 			Init();
 		}
 
-		private void Init()
-		{
+		private void Init() {
 			//Shared
 			Add(new() { Shortcut = DebuggerShortcut.GoToAddress, KeyBinding = new(KeyModifiers.Control, Key.G) });
 
@@ -79,7 +67,7 @@ namespace Mesen.Config
 			Add(new() { Shortcut = DebuggerShortcut.Copy, KeyBinding = new(KeyModifiers.Control, Key.C) });
 			Add(new() { Shortcut = DebuggerShortcut.Paste, KeyBinding = new(KeyModifiers.Control, Key.V) });
 			Add(new() { Shortcut = DebuggerShortcut.SelectAll, KeyBinding = new(KeyModifiers.Control, Key.A) });
-			
+
 			Add(new() { Shortcut = DebuggerShortcut.Undo, KeyBinding = new(KeyModifiers.Control, Key.Z) });
 
 			Add(new() { Shortcut = DebuggerShortcut.Refresh, KeyBinding = new(Key.F5) });
@@ -149,7 +137,7 @@ namespace Mesen.Config
 			Add(new() { Shortcut = DebuggerShortcut.BreakOn, KeyBinding = new(KeyModifiers.Alt, Key.B) });
 
 			Add(new() { Shortcut = DebuggerShortcut.FindOccurrences, KeyBinding = new(KeyModifiers.Control | KeyModifiers.Shift, Key.F) });
-			
+
 			Add(new() { Shortcut = DebuggerShortcut.GoToProgramCounter, KeyBinding = new(KeyModifiers.Alt, Key.Multiply) });
 			Add(new() { Shortcut = DebuggerShortcut.GoToCpuVector1, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.GoToCpuVector2, KeyBinding = new() });
@@ -167,7 +155,7 @@ namespace Mesen.Config
 			Add(new() { Shortcut = DebuggerShortcut.CodeWindow_EditComment, KeyBinding = new(Key.OemSemicolon) });
 			Add(new() { Shortcut = DebuggerShortcut.CodeWindow_ToggleBreakpoint, KeyBinding = new(Key.F9) });
 			Add(new() { Shortcut = DebuggerShortcut.CodeWindow_SwitchView, KeyBinding = new(KeyModifiers.Control, Key.Q) });
-			
+
 			Add(new() { Shortcut = DebuggerShortcut.CodeWindow_NavigateBack, KeyBinding = new(KeyModifiers.Control, Key.OemMinus) });
 			Add(new() { Shortcut = DebuggerShortcut.CodeWindow_NavigateForward, KeyBinding = new(KeyModifiers.Control | KeyModifiers.Shift, Key.OemMinus) });
 
@@ -201,7 +189,7 @@ namespace Mesen.Config
 
 			Add(new() { Shortcut = DebuggerShortcut.CallStack_EditLabel, KeyBinding = new(Key.F2) });
 			Add(new() { Shortcut = DebuggerShortcut.CallStack_GoToLocation, KeyBinding = new() });
-			
+
 			Add(new() { Shortcut = DebuggerShortcut.FindResultList_AddWatch, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.FindResultList_GoToLocation, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.FindResultList_ToggleBreakpoint, KeyBinding = new() });
@@ -209,11 +197,11 @@ namespace Mesen.Config
 			Add(new() { Shortcut = DebuggerShortcut.SaveRom, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.SaveRomAs, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.SaveEditAsIps, KeyBinding = new() });
-			
+
 			Add(new() { Shortcut = DebuggerShortcut.ResetCdl, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.LoadCdl, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.SaveCdl, KeyBinding = new() });
-		
+
 			Add(new() { Shortcut = DebuggerShortcut.ImportLabels, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.ExportLabels, KeyBinding = new() });
 			Add(new() { Shortcut = DebuggerShortcut.ImportWatchEntries, KeyBinding = new() });
@@ -235,7 +223,7 @@ namespace Mesen.Config
 			//Tile viewer
 			Add(new() { Shortcut = DebuggerShortcut.TileViewer_ViewInMemoryViewer, KeyBinding = new(Key.F1) });
 			Add(new() { Shortcut = DebuggerShortcut.TileViewer_EditTile, KeyBinding = new(Key.F2) });
-			
+
 			//Palette viewer
 			Add(new() { Shortcut = DebuggerShortcut.PaletteViewer_EditColor, KeyBinding = new(Key.F2) });
 			Add(new() { Shortcut = DebuggerShortcut.PaletteViewer_ViewInMemoryViewer, KeyBinding = new(Key.F1) });
@@ -293,8 +281,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public enum DebuggerShortcut
-	{
+	public enum DebuggerShortcut {
 		GoToAddress,
 		Find,
 		FindNext,
@@ -473,14 +460,12 @@ namespace Mesen.Config
 		TileEditor_TranslateDown,
 	}
 
-	public class DebuggerShortcutInfo : ViewModelBase
-	{
+	public class DebuggerShortcutInfo : ViewModelBase {
 		[Reactive] public DebuggerShortcut Shortcut { get; set; }
 		[Reactive] public DbgShortKeys KeyBinding { get; set; } = new();
 	}
 
-	public class DbgShortKeys
-	{
+	public class DbgShortKeys {
 		private static Regex _numberKeyRegex = new Regex("D[0-9]", RegexOptions.Compiled);
 
 		public KeyModifiers Modifiers { get; set; }
@@ -490,17 +475,15 @@ namespace Mesen.Config
 
 		public DbgShortKeys(Key key) : this(KeyModifiers.None, key) { }
 
-		public DbgShortKeys(KeyModifiers modifiers, Key key)
-		{
+		public DbgShortKeys(KeyModifiers modifiers, Key key) {
 			Modifiers = modifiers;
 			ShortcutKey = key;
 		}
 
-		public override string ToString()
-		{
-			if(ShortcutKey != Key.None) {
+		public override string ToString() {
+			if (ShortcutKey != Key.None) {
 				KeyModifiers modifiers = Modifiers;
-				switch(ShortcutKey) {
+				switch (ShortcutKey) {
 					case Key.LeftAlt:
 					case Key.LeftShift:
 					case Key.LeftCtrl:
@@ -514,12 +497,13 @@ namespace Mesen.Config
 
 				string shortcut = new KeyGesture(ShortcutKey, modifiers).ToString();
 				shortcut = shortcut.Replace("Oem", "");
-				
+
 				//Rename D0-D9 to 0-9
 				shortcut = _numberKeyRegex.Replace(shortcut, (Match match) => match.Value.Substring(1));
 
 				return shortcut;
 			}
+
 			return "";
 		}
 	}

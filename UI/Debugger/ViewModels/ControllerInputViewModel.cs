@@ -1,15 +1,13 @@
-﻿using Avalonia;
+using System;
+using Avalonia;
 using Avalonia.Controls;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using System;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class ControllerInputViewModel : ViewModelBase
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class ControllerInputViewModel : ViewModelBase {
 		[Reactive] public int ViewHeight { get; set; }
 
 		[Reactive] public bool ButtonA { get; set; }
@@ -37,30 +35,27 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public ControllerInputViewModel() : this(ConsoleType.Ws, 0) { }
 
-		public ControllerInputViewModel(ConsoleType consoleType, int index)
-		{
+		public ControllerInputViewModel(ConsoleType consoleType, int index) {
 			ControllerIndex = index + 1;
 			IsSnes = consoleType == ConsoleType.Snes;
 			IsWs = consoleType == ConsoleType.Ws;
-			HasShoulderButtons = consoleType == ConsoleType.Snes || consoleType == ConsoleType.Gba;
+			HasShoulderButtons = consoleType is ConsoleType.Snes or ConsoleType.Gba;
 			HasSelectButton = consoleType != ConsoleType.Sms;
 			HasStartButton = consoleType != ConsoleType.Sms || index == 0;
 			ViewHeight = consoleType != ConsoleType.Ws ? (HasShoulderButtons ? 34 : 30) : 64;
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			PropertyChanged += ControllerInputViewModel_PropertyChanged;
 		}
 
-		private void ControllerInputViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
+		private void ControllerInputViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
 			SetInputOverrides();
 		}
 
-		public void SetInputOverrides()
-		{
+		public void SetInputOverrides() {
 			DebugApi.SetInputOverrides((uint)ControllerIndex - 1, new DebugControllerState() {
 				A = ButtonA,
 				B = ButtonB,
@@ -79,10 +74,9 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		public void OnButtonClick(object param)
-		{
-			if(param is string buttonName) {
-				switch(buttonName) {
+		public void OnButtonClick(object param) {
+			if (param is string buttonName) {
+				switch (buttonName) {
 					case "A": ButtonA = !ButtonA; break;
 					case "B": ButtonB = !ButtonB; break;
 					case "X": ButtonX = !ButtonX; break;

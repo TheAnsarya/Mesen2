@@ -1,30 +1,27 @@
-﻿using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
 using System;
 using System.Collections.Generic;
+using Mesen.Debugger.ViewModels;
+using Mesen.Interop;
 using static Mesen.Debugger.ViewModels.RegEntry;
 
 namespace Mesen.Debugger.RegisterViewer;
 
-public class NesRegisterViewer
-{
-	public static List<RegisterViewerTab> GetTabs(ref NesState nesState)
-	{
+public class NesRegisterViewer {
+	public static List<RegisterViewerTab> GetTabs(ref NesState nesState) {
 		List<RegisterViewerTab> tabs = new() {
 			GetNesPpuTab(ref nesState),
 			GetNesApuTab(ref nesState)
 		};
 
 		RegisterViewerTab cartTab = GetNesCartTab(ref nesState);
-		if(cartTab.Data.Count > 0) {
+		if (cartTab.Data.Count > 0) {
 			tabs.Add(cartTab);
 		}
 
 		return tabs;
 	}
 
-	private static RegisterViewerTab GetNesPpuTab(ref NesState state)
-	{
+	private static RegisterViewerTab GetNesPpuTab(ref NesState state) {
 		NesPpuState ppu = state.Ppu;
 
 		List<RegEntry> entries = new List<RegEntry>() {
@@ -70,8 +67,7 @@ public class NesRegisterViewer
 		return new RegisterViewerTab("PPU", entries, CpuType.Nes, MemoryType.NesMemory);
 	}
 
-	private static RegisterViewerTab GetNesApuTab(ref NesState state)
-	{
+	private static RegisterViewerTab GetNesApuTab(ref NesState state) {
 		List<RegEntry> entries = new List<RegEntry>();
 		NesApuState apu = state.Apu;
 
@@ -209,12 +205,11 @@ public class NesRegisterViewer
 		return new RegisterViewerTab("APU", entries, CpuType.Nes, MemoryType.NesMemory);
 	}
 
-	private static RegisterViewerTab GetNesCartTab(ref NesState state)
-	{
+	private static RegisterViewerTab GetNesCartTab(ref NesState state) {
 		NesCartridgeState cart = state.Cartridge;
 
 		List<RegEntry> entries = new List<RegEntry>();
-		for(int i = 0; i < cart.CustomEntryCount; i++) {
+		for (int i = 0; i < cart.CustomEntryCount; i++) {
 			ref MapperStateEntry entry = ref cart.CustomEntries[i];
 			Format format = entry.Type switch {
 				MapperStateValueType.Number8 => Format.X8,
@@ -227,11 +222,11 @@ public class NesRegisterViewer
 			string addr = entry.GetAddress();
 			string name = entry.GetName();
 
-			if(value is ISpanFormattable) {
+			if (value is ISpanFormattable) {
 				entries.Add(new RegEntry(addr, name, (ISpanFormattable)value, format));
-			} else if(value is bool) {
+			} else if (value is bool) {
 				entries.Add(new RegEntry(addr, name, (bool)value));
-			} else if(value is string) {
+			} else if (value is string) {
 				entries.Add(new RegEntry(addr, name, (string)value, entry.RawValue != Int64.MinValue ? entry.RawValue : null));
 			} else {
 				entries.Add(new RegEntry(addr, name));

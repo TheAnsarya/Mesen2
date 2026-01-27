@@ -1,36 +1,34 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.ViewModels;
-using Mesen.Config;
-using System;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using System.IO;
-using System.Linq;
-using Mesen.Utilities;
-using Mesen.Interop;
-using Mesen.Views;
-using Avalonia.Layout;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Labels;
-using System.Threading;
-using Mesen.Debugger.Windows;
-using Avalonia.Input.Platform;
-using System.Collections.Generic;
-using Mesen.Controls;
-using Mesen.Localization;
-using System.Diagnostics;
 using Avalonia.VisualTree;
-using System.Text;
+using Mesen.Config;
+using Mesen.Controls;
+using Mesen.Debugger.Labels;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using Mesen.Views;
 
-namespace Mesen.Windows
-{
-	public class MainWindow : MesenWindow
-	{
+namespace Mesen.Windows {
+	public class MainWindow : MesenWindow {
 		private DispatcherTimer _timerBackgroundFlag = new DispatcherTimer();
 		private MainWindowViewModel _model = null!;
 
@@ -69,14 +67,12 @@ namespace Mesen.Windows
 		private Dictionary<Key, long> _keyPressedStamp = new();
 		private bool _focusInMenu;
 
-		static MainWindow()
-		{
+		static MainWindow() {
 			WindowStateProperty.Changed.AddClassHandler<MainWindow>((x, e) => x.OnWindowStateChanged());
 			IsActiveProperty.Changed.AddClassHandler<MainWindow>((x, e) => x.OnActiveChanged());
 		}
 
-		public MainWindow()
-		{
+		public MainWindow() {
 			_testModeEnabled = System.Diagnostics.Debugger.IsAttached;
 			_isLinux = OperatingSystem.IsLinux();
 			_usesSoftwareRenderer = ConfigManager.Config.Video.UseSoftwareRenderer || OperatingSystem.IsMacOS();
@@ -116,49 +112,47 @@ namespace Mesen.Windows
 #endif
 		}
 
-		private static void InitGlobalShortcuts()
-		{
-			if(Application.Current?.PlatformSettings == null) {
+		private static void InitGlobalShortcuts() {
+			if (Application.Current?.PlatformSettings == null) {
 				return;
 			}
 
 			PlatformHotkeyConfiguration hotkeyConfig = Application.Current.PlatformSettings.HotkeyConfiguration;
-			List <KeyGesture> gestures = hotkeyConfig.OpenContextMenu;
-			for(int i = gestures.Count - 1; i >= 0; i--) {
-				if(gestures[i].Key == Key.F10 && gestures[i].KeyModifiers == KeyModifiers.Shift) {
+			List<KeyGesture> gestures = hotkeyConfig.OpenContextMenu;
+			for (int i = gestures.Count - 1; i >= 0; i--) {
+				if (gestures[i].Key == Key.F10 && gestures[i].KeyModifiers == KeyModifiers.Shift) {
 					//Disable Shift-F10 shortcut to open context menu - interferes with default shortcut for step back
 					gestures.RemoveAt(i);
 				}
 			}
+
 			hotkeyConfig.Copy.Add(new KeyGesture(Key.Insert, KeyModifiers.Control));
 			hotkeyConfig.Paste.Add(new KeyGesture(Key.Insert, KeyModifiers.Shift));
 			hotkeyConfig.Cut.Add(new KeyGesture(Key.Delete, KeyModifiers.Shift));
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e)
-		{
+		protected override void OnClosing(WindowClosingEventArgs e) {
 			base.OnClosing(e);
-			if(_needCloseValidation) {
+			if (_needCloseValidation) {
 				e.Cancel = true;
 				ValidateExit();
 			} else {
-				if(!CloseEmu(false)) {
+				if (!CloseEmu(false)) {
 					e.Cancel = true;
 				}
 			}
 		}
 
-		private bool CloseEmu(bool force)
-		{
+		private bool CloseEmu(bool force) {
 			//Close all other windows first
 			DebugWindowManager.CloseAllWindows();
-			foreach(Window wnd in ApplicationHelper.GetOpenedWindows()) {
-				if(wnd != this) {
+			foreach (Window wnd in ApplicationHelper.GetOpenedWindows()) {
+				if (wnd != this) {
 					wnd.Close();
 				}
 			}
 
-			if(!force && ApplicationHelper.GetOpenedWindows().Count > 1) {
+			if (!force && ApplicationHelper.GetOpenedWindows().Count > 1) {
 				return false;
 			}
 
@@ -173,35 +167,29 @@ namespace Mesen.Windows
 			return true;
 		}
 
-		private async void ValidateExit()
-		{
-			if(!ConfigManager.Config.Preferences.ConfirmExitResetPower || await MesenMsgBox.Show(null, "ConfirmExit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+		private async void ValidateExit() {
+			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await MesenMsgBox.Show(null, "ConfirmExit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
 				_needCloseValidation = false;
 				Close();
 			}
 		}
 
-		protected override void OnClosed(EventArgs e)
-		{
+		protected override void OnClosed(EventArgs e) {
 			base.OnClosed(e);
 			_mouseManager?.Dispose();
 		}
 
-		private void Console_CancelKeyPress(object? sender, ConsoleCancelEventArgs e)
-		{
+		private void Console_CancelKeyPress(object? sender, ConsoleCancelEventArgs e) {
 			_needCloseValidation = false;
-			Dispatcher.UIThread.Post(() => {
-				CloseEmu(true);
-			});
+			Dispatcher.UIThread.Post(() => CloseEmu(true));
 		}
 
-		private void OnDrop(object? sender, DragEventArgs e)
-		{
+		private void OnDrop(object? sender, DragEventArgs e) {
 #pragma warning disable CS0618 // Type or member is obsolete
 			string? filename = e.Data.GetFiles()?.FirstOrDefault()?.Path.LocalPath;
 #pragma warning restore CS0618
-			if(filename != null) {
-				if(File.Exists(filename)) {
+			if (filename != null) {
+				if (File.Exists(filename)) {
 					LoadRomHelper.LoadFile(filename);
 					Activate();
 				} else {
@@ -210,11 +198,10 @@ namespace Mesen.Windows
 			}
 		}
 
-		protected override void OnOpened(EventArgs e)
-		{
+		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
@@ -250,7 +237,7 @@ namespace Mesen.Windows
 				);
 
 				ConfigManager.Config.RemoveObsoleteConfig();
-				
+
 				//InitializeDefaults must be after InitializeEmu, otherwise keybindings will be empty
 				ConfigManager.Config.InitializeDefaults();
 				ConfigManager.Config.UpgradeConfig();
@@ -262,10 +249,11 @@ namespace Mesen.Windows
 
 				ConfigManager.Config.ApplyConfig();
 
-				if(ConfigManager.Config.Preferences.OverrideGameFolder && Directory.Exists(ConfigManager.Config.Preferences.GameFolder)) {
+				if (ConfigManager.Config.Preferences.OverrideGameFolder && Directory.Exists(ConfigManager.Config.Preferences.GameFolder)) {
 					EmuApi.AddKnownGameFolder(ConfigManager.Config.Preferences.GameFolder);
 				}
-				foreach(RecentItem recentItem in ConfigManager.Config.RecentFiles.Items) {
+
+				foreach (RecentItem recentItem in ConfigManager.Config.RecentFiles.Items) {
 					EmuApi.AddKnownGameFolder(recentItem.RomFile.Folder);
 				}
 
@@ -276,15 +264,14 @@ namespace Mesen.Windows
 					cmdLine.LoadFiles();
 					cmdLine.OnAfterInit(this);
 
-					if(ConfigManager.Config.Preferences.AutomaticallyCheckForUpdates) {
+					if (ConfigManager.Config.Preferences.AutomaticallyCheckForUpdates) {
 						_model.MainMenu.CheckForUpdate(this, true);
 					}
 				});
 			});
 		}
 
-		private void Instance_ArgumentsReceived(object? sender, ArgumentsReceivedEventArgs e)
-		{
+		private void Instance_ArgumentsReceived(object? sender, ArgumentsReceivedEventArgs e) {
 			Dispatcher.UIThread.Post(() => {
 				CommandLineHelper cmdLine = new(e.Args, false);
 
@@ -296,51 +283,48 @@ namespace Mesen.Windows
 			});
 		}
 
-		private void OnNotification(NotificationEventArgs e)
-		{
+		private void OnNotification(NotificationEventArgs e) {
 			DebugWindowManager.ProcessNotification(e);
 
-			switch(e.NotificationType) {
+			switch (e.NotificationType) {
 				case ConsoleNotificationType.GameLoaded:
 					CheatCodes.ApplyCheats();
 					RomInfo romInfo = EmuApi.GetRomInfo();
-					
+
 					Dispatcher.UIThread.Post(() => {
 						bool wasAudioFile = _model.AudioPlayer != null;
 						bool updateConfig = _model.RomInfo.Format != romInfo.Format;
 						_model.RomInfo = romInfo;
 
-						if(updateConfig) {
+						if (updateConfig) {
 							//Make sure any config overrides (video filter/aspect ratio) are applied when loading a different file
 							ConfigManager.Config.Video.ApplyConfig();
 						}
 
 						bool isAudioFile = _model.AudioPlayer != null;
-						if(wasAudioFile != isAudioFile) {
+						if (wasAudioFile != isAudioFile) {
 							//Force window size update when switching between an audio file and a regular rom
-							Dispatcher.UIThread.Post(() => {
-								ProcessResolutionChange();
-							});
+							Dispatcher.UIThread.Post(() => ProcessResolutionChange());
 						}
 					});
 
 					GameConfig.LoadGameConfig(romInfo).ApplyConfig();
 
 					GameLoadedEventParams evtParams = Marshal.PtrToStructure<GameLoadedEventParams>(e.Parameter);
-					if(!evtParams.IsPowerCycle) {
+					if (!evtParams.IsPowerCycle) {
 						Dispatcher.UIThread.Post(() => {
 							_model.RecentGames.Visible = false;
-							if(IsKeyboardFocusWithin || IsActive || ApplicationHelper.GetActiveOrMainWindow() == this) {
+							if (IsKeyboardFocusWithin || IsActive || ApplicationHelper.GetActiveOrMainWindow() == this) {
 								this.GetControl<Panel>("RendererPanel").Focus();
 							}
 
 							DispatcherTimer.RunOnce(() => {
-								if(_cmdLine != null) {
+								if (_cmdLine != null) {
 									_cmdLine?.ProcessPostLoadCommandSwitches(this);
 									_cmdLine = null;
 								}
 
-								if(WindowState == WindowState.FullScreen || WindowState == WindowState.Maximized) {
+								if (WindowState is WindowState.FullScreen or WindowState.Maximized) {
 									//Force resize of renderer when loading a game while in fullscreen
 									//Prevents some issues when fullscreen was turned on before loading a game, etc.
 									_rendererSize = new Size();
@@ -350,14 +334,10 @@ namespace Mesen.Windows
 						});
 					}
 
-					Dispatcher.UIThread.Post(() => {
-						ApplicationHelper.GetExistingWindow<HdPackBuilderWindow>()?.Close();
-					});
+					Dispatcher.UIThread.Post(() => ApplicationHelper.GetExistingWindow<HdPackBuilderWindow>()?.Close());
 
 					// Start background CDL recording if enabled
-					Dispatcher.UIThread.Post(() => {
-						BackgroundPansyExporter.OnRomLoaded(romInfo);
-					});
+					Dispatcher.UIThread.Post(() => BackgroundPansyExporter.OnRomLoaded(romInfo));
 
 					LoadRomHelper.ResetReloadCounter();
 					break;
@@ -370,22 +350,20 @@ namespace Mesen.Windows
 				case ConsoleNotificationType.GameResumed:
 					Dispatcher.UIThread.Post(() => {
 						_model.RecentGames.Visible = false;
-						if(IsKeyboardFocusWithin) {
+						if (IsKeyboardFocusWithin) {
 							this.GetControl<Panel>("RendererPanel").Focus();
 						}
 					});
 					break;
 
 				case ConsoleNotificationType.RequestConfigChange:
-					Dispatcher.UIThread.Post(() => {
-						UpdateInputConfiguration();
-					});
+					Dispatcher.UIThread.Post(() => UpdateInputConfiguration());
 					break;
 
 				case ConsoleNotificationType.EmulationStopped:
 					// Save final Pansy file before stopping
 					BackgroundPansyExporter.OnRomUnloaded();
-					
+
 					Dispatcher.UIThread.Post(() => {
 						_model.RomInfo = new RomInfo();
 						_model.RecentGames.Init(GameScreenMode.RecentGames);
@@ -393,51 +371,46 @@ namespace Mesen.Windows
 					break;
 
 				case ConsoleNotificationType.ResolutionChanged:
-					Dispatcher.UIThread.Post(() => {
-						ProcessResolutionChange();
-					});
+					Dispatcher.UIThread.Post(() => ProcessResolutionChange());
 					break;
 
 				case ConsoleNotificationType.ExecuteShortcut:
 					ExecuteShortcutParams p = Marshal.PtrToStructure<ExecuteShortcutParams>(e.Parameter);
-					Dispatcher.UIThread.Post(() => {
-						_shortcutHandler.ExecuteShortcut(p.Shortcut);
-					});
+					Dispatcher.UIThread.Post(() => _shortcutHandler.ExecuteShortcut(p.Shortcut));
 					break;
 
 				case ConsoleNotificationType.MissingFirmware: {
-					MissingFirmwareMessage msg = Marshal.PtrToStructure<MissingFirmwareMessage>(e.Parameter);
-					TaskCompletionSource tcs = new TaskCompletionSource();
-					Dispatcher.UIThread.Post(async () => {
-						await FirmwareHelper.RequestFirmwareFile(msg);
-						tcs.SetResult();
-					});
-					tcs.Task.Wait();
-					break;
-				}
+						MissingFirmwareMessage msg = Marshal.PtrToStructure<MissingFirmwareMessage>(e.Parameter);
+						TaskCompletionSource tcs = new TaskCompletionSource();
+						Dispatcher.UIThread.Post(async () => {
+							await FirmwareHelper.RequestFirmwareFile(msg);
+							tcs.SetResult();
+						});
+						tcs.Task.Wait();
+						break;
+					}
 
 				case ConsoleNotificationType.SufamiTurboFilePrompt: {
-					SufamiTurboFilePromptMessage msg = Marshal.PtrToStructure<SufamiTurboFilePromptMessage>(e.Parameter);
-					TaskCompletionSource tcs = new TaskCompletionSource();
-					Dispatcher.UIThread.Post(async () => {
-						if(await MesenMsgBox.Show(this, "PromptLoadSufamiTurbo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-							string? selectedFile = await FileDialogHelper.OpenFile(null, this, FileDialogHelper.SufamiTurboExt);
-							if(selectedFile != null) {
-								byte[] file = Encoding.UTF8.GetBytes(selectedFile);
-								Array.Copy(file, msg.Filename, file.Length);
-								Marshal.StructureToPtr<SufamiTurboFilePromptMessage>(msg, e.Parameter, false);
+						SufamiTurboFilePromptMessage msg = Marshal.PtrToStructure<SufamiTurboFilePromptMessage>(e.Parameter);
+						TaskCompletionSource tcs = new TaskCompletionSource();
+						Dispatcher.UIThread.Post(async () => {
+							if (await MesenMsgBox.Show(this, "PromptLoadSufamiTurbo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+								string? selectedFile = await FileDialogHelper.OpenFile(null, this, FileDialogHelper.SufamiTurboExt);
+								if (selectedFile != null) {
+									byte[] file = Encoding.UTF8.GetBytes(selectedFile);
+									Array.Copy(file, msg.Filename, file.Length);
+									Marshal.StructureToPtr<SufamiTurboFilePromptMessage>(msg, e.Parameter, false);
+								}
 							}
-						}
-						tcs.SetResult();
-					});
-					tcs.Task.Wait();
-					break;
-				}
+
+							tcs.SetResult();
+						});
+						tcs.Task.Wait();
+						break;
+					}
 
 				case ConsoleNotificationType.BeforeGameLoad:
-					Dispatcher.UIThread.Post(() => {
-						ApplicationHelper.GetExistingWindow<HdPackBuilderWindow>()?.Close();
-					});
+					Dispatcher.UIThread.Post(() => ApplicationHelper.GetExistingWindow<HdPackBuilderWindow>()?.Close());
 					break;
 
 				case ConsoleNotificationType.RefreshSoftwareRenderer:
@@ -447,25 +420,22 @@ namespace Mesen.Windows
 			}
 		}
 
-		private static void UpdateInputConfiguration()
-		{
+		private static void UpdateInputConfiguration() {
 			//Used to update input devices when the core requests changes (NES-only for now)
 			ConfigManager.Config.Nes.UpdateInputFromCoreConfig();
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void ProcessResolutionChange()
-		{
+		private void ProcessResolutionChange() {
 			double dpiScale = LayoutHelper.GetLayoutScale(this);
 			FrameInfo baseScreenSize = EmuApi.GetBaseScreenSize();
-			if(WindowState == WindowState.Normal) {
+			if (WindowState == WindowState.Normal) {
 				double menuHeight = ConfigManager.Config.Preferences.AutoHideMenu ? 0 : _mainMenu.Bounds.Height;
 				double height = ClientSize.Height - menuHeight - _audioPlayer.Bounds.Height;
-				if(baseScreenSize.Width == _prevScreenSize.Height && baseScreenSize.Height == _prevScreenSize.Width) {
+				if (baseScreenSize.Width == _prevScreenSize.Height && baseScreenSize.Height == _prevScreenSize.Width) {
 					//Rotation, swap sizes without changing scale
 					double xScale = ClientSize.Width * dpiScale / _prevScreenSize.Width;
 					double yScale = height * dpiScale / _prevScreenSize.Height;
@@ -475,8 +445,8 @@ namespace Mesen.Windows
 					double yScale = height * dpiScale / baseScreenSize.Height;
 					SetScale(Math.Min(Math.Round(xScale), Math.Round(yScale)));
 				}
-			} else if(WindowState == WindowState.Maximized || WindowState == WindowState.FullScreen) {
-				if(_rendererSize == default) {
+			} else if (WindowState is WindowState.Maximized or WindowState.FullScreen) {
+				if (_rendererSize == default) {
 					ResizeRenderer();
 				} else {
 					double xScale = _rendererSize.Width * dpiScale / baseScreenSize.Width;
@@ -484,12 +454,12 @@ namespace Mesen.Windows
 					SetScale(Math.Min(Math.Round(xScale, 2), Math.Round(yScale, 2)));
 				}
 			}
+
 			_prevScreenSize = baseScreenSize;
 		}
 
-		public void SetScale(double scale)
-		{
-			if(scale < 1) {
+		public void SetScale(double scale) {
+			if (scale < 1) {
 				scale = 1;
 			}
 
@@ -499,13 +469,12 @@ namespace Mesen.Windows
 			InternalSetScale(scale);
 		}
 
-		private void InternalSetScale(double scale)
-		{
+		private void InternalSetScale(double scale) {
 			double dpiScale = LayoutHelper.GetLayoutScale(this);
 			double aspectRatio = EmuApi.GetAspectRatio();
 
 			FrameInfo screenSize = EmuApi.GetBaseScreenSize();
-			if(WindowState == WindowState.Normal) {
+			if (WindowState == WindowState.Normal) {
 				_rendererSize = new Size();
 
 				//When menu is set to auto-hide, don't count its height when calculating the window's final size
@@ -516,27 +485,25 @@ namespace Mesen.Windows
 				Width = width;
 				Height = height + menuHeight + _audioPlayer.Bounds.Height;
 				ResizeRenderer();
-			} else if(WindowState == WindowState.Maximized || WindowState == WindowState.FullScreen) {
+			} else if (WindowState is WindowState.Maximized or WindowState.FullScreen) {
 				_rendererSize = new Size(Math.Round(screenSize.Width * scale * aspectRatio) / dpiScale, Math.Round(screenSize.Height * scale) / dpiScale);
 				ResizeRenderer();
 			}
 		}
 
-		private void ResizeRenderer()
-		{
+		private void ResizeRenderer() {
 			_rendererPanel.InvalidateMeasure();
 			_rendererPanel.InvalidateArrange();
 		}
 
-		private void RendererPanel_LayoutUpdated(object? sender, EventArgs e)
-		{
+		private void RendererPanel_LayoutUpdated(object? sender, EventArgs e) {
 			double aspectRatio = EmuApi.GetAspectRatio();
 			double dpiScale = LayoutHelper.GetLayoutScale(this);
 
 			Size finalSize = _rendererSize == default ? _rendererPanel.Bounds.Size : _rendererSize;
 			double height = finalSize.Height;
 			double width = finalSize.Height * aspectRatio;
-			if(Math.Round(width) > Math.Round(finalSize.Width)) {
+			if (Math.Round(width) > Math.Round(finalSize.Width)) {
 				//Use renderer width to calculate the height instead of the opposite
 				//when current window dimensions would cause cropping horizontally
 				//if the screen width was calculated based on the height.
@@ -544,10 +511,10 @@ namespace Mesen.Windows
 				height = width / aspectRatio;
 			}
 
-			if(ConfigManager.Config.Video.FullscreenForceIntegerScale && VisualRoot is Window wnd && (wnd.WindowState == WindowState.FullScreen || wnd.WindowState == WindowState.Maximized)) {
+			if (ConfigManager.Config.Video.FullscreenForceIntegerScale && VisualRoot is Window wnd && (wnd.WindowState == WindowState.FullScreen || wnd.WindowState == WindowState.Maximized)) {
 				FrameInfo baseSize = EmuApi.GetBaseScreenSize();
 				double scale = height * dpiScale / baseSize.Height;
-				if(scale != Math.Floor(scale)) {
+				if (scale != Math.Floor(scale)) {
 					height = baseSize.Height * Math.Max(1, Math.Floor(scale / dpiScale));
 					width = height * aspectRatio;
 				}
@@ -564,32 +531,31 @@ namespace Mesen.Windows
 			_model.SoftwareRenderer.Height = height;
 		}
 
-		private void OnWindowStateChanged()
-		{
+		private void OnWindowStateChanged() {
 			_rendererSize = new Size();
 			ResizeRenderer();
 		}
 
-		public void ToggleFullscreen()
-		{
-			if(_preventFullscreenToggle) {
+		public void ToggleFullscreen() {
+			if (_preventFullscreenToggle) {
 				return;
 			}
 
 			_preventFullscreenToggle = true;
-			if(WindowState == WindowState.FullScreen) {
+			if (WindowState == WindowState.FullScreen) {
 				Task.Run(() => {
-					if(ConfigManager.Config.Video.UseExclusiveFullscreen) {
+					if (ConfigManager.Config.Video.UseExclusiveFullscreen) {
 						EmuApi.SetExclusiveFullscreenMode(false, _renderer.Handle);
 					}
 
 					Dispatcher.UIThread.Post(() => {
 						WindowState = _prevWindowState;
-						if(_prevWindowState == WindowState.Normal) {
+						if (_prevWindowState == WindowState.Normal) {
 							Width = _originalSize.Width;
 							Height = _originalSize.Height;
 							Position = _originalPos;
 						}
+
 						_preventFullscreenToggle = false;
 					});
 				});
@@ -598,8 +564,8 @@ namespace Mesen.Windows
 				_originalPos = Position;
 				_prevWindowState = WindowState;
 
-				if(ConfigManager.Config.Video.UseExclusiveFullscreen) {
-					if(!EmuApi.IsRunning()) {
+				if (ConfigManager.Config.Video.UseExclusiveFullscreen) {
+					if (!EmuApi.IsRunning()) {
 						//Prevent entering fullscreen mode until a game is loaded
 						_preventFullscreenToggle = false;
 						return;
@@ -609,9 +575,7 @@ namespace Mesen.Windows
 						EmuApi.SetExclusiveFullscreenMode(true, TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
 						_preventFullscreenToggle = false;
 
-						Dispatcher.UIThread.Post(() => {
-							WindowState = WindowState.FullScreen;
-						});
+						Dispatcher.UIThread.Post(() => WindowState = WindowState.FullScreen);
 					});
 				} else {
 					WindowState = WindowState.FullScreen;
@@ -620,39 +584,38 @@ namespace Mesen.Windows
 			}
 		}
 
-		protected override void OnLostFocus(RoutedEventArgs e)
-		{
+		protected override void OnLostFocus(RoutedEventArgs e) {
 			base.OnLostFocus(e);
-			if(WindowState == WindowState.FullScreen && ConfigManager.Config.Video.UseExclusiveFullscreen) {
+			if (WindowState == WindowState.FullScreen && ConfigManager.Config.Video.UseExclusiveFullscreen) {
 				ToggleFullscreen();
 			}
 		}
 
-		private bool ProcessTestModeShortcuts(Key key)
-		{
-			if(key == Key.F1) {
-				if(TestApi.RomTestRecording()) {
+		private bool ProcessTestModeShortcuts(Key key) {
+			if (key == Key.F1) {
+				if (TestApi.RomTestRecording()) {
 					TestApi.RomTestStop();
 				} else {
 					RomTestHelper.RecordTest();
 				}
+
 				return true;
-			} else if(key == Key.F2) {
+			} else if (key == Key.F2) {
 				RomTestHelper.RunTest();
 				return true;
-			} else if(key == Key.F3) {
+			} else if (key == Key.F3) {
 				RomTestHelper.RunAllTests();
 				return true;
-			} else if(key == Key.F7) {
+			} else if (key == Key.F7) {
 				RomTestHelper.RunGbMicroTests();
 				return true;
-			} else if(key == Key.F8) {
+			} else if (key == Key.F8) {
 				RomTestHelper.RunGambatteTests();
 				return true;
-			} else if(key == Key.F6) {
+			} else if (key == Key.F6) {
 				//For testing purposes (to test for memory leaks)
 				Task.Run(() => {
-					for(int i = 0; i < 50; i++) {
+					for (int i = 0; i < 50; i++) {
 						GC.Collect();
 						GC.WaitForPendingFinalizers();
 						Thread.Sleep(10);
@@ -660,28 +623,28 @@ namespace Mesen.Windows
 				});
 				return true;
 			}
+
 			return false;
 		}
 
-		private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
-		{
-			if(_testModeEnabled && e.KeyModifiers == KeyModifiers.Alt && ProcessTestModeShortcuts(e.Key)) {
+		private void OnPreviewKeyDown(object? sender, KeyEventArgs e) {
+			if (_testModeEnabled && e.KeyModifiers == KeyModifiers.Alt && ProcessTestModeShortcuts(e.Key)) {
 				return;
 			}
 
-			if(OperatingSystem.IsMacOS()) {
+			if (OperatingSystem.IsMacOS()) {
 				//Keyhandler handles key internally on macOS
 				return;
 			}
 
-			if(_focusInMenu) {
+			if (_focusInMenu) {
 				return;
 			}
 
-			if(e.Key != Key.None) {
+			if (e.Key != Key.None) {
 				_keyPressedStamp[e.Key] = _stopWatch.ElapsedTicks;
 
-				if(_isLinux && _pendingKeyUpEvents.TryGetValue(e.Key, out IDisposable? cancelTimer)) {
+				if (_isLinux && _pendingKeyUpEvents.TryGetValue(e.Key, out IDisposable? cancelTimer)) {
 					//Cancel any pending key up event
 					cancelTimer.Dispose();
 					_pendingKeyUpEvents.Remove(e.Key);
@@ -690,21 +653,20 @@ namespace Mesen.Windows
 				InputApi.SetKeyState((UInt16)e.Key, true);
 			}
 
-			if(e.Key == Key.Tab || e.Key == Key.F10) {
+			if (e.Key is Key.Tab or Key.F10) {
 				//Prevent menu/window from handling these keys to avoid issue with custom shortcuts
 				e.Handled = true;
 			}
 		}
 
-		private void OnPreviewKeyUp(object? sender, KeyEventArgs e)
-		{
-			if(OperatingSystem.IsMacOS()) {
+		private void OnPreviewKeyUp(object? sender, KeyEventArgs e) {
+			if (OperatingSystem.IsMacOS()) {
 				//Keyhandler handles key internally on macOS
 				return;
 			}
 
-			if(e.Key != Key.None) {
-				if(e.Key.IsSpecialKey() && (!_keyPressedStamp.TryGetValue(e.Key, out long stamp) || ((_stopWatch.ElapsedTicks - stamp) * 1000 / Stopwatch.Frequency) < 10)) {
+			if (e.Key != Key.None) {
+				if (e.Key.IsSpecialKey() && (!_keyPressedStamp.TryGetValue(e.Key, out long stamp) || ((_stopWatch.ElapsedTicks - stamp) * 1000 / Stopwatch.Frequency) < 10)) {
 					//Key up received without key down, or key pressed for less than 10 ms, pretend the key was pressed for 50ms
 					//Some special keys can behave this way (e.g printscreen)
 					InputApi.SetKeyState((UInt16)e.Key, true);
@@ -715,7 +677,7 @@ namespace Mesen.Windows
 
 				_keyPressedStamp.Remove(e.Key);
 
-				if(_isLinux) {
+				if (_isLinux) {
 					//Process keyup events after 1ms on Linux to prevent key repeat from triggering key up/down repeatedly
 					IDisposable cancelTimer = DispatcherTimer.RunOnce(() => InputApi.SetKeyState((UInt16)e.Key, false), TimeSpan.FromMilliseconds(1), DispatcherPriority.MaxValue);
 					_pendingKeyUpEvents[e.Key] = cancelTimer;
@@ -725,48 +687,47 @@ namespace Mesen.Windows
 			}
 		}
 
-		private void OnActiveChanged()
-		{
-			if(!_isClosing) {
+		private void OnActiveChanged() {
+			if (!_isClosing) {
 				ConfigApi.SetEmulationFlag(EmulationFlags.InBackground, !IsActive);
 				InputApi.ResetKeyState();
 			}
 		}
 
-		private void timerUpdateBackgroundFlag(object? sender, EventArgs e)
-		{
+		private void timerUpdateBackgroundFlag(object? sender, EventArgs e) {
 			Window? activeWindow = ApplicationHelper.GetActiveWindow();
 
 			PreferencesConfig cfg = ConfigManager.Config.Preferences;
 
 			bool focusInMenu = MenuHelper.IsFocusInMenu(_mainMenu.MainMenu);
-			if(focusInMenu && !_focusInMenu) {
+			if (focusInMenu && !_focusInMenu) {
 				InputApi.ResetKeyState();
 			}
+
 			_focusInMenu = focusInMenu;
 
 			bool needPause = activeWindow == null && cfg.PauseWhenInBackground;
-			if(activeWindow != null) {
+			if (activeWindow != null) {
 				bool isConfigWindow = (activeWindow != this) && !DebugWindowManager.IsDebugWindow(activeWindow);
 				needPause |= cfg.PauseWhenInMenusAndConfig && !isConfigWindow && _mainMenu.MainMenu.IsOpen; //in main menu
 				needPause |= cfg.PauseWhenInMenusAndConfig && isConfigWindow; //in a window that's neither the main window nor a debug tool
 			}
 
-			if(needPause) {
-				if(!EmuApi.IsPaused()) {
+			if (needPause) {
+				if (!EmuApi.IsPaused()) {
 					_needResume = true;
 
 					DebuggerWindow? wnd = DebugWindowManager.GetDebugWindow<DebuggerWindow>(x => x.CpuType == _model.RomInfo.ConsoleType.GetMainCpuType());
-					if(wnd != null) {
+					if (wnd != null) {
 						//If the debugger window for the main cpu is opened, suppress the "bring to front on break" behavior
 						wnd.SuppressBringToFront();
 					}
 
 					EmuApi.Pause();
 				}
-			} else if(_needResume) {
+			} else if (_needResume) {
 				//Don't resume if the load/save state dialog is opened
-				if(!_model.RecentGames.Visible) {
+				if (!_model.RecentGames.Visible) {
 					EmuApi.Resume();
 					_needResume = false;
 				}

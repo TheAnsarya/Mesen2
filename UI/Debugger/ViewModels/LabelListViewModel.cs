@@ -1,4 +1,9 @@
-﻿using Avalonia;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
@@ -12,16 +17,9 @@ using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class LabelListViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class LabelListViewModel : DisposableViewModel {
 		[Reactive] public MesenList<LabelViewModel> Labels { get; private set; } = new();
 		[Reactive] public SelectionModel<LabelViewModel?> Selection { get; set; } = new() { SingleSelect = false };
 		[Reactive] public SortState SortState { get; set; } = new();
@@ -33,16 +31,14 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public LabelListViewModel() : this(CpuType.Snes, new()) { }
 
-		public LabelListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger)
-		{
+		public LabelListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger) {
 			CpuType = cpuType;
 			Debugger = debugger;
 
 			SortState.SetColumnSort("Label", ListSortDirection.Ascending, true);
 		}
 
-		public void Sort(object? param)
-		{
+		public void Sort(object? param) {
 			UpdateLabelList();
 		}
 
@@ -53,8 +49,7 @@ namespace Mesen.Debugger.ViewModels
 			{ "Comment", (a, b) => string.Compare(a.Label.Comment, b.Label.Comment, StringComparison.OrdinalIgnoreCase) },
 		};
 
-		public void UpdateLabelList()
-		{
+		public void UpdateLabelList() {
 			List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 
 			List<LabelViewModel> sortedLabels = LabelManager.GetLabels(CpuType).Select(l => new LabelViewModel(l, CpuType)).ToList();
@@ -66,15 +61,13 @@ namespace Mesen.Debugger.ViewModels
 			Selection.SelectIndexes(selectedIndexes, Labels.Count);
 		}
 
-		public void RefreshLabelList()
-		{
-			foreach(LabelViewModel label in Labels) {
+		public void RefreshLabelList() {
+			foreach (LabelViewModel label in Labels) {
 				label.Refresh();
 			}
 		}
 
-		public void InitContextMenu(Control parent)
-		{
+		public void InitContextMenu(Control parent) {
 			AddDisposables(DebugShortcutManager.CreateContextMenu(parent, new object[] {
 				new ContextMenuAction() {
 					ActionType = ActionType.Add,
@@ -170,6 +163,7 @@ namespace Mesen.Debugger.ViewModels
 							if(addr.Address < 0) {
 								addr = vm.Label.GetAbsoluteAddress();
 							}
+
 							MemoryToolsWindow.ShowInMemoryTools(addr.Type, addr.Address);
 						}
 					}
@@ -178,9 +172,7 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class LabelViewModel : INotifyPropertyChanged
-	{
-		private string _format;
+	public class LabelViewModel : INotifyPropertyChanged {
 		private bool _isUnmappedType;
 
 		public CodeLabel Label { get; set; }
@@ -190,16 +182,15 @@ namespace Mesen.Debugger.ViewModels
 		public string LabelText { get; private set; }
 		public string LabelComment { get; private set; }
 		public int RelAddress { get; private set; }
-		public string RelAddressDisplay => RelAddress >= 0 ? ("$" + RelAddress.ToString(_format)) : (_isUnmappedType ? "" : "<unavailable>");
+		public string RelAddressDisplay => RelAddress >= 0 ? ("$" + RelAddress.ToString(field)) : (_isUnmappedType ? "" : "<unavailable>");
 		public object RowBrush => RelAddress >= 0 || _isUnmappedType ? AvaloniaProperty.UnsetValue : Brushes.Gray;
 		public FontStyle RowStyle => RelAddress >= 0 || _isUnmappedType ? FontStyle.Normal : FontStyle.Italic;
 
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		public void Refresh()
-		{
+		public void Refresh() {
 			int addr = Label.GetRelativeAddress(CpuType).Address;
-			if(addr != RelAddress) {
+			if (addr != RelAddress) {
 				RelAddress = addr;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowBrush)));
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowStyle)));
@@ -207,21 +198,18 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public LabelViewModel(CodeLabel label, CpuType cpuType)
-		{
+		public LabelViewModel(CodeLabel label, CpuType cpuType) {
 			Label = label;
 			LabelText = label.Label;
 			LabelComment = label.Comment;
 			CpuType = cpuType;
 			RelAddress = Label.GetRelativeAddress(CpuType).Address;
-			_format = "X" + cpuType.GetAddressSize();
+			RelAddressDisplay = "X" + cpuType.GetAddressSize();
 			_isUnmappedType = Label.MemoryType.IsUnmapped();
 
-			if(Label.MemoryType.IsRelativeMemory()) {
-				AbsAddressDisplay = "";
-			} else {
-				AbsAddressDisplay = "$" + label.Address.ToString(label.MemoryType.GetFormatString()) + " [" + label.MemoryType.GetShortName() + "]";
-			}
+			AbsAddressDisplay = Label.MemoryType.IsRelativeMemory()
+				? ""
+				: "$" + label.Address.ToString(label.MemoryType.GetFormatString()) + " [" + label.MemoryType.GetShortName() + "]";
 		}
 	}
 }

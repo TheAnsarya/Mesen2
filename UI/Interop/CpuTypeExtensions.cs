@@ -1,11 +1,8 @@
-﻿using System;
+using System;
 
-namespace Mesen.Interop
-{
-	public static class CpuTypeExtensions
-	{
-		public static MemoryType ToMemoryType(this CpuType cpuType)
-		{
+namespace Mesen.Interop {
+	public static class CpuTypeExtensions {
+		public static MemoryType ToMemoryType(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => MemoryType.SnesMemory,
 				CpuType.Spc => MemoryType.SpcMemory,
@@ -24,8 +21,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static MemoryType GetVramMemoryType(this CpuType cpuType, bool getExtendedRam = false)
-		{
+		public static MemoryType GetVramMemoryType(this CpuType cpuType, bool getExtendedRam = false) {
 			return cpuType switch {
 				CpuType.Snes => MemoryType.SnesVideoRam,
 				CpuType.Gameboy => MemoryType.GbVideoRam,
@@ -38,8 +34,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static MemoryType GetSpriteRamMemoryType(this CpuType cpuType, bool getExtendedRam = false)
-		{
+		public static MemoryType GetSpriteRamMemoryType(this CpuType cpuType, bool getExtendedRam = false) {
 			return cpuType switch {
 				CpuType.Snes => MemoryType.SnesSpriteRam,
 				CpuType.Gameboy => MemoryType.GbSpriteRam,
@@ -52,8 +47,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static MemoryType GetPrgRomMemoryType(this CpuType cpuType)
-		{
+		public static MemoryType GetPrgRomMemoryType(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => MemoryType.SnesPrgRom,
 				CpuType.NecDsp => MemoryType.DspProgramRom,
@@ -61,7 +55,7 @@ namespace Mesen.Interop
 				CpuType.Gsu => MemoryType.SnesPrgRom,
 				CpuType.Cx4 => MemoryType.SnesPrgRom,
 				CpuType.St018 => MemoryType.St018PrgRom,
-				
+
 				CpuType.Gameboy => MemoryType.GbPrgRom,
 				CpuType.Nes => MemoryType.NesPrgRom,
 				CpuType.Pce => MemoryType.PcePrgRom,
@@ -72,8 +66,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static MemoryType GetSystemRamType(this CpuType cpuType)
-		{
+		public static MemoryType GetSystemRamType(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => MemoryType.SnesWorkRam,
 				CpuType.NecDsp => MemoryType.DspDataRam,
@@ -92,8 +85,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static int GetAddressSize(this CpuType cpuType)
-		{
+		public static int GetAddressSize(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => 6,
 				CpuType.Spc => 4,
@@ -112,8 +104,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static int GetByteCodeSize(this CpuType cpuType)
-		{
+		public static int GetByteCodeSize(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => 4,
 				CpuType.Spc => 3,
@@ -132,8 +123,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static DebuggerFlags GetDebuggerFlag(this CpuType cpuType)
-		{
+		public static DebuggerFlags GetDebuggerFlag(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => DebuggerFlags.SnesDebuggerEnabled,
 				CpuType.Spc => DebuggerFlags.SpcDebuggerEnabled,
@@ -152,8 +142,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static ConsoleType GetConsoleType(this CpuType cpuType)
-		{
+		public static ConsoleType GetConsoleType(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => ConsoleType.Snes,
 				CpuType.Spc => ConsoleType.Snes,
@@ -172,24 +161,24 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static bool SupportsAssembler(this CpuType cpuType)
-		{
-			switch(cpuType) {
+		public static bool SupportsAssembler(this CpuType cpuType) {
+			switch (cpuType) {
 				case CpuType.Snes:
 				case CpuType.Gameboy:
 				case CpuType.Nes:
 				case CpuType.Pce:
 				case CpuType.Sms:
 					return true;
-				
+
 				default:
 					return false;
-			};
+			}
+
+			;
 		}
 
-		public static bool SupportsFunctionList(this CpuType cpuType)
-		{
-			switch(cpuType) {
+		public static bool SupportsFunctionList(this CpuType cpuType) {
+			switch (cpuType) {
 				case CpuType.Snes:
 				case CpuType.Sa1:
 				case CpuType.Gameboy:
@@ -202,23 +191,25 @@ namespace Mesen.Interop
 
 				default:
 					return false;
-			};
+			}
+
+			;
 		}
 
-		public static bool SupportsCallStack(this CpuType cpuType)
-		{
-			switch(cpuType) {
+		public static bool SupportsCallStack(this CpuType cpuType) {
+			switch (cpuType) {
 				case CpuType.Gsu:
 					return false;
 
 				default:
 					return true;
-			};
+			}
+
+			;
 		}
 
-		public static bool SupportsMemoryMappings(this CpuType cpuType)
-		{
-			switch(cpuType) {
+		public static bool SupportsMemoryMappings(this CpuType cpuType) {
+			switch (cpuType) {
 				case CpuType.Gameboy:
 				case CpuType.Nes:
 				case CpuType.Pce:
@@ -228,12 +219,13 @@ namespace Mesen.Interop
 
 				default:
 					return false;
-			};
+			}
+
+			;
 		}
 
-		public static bool HasDummyOperations(this CpuType cpuType)
-		{
-			switch(cpuType) {
+		public static bool HasDummyOperations(this CpuType cpuType) {
+			switch (cpuType) {
 				case CpuType.Spc:
 				case CpuType.Nes:
 				case CpuType.Pce:
@@ -241,11 +233,12 @@ namespace Mesen.Interop
 
 				default:
 					return false;
-			};
+			}
+
+			;
 		}
 
-		public static byte GetNopOpCode(this CpuType cpuType)
-		{
+		public static byte GetNopOpCode(this CpuType cpuType) {
 			return cpuType switch {
 				CpuType.Snes => 0xEA,
 				CpuType.Gameboy => 0x00,
@@ -258,17 +251,16 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static bool CanAccessMemoryType(this CpuType cpuType, MemoryType memType)
-		{
-			switch(memType) {
+		public static bool CanAccessMemoryType(this CpuType cpuType, MemoryType memType) {
+			switch (memType) {
 				case MemoryType.None:
 					return false;
 
 				case MemoryType.SnesPrgRom:
-					return cpuType == CpuType.Snes || cpuType == CpuType.Sa1 || cpuType == CpuType.Gsu || cpuType == CpuType.Cx4;
-				
+					return cpuType is CpuType.Snes or CpuType.Sa1 or CpuType.Gsu or CpuType.Cx4;
+
 				case MemoryType.SnesSaveRam:
-					return cpuType == CpuType.Snes || cpuType == CpuType.Sa1 || cpuType == CpuType.Cx4;
+					return cpuType is CpuType.Snes or CpuType.Sa1 or CpuType.Cx4;
 
 				default:
 					//All other types are specific to a single CPU type

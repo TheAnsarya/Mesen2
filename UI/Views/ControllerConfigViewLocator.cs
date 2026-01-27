@@ -1,22 +1,17 @@
-﻿using Avalonia.Controls;
-using Avalonia.Controls.Templates;
-using Mesen.Config;
-using Mesen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Controls.Templates;
+using Mesen.Config;
+using Mesen.ViewModels;
 
-namespace Mesen.Views
-{
-	public class ControllerConfigViewLocator : IDataTemplate
-	{
-		public Control Build(object? data)
-		{
-			KeyMappingViewModel? mappings = data as KeyMappingViewModel;
-
-			if(mappings != null) {
+namespace Mesen.Views {
+	public class ControllerConfigViewLocator : IDataTemplate {
+		public Control Build(object? data) {
+			if (data is KeyMappingViewModel mappings) {
 				return mappings.Type switch {
 					ControllerType.SnesController or ControllerType.SnesRumbleController => new SnesControllerView(),
 					ControllerType.NesController => new NesControllerView(),
@@ -38,8 +33,7 @@ namespace Mesen.Views
 			return new TextBlock { Text = "No matching view found for controller type" };
 		}
 
-		public bool Match(object? data)
-		{
+		public bool Match(object? data) {
 			return data is KeyMappingViewModel;
 		}
 	}

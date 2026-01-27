@@ -1,11 +1,3 @@
-﻿using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,11 +6,17 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Avalonia.Threading;
+using Mesen.Config;
+using Mesen.Config.Shortcuts;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels
-{
-	public class HdPackBuilderViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class HdPackBuilderViewModel : DisposableViewModel {
 		[Reactive] public string SaveFolder { get; set; }
 		[Reactive] public bool IsRecording { get; set; }
 		[Reactive] public bool IsBankSizeVisible { get; set; }
@@ -26,7 +24,7 @@ namespace Mesen.ViewModels
 		[Reactive] public HdPackBuilderConfig Config { get; set; }
 		[Reactive] public FilterInfo? SelectedFilter { get; set; }
 		[Reactive] public BankSizeInfo SelectedBankSize { get; set; }
-		
+
 		[Reactive] public FilterInfo[] Filters { get; private set; } = Array.Empty<FilterInfo>();
 
 		public BankSizeInfo[] BankSizes { get; } = {
@@ -35,8 +33,7 @@ namespace Mesen.ViewModels
 			new BankSizeInfo() { Name = "4 KB", BankSize = 0x1000 },
 		};
 
-		public HdPackBuilderViewModel()
-		{
+		public HdPackBuilderViewModel() {
 			Config = ConfigManager.Config.HdPackBuilder;
 			SaveFolder = Path.Join(ConfigManager.HdPackFolder, EmuApi.GetRomInfo().GetRomName());
 
@@ -47,15 +44,13 @@ namespace Mesen.ViewModels
 			IsBankSizeVisible = EmuApi.GetGameMemorySize(MemoryType.NesChrRam) > 0;
 
 			AddDisposable(this.WhenAnyValue(x => x.SelectedFilter).Subscribe(x => {
-				if(x != null) {
+				if (x != null) {
 					Config.FilterType = x.FilterType;
 					Config.Scale = x.Scale;
 				}
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedBankSize).Subscribe(x => {
-				Config.ChrRamBankSize = x.BankSize;
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.SelectedBankSize).Subscribe(x => Config.ChrRamBankSize = x.BankSize));
 
 			AddDisposable(this.WhenAnyValue(x => x.SaveFolder).Subscribe(x => {
 				IsOpenFolderEnabled = File.Exists(SaveFolder);
@@ -63,16 +58,15 @@ namespace Mesen.ViewModels
 			}));
 		}
 
-		private void UpdateFilterDropdown()
-		{
+		private void UpdateFilterDropdown() {
 			string hdDefFile = Path.Combine(SaveFolder, "hires.txt");
 			FilterInfo? selectedFilter = SelectedFilter;
-			if(File.Exists(hdDefFile)) {
+			if (File.Exists(hdDefFile)) {
 				string fileContent = File.ReadAllText(hdDefFile);
 				Match match = Regex.Match(fileContent, "<scale>(\\d*)");
-				if(match.Success) {
+				if (match.Success) {
 					int scale;
-					if(Int32.TryParse(match.Groups[1].ToString(), out scale)) {
+					if (Int32.TryParse(match.Groups[1].ToString(), out scale)) {
 						Filters = _allFilters.Where(x => x.Scale == scale).ToArray();
 						SelectedFilter = Filters.Contains(selectedFilter) ? selectedFilter : Filters[0];
 						return;
@@ -84,9 +78,8 @@ namespace Mesen.ViewModels
 			SelectedFilter = selectedFilter;
 		}
 
-		public void StartRecording()
-		{
-			if(IsRecording) {
+		public void StartRecording() {
+			if (IsRecording) {
 				return;
 			}
 
@@ -94,7 +87,7 @@ namespace Mesen.ViewModels
 
 			Task.Run(() => {
 				HdPackBuilderOptions options = Config.ToInterop(SaveFolder);
-				if(!IsBankSizeVisible) {
+				if (!IsBankSizeVisible) {
 					options.ChrRamBankSize = 0x1000;
 				}
 
@@ -111,9 +104,8 @@ namespace Mesen.ViewModels
 			});
 		}
 
-		public void StopRecording()
-		{
-			if(!IsRecording) {
+		public void StopRecording() {
+			if (!IsRecording) {
 				return;
 			}
 
@@ -129,9 +121,8 @@ namespace Mesen.ViewModels
 			});
 		}
 
-		public void OpenFolder()
-		{
-			if(Directory.Exists(SaveFolder)) {
+		public void OpenFolder() {
+			if (Directory.Exists(SaveFolder)) {
 				System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
 					FileName = SaveFolder + Path.DirectorySeparatorChar,
 					UseShellExecute = true,
@@ -140,25 +131,21 @@ namespace Mesen.ViewModels
 			}
 		}
 
-		public class FilterInfo
-		{
+		public class FilterInfo {
 			public string Name { get; set; } = "";
 			public ScaleFilterType FilterType { get; set; }
 			public UInt32 Scale { get; set; }
 
-			public override string ToString()
-			{
+			public override string ToString() {
 				return Name;
 			}
 		}
 
-		public class BankSizeInfo
-		{
+		public class BankSizeInfo {
 			public string Name { get; set; } = "";
 			public UInt32 BankSize { get; set; }
 
-			public override string ToString()
-			{
+			public override string ToString() {
 				return Name;
 			}
 		}

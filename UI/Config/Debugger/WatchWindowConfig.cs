@@ -1,6 +1,4 @@
-﻿namespace Mesen.Config
-{
-	public class WatchWindowConfig : BaseWindowConfig<WatchWindowConfig>
-	{
+namespace Mesen.Config {
+	public class WatchWindowConfig : BaseWindowConfig<WatchWindowConfig> {
 	}
 }

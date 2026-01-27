@@ -1,4 +1,9 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Platform;
@@ -12,16 +17,10 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class TileEditorViewModel : DisposableViewModel
-{
+public class TileEditorViewModel : DisposableViewModel {
 	[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
 
 	[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
@@ -48,8 +47,7 @@ public class TileEditorViewModel : DisposableViewModel
 	[Obsolete("For designer only")]
 	public TileEditorViewModel() : this(new() { new() }, 1, TileFormat.Bpp4, 0) { }
 
-	public TileEditorViewModel(List<AddressInfo> tileAddresses, int columnCount, TileFormat format, int initialPalette)
-	{
+	public TileEditorViewModel(List<AddressInfo> tileAddresses, int columnCount, TileFormat format, int initialPalette) {
 		Config = ConfigManager.Config.Debug.TileEditor;
 		_tileAddresses = tileAddresses;
 		_columnCount = columnCount;
@@ -61,15 +59,15 @@ public class TileEditorViewModel : DisposableViewModel
 		PixelSize size = format.GetTileSize();
 		_tileBuffer = new UInt32[size.Width * size.Height];
 		ViewerBitmap = new DynamicBitmap(new PixelSize(size.Width * _columnCount, size.Height * _rowCount), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
-		
-		if(Design.IsDesignMode) {
+
+		if (Design.IsDesignMode) {
 			return;
 		}
 
 		AddDisposable(this.WhenAnyValue(x => x.Config.Background).Subscribe(x => RefreshViewer()));
 		AddDisposable(this.WhenAnyValue(x => x.SelectedColor).Subscribe(x => RefreshViewer()));
 		AddDisposable(this.WhenAnyValue(x => x.Config.ShowGrid).Subscribe(x => {
-			if(Config.ShowGrid) {
+			if (Config.ShowGrid) {
 				PixelSize tileSize = _tileFormat.GetTileSize();
 				CustomGrids = new List<GridDefinition>() { new GridDefinition() {
 					SizeX = tileSize.Width,
@@ -81,7 +79,7 @@ public class TileEditorViewModel : DisposableViewModel
 			}
 		}));
 		AddDisposable(this.WhenAnyValue(x => x.Config.ImageScale).Subscribe(x => {
-			if(Config.ImageScale < 4) {
+			if (Config.ImageScale < 4) {
 				Config.ImageScale = 4;
 			}
 		}));
@@ -89,8 +87,7 @@ public class TileEditorViewModel : DisposableViewModel
 		RefreshViewer();
 	}
 
-	public void InitActions(PictureViewer picViewer, Window wnd)
-	{
+	public void InitActions(PictureViewer picViewer, Window wnd) {
 		FileMenuActions = AddDisposables(new List<ContextMenuAction>() {
 			new ContextMenuAction() {
 				ActionType = ActionType.ExportToPng,
@@ -125,8 +122,7 @@ public class TileEditorViewModel : DisposableViewModel
 		DebugShortcutManager.RegisterActions(wnd, ToolsMenuActions);
 	}
 
-	private List<ContextMenuAction> GetTools()
-	{
+	private List<ContextMenuAction> GetTools() {
 		return new List<ContextMenuAction>() {
 			new ContextMenuAction() {
 				ActionType = ActionType.FlipHorizontal,
@@ -179,15 +175,14 @@ public class TileEditorViewModel : DisposableViewModel
 		};
 	}
 
-	private List<int> GetTileData()
-	{
+	private List<int> GetTileData() {
 		PixelSize tileSize = _tileFormat.GetTileSize();
 		int width = tileSize.Width * _columnCount;
 		int height = tileSize.Height * _rowCount;
 
 		List<int> data = new List<int>(width * height);
-		for(int y = 0; y < height; y++) {
-			for(int x = 0; x < width; x++) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				data.Add(GetColorAtPosition(new PixelPoint(x, y)));
 			}
 		}
@@ -195,15 +190,14 @@ public class TileEditorViewModel : DisposableViewModel
 		return data;
 	}
 
-	private void Transform(TransformType type)
-	{
+	private void Transform(TransformType type) {
 		List<int> data = GetTileData();
 
 		PixelSize tileSize = _tileFormat.GetTileSize();
 		int width = tileSize.Width * _columnCount;
 		int height = tileSize.Height * _rowCount;
-		for(int y = 0; y < height; y++) {
-			for(int x = 0; x < width; x++) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				int newY = type switch {
 					TransformType.FlipVertical => height - y - 1,
 					TransformType.FlipHorizontal => y,
@@ -224,11 +218,11 @@ public class TileEditorViewModel : DisposableViewModel
 					TransformType.TranslateLeft => x < width - 1 ? (x + 1) : 0,
 					TransformType.TranslateRight => x > 0 ? (x - 1) : width - 1,
 					TransformType.TranslateUp => x,
-					TransformType.TranslateDown => x, 
+					TransformType.TranslateDown => x,
 					_ => x
 				};
 
-				SetPixelColor(new PixelPoint(x, y), data[newY * width + newX]);
+				SetPixelColor(new PixelPoint(x, y), data[(newY * width) + newX]);
 			}
 		}
 
@@ -236,8 +230,7 @@ public class TileEditorViewModel : DisposableViewModel
 	}
 
 	private record TilePixelPositionInfo(int Column, int Row, int TileX, int TileY);
-	private TilePixelPositionInfo GetPositionInfo(PixelPoint position)
-	{
+	private TilePixelPositionInfo GetPositionInfo(PixelPoint position) {
 		PixelSize tileSize = _tileFormat.GetTileSize();
 
 		int column = position.X / tileSize.Width;
@@ -247,33 +240,28 @@ public class TileEditorViewModel : DisposableViewModel
 		return new(column, row, tileX, tileY);
 	}
 
-	public int GetColorAtPosition(PixelPoint position)
-	{
+	public int GetColorAtPosition(PixelPoint position) {
 		TilePixelPositionInfo pos = GetPositionInfo(position);
-		int paletteColorIndex = DebugApi.GetTilePixel(_tileAddresses[pos.Column + pos.Row * _columnCount], _tileFormat, pos.TileX, pos.TileY);
+		int paletteColorIndex = DebugApi.GetTilePixel(_tileAddresses[pos.Column + (pos.Row * _columnCount)], _tileFormat, pos.TileX, pos.TileY);
 		return SelectedColor - (SelectedColor % GetColorsPerPalette(_tileFormat)) + paletteColorIndex;
 	}
 
-	public void SelectColor(PixelPoint position)
-	{
+	public void SelectColor(PixelPoint position) {
 		SelectedColor = GetColorAtPosition(position);
 	}
 
-	private void SetPixelColor(PixelPoint position, int color)
-	{
+	private void SetPixelColor(PixelPoint position, int color) {
 		TilePixelPositionInfo pos = GetPositionInfo(position);
-		DebugApi.SetTilePixel(_tileAddresses[pos.Column + pos.Row * _columnCount], _tileFormat, pos.TileX, pos.TileY, color);
+		DebugApi.SetTilePixel(_tileAddresses[pos.Column + (pos.Row * _columnCount)], _tileFormat, pos.TileX, pos.TileY, color);
 	}
 
-	public void UpdatePixel(PixelPoint position, bool clearPixel)
-	{
+	public void UpdatePixel(PixelPoint position, bool clearPixel) {
 		int pixelColor = clearPixel ? 0 : SelectedColor % GetColorsPerPalette(_tileFormat);
 		SetPixelColor(position, pixelColor);
 		RefreshViewer();
 	}
 
-	private unsafe void RefreshViewer()
-	{
+	private unsafe void RefreshViewer() {
 		Dispatcher.UIThread.Post((Action)(() => {
 			DebugPaletteInfo palette = DebugApi.GetPaletteInfo(_cpuType, new GetPaletteInfoOptions() { Format = _tileFormat });
 			PaletteColors = palette.GetRgbPalette();
@@ -284,19 +272,19 @@ public class TileEditorViewModel : DisposableViewModel
 			PixelSize tileSize = _tileFormat.GetTileSize();
 			int bytesPerTile = _tileFormat.GetBytesPerTile();
 
-			using(var framebuffer = ViewerBitmap.Lock()) {
-				for(int y = 0; y < _rowCount; y++) {
-					for(int x = 0; x < _columnCount; x++) {
-						fixed(UInt32* ptr = _tileBuffer) {
-							AddressInfo addr = _tileAddresses[y * _columnCount + x];
+			using (var framebuffer = ViewerBitmap.Lock()) {
+				for (int y = 0; y < _rowCount; y++) {
+					for (int x = 0; x < _columnCount; x++) {
+						fixed (UInt32* ptr = _tileBuffer) {
+							AddressInfo addr = _tileAddresses[(y * _columnCount) + x];
 							byte[] sourceData = DebugApi.GetMemoryValues(addr.Type, (uint)addr.Address, (uint)(addr.Address + bytesPerTile - 1));
 							DebugApi.GetTileView(_cpuType, GetOptions(x, y), sourceData, sourceData.Length, PaletteColors, (IntPtr)ptr);
 							UInt32* viewer = (UInt32*)framebuffer.FrameBuffer.Address;
 							int rowPitch = ViewerBitmap.PixelSize.Width;
-							int baseOffset = x * tileSize.Width + y * tileSize.Height * rowPitch;
-							for(int j = 0; j < tileSize.Height; j++) {
-								for(int i = 0; i < tileSize.Width; i++) {
-									viewer[baseOffset + j * rowPitch + i] = ptr[j * tileSize.Width + i];
+							int baseOffset = (x * tileSize.Width) + (y * tileSize.Height * rowPitch);
+							for (int j = 0; j < tileSize.Height; j++) {
+								for (int i = 0; i < tileSize.Width; i++) {
+									viewer[baseOffset + (j * rowPitch) + i] = ptr[(j * tileSize.Width) + i];
 								}
 							}
 						}
@@ -306,13 +294,11 @@ public class TileEditorViewModel : DisposableViewModel
 		}));
 	}
 
-	public int GetColorsPerPalette()
-	{
+	public int GetColorsPerPalette() {
 		return GetColorsPerPalette(_tileFormat);
 	}
 
-	private int GetColorsPerPalette(TileFormat format)
-	{
+	private int GetColorsPerPalette(TileFormat format) {
 		return format.GetBitsPerPixel() switch {
 			1 => 2, //2-color palettes
 			2 => 4, //4-color palettes
@@ -321,9 +307,8 @@ public class TileEditorViewModel : DisposableViewModel
 		};
 	}
 
-	private GetTileViewOptions GetOptions(int column, int row)
-	{
-		int tileIndex = row * _columnCount + column;
+	private GetTileViewOptions GetOptions(int column, int row) {
+		int tileIndex = (row * _columnCount) + column;
 
 		return new GetTileViewOptions() {
 			MemType = _tileAddresses[tileIndex].Type,
@@ -339,8 +324,7 @@ public class TileEditorViewModel : DisposableViewModel
 		};
 	}
 
-	public enum TransformType
-	{
+	public enum TransformType {
 		FlipHorizontal,
 		FlipVertical,
 		RotateLeft,

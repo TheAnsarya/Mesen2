@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -7,19 +8,15 @@ using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
 using Mesen.Utilities;
-using System;
 
-namespace Mesen.Debugger.Windows
-{
-	public class LabelEditWindow : MesenWindow
-	{
+namespace Mesen.Debugger.Windows {
+	public class LabelEditWindow : MesenWindow {
 		private LabelEditViewModel _model;
-		
+
 		[Obsolete("For designer only")]
 		public LabelEditWindow() : this(new()) { }
 
-		public LabelEditWindow(LabelEditViewModel model)
-		{
+		public LabelEditWindow(LabelEditViewModel model) {
 			InitializeComponent();
 
 			DataContext = model;
@@ -30,22 +27,19 @@ namespace Mesen.Debugger.Windows
 #endif
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnOpened(EventArgs e)
-		{
+		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
 			this.GetControl<TextBox>("txtLabel").FocusAndSelectAll();
 		}
 
-		public static async void EditLabel(CpuType cpuType, Control parent, CodeLabel label)
-		{
+		public static async void EditLabel(CpuType cpuType, Control parent, CodeLabel label) {
 			LabelEditViewModel model;
 			CodeLabel? copy = null;
-			if(LabelManager.ContainsLabel(label)) {
+			if (LabelManager.ContainsLabel(label)) {
 				copy = label.Clone();
 				model = new LabelEditViewModel(cpuType, copy, label);
 			} else {
@@ -55,7 +49,7 @@ namespace Mesen.Debugger.Windows
 			LabelEditWindow wnd = new LabelEditWindow(model);
 
 			bool result = await wnd.ShowCenteredDialog<bool>(parent);
-			if(result) {
+			if (result) {
 				model.Commit();
 				LabelManager.DeleteLabel(label, false);
 				LabelManager.SetLabel(copy ?? label, true);
@@ -65,18 +59,15 @@ namespace Mesen.Debugger.Windows
 			model.Dispose();
 		}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Ok_OnClick(object sender, RoutedEventArgs e) {
 			Close(true);
 		}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
 			Close(false);
 		}
 
-		private void Delete_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Delete_OnClick(object sender, RoutedEventArgs e) {
 			_model.DeleteLabel();
 			Close(false);
 		}

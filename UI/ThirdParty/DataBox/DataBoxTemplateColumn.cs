@@ -1,5 +1,4 @@
 namespace DataBoxControl;
 
-public class DataBoxTemplateColumn : DataBoxColumn
-{
+public class DataBoxTemplateColumn : DataBoxColumn {
 }

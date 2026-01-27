@@ -1,4 +1,10 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -6,17 +12,10 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class QuickSearchViewModel : ViewModelBase
-{
+public class QuickSearchViewModel : ViewModelBase {
 	[Reactive] public bool IsSearchBoxVisible { get; set; }
 	[Reactive] public string SearchString { get; set; } = "";
 	[Reactive] public bool IsErrorVisible { get; set; } = false;
@@ -30,11 +29,10 @@ public class QuickSearchViewModel : ViewModelBase
 
 	private TextBox? _txtSearch = null;
 
-	public QuickSearchViewModel()
-	{
+	public QuickSearchViewModel() {
 		this.WhenAnyValue(x => x.SearchString).Subscribe(x => {
-			if(!string.IsNullOrWhiteSpace(x)) {
-				if(!string.IsNullOrEmpty(_noMatchSearch) && x.StartsWith(_noMatchSearch)) {
+			if (!string.IsNullOrWhiteSpace(x)) {
+				if (!string.IsNullOrEmpty(_noMatchSearch) && x.StartsWith(_noMatchSearch)) {
 					//Previous search gave no result, current search starts with the same string, so can't give results either, don't search
 					return;
 				}
@@ -44,54 +42,49 @@ public class QuickSearchViewModel : ViewModelBase
 		});
 	}
 
-	public void Open()
-	{
+	public void Open() {
 		IsSearchBoxVisible = true;
 		_txtSearch?.FocusAndSelectAll();
 	}
 
-	public void Close(object? param = null)
-	{
+	public void Close(object? param = null) {
 		IsSearchBoxVisible = false;
 		SearchString = "";
 	}
 
-	public void FindPrev(object? param = null)
-	{
+	public void FindPrev(object? param = null) {
 		Find(SearchDirection.Backward, false);
 	}
 
-	public void FindNext(object? param = null)
-	{
+	public void FindNext(object? param = null) {
 		Find(SearchDirection.Forward, true);
 	}
 
-	public void Find(SearchDirection dir, bool skipCurrent)
-	{
-		if(string.IsNullOrWhiteSpace(SearchString)) {
+	public void Find(SearchDirection dir, bool skipCurrent) {
+		if (string.IsNullOrWhiteSpace(SearchString)) {
 			Open();
 			return;
 		}
 
 		_searchArgs = new OnFindEventArgs() { SearchString = SearchString, Direction = dir, SkipCurrent = skipCurrent };
-		if(_searchInProgress) {
+		if (_searchInProgress) {
 			return;
 		}
-		
+
 		_searchInProgress = true;
 
 		Task.Run(() => {
 			OnFindEventArgs? args;
 			OnFindEventArgs? lastArgs = null;
-			while((args = Interlocked.Exchange(ref _searchArgs, null)) != null) {
+			while ((args = Interlocked.Exchange(ref _searchArgs, null)) != null) {
 				//Keep searching until the most recent search is processed
 				OnFind?.Invoke(args);
 				lastArgs = args;
 			}
 
 			Dispatcher.UIThread.Post(() => {
-				if(lastArgs != null) {
-					if(lastArgs.Success) {
+				if (lastArgs != null) {
+					if (lastArgs.Success) {
 						IsErrorVisible = false;
 						_noMatchSearch = "";
 					} else {
@@ -104,14 +97,12 @@ public class QuickSearchViewModel : ViewModelBase
 		});
 	}
 
-	public void SetSearchBox(TextBox txtSearch)
-	{
+	public void SetSearchBox(TextBox txtSearch) {
 		_txtSearch = txtSearch;
 	}
 }
 
-public class OnFindEventArgs : EventArgs
-{
+public class OnFindEventArgs : EventArgs {
 	public string SearchString { get; init; } = "";
 	public SearchDirection Direction { get; init; }
 	public bool SkipCurrent { get; init; }

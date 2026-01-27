@@ -1,26 +1,24 @@
-﻿using ReactiveUI.Fody.Helpers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reactive.Linq;
-using System.Linq;
-using Mesen.Interop;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
-using Mesen.Debugger.Windows;
-using Avalonia.Controls;
-using Mesen.ViewModels;
 using System.ComponentModel;
-using Mesen.Utilities;
-using System.Collections;
-using DataBoxControl;
+using System.Linq;
+using System.Reactive.Linq;
 using Avalonia.Collections;
+using Avalonia.Controls;
 using Avalonia.Controls.Selection;
+using DataBoxControl;
+using Mesen.Config;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class BreakpointListViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class BreakpointListViewModel : DisposableViewModel {
 		[Reactive] public MesenList<BreakpointViewModel> Breakpoints { get; private set; } = new();
 		[Reactive] public SelectionModel<BreakpointViewModel?> Selection { get; set; } = new() { SingleSelect = false };
 		[Reactive] public SortState SortState { get; set; } = new();
@@ -32,14 +30,12 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public BreakpointListViewModel() : this(CpuType.Snes, new()) { }
 
-		public BreakpointListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger)
-		{
+		public BreakpointListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger) {
 			CpuType = cpuType;
 			Debugger = debugger;
 		}
 
-		public void Sort(object? param)
-		{
+		public void Sort(object? param) {
 			UpdateBreakpoints();
 		}
 
@@ -51,13 +47,12 @@ namespace Mesen.Debugger.ViewModels
 			{ "Condition", (a, b) => string.Compare(a.Breakpoint.Condition, b.Breakpoint.Condition, StringComparison.OrdinalIgnoreCase) },
 		};
 
-		public void UpdateBreakpoints()
-		{
+		public void UpdateBreakpoints() {
 			List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 
 			List<BreakpointViewModel> sortedBreakpoints = BreakpointManager.GetBreakpoints(CpuType).Select(bp => new BreakpointViewModel(bp)).ToList();
-			
-			if(SortState.SortOrder.Count > 0) {
+
+			if (SortState.SortOrder.Count > 0) {
 				SortHelper.SortList(sortedBreakpoints, SortState.SortOrder, _comparers, "Address");
 			}
 
@@ -65,15 +60,13 @@ namespace Mesen.Debugger.ViewModels
 			Selection.SelectIndexes(selectedIndexes, Breakpoints.Count);
 		}
 
-		public void RefreshBreakpointList()
-		{
-			foreach(BreakpointViewModel bp in Breakpoints) {
+		public void RefreshBreakpointList() {
+			foreach (BreakpointViewModel bp in Breakpoints) {
 				bp.Refresh();
 			}
 		}
 
-		public void InitContextMenu(Control parent)
-		{
+		public void InitContextMenu(Control parent) {
 			AddDisposables(DebugShortcutManager.CreateContextMenu(parent, new object[] {
 				new ContextMenuAction() {
 					ActionType = ActionType.AddBreakpoint,
@@ -127,6 +120,7 @@ namespace Mesen.Debugger.ViewModels
 						foreach(Breakpoint bp in selectedBps) {
 							bp.Enabled = true;
 						}
+
 						BreakpointManager.RefreshBreakpoints();
 					}
 				},
@@ -140,6 +134,7 @@ namespace Mesen.Debugger.ViewModels
 						foreach(Breakpoint bp in selectedBps) {
 							bp.Enabled = false;
 						}
+
 						BreakpointManager.RefreshBreakpoints();
 					}
 				},
@@ -174,22 +169,19 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class BreakpointViewModel : INotifyPropertyChanged
-	{
+	public class BreakpointViewModel : INotifyPropertyChanged {
 		public Breakpoint Breakpoint { get; set; }
 		public string TypeDisplay => Breakpoint.ToReadableType();
 		public string AddressDisplay => Breakpoint.GetAddressString(true);
 
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		public void Refresh()
-		{
+		public void Refresh() {
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TypeDisplay)));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AddressDisplay)));
 		}
 
-		public BreakpointViewModel(Breakpoint bp)
-		{
+		public BreakpointViewModel(Breakpoint bp) {
 			Breakpoint = bp;
 		}
 	}

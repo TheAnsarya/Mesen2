@@ -1,4 +1,10 @@
-﻿using Avalonia;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
@@ -12,17 +18,9 @@ using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class FunctionListViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class FunctionListViewModel : DisposableViewModel {
 		[Reactive] public MesenList<FunctionViewModel> Functions { get; private set; } = new();
 		[Reactive] public SelectionModel<FunctionViewModel?> Selection { get; set; } = new() { SingleSelect = false };
 		[Reactive] public SortState SortState { get; set; } = new();
@@ -34,16 +32,14 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public FunctionListViewModel() : this(CpuType.Snes, new()) { }
 
-		public FunctionListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger)
-		{
+		public FunctionListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger) {
 			CpuType = cpuType;
 			Debugger = debugger;
 
 			SortState.SetColumnSort("AbsAddr", ListSortDirection.Ascending, true);
 		}
 
-		public void Sort(object? param)
-		{
+		public void Sort(object? param) {
 			UpdateFunctionList();
 		}
 
@@ -53,8 +49,7 @@ namespace Mesen.Debugger.ViewModels
 			{ "AbsAddr", (a, b) => a.AbsAddress.CompareTo(b.AbsAddress) },
 		};
 
-		public void UpdateFunctionList()
-		{
+		public void UpdateFunctionList() {
 			List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 
 			MemoryType prgMemType = CpuType.GetPrgRomMemoryType();
@@ -66,8 +61,7 @@ namespace Mesen.Debugger.ViewModels
 			Selection.SelectIndexes(selectedIndexes, Functions.Count);
 		}
 
-		public void InitContextMenu(Control parent)
-		{
+		public void InitContextMenu(Control parent) {
 			AddDisposables(DebugShortcutManager.CreateContextMenu(parent, new object[] {
 				new ContextMenuAction() {
 					ActionType = ActionType.EditLabel,
@@ -94,7 +88,7 @@ namespace Mesen.Debugger.ViewModels
 				},
 
 				new ContextMenuSeparator(),
-		
+
 				new ContextMenuAction() {
 					ActionType = ActionType.FindOccurrences,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.FunctionList_FindOccurrences),
@@ -130,6 +124,7 @@ namespace Mesen.Debugger.ViewModels
 							if(addr.Address < 0) {
 								addr = vm.FuncAddr;
 							}
+
 							MemoryToolsWindow.ShowInMemoryTools(addr.Type, addr.Address);
 						}
 					}
@@ -138,13 +133,12 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class FunctionViewModel : INotifyPropertyChanged
-	{
+	public class FunctionViewModel : INotifyPropertyChanged {
 		private string _format;
 
 		public AddressInfo FuncAddr { get; private set; }
 		public CpuType _cpuType;
-			
+
 		public string AbsAddressDisplay { get; }
 		public int AbsAddress => FuncAddr.Address;
 		public int RelAddress { get; private set; }
@@ -157,10 +151,9 @@ namespace Mesen.Debugger.ViewModels
 
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		public void Refresh()
-		{
+		public void Refresh() {
 			int addr = DebugApi.GetRelativeAddress(FuncAddr, _cpuType).Address;
-			if(addr != RelAddress) {
+			if (addr != RelAddress) {
 				RelAddress = addr;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowBrush)));
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RowStyle)));
@@ -170,8 +163,7 @@ namespace Mesen.Debugger.ViewModels
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LabelName)));
 		}
 
-		public FunctionViewModel(AddressInfo funcAddr, CpuType cpuType)
-		{
+		public FunctionViewModel(AddressInfo funcAddr, CpuType cpuType) {
 			FuncAddr = funcAddr;
 			_cpuType = cpuType;
 			RelAddress = DebugApi.GetRelativeAddress(FuncAddr, _cpuType).Address;

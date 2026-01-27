@@ -1,4 +1,9 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Reactive;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -11,16 +16,9 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Reactive;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
-namespace Mesen.Debugger.Utilities
-{
-	public abstract class BaseMenuAction : ViewModelBase, IDisposable
-	{
+namespace Mesen.Debugger.Utilities {
+	public abstract class BaseMenuAction : ViewModelBase, IDisposable {
 		private static Dictionary<ActionType, string?> _iconCache = new();
 
 		public ActionType ActionType;
@@ -28,34 +26,29 @@ namespace Mesen.Debugger.Utilities
 		public Func<string>? DynamicText { get; set; }
 		public Func<string>? DynamicIcon { get; set; }
 
-		static BaseMenuAction()
-		{
-			foreach(ActionType value in Enum.GetValues<ActionType>()) {
+		static BaseMenuAction() {
+			foreach (ActionType value in Enum.GetValues<ActionType>()) {
 				_iconCache[value] = value.GetAttribute<IconFileAttribute>()?.Icon;
 			}
 		}
 
-		public virtual string Name
-		{
-			get
-			{
+		public virtual string Name {
+			get {
 				string label;
-				if(DynamicText != null) {
+				if (DynamicText != null) {
 					label = DynamicText();
-				} else if(ActionType == ActionType.Custom) {
-					label = CustomText ?? "";
 				} else {
-					label = ResourceHelper.GetEnumText(ActionType);
+					label = ActionType == ActionType.Custom ? CustomText ?? "" : ResourceHelper.GetEnumText(ActionType);
 				}
-				
-				if(HintText != null) {
+
+				if (HintText != null) {
 					string hint = HintText();
-					if(!string.IsNullOrWhiteSpace(hint)) {
+					if (!string.IsNullOrWhiteSpace(hint)) {
 						label += " (" + hint + ")";
 					}
 				}
 
-				if(!label.StartsWith("_")) {
+				if (!label.StartsWith("_")) {
 					//Escape underscores to prevent them from getting removed
 					//(underscore is used to highlight the next letter when alt is pressed)
 					label = label.Replace("_", "__");
@@ -67,46 +60,45 @@ namespace Mesen.Debugger.Utilities
 
 		private string? _currentIcon = null;
 
-		private string? GetIconFile()
-		{
+		private string? GetIconFile() {
 			string? actionIcon = _iconCache[ActionType];
-			if(!string.IsNullOrEmpty(actionIcon)) {
+			if (!string.IsNullOrEmpty(actionIcon)) {
 				return actionIcon;
-			} else if(DynamicIcon != null) {
+			} else if (DynamicIcon != null) {
 				return "Assets/" + DynamicIcon() + ".png";
-			} else if(IsSelected?.Invoke() == true) {
+			} else if (IsSelected?.Invoke() == true) {
 				return ConfigManager.ActiveTheme == MesenTheme.Light ? "Assets/MenuItemChecked.png" : "Assets/MenuItemCheckedDark.png";
 			}
+
 			return null;
 		}
 
-		List<object>? _subActions;
-		public List<object>? SubActions
-		{
-			get => _subActions;
-			set
-			{
-				_subActions = value;
+		public List<object>? SubActions {
+			get;
+			set {
+				field = value;
 
-				if(_subActions != null) {
+				if (field != null) {
 					Func<bool>? isEnabled = IsEnabled;
 
 					IsEnabled = () => {
-						if(isEnabled != null && !isEnabled()) {
+						if (isEnabled != null && !isEnabled()) {
 							return false;
 						}
 
-						foreach(object subAction in _subActions) {
-							if(subAction is BaseMenuAction act) {
-								if(act.IsEnabled == null || act.IsEnabled()) {
+						foreach (object subAction in field) {
+							if (subAction is BaseMenuAction act) {
+								if (act.IsEnabled == null || act.IsEnabled()) {
 									return true;
 								}
 							}
 						}
+
 						return false;
 					};
 				}
-				this.RaiseAndSetIfChanged(ref _subActions, value);
+
+				this.RaiseAndSetIfChanged(ref field, value);
 			}
 		}
 
@@ -114,7 +106,7 @@ namespace Mesen.Debugger.Utilities
 		public Func<bool>? IsEnabled { get; set; }
 		public Func<bool>? IsSelected { get; set; }
 		public Func<bool>? IsVisible { get; set; }
-		
+
 		public bool AllowedWhenHidden { get; set; }
 		public bool AlwaysShowLabel { get; set; }
 		public RoutingStrategies RoutingStrategy { get; set; } = RoutingStrategies.Bubble;
@@ -126,64 +118,52 @@ namespace Mesen.Debugger.Utilities
 		[Reactive] public Image? ActionIcon { get; set; }
 		[Reactive] public bool Enabled { get; set; }
 		[Reactive] public bool Visible { get; set; }
-		
+
 		[Reactive] public string TooltipText { get; set; } = "";
 
 		private static SimpleCommand _emptyCommand = new SimpleCommand(() => { });
 
-		private SimpleCommand? _clickCommand;
-		public SimpleCommand? ClickCommand
-		{
-			get
-			{
+		public SimpleCommand? ClickCommand {
+			get {
 				Update();
-				return _clickCommand ?? ContextMenuAction._emptyCommand;
+				return field ?? ContextMenuAction._emptyCommand;
 			}
+
+			private set;
 		}
 
 		private Action _onClick = () => { };
-		public Action OnClick
-		{
+		public Action OnClick {
 			get => _onClick;
-			set
-			{
+			set {
 				_onClick = () => {
-					if((IsVisible == null || AllowedWhenHidden || IsVisible()) && (IsEnabled == null || IsEnabled())) {
-						if(ActionType == ActionType.Exit) {
+					if ((IsVisible == null || AllowedWhenHidden || IsVisible()) && (IsEnabled == null || IsEnabled())) {
+						if (ActionType == ActionType.Exit) {
 							//When using exit, the command is disposed while the command is running, which causes a crash
 							//Run the code in a posted action to prevent the crash
-							Dispatcher.UIThread.Post(() => { value(); });
+							Dispatcher.UIThread.Post(() => value());
 						} else {
 							try {
 								value();
-							} catch(Exception ex) {
+							} catch (Exception ex) {
 								Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
 							}
 						}
 					}
 				};
-				_clickCommand = new SimpleCommand(_onClick);
+				ClickCommand = new SimpleCommand(_onClick);
 			}
 		}
 
-		public void Update()
-		{
+		public void Update() {
 			ActionName = Name;
 
 			ShortcutText = InternalShortcutText;
-			if(ShortcutText.Length > 0) {
-				TooltipText = $"{Name} ({ShortcutText})";
-			} else {
-				TooltipText = Name;
-			}
+			TooltipText = ShortcutText.Length > 0 ? $"{Name} ({ShortcutText})" : Name;
 
 			string? iconFile = GetIconFile();
-			if(_currentIcon != iconFile) {
-				if(iconFile != null) {
-					ActionIcon = ImageUtilities.FromAsset(iconFile);
-				} else {
-					ActionIcon = null;
-				}
+			if (_currentIcon != iconFile) {
+				ActionIcon = iconFile != null ? ImageUtilities.FromAsset(iconFile) : null;
 				_currentIcon = iconFile;
 			}
 
@@ -191,16 +171,15 @@ namespace Mesen.Debugger.Utilities
 			Visible = IsVisible?.Invoke() ?? true;
 		}
 
-		public virtual void Dispose()
-		{
+		public virtual void Dispose() {
 			_onClick = () => { };
-			_clickCommand = null;
+			ClickCommand = null;
 			IsSelected = null;
 			IsEnabled = null;
 			IsVisible = null;
-			if(_subActions != null) {
-				foreach(object subAction in _subActions) {
-					if(subAction is BaseMenuAction action) {
+			if (SubActions != null) {
+				foreach (object subAction in SubActions) {
+					if (subAction is BaseMenuAction action) {
 						action.Dispose();
 					}
 				}
@@ -208,38 +187,29 @@ namespace Mesen.Debugger.Utilities
 		}
 	}
 
-	public class MainMenuAction : BaseMenuAction
-	{
+	public class MainMenuAction : BaseMenuAction {
 		public EmulatorShortcut? Shortcut { get; set; }
 		public uint ShortcutParam { get; set; }
 
 		public Func<string>? CustomShortcutText { get; set; }
 
-		public MainMenuAction()
-		{
+		public MainMenuAction() {
 		}
 
-		public MainMenuAction(EmulatorShortcut? shortcut)
-		{
-			if(shortcut.HasValue) {
+		public MainMenuAction(EmulatorShortcut? shortcut) {
+			if (shortcut.HasValue) {
 				Shortcut = shortcut.Value;
 
 				IsEnabled = () => EmuApi.IsShortcutAllowed(shortcut.Value, ShortcutParam);
 
-				OnClick = () => {
-					//Run outside the UI thread to avoid deadlocks, etc.
-					Task.Run(() => {
-						EmuApi.ExecuteShortcut(new ExecuteShortcutParams() { Shortcut = shortcut.Value, Param = ShortcutParam });
-					});
-				};
+				OnClick = () =>                     //Run outside the UI thread to avoid deadlocks, etc.
+					Task.Run(() => EmuApi.ExecuteShortcut(new ExecuteShortcutParams() { Shortcut = shortcut.Value, Param = ShortcutParam }));
 			}
 		}
 
-		protected override string InternalShortcutText
-		{
-			get
-			{
-				if(CustomShortcutText != null) {
+		protected override string InternalShortcutText {
+			get {
+				if (CustomShortcutText != null) {
 					return CustomShortcutText();
 				} else {
 					return Shortcut.HasValue ? Shortcut.Value.GetShortcutKeys()?.ToString() ?? "" : "";
@@ -249,54 +219,45 @@ namespace Mesen.Debugger.Utilities
 
 	}
 
-	public class ContextMenuAction : BaseMenuAction
-	{
+	public class ContextMenuAction : BaseMenuAction {
 		public Func<DbgShortKeys>? Shortcut { get; set; }
 		protected override string InternalShortcutText => Shortcut?.Invoke().ToString() ?? "";
 
-		public override void Dispose()
-		{
+		public override void Dispose() {
 			base.Dispose();
 			Shortcut = null;
 		}
 	}
 
-	public class ContextMenuSeparator : ContextMenuAction
-	{
+	public class ContextMenuSeparator : ContextMenuAction {
 		public override string Name => "-";
 
-		public ContextMenuSeparator()
-		{
+		public ContextMenuSeparator() {
 			IsEnabled = () => false;
 		}
 	}
 
-	public class SimpleCommand : ICommand
-	{
+	public class SimpleCommand : ICommand {
 		private Action _commandAction;
 
 #pragma warning disable CS0067 // The event 'SimpleCommand.CanExecuteChanged' is never used
 		public event EventHandler? CanExecuteChanged;
 #pragma warning restore CS0067 // The event 'SimpleCommand.CanExecuteChanged' is never used
 
-		public SimpleCommand(Action action)
-		{
+		public SimpleCommand(Action action) {
 			this._commandAction = action;
 		}
 
-		public bool CanExecute(object? parameter)
-		{
+		public bool CanExecute(object? parameter) {
 			return true;
 		}
 
-		public void Execute(object? parameter)
-		{
+		public void Execute(object? parameter) {
 			_commandAction();
 		}
 	}
 
-	public enum ActionType
-	{
+	public enum ActionType {
 		Custom,
 
 		[IconFile("Copy")]
@@ -313,7 +274,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("EditLabel")]
 		EditLabel,
-		
+
 		[IconFile("EditLabel")]
 		EditComment,
 
@@ -330,7 +291,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("CheatCode")]
 		MarkAsData,
-		
+
 		[IconFile("Help")]
 		MarkAsUnidentified,
 
@@ -364,7 +325,7 @@ namespace Mesen.Debugger.Utilities
 		WatchDecimalDisplay,
 		WatchHexDisplay,
 		WatchBinaryDisplay,
-		
+
 		RowDisplayFormat,
 		RowFormatBinary,
 		RowFormatHex8Bits,
@@ -408,10 +369,10 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("StepInto")]
 		StepInto,
-		
+
 		[IconFile("StepOver")]
 		StepOver,
-		
+
 		[IconFile("StepOut")]
 		StepOut,
 
@@ -473,7 +434,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("SaveFloppy")]
 		Save,
-		
+
 		SaveAs,
 
 		[IconFile("Exit")]
@@ -488,7 +449,7 @@ namespace Mesen.Debugger.Utilities
 		Refresh,
 		EnableAutoRefresh,
 		RefreshOnBreakPause,
-		
+
 		ZoomIn,
 		ZoomOut,
 
@@ -503,7 +464,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("CheatCode")]
 		ViewInMemoryViewer,
-		
+
 		LoadTblFile,
 		ResetTblMappings,
 
@@ -526,7 +487,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("LogWindow")]
 		OpenTraceLogger,
-		
+
 		[IconFile("Find")]
 		OpenMemorySearch,
 
@@ -544,7 +505,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Chip")]
 		OpenAssembler,
-		
+
 		[IconFile("LogWindow")]
 		OpenDebugLog,
 
@@ -590,7 +551,7 @@ namespace Mesen.Debugger.Utilities
 		Record,
 		[IconFile("MediaStop")]
 		Stop,
-		
+
 		[IconFile("Network")]
 		NetPlay,
 		Connect,
@@ -696,7 +657,7 @@ namespace Mesen.Debugger.Utilities
 		InsertCoin3,
 		[IconFile("Coins")]
 		InsertCoin4,
-		
+
 		SaveState,
 		LoadState,
 		[IconFile("SplitView")]
@@ -707,7 +668,7 @@ namespace Mesen.Debugger.Utilities
 		LoadStateDialog,
 		[IconFile("Folder")]
 		LoadStateFromFile,
-		
+
 		RecentFiles,
 		LoadLastSession,
 
@@ -731,10 +692,10 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Breakpoint")]
 		SetBreakpoint,
-		
+
 		[IconFile("Close")]
 		RemoveBreakpoint,
-		
+
 		[IconFile("Breakpoint")]
 		EnableBreakpoint,
 
@@ -743,7 +704,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Edit")]
 		CodeWindowEditBreakpoint,
-		
+
 		CodeDataLogger,
 		[IconFile("ResetSettings")]
 		ResetCdl,
@@ -762,14 +723,14 @@ namespace Mesen.Debugger.Utilities
 		ResetWorkspace,
 		[IconFile("TabContent")]
 		Workspace,
-		
+
 		[IconFile("Import")]
 		ImportLabels,
 		[IconFile("Export")]
 		ExportLabels,
 		[IconFile("Export")]
 		ExportPansy,
-		
+
 		[IconFile("Import")]
 		ImportWatchEntries,
 		[IconFile("Export")]
@@ -844,7 +805,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Settings")]
 		GameConfig,
-		
+
 		[IconFile("MediaStop")]
 		FreezeMemory,
 		[IconFile("MediaPlay")]
@@ -852,7 +813,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("ResetSettings")]
 		ResetAccessCounters,
-		
+
 		[IconFile("HdPack")]
 		CopyToHdPackFormat,
 
@@ -869,7 +830,7 @@ namespace Mesen.Debugger.Utilities
 		FlipHorizontal,
 		[IconFile("FlipVertical")]
 		FlipVertical,
-		
+
 		[IconFile("TranslateLeft")]
 		TranslateLeft,
 		[IconFile("TranslateRight")]

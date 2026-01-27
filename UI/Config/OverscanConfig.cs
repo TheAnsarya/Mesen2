@@ -1,8 +1,3 @@
-﻿using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,18 +6,20 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class OverscanConfig : BaseConfig<OverscanConfig>
-	{
+namespace Mesen.Config {
+	public class OverscanConfig : BaseConfig<OverscanConfig> {
 		[Reactive][MinMax(0, 100)] public UInt32 Left { get; set; } = 0;
 		[Reactive][MinMax(0, 100)] public UInt32 Right { get; set; } = 0;
 		[Reactive][MinMax(0, 95)] public UInt32 Top { get; set; } = 0;
 		[Reactive][MinMax(0, 95)] public UInt32 Bottom { get; set; } = 0;
 
-		public InteropOverscanDimensions ToInterop()
-		{
+		public InteropOverscanDimensions ToInterop() {
 			return new InteropOverscanDimensions() {
 				Left = Left,
 				Right = Right,
@@ -32,8 +29,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public struct InteropOverscanDimensions
-	{
+	public struct InteropOverscanDimensions {
 		public UInt32 Left;
 		public UInt32 Right;
 		public UInt32 Top;

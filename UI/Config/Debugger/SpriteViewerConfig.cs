@@ -1,11 +1,9 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
 using System.Collections.Generic;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class SpriteViewerConfig : BaseWindowConfig<SpriteViewerConfig>
-	{
+namespace Mesen.Config {
+	public class SpriteViewerConfig : BaseWindowConfig<SpriteViewerConfig> {
 		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 
 		[Reactive] public bool ShowOutline { get; set; } = false;
@@ -23,13 +21,11 @@ namespace Mesen.Config
 		[Reactive] public double ImageScale { get; set; } = 2;
 		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
 
-		public SpriteViewerConfig()
-		{
+		public SpriteViewerConfig() {
 		}
 	}
 
-	public enum SpriteViewerSource
-	{
+	public enum SpriteViewerSource {
 		SpriteRam,
 		CpuMemory
 	}

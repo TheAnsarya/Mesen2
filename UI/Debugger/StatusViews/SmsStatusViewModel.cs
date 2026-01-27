@@ -1,13 +1,11 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class SmsStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class SmsStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public byte RegA { get; set; }
 		[Reactive] public byte RegB { get; set; }
 		[Reactive] public byte RegC { get; set; }
@@ -17,7 +15,7 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public byte RegH { get; set; }
 		[Reactive] public byte RegL { get; set; }
-		
+
 		[Reactive] public UInt16 RegIX { get; set; }
 		[Reactive] public UInt16 RegIY { get; set; }
 
@@ -55,8 +53,7 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public string StackPreview { get; private set; } = "";
 
-		public SmsStatusViewModel()
-		{
+		public SmsStatusViewModel() {
 			this.WhenAnyValue(x => x.FlagCarry, x => x.FlagHalf, x => x.FlagAddSub, x => x.FlagZero).Subscribe(x => UpdateFlagsValue());
 
 			this.WhenAnyValue(x => x.RegFlags).Subscribe(x => {
@@ -72,8 +69,7 @@ namespace Mesen.Debugger.StatusViews
 			});
 		}
 
-		private void UpdateFlagsValue()
-		{
+		private void UpdateFlagsValue() {
 			RegFlags = (byte)(
 				(FlagCarry ? (byte)SmsCpuFlags.Carry : 0) |
 				(FlagAddSub ? (byte)SmsCpuFlags.AddSub : 0) |
@@ -86,8 +82,7 @@ namespace Mesen.Debugger.StatusViews
 			);
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			SmsState state = DebugApi.GetConsoleState<SmsState>(ConsoleType.Sms);
 
 			SmsCpuState cpu = state.Cpu;
@@ -133,14 +128,14 @@ namespace Mesen.Debugger.StatusViews
 			Cycle = ppu.Cycle;
 
 			StringBuilder sb = new StringBuilder();
-			for(UInt32 i = (UInt32)cpu.SP; (i & 0xFF) != 0; i++) {
+			for (UInt32 i = (UInt32)cpu.SP; (i & 0xFF) != 0; i++) {
 				sb.Append($"${DebugApi.GetMemoryValue(MemoryType.SmsMemory, i):X2} ");
 			}
+
 			StackPreview = sb.ToString();
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			SmsCpuState cpu = DebugApi.GetCpuState<SmsCpuState>(CpuType.Sms);
 
 			cpu.A = RegA;

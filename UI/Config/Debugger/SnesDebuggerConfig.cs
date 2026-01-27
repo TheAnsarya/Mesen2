@@ -1,10 +1,8 @@
-﻿using ReactiveUI.Fody.Helpers;
 using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class SnesDebuggerConfig : ViewModelBase
-	{
+namespace Mesen.Config {
+	public class SnesDebuggerConfig : ViewModelBase {
 		[Reactive] public bool BreakOnBrk { get; set; } = false;
 		[Reactive] public bool BreakOnCop { get; set; } = false;
 		[Reactive] public bool BreakOnWdm { get; set; } = false;
@@ -14,7 +12,7 @@ namespace Mesen.Config
 
 		[Reactive] public bool SpcBreakOnBrk { get; set; } = false;
 		[Reactive] public bool SpcBreakOnStpSleep { get; set; } = false;
-		
+
 		[Reactive] public bool UseAltSpcOpNames { get; set; } = false;
 		[Reactive] public bool IgnoreDspReadWrites { get; set; } = true;
 	}

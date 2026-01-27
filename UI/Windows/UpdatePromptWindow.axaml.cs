@@ -1,3 +1,6 @@
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -5,21 +8,15 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using System;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
-namespace Mesen.Windows
-{
-	public partial class UpdatePromptWindow : MesenWindow
-	{
+namespace Mesen.Windows {
+	public partial class UpdatePromptWindow : MesenWindow {
 		private UpdatePromptViewModel _model;
 
 		[Obsolete("For designer only")]
 		public UpdatePromptWindow() : this(new(new(), new())) { }
 
-		public UpdatePromptWindow(UpdatePromptViewModel model)
-		{
+		public UpdatePromptWindow(UpdatePromptViewModel model) {
 			_model = model;
 			DataContext = model;
 
@@ -29,26 +26,23 @@ namespace Mesen.Windows
 #endif
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e)
-		{
+		protected override void OnClosing(WindowClosingEventArgs e) {
 			base.OnClosing(e);
-			if(_model.IsUpdating) {
+			if (_model.IsUpdating) {
 				e.Cancel = true;
 			}
 		}
 
-		private void OnUpdateClick(object sender, RoutedEventArgs e)
-		{
-			if(_model.FileInfo == null || UpdateHelper.GetCommitHash() == null) {
+		private void OnUpdateClick(object sender, RoutedEventArgs e) {
+			if (_model.FileInfo == null || UpdateHelper.GetCommitHash() == null) {
 				MesenMsgBox.Show(null, "AutoUpdateNotSupported", MessageBoxButtons.OK, MessageBoxIcon.Info);
 				return;
 			}
-			
+
 			_model.Progress = 0;
 			_model.IsUpdating = true;
 
@@ -56,7 +50,7 @@ namespace Mesen.Windows
 				bool result;
 				try {
 					result = await _model.UpdateMesen(this);
-				} catch(Exception ex) {
+				} catch (Exception ex) {
 					result = false;
 					Dispatcher.UIThread.Post(() => {
 						_model.IsUpdating = false;
@@ -67,15 +61,14 @@ namespace Mesen.Windows
 
 				Dispatcher.UIThread.Post(() => {
 					_model.IsUpdating = false;
-					if(result) {
+					if (result) {
 						Close(true);
 					}
 				});
 			});
 		}
 
-		private void OnCancelClick(object sender, RoutedEventArgs e)
-		{
+		private void OnCancelClick(object sender, RoutedEventArgs e) {
 			Close(false);
 		}
 	}

@@ -1,16 +1,14 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class IntegrationConfig : BaseConfig<IntegrationConfig>
-	{
+namespace Mesen.Config {
+	public class IntegrationConfig : BaseConfig<IntegrationConfig> {
 		[Reactive] public bool AutoLoadDbgFiles { get; set; } = true;
 		[Reactive] public bool AutoLoadMlbFiles { get; set; } = true;
 		[Reactive] public bool AutoLoadCdlFiles { get; set; } = false;
@@ -18,9 +16,9 @@ namespace Mesen.Config
 		[Reactive] public bool AutoLoadCdbFiles { get; set; } = true;
 		[Reactive] public bool AutoLoadElfFiles { get; set; } = true;
 		[Reactive] public bool AutoLoadFnsFiles { get; set; } = true;
-		
+
 		[Reactive] public bool AutoExportPansy { get; set; } = true;
-		
+
 		// Background CDL recording settings
 		[Reactive] public bool BackgroundCdlRecording { get; set; } = false;
 		[Reactive] public int AutoSaveIntervalMinutes { get; set; } = 5;
@@ -33,12 +31,11 @@ namespace Mesen.Config
 		[Reactive] public bool ImportSaveRamLabels { get; set; } = true;
 		[Reactive] public bool ImportOtherLabels { get; set; } = true;
 		[Reactive] public bool ImportComments { get; set; } = true;
-		
+
 		[Reactive] public int TabSize { get; set; } = 4;
 
-		public bool IsMemoryTypeImportEnabled(MemoryType memType)
-		{
-			switch(memType) {
+		public bool IsMemoryTypeImportEnabled(MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SnesMemory:
 				case MemoryType.SpcMemory:
 				case MemoryType.Sa1Memory:
@@ -92,14 +89,14 @@ namespace Mesen.Config
 				case MemoryType.GbaBootRom:
 				case MemoryType.WsPrgRom:
 					return ImportPrgRomLabels;
-				
+
 				case MemoryType.SnesWorkRam:
 				case MemoryType.GbWorkRam:
 				case MemoryType.PceWorkRam:
 				case MemoryType.PceCdromRam:
 				case MemoryType.PceCardRam:
 				case MemoryType.PceAdpcmRam:
-				case MemoryType.PceArcadeCardRam: 
+				case MemoryType.PceArcadeCardRam:
 				case MemoryType.SpcRam:
 				case MemoryType.DspDataRam:
 				case MemoryType.Sa1InternalRam:

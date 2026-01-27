@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -11,23 +15,16 @@ using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
 using Mesen.Utilities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 
-namespace Mesen.Debugger.Windows
-{
-	public class TraceLoggerWindow : MesenWindow, INotificationHandler
-	{
+namespace Mesen.Debugger.Windows {
+	public class TraceLoggerWindow : MesenWindow, INotificationHandler {
 		private TraceLoggerViewModel _model;
 		private CodeViewerSelectionHandler _selectionHandler;
 
 		[Obsolete("For designer only")]
 		public TraceLoggerWindow() : this(new()) { }
 
-		public TraceLoggerWindow(TraceLoggerViewModel model)
-		{
+		public TraceLoggerWindow(TraceLoggerViewModel model) {
 			InitializeComponent();
 #if DEBUG
 			this.AttachDevTools();
@@ -35,7 +32,7 @@ namespace Mesen.Debugger.Windows
 
 			_model = model;
 			_model.InitializeMenu(this);
-			
+
 			DisassemblyViewer viewer = this.GetControl<DisassemblyViewer>("disViewer");
 			_model.SetViewer(viewer);
 			InitContextMenu(viewer);
@@ -48,21 +45,20 @@ namespace Mesen.Debugger.Windows
 
 			DataContext = model;
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			_model.Config.LoadWindowSettings(this);
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e)
-		{
+		protected override void OnClosing(WindowClosingEventArgs e) {
 			base.OnClosing(e);
 			_model.Config.SaveWindowSettings(this);
 			DebugApi.StopLogTraceToFile();
-			
+
 			//Disable trace logging for all cpus
-			foreach(CpuType cpuType in Enum.GetValues<CpuType>()) {
+			foreach (CpuType cpuType in Enum.GetValues<CpuType>()) {
 				DebugApi.SetTraceOptions(cpuType, new());
 			}
 		}
@@ -70,8 +66,7 @@ namespace Mesen.Debugger.Windows
 		private LocationInfo ActionLocation => _selectionHandler?.ActionLocation ?? new LocationInfo();
 		private CpuType CpuType => ActionLocation?.RelAddress?.Type.ToCpuType() ?? ActionLocation?.AbsAddress?.Type.ToCpuType() ?? _model.SelectedTab.CpuType;
 
-		private void InitContextMenu(DisassemblyViewer viewer)
-		{
+		private void InitContextMenu(DisassemblyViewer viewer) {
 			_model.AddDisposables(DebugShortcutManager.CreateContextMenu(viewer, new List<ContextMenuAction> {
 				new ContextMenuAction() {
 					ActionType = ActionType.Copy,
@@ -115,6 +110,7 @@ namespace Mesen.Debugger.Windows
 						} else if(ActionLocation.AbsAddress != null) {
 							LabelEditWindow.EditLabel(CpuType, this, new CodeLabel(ActionLocation.AbsAddress.Value));
 						}
+
 						_model.InvalidateVisual();
 					}
 				},
@@ -146,72 +142,66 @@ namespace Mesen.Debugger.Windows
 			}));
 		}
 
-		private string GetFormatString()
-		{
+		private string GetFormatString() {
 			return CpuType.ToMemoryType().GetFormatString();
 		}
 
-		private string GetHint(LocationInfo? codeLoc)
-		{
-			if(codeLoc == null) {
+		private string GetHint(LocationInfo? codeLoc) {
+			if (codeLoc == null) {
 				return string.Empty;
 			}
 
-			if(codeLoc?.RelAddress != null) {
+			if (codeLoc?.RelAddress != null) {
 				return "$" + codeLoc.RelAddress.Value.Address.ToString(GetFormatString());
 			}
 
 			return string.Empty;
 		}
 
-		public void ProcessNotification(NotificationEventArgs e)
-		{
-			switch(e.NotificationType) {
+		public void ProcessNotification(NotificationEventArgs e) {
+			switch (e.NotificationType) {
 				case ConsoleNotificationType.GameLoaded:
 					_model.UpdateCoreOptions();
 
-					Dispatcher.UIThread.Post(() => {
-						_model.UpdateAvailableTabs();
-					});
+					Dispatcher.UIThread.Post(() => _model.UpdateAvailableTabs());
 					break;
 
 				case ConsoleNotificationType.CodeBreak: {
-					if(_model.Config.RefreshOnBreakPause) {
-						_model.UpdateLog(true);
+						if (_model.Config.RefreshOnBreakPause) {
+							_model.UpdateLog(true);
+						}
+
+						break;
 					}
-					break;
-				}
 
 				case ConsoleNotificationType.PpuFrameDone: {
-					if(_model.Config.AutoRefresh && !ToolRefreshHelper.LimitFps(this, 10)) {
-						_model.UpdateLog(true);
+						if (_model.Config.AutoRefresh && !ToolRefreshHelper.LimitFps(this, 10)) {
+							_model.UpdateLog(true);
+						}
+
+						break;
 					}
-					break;
-				}
 			}
 		}
 
-		private async void OnStartLoggingClick(object sender, RoutedEventArgs e)
-		{
+		private async void OnStartLoggingClick(object sender, RoutedEventArgs e) {
 			string? filename = await FileDialogHelper.SaveFile(ConfigManager.DebuggerFolder, EmuApi.GetRomInfo().GetRomName() + ".txt", VisualRoot, FileDialogHelper.TraceExt);
-			if(filename != null) {
+			if (filename != null) {
 				_model.TraceFile = filename;
 				_model.IsLoggingToFile = true;
 				DebugApi.StartLogTraceToFile(filename);
 			}
 		}
 
-		private void OnStopLoggingClick(object sender, RoutedEventArgs e)
-		{
-			if(_model.IsLoggingToFile) {
+		private void OnStopLoggingClick(object sender, RoutedEventArgs e) {
+			if (_model.IsLoggingToFile) {
 				_model.IsLoggingToFile = false;
 				DebugApi.StopLogTraceToFile();
 			}
 		}
 
-		private void OnOpenTraceFile(object sender, RoutedEventArgs e)
-		{
-			if(File.Exists(_model.TraceFile)) {
+		private void OnOpenTraceFile(object sender, RoutedEventArgs e) {
+			if (File.Exists(_model.TraceFile)) {
 				System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
 					FileName = _model.TraceFile,
 					UseShellExecute = true,
@@ -220,14 +210,12 @@ namespace Mesen.Debugger.Windows
 			}
 		}
 
-		private void OnClearClick(object sender, RoutedEventArgs e)
-		{
+		private void OnClearClick(object sender, RoutedEventArgs e) {
 			DebugApi.ClearExecutionTrace();
 			_model.UpdateLog();
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 	}

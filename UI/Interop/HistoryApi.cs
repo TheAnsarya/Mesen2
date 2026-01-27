@@ -1,15 +1,13 @@
-﻿using Mesen.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Config;
 
-namespace Mesen.Interop
-{
-	public class HistoryApi
-	{
+namespace Mesen.Interop {
+	public class HistoryApi {
 		private const string DllPath = EmuApi.DllName;
 
 		[DllImport(DllPath)] public static extern void HistoryViewerInitialize(IntPtr windowHandle, IntPtr viewerHandle);
@@ -21,7 +19,7 @@ namespace Mesen.Interop
 		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool HistoryViewerCreateSaveState([MarshalAs(UnmanagedType.LPUTF8Str)] string outfileFile, UInt32 position);
 		[DllImport(DllPath)] public static extern void HistoryViewerSetPosition(UInt32 seekPosition);
 		[DllImport(DllPath)] public static extern void HistoryViewerResumeGameplay(UInt32 seekPosition);
-		
+
 		[DllImport(DllPath)] public static extern HistoryViewerState HistoryViewerGetState();
 		[DllImport(DllPath)] public static extern void HistoryViewerSetOptions(HistoryViewerOptions options);
 
@@ -29,8 +27,7 @@ namespace Mesen.Interop
 		[DllImport(DllPath)] public static extern void HistoryViewerUnregisterNotificationCallback(IntPtr notificationListener);
 	}
 
-	public struct HistoryViewerState
-	{
+	public struct HistoryViewerState {
 		public UInt32 Position;
 		public UInt32 Length;
 		public UInt32 Volume;
@@ -42,8 +39,7 @@ namespace Mesen.Interop
 		public UInt32[] Segments;
 	}
 
-	public struct HistoryViewerOptions
-	{
+	public struct HistoryViewerOptions {
 		[MarshalAs(UnmanagedType.I1)] public bool IsPaused;
 		public UInt32 Volume;
 		public UInt32 Width;

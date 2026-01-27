@@ -1,19 +1,17 @@
+using System;
+using System.Threading;
+using Avalonia.Threading;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
 using Mesen.Interop;
 using Mesen.Utilities;
-using System;
-using System.Threading;
-using Avalonia.Threading;
 
-namespace Mesen.Debugger.Labels
-{
+namespace Mesen.Debugger.Labels {
 	/// <summary>
 	/// Manages background CDL recording and periodic Pansy file export.
 	/// This enables CDL collection without requiring the debugger window to be open.
 	/// </summary>
-	public static class BackgroundPansyExporter
-	{
+	public static class BackgroundPansyExporter {
 		private static Timer? _autoSaveTimer;
 		private static RomInfo? _currentRomInfo;
 		private static bool _debuggerInitialized;
@@ -22,8 +20,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Called when a ROM is loaded. Starts background CDL recording if enabled.
 		/// </summary>
-		public static void OnRomLoaded(RomInfo romInfo)
-		{
+		public static void OnRomLoaded(RomInfo romInfo) {
 			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] OnRomLoaded: {romInfo.GetRomName()}");
 			_currentRomInfo = romInfo;
 
@@ -39,8 +36,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Called when a ROM is unloaded. Saves final Pansy file and stops recording.
 		/// </summary>
-		public static void OnRomUnloaded()
-		{
+		public static void OnRomUnloaded() {
 			System.Diagnostics.Debug.WriteLine("[BackgroundPansy] OnRomUnloaded");
 			StopAutoSaveTimer();
 
@@ -55,8 +51,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Initialize the debugger and enable CDL logging for the main CPU.
 		/// </summary>
-		private static void StartCdlRecording()
-		{
+		private static void StartCdlRecording() {
 			if (_currentRomInfo is null) return;
 
 			try {
@@ -81,8 +76,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Disable CDL logging when done.
 		/// </summary>
-		private static void StopCdlRecording()
-		{
+		private static void StopCdlRecording() {
 			if (!_cdlEnabled || _currentRomInfo is null) return;
 
 			try {
@@ -99,8 +93,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Start the periodic auto-save timer.
 		/// </summary>
-		private static void StartAutoSaveTimer()
-		{
+		private static void StartAutoSaveTimer() {
 			int intervalMinutes = ConfigManager.Config.Debug.Integration.AutoSaveIntervalMinutes;
 			if (intervalMinutes <= 0) {
 				System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Auto-save disabled (interval = 0)");
@@ -109,7 +102,7 @@ namespace Mesen.Debugger.Labels
 
 			int intervalMs = intervalMinutes * 60 * 1000;
 			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Starting auto-save timer: {intervalMinutes} minutes");
-			
+
 			_autoSaveTimer?.Dispose();
 			_autoSaveTimer = new Timer(OnAutoSaveTick, null, intervalMs, intervalMs);
 		}
@@ -117,8 +110,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Stop the periodic auto-save timer.
 		/// </summary>
-		private static void StopAutoSaveTimer()
-		{
+		private static void StopAutoSaveTimer() {
 			if (_autoSaveTimer is not null) {
 				System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Stopping auto-save timer");
 				_autoSaveTimer.Dispose();
@@ -129,8 +121,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Timer callback - exports Pansy on UI thread.
 		/// </summary>
-		private static void OnAutoSaveTick(object? state)
-		{
+		private static void OnAutoSaveTick(object? state) {
 			System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Auto-save tick");
 			Dispatcher.UIThread.Post(() => ExportPansy());
 		}
@@ -138,8 +129,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Export the current Pansy file.
 		/// </summary>
-		private static void ExportPansy()
-		{
+		private static void ExportPansy() {
 			if (_currentRomInfo is null || string.IsNullOrEmpty(_currentRomInfo.RomPath)) {
 				System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Cannot export - no ROM loaded");
 				return;
@@ -157,8 +147,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Force an immediate Pansy export (for manual trigger).
 		/// </summary>
-		public static void ForceExport()
-		{
+		public static void ForceExport() {
 			ExportPansy();
 		}
 	}

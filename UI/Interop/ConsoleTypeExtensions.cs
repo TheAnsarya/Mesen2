@@ -1,11 +1,8 @@
-﻿using System;
+using System;
 
-namespace Mesen.Interop
-{
-	public static class ConsoleTypeExtensions
-	{
-		public static CpuType GetMainCpuType(this ConsoleType type)
-		{
+namespace Mesen.Interop {
+	public static class ConsoleTypeExtensions {
+		public static CpuType GetMainCpuType(this ConsoleType type) {
 			return type switch {
 				ConsoleType.Snes => CpuType.Snes,
 				ConsoleType.Nes => CpuType.Nes,
@@ -18,8 +15,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static bool SupportsCheats(this ConsoleType type)
-		{
+		public static bool SupportsCheats(this ConsoleType type) {
 			return type switch {
 				ConsoleType.Gba => false,
 				ConsoleType.Ws => false,

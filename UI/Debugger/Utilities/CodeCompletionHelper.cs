@@ -1,5 +1,3 @@
-﻿using Mesen.Interop;
-using Mesen.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,43 +6,39 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Mesen.Interop;
+using Mesen.Localization;
 
-namespace Mesen.Debugger.Utilities
-{
-	public class CodeCompletionHelper
-	{
+namespace Mesen.Debugger.Utilities {
+	public class CodeCompletionHelper {
 		private static Dictionary<string, DocEntryViewModel> _documentation;
-		
+
 		private static Regex _linkRegex = new Regex("emu[.](([a-zA-Z0-9]+)(\\([a-zA-Z0-9 ,]*\\)){0,1})", RegexOptions.Compiled);
 
-		static CodeCompletionHelper()
-		{
+		static CodeCompletionHelper() {
 			using StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Mesen.Debugger.Documentation.LuaDocumentation.json")!);
 			DocEntryViewModel[] documentation = (DocEntryViewModel[]?)JsonSerializer.Deserialize(reader.ReadToEnd(), typeof(DocEntryViewModel[]), MesenCamelCaseSerializerContext.Default) ?? Array.Empty<DocEntryViewModel>();
 
 			_documentation = new Dictionary<string, DocEntryViewModel>();
-			foreach(DocEntryViewModel entry in documentation) {
+			foreach (DocEntryViewModel entry in documentation) {
 				_documentation[entry.Name] = entry;
 			}
 		}
 
-		public static IEnumerable<string> GetEntries()
-		{
+		public static IEnumerable<string> GetEntries() {
 			return _documentation.Select(x => x.Key).OrderBy(x => x);
 		}
 
-		public static DocEntryViewModel? GetEntry(string keyword)
-		{
-			if(_documentation.TryGetValue(keyword, out DocEntryViewModel? entry)) {
+		public static DocEntryViewModel? GetEntry(string keyword) {
+			if (_documentation.TryGetValue(keyword, out DocEntryViewModel? entry)) {
 				return entry;
 			}
+
 			return null;
 		}
 
-		public static string GenerateHtmlDocumentation()
-		{
-			string processText(string text)
-			{
+		public static string GenerateHtmlDocumentation() {
+			string processText(string text) {
 				text = text.Replace("ARGB", "<a href=\"#ColorFormat\">ARGB</a>");
 				return _linkRegex.Replace(text, (match) => "<a href=\"#" + match.Groups[2].Value + "\">emu." + match.Groups[1].Value + "</a>").Replace("\n", "<br/>");
 			}
@@ -193,12 +187,13 @@ namespace Mesen.Debugger.Utilities
 			DocEntrySubcategory? subcategory = null;
 
 			sb.AppendLine("<div class=\"menu\">");
-			foreach(DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
-				if(entry.Category != category) {
-					if(category != null) {
+			foreach (DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
+				if (entry.Category != category) {
+					if (category != null) {
 						sb.AppendLine("</div>");
 					}
-					if(subcategory != null) {
+
+					if (subcategory != null) {
 						sb.AppendLine("</div>");
 					}
 
@@ -207,22 +202,26 @@ namespace Mesen.Debugger.Utilities
 					category = entry.Category;
 				}
 
-				if(entry.Subcategory != subcategory && entry.Subcategory != null) {
-					if(subcategory != null) {
+				if (entry.Subcategory != subcategory && entry.Subcategory != null) {
+					if (subcategory != null) {
 						sb.AppendLine("</div>");
 					}
+
 					sb.AppendLine($"<a href=\"#{entry.Category}_{entry.Subcategory}\">{ResourceHelper.GetEnumText(entry.Subcategory)}</a><div class=\"subcategory\">");
 					subcategory = entry.Subcategory;
 				}
 
 				sb.AppendLine($"<div class=\"apilink\"><a href=\"#{entry.Name}\">{entry.Name}</a></div>");
 			}
-			if(category != null) {
+
+			if (category != null) {
 				sb.AppendLine("</div>");
 			}
-			if(subcategory != null) {
+
+			if (subcategory != null) {
 				sb.AppendLine("</div>");
 			}
+
 			sb.AppendLine("</div>");
 
 			category = null;
@@ -234,13 +233,13 @@ namespace Mesen.Debugger.Utilities
 			sb.AppendLine("<p><strong>Important: </strong>This API is similar but not completely compatible with the old Mesen 0.9.x (or Mesen-S) Lua APIs.</p>");
 			sb.AppendLine("<p>Generated on " + EmuApi.GetMesenBuildDate() + " for Mesen " + EmuApi.GetMesenVersion().ToString() + ".</p>");
 
-			foreach(DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
-				if(entry.Category != category) {
+			foreach (DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
+				if (entry.Category != category) {
 					sb.AppendLine($"<h1 id=\"{entry.Category}\">{ResourceHelper.GetEnumText(entry.Category)}</h1>");
 					category = entry.Category;
 					subcategory = null;
 
-					if(category == DocEntryCategory.Drawing) {
+					if (category == DocEntryCategory.Drawing) {
 						sb.AppendLine(@"
 							<h3 id=""ColorFormat""><strong>Color format for APIs</strong></h3>
 							<p>Colors are integers in ARGB format, but the alpha value is inverted: 0 is opaque, 255 is fully transparent.</p>
@@ -257,13 +256,13 @@ namespace Mesen.Debugger.Utilities
 					}
 				}
 
-				if(entry.Subcategory != subcategory && entry.Subcategory != null) {
+				if (entry.Subcategory != subcategory && entry.Subcategory != null) {
 					sb.AppendLine($"<h2 id=\"{entry.Category}_{entry.Subcategory}\">{ResourceHelper.GetEnumText(entry.Subcategory)}</h2>");
 					subcategory = entry.Subcategory;
 				}
 
 				sb.AppendLine($"<h3 id=\"{entry.Name}\">{entry.Name}</h3>");
-				if(entry.EnumValues.Count > 0) {
+				if (entry.EnumValues.Count > 0) {
 					sb.AppendLine($"<p><strong>Syntax</strong></p>");
 					sb.AppendLine($"<div class=\"monofont\">emu.{entry.Name}.[value]</div>");
 
@@ -272,25 +271,27 @@ namespace Mesen.Debugger.Utilities
 
 					sb.AppendLine($"<p><strong>Values</strong></p>");
 					sb.AppendLine($"<div class=\"monofont\">");
-					foreach(DocEnumValue value in entry.EnumValues) {
+					foreach (DocEnumValue value in entry.EnumValues) {
 						sb.AppendLine($"<div>{value.Name} - {processText(value.Description)}</div>");
 					}
+
 					sb.AppendLine($"</div>");
 				} else {
 					sb.AppendLine($"<p><strong>Syntax</strong></p>");
 					sb.AppendLine($"<div class=\"monofont\">emu.{entry.Name}({string.Join(", ", entry.Parameters.Select(x => x.Name))})</div>");
 					sb.AppendLine($"<p><strong>Parameters</strong></p>");
 
-					if(entry.Parameters.Count == 0) {
+					if (entry.Parameters.Count == 0) {
 						sb.AppendLine($"<div class=\"fieldData\"><em>&lt;none&gt;</em></div>");
 					} else {
-						foreach(DocParam param in entry.Parameters) {
+						foreach (DocParam param in entry.Parameters) {
 							sb.AppendLine($"<div class=\"fieldData\"><strong>{param.Name}</strong> - <em>");
-							if(param.Type.ToLowerInvariant() == "enum") {
+							if (param.Type.ToLowerInvariant() == "enum") {
 								sb.AppendLine($"<a href=\"#{param.EnumName}\">{param.CalculatedType}</a>");
 							} else {
 								sb.AppendLine($"{processText(param.CalculatedType)}");
 							}
+
 							sb.AppendLine($"</em>{(param.DefaultValue.Length > 0 ? $" <span class=\"defaultvalue\">(default: {param.DefaultValue})</span>" : "")}");
 							sb.AppendLine($"<div class=\"fieldDesc\">{processText(param.Description)}</div>");
 							sb.AppendLine($"</div>");
@@ -300,16 +301,18 @@ namespace Mesen.Debugger.Utilities
 					sb.AppendLine($"<p><strong>Return value</strong></p>");
 
 					sb.AppendLine($"<div class=\"fieldData\">");
-					if(string.IsNullOrEmpty(entry.ReturnValue.Type)) {
+					if (string.IsNullOrEmpty(entry.ReturnValue.Type)) {
 						sb.AppendLine("<em>&lt;none&gt;</em>");
 					} else {
 						sb.AppendLine($"<em>{entry.ReturnValue.Type}</em> - {processText(entry.ReturnValue.Description)}");
 					}
+
 					sb.AppendLine($"</div>");
 					sb.AppendLine($"<p><strong>Description</strong></p>");
 					sb.AppendLine($"<div class=\"fieldData\">{processText(entry.Description)}</div>");
 				}
 			}
+
 			sb.AppendLine("</div>");
 			sb.AppendLine("</body></html>");
 
@@ -317,8 +320,7 @@ namespace Mesen.Debugger.Utilities
 		}
 	}
 
-	public enum DocEntryCategory
-	{
+	public enum DocEntryCategory {
 		Callbacks,
 		Drawing,
 		Emulation,
@@ -329,8 +331,7 @@ namespace Mesen.Debugger.Utilities
 		Enums
 	}
 
-	public enum DocEntrySubcategory
-	{
+	public enum DocEntrySubcategory {
 		AccessCounters,
 		Cdl,
 		Cheats,
@@ -338,82 +339,77 @@ namespace Mesen.Debugger.Utilities
 		Others
 	}
 
-	public class DocEntryViewModel
-	{
+	public class DocEntryViewModel {
 		public string Name { get; set; } = "";
 		public string Description { get; set; } = "";
 		public DocEntryCategory Category { get; set; } = DocEntryCategory.Callbacks;
 		public DocEntrySubcategory? Subcategory { get; set; } = null;
 		public List<DocParam> Parameters { get; set; } = new();
 		public DocReturnValue ReturnValue { get; set; } = new();
-		
+
 		public List<DocEnumValue> EnumValues { get; set; } = new();
 
 		public int MaxWidth => SplitView ? 1000 : 550;
 		public bool SplitView => EnumValues.Count >= 30;
-		public List<DocEnumValue> Column1Values => SplitView ? EnumValues.GetRange(0, EnumValues.Count / 2 + (EnumValues.Count % 2 == 0 ? 0 : 1)) : EnumValues;
+		public List<DocEnumValue> Column1Values => SplitView ? EnumValues.GetRange(0, (EnumValues.Count / 2) + (EnumValues.Count % 2 == 0 ? 0 : 1)) : EnumValues;
 		public List<DocEnumValue> Column2Values => SplitView ? EnumValues.GetRange(Column1Values.Count, EnumValues.Count - Column1Values.Count) : new();
 
-		public string Syntax
-		{
-			get
-			{
+		public string Syntax {
+			get {
 				StringBuilder sb = new();
 				sb.Append($"emu.{Name}(");
 				bool isOptional = false;
-				for(int i = 0; i < Parameters.Count; i++) {
-					if(!string.IsNullOrEmpty(Parameters[i].DefaultValue)) {
-						if(!isOptional) {
+				for (int i = 0; i < Parameters.Count; i++) {
+					if (!string.IsNullOrEmpty(Parameters[i].DefaultValue)) {
+						if (!isOptional) {
 							isOptional = true;
 							sb.Append("[");
 						}
 					} else {
 						System.Diagnostics.Debug.Assert(!isOptional);
 					}
+
 					sb.Append(Parameters[i].Name);
-					if(i < Parameters.Count - 1) {
+					if (i < Parameters.Count - 1) {
 						sb.Append(", ");
 					} else {
-						if(isOptional) {
+						if (isOptional) {
 							sb.Append("]");
 						}
 					}
 				}
+
 				sb.Append(")");
 				return sb.ToString();
 			}
 		}
 	}
 
-	public class DocParam
-	{
+	public class DocParam {
 		public string Name { get; set; } = "";
 		public string Type { get; set; } = "";
 		public string EnumName { get; set; } = "";
 		public string Description { get; set; } = "";
 		public string DefaultValue { get; set; } = "";
 
-		public string CalculatedType
-		{
-			get
-			{
-				if(Type.ToLowerInvariant() == "enum") {
+		public string CalculatedType {
+			get {
+				if (Type.ToLowerInvariant() == "enum") {
 					System.Diagnostics.Debug.Assert(EnumName.Length > 0);
 					return $"Enum ({EnumName})";
 				}
+
 				return Type;
 			}
 		}
 	}
 
-	public class DocReturnValue
-	{
+	public class DocReturnValue {
 		public string Type { get; set; } = "";
 		public string Description { get; set; } = "";
 	}
-	
-	public class DocEnumValue
-	{
+
+	public class DocEnumValue {
 		public string Name { get; set; } = "";
 		public string Description { get; set; } = "";
 	}

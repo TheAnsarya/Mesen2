@@ -1,16 +1,13 @@
-﻿namespace Mesen.Interop
-{
-	public static class DebugEventInfoExtensions
-	{
-		public static string GetRegisterName(this DebugEventInfo evt)
-		{
-			if(evt.RegisterId < 0) {
+namespace Mesen.Interop {
+	public static class DebugEventInfoExtensions {
+		public static string GetRegisterName(this DebugEventInfo evt) {
+			if (evt.RegisterId < 0) {
 				return "";
 			}
 
-			switch(evt.Operation.MemType.ToCpuType()) {
+			switch (evt.Operation.MemType.ToCpuType()) {
 				case CpuType.Pce:
-					switch(evt.RegisterId) {
+					switch (evt.RegisterId) {
 						case 0: return "MAWR";
 						case 1: return "MARR";
 						case 2: return evt.Operation.Type.IsRead() ? "VRR" : "VWR";
@@ -30,13 +27,14 @@
 						case 0x12: return "LENR";
 						case 0x13: return "DVSSR";
 					}
+
 					break;
 
 				case CpuType.Sms:
 					byte codeReg = (byte)(evt.Operation.Value >> 6);
 					byte regNumber = (byte)(evt.Operation.Value & 0x0F);
-					if(codeReg == 2) {
-						switch(regNumber) {
+					if (codeReg == 2) {
+						switch (regNumber) {
 							case 0: return "Mode1";
 							case 1: return "Mode2";
 							case 2: return "NtAddress";
@@ -50,6 +48,7 @@
 							case 10: return "LineCounter";
 						}
 					}
+
 					break;
 			}
 

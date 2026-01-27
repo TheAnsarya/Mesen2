@@ -1,12 +1,10 @@
-﻿using Avalonia.Media;
+using Avalonia.Media;
 using Mesen.Interop;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class SnesEventViewerConfig : ViewModelBase
-	{
+namespace Mesen.Config {
+	public class SnesEventViewerConfig : ViewModelBase {
 		[Reactive] public EventViewerCategoryCfg PpuRegisterCgramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
 		[Reactive] public EventViewerCategoryCfg PpuRegisterVramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));
 		[Reactive] public EventViewerCategoryCfg PpuRegisterOamWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x53, 0xD7, 0x44));
@@ -42,8 +40,7 @@ namespace Mesen.Config
 		[Reactive] public bool ShowDmaChannel6 { get; set; } = true;
 		[Reactive] public bool ShowDmaChannel7 { get; set; } = true;
 
-		public InteropSnesEventViewerConfig ToInterop()
-		{
+		public InteropSnesEventViewerConfig ToInterop() {
 			return new InteropSnesEventViewerConfig() {
 				PpuRegisterCgramWrites = this.PpuRegisterCgramWrites,
 				PpuRegisterVramWrites = this.PpuRegisterVramWrites,

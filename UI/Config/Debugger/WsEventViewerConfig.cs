@@ -1,17 +1,16 @@
-﻿using Mesen.Interop;
+using Mesen.Interop;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Config;
 
-public class WsEventViewerConfig : ViewModelBase
-{
+public class WsEventViewerConfig : ViewModelBase {
 	[Reactive] public EventViewerCategoryCfg PpuPaletteRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[0]);
 	[Reactive] public EventViewerCategoryCfg PpuPaletteWrite { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[1]);
-	
+
 	[Reactive] public EventViewerCategoryCfg PpuVramRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[2]);
 	[Reactive] public EventViewerCategoryCfg PpuVramWrite { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[3]);
-	
+
 	[Reactive] public EventViewerCategoryCfg PpuScrollRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[4]);
 	[Reactive] public EventViewerCategoryCfg PpuScrollWrite { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[5]);
 	[Reactive] public EventViewerCategoryCfg PpuWindowRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[6]);
@@ -21,7 +20,7 @@ public class WsEventViewerConfig : ViewModelBase
 
 	[Reactive] public EventViewerCategoryCfg AudioRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[10]);
 	[Reactive] public EventViewerCategoryCfg AudioWrite { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[11]);
-	
+
 	[Reactive] public EventViewerCategoryCfg SerialRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[12]);
 	[Reactive] public EventViewerCategoryCfg SerialWrite { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[13]);
 
@@ -54,8 +53,7 @@ public class WsEventViewerConfig : ViewModelBase
 
 	[Reactive] public bool ShowPreviousFrameEvents { get; set; } = true;
 
-	public InteropWsEventViewerConfig ToInterop()
-	{
+	public InteropWsEventViewerConfig ToInterop() {
 		return new InteropWsEventViewerConfig() {
 			PpuPaletteRead = this.PpuPaletteRead,
 			PpuPaletteWrite = this.PpuPaletteWrite,

@@ -1,22 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Mesen.Utilities
-{
+namespace Mesen.Utilities {
 	[XmlRoot("cheats")]
-	public class CheatDatabase
-	{
+	public class CheatDatabase {
 		[XmlElement("game")]
 		public List<CheatDbGameEntry> Games { get; set; } = null!;
 	}
 
 	[XmlType("game")]
-	public class CheatDbGameEntry
-	{
+	public class CheatDbGameEntry {
 		[XmlAttribute("name")]
 		public string Name { get; set; } = null!;
 
@@ -26,14 +23,12 @@ namespace Mesen.Utilities
 		[XmlElement("cheat")]
 		public List<CheatDbCheatEntry> Cheats { get; set; } = null!;
 
-		public override string ToString()
-		{
+		public override string ToString() {
 			return this.Name;
 		}
 	}
 
-	public class CheatDbCheatEntry
-	{
+	public class CheatDbCheatEntry {
 		[XmlAttribute("desc")]
 		public string Desc { get; set; } = null!;
 

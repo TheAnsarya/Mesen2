@@ -1,4 +1,3 @@
-﻿using Avalonia.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,22 +6,19 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 
-namespace Mesen.Utilities
-{
+namespace Mesen.Utilities {
 	//Copy of Avalonia's AvaloniaList with an added Replace function to avoid triggering 2 updates
-	public partial class MesenList<T>
-	{
-		public void Replace(IList<T> items)
-		{
+	public partial class MesenList<T> {
+		public void Replace(IList<T> items) {
 			_inner.Clear();
 			_inner.Capacity = items.Count;
 			_inner.AddRange(items);
 			_collectionChanged?.Invoke(this, EventArgsCache.ResetCollectionChanged);
 		}
 
-		public List<T> GetInnerList()
-		{
+		public List<T> GetInnerList() {
 			return _inner;
 		}
 	}
@@ -51,16 +47,14 @@ namespace Mesen.Utilities
 	/// </item>
 	/// </list>
 	/// </remarks>
-	public partial class MesenList<T> : IAvaloniaList<T>, IList
-	{
+	public partial class MesenList<T> : IAvaloniaList<T>, IList {
 		private readonly List<T> _inner;
 		private NotifyCollectionChangedEventHandler? _collectionChanged;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/> class.
 		/// </summary>
-		public MesenList()
-		{
+		public MesenList() {
 			_inner = new List<T>();
 		}
 
@@ -68,8 +62,7 @@ namespace Mesen.Utilities
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/>.
 		/// </summary>
 		/// <param name="capacity">Initial list capacity.</param>
-		public MesenList(int capacity)
-		{
+		public MesenList(int capacity) {
 			_inner = new List<T>(capacity);
 		}
 
@@ -77,8 +70,7 @@ namespace Mesen.Utilities
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/> class.
 		/// </summary>
 		/// <param name="items">The initial items for the collection.</param>
-		public MesenList(IEnumerable<T> items)
-		{
+		public MesenList(IEnumerable<T> items) {
 			_inner = new List<T>(items);
 		}
 
@@ -86,16 +78,14 @@ namespace Mesen.Utilities
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/> class.
 		/// </summary>
 		/// <param name="items">The initial items for the collection.</param>
-		public MesenList(params T[] items)
-		{
+		public MesenList(params T[] items) {
 			_inner = new List<T>(items);
 		}
 
 		/// <summary>
 		/// Raised when a change is made to the collection's items.
 		/// </summary>
-		public event NotifyCollectionChangedEventHandler? CollectionChanged
-		{
+		public event NotifyCollectionChangedEventHandler? CollectionChanged {
 			add => _collectionChanged += value;
 			remove => _collectionChanged -= value;
 		}
@@ -144,23 +134,20 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="index">The index.</param>
 		/// <returns>The item.</returns>
-		public T this[int index]
-		{
-			get
-			{
+		public T this[int index] {
+			get {
 				return _inner[index];
 			}
 
-			set
-			{
+			set {
 				Validate?.Invoke(value);
 
 				T old = _inner[index];
 
-				if(!EqualityComparer<T>.Default.Equals(old, value)) {
+				if (!EqualityComparer<T>.Default.Equals(old, value)) {
 					_inner[index] = value;
 
-					if(_collectionChanged != null) {
+					if (_collectionChanged != null) {
 						var e = new NotifyCollectionChangedEventArgs(
 							 NotifyCollectionChangedAction.Replace,
 							 value,
@@ -177,8 +164,7 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="index">The index.</param>
 		/// <returns>The item.</returns>
-		object? IList.this[int index]
-		{
+		object? IList.this[int index] {
 			get { return this[index]; }
 			set { this[index] = (T)value!; }
 		}
@@ -186,8 +172,7 @@ namespace Mesen.Utilities
 		/// <summary>
 		/// Gets or sets the total number of elements the internal data structure can hold without resizing.
 		/// </summary>
-		public int Capacity
-		{
+		public int Capacity {
 			get => _inner.Capacity;
 			set => _inner.Capacity = value;
 		}
@@ -196,8 +181,7 @@ namespace Mesen.Utilities
 		/// Adds an item to the collection.
 		/// </summary>
 		/// <param name="item">The item.</param>
-		public virtual void Add(T item)
-		{
+		public virtual void Add(T item) {
 			Validate?.Invoke(item);
 			int index = _inner.Count;
 			_inner.Add(item);
@@ -213,10 +197,9 @@ namespace Mesen.Utilities
 		/// <summary>
 		/// Removes all items from the collection.
 		/// </summary>
-		public virtual void Clear()
-		{
-			if(Count > 0) {
-				if(_collectionChanged != null) {
+		public virtual void Clear() {
+			if (Count > 0) {
+				if (_collectionChanged != null) {
 					var e = ResetBehavior == ResetBehavior.Reset ?
 						 EventArgsCache.ResetCollectionChanged :
 						 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _inner.ToArray(), 0);
@@ -237,8 +220,7 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns>True if the collection contains the item; otherwise false.</returns>
-		public bool Contains(T item)
-		{
+		public bool Contains(T item) {
 			return _inner.Contains(item);
 		}
 
@@ -247,8 +229,7 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="array">The array.</param>
 		/// <param name="arrayIndex">The first index of the array to copy to.</param>
-		public void CopyTo(T[] array, int arrayIndex)
-		{
+		public void CopyTo(T[] array, int arrayIndex) {
 			_inner.CopyTo(array, arrayIndex);
 		}
 
@@ -256,19 +237,16 @@ namespace Mesen.Utilities
 		/// Returns an enumerator that enumerates the items in the collection.
 		/// </summary>
 		/// <returns>An <see cref="IEnumerator{T}"/>.</returns>
-		IEnumerator<T> IEnumerable<T>.GetEnumerator()
-		{
+		IEnumerator<T> IEnumerable<T>.GetEnumerator() {
 			return new Enumerator(_inner);
 		}
 
 		/// <inheritdoc/>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
+		IEnumerator IEnumerable.GetEnumerator() {
 			return new Enumerator(_inner);
 		}
 
-		public Enumerator GetEnumerator()
-		{
+		public Enumerator GetEnumerator() {
 			return new Enumerator(_inner);
 		}
 
@@ -277,8 +255,7 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="index">The zero-based <see cref="AvaloniaList{T}"/> index at which the range starts.</param>
 		/// <param name="count">The number of elements in the range.</param>
-		public IEnumerable<T> GetRange(int index, int count)
-		{
+		public IEnumerable<T> GetRange(int index, int count) {
 			return _inner.GetRange(index, count);
 		}
 
@@ -289,8 +266,7 @@ namespace Mesen.Utilities
 		/// <returns>
 		/// The index of the item or -1 if the item is not contained in the collection.
 		/// </returns>
-		public int IndexOf(T item)
-		{
+		public int IndexOf(T item) {
 			return _inner.IndexOf(item);
 		}
 
@@ -299,8 +275,7 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="index">The index.</param>
 		/// <param name="item">The item.</param>
-		public virtual void Insert(int index, T item)
-		{
+		public virtual void Insert(int index, T item) {
 			Validate?.Invoke(item);
 			_inner.Insert(index, item);
 			NotifyAdd(item, index);
@@ -311,18 +286,17 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="index">The index.</param>
 		/// <param name="items">The items.</param>
-		public virtual void InsertRange(int index, IEnumerable<T> items)
-		{
+		public virtual void InsertRange(int index, IEnumerable<T> items) {
 			_ = items ?? throw new ArgumentNullException(nameof(items));
 
 			bool willRaiseCollectionChanged = _collectionChanged != null;
 			bool hasValidation = Validate != null;
 
-			if(items is IList list) {
-				if(list.Count > 0) {
-					if(list is ICollection<T> collection) {
-						if(hasValidation) {
-							foreach(T item in collection) {
+			if (items is IList list) {
+				if (list.Count > 0) {
+					if (list is ICollection<T> collection) {
+						if (hasValidation) {
+							foreach (T item in collection) {
 								Validate!(item);
 							}
 						}
@@ -332,13 +306,13 @@ namespace Mesen.Utilities
 					} else {
 						EnsureCapacity(_inner.Count + list.Count);
 
-						using(IEnumerator<T> en = items.GetEnumerator()) {
+						using (IEnumerator<T> en = items.GetEnumerator()) {
 							int insertIndex = index;
 
-							while(en.MoveNext()) {
+							while (en.MoveNext()) {
 								T item = en.Current;
 
-								if(hasValidation) {
+								if (hasValidation) {
 									Validate!(item);
 								}
 
@@ -350,8 +324,8 @@ namespace Mesen.Utilities
 					}
 				}
 			} else {
-				using(IEnumerator<T> en = items.GetEnumerator()) {
-					if(en.MoveNext()) {
+				using (IEnumerator<T> en = items.GetEnumerator()) {
+					if (en.MoveNext()) {
 						// Avoid allocating list for collection notification if there is no event subscriptions.
 						List<T>? notificationItems = willRaiseCollectionChanged ?
 							 new List<T>() :
@@ -362,7 +336,7 @@ namespace Mesen.Utilities
 						do {
 							T item = en.Current;
 
-							if(hasValidation) {
+							if (hasValidation) {
 								Validate!(item);
 							}
 
@@ -370,9 +344,9 @@ namespace Mesen.Utilities
 
 							notificationItems?.Add(item);
 
-						} while(en.MoveNext());
+						} while (en.MoveNext());
 
-						if(notificationItems is not null) {
+						if (notificationItems is not null) {
 							NotifyAdd(notificationItems, index);
 						} else {
 							NotifyCountChanged();
@@ -387,13 +361,12 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="oldIndex">The index of the item to move.</param>
 		/// <param name="newIndex">The index to move the item to.</param>
-		public void Move(int oldIndex, int newIndex)
-		{
+		public void Move(int oldIndex, int newIndex) {
 			var item = this[oldIndex];
 			_inner.RemoveAt(oldIndex);
 			_inner.Insert(newIndex, item);
 
-			if(_collectionChanged != null) {
+			if (_collectionChanged != null) {
 				var e = new NotifyCollectionChangedEventArgs(
 					 NotifyCollectionChangedAction.Move,
 					 item,
@@ -409,19 +382,18 @@ namespace Mesen.Utilities
 		/// <param name="oldIndex">The first index of the items to move.</param>
 		/// <param name="count">The number of items to move.</param>
 		/// <param name="newIndex">The index to move the items to.</param>
-		public void MoveRange(int oldIndex, int count, int newIndex)
-		{
+		public void MoveRange(int oldIndex, int count, int newIndex) {
 			var items = _inner.GetRange(oldIndex, count);
 			var modifiedNewIndex = newIndex;
 			_inner.RemoveRange(oldIndex, count);
 
-			if(newIndex > oldIndex) {
+			if (newIndex > oldIndex) {
 				modifiedNewIndex -= count;
 			}
 
 			_inner.InsertRange(modifiedNewIndex, items);
 
-			if(_collectionChanged != null) {
+			if (_collectionChanged != null) {
 				var e = new NotifyCollectionChangedEventArgs(
 					 NotifyCollectionChangedAction.Move,
 					 items,
@@ -435,15 +407,14 @@ namespace Mesen.Utilities
 		/// Ensures that the capacity of the list is at least <see cref="Capacity"/>.
 		/// </summary>
 		/// <param name="capacity">The capacity.</param>
-		public void EnsureCapacity(int capacity)
-		{
+		public void EnsureCapacity(int capacity) {
 			// Adapted from List<T> implementation.
 			var currentCapacity = _inner.Capacity;
 
-			if(currentCapacity < capacity) {
+			if (currentCapacity < capacity) {
 				var newCapacity = currentCapacity == 0 ? 4 : currentCapacity * 2;
 
-				if(newCapacity < capacity) {
+				if (newCapacity < capacity) {
 					newCapacity = capacity;
 				}
 
@@ -456,11 +427,10 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns>True if the item was found and removed, otherwise false.</returns>
-		public virtual bool Remove(T item)
-		{
+		public virtual bool Remove(T item) {
 			int index = _inner.IndexOf(item);
 
-			if(index != -1) {
+			if (index != -1) {
 				_inner.RemoveAt(index);
 				NotifyRemove(item, index);
 				return true;
@@ -473,23 +443,22 @@ namespace Mesen.Utilities
 		/// Removes multiple items from the collection.
 		/// </summary>
 		/// <param name="items">The items.</param>
-		public virtual void RemoveAll(IEnumerable<T> items)
-		{
+		public virtual void RemoveAll(IEnumerable<T> items) {
 			_ = items ?? throw new ArgumentNullException(nameof(items));
 
 			var hItems = new HashSet<T>(items);
 
 			int counter = 0;
-			for(int i = _inner.Count - 1; i >= 0; --i) {
-				if(hItems.Contains(_inner[i])) {
+			for (int i = _inner.Count - 1; i >= 0; --i) {
+				if (hItems.Contains(_inner[i])) {
 					counter += 1;
-				} else if(counter > 0) {
+				} else if (counter > 0) {
 					RemoveRange(i + 1, counter);
 					counter = 0;
 				}
 			}
 
-			if(counter > 0)
+			if (counter > 0)
 				RemoveRange(0, counter);
 		}
 
@@ -497,8 +466,7 @@ namespace Mesen.Utilities
 		/// Removes the item at the specified index.
 		/// </summary>
 		/// <param name="index">The index.</param>
-		public virtual void RemoveAt(int index)
-		{
+		public virtual void RemoveAt(int index) {
 			T item = _inner[index];
 			_inner.RemoveAt(index);
 			NotifyRemove(item, index);
@@ -509,9 +477,8 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="index">The first index to remove.</param>
 		/// <param name="count">The number of items to remove.</param>
-		public virtual void RemoveRange(int index, int count)
-		{
-			if(count > 0) {
+		public virtual void RemoveRange(int index, int count) {
+			if (count > 0) {
 				var list = _inner.GetRange(index, count);
 				_inner.RemoveRange(index, count);
 				NotifyRemove(list, index);
@@ -519,73 +486,65 @@ namespace Mesen.Utilities
 		}
 
 		/// <inheritdoc/>
-		int IList.Add(object? value)
-		{
+		int IList.Add(object? value) {
 			int index = Count;
 			Add((T)value!);
 			return index;
 		}
 
 		/// <inheritdoc/>
-		bool IList.Contains(object? value)
-		{
+		bool IList.Contains(object? value) {
 			return Contains((T)value!);
 		}
 
 		/// <inheritdoc/>
-		void IList.Clear()
-		{
+		void IList.Clear() {
 			Clear();
 		}
 
 		/// <inheritdoc/>
-		int IList.IndexOf(object? value)
-		{
+		int IList.IndexOf(object? value) {
 			return IndexOf((T)value!);
 		}
 
 		/// <inheritdoc/>
-		void IList.Insert(int index, object? value)
-		{
+		void IList.Insert(int index, object? value) {
 			Insert(index, (T)value!);
 		}
 
 		/// <inheritdoc/>
-		void IList.Remove(object? value)
-		{
+		void IList.Remove(object? value) {
 			Remove((T)value!);
 		}
 
 		/// <inheritdoc/>
-		void IList.RemoveAt(int index)
-		{
+		void IList.RemoveAt(int index) {
 			RemoveAt(index);
 		}
 
 		/// <inheritdoc/>
-		void ICollection.CopyTo(Array array, int index)
-		{
-			if(array == null) {
+		void ICollection.CopyTo(Array array, int index) {
+			if (array == null) {
 				throw new ArgumentNullException(nameof(array));
 			}
 
-			if(array.Rank != 1) {
+			if (array.Rank != 1) {
 				throw new ArgumentException("Multi-dimensional arrays are not supported.");
 			}
 
-			if(array.GetLowerBound(0) != 0) {
+			if (array.GetLowerBound(0) != 0) {
 				throw new ArgumentException("Non-zero lower bounds are not supported.");
 			}
 
-			if(index < 0) {
+			if (index < 0) {
 				throw new ArgumentException("Invalid index.");
 			}
 
-			if(array.Length - index < Count) {
+			if (array.Length - index < Count) {
 				throw new ArgumentException("The target array is too small.");
 			}
 
-			if(array is T[] tArray) {
+			if (array is T[] tArray) {
 				_inner.CopyTo(tArray, index);
 			} else {
 				//
@@ -596,7 +555,7 @@ namespace Mesen.Utilities
 				//
 				Type targetType = array.GetType().GetElementType()!;
 				Type sourceType = typeof(T);
-				if(!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType))) {
+				if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType))) {
 					throw new ArgumentException("Invalid array type");
 				}
 
@@ -604,16 +563,16 @@ namespace Mesen.Utilities
 				// We can't cast array of value type to object[], so we don't support
 				// widening of primitive types here.
 				//
-				if(array is not object?[] objects) {
+				if (array is not object?[] objects) {
 					throw new ArgumentException("Invalid array type");
 				}
 
 				int count = _inner.Count;
 				try {
-					for(int i = 0; i < count; i++) {
+					for (int i = 0; i < count; i++) {
 						objects[index++] = _inner[i];
 					}
-				} catch(ArrayTypeMismatchException) {
+				} catch (ArrayTypeMismatchException) {
 					throw new ArgumentException("Invalid array type");
 				}
 			}
@@ -624,9 +583,8 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="t">The items that were added.</param>
 		/// <param name="index">The starting index.</param>
-		private void NotifyAdd(IList t, int index)
-		{
-			if(_collectionChanged != null) {
+		private void NotifyAdd(IList t, int index) {
+			if (_collectionChanged != null) {
 				var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, t, index);
 				_collectionChanged(this, e);
 			}
@@ -639,9 +597,8 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="item">The item that was added.</param>
 		/// <param name="index">The starting index.</param>
-		private void NotifyAdd(T item, int index)
-		{
-			if(_collectionChanged != null) {
+		private void NotifyAdd(T item, int index) {
+			if (_collectionChanged != null) {
 				var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new[] { item }, index);
 				_collectionChanged(this, e);
 			}
@@ -653,8 +610,7 @@ namespace Mesen.Utilities
 		/// Raises the <see cref="PropertyChanged"/> event when the <see cref="Count"/> property
 		/// changes.
 		/// </summary>
-		private void NotifyCountChanged()
-		{
+		private void NotifyCountChanged() {
 			PropertyChanged?.Invoke(this, EventArgsCache.CountPropertyChanged);
 		}
 
@@ -663,9 +619,8 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="t">The items that were removed.</param>
 		/// <param name="index">The starting index.</param>
-		private void NotifyRemove(IList t, int index)
-		{
-			if(_collectionChanged != null) {
+		private void NotifyRemove(IList t, int index) {
+			if (_collectionChanged != null) {
 				var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, t, index);
 				_collectionChanged(this, e);
 			}
@@ -678,9 +633,8 @@ namespace Mesen.Utilities
 		/// </summary>
 		/// <param name="item">The item that was removed.</param>
 		/// <param name="index">The starting index.</param>
-		private void NotifyRemove(T item, int index)
-		{
-			if(_collectionChanged != null) {
+		private void NotifyRemove(T item, int index) {
+			if (_collectionChanged != null) {
 				var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { item }, index);
 				_collectionChanged(this, e);
 			}
@@ -691,22 +645,18 @@ namespace Mesen.Utilities
 		/// <summary>
 		/// Enumerates the elements of a <see cref="AvaloniaList{T}"/>.
 		/// </summary>
-		public struct Enumerator : IEnumerator<T>
-		{
+		public struct Enumerator : IEnumerator<T> {
 			private List<T>.Enumerator _innerEnumerator;
 
-			public Enumerator(List<T> inner)
-			{
+			public Enumerator(List<T> inner) {
 				_innerEnumerator = inner.GetEnumerator();
 			}
 
-			public bool MoveNext()
-			{
+			public bool MoveNext() {
 				return _innerEnumerator.MoveNext();
 			}
 
-			void IEnumerator.Reset()
-			{
+			void IEnumerator.Reset() {
 				((IEnumerator)_innerEnumerator).Reset();
 			}
 
@@ -714,15 +664,13 @@ namespace Mesen.Utilities
 
 			object? IEnumerator.Current => Current;
 
-			public void Dispose()
-			{
+			public void Dispose() {
 				_innerEnumerator.Dispose();
 			}
 		}
 	}
 
-	internal static class EventArgsCache
-	{
+	internal static class EventArgsCache {
 		internal static readonly PropertyChangedEventArgs CountPropertyChanged = new PropertyChangedEventArgs(nameof(AvaloniaList<object>.Count));
 		internal static readonly NotifyCollectionChangedEventArgs ResetCollectionChanged = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
 	}

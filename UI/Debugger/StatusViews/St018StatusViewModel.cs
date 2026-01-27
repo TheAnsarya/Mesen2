@@ -1,13 +1,12 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Debugger.StatusViews;
 
-public class St018StatusViewModel : BaseConsoleStatusViewModel
-{
+public class St018StatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt32 Reg0 { get; set; }
 	[Reactive] public UInt32 Reg1 { get; set; }
 	[Reactive] public UInt32 Reg2 { get; set; }
@@ -34,21 +33,19 @@ public class St018StatusViewModel : BaseConsoleStatusViewModel
 	[Reactive] public bool FlagCarry { get; set; }
 	[Reactive] public bool FlagNegative { get; set; }
 	[Reactive] public bool FlagOverflow { get; set; }
-	
+
 	[Reactive] public bool FlagThumb { get; set; }
 	[Reactive] public bool FlagIrqDisable { get; set; }
 	[Reactive] public bool FlagFiqDisable { get; set; }
 
 	[Reactive] public string StackPreview { get; set; } = "";
 
-	public St018StatusViewModel()
-	{
+	public St018StatusViewModel() {
 		this.WhenAnyValue(x => x.FlagZero, x => x.FlagCarry, x => x.FlagNegative, x => x.FlagOverflow).Subscribe(x => UpdateFlags());
 		this.WhenAnyValue(x => x.FlagIrqDisable, x => x.FlagFiqDisable).Subscribe(x => UpdateFlags());
 	}
 
-	private void UpdateFlags()
-	{
+	private void UpdateFlags() {
 		RegCpsr = (UInt32)(
 			(FlagNegative ? (1 << 31) : 0) |
 			(FlagZero ? (1 << 30) : 0) |
@@ -61,8 +58,7 @@ public class St018StatusViewModel : BaseConsoleStatusViewModel
 		);
 	}
 
-	protected override void InternalUpdateUiState()
-	{
+	protected override void InternalUpdateUiState() {
 		ArmV3CpuState cpu = DebugApi.GetCpuState<ArmV3CpuState>(CpuType.St018);
 		UpdateCycleCount(cpu.CycleCount);
 
@@ -91,31 +87,30 @@ public class St018StatusViewModel : BaseConsoleStatusViewModel
 		FlagFiqDisable = cpu.CPSR.FiqDisable;
 
 		Mode = cpu.CPSR.Mode;
-		if(cpu.CPSR.Mode == ArmV3CpuMode.Irq || cpu.CPSR.Mode == ArmV3CpuMode.Fiq) {
-			ModeString = cpu.CPSR.Mode.ToString().ToUpper();
-		} else {
-			ModeString = cpu.CPSR.Mode.ToString();
-		}
+		ModeString = cpu.CPSR.Mode is ArmV3CpuMode.Irq or ArmV3CpuMode.Fiq
+			? cpu.CPSR.Mode.ToString().ToUpper()
+			: cpu.CPSR.Mode.ToString();
 
 		StringBuilder sb = new StringBuilder();
-		if(cpu.R[13] >= 0xE0000000) {
+		if (cpu.R[13] >= 0xE0000000) {
 			//Patch to show work ram data directly (since APIs don't work well with addresses over 2^31)
 			uint start = (cpu.R[13] - 0xE0000000) & 0x3FFF;
-			uint end = (cpu.R[13] - 0xE0000000 + 30 * 4 - 1) & 0x3FFF;
-			if(end < start) {
+			uint end = (cpu.R[13] - 0xE0000000 + (30 * 4) - 1) & 0x3FFF;
+			if (end < start) {
 				end = 0x3FFF;
 			}
+
 			byte[] stackValues = DebugApi.GetMemoryValues(MemoryType.St018WorkRam, start, end);
-			for(int i = 0; i < stackValues.Length; i += 4) {
+			for (int i = 0; i < stackValues.Length; i += 4) {
 				UInt32 value = (uint)stackValues[i] | (uint)(stackValues[i + 1] << 8) | (uint)(stackValues[i + 2] << 16) | (uint)(stackValues[i + 3] << 24);
 				sb.Append($"${value:X8} ");
 			}
 		}
+
 		StackPreview = sb.ToString();
 	}
 
-	protected override void InternalUpdateConsoleState()
-	{
+	protected override void InternalUpdateConsoleState() {
 		ArmV3CpuState cpu = DebugApi.GetCpuState<ArmV3CpuState>(CpuType.St018);
 
 		cpu.R[0] = Reg0;

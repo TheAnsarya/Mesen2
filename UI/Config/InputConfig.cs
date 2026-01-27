@@ -1,20 +1,18 @@
-﻿using Mesen.Interop;
-using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using Mesen.ViewModels;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class InputConfig : BaseConfig<InputConfig>
-	{
-		[Reactive] [MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
-		[Reactive] [MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;
+namespace Mesen.Config {
+	public class InputConfig : BaseConfig<InputConfig> {
+		[Reactive][MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
+		[Reactive][MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;
 		[Reactive] public bool HidePointerForLightGuns { get; set; } = false;
 		[Reactive][MinMax(0, 10)] public UInt32 ForceFeedbackIntensity { get; set; } = 5;
 
@@ -29,12 +27,10 @@ namespace Mesen.Config
 		[Reactive] public bool DisplayInputPort8 { get; set; } = false;
 		[Reactive] public bool DisplayInputHorizontally { get; set; } = true;
 
-		public InputConfig()
-		{
+		public InputConfig() {
 		}
 
-		public void ApplyConfig()
-		{
+		public void ApplyConfig() {
 			ConfigApi.SetInputConfig(new InteropInputConfig() {
 				ControllerDeadzoneSize = this.ControllerDeadzoneSize,
 				MouseSensitivity = this.MouseSensitivity,
@@ -53,8 +49,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public class KeyMapping : ReactiveObject
-	{
+	public class KeyMapping : ReactiveObject {
 		[Reactive] public UInt16 A { get; set; }
 		[Reactive] public UInt16 B { get; set; }
 		[Reactive] public UInt16 X { get; set; }
@@ -81,8 +76,7 @@ namespace Mesen.Config
 
 		[Reactive] public UInt16 GenericKey1 { get; set; }
 
-		public virtual InteropKeyMapping ToInterop(ControllerType type, int mappingIndex)
-		{
+		public virtual InteropKeyMapping ToInterop(ControllerType type, int mappingIndex) {
 			InteropKeyMapping mappings = new InteropKeyMapping() {
 				A = this.A,
 				B = this.B,
@@ -110,13 +104,13 @@ namespace Mesen.Config
 			};
 
 			UInt16[]? customKeys = GetCustomButtons(type);
-			if(customKeys == null && mappingIndex == 0) {
+			if (customKeys == null && mappingIndex == 0) {
 				customKeys = GetDefaultCustomKeys(type, null);
 			}
 
-			if(customKeys != null) {
+			if (customKeys != null) {
 				mappings.CustomKeys = new UInt16[100];
-				for(int i = 0; i < customKeys.Length; i++) {
+				for (int i = 0; i < customKeys.Length; i++) {
 					mappings.CustomKeys[i] = customKeys[i];
 				}
 			}
@@ -124,25 +118,21 @@ namespace Mesen.Config
 			return mappings;
 		}
 
-		protected virtual UInt16[]? GetCustomButtons(ControllerType type)
-		{
+		protected virtual UInt16[]? GetCustomButtons(ControllerType type) {
 			return null;
 		}
 
-		public virtual UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset)
-		{
+		public virtual UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset) {
 			return null;
 		}
 
-		public virtual List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex)
-		{
+		public virtual List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex) {
 			return new();
 		}
 
-		public virtual void SetDefaultKeys(ControllerType type, KeyPresetType? preset = null)
-		{
-			if(type.HasPresets()) {
-				switch(preset) {
+		public virtual void SetDefaultKeys(ControllerType type, KeyPresetType? preset = null) {
+			if (type.HasPresets()) {
+				switch (preset) {
 					case KeyPresetType.WasdKeys: KeyPresets.ApplyWasdLayout(this, type); break;
 					case KeyPresetType.ArrowKeys: KeyPresets.ApplyArrowLayout(this, type); break;
 					case KeyPresetType.XboxP1: KeyPresets.ApplyXboxLayout(this, 0, type, false); break;
@@ -157,8 +147,7 @@ namespace Mesen.Config
 			}
 		}
 
-		public virtual void ClearKeys(ControllerType type)
-		{
+		public virtual void ClearKeys(ControllerType type) {
 			A = 0;
 			B = 0;
 			X = 0;
@@ -185,8 +174,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public enum KeyPresetType
-	{
+	public enum KeyPresetType {
 		XboxP1,
 		XboxP1Alt,
 		XboxP2,
@@ -199,8 +187,7 @@ namespace Mesen.Config
 		ArrowKeys
 	}
 
-	public class ControllerConfig : BaseConfig<ControllerConfig>
-	{
+	public class ControllerConfig : BaseConfig<ControllerConfig> {
 		protected KeyMapping _mapping1 = new();
 		protected KeyMapping _mapping2 = new();
 		protected KeyMapping _mapping3 = new();
@@ -213,30 +200,31 @@ namespace Mesen.Config
 		[Reactive] public UInt32 TurboSpeed { get; set; } = 0;
 		[Reactive] public ControllerType Type { get; set; } = ControllerType.None;
 
-		public void InitDefaults(DefaultKeyMappingType defaultMappings, ControllerType type)
-		{
+		public void InitDefaults(DefaultKeyMappingType defaultMappings, ControllerType type) {
 			InitDefaults<KeyMapping>(defaultMappings, type);
 		}
 
-		public void InitDefaults<T>(DefaultKeyMappingType defaultMappings, ControllerType type) where T : KeyMapping, new()
-		{
+		public void InitDefaults<T>(DefaultKeyMappingType defaultMappings, ControllerType type) where T : KeyMapping, new() {
 			List<T> mappings = new List<T>();
-			if(defaultMappings.HasFlag(DefaultKeyMappingType.Xbox)) {
+			if (defaultMappings.HasFlag(DefaultKeyMappingType.Xbox)) {
 				T mapping = new T();
 				mapping.SetDefaultKeys(type, KeyPresetType.XboxP1);
 				mappings.Add(mapping);
 			}
-			if(defaultMappings.HasFlag(DefaultKeyMappingType.Ps4)) {
+
+			if (defaultMappings.HasFlag(DefaultKeyMappingType.Ps4)) {
 				T mapping = new T();
 				mapping.SetDefaultKeys(type, KeyPresetType.Ps4P1);
 				mappings.Add(mapping);
 			}
-			if(defaultMappings.HasFlag(DefaultKeyMappingType.WasdKeys)) {
+
+			if (defaultMappings.HasFlag(DefaultKeyMappingType.WasdKeys)) {
 				T mapping = new T();
 				mapping.SetDefaultKeys(type, KeyPresetType.WasdKeys);
 				mappings.Add(mapping);
 			}
-			if(defaultMappings.HasFlag(DefaultKeyMappingType.ArrowKeys)) {
+
+			if (defaultMappings.HasFlag(DefaultKeyMappingType.ArrowKeys)) {
 				T mapping = new T();
 				mapping.SetDefaultKeys(type, KeyPresetType.ArrowKeys);
 				mappings.Add(mapping);
@@ -245,13 +233,13 @@ namespace Mesen.Config
 			Type = type;
 			TurboSpeed = 2;
 
-			if(mappings.Count > 0) {
+			if (mappings.Count > 0) {
 				Mapping1 = mappings[0];
-				if(mappings.Count > 1) {
+				if (mappings.Count > 1) {
 					Mapping2 = mappings[1];
-					if(mappings.Count > 2) {
+					if (mappings.Count > 2) {
 						Mapping3 = mappings[2];
-						if(mappings.Count > 3) {
+						if (mappings.Count > 3) {
 							Mapping4 = mappings[3];
 						}
 					}
@@ -259,8 +247,7 @@ namespace Mesen.Config
 			}
 		}
 
-		public InteropControllerConfig ToInterop()
-		{
+		public InteropControllerConfig ToInterop() {
 			return new InteropControllerConfig() {
 				Type = this.Type,
 				Keys = new InteropKeyMappingSet() {
@@ -275,8 +262,7 @@ namespace Mesen.Config
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct InteropInputConfig
-	{
+	public struct InteropInputConfig {
 		public UInt32 ControllerDeadzoneSize;
 		public UInt32 MouseSensitivity;
 
@@ -295,8 +281,7 @@ namespace Mesen.Config
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct InteropKeyMapping
-	{
+	public struct InteropKeyMapping {
 		public UInt16 A;
 		public UInt16 B;
 		public UInt16 X;
@@ -320,15 +305,14 @@ namespace Mesen.Config
 		public UInt16 TurboR;
 		public UInt16 TurboSelect;
 		public UInt16 TurboStart;
-		
+
 		public UInt16 GenericKey1;
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 100)]
 		public UInt16[] CustomKeys;
 	}
 
-	public struct InteropKeyMappingSet
-	{
+	public struct InteropKeyMappingSet {
 		public InteropKeyMapping Mapping1;
 		public InteropKeyMapping Mapping2;
 		public InteropKeyMapping Mapping3;
@@ -336,14 +320,12 @@ namespace Mesen.Config
 		public UInt32 TurboSpeed;
 	}
 
-	public struct InteropControllerConfig
-	{
+	public struct InteropControllerConfig {
 		public InteropKeyMappingSet Keys { get; set; }
 		public ControllerType Type { get; set; }
 	}
 
-	public enum ControllerType
-	{
+	public enum ControllerType {
 		None,
 
 		//SNES controllers
@@ -412,11 +394,9 @@ namespace Mesen.Config
 		WsControllerVertical,
 	}
 
-	public static class ControllerTypeExtensions
-	{
-		public static bool HasPresets(this ControllerType type)
-		{
-			switch(type) {
+	public static class ControllerTypeExtensions {
+		public static bool HasPresets(this ControllerType type) {
+			switch (type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
 				case ControllerType.NesController:
@@ -438,9 +418,8 @@ namespace Mesen.Config
 			return false;
 		}
 
-		public static bool HasTurbo(this ControllerType type)
-		{
-			switch(type) {
+		public static bool HasTurbo(this ControllerType type) {
+			switch (type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
 				case ControllerType.NesController:
@@ -460,9 +439,8 @@ namespace Mesen.Config
 			return false;
 		}
 
-		public static bool CanConfigure(this ControllerType type)
-		{
-			switch(type) {
+		public static bool CanConfigure(this ControllerType type) {
+			switch (type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
 				case ControllerType.NesController:
@@ -506,9 +484,8 @@ namespace Mesen.Config
 			return false;
 		}
 
-		public static bool IsTwoButtonController(this ControllerType type)
-		{
-			switch(type) {
+		public static bool IsTwoButtonController(this ControllerType type) {
+			switch (type) {
 				case ControllerType.NesController:
 				case ControllerType.FamicomController:
 				case ControllerType.FamicomControllerP2:
@@ -525,8 +502,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public enum InputDisplayPosition
-	{
+	public enum InputDisplayPosition {
 		TopLeft = 0,
 		TopRight = 1,
 		BottomLeft = 2,

@@ -1,4 +1,8 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -13,15 +17,9 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class TilemapViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class TilemapViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
 		[Reactive] public CpuType CpuType { get; set; }
 		[Reactive] public bool IsNes { get; private set; }
 
@@ -67,8 +65,7 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public TilemapViewerViewModel() : this(CpuType.Snes, new(), new(), null) { }
 
-		public TilemapViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Window? wnd)
-		{
+		public TilemapViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Window? wnd) {
 			Config = ConfigManager.Config.Debug.TilemapViewer.Clone();
 			CpuType = cpuType;
 			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, cpuType);
@@ -130,7 +127,7 @@ namespace Mesen.Debugger.ViewModels
 				},
 			});
 
-			if(Design.IsDesignMode || wnd == null) {
+			if (Design.IsDesignMode || wnd == null) {
 				return;
 			}
 
@@ -221,13 +218,13 @@ namespace Mesen.Debugger.ViewModels
 
 			AddDisposable(this.WhenAnyValue(x => x.Tabs).Subscribe(x => ShowTabs = x.Count > 1));
 			AddDisposable(this.WhenAnyValue(x => x.SelectedTab).Subscribe(x => {
-				if(_inGameLoaded) {
+				if (_inGameLoaded) {
 					//Skip refresh data/tab if this is triggered while processing a gameloaded event
 					//Otherwise RefreshTab will be called on the old game's data, causing a crash.
 					return;
 				}
 
-				if(_refreshDataOnTabChange) {
+				if (_refreshDataOnTabChange) {
 					RefreshData();
 				} else {
 					RefreshTab();
@@ -235,27 +232,29 @@ namespace Mesen.Debugger.ViewModels
 			}));
 			AddDisposable(this.WhenAnyValue(x => x.SelectionRect).Subscribe(x => UpdatePreviewPanel()));
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, Config_PropertyChanged));
-			
+
 			InitNesGridOptions();
 
 			DebugShortcutManager.RegisterActions(wnd, FileMenuActions);
 			DebugShortcutManager.RegisterActions(wnd, ViewMenuActions);
 		}
 
-		private void InitNesGridOptions()
-		{
+		private void InitNesGridOptions() {
 			AddDisposable(this.WhenAnyValue(x => x.Config.NesShowAttributeGrid, x => x.Config.NesShowAttributeByteGrid, x => x.Config.NesShowTilemapGrid, x => x.CpuType).Subscribe(x => {
-				if(CpuType == CpuType.Nes) {
+				if (CpuType == CpuType.Nes) {
 					List<GridDefinition> grids = new();
-					if(Config.NesShowAttributeGrid) {
+					if (Config.NesShowAttributeGrid) {
 						grids.Add(new() { SizeX = 16, SizeY = 16, Color = Colors.Red });
 					}
-					if(Config.NesShowAttributeByteGrid) {
+
+					if (Config.NesShowAttributeByteGrid) {
 						grids.Add(new() { SizeX = 32, SizeY = 32, Color = Colors.LightGreen, RestartY = 240 });
 					}
-					if(Config.NesShowTilemapGrid) {
+
+					if (Config.NesShowTilemapGrid) {
 						grids.Add(new() { SizeX = 256, SizeY = 240, Color = Colors.LightGray });
 					}
+
 					CustomGrids = grids;
 				} else {
 					CustomGrids = null;
@@ -263,21 +262,19 @@ namespace Mesen.Debugger.ViewModels
 			}));
 		}
 
-		private async void EditBreakpoint(Window wnd, int address)
-		{
+		private async void EditBreakpoint(Window wnd, int address) {
 			MemoryType memType = GetVramMemoryType();
 			AddressInfo addr = new AddressInfo() { Address = address, Type = memType };
-			if(memType.IsRelativeMemory()) {
+			if (memType.IsRelativeMemory()) {
 				AddressInfo absAddr = DebugApi.GetAbsoluteAddress(addr);
-				if(absAddr.Address >= 0) {
+				if (absAddr.Address >= 0) {
 					addr = absAddr;
 				}
 			}
 
-			if(addr.Address >= 0) {
+			if (addr.Address >= 0) {
 				Breakpoint? bp = BreakpointManager.GetMatchingBreakpoint(addr, CpuType);
-				if(bp == null) {
-					bp = new Breakpoint() {
+				bp ??= new Breakpoint() {
 						BreakOnWrite = true,
 						BreakOnRead = true,
 						CpuType = CpuType,
@@ -285,27 +282,23 @@ namespace Mesen.Debugger.ViewModels
 						EndAddress = (uint)addr.Address,
 						MemoryType = addr.Type
 					};
-				}
 
 				bool result = await BreakpointEditWindow.EditBreakpointAsync(bp, wnd);
-				if(result && DebugWindowManager.GetDebugWindow<DebuggerWindow>(x => x.CpuType == CpuType) == null) {
+				if (result && DebugWindowManager.GetDebugWindow<DebuggerWindow>(x => x.CpuType == CpuType) == null) {
 					DebuggerWindow.GetOrOpenWindow(CpuType);
 				}
 			}
 		}
 
-		private void InitForCpuType()
-		{
+		private void InitForCpuType() {
 			IsNes = CpuType == CpuType.Nes;
 
-			if(IsNes) {
-				AvailableDisplayModes = new Enum[] { TilemapDisplayMode.Default, TilemapDisplayMode.Grayscale, TilemapDisplayMode.AttributeView };
-			} else {
-				AvailableDisplayModes = new Enum[] { TilemapDisplayMode.Default, TilemapDisplayMode.Grayscale };
-			}
+			AvailableDisplayModes = IsNes
+				? (new Enum[] { TilemapDisplayMode.Default, TilemapDisplayMode.Grayscale, TilemapDisplayMode.AttributeView })
+				: (new Enum[] { TilemapDisplayMode.Default, TilemapDisplayMode.Grayscale });
 
 			_refreshDataOnTabChange = false;
-			switch(CpuType) {
+			switch (CpuType) {
 				case CpuType.Snes:
 					Tabs = new List<TilemapViewerTab>() {
 						new() { Title = "Layer 1", Layer = 0 },
@@ -319,16 +312,14 @@ namespace Mesen.Debugger.ViewModels
 
 				case CpuType.Nes:
 					FrameInfo size = DebugApi.GetTilemapSize(CpuType.Nes, new GetTilemapOptions() { Layer = 1 }, new NesPpuState());
-					if(size.Width != 0 && size.Height != 0) {
-						Tabs = new List<TilemapViewerTab>() {
+					Tabs = size.Width != 0 && size.Height != 0
+						? new List<TilemapViewerTab>() {
 							new() { Title = "Nametables", Layer = 0 },
 							new() { Title = "Window", Layer = 1 }
-						};
-					} else {
-						Tabs = new List<TilemapViewerTab>() {
+						}
+						: new List<TilemapViewerTab>() {
 							new() { Title = "", Layer = 0 }
 						};
-					}
 					break;
 
 				case CpuType.Sms:
@@ -339,7 +330,7 @@ namespace Mesen.Debugger.ViewModels
 					break;
 
 				case CpuType.Pce:
-					if(DebugApi.GetConsoleState<PceState>(ConsoleType.PcEngine).IsSuperGrafx) {
+					if (DebugApi.GetConsoleState<PceState>(ConsoleType.PcEngine).IsSuperGrafx) {
 						_refreshDataOnTabChange = true;
 						Tabs = new List<TilemapViewerTab>() {
 							new() { Title = "VDC1", Layer = 0 },
@@ -350,6 +341,7 @@ namespace Mesen.Debugger.ViewModels
 							new() { Title = "", Layer = 0 }
 						};
 					}
+
 					break;
 
 				case CpuType.Gameboy:
@@ -360,15 +352,15 @@ namespace Mesen.Debugger.ViewModels
 					break;
 
 				case CpuType.Gba: {
-					Tabs = new() {
+						Tabs = new() {
 						new() { Title = "BG0", Layer = 0 },
 						new() { Title = "BG1", Layer = 1 },
 						new() { Title = "BG2", Layer = 2 },
 						new() { Title = "BG3", Layer = 3 },
 						new() { Title = "Mem Access", Layer = 4 }
 					};
-					break;
-				}
+						break;
+					}
 
 				case CpuType.Ws:
 					Tabs = new() {
@@ -382,54 +374,47 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private DebugTilemapTileInfo? GetSelectedTileInfo()
-		{
-			if(_data.PpuState == null || _data.PpuToolsState == null || _data.Vram == null) {
+		private DebugTilemapTileInfo? GetSelectedTileInfo() {
+			if (_data.PpuState == null || _data.PpuToolsState == null || _data.Vram == null) {
 				return null;
 			} else {
 				PixelPoint p;
-				if(ViewerMousePos.HasValue) {
+				if (ViewerMousePos.HasValue) {
 					p = ViewerMousePos.Value;
 				} else {
-					if(SelectionRect == default) {
+					if (SelectionRect == default) {
 						return null;
 					}
+
 					p = PixelPoint.FromPoint(SelectionRect.TopLeft, 1);
 				}
+
 				return DebugApi.GetTilemapTileInfo((uint)p.X, (uint)p.Y, CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
 			}
 		}
 
-		private void UpdatePreviewPanel()
-		{
-			if(SelectionRect == default) {
-				PreviewPanel = null;
-			} else {
-				PreviewPanel = GetPreviewPanel(PixelPoint.FromPoint(SelectionRect.TopLeft, 1), PreviewPanel);
-			}
+		private void UpdatePreviewPanel() {
+			PreviewPanel = SelectionRect == default ? null : GetPreviewPanel(PixelPoint.FromPoint(SelectionRect.TopLeft, 1), PreviewPanel);
 
-			if(ViewerTooltip != null && ViewerMousePos != null) {
+			if (ViewerTooltip != null && ViewerMousePos != null) {
 				GetPreviewPanel(ViewerMousePos.Value, ViewerTooltip);
 			}
 		}
 
-		private void Config_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			if(!_inGameLoaded) {
+		private void Config_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
+			if (!_inGameLoaded) {
 				RefreshTab();
 			}
 		}
 
 		[MemberNotNull(nameof(ViewerBitmap))]
-		private void InitBitmap(int width, int height)
-		{
-			if(ViewerBitmap == null || ViewerBitmap.PixelSize.Width != width || ViewerBitmap.PixelSize.Height != height) {
+		private void InitBitmap(int width, int height) {
+			if (ViewerBitmap == null || ViewerBitmap.PixelSize.Width != width || ViewerBitmap.PixelSize.Height != height) {
 				ViewerBitmap = new DynamicBitmap(new PixelSize(width, height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 			}
 		}
 
-		private GetTilemapOptions GetOptions(TilemapViewerTab tab, byte[]? prevVram = null, AddressCounters[]? accessCounters = null)
-		{
+		private GetTilemapOptions GetOptions(TilemapViewerTab tab, byte[]? prevVram = null, AddressCounters[]? accessCounters = null) {
 			return new GetTilemapOptions() {
 				Layer = (byte)tab.Layer,
 				CompareVram = prevVram?.Length > 0 ? prevVram : null,
@@ -440,14 +425,12 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private MemoryType GetVramMemoryType()
-		{
+		private MemoryType GetVramMemoryType() {
 			return SelectedTab?.VramMemoryType ?? CpuType.GetVramMemoryType();
 		}
 
-		public void RefreshData()
-		{
-			lock(_updateLock) {
+		public void RefreshData() {
+			lock (_updateLock) {
 				_coreData.MasterClock = EmuApi.GetTimingInfo(CpuType).MasterClock;
 
 				BaseState ppuState = DebugApi.GetPpuState(CpuType);
@@ -466,9 +449,8 @@ namespace Mesen.Debugger.ViewModels
 			RefreshTab();
 		}
 
-		private void RefreshTab()
-		{
-			if(_refreshPending) {
+		private void RefreshTab() {
+			if (_refreshPending) {
 				return;
 			}
 
@@ -479,17 +461,16 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		private void InternalRefreshTab()
-		{
-			if(Disposed) {
+		private void InternalRefreshTab() {
+			if (Disposed) {
 				return;
 			}
 
-			lock(_updateLock) {
+			lock (_updateLock) {
 				_coreData.CopyTo(_data);
 			}
 
-			if(_data.PpuState == null || _data.PpuToolsState == null || _data.RgbPalette.Length == 0) {
+			if (_data.PpuState == null || _data.PpuToolsState == null || _data.RgbPalette.Length == 0) {
 				_refreshPending = false;
 				return;
 			}
@@ -497,15 +478,15 @@ namespace Mesen.Debugger.ViewModels
 			GetTilemapOptions options;
 			FrameInfo size;
 
-			foreach(TilemapViewerTab tab in Tabs) {
+			foreach (TilemapViewerTab tab in Tabs) {
 				options = GetOptions(tab);
 				size = DebugApi.GetTilemapSize(CpuType, options, _data.PpuState);
 				tab.Enabled = size.Width != 0 && size.Height != 0;
 			}
 
-			if(!SelectedTab.Enabled) {
-				foreach(TilemapViewerTab tab in Tabs) {
-					if(tab.Enabled) {
+			if (!SelectedTab.Enabled) {
+				foreach (TilemapViewerTab tab in Tabs) {
+					if (tab.Enabled) {
 						SelectedTab = tab;
 						break;
 					}
@@ -518,11 +499,11 @@ namespace Mesen.Debugger.ViewModels
 			size = DebugApi.GetTilemapSize(CpuType, options, _data.PpuState);
 			InitBitmap((int)size.Width, (int)size.Height);
 
-			using(var framebuffer = ViewerBitmap.Lock()) {
+			using (var framebuffer = ViewerBitmap.Lock()) {
 				_data.TilemapInfo = DebugApi.GetTilemap(CpuType, options, _data.PpuState, _data.PpuToolsState, _data.Vram, _data.RgbPalette, framebuffer.FrameBuffer.Address);
 			}
 
-			if(_data.TilemapInfo.Bpp == 0) {
+			if (_data.TilemapInfo.Bpp == 0) {
 				GridSizeX = 8;
 				GridSizeY = 8;
 				ScrollOverlayRect = default;
@@ -540,7 +521,7 @@ namespace Mesen.Debugger.ViewModels
 			UpdatePreviewPanel();
 			UpdateTilemapInfo();
 
-			if(Config.ShowScrollOverlay) {
+			if (Config.ShowScrollOverlay) {
 				ScrollOverlayRect = new Rect(
 					_data.TilemapInfo.ScrollX % size.Width,
 					_data.TilemapInfo.ScrollY % size.Height,
@@ -557,34 +538,34 @@ namespace Mesen.Debugger.ViewModels
 			_refreshPending = false;
 		}
 
-		private void UpdateTilemapInfo()
-		{
+		private void UpdateTilemapInfo() {
 			TooltipEntries entries = TilemapInfoPanel.Items ?? new TooltipEntries();
 			DebugTilemapInfo info = _data.TilemapInfo;
 			entries.StartUpdate();
 			entries.AddEntry("Size", info.ColumnCount + "x" + info.RowCount);
-			entries.AddEntry("Size (px)", info.ColumnCount* info.TileWidth + "x" + info.RowCount* info.TileHeight);
+			entries.AddEntry("Size (px)", (info.ColumnCount * info.TileWidth) + "x" + (info.RowCount * info.TileHeight));
 			entries.AddEntry("Tilemap Address", FormatAddress((int)info.TilemapAddress));
 			entries.AddEntry("Tileset Address", FormatAddress((int)info.TilesetAddress));
 			entries.AddEntry("Tile Format", info.Format);
-			if(info.Mirroring != TilemapMirroring.None) {
+			if (info.Mirroring != TilemapMirroring.None) {
 				entries.AddEntry("Mirroring", info.Mirroring);
 			}
-			if(info.Priority >= 0) {
+
+			if (info.Priority >= 0) {
 				entries.AddEntry("Priority", info.Priority);
 			}
+
 			entries.EndUpdate();
 			TilemapInfoPanel.Items = entries;
 		}
 
-		public DynamicTooltip? GetPreviewPanel(PixelPoint p, DynamicTooltip? tooltipToUpdate)
-		{
-			if(_data.PpuState == null || _data.PpuToolsState == null) {
+		public DynamicTooltip? GetPreviewPanel(PixelPoint p, DynamicTooltip? tooltipToUpdate) {
+			if (_data.PpuState == null || _data.PpuToolsState == null) {
 				return null;
 			}
 
 			DebugTilemapTileInfo? result = DebugApi.GetTilemapTileInfo((uint)p.X, (uint)p.Y, CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
-			if(result == null) {
+			if (result == null) {
 				return null;
 			}
 
@@ -595,40 +576,42 @@ namespace Mesen.Debugger.ViewModels
 
 			entries.StartUpdate();
 
-			if(tileInfo.Width == 1 && tileInfo.Height == 1) {
+			if (tileInfo.Width == 1 && tileInfo.Height == 1) {
 				entries.AddPicture("Tile", ViewerBitmap, 32, cropRect);
 			} else {
 				entries.AddPicture("Tile", ViewerBitmap, 6, cropRect);
 			}
 
-			if(_data.TilemapInfo.Bpp >= 2 && _data.TilemapInfo.Bpp <= 4) {
+			if (_data.TilemapInfo.Bpp is >= 2 and <= 4) {
 				int paletteSize = (int)Math.Pow(2, _data.TilemapInfo.Bpp);
 				int paletteIndex = tileInfo.PaletteIndex >= 0 ? tileInfo.PaletteIndex : 0;
 				entries.AddEntry("Palette", new TooltipPaletteEntry(paletteIndex, paletteSize, _data.RgbPalette, _data.RawPalette, _data.RawFormat));
 			}
 
-			if(tileInfo.Width != 1 || tileInfo.Height != 1) {
+			if (tileInfo.Width != 1 || tileInfo.Height != 1) {
 				entries.AddEntry("Column, Row", $"{tileInfo.Column}, {tileInfo.Row}");
 			}
-			entries.AddEntry("X, Y", $"{tileInfo.Column*tileInfo.Width}, {tileInfo.Row*tileInfo.Height}");
+
+			entries.AddEntry("X, Y", $"{tileInfo.Column * tileInfo.Width}, {tileInfo.Row * tileInfo.Height}");
 			entries.AddEntry("Size", tileInfo.Width + "x" + tileInfo.Height);
 
-			if(tileInfo.TileMapAddress >= 0) {
+			if (tileInfo.TileMapAddress >= 0) {
 				entries.AddEntry("Tilemap address", FormatAddress(tileInfo.TileMapAddress));
 			}
 
 			entries.AddSeparator("TileSeparator");
 
-			if(tileInfo.TileIndex >= 0) {
+			if (tileInfo.TileIndex >= 0) {
 				entries.AddEntry("Tile index", "$" + tileInfo.TileIndex.ToString("X2"));
 			}
-			if(tileInfo.TileAddress >= 0) {
+
+			if (tileInfo.TileAddress >= 0) {
 				MemoryType memType = GetVramMemoryType();
-				if(memType.IsRelativeMemory()) {
+				if (memType.IsRelativeMemory()) {
 					entries.AddEntry("Tile address (" + memType.GetShortName() + ")", "$" + tileInfo.TileAddress.ToString("X4"));
 
 					AddressInfo absAddress = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = tileInfo.TileAddress, Type = memType });
-					if(absAddress.Address >= 0) {
+					if (absAddress.Address >= 0) {
 						entries.AddEntry("Tile address (" + absAddress.Type.GetShortName() + ")", "$" + absAddress.Address.ToString("X4"));
 					}
 				} else {
@@ -638,55 +621,56 @@ namespace Mesen.Debugger.ViewModels
 
 			entries.AddSeparator("PaletteSeparator");
 
-			if(tileInfo.PaletteIndex >= 0) {
-				if(tileInfo.BasePaletteIndex >= 0) {
+			if (tileInfo.PaletteIndex >= 0) {
+				if (tileInfo.BasePaletteIndex >= 0) {
 					entries.AddEntry("Palette index", $"{tileInfo.BasePaletteIndex} ({tileInfo.PaletteIndex})");
 				} else {
 					entries.AddEntry("Palette index", tileInfo.PaletteIndex.ToString());
 				}
 			}
-			if(tileInfo.PaletteAddress >= 0) {
+
+			if (tileInfo.PaletteAddress >= 0) {
 				entries.AddEntry("Palette address", "$" + tileInfo.PaletteAddress.ToString("X2"));
 			}
 
 			entries.AddSeparator("AttributeSeparator");
 
-			if(tileInfo.AttributeAddress >= 0) {
+			if (tileInfo.AttributeAddress >= 0) {
 				entries.AddEntry("Attribute address", "$" + tileInfo.AttributeAddress.ToString("X4"));
 			}
-			if(tileInfo.AttributeData >= 0) {
+
+			if (tileInfo.AttributeData >= 0) {
 				entries.AddEntry("Attribute data", "$" + tileInfo.AttributeData.ToString("X2"));
 			}
 
 			entries.AddSeparator("MiscSeparator");
 
-			if(tileInfo.PixelData >= 0) {
+			if (tileInfo.PixelData >= 0) {
 				entries.AddEntry("Pixel data", "$" + tileInfo.PixelData.ToString("X2"));
 			}
+
 			entries.AddEntry("Horizontal mirror", tileInfo.HorizontalMirroring);
 			entries.AddEntry("Vertical mirror", tileInfo.VerticalMirroring);
 			entries.AddEntry("High priority", tileInfo.HighPriority);
 
 			entries.EndUpdate();
 
-			if(tooltipToUpdate != null) {
+			if (tooltipToUpdate != null) {
 				return tooltipToUpdate;
 			} else {
 				return new DynamicTooltip() { Items = entries };
 			}
 		}
 
-		private string FormatAddress(int address)
-		{
-			if(GetVramMemoryType().IsWordAddressing()) {
+		private string FormatAddress(int address) {
+			if (GetVramMemoryType().IsWordAddressing()) {
 				return $"${address / 2:X4}.w";
 			} else {
 				return $"${address:X4}";
 			}
 		}
 
-		private ContextMenuAction GetEditTileAction(int columnCount, int rowCount, Window wnd)
-		{
+		private ContextMenuAction GetEditTileAction(int columnCount, int rowCount, Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.Custom,
 				CustomText = $"{columnCount}x{rowCount} ({GridSizeX * columnCount}px x {GridSizeY * rowCount}px)",
@@ -694,9 +678,8 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private void EditTileGrid(int columnCount, int rowCount, Window wnd)
-		{
-			if(_data.PpuState == null || _data.PpuToolsState == null) {
+		private void EditTileGrid(int columnCount, int rowCount, Window wnd) {
+			if (_data.PpuState == null || _data.PpuToolsState == null) {
 				return;
 			}
 
@@ -704,11 +687,11 @@ namespace Mesen.Debugger.ViewModels
 			List<AddressInfo> addresses = new();
 			MemoryType memType = GetVramMemoryType();
 			int palette = -1;
-			for(int row = 0; row < rowCount; row++) {
-				for(int col = 0; col < columnCount; col++) {
-					DebugTilemapTileInfo? tile = DebugApi.GetTilemapTileInfo((uint)(p.X + GridSizeX*col), (uint)(p.Y + GridSizeY*row), CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
-					if(tile == null) {
-						if(col == 0) {
+			for (int row = 0; row < rowCount; row++) {
+				for (int col = 0; col < columnCount; col++) {
+					DebugTilemapTileInfo? tile = DebugApi.GetTilemapTileInfo((uint)(p.X + (GridSizeX * col)), (uint)(p.Y + (GridSizeY * row)), CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
+					if (tile == null) {
+						if (col == 0) {
 							rowCount = row;
 							break;
 						} else {
@@ -717,14 +700,15 @@ namespace Mesen.Debugger.ViewModels
 						}
 					}
 
-					if(palette == -1) {
+					if (palette == -1) {
 						palette = tile.Value.PaletteIndex;
 					}
+
 					addresses.Add(new AddressInfo() { Address = tile.Value.TileAddress, Type = memType });
 				}
 			}
 
-			if(rowCount <= 0 || columnCount <= 0) {
+			if (rowCount <= 0 || columnCount <= 0) {
 				return;
 			}
 
@@ -741,15 +725,14 @@ namespace Mesen.Debugger.ViewModels
 			);
 		}
 
-		private void DrawMode7Overlay()
-		{
-			if(_data.PpuToolsState is SnesPpuToolsState toolsState && _data.PpuState is SnesPpuState ppuState && ppuState.BgMode == 7) {
+		private void DrawMode7Overlay() {
+			if (_data.PpuToolsState is SnesPpuToolsState toolsState && _data.PpuState is SnesPpuState ppuState && ppuState.BgMode == 7) {
 				List<PictureViewerLine> lines = new();
 
 				Point prevStart = new();
 				Point prevEnd = new();
 				void AddLine(Point start, Point end, Color color) {
-					if(start != prevStart && end != prevEnd) {
+					if (start != prevStart && end != prevEnd) {
 						lines.Add(new PictureViewerLine() { Start = start, End = end, Width = 1.5, Color = color });
 						prevStart = start;
 						prevEnd = end;
@@ -757,8 +740,8 @@ namespace Mesen.Debugger.ViewModels
 				}
 
 				Mesen.Utilities.HslColor baseColor = ColorHelper.RgbToHsl(Color.FromRgb(255, 0, 255));
-				for(int i = 0; i < 239; i++) {
-					if(toolsState.ScanlineBgMode[i] == 7) {
+				for (int i = 0; i < 239; i++) {
+					if (toolsState.ScanlineBgMode[i] == 7) {
 						Color lineColor = ColorHelper.HslToRgb(baseColor);
 						Color alphaColor = Color.FromArgb(0xA0, lineColor.R, lineColor.G, lineColor.B);
 
@@ -768,9 +751,9 @@ namespace Mesen.Debugger.ViewModels
 						int endY = toolsState.Mode7EndY[i] >> 8;
 
 						AddLine(new Point(startX, startY), new Point(endX, endY), alphaColor);
-						if(!ppuState.Mode7.LargeMap) {
+						if (!ppuState.Mode7.LargeMap) {
 							void Translate(ref int start, ref int end, int offset, Func<int, bool> predicate) {
-								while(predicate(start) || predicate(end)) {
+								while (predicate(start) || predicate(end)) {
 									start += offset;
 									end += offset;
 									AddLine(new Point(startX, startY), new Point(endX, endY), alphaColor);
@@ -783,16 +766,17 @@ namespace Mesen.Debugger.ViewModels
 							Translate(ref startY, ref endY, -1024, x => x >= 1024);
 						}
 					}
+
 					baseColor.H = (baseColor.H + 1) % 360;
 				}
+
 				OverlayLines = lines;
 			} else {
 				OverlayLines = null;
 			}
 		}
 
-		public void OnGameLoaded()
-		{
+		public void OnGameLoaded() {
 			Dispatcher.UIThread.Post(() => {
 				_inGameLoaded = true;
 				InitForCpuType();
@@ -802,16 +786,14 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class TilemapViewerTab : ViewModelBase
-	{
+	public class TilemapViewerTab : ViewModelBase {
 		[Reactive] public string Title { get; set; } = "";
-		[Reactive] public int Layer { get; set; }  = 0;
+		[Reactive] public int Layer { get; set; } = 0;
 		[Reactive] public MemoryType? VramMemoryType { get; set; }
 		[Reactive] public bool Enabled { get; set; } = true;
 	}
 
-	public class TilemapViewerData
-	{
+	public class TilemapViewerData {
 		public DebugTilemapInfo TilemapInfo;
 		public UInt64 MasterClock;
 		public BaseState? PpuState;
@@ -823,8 +805,7 @@ namespace Mesen.Debugger.ViewModels
 		public RawPaletteFormat RawFormat;
 		public AddressCounters[] AccessCounters = Array.Empty<AddressCounters>();
 
-		public void CopyTo(TilemapViewerData dst)
-		{
+		public void CopyTo(TilemapViewerData dst) {
 			dst.TilemapInfo = TilemapInfo;
 			dst.MasterClock = MasterClock;
 			dst.PpuState = PpuState;
@@ -838,11 +819,11 @@ namespace Mesen.Debugger.ViewModels
 			CopyArray(AccessCounters, ref dst.AccessCounters);
 		}
 
-		private void CopyArray<T>(T[] src, ref T[] dst)
-		{
-			if(src.Length != dst.Length) {
+		private void CopyArray<T>(T[] src, ref T[] dst) {
+			if (src.Length != dst.Length) {
 				Array.Resize(ref dst, src.Length);
 			}
+
 			Array.Copy(src, dst, src.Length);
 		}
 	}

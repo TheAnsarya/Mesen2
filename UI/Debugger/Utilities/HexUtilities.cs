@@ -1,17 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Debugger.Utilities
-{
-	public class HexUtilities
-	{
+namespace Mesen.Debugger.Utilities {
+	public class HexUtilities {
 		private static byte[] _hexLookup = new byte[256];
 
-		static HexUtilities()
-		{
+		static HexUtilities() {
 			_hexLookup['0'] = 0;
 			_hexLookup['1'] = 1;
 			_hexLookup['2'] = 2;
@@ -36,38 +33,37 @@ namespace Mesen.Debugger.Utilities
 			_hexLookup['F'] = 15;
 		}
 
-		public static int FromHex(string hex)
-		{
+		public static int FromHex(string hex) {
 			int value = 0;
-			for(int i = 0; i < hex.Length; i++) {
+			for (int i = 0; i < hex.Length; i++) {
 				value <<= 4;
 				value |= _hexLookup[hex[i]];
 			}
+
 			return value;
 		}
 
-		public static byte[] HexToArray(string hex)
-		{
+		public static byte[] HexToArray(string hex) {
 			hex = string.Join("", hex.Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Length % 2 == 1 ? ("0" + x) : x));
 			byte[] result = new byte[hex.Length / 2];
-			for(int i = 0; i < hex.Length; i += 2) {
+			for (int i = 0; i < hex.Length; i += 2) {
 				byte value = 0;
 				value |= _hexLookup[hex[i]];
 				value <<= 4;
-				value |= _hexLookup[hex[i+1]];
+				value |= _hexLookup[hex[i + 1]];
 				result[i / 2] = value;
 			}
+
 			return result;
 		}
 
-		public static short[] HexToArrayWithWildcards(string hex)
-		{
+		public static short[] HexToArrayWithWildcards(string hex) {
 			string[] sections = hex.Split("?");
 
 			StringBuilder sb = new();
-			for(int i = 0; i < sections.Length; i++) {
+			for (int i = 0; i < sections.Length; i++) {
 				sb.Append(string.Join("", sections[i].Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Length % 2 == 1 ? ("0" + x) : x)));
-				if(i < sections.Length - 1) {
+				if (i < sections.Length - 1) {
 					sb.Append("??");
 				}
 			}
@@ -75,8 +71,8 @@ namespace Mesen.Debugger.Utilities
 			hex = sb.ToString();
 
 			short[] result = new short[hex.Length / 2];
-			for(int i = 0; i < hex.Length; i += 2) {
-				if(hex[i] == '?' && hex[i + 1] == '?') {
+			for (int i = 0; i < hex.Length; i += 2) {
+				if (hex[i] == '?' && hex[i + 1] == '?') {
 					result[i / 2] = -1;
 				} else {
 					byte value = 0;
@@ -86,6 +82,7 @@ namespace Mesen.Debugger.Utilities
 					result[i / 2] = value;
 				}
 			}
+
 			return result;
 		}
 	}

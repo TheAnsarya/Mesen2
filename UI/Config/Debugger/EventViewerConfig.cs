@@ -1,10 +1,8 @@
-﻿using ReactiveUI.Fody.Helpers;
 using System.Collections.Generic;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class EventViewerConfig : BaseWindowConfig<EventViewerConfig>
-	{
+namespace Mesen.Config {
+	public class EventViewerConfig : BaseWindowConfig<EventViewerConfig> {
 		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 
 		[Reactive] public double ImageScale { get; set; } = 1;
@@ -12,7 +10,7 @@ namespace Mesen.Config
 		[Reactive] public bool RefreshOnBreakPause { get; set; } = true;
 		[Reactive] public bool AutoRefresh { get; set; } = true;
 		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
-		
+
 		[Reactive] public List<int> ColumnWidths { get; set; } = new();
 
 		[Reactive] public bool ShowToolbar { get; set; } = true;

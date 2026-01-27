@@ -1,19 +1,17 @@
-﻿using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using Avalonia.Controls;
+using Mesen.Config;
+using Mesen.Controls;
+using Mesen.Utilities;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels
-{
-	public class PceConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class PceConfigViewModel : DisposableViewModel {
 		[Reactive] public PcEngineConfig Config { get; set; }
 		[Reactive] public PcEngineConfig OriginalConfig { get; set; }
 		[Reactive] public PceConfigTab SelectedTab { get; set; } = 0;
@@ -26,37 +24,35 @@ namespace Mesen.ViewModels
 			new() { Name = "Default (by Kitrinx)", Palette = PcEngineConfig.DefaultPalette.ToArray() },
 		};
 
-		public PceConfigViewModel()
-		{
+		public PceConfigViewModel() {
 			Config = ConfigManager.Config.PcEngine;
 			OriginalConfig = Config.Clone();
 			Input = new PceInputConfigViewModel(Config);
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			UInt32[] linearPalette = new UInt32[512];
-			for(UInt32 i = 0; i < 0x200; i++) {
+			for (UInt32 i = 0; i < 0x200; i++) {
 				UInt32 g = To8Bit(i >> 6);
 				UInt32 r = To8Bit((i >> 3) & 0x07);
 				UInt32 b = To8Bit(i & 0x07);
-				linearPalette[i] = (0xFF000000 | (r << 16) | (g << 8) | b);
+				linearPalette[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
 			}
+
 			PalettePresets.Add(new() { Name = "Linear RGB333", Palette = linearPalette });
 
 			AddDisposable(Input);
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => Config.ApplyConfig()));
 		}
 
-		UInt32 To8Bit(UInt32 color)
-		{
+		UInt32 To8Bit(UInt32 color) {
 			return (color << 5) | (color << 2) | (color >> 1);
 		}
 	}
 
-	public enum PceConfigTab
-	{
+	public enum PceConfigTab {
 		General,
 		Audio,
 		Emulation,

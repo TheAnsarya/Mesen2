@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -10,21 +12,16 @@ using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
 using Mesen.Utilities;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
 
-namespace Mesen.Debugger.Windows
-{
-	public class MemoryViewerFindWindow : MesenWindow
-	{
+namespace Mesen.Debugger.Windows {
+	public class MemoryViewerFindWindow : MesenWindow {
 		private MemoryViewerFindViewModel _model;
 		private MemoryToolsViewModel _viewerModel;
 
 		[Obsolete("For designer only")]
 		public MemoryViewerFindWindow() : this(new(), null!) { }
 
-		public MemoryViewerFindWindow(MemoryViewerFindViewModel model, MemoryToolsViewModel viewerModel)
-		{
+		public MemoryViewerFindWindow(MemoryViewerFindViewModel model, MemoryToolsViewModel viewerModel) {
 			DataContext = model;
 			_model = model;
 			_viewerModel = viewerModel;
@@ -39,29 +36,25 @@ namespace Mesen.Debugger.Windows
 #endif
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnClosed(EventArgs e)
-		{
+		protected override void OnClosed(EventArgs e) {
 			//Prevent MesenWindow logic from disposing the model
 			DataContext = null;
 
 			base.OnClosed(e);
 		}
 
-		private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
-		{
-			if(e.Key == Key.Enter) {
+		private void OnPreviewKeyDown(object? sender, KeyEventArgs e) {
+			if (e.Key == Key.Enter) {
 				_viewerModel.Find(SearchDirection.Forward);
 				e.Handled = true;
 			}
 		}
 
-		protected override void OnOpened(EventArgs e)
-		{
+		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
 			this.GetControl<TextBox>("txtValue").FocusAndSelectAll();
 
@@ -79,24 +72,20 @@ namespace Mesen.Debugger.Windows
 			});
 		}
 
-		private void MemorySearchWindow_Activated(object? sender, EventArgs e)
-		{
+		private void MemorySearchWindow_Activated(object? sender, EventArgs e) {
 			this.GetControl<TextBox>("txtValue").Focus();
 			this.GetControl<TextBox>("txtValue").SelectAll();
 		}
 
-		private void FindPrev_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void FindPrev_OnClick(object sender, RoutedEventArgs e) {
 			_viewerModel.Find(SearchDirection.Backward);
 		}
 
-		private void FindNext_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void FindNext_OnClick(object sender, RoutedEventArgs e) {
 			_viewerModel.Find(SearchDirection.Forward);
 		}
 
-		private void Close_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Close_OnClick(object sender, RoutedEventArgs e) {
 			Close();
 		}
 	}

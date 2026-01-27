@@ -1,21 +1,16 @@
-﻿using Mesen.Interop;
+using Mesen.Interop;
 
-namespace Mesen.Debugger.Integration
-{
-	public class PceDbgImporter : DbgImporter
-	{
-		public PceDbgImporter(RomFormat romFormat) : base(CpuType.Pce, romFormat, new() { MemoryType.PcePrgRom, MemoryType.PceWorkRam, MemoryType.PceSaveRam, MemoryType.PceCdromRam, MemoryType.PceCardRam })
-		{
+namespace Mesen.Debugger.Integration {
+	public class PceDbgImporter : DbgImporter {
+		public PceDbgImporter(RomFormat romFormat) : base(CpuType.Pce, romFormat, new() { MemoryType.PcePrgRom, MemoryType.PceWorkRam, MemoryType.PceSaveRam, MemoryType.PceCdromRam, MemoryType.PceCardRam }) {
 		}
 
-		protected override CdlFlags GetOpFlags(byte opCode, int opSize)
-		{
+		protected override CdlFlags GetOpFlags(byte opCode, int opSize) {
 			return CdlFlags.None;
 		}
 
-		protected override bool IsBranchInstruction(byte opCode)
-		{
-			switch(opCode) {
+		protected override bool IsBranchInstruction(byte opCode) {
+			switch (opCode) {
 				case 0x20: //JSR
 				case 0x40: //RTI
 				case 0x44: //BSR
@@ -59,9 +54,8 @@ namespace Mesen.Debugger.Integration
 			return false;
 		}
 
-		protected override bool IsJumpToSubroutine(byte opCode)
-		{
-			return opCode == 0x20 || opCode == 0x44 || opCode == 0x00;
+		protected override bool IsJumpToSubroutine(byte opCode) {
+			return opCode is 0x20 or 0x44 or 0x00;
 		}
 	}
 }

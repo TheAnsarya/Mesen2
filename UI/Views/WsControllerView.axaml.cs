@@ -3,15 +3,12 @@ using Avalonia.Markup.Xaml;
 
 namespace Mesen.Views;
 
-public class WsControllerView : UserControl
-{
-	public WsControllerView()
-	{
+public class WsControllerView : UserControl {
+	public WsControllerView() {
 		InitializeComponent();
 	}
 
-	private void InitializeComponent()
-	{
+	private void InitializeComponent() {
 		AvaloniaXamlLoader.Load(this);
 	}
 }

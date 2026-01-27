@@ -1,16 +1,14 @@
-﻿using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class TraceLoggerCpuConfig : BaseConfig<TraceLoggerCpuConfig>
-	{
+namespace Mesen.Config {
+	public class TraceLoggerCpuConfig : BaseConfig<TraceLoggerCpuConfig> {
 		[Reactive] public bool Enabled { get; set; } = true;
 
 		[Reactive] public bool ShowRegisters { get; set; } = true;
 		[Reactive] public bool ShowStatusFlags { get; set; } = true;
 		[Reactive] public StatusFlagFormat StatusFormat { get; set; } = StatusFlagFormat.Text;
 
-		[Reactive] public bool ShowEffectiveAddresses { get; set; } = true; 
+		[Reactive] public bool ShowEffectiveAddresses { get; set; } = true;
 		[Reactive] public bool ShowMemoryValues { get; set; } = true;
 		[Reactive] public bool ShowByteCode { get; set; } = false;
 
@@ -26,8 +24,7 @@ namespace Mesen.Config
 		[Reactive] public string Condition { get; set; } = "";
 	}
 
-	public enum StatusFlagFormat
-	{
+	public enum StatusFlagFormat {
 		Hexadecimal = 0,
 		Text = 1,
 		CompactText = 2

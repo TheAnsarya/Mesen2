@@ -1,26 +1,24 @@
-﻿using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Linq;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Mesen.Windows;
-using Avalonia.Collections;
-using Mesen.Interop;
-using Avalonia.Controls.Selection;
-using DataBoxControl;
 using System.ComponentModel;
-using Mesen.Utilities;
+using System.Linq;
+using System.Reactive.Linq;
+using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Controls.Selection;
+using Avalonia.Input;
 using Avalonia.VisualTree;
+using DataBoxControl;
+using Mesen.Config;
 using Mesen.Debugger;
+using Mesen.Debugger.Utilities;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.Windows;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels
-{
-	public class CheatListWindowViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class CheatListWindowViewModel : DisposableViewModel {
 		[Reactive] public MesenList<CheatCode> Cheats { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> ToolbarActions { get; private set; } = new();
 		[Reactive] public bool DisableAllCheats { get; set; } = false;
@@ -32,8 +30,7 @@ namespace Mesen.ViewModels
 
 		private CheatCodes _cheatCodes = new();
 
-		public CheatListWindowViewModel()
-		{
+		public CheatListWindowViewModel() {
 			Config = ConfigManager.Config.Cheats;
 			Selection.SingleSelect = false;
 
@@ -50,8 +47,7 @@ namespace Mesen.ViewModels
 			{ "Codes", (a, b) => string.Compare(a.Codes, b.Codes, StringComparison.OrdinalIgnoreCase) }
 		};
 
-		public void Sort(object? param = null)
-		{
+		public void Sort(object? param = null) {
 			List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 			List<CheatCode> sortedCheats = new List<CheatCode>(Cheats);
 			SortHelper.SortList(sortedCheats, SortState.SortOrder, _comparers, "Codes");
@@ -59,30 +55,26 @@ namespace Mesen.ViewModels
 			Selection.SelectIndexes(selectedIndexes, Cheats.Count);
 		}
 
-		public void LoadCheats()
-		{
+		public void LoadCheats() {
 			_cheatCodes = CheatCodes.LoadCheatCodes();
 			Cheats = new MesenList<CheatCode>(_cheatCodes.Cheats);
 		}
 
-		public void SaveCheats()
-		{
+		public void SaveCheats() {
 			ConfigManager.Config.Cheats.DisableAllCheats = DisableAllCheats;
 			_cheatCodes.Cheats = new List<CheatCode>(Cheats);
 			_cheatCodes.Save();
 		}
 
-		public void ApplyCheats()
-		{
-			if(DisableAllCheats) {
+		public void ApplyCheats() {
+			if (DisableAllCheats) {
 				EmuApi.ClearCheats();
 			} else {
 				CheatCodes.ApplyCheats(Cheats);
 			}
 		}
 
-		public void InitActions(Control parent)
-		{
+		public void InitActions(Control parent) {
 			List<ContextMenuAction> toolbarActions = GetActions(parent);
 			toolbarActions.Add(new ContextMenuSeparator());
 			toolbarActions.Add(new ContextMenuAction() {
@@ -96,26 +88,27 @@ namespace Mesen.ViewModels
 				OnClick = async () => {
 					ConsoleType consoleType = MainWindowViewModel.Instance.RomInfo.ConsoleType;
 					CheatDbGameEntry? dbEntry = await CheatDatabaseWindow.Show(consoleType, parent);
-					if(dbEntry != null && consoleType == MainWindowViewModel.Instance.RomInfo.ConsoleType) {
+					if (dbEntry != null && consoleType == MainWindowViewModel.Instance.RomInfo.ConsoleType) {
 						List<CheatCode> newCheats = new();
 						HashSet<string> existingCheats = new();
-						foreach(CheatCode cheatCode in Cheats) {
+						foreach (CheatCode cheatCode in Cheats) {
 							string key = cheatCode.Description + cheatCode.Codes + cheatCode.Type.ToString();
 							existingCheats.Add(key);
 						}
 
-						foreach(CheatDbCheatEntry cheatEntry in dbEntry.Cheats) {
+						foreach (CheatDbCheatEntry cheatEntry in dbEntry.Cheats) {
 							CheatCode newCheat = new CheatCode();
 							newCheat.Description = cheatEntry.Desc;
 							newCheat.Enabled = false;
 							newCheat.Type = GetCheatType(consoleType, cheatEntry.Code);
 							newCheat.Codes = string.Join(Environment.NewLine, cheatEntry.Code.Split(";", StringSplitOptions.RemoveEmptyEntries));
-							
+
 							string key = newCheat.Description + newCheat.Codes + newCheat.Type.ToString();
-							if(!existingCheats.Contains(key)) {
+							if (!existingCheats.Contains(key)) {
 								newCheats.Add(newCheat);
 							}
 						}
+
 						Cheats.AddRange(newCheats);
 						Sort();
 						ApplyCheats();
@@ -127,9 +120,8 @@ namespace Mesen.ViewModels
 			AddDisposables(DebugShortcutManager.CreateContextMenu(parent, GetActions(parent)));
 		}
 
-		private CheatType GetCheatType(ConsoleType consoleType, string code)
-		{
-			switch(consoleType) {
+		private CheatType GetCheatType(ConsoleType consoleType, string code) {
+			switch (consoleType) {
 				case ConsoleType.Snes:
 					return code.Contains("-") ? CheatType.SnesGameGenie : CheatType.SnesProActionReplay;
 
@@ -141,8 +133,7 @@ namespace Mesen.ViewModels
 			}
 		}
 
-		private List<ContextMenuAction> GetActions(Control parent)
-		{
+		private List<ContextMenuAction> GetActions(Control parent) {
 			return new List<ContextMenuAction> {
 				new ContextMenuAction() {
 					ActionType = ActionType.Add,
@@ -180,6 +171,7 @@ namespace Mesen.ViewModels
 						foreach(CheatCode cheat in Selection.SelectedItems.Cast<CheatCode>().ToArray()) {
 							Cheats.Remove(cheat);
 						}
+
 						ApplyCheats();
 					}
 				}

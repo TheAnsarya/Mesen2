@@ -1,18 +1,16 @@
-﻿using Avalonia.Controls;
-using Avalonia.Platform.Storage;
-using Avalonia.Platform.Storage.FileIO;
-using Avalonia.Rendering;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
+using Avalonia.Platform.Storage.FileIO;
+using Avalonia.Rendering;
 
-namespace Mesen.Utilities
-{
-	public class FileDialogHelper
-	{
+namespace Mesen.Utilities {
+	public class FileDialogHelper {
 		public const string RomExt = "[[ROMFILES]]";
 		public const string FirmwareExt = "[[FIRMWAREFILES]]";
 		public const string LabelFileExt = "[[LABELFILES]]";
@@ -41,17 +39,17 @@ namespace Mesen.Utilities
 		public const string NesExt = "nes";
 		public const string SufamiTurboExt = "st";
 
-		public static async Task<string?> OpenFile(string? initialFolder, IRenderRoot? parent, params string[] extensions)
-		{
-			if(!((parent ?? ApplicationHelper.GetMainWindow()) is Window wnd)) {
+		public static async Task<string?> OpenFile(string? initialFolder, IRenderRoot? parent, params string[] extensions) {
+			if ((parent ?? ApplicationHelper.GetMainWindow()) is not Window wnd) {
 				throw new Exception("Invalid parent window");
 			}
 
 			try {
 				List<FilePickerFileType> filter = new List<FilePickerFileType>();
-				foreach(string ext in extensions) {
-					if(ext == FileDialogHelper.RomExt) {
-						filter.Add(new FilePickerFileType("All supported files") { Patterns = new List<string>() { 
+				foreach (string ext in extensions) {
+					if (ext == FileDialogHelper.RomExt) {
+						filter.Add(new FilePickerFileType("All supported files") {
+							Patterns = new List<string>() {
 							"*.sfc", "*.fig", "*.smc", "*.bs", "*.st", "*.spc",
 							"*.nes", "*.fds", "*.qd", "*.unif", "*.unf", "*.studybox", "*.nsf", "*.nsfe",
 							"*.gb", "*.gbc", "*.gbx", "*.gbs",
@@ -61,7 +59,8 @@ namespace Mesen.Utilities
 							"*.ws", "*.wsc",
 							"*.zip", "*.7z",
 							"*.ips", "*.bps"
-						} });
+						}
+						});
 						filter.Add(new FilePickerFileType("SNES ROM files") { Patterns = new List<string>() { "*.sfc", "*.fig", "*.smc", "*.bs", "*.st", "*.spc" } });
 						filter.Add(new FilePickerFileType("NES ROM files") { Patterns = new List<string>() { "*.nes", "*.fds", "*.qd", "*.unif", "*.unf", "*.studybox", "*.nsf", "*.nsfe" } });
 						filter.Add(new FilePickerFileType("GB ROM files") { Patterns = new List<string>() { "*.gb", "*.gbc", "*.gbx", "*.gbs" } });
@@ -72,14 +71,15 @@ namespace Mesen.Utilities
 						filter.Add(new FilePickerFileType("ColecoVision ROM files") { Patterns = new List<string>() { "*.col" } });
 						filter.Add(new FilePickerFileType("WonderSwan ROM files") { Patterns = new List<string>() { "*.ws", "*.wsc" } });
 						filter.Add(new FilePickerFileType("Patch files (IPS/BPS)") { Patterns = new List<string>() { "*.ips", "*.bps" } });
-					} else if(ext == FileDialogHelper.FirmwareExt) {
+					} else if (ext == FileDialogHelper.FirmwareExt) {
 						filter.Add(new FilePickerFileType("All firmware files") { Patterns = new List<string>() { "*.sfc", "*.pce", "*.nes", "*.bin", "*.rom", "*.col", "*.sms", "*.gg", "*.gba" } });
-					} else if(ext == FileDialogHelper.LabelFileExt) {
+					} else if (ext == FileDialogHelper.LabelFileExt) {
 						filter.Add(new FilePickerFileType("All label files") { Patterns = new List<string>() { "*.mlb", "*.sym", "*.dbg", "*.fns", "*.elf", "*.cdb" } });
 					} else {
 						filter.Add(new FilePickerFileType(ext.ToUpper() + " files") { Patterns = new List<string>() { "*." + ext } });
 					}
 				}
+
 				filter.Add(new FilePickerFileType("All files") { Patterns = new List<string>() { "*" } });
 
 				IReadOnlyList<IStorageFile> files = await wnd.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions() {
@@ -88,30 +88,31 @@ namespace Mesen.Utilities
 					FileTypeFilter = filter
 				});
 
-				if(files.Count > 0) {
+				if (files.Count > 0) {
 					return files[0].Path.LocalPath;
 				}
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				await MesenMsgBox.ShowException(ex);
 			}
+
 			return null;
 		}
 
-		public static async Task<string?> SaveFile(string? initialFolder, string? initialFile, IRenderRoot? parent, params string[] extensions)
-		{
-			if(!((parent ?? ApplicationHelper.GetMainWindow()) is Window wnd)) {
+		public static async Task<string?> SaveFile(string? initialFolder, string? initialFile, IRenderRoot? parent, params string[] extensions) {
+			if ((parent ?? ApplicationHelper.GetMainWindow()) is not Window wnd) {
 				throw new Exception("Invalid parent window");
 			}
 
 			try {
 				List<FilePickerFileType> filter = new List<FilePickerFileType>();
-				foreach(string ext in extensions) {
+				foreach (string ext in extensions) {
 					filter.Add(new FilePickerFileType(ext.ToUpper() + " files") { Patterns = new List<string>() { "*." + ext } });
 				}
+
 				filter.Add(new FilePickerFileType("All files") { Patterns = new List<string>() { "*" } });
 
 				IStorageFolder? startLocation = initialFolder != null ? await wnd.StorageProvider.TryGetFolderFromPathAsync(initialFolder) : null;
-				if(OperatingSystem.IsLinux()) {
+				if (OperatingSystem.IsLinux()) {
 					//TODOv2 - setting a start location appears to cause crashes on Linux (dbus crash), force it to null for now
 					startLocation = null;
 				}
@@ -124,18 +125,18 @@ namespace Mesen.Utilities
 					FileTypeChoices = filter
 				});
 
-				if(file != null) {
+				if (file != null) {
 					return file.Path.LocalPath;
 				}
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				await MesenMsgBox.ShowException(ex);
 			}
+
 			return null;
 		}
 
-		public static async Task<string?> OpenFolder(IRenderRoot? parent)
-		{
-			if(!((parent ?? ApplicationHelper.GetMainWindow()) is Window wnd)) {
+		public static async Task<string?> OpenFolder(IRenderRoot? parent) {
+			if ((parent ?? ApplicationHelper.GetMainWindow()) is not Window wnd) {
 				throw new Exception("Invalid parent window");
 			}
 
@@ -144,12 +145,13 @@ namespace Mesen.Utilities
 					AllowMultiple = false
 				});
 
-				if(folders.Count > 0) {
+				if (folders.Count > 0) {
 					return folders[0].Path.LocalPath;
 				}
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				await MesenMsgBox.ShowException(ex);
 			}
+
 			return null;
 		}
 	}

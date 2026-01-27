@@ -1,4 +1,4 @@
-﻿using Avalonia.Metadata;
+using Avalonia.Metadata;
 
 [assembly: XmlnsDefinition("https://github.com/avaloniaui", "DataBoxControl")]
 [assembly: XmlnsDefinition("https://github.com/avaloniaui", "DataBoxControl.Controls")]

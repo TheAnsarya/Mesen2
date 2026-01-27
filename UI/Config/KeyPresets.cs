@@ -1,13 +1,10 @@
-﻿using Mesen.Interop;
-using Mesen.Utilities;
 using System;
+using Mesen.Interop;
+using Mesen.Utilities;
 
-namespace Mesen.Config
-{
-	public static class KeyPresets
-	{
-		public static void ApplyWasdLayout(KeyMapping m, ControllerType type)
-		{
+namespace Mesen.Config {
+	public static class KeyPresets {
+		public static void ApplyWasdLayout(KeyMapping m, ControllerType type) {
 			m.ClearKeys(type);
 
 			m.A = InputApi.GetKeyCode("K");
@@ -17,26 +14,26 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode("A");
 			m.Right = InputApi.GetKeyCode("D");
 
-			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController) {
+			if (type is ControllerType.SnesController or ControllerType.SnesRumbleController) {
 				m.X = InputApi.GetKeyCode(";");
 				m.Y = InputApi.GetKeyCode("M");
 				m.L = InputApi.GetKeyCode("U");
 				m.R = InputApi.GetKeyCode("I");
 				m.Select = InputApi.GetKeyCode("O");
 				m.Start = InputApi.GetKeyCode("L");
-			} else if(type == ControllerType.PceAvenuePad6) {
+			} else if (type == ControllerType.PceAvenuePad6) {
 				m.X = InputApi.GetKeyCode("H");
 				m.Y = InputApi.GetKeyCode("Y");
 				m.L = InputApi.GetKeyCode("U");
 				m.R = InputApi.GetKeyCode("I");
 				m.Select = InputApi.GetKeyCode("N");
 				m.Start = InputApi.GetKeyCode("M");
-			} else if(type == ControllerType.GbaController) {
+			} else if (type == ControllerType.GbaController) {
 				m.L = InputApi.GetKeyCode("U");
 				m.R = InputApi.GetKeyCode("I");
 				m.Select = InputApi.GetKeyCode("O");
 				m.Start = InputApi.GetKeyCode("L");
-			} else if(type == ControllerType.WsController) {
+			} else if (type == ControllerType.WsController) {
 				m.B = InputApi.GetKeyCode("Z");
 				m.A = InputApi.GetKeyCode("X");
 				m.GenericKey1 = InputApi.GetKeyCode("Q");
@@ -45,12 +42,12 @@ namespace Mesen.Config
 				m.D = InputApi.GetKeyCode("Down Arrow");
 				m.L = InputApi.GetKeyCode("Left Arrow");
 				m.R = InputApi.GetKeyCode("Right Arrow");
-			} else if(type == ControllerType.WsControllerVertical) {
+			} else if (type == ControllerType.WsControllerVertical) {
 				m.B = InputApi.GetKeyCode("X");
 				m.A = InputApi.GetKeyCode("Z");
 				m.GenericKey1 = InputApi.GetKeyCode("Q");
 				m.Start = InputApi.GetKeyCode("E");
-				
+
 				m.U = InputApi.GetKeyCode("A");
 				m.D = InputApi.GetKeyCode("D");
 				m.L = InputApi.GetKeyCode("S");
@@ -68,8 +65,7 @@ namespace Mesen.Config
 			}
 		}
 
-		public static void ApplyArrowLayout(KeyMapping m, ControllerType type)
-		{
+		public static void ApplyArrowLayout(KeyMapping m, ControllerType type) {
 			m.ClearKeys(type);
 
 			m.A = InputApi.GetKeyCode("S");
@@ -79,14 +75,14 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode("Left Arrow");
 			m.Right = InputApi.GetKeyCode("Right Arrow");
 
-			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController) {
+			if (type is ControllerType.SnesController or ControllerType.SnesRumbleController) {
 				m.X = InputApi.GetKeyCode("X");
 				m.Y = InputApi.GetKeyCode("Z");
 				m.L = InputApi.GetKeyCode("Q");
 				m.R = InputApi.GetKeyCode("W");
 				m.Select = InputApi.GetKeyCode("E");
 				m.Start = InputApi.GetKeyCode("D");
-			} else if(type == ControllerType.PceAvenuePad6) {
+			} else if (type == ControllerType.PceAvenuePad6) {
 				m.Y = InputApi.GetKeyCode("A");
 				m.L = InputApi.GetKeyCode("S");
 				m.R = InputApi.GetKeyCode("D");
@@ -95,12 +91,12 @@ namespace Mesen.Config
 				m.X = InputApi.GetKeyCode("C");
 				m.Select = InputApi.GetKeyCode("Q");
 				m.Start = InputApi.GetKeyCode("W");
-			} else if(type == ControllerType.GbaController) {
+			} else if (type == ControllerType.GbaController) {
 				m.Select = InputApi.GetKeyCode("Q");
 				m.Start = InputApi.GetKeyCode("W");
 				m.L = InputApi.GetKeyCode("Z");
 				m.R = InputApi.GetKeyCode("X");
-			} else if(type == ControllerType.WsController) {
+			} else if (type == ControllerType.WsController) {
 				m.B = InputApi.GetKeyCode("Z");
 				m.A = InputApi.GetKeyCode("X");
 				m.GenericKey1 = InputApi.GetKeyCode("Q");
@@ -109,7 +105,7 @@ namespace Mesen.Config
 				m.D = InputApi.GetKeyCode("S");
 				m.L = InputApi.GetKeyCode("A");
 				m.R = InputApi.GetKeyCode("D");
-			} else if(type == ControllerType.WsControllerVertical) {
+			} else if (type == ControllerType.WsControllerVertical) {
 				m.B = InputApi.GetKeyCode("X");
 				m.A = InputApi.GetKeyCode("Z");
 				m.GenericKey1 = InputApi.GetKeyCode("Q");
@@ -131,8 +127,7 @@ namespace Mesen.Config
 			}
 		}
 
-		public static void ApplyXboxLayout(KeyMapping m, int player, ControllerType type, bool altLayout = false)
-		{
+		public static void ApplyXboxLayout(KeyMapping m, int player, ControllerType type, bool altLayout = false) {
 			m.ClearKeys(type);
 
 			string prefix = "Pad" + (player + 1).ToString() + " ";
@@ -145,18 +140,18 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode(prefix + "Left");
 			m.Right = InputApi.GetKeyCode(prefix + "Right");
 
-			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController) {
+			if (type is ControllerType.SnesController or ControllerType.PceAvenuePad6 or ControllerType.GbaController or ControllerType.SnesRumbleController) {
 				m.X = InputApi.GetKeyCode(prefix + "Y");
 				m.Y = InputApi.GetKeyCode(prefix + "X");
 				m.L = InputApi.GetKeyCode(prefix + "L1");
 				m.R = InputApi.GetKeyCode(prefix + "R1");
-			} else if(type == ControllerType.WsController) {
+			} else if (type == ControllerType.WsController) {
 				m.GenericKey1 = InputApi.GetKeyCode(prefix + "Back");
 				m.U = InputApi.GetKeyCode(prefix + "RT Up");
 				m.D = InputApi.GetKeyCode(prefix + "RT Down");
 				m.L = InputApi.GetKeyCode(prefix + "RT Left");
 				m.R = InputApi.GetKeyCode(prefix + "RT Right");
-			} else if(type == ControllerType.WsControllerVertical) {
+			} else if (type == ControllerType.WsControllerVertical) {
 				m.GenericKey1 = InputApi.GetKeyCode(prefix + "Back");
 
 				m.A = InputApi.GetKeyCode(prefix + "L1");
@@ -177,8 +172,7 @@ namespace Mesen.Config
 			}
 		}
 
-		public static void ApplyPs4Layout(KeyMapping m, int player, ControllerType type, bool altLayout = false)
-		{
+		public static void ApplyPs4Layout(KeyMapping m, int player, ControllerType type, bool altLayout = false) {
 			m.ClearKeys(type);
 
 			string prefix = "Joy" + (player + 1).ToString() + " ";
@@ -190,18 +184,18 @@ namespace Mesen.Config
 			m.Down = InputApi.GetKeyCode(prefix + "DPad Down");
 			m.Left = InputApi.GetKeyCode(prefix + "DPad Left");
 			m.Right = InputApi.GetKeyCode(prefix + "DPad Right");
-			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController) {
+			if (type is ControllerType.SnesController or ControllerType.PceAvenuePad6 or ControllerType.GbaController or ControllerType.SnesRumbleController) {
 				m.X = InputApi.GetKeyCode(prefix + "But4");
 				m.Y = InputApi.GetKeyCode(prefix + "But1");
 				m.L = InputApi.GetKeyCode(prefix + "But5");
 				m.R = InputApi.GetKeyCode(prefix + "But6");
-			} else if(type == ControllerType.WsController) {
+			} else if (type == ControllerType.WsController) {
 				m.GenericKey1 = InputApi.GetKeyCode(prefix + "But9");
 				m.U = InputApi.GetKeyCode(prefix + "Y2+");
 				m.D = InputApi.GetKeyCode(prefix + "Y2-");
 				m.L = InputApi.GetKeyCode(prefix + "X2-");
 				m.R = InputApi.GetKeyCode(prefix + "X2+");
-			} else if(type == ControllerType.WsControllerVertical) {
+			} else if (type == ControllerType.WsControllerVertical) {
 				m.GenericKey1 = InputApi.GetKeyCode(prefix + "But9");
 
 				m.A = InputApi.GetKeyCode(prefix + "But5");

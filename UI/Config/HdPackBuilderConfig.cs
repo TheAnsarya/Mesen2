@@ -1,12 +1,10 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
-using System.Runtime.InteropServices;
 using System;
+using System.Runtime.InteropServices;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class HdPackBuilderConfig : BaseConfig<HdPackBuilderConfig>
-	{
+namespace Mesen.Config {
+	public class HdPackBuilderConfig : BaseConfig<HdPackBuilderConfig> {
 		public ScaleFilterType FilterType { get; set; } = ScaleFilterType.Prescale;
 		public UInt32 Scale { get; set; } = 1;
 		public UInt32 ChrRamBankSize { get; set; } = 0x1000;
@@ -16,8 +14,7 @@ namespace Mesen.Config
 		public bool GroupBlankTiles { get; set; } = true;
 		public bool IgnoreOverscan { get; set; } = false;
 
-		public HdPackBuilderOptions ToInterop(string saveFolder)
-		{
+		public HdPackBuilderOptions ToInterop(string saveFolder) {
 			return new HdPackBuilderOptions() {
 				SaveFolder = saveFolder,
 				FilterType = FilterType,
@@ -31,8 +28,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public enum ScaleFilterType
-	{
+	public enum ScaleFilterType {
 		xBRZ = 0,
 		HQX = 1,
 		Scale2x = 2,
@@ -43,8 +39,7 @@ namespace Mesen.Config
 		LcdGrid = 7,
 	}
 
-	public struct HdPackBuilderOptions
-	{
+	public struct HdPackBuilderOptions {
 		[MarshalAs(UnmanagedType.LPUTF8Str)] public string SaveFolder;
 		public ScaleFilterType FilterType;
 		public UInt32 Scale;

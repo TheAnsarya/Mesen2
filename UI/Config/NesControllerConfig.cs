@@ -1,21 +1,18 @@
-﻿using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.ViewModels;
 
-namespace Mesen.Config
-{
-	public class NesControllerConfig : ControllerConfig
-	{
+namespace Mesen.Config {
+	public class NesControllerConfig : ControllerConfig {
 		public new NesKeyMapping Mapping1 { get => (NesKeyMapping)_mapping1; set => _mapping1 = value; }
 		public new NesKeyMapping Mapping2 { get => (NesKeyMapping)_mapping2; set => _mapping2 = value; }
 		public new NesKeyMapping Mapping3 { get => (NesKeyMapping)_mapping3; set => _mapping3 = value; }
 		public new NesKeyMapping Mapping4 { get => (NesKeyMapping)_mapping4; set => _mapping4 = value; }
 
-		public NesControllerConfig()
-		{
+		public NesControllerConfig() {
 			_mapping1 = new NesKeyMapping();
 			_mapping2 = new NesKeyMapping();
 			_mapping3 = new NesKeyMapping();
@@ -23,8 +20,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public class NesKeyMapping : KeyMapping
-	{
+	public class NesKeyMapping : KeyMapping {
 		public UInt16[]? PowerPadButtons { get; set; } = null;
 		public UInt16[]? FamilyBasicKeyboardButtons { get; set; } = null;
 		public UInt16[]? PartyTapButtons { get; set; } = null;
@@ -41,8 +37,7 @@ namespace Mesen.Config
 		public UInt16[]? OekakidsButtons { get; set; } = null;
 		public UInt16[]? BandaiHypershotButtons { get; set; } = null;
 
-		protected override UInt16[]? GetCustomButtons(ControllerType type)
-		{
+		protected override UInt16[]? GetCustomButtons(ControllerType type) {
 			return type switch {
 				ControllerType.PowerPadSideA => PowerPadButtons,
 				ControllerType.PowerPadSideB => PowerPadButtons,
@@ -69,12 +64,11 @@ namespace Mesen.Config
 			};
 		}
 
-		public override List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex)
-		{
+		public override List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex) {
 			UInt16[]? buttonMappings = GetCustomButtons(type);
-			if(buttonMappings == null) {
-				if(GetDefaultCustomKeys(type, null) != null) {
-					if(mappingIndex == 0) {
+			if (buttonMappings == null) {
+				if (GetDefaultCustomKeys(type, null) != null) {
+					if (mappingIndex == 0) {
 						SetDefaultKeys(type, null);
 					} else {
 						ClearKeys(type);
@@ -82,14 +76,14 @@ namespace Mesen.Config
 				}
 
 				buttonMappings = GetCustomButtons(type);
-				if(buttonMappings == null) {
+				if (buttonMappings == null) {
 					return new List<CustomKeyMapping>();
 				}
 			}
 
 			List<CustomKeyMapping> keys = type switch {
-				ControllerType.PowerPadSideA or 
-				ControllerType.PowerPadSideB or 
+				ControllerType.PowerPadSideA or
+				ControllerType.PowerPadSideB or
 				ControllerType.FamilyTrainerMatSideA or
 				ControllerType.FamilyTrainerMatSideB => Enum.GetValues<NesPowerPadButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
 
@@ -115,9 +109,8 @@ namespace Mesen.Config
 			return keys;
 		}
 
-		public override void ClearKeys(ControllerType type)
-		{
-			switch(type) {
+		public override void ClearKeys(ControllerType type) {
+			switch (type) {
 				case ControllerType.FamilyBasicKeyboard:
 					FamilyBasicKeyboardButtons = new UInt16[72];
 					break;
@@ -195,9 +188,8 @@ namespace Mesen.Config
 			}
 		}
 
-		public override UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset)
-		{
-			switch(type) {
+		public override UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset) {
+			switch (type) {
 				case ControllerType.FamilyBasicKeyboard:
 					return new UInt16[72] {
 						InputApi.GetKeyCode("A"), InputApi.GetKeyCode("B"), InputApi.GetKeyCode("C"), InputApi.GetKeyCode("D"),
@@ -404,9 +396,8 @@ namespace Mesen.Config
 			}
 		}
 
-		public override void SetDefaultKeys(ControllerType type, KeyPresetType? preset)
-		{
-			switch(type) {
+		public override void SetDefaultKeys(ControllerType type, KeyPresetType? preset) {
+			switch (type) {
 				case ControllerType.FamilyBasicKeyboard: FamilyBasicKeyboardButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.PartyTap: PartyTapButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.Pachinko: PachinkoButtons = GetDefaultCustomKeys(type, preset); break;
@@ -415,7 +406,7 @@ namespace Mesen.Config
 				case ControllerType.SuborKeyboard: SuborKeyboardButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.VbController: VirtualBoyButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.KonamiHyperShot: KonamiHyperShotButtons = GetDefaultCustomKeys(type, preset); break;
-				
+
 				case ControllerType.NesZapper: ZapperButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.FamicomZapper: ZapperButtons = GetDefaultCustomKeys(type, preset); break;
 
@@ -426,13 +417,13 @@ namespace Mesen.Config
 					//Set default controller keys, too
 					base.SetDefaultKeys(type, preset);
 					break;
-				
+
 				case ControllerType.NesArkanoidController: ArkanoidButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.FamicomArkanoidController: ArkanoidButtons = GetDefaultCustomKeys(type, preset); break;
-				
+
 				case ControllerType.SuborMouse: MouseButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.SnesMouse: MouseButtons = GetDefaultCustomKeys(type, preset); break;
-				
+
 				case ControllerType.OekaKidsTablet: OekakidsButtons = GetDefaultCustomKeys(type, preset); break;
 
 				case ControllerType.PowerPadSideA:
@@ -462,8 +453,7 @@ namespace Mesen.Config
 	public enum NesBandaiMicrophoneButtons { A, B, Microphone };
 	public enum GenericMouseButtons { LeftButton, RightButton };
 
-	public enum NesFamilyBasicKeyboardButtons
-	{
+	public enum NesFamilyBasicKeyboardButtons {
 		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
 		Return, Space, Del, Ins, Esc,
@@ -475,8 +465,7 @@ namespace Mesen.Config
 		Yen, Stop, AtSign, Grph, ClrHome, Kana
 	};
 
-	public enum NesSuborKeyboardButtons
-	{
+	public enum NesSuborKeyboardButtons {
 		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
 		F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,

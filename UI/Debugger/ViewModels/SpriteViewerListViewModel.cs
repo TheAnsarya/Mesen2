@@ -1,20 +1,18 @@
-﻿using Avalonia.Controls.Selection;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Input;
+using Avalonia.Controls.Selection;
 using DataBoxControl;
 using Mesen.Config;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows.Input;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class SpriteViewerListViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class SpriteViewerListViewModel : DisposableViewModel {
 		[Reactive] public bool ShowListView { get; set; }
 		[Reactive] public double MinListViewHeight { get; set; }
 		[Reactive] public double ListViewHeight { get; set; }
@@ -26,11 +24,10 @@ namespace Mesen.Debugger.ViewModels
 		public ICommand SortCommand { get; }
 		public SpriteViewerViewModel SpriteViewer { get; }
 		public SpriteViewerConfig Config { get; }
-		
+
 		private DateTime _lastRefresh = DateTime.MinValue;
 
-		public SpriteViewerListViewModel(SpriteViewerViewModel viewer)
-		{
+		public SpriteViewerListViewModel(SpriteViewerViewModel viewer) {
 			SpriteViewer = viewer;
 			Config = viewer.Config;
 			ShowListView = Config.ShowListView;
@@ -38,24 +35,20 @@ namespace Mesen.Debugger.ViewModels
 
 			SortState.SetColumnSort("SpriteIndex", ListSortDirection.Ascending, false);
 
-			SortCommand = ReactiveCommand.Create<string?>(sortMemberPath => {
-				RefreshList(true);
-			});
+			SortCommand = ReactiveCommand.Create<string?>(sortMemberPath => RefreshList(true));
 
 			AddDisposable(this.WhenAnyValue(x => x.Selection.SelectedItem).Subscribe(x => {
-				if(x != null) {
+				if (x != null) {
 					SpriteViewer.SelectSprite(x.SpriteIndex);
 				}
 			}));
 		}
 
-		public void SelectSprite(int spriteIndex)
-		{
+		public void SelectSprite(int spriteIndex) {
 			Selection.SelectedItem = SpritePreviews?.Find(x => x.SpriteIndex == spriteIndex);
 		}
 
-		public void ForceRefresh()
-		{
+		public void ForceRefresh() {
 			_lastRefresh = DateTime.MinValue;
 		}
 
@@ -69,6 +62,7 @@ namespace Mesen.Debugger.ViewModels
 				if(result == 0) {
 					return a.Height.CompareTo(b.Height);
 				}
+
 				return result;
 			} },
 			{ "Palette", (a, b) => a.Palette.CompareTo(b.Palette) },
@@ -77,20 +71,19 @@ namespace Mesen.Debugger.ViewModels
 			{ "Visible", (a, b) => a.FadePreview.CompareTo(b.FadePreview) }
 		};
 
-		public void RefreshList(bool force = false)
-		{
-			if(!force && (DateTime.Now - _lastRefresh).TotalMilliseconds < 70) {
+		public void RefreshList(bool force = false) {
+			if (!force && (DateTime.Now - _lastRefresh).TotalMilliseconds < 70) {
 				return;
 			}
 
 			_lastRefresh = DateTime.Now;
 
-			if(!ShowListView) {
+			if (!ShowListView) {
 				SpritePreviews = null;
 				return;
 			}
 
-			if(SpritePreviews == null || SpritePreviews.Count != SpriteViewer.SpritePreviews.Count) {
+			if (SpritePreviews == null || SpritePreviews.Count != SpriteViewer.SpritePreviews.Count) {
 				SpritePreviews = SpriteViewer.SpritePreviews.Select(x => x.Clone()).ToList();
 			}
 
@@ -99,17 +92,16 @@ namespace Mesen.Debugger.ViewModels
 			List<SpritePreviewModel> newList = new(SpriteViewer.SpritePreviews.Select(x => x.Clone()).ToList());
 			SortHelper.SortList(newList, SortState.SortOrder, _comparers, "SpriteIndex");
 
-			for(int i = 0; i < newList.Count; i++) {
+			for (int i = 0; i < newList.Count; i++) {
 				newList[i].CopyTo(SpritePreviews[i]);
 			}
 
-			if(selectedIndex != null && Selection.SelectedItem?.SpriteIndex != selectedIndex) {
+			if (selectedIndex != null && Selection.SelectedItem?.SpriteIndex != selectedIndex) {
 				Selection.SelectedItem = null;
 			}
 		}
 
-		public void InitListViewObservers()
-		{
+		public void InitListViewObservers() {
 			//Update list view height based on show list view flag
 			AddDisposable(this.WhenAnyValue(x => x.ShowListView).Subscribe(showListView => {
 				Config.ShowListView = showListView;
@@ -118,12 +110,10 @@ namespace Mesen.Debugger.ViewModels
 				RefreshList(true);
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.SpriteViewer.SpritePreviews).Subscribe(x => {
-				RefreshList(true);
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.SpriteViewer.SpritePreviews).Subscribe(x => RefreshList(true)));
 
 			AddDisposable(this.WhenAnyValue(x => x.ListViewHeight).Subscribe(height => {
-				if(ShowListView) {
+				if (ShowListView) {
 					Config.ListViewHeight = height;
 				} else {
 					ListViewHeight = 0;

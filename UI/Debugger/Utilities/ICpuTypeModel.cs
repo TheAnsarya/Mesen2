@@ -1,9 +1,7 @@
-﻿using Mesen.Interop;
+using Mesen.Interop;
 
-namespace Mesen.Debugger.Utilities
-{
-	public interface ICpuTypeModel
-	{
+namespace Mesen.Debugger.Utilities {
+	public interface ICpuTypeModel {
 		CpuType CpuType { get; set; }
 		void OnGameLoaded();
 	}

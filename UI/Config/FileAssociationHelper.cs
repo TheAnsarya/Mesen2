@@ -9,19 +9,17 @@ using Mesen.Interop;
 using Mesen.Utilities;
 using Microsoft.Win32;
 
-namespace Mesen.Config
-{
-	class FileAssociationHelper
-	{
-		static private string CreateMimeType(string mimeType, string extension, string description, List<string> mimeTypes, bool addType)
-		{
+namespace Mesen.Config {
+	class FileAssociationHelper {
+		static private string CreateMimeType(string mimeType, string extension, string description, List<string> mimeTypes, bool addType) {
 			string baseFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "mime", "packages");
-			if(!Directory.Exists(baseFolder)) {
+			if (!Directory.Exists(baseFolder)) {
 				Directory.CreateDirectory(baseFolder);
 			}
+
 			string filename = Path.Combine(baseFolder, mimeType + ".xml");
-			
-			if(addType) {
+
+			if (addType) {
 				FileHelper.WriteAllText(filename,
 					"<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine +
 					"<mime-info xmlns=\"http://www.freedesktop.org/standards/shared-mime-info\">" + Environment.NewLine +
@@ -34,29 +32,31 @@ namespace Mesen.Config
 					"</mime-info>" + Environment.NewLine);
 
 				mimeTypes.Add(mimeType);
-			} else if(File.Exists(filename)) {
+			} else if (File.Exists(filename)) {
 				try {
 					File.Delete(filename);
 				} catch { }
 			}
+
 			return mimeType;
 		}
 
-		static public void UpdateLinuxFileAssociations()
-		{
+		static public void UpdateLinuxFileAssociations() {
 			PreferencesConfig cfg = ConfigManager.Config.Preferences;
 
 			string baseFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 			string desktopFolder = Path.Combine(baseFolder, "applications");
 			string mimeFolder = Path.Combine(baseFolder, "mime");
 			string iconFolder = Path.Combine(baseFolder, "icons");
-			if(!Directory.Exists(mimeFolder)) {
+			if (!Directory.Exists(mimeFolder)) {
 				Directory.CreateDirectory(mimeFolder);
 			}
-			if(!Directory.Exists(iconFolder)) {
+
+			if (!Directory.Exists(iconFolder)) {
 				Directory.CreateDirectory(iconFolder);
 			}
-			if(!Directory.Exists(desktopFolder)) {
+
+			if (!Directory.Exists(desktopFolder)) {
 				Directory.CreateDirectory(desktopFolder);
 			}
 
@@ -91,7 +91,7 @@ namespace Mesen.Config
 			CreateMimeType("x-mesen-gg", "gg", "Game Gear ROM", mimeTypes, cfg.AssociateGameGearRomFiles);
 			CreateMimeType("x-mesen-sg", "sg", "SG-1000 ROM", mimeTypes, cfg.AssociateSgRomFiles);
 			CreateMimeType("x-mesen-col", "col", "ColecoVision ROM", mimeTypes, cfg.AssociateCvRomFiles);
-			
+
 			CreateMimeType("x-mesen-ws", "ws", "WonderSwan ROM", mimeTypes, cfg.AssociateWsRomFiles);
 			CreateMimeType("x-mesen-wsc", "wsc", "WonderSwan Color ROM", mimeTypes, cfg.AssociateWsRomFiles);
 
@@ -99,7 +99,7 @@ namespace Mesen.Config
 			ImageUtilities.BitmapFromAsset("Assets/MesenIcon.png").Save(Path.Combine(iconFolder, "MesenIcon.png"));
 
 			string desktopFile = Path.Combine(desktopFolder, "mesen.desktop");
-			if(!File.Exists(desktopFile)) {
+			if (!File.Exists(desktopFile)) {
 				CreateLinuxShortcutFile(desktopFile, mimeTypes);
 			} else {
 				UpdateLinuxShortcutFileMimeTypes(desktopFile, mimeTypes);
@@ -116,21 +116,20 @@ namespace Mesen.Config
 			}
 		}
 
-		private static void UpdateLinuxShortcutFileMimeTypes(string desktopFile, List<string> mimeTypes)
-		{
+		private static void UpdateLinuxShortcutFileMimeTypes(string desktopFile, List<string> mimeTypes) {
 			string? content = FileHelper.ReadAllText(desktopFile);
 
-			if(content != null) {
+			if (content != null) {
 				List<string> lines = new List<string>(content.Split(Environment.NewLine));
 				bool replaced = false;
-				for(int i = 0; i < lines.Count; i++) {
-					if(lines[i].Trim().StartsWith("MimeType=")) {
+				for (int i = 0; i < lines.Count; i++) {
+					if (lines[i].Trim().StartsWith("MimeType=")) {
 						lines[i] = "MimeType=" + string.Join(";", mimeTypes.Select(type => "application/" + type));
 						replaced = true;
 					}
 				}
 
-				if(!replaced) {
+				if (!replaced) {
 					lines.Add("MimeType=" + string.Join(";", mimeTypes.Select(type => "application/" + type)));
 				}
 
@@ -138,14 +137,13 @@ namespace Mesen.Config
 			}
 		}
 
-		static public void CreateLinuxShortcutFile(string filename, List<string>? mimeTypes = null)
-		{
+		static public void CreateLinuxShortcutFile(string filename, List<string>? mimeTypes = null) {
 			ProcessModule? mainModule = Process.GetCurrentProcess().MainModule;
-			if(mainModule == null) {
+			if (mainModule == null) {
 				return;
 			}
 
-			string content = 
+			string content =
 				"[Desktop Entry]" + Environment.NewLine +
 				"Type=Application" + Environment.NewLine +
 				"Name=Mesen" + Environment.NewLine +
@@ -156,31 +154,27 @@ namespace Mesen.Config
 				"NoDisplay=false" + Environment.NewLine +
 				"StartupNotify=true" + Environment.NewLine +
 				"Icon=MesenIcon" + Environment.NewLine;
-			
-			if(mimeTypes != null) {
+
+			if (mimeTypes != null) {
 				content += "MimeType=" + string.Join(";", mimeTypes.Select(type => "application/" + type)) + Environment.NewLine;
 			}
 
 			FileHelper.WriteAllText(filename, content, new UTF8Encoding(false));
 		}
 
-		static public void UpdateFileAssociations()
-		{
+		static public void UpdateFileAssociations() {
 			try {
-				if(OperatingSystem.IsWindows()) {
+				if (OperatingSystem.IsWindows()) {
 					FileAssociationHelper.UpdateWindowsFileAssociations();
-				} else if(OperatingSystem.IsLinux()) {
+				} else if (OperatingSystem.IsLinux()) {
 					FileAssociationHelper.UpdateLinuxFileAssociations();
 				}
-			} catch(Exception ex) {
-				Dispatcher.UIThread.Post(() => {
-					MesenMsgBox.ShowException(ex);
-				});
+			} catch (Exception ex) {
+				Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
 			}
 		}
 
-		static public void UpdateWindowsFileAssociations()
-		{
+		static public void UpdateWindowsFileAssociations() {
 			PreferencesConfig cfg = ConfigManager.Config.Preferences;
 			FileAssociationHelper.UpdateFileAssociation("sfc", cfg.AssociateSnesRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("smc", cfg.AssociateSnesRomFiles);
@@ -203,7 +197,7 @@ namespace Mesen.Config
 			FileAssociationHelper.UpdateFileAssociation("gbx", cfg.AssociateGbRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("gbc", cfg.AssociateGbRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("gbs", cfg.AssociateGbMusicFiles);
-			
+
 			FileAssociationHelper.UpdateFileAssociation("gba", cfg.AssociateGbaRomFiles);
 
 			FileAssociationHelper.UpdateFileAssociation("pce", cfg.AssociatePceRomFiles);
@@ -214,27 +208,26 @@ namespace Mesen.Config
 			FileAssociationHelper.UpdateFileAssociation("gg", cfg.AssociateGameGearRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("sg", cfg.AssociateSgRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("col", cfg.AssociateCvRomFiles);
-		
+
 			FileAssociationHelper.UpdateFileAssociation("ws", cfg.AssociateWsRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("wsc", cfg.AssociateWsRomFiles);
 		}
 
-		static private void UpdateFileAssociation(string extension, bool associate)
-		{
-			if(!OperatingSystem.IsWindows()) {
+		static private void UpdateFileAssociation(string extension, bool associate) {
+			if (!OperatingSystem.IsWindows()) {
 				return;
 			}
 
 			string key = @"HKEY_CURRENT_USER\Software\Classes\." + extension;
-			if(associate) {
+			if (associate) {
 				ProcessModule? mainModule = Process.GetCurrentProcess().MainModule;
-				if(mainModule != null) {
+				if (mainModule != null) {
 					Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\Mesen\shell\open\command", null, mainModule.FileName + " \"%1\"");
 					Registry.SetValue(key, null, "Mesen");
 				}
 			} else {
 				object? regKey = Registry.GetValue(key, null, "");
-				if(regKey != null && regKey.Equals("Mesen")) {
+				if (regKey != null && regKey.Equals("Mesen")) {
 					Registry.SetValue(key, null, "");
 				}
 			}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,10 +10,8 @@ using System.Xml.Serialization;
 using Mesen.Debugger;
 using Mesen.Interop;
 
-namespace Mesen.Config
-{
-	public class DebugConfig
-	{
+namespace Mesen.Config {
+	public class DebugConfig {
 		public DebuggerShortcutsConfig Shortcuts { get; set; } = new();
 		public TraceLoggerConfig TraceLogger { get; set; } = new();
 		public HexEditorConfig HexEditor { get; set; } = new();
@@ -34,12 +32,10 @@ namespace Mesen.Config
 		public DebugLogConfig DebugLog { get; set; } = new();
 		public DebuggerFontConfig Fonts { get; set; } = new();
 
-		public DebugConfig()
-		{		
+		public DebugConfig() {
 		}
 
-		public void ApplyConfig()
-		{
+		public void ApplyConfig() {
 			ConfigApi.SetDebugConfig(new InteropDebugConfig() {
 				BreakOnUninitRead = Debugger.BreakOnUninitRead,
 				ShowJumpLabels = Debugger.ShowJumpLabels,
@@ -91,7 +87,7 @@ namespace Mesen.Config
 				PceBreakOnBrk = Debugger.Pce.BreakOnBrk,
 				PceBreakOnUnofficialOpCode = Debugger.Pce.BreakOnUnofficialOpCode,
 				PceBreakOnInvalidVramAddress = Debugger.Pce.BreakOnInvalidVramAddress,
-				
+
 				SmsBreakOnNopLoad = Debugger.Sms.BreakOnNopLoad,
 
 				GbaBreakOnInvalidOpCode = Debugger.Gba.BreakOnInvalidOpCode,
@@ -108,8 +104,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public struct InteropDebugConfig
-	{
+	public struct InteropDebugConfig {
 		[MarshalAs(UnmanagedType.I1)] public bool BreakOnUninitRead;
 
 		[MarshalAs(UnmanagedType.I1)] public bool ShowJumpLabels;
@@ -165,12 +160,12 @@ namespace Mesen.Config
 		[MarshalAs(UnmanagedType.I1)] public bool PceBreakOnInvalidVramAddress;
 
 		[MarshalAs(UnmanagedType.I1)] public bool SmsBreakOnNopLoad;
-		
+
 		[MarshalAs(UnmanagedType.I1)] public bool GbaBreakOnNopLoad;
 		[MarshalAs(UnmanagedType.I1)] public bool GbaBreakOnInvalidOpCode;
 		[MarshalAs(UnmanagedType.I1)] public bool GbaBreakOnUnalignedMemAccess;
 		public GbaDisassemblyMode GbaDisMode;
-		
+
 		[MarshalAs(UnmanagedType.I1)] public bool WsBreakOnUndefinedOpCode;
 
 		[MarshalAs(UnmanagedType.I1)] public bool ScriptAllowIoOsAccess;
@@ -178,8 +173,7 @@ namespace Mesen.Config
 		public UInt32 ScriptTimeout;
 	}
 
-	public enum RefreshSpeed
-	{
+	public enum RefreshSpeed {
 		Off = 0,
 		Low = 1,
 		Normal = 2,

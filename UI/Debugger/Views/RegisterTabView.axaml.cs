@@ -1,28 +1,25 @@
+using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Windows;
-using System;
-using static Mesen.Debugger.ViewModels.LabelListViewModel;
-using Avalonia.Input;
-using DataBoxControl;
-using Mesen.Debugger.Utilities;
-using System.Collections.Generic;
 using AvaloniaEdit.Editing;
-using Mesen.Interop;
+using DataBoxControl;
 using Mesen.Config;
+using Mesen.Debugger.Labels;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.ViewModels;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
 using Mesen.Utilities;
+using static Mesen.Debugger.ViewModels.LabelListViewModel;
 
-namespace Mesen.Debugger.Views
-{
-	public class RegisterTabView : MesenUserControl
-	{
+namespace Mesen.Debugger.Views {
+	public class RegisterTabView : MesenUserControl {
 		public RegisterViewerTab Model => (RegisterViewerTab)DataContext!;
 
-		public RegisterTabView()
-		{
+		public RegisterTabView() {
 			InitializeComponent();
 
 			DataBox dataBox = this.GetControl<DataBox>("lstRegisterTab");
@@ -37,8 +34,10 @@ namespace Mesen.Debugger.Views
 							if(entry.EndAddress > entry.StartAddress) {
 								hint += $" - ${entry.EndAddress:X4}";
 							}
+
 							return hint;
 						}
+
 						return "";
 					},
 					OnClick = async () => {
@@ -47,8 +46,7 @@ namespace Mesen.Debugger.Views
 							uint endAddress = (uint)entry.EndAddress;
 
 							Breakpoint? bp = BreakpointManager.GetMatchingBreakpoint(startAddress, endAddress, Model.MemoryType.Value);
-							if(bp == null) {
-								bp = new Breakpoint() {
+							bp ??= new Breakpoint() {
 									BreakOnRead = true,
 									BreakOnWrite = true,
 									CpuType = Model.CpuType.Value,
@@ -56,7 +54,6 @@ namespace Mesen.Debugger.Views
 									EndAddress = (uint)entry.EndAddress,
 									MemoryType = Model.MemoryType.Value
 								};
-							}
 
 							bool result = await BreakpointEditWindow.EditBreakpointAsync(bp, this);
 							if(result && DebugWindowManager.GetDebugWindow<DebuggerWindow>(x => x.CpuType == Model.CpuType) == null) {
@@ -68,8 +65,7 @@ namespace Mesen.Debugger.Views
 			}));
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 	}

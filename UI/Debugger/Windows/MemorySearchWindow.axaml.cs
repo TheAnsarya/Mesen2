@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -9,17 +11,12 @@ using Mesen.Debugger.Controls;
 using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
-using System;
-using System.ComponentModel;
 
-namespace Mesen.Debugger.Windows
-{
-	public class MemorySearchWindow : MesenWindow, INotificationHandler
-	{
+namespace Mesen.Debugger.Windows {
+	public class MemorySearchWindow : MesenWindow, INotificationHandler {
 		private MemorySearchViewModel _model;
 
-		public MemorySearchWindow()
-		{
+		public MemorySearchWindow() {
 			_model = new MemorySearchViewModel();
 			DataContext = _model;
 
@@ -28,32 +25,29 @@ namespace Mesen.Debugger.Windows
 			this.AttachDevTools();
 #endif
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			_model.Config.LoadWindowSettings(this);
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e)
-		{
+		protected override void OnClosing(WindowClosingEventArgs e) {
 			base.OnClosing(e);
 			_model.Config.SaveWindowSettings(this);
 		}
 
-		public void ProcessNotification(NotificationEventArgs e)
-		{
-			switch(e.NotificationType) {
+		public void ProcessNotification(NotificationEventArgs e) {
+			switch (e.NotificationType) {
 				case ConsoleNotificationType.GameLoaded:
-					Dispatcher.UIThread.Post(() => {
-						_model.OnGameLoaded();
-					});
+					Dispatcher.UIThread.Post(() => _model.OnGameLoaded());
 					break;
 
 				case ConsoleNotificationType.PpuFrameDone:
-					if(!ToolRefreshHelper.LimitFps(this, 30)) {
+					if (!ToolRefreshHelper.LimitFps(this, 30)) {
 						_model.RefreshData(false);
 					}
+
 					break;
 
 				case ConsoleNotificationType.CodeBreak:
@@ -62,8 +56,7 @@ namespace Mesen.Debugger.Windows
 			}
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 	}

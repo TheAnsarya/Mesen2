@@ -1,16 +1,15 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Config;
 
-public class WsConfig : BaseConfig<WsConfig>
-{
+public class WsConfig : BaseConfig<WsConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 	[Reactive] public ControllerConfig ControllerHorizontal { get; set; } = new();
@@ -36,8 +35,7 @@ public class WsConfig : BaseConfig<WsConfig>
 	[Reactive][MinMax(0, 100)] public UInt32 Channel4Vol { get; set; } = 100;
 	[Reactive][MinMax(0, 100)] public UInt32 Channel5Vol { get; set; } = 100;
 
-	public void ApplyConfig()
-	{
+	public void ApplyConfig() {
 		ControllerHorizontal.Type = ControllerType.WsController;
 		ControllerVertical.Type = ControllerType.WsControllerVertical;
 
@@ -49,8 +47,8 @@ public class WsConfig : BaseConfig<WsConfig>
 
 			Model = Model,
 			UseBootRom = UseBootRom,
-			
-			AutoRotate= AutoRotate,
+
+			AutoRotate = AutoRotate,
 
 			BlendFrames = BlendFrames,
 			LcdAdjustColors = LcdAdjustColors,
@@ -69,16 +67,14 @@ public class WsConfig : BaseConfig<WsConfig>
 		});
 	}
 
-	internal void InitializeDefaults(DefaultKeyMappingType defaultMappings)
-	{
+	internal void InitializeDefaults(DefaultKeyMappingType defaultMappings) {
 		ControllerHorizontal.InitDefaults(defaultMappings, ControllerType.WsController);
 		ControllerVertical.InitDefaults(defaultMappings, ControllerType.WsControllerVertical);
 	}
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct InteropWsConfig
-{
+public struct InteropWsConfig {
 	public InteropControllerConfig ControllerHorizontal;
 	public InteropControllerConfig ControllerVertical;
 
@@ -90,7 +86,7 @@ public struct InteropWsConfig
 	[MarshalAs(UnmanagedType.I1)] public bool BlendFrames;
 	[MarshalAs(UnmanagedType.I1)] public bool LcdAdjustColors;
 	[MarshalAs(UnmanagedType.I1)] public bool LcdShowIcons;
-	
+
 	[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer1;
 	[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer2;
 	[MarshalAs(UnmanagedType.I1)] public bool DisableSprites;
@@ -103,16 +99,14 @@ public struct InteropWsConfig
 	public UInt32 Channel5Vol;
 }
 
-public enum WsModel : byte
-{
+public enum WsModel : byte {
 	Auto,
 	Monochrome,
 	Color,
 	SwanCrystal
 }
 
-public enum WsAudioMode : byte
-{
+public enum WsAudioMode : byte {
 	Headphones,
 	Speaker
 }

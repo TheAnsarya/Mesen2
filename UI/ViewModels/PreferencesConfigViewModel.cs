@@ -1,17 +1,15 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Styling;
 using Mesen.Config;
 using Mesen.Config.Shortcuts;
 using Mesen.Utilities;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
 
-namespace Mesen.ViewModels
-{
-	public class PreferencesConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class PreferencesConfigViewModel : DisposableViewModel {
 		[Reactive] public PreferencesConfig Config { get; set; }
 		[Reactive] public PreferencesConfig OriginalConfig { get; set; }
 
@@ -20,8 +18,7 @@ namespace Mesen.ViewModels
 
 		public List<ShortcutKeyInfo> ShortcutKeys { get; set; }
 
-		public PreferencesConfigViewModel()
-		{
+		public PreferencesConfigViewModel() {
 			Config = ConfigManager.Config.Preferences;
 			OriginalConfig = Config.Clone();
 
@@ -77,7 +74,7 @@ namespace Mesen.ViewModels
 				EmulatorShortcut.ToggleSprites1,
 				EmulatorShortcut.ToggleSprites2,
 				EmulatorShortcut.EnableAllLayers,
-				
+
 				EmulatorShortcut.ToggleLagCounter,
 				EmulatorShortcut.ResetLagCounter,
 
@@ -93,7 +90,7 @@ namespace Mesen.ViewModels
 				EmulatorShortcut.DecreaseSpeed,
 
 				EmulatorShortcut.OpenFile,
-				
+
 				EmulatorShortcut.InputBarcode,
 				EmulatorShortcut.LoadTape,
 				EmulatorShortcut.RecordTape,
@@ -145,25 +142,25 @@ namespace Mesen.ViewModels
 			};
 
 			Dictionary<EmulatorShortcut, ShortcutKeyInfo> shortcuts = new Dictionary<EmulatorShortcut, ShortcutKeyInfo>();
-			foreach(ShortcutKeyInfo shortcut in Config.ShortcutKeys) {
+			foreach (ShortcutKeyInfo shortcut in Config.ShortcutKeys) {
 				shortcuts[shortcut.Shortcut] = shortcut;
 			}
 
 			ShortcutKeys = new List<ShortcutKeyInfo>();
-			for(int i = 0; i < displayOrder.Length; i++) {
-				if(shortcuts.ContainsKey(displayOrder[i])) {
+			for (int i = 0; i < displayOrder.Length; i++) {
+				if (shortcuts.ContainsKey(displayOrder[i])) {
 					ShortcutKeys.Add(shortcuts[displayOrder[i]]);
 				}
 			}
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { 
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
 				Config.ApplyConfig();
 				PreferencesConfig.UpdateTheme();
 			}));
 		}
-   }
+	}
 }

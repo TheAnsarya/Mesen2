@@ -1,20 +1,18 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class PceStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class PceStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public byte RegA { get; set; }
 		[Reactive] public byte RegX { get; set; }
 		[Reactive] public byte RegY { get; set; }
 		[Reactive] public byte RegSP { get; set; }
 		[Reactive] public UInt16 RegPC { get; set; }
 		[Reactive] public byte RegPS { get; set; }
-		
+
 		[Reactive] public bool FlagN { get; set; }
 		[Reactive] public bool FlagV { get; set; }
 		[Reactive] public bool FlagD { get; set; }
@@ -29,10 +27,8 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public string StackPreview { get; private set; } = "";
 
-		public PceStatusViewModel()
-		{
-			this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ, x => x.FlagT).Subscribe(x => {
-				RegPS = (byte)(
+		public PceStatusViewModel() {
+			this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ, x => x.FlagT).Subscribe(x => RegPS = (byte)(
 					(FlagN ? (byte)PceCpuFlags.Negative : 0) |
 					(FlagV ? (byte)PceCpuFlags.Overflow : 0) |
 					(FlagT ? (byte)PceCpuFlags.Memory : 0) |
@@ -40,8 +36,7 @@ namespace Mesen.Debugger.StatusViews
 					(FlagI ? (byte)PceCpuFlags.IrqDisable : 0) |
 					(FlagZ ? (byte)PceCpuFlags.Zero : 0) |
 					(FlagC ? (byte)PceCpuFlags.Carry : 0)
-				);
-			});
+				));
 
 			this.WhenAnyValue(x => x.RegPS).Subscribe(x => {
 				using var delayNotifs = DelayChangeNotifications(); //don't reupdate PS while updating the flags
@@ -55,8 +50,7 @@ namespace Mesen.Debugger.StatusViews
 			});
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			PceCpuState cpu = DebugApi.GetCpuState<PceCpuState>(CpuType.Pce);
 			PceVideoState video = DebugApi.GetPpuState<PceVideoState>(CpuType.Pce);
 
@@ -70,9 +64,10 @@ namespace Mesen.Debugger.StatusViews
 			RegPS = cpu.PS;
 
 			StringBuilder sb = new StringBuilder();
-			for(UInt32 i = (UInt32)0x2100 + cpu.SP + 1; i < 0x2200; i++) {
+			for (UInt32 i = (UInt32)0x2100 + cpu.SP + 1; i < 0x2200; i++) {
 				sb.Append($"${DebugApi.GetMemoryValue(MemoryType.PceMemory, i):X2} ");
 			}
+
 			StackPreview = sb.ToString();
 
 			Cycle = video.Vdc.HClock;
@@ -80,8 +75,7 @@ namespace Mesen.Debugger.StatusViews
 			FrameCount = video.Vdc.FrameCount;
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			PceCpuState cpu = DebugApi.GetCpuState<PceCpuState>(CpuType.Pce);
 
 			cpu.A = RegA;

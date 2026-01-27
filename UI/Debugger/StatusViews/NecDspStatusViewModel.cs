@@ -1,13 +1,11 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class NecDspStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class NecDspStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public UInt16 RegTR { get; set; }
 		[Reactive] public UInt16 RegTRB { get; set; }
 		[Reactive] public UInt16 RegRP { get; set; }
@@ -38,12 +36,10 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool RegB_S0 { get; set; }
 		[Reactive] public bool RegB_S1 { get; set; }
 
-		public NecDspStatusViewModel()
-		{
+		public NecDspStatusViewModel() {
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			NecDspState cpu = DebugApi.GetCpuState<NecDspState>(CpuType.NecDsp);
 
 			UpdateCycleCount(cpu.CycleCount);
@@ -80,8 +76,7 @@ namespace Mesen.Debugger.StatusViews
 			RegB_S1 = cpu.FlagsB.Sign1;
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			NecDspState cpu = DebugApi.GetCpuState<NecDspState>(CpuType.NecDsp);
 
 			cpu.TR = RegTR;

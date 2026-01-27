@@ -1,25 +1,22 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Mesen.Config;
 using Mesen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels
-{
-	public class InputConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class InputConfigViewModel : DisposableViewModel {
 		[Reactive] public InputConfig Config { get; set; }
 		[Reactive] public InputConfig OriginalConfig { get; set; }
 
-		public InputConfigViewModel()
-		{
+		public InputConfigViewModel() {
 			Config = ConfigManager.Config.Input;
 			OriginalConfig = Config.Clone();
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => Config.ApplyConfig()));
 		}
 	}
 }

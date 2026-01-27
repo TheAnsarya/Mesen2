@@ -1,27 +1,25 @@
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Avalonia.Interactivity;
 using System;
-using Mesen.Config.Shortcuts;
 using System.Collections.Generic;
-using System.Linq;
-using Avalonia.Input;
 using System.ComponentModel;
-using Mesen.Interop;
-using Avalonia.Threading;
-using Avalonia;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.Localization;
-using Avalonia.Layout;
 using System.Diagnostics;
+using System.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using Mesen.Config;
+using Mesen.Config.Shortcuts;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
 
-namespace Mesen.Windows
-{
-	public class GetKeyWindow : MesenWindow
-	{
-		private DispatcherTimer _timer; 
-		
+namespace Mesen.Windows {
+	public class GetKeyWindow : MesenWindow {
+		private DispatcherTimer _timer;
+
 		private List<UInt16> _prevScanCodes = new List<UInt16>();
 		private TextBlock lblCurrentKey;
 		private bool _allowKeyboardOnly;
@@ -31,15 +29,14 @@ namespace Mesen.Windows
 
 		public string HintLabel { get; }
 		public bool SingleKeyMode { get; set; } = false;
-		
+
 		public DbgShortKeys DbgShortcutKey { get; set; } = new DbgShortKeys();
 		public KeyCombination ShortcutKey { get; set; } = new KeyCombination();
 
 		[Obsolete("For designer only")]
 		public GetKeyWindow() : this(false) { }
 
-		public GetKeyWindow(bool allowKeyboardOnly)
-		{
+		public GetKeyWindow(bool allowKeyboardOnly) {
 			_allowKeyboardOnly = allowKeyboardOnly;
 			HintLabel = ResourceHelper.GetMessage(_allowKeyboardOnly ? "SetKeyHint" : "SetKeyMouseHint");
 
@@ -49,7 +46,7 @@ namespace Mesen.Windows
 			InitializeComponent();
 
 			lblCurrentKey = this.GetControl<TextBlock>("lblCurrentKey");
-			
+
 			_timer = new DispatcherTimer(TimeSpan.FromMilliseconds(25), DispatcherPriority.Normal, (s, e) => UpdateKeyDisplay());
 			_timer.Start();
 
@@ -58,30 +55,26 @@ namespace Mesen.Windows
 			this.AddHandler(InputElement.KeyUpEvent, OnPreviewKeyUp, RoutingStrategies.Tunnel, true);
 		}
 
-		protected override void OnClosed(EventArgs e)
-		{
+		protected override void OnClosed(EventArgs e) {
 			_timer?.Stop();
 			base.OnClosed(e);
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
-		{
+		private void OnPreviewKeyDown(object? sender, KeyEventArgs e) {
 			InputApi.SetKeyState((UInt16)e.Key, true);
 			DbgShortcutKey = new DbgShortKeys(e.KeyModifiers, e.Key);
 			_keyPressedStamp[e.Key] = _stopWatch.ElapsedTicks;
 			e.Handled = true;
 		}
 
-		private void OnPreviewKeyUp(object? sender, KeyEventArgs e)
-		{
+		private void OnPreviewKeyUp(object? sender, KeyEventArgs e) {
 			e.Handled = true;
 
-			if(e.Key.IsSpecialKey() && !_allowKeyboardOnly && (!_keyPressedStamp.TryGetValue(e.Key, out long stamp) || ((_stopWatch.ElapsedTicks - stamp) * 1000 / Stopwatch.Frequency) < 10)) {
+			if (e.Key.IsSpecialKey() && !_allowKeyboardOnly && (!_keyPressedStamp.TryGetValue(e.Key, out long stamp) || ((_stopWatch.ElapsedTicks - stamp) * 1000 / Stopwatch.Frequency) < 10)) {
 				//Key up received without key down, or key pressed for less than 10 ms, pretend the key was pressed for 50ms
 				//Some special keys can behave this way (e.g printscreen)
 				DbgShortcutKey = new DbgShortKeys(e.KeyModifiers, e.Key);
@@ -95,13 +88,12 @@ namespace Mesen.Windows
 			_keyPressedStamp.Remove(e.Key);
 
 			InputApi.SetKeyState((UInt16)e.Key, false);
-			if(_allowKeyboardOnly) {
+			if (_allowKeyboardOnly) {
 				this.Close();
 			}
 		}
 
-		protected override void OnOpened(EventArgs e)
-		{
+		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
 
 			lblCurrentKey.IsVisible = !this.SingleKeyMode;
@@ -115,23 +107,20 @@ namespace Mesen.Windows
 			InputApi.DisableAllKeys(true);
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e)
-		{
+		protected override void OnClosing(WindowClosingEventArgs e) {
 			base.OnClosing(e);
 			InputApi.DisableAllKeys(false);
 		}
 
-		private void SelectKeyCombination(KeyCombination key)
-		{
-			if(!string.IsNullOrWhiteSpace(key.ToString())) {
+		private void SelectKeyCombination(KeyCombination key) {
+			if (!string.IsNullOrWhiteSpace(key.ToString())) {
 				ShortcutKey = key;
 				this.Close();
 			}
 		}
 
-		private void UpdateKeyDisplay()
-		{
-			if(!_allowKeyboardOnly) {
+		private void UpdateKeyDisplay() {
+			if (!_allowKeyboardOnly) {
 				SystemMouseState mouseState = InputApi.GetSystemMouseState(IntPtr.Zero);
 				PixelPoint mousePos = new PixelPoint(mouseState.XPosition, mouseState.YPosition);
 				PixelRect clientBounds = new PixelRect(this.PointToScreen(new Point(0, 0)), PixelSize.FromSize(Bounds.Size, LayoutHelper.GetLayoutScale(this) / InputApi.GetPixelScale()));
@@ -144,8 +133,8 @@ namespace Mesen.Windows
 
 				List<UInt16> scanCodes = InputApi.GetPressedKeys();
 
-				if(this.SingleKeyMode) {
-					if(scanCodes.Count >= 1) {
+				if (this.SingleKeyMode) {
+					if (scanCodes.Count >= 1) {
 						//Always use the largest scancode (when multiple buttons are pressed at once)
 						scanCodes = new List<UInt16> { scanCodes.OrderBy(code => -code).First() };
 						this.SelectKeyCombination(new KeyCombination(scanCodes));
@@ -154,7 +143,7 @@ namespace Mesen.Windows
 					KeyCombination key = new KeyCombination(_prevScanCodes);
 					this.GetControl<TextBlock>("lblCurrentKey").Text = key.ToString();
 
-					if(scanCodes.Count < _prevScanCodes.Count) {
+					if (scanCodes.Count < _prevScanCodes.Count) {
 						//Confirm key selection when the user releases a key
 						this.SelectKeyCombination(key);
 					}

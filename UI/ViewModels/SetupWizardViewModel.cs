@@ -1,17 +1,15 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Diagnostics;
+using System.IO;
+using Avalonia.Controls;
 using Mesen.Config;
 using Mesen.Utilities;
 using Mesen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Diagnostics;
-using System.IO;
 
-namespace Mesen.ViewModels
-{
-	public class SetupWizardViewModel : ViewModelBase
-	{
+namespace Mesen.ViewModels {
+	public class SetupWizardViewModel : ViewModelBase {
 		[Reactive] public bool StoreInUserProfile { get; set; } = true;
 
 		[Reactive] public bool EnableXboxMappings { get; set; } = true;
@@ -25,67 +23,63 @@ namespace Mesen.ViewModels
 		[Reactive] public bool CheckForUpdates { get; set; } = true;
 		[Reactive] public bool IsOsx { get; set; } = OperatingSystem.IsMacOS();
 
-		public SetupWizardViewModel()
-		{
+		public SetupWizardViewModel() {
 			InstallLocation = ConfigManager.DefaultDocumentsFolder;
 
-			this.WhenAnyValue(x => x.StoreInUserProfile).Subscribe(x => {
-				if(StoreInUserProfile) {
-					InstallLocation = ConfigManager.DefaultDocumentsFolder;
-				} else {
-					InstallLocation = ConfigManager.DefaultPortableFolder;
-				}
-			});
+			this.WhenAnyValue(x => x.StoreInUserProfile).Subscribe(x => InstallLocation = StoreInUserProfile ? ConfigManager.DefaultDocumentsFolder : ConfigManager.DefaultPortableFolder);
 
 			this.WhenAnyValue(x => x.EnableWasdMappings).Subscribe(x => {
-				if(x) {
+				if (x) {
 					EnableArrowMappings = false;
 				}
 			});
 
 			this.WhenAnyValue(x => x.EnableArrowMappings).Subscribe(x => {
-				if(x) {
+				if (x) {
 					EnableWasdMappings = false;
 				}
 			});
 		}
 
-		public bool Confirm(Window parent)
-		{
+		public bool Confirm(Window parent) {
 			string targetFolder = StoreInUserProfile ? ConfigManager.DefaultDocumentsFolder : ConfigManager.DefaultPortableFolder;
 			string testFile = Path.Combine(targetFolder, "test.txt");
 			try {
-				if(!Directory.Exists(targetFolder)) {
+				if (!Directory.Exists(targetFolder)) {
 					Directory.CreateDirectory(targetFolder);
 				}
+
 				File.WriteAllText(testFile, "test");
 				File.Delete(testFile);
 				InitializeConfig();
-				if(CreateShortcut) {
+				if (CreateShortcut) {
 					CreateShortcutFile();
 				}
+
 				return true;
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				MesenMsgBox.Show(parent, "CannotWriteToFolder", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.ToString());
 			}
 
 			return false;
 		}
 
-		private void InitializeConfig()
-		{
+		private void InitializeConfig() {
 			ConfigManager.CreateConfig(!StoreInUserProfile);
 			DefaultKeyMappingType mappingType = DefaultKeyMappingType.None;
-			if(EnableXboxMappings) {
+			if (EnableXboxMappings) {
 				mappingType |= DefaultKeyMappingType.Xbox;
 			}
-			if(EnablePsMappings) {
+
+			if (EnablePsMappings) {
 				mappingType |= DefaultKeyMappingType.Ps4;
 			}
-			if(EnableWasdMappings) {
+
+			if (EnableWasdMappings) {
 				mappingType |= DefaultKeyMappingType.WasdKeys;
 			}
-			if(EnableArrowMappings) {
+
+			if (EnableArrowMappings) {
 				mappingType |= DefaultKeyMappingType.ArrowKeys;
 			}
 
@@ -94,14 +88,13 @@ namespace Mesen.ViewModels
 			ConfigManager.Config.Save();
 		}
 
-		private void CreateShortcutFile()
-		{
-			if(OperatingSystem.IsMacOS()) {
+		private void CreateShortcutFile() {
+			if (OperatingSystem.IsMacOS()) {
 				//TODO OSX
 				return;
 			}
-			
-			if(OperatingSystem.IsWindows()) {
+
+			if (OperatingSystem.IsWindows()) {
 				string linkPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Mesen.url");
 				FileHelper.WriteAllText(linkPath,
 					"[InternetShortcut]" + Environment.NewLine +

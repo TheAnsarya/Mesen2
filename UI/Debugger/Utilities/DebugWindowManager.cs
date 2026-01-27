@@ -1,27 +1,24 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
 using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Utilities;
-using System;
-using System.Collections.Concurrent;
-using System.Runtime.InteropServices;
-using System.Threading;
 
-namespace Mesen.Debugger.Utilities
-{
-	public static class DebugWindowManager
-	{
+namespace Mesen.Debugger.Utilities {
+	public static class DebugWindowManager {
 		private static int _debugWindowCounter = 0;
 		private static ConcurrentDictionary<Window, bool> _openedWindows = new();
 		private static ReaderWriterLockSlim _windowNotifLock = new();
 		private static bool _loadingGame = false;
 
-		public static T CreateDebugWindow<T>(Func<T> createWindow) where T : MesenWindow
-		{
-			if(Interlocked.Increment(ref _debugWindowCounter) == 1) {
+		public static T CreateDebugWindow<T>(Func<T> createWindow) where T : MesenWindow {
+			if (Interlocked.Increment(ref _debugWindowCounter) == 1) {
 				//Opened a debug window and nothing else was opened, load the saved workspace
 				DebugWorkspaceManager.Load();
 			}
@@ -32,52 +29,50 @@ namespace Mesen.Debugger.Utilities
 			return wnd;
 		}
 
-		private static void OnClosedHandler(object? sender, EventArgs e)
-		{
-			if(sender is Window window) {
-				if(window.DataContext is IDisposable disposable) {
+		private static void OnClosedHandler(object? sender, EventArgs e) {
+			if (sender is Window window) {
+				if (window.DataContext is IDisposable disposable) {
 					disposable.Dispose();
 				}
+
 				CloseDebugWindow(window);
 				ConfigManager.Config.Save();
 				window.Closed -= OnClosedHandler;
 			}
 		}
 
-		public static T OpenDebugWindow<T>(Func<T> createWindow) where T : MesenWindow
-		{
+		public static T OpenDebugWindow<T>(Func<T> createWindow) where T : MesenWindow {
 			T wnd = CreateDebugWindow<T>(createWindow);
 			wnd.Show();
 			return wnd;
 		}
 
-		public static T GetOrOpenDebugWindow<T>(Func<T> createWindow) where T : MesenWindow
-		{
-			foreach(Window wnd in _openedWindows.Keys) {
-				if(wnd is T) {
+		public static T GetOrOpenDebugWindow<T>(Func<T> createWindow) where T : MesenWindow {
+			foreach (Window wnd in _openedWindows.Keys) {
+				if (wnd is T) {
 					wnd.BringToFront();
 					return (T)wnd;
 				}
 			}
+
 			return OpenDebugWindow<T>(createWindow);
 		}
 
-		public static T? GetDebugWindow<T>(Func<T, bool> isMatch) where T : MesenWindow
-		{
-			foreach(Window wnd in _openedWindows.Keys) {
-				if(wnd is T tWnd && isMatch(tWnd)) {
+		public static T? GetDebugWindow<T>(Func<T, bool> isMatch) where T : MesenWindow {
+			foreach (Window wnd in _openedWindows.Keys) {
+				if (wnd is T tWnd && isMatch(tWnd)) {
 					return (T)wnd;
 				}
 			}
+
 			return null;
 		}
 
-		private static void CloseDebugWindow(Window wnd)
-		{
+		private static void CloseDebugWindow(Window wnd) {
 			//Remove window from list first, to ensure no more notifications are sent to it
 			_openedWindows.TryRemove(wnd, out _);
 
-			if(Interlocked.Decrement(ref _debugWindowCounter) == 0) {
+			if (Interlocked.Decrement(ref _debugWindowCounter) == 0) {
 				//Closed the last debug window, save the workspace and turn off the debugger
 				//Run any jobs pending on the UI thread, to ensure the debugger
 				//doesn't get restarted by a pending job from the window that was closed
@@ -89,31 +84,29 @@ namespace Mesen.Debugger.Utilities
 				} finally {
 					_windowNotifLock.ExitWriteLock();
 				}
+
 				DebugWorkspaceManager.Save(true);
 				DebugApi.ReleaseDebugger();
 			}
 		}
 
-		public static bool HasOpenedDebugWindows()
-		{
+		public static bool HasOpenedDebugWindows() {
 			return _debugWindowCounter > 0;
 		}
 
-		public static void CloseAllWindows()
-		{
+		public static void CloseAllWindows() {
 			//Iterate on a copy of the list since it will change during iteration
-			foreach(Window window in _openedWindows.Keys) {
+			foreach (Window window in _openedWindows.Keys) {
 				window.Close();
 			}
 		}
 
-		public static void ProcessNotification(NotificationEventArgs e)
-		{
-			if(_openedWindows.Count == 0) {
+		public static void ProcessNotification(NotificationEventArgs e) {
+			if (_openedWindows.Count == 0) {
 				return;
 			}
 
-			switch(e.NotificationType) {
+			switch (e.NotificationType) {
 				case ConsoleNotificationType.ExecuteShortcut:
 				case ConsoleNotificationType.ReleaseShortcut:
 				case ConsoleNotificationType.RefreshSoftwareRenderer:
@@ -132,11 +125,12 @@ namespace Mesen.Debugger.Utilities
 					_loadingGame = true;
 
 					//Run any pending UI calls (and wait for them to complete)
-					if(Dispatcher.UIThread.CheckAccess()) {
+					if (Dispatcher.UIThread.CheckAccess()) {
 						Dispatcher.UIThread.RunJobs();
 					} else {
 						Dispatcher.UIThread.InvokeAsync(() => Dispatcher.UIThread.RunJobs()).Wait();
 					}
+
 					break;
 
 				case ConsoleNotificationType.GameLoaded:
@@ -146,19 +140,19 @@ namespace Mesen.Debugger.Utilities
 					break;
 			}
 
-			if(!_loadingGame) {
+			if (!_loadingGame) {
 #if DEBUG
 				//Allow multiple threads to send notifications to avoid deadlocks if this ever occurs,
 				//but throw an exception in debug builds to be able to fix the source of the problem.
-				if(_windowNotifLock.CurrentReadCount > 0) {
+				if (_windowNotifLock.CurrentReadCount > 0) {
 					throw new Exception("Multiple threads tried to send debugger notifications at the same time");
 				}
 #endif
 
-				if(_windowNotifLock.TryEnterReadLock(100)) {
+				if (_windowNotifLock.TryEnterReadLock(100)) {
 					try {
-						foreach(Window window in _openedWindows.Keys) {
-							if(window is INotificationHandler handler) {
+						foreach (Window window in _openedWindows.Keys) {
+							if (window is INotificationHandler handler) {
 								handler.ProcessNotification(e);
 							}
 						}
@@ -173,10 +167,10 @@ namespace Mesen.Debugger.Utilities
 				}
 			}
 
-			switch(e.NotificationType) {
+			switch (e.NotificationType) {
 				case ConsoleNotificationType.GameLoaded:
 					GameLoadedEventParams evtParams = Marshal.PtrToStructure<GameLoadedEventParams>(e.Parameter);
-					if(!evtParams.IsPowerCycle) {
+					if (!evtParams.IsPowerCycle) {
 						//When reloading or loading another rom, reload workspace
 						Dispatcher.UIThread.Post(() => DebugWorkspaceManager.Load());
 					} else {
@@ -187,6 +181,7 @@ namespace Mesen.Debugger.Utilities
 							LabelManager.RefreshLabels(false);
 						});
 					}
+
 					break;
 
 				case ConsoleNotificationType.EmulationStopped:
@@ -195,8 +190,7 @@ namespace Mesen.Debugger.Utilities
 			}
 		}
 
-		public static bool IsDebugWindow(Window wnd)
-		{
+		public static bool IsDebugWindow(Window wnd) {
 			return _openedWindows.ContainsKey(wnd);
 		}
 	}

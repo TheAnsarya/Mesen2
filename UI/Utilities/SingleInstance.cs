@@ -1,16 +1,14 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mesen.Config;
-using System.Runtime.CompilerServices;
 
-namespace Mesen.Utilities
-{
-	public class SingleInstance : IDisposable
-	{
+namespace Mesen.Utilities {
+	public class SingleInstance : IDisposable {
 		public static SingleInstance Instance { get; private set; } = new SingleInstance();
 
 		private static Guid _identifier = new Guid("{A46696B7-2D1C-4CC5-A52F-43BCAF094AEF}");
@@ -24,9 +22,8 @@ namespace Mesen.Utilities
 		public bool FirstInstance => _firstInstance || !ConfigManager.Config.Preferences.SingleInstance;
 		public event EventHandler<ArgumentsReceivedEventArgs>? ArgumentsReceived;
 
-		public void Init(string[] args)
-		{
-			if(OperatingSystem.IsLinux() && !RuntimeFeature.IsDynamicCodeSupported) {
+		public void Init(string[] args) {
+			if (OperatingSystem.IsLinux() && !RuntimeFeature.IsDynamicCodeSupported) {
 				//Linux NativeAOT doesn't appear to work correctly here, use file lock instead
 				try {
 					_lockFileStream = File.Open(Path.Combine(ConfigManager.HomeFolder, "mesen.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
@@ -39,29 +36,22 @@ namespace Mesen.Utilities
 				_mutex = new Mutex(true, "Global\\" + _identifier.ToString(), out _firstInstance);
 			}
 
-			if(_firstInstance || !ConfigManager.Config.Preferences.SingleInstance) {
+			if (_firstInstance || !ConfigManager.Config.Preferences.SingleInstance) {
 				Task.Run(() => ListenForArguments());
 			} else {
 				PassArgumentsToFirstInstance(args);
 			}
 		}
 
-		private bool PassArgumentsToFirstInstance(string[] args)
-		{
+		private bool PassArgumentsToFirstInstance(string[] args) {
 			try {
-				using(NamedPipeClientStream client = new NamedPipeClientStream(_identifier.ToString())) {
-					using(StreamWriter writer = new StreamWriter(client)) {
+				using (NamedPipeClientStream client = new NamedPipeClientStream(_identifier.ToString())) {
+					using (StreamWriter writer = new StreamWriter(client)) {
 						client.Connect(200);
 
-						foreach(string argument in args) {
-							string absPath;
-							if(Path.IsPathRooted(argument)) {
-								absPath = argument;
-							} else {
-								absPath = Path.GetFullPath(argument, Program.OriginalFolder);
-							}
-
-							if(File.Exists(absPath)) {
+						foreach (string argument in args) {
+							string absPath = Path.IsPathRooted(argument) ? argument : Path.GetFullPath(argument, Program.OriginalFolder);
+							if (File.Exists(absPath)) {
 								//Send absolute path to the other instance, to ensure it can find
 								//the file even though its startup folder might have been different
 								writer.WriteLine(absPath);
@@ -71,26 +61,26 @@ namespace Mesen.Utilities
 						}
 					}
 				}
+
 				return true;
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				Console.WriteLine("Error: " + ex.ToString());
 			}
 
 			return false;
 		}
 
-		private void ListenForArguments()
-		{
+		private void ListenForArguments() {
 			try {
-				while(true) {
+				while (true) {
 					using NamedPipeServerStream server = new NamedPipeServerStream(_identifier.ToString());
 					using StreamReader reader = new StreamReader(server);
 					server.WaitForConnection();
 
 					List<string> args = new List<string>();
-					while(server.IsConnected) {
+					while (server.IsConnected) {
 						string? arg = reader.ReadLine();
-						if(!string.IsNullOrWhiteSpace(arg)) {
+						if (!string.IsNullOrWhiteSpace(arg)) {
 							args.Add(arg);
 						} else {
 							server.Disconnect();
@@ -98,11 +88,9 @@ namespace Mesen.Utilities
 						}
 					}
 
-					Task.Run(() => {
-						ArgumentsReceived?.Invoke(this, new ArgumentsReceivedEventArgs(args.ToArray()));
-					});
+					Task.Run(() => ArgumentsReceived?.Invoke(this, new ArgumentsReceivedEventArgs(args.ToArray())));
 				}
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				Console.WriteLine("ListenForArguments error: " + ex.ToString());
 			} finally {
 				Thread.Sleep(10000);
@@ -112,40 +100,37 @@ namespace Mesen.Utilities
 
 		#region IDisposable
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if(!_disposed) {
-				if(_mutex != null) {
-					if(_firstInstance) {
+		protected virtual void Dispose(bool disposing) {
+			if (!_disposed) {
+				if (_mutex != null) {
+					if (_firstInstance) {
 						_mutex.ReleaseMutex();
 					}
+
 					_mutex.Dispose();
 					_mutex = null;
 				}
+
 				_lockFileStream = null;
 				_disposed = true;
 			}
 		}
 
-		~SingleInstance()
-		{
+		~SingleInstance() {
 			Dispose(false);
 		}
 
-		public void Dispose()
-		{
+		public void Dispose() {
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 		#endregion
 	}
 
-	public class ArgumentsReceivedEventArgs : EventArgs
-	{
+	public class ArgumentsReceivedEventArgs : EventArgs {
 		public string[] Args { get; }
 
-		public ArgumentsReceivedEventArgs(string[] args)
-		{
+		public ArgumentsReceivedEventArgs(string[] args) {
 			Args = args;
 		}
 	}

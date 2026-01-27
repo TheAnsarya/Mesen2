@@ -1,3 +1,8 @@
+using System;
+using System.Globalization;
+using System.IO;
+using System.IO.Compression;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -8,16 +13,9 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using System;
-using System.Globalization;
-using System.IO;
-using System.IO.Compression;
-using System.Threading.Tasks;
 
-namespace Mesen.Controls
-{
-	public class StateGridEntry : UserControl
-	{
+namespace Mesen.Controls {
+	public class StateGridEntry : UserControl {
 		private static readonly WriteableBitmap EmptyImage = new WriteableBitmap(new PixelSize(256, 240), new Vector(96, 96), Avalonia.Platform.PixelFormat.Rgba8888, Avalonia.Platform.AlphaFormat.Opaque);
 
 		public static readonly StyledProperty<RecentGameInfo> EntryProperty = AvaloniaProperty.Register<StateGridEntry, RecentGameInfo>(nameof(Entry));
@@ -28,91 +26,79 @@ namespace Mesen.Controls
 		public static readonly StyledProperty<bool> IsActiveEntryProperty = AvaloniaProperty.Register<StateGridEntry, bool>(nameof(IsActiveEntry));
 		public static readonly StyledProperty<double> AspectRatioProperty = AvaloniaProperty.Register<StateGridEntry, double>(nameof(AspectRatio));
 
-		public RecentGameInfo Entry
-		{
+		public RecentGameInfo Entry {
 			get { return GetValue(EntryProperty); }
 			set { SetValue(EntryProperty, value); }
 		}
 
-		public Bitmap? Image
-		{
+		public Bitmap? Image {
 			get { return GetValue(ImageProperty); }
 			set { SetValue(ImageProperty, value); }
 		}
 
-		public double AspectRatio
-		{
+		public double AspectRatio {
 			get { return GetValue(AspectRatioProperty); }
 			set { SetValue(AspectRatioProperty, value); }
 		}
 
-		public bool Enabled
-		{
+		public bool Enabled {
 			get { return GetValue(EnabledProperty); }
 			set { SetValue(EnabledProperty, value); }
 		}
 
-		public bool IsActiveEntry
-		{
+		public bool IsActiveEntry {
 			get { return GetValue(IsActiveEntryProperty); }
 			set { SetValue(IsActiveEntryProperty, value); }
 		}
 
-		public string Title
-		{
+		public string Title {
 			get { return GetValue(TitleProperty); }
 			set { SetValue(TitleProperty, value); }
 		}
 
-		public string SubTitle
-		{
+		public string SubTitle {
 			get { return GetValue(SubTitleProperty); }
 			set { SetValue(SubTitleProperty, value); }
 		}
 
-		static StateGridEntry()
-		{
+		static StateGridEntry() {
 			//Make empty image black
 			using var imgLock = EmptyImage.Lock();
 			unsafe {
 				UInt32* buffer = (UInt32*)imgLock.Address;
-				for(int i = 0; i < 256*240; i++) {
+				for (int i = 0; i < 256 * 240; i++) {
 					buffer[i] = 0xFF000000;
 				}
 			}
 		}
 
-		public StateGridEntry()
-		{
+		public StateGridEntry() {
 			InitializeComponent();
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void OnImageClick(object sender, RoutedEventArgs e)
-		{
-			if(!IsEffectivelyVisible) {
+		private void OnImageClick(object sender, RoutedEventArgs e) {
+			if (!IsEffectivelyVisible) {
 				return;
 			}
 
 			Entry.Load();
 		}
 
-		public void Init()
-		{
+		public void Init() {
 			RecentGameInfo game = Entry;
-			if(game == null) {
+			if (game == null) {
 				return;
 			}
 
 			Title = game.Name;
 
 			bool fileExists = File.Exists(game.FileName);
-			if(fileExists) {
-				if(Path.GetExtension(game.FileName) == "." + FileDialogHelper.MesenSaveStateExt) {
+			if (fileExists) {
+				if (Path.GetExtension(game.FileName) == "." + FileDialogHelper.MesenSaveStateExt) {
 					SubTitle = new FileInfo(game.FileName).LastWriteTime.ToString();
 				} else {
 					DateTime writeTime = new FileInfo(game.FileName).LastWriteTime;
@@ -121,22 +107,23 @@ namespace Mesen.Controls
 			} else {
 				SubTitle = ResourceHelper.GetMessage("EmptyState");
 			}
+
 			Enabled = fileExists || game.SaveMode;
 			Image = StateGridEntry.EmptyImage;
 
-			if(fileExists) {
+			if (fileExists) {
 				Task.Run(() => {
 					Bitmap? img = null;
 					double aspectRatio = 0;
 					try {
-						if(Path.GetExtension(game.FileName) == "." + FileDialogHelper.MesenSaveStateExt) {
+						if (Path.GetExtension(game.FileName) == "." + FileDialogHelper.MesenSaveStateExt) {
 							img = EmuApi.GetSaveStatePreview(game.FileName);
 						} else {
 							using FileStream? fs = FileHelper.OpenRead(game.FileName);
-							if(fs != null) {
+							if (fs != null) {
 								ZipArchive zip = new ZipArchive(fs);
 								ZipArchiveEntry? entry = zip.GetEntry("Screenshot.png");
-								if(entry != null) {
+								if (entry != null) {
 									using Stream stream = entry.Open();
 
 									//Copy to a memory stream (to avoid what looks like a Skia or Avalonia issue?)
@@ -148,11 +135,11 @@ namespace Mesen.Controls
 								}
 
 								entry = zip.GetEntry("RomInfo.txt");
-								if(entry != null) {
+								if (entry != null) {
 									using StreamReader reader = new StreamReader(entry.Open());
 									string? line = null;
-									while((line = reader.ReadLine()) != null) {
-										if(line.StartsWith("aspectratio=")) {
+									while ((line = reader.ReadLine()) != null) {
+										if (line.StartsWith("aspectratio=")) {
 											double.TryParse(line.Split('=')[1], NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out aspectRatio);
 											break;
 										}

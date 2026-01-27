@@ -1,4 +1,12 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Mesen.Config;
@@ -10,25 +18,15 @@ using Mesen.Views;
 using Mesen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mesen.ViewModels
-{
-	public class NesInputConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class NesInputConfigViewModel : DisposableViewModel {
 		[Reactive] public NesConfig Config { get; set; }
-		
+
 		public List<ShortcutKeyInfo> ShortcutKeys { get; set; }
 
 		private MainWindowViewModel MainWindow { get; }
-		
+
 		[Reactive] public bool ShowMapperInput { get; private set; }
 		[Reactive] public bool HasFourScore { get; private set; }
 		[ObservableAsProperty] public bool HasFourPlayerAdapter { get; }
@@ -111,26 +109,23 @@ namespace Mesen.ViewModels
 		[Obsolete("For designer only")]
 		public NesInputConfigViewModel() : this(new NesConfig(), new PreferencesConfig()) { }
 
-		public NesInputConfigViewModel(NesConfig config, PreferencesConfig preferences)
-		{
+		public NesInputConfigViewModel(NesConfig config, PreferencesConfig preferences) {
 			Config = config;
 			MainWindow = MainWindowViewModel.Instance;
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type, x => x.Config.Port2.Type).Subscribe(t => {
-				Dispatcher.UIThread.Post(() => {
-					HasFourScore = Config.Port1.Type == ControllerType.FourScore || Config.Port2.Type == ControllerType.FourScore;
-					if(HasFourScore) {
-						Config.Port1.Type = ControllerType.FourScore;
-						Config.Port2.Type = ControllerType.None;
-					}
-				});
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type, x => x.Config.Port2.Type).Subscribe(t => Dispatcher.UIThread.Post(() => {
+				HasFourScore = Config.Port1.Type == ControllerType.FourScore || Config.Port2.Type == ControllerType.FourScore;
+				if (HasFourScore) {
+					Config.Port1.Type = ControllerType.FourScore;
+					Config.Port2.Type = ControllerType.None;
+				}
+			})));
 
 			AddDisposable(this.WhenAnyValue(x => x.Config.ExpPort.Type).Select(t => t == ControllerType.FourPlayerAdapter).ToPropertyEx(this, x => x.HasFourPlayerAdapter));
-			
+
 			AddDisposable(
 				this.WhenAnyValue(x => x.Config.ExpPort.Type)
-					.Select(t => t == ControllerType.TwoPlayerAdapter || t == ControllerType.FourPlayerAdapter)
+					.Select(t => t is ControllerType.TwoPlayerAdapter or ControllerType.FourPlayerAdapter)
 					.ToPropertyEx(this, x => x.HasExpansionHub)
 			);
 
@@ -146,9 +141,7 @@ namespace Mesen.ViewModels
 					.ToPropertyEx(this, x => x.AvailableControllerTypesExpansionHub)
 			);
 
-			AddDisposable(this.WhenAnyValue(x => x.MainWindow.RomInfo).Subscribe(x => {
-				ShowMapperInput = InputApi.HasControlDevice(ControllerType.BandaiMicrophone);
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.MainWindow.RomInfo).Subscribe(x => ShowMapperInput = InputApi.HasControlDevice(ControllerType.BandaiMicrophone)));
 
 			EmulatorShortcut[] displayOrder = new EmulatorShortcut[] {
 				EmulatorShortcut.FdsSwitchDiskSide,
@@ -163,17 +156,17 @@ namespace Mesen.ViewModels
 			};
 
 			Dictionary<EmulatorShortcut, ShortcutKeyInfo> shortcuts = new Dictionary<EmulatorShortcut, ShortcutKeyInfo>();
-			foreach(ShortcutKeyInfo shortcut in preferences.ShortcutKeys) {
+			foreach (ShortcutKeyInfo shortcut in preferences.ShortcutKeys) {
 				shortcuts[shortcut.Shortcut] = shortcut;
 			}
 
 			ShortcutKeys = new List<ShortcutKeyInfo>();
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
-			for(int i = 0; i < displayOrder.Length; i++) {
+			for (int i = 0; i < displayOrder.Length; i++) {
 				ShortcutKeys.Add(shortcuts[displayOrder[i]]);
 			}
 		}

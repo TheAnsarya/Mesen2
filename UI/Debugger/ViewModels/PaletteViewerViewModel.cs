@@ -1,4 +1,7 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -12,14 +15,9 @@ using Mesen.ViewModels;
 using Mesen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class PaletteViewerViewModel : DisposableViewModel, ICpuTypeModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class PaletteViewerViewModel : DisposableViewModel, ICpuTypeModel {
 		public CpuType CpuType { get; set; }
 		public PaletteViewerConfig Config { get; }
 		public RefreshTimingViewModel RefreshTiming { get; }
@@ -43,22 +41,20 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public PaletteViewerViewModel() : this(CpuType.Snes) { }
 
-		public PaletteViewerViewModel(CpuType cpuType)
-		{
+		public PaletteViewerViewModel(CpuType cpuType) {
 			Config = ConfigManager.Config.Debug.PaletteViewer.Clone();
 			CpuType = cpuType;
 			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, cpuType);
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Zoom).Subscribe(x => BlockSize = Math.Max(16, 16 + (x - 1) * 4)));
+			AddDisposable(this.WhenAnyValue(x => x.Config.Zoom).Subscribe(x => BlockSize = Math.Max(16, 16 + ((x - 1) * 4))));
 			AddDisposable(this.WhenAnyValue(x => x.SelectedPalette).Subscribe(x => UpdatePreviewPanel()));
 		}
 
-		public void InitActions(Window wnd, PaletteSelector palSelector, Border selectorBorder)
-		{
+		public void InitActions(Window wnd, PaletteSelector palSelector, Border selectorBorder) {
 			FileMenuActions = AddDisposables(new List<object>() {
 				new ContextMenuAction() {
 					ActionType = ActionType.Exit,
@@ -111,12 +107,7 @@ namespace Mesen.Debugger.ViewModels
 					ActionType = ActionType.EditColor,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.PaletteViewer_EditColor),
 					IsEnabled = () => SelectedPalette >= 0,
-					OnClick = () => {
-						Dispatcher.UIThread.Post(() => {
-							EditColor(wnd, SelectedPalette);
-						});
-					}
-				},
+					OnClick = () => Dispatcher.UIThread.Post(() => EditColor(wnd, SelectedPalette))                },
 				new ContextMenuSeparator() { IsVisible = () => _palette != null && _palette.Get().HasMemType },
 				new ContextMenuAction() {
 					ActionType = ActionType.ViewInMemoryViewer,
@@ -129,7 +120,7 @@ namespace Mesen.Debugger.ViewModels
 							int memSize = DebugApi.GetMemorySize(pal.PaletteMemType) - (int)pal.PaletteMemOffset;
 							if(memSize > 0) {
 								int bytesPerColor = memSize / (int)pal.ColorCount;
-								MemoryToolsWindow.ShowInMemoryTools(pal.PaletteMemType, (int)pal.PaletteMemOffset + SelectedPalette * bytesPerColor);
+								MemoryToolsWindow.ShowInMemoryTools(pal.PaletteMemType, (int)pal.PaletteMemOffset + (SelectedPalette * bytesPerColor));
 							}
 						}
 					}
@@ -137,22 +128,21 @@ namespace Mesen.Debugger.ViewModels
 			}));
 		}
 
-		private async void EditColor(Window wnd, int selectedPalette)
-		{
-			if(_palette == null) {
+		private async void EditColor(Window wnd, int selectedPalette) {
+			if (_palette == null) {
 				return;
 			}
 
 			DebugPaletteInfo palette = _palette.Get();
-			if(selectedPalette < 0 || selectedPalette >= palette.ColorCount) {
+			if (selectedPalette < 0 || selectedPalette >= palette.ColorCount) {
 				return;
 			}
 
-			if(palette.RawFormat == RawPaletteFormat.Rgb555 || palette.RawFormat == RawPaletteFormat.Rgb444 || palette.RawFormat == RawPaletteFormat.Bgr444) {
+			if (palette.RawFormat is RawPaletteFormat.Rgb555 or RawPaletteFormat.Rgb444 or RawPaletteFormat.Bgr444) {
 				ColorPickerViewModel model = new ColorPickerViewModel() { Color = Color.FromUInt32(palette.GetRgbPalette()[selectedPalette]) };
 				ColorPickerWindow colorPicker = new ColorPickerWindow() { DataContext = model };
 				bool success = await colorPicker.ShowCenteredDialog<bool>(wnd);
-				if(success) {
+				if (success) {
 					DebugApi.SetPaletteColor(CpuType, selectedPalette, model.Color.ToUInt32());
 					RefreshData();
 				}
@@ -160,33 +150,25 @@ namespace Mesen.Debugger.ViewModels
 				//Show palette and let user pick a color
 				ColorIndexPickerWindow colorPicker = new ColorIndexPickerWindow(CpuType, selectedPalette);
 				int? colorIndex = await colorPicker.ShowCenteredDialog<int?>(wnd);
-				if(colorIndex.HasValue) {
+				if (colorIndex.HasValue) {
 					DebugApi.SetPaletteColor(CpuType, selectedPalette, (uint)colorIndex.Value);
 					RefreshData();
 				}
 			}
 		}
 
-		public void ZoomOut()
-		{
+		public void ZoomOut() {
 			Config.Zoom = Math.Min(20, Math.Max(1, Config.Zoom - 1));
 		}
 
-		public void ZoomIn()
-		{
+		public void ZoomIn() {
 			Config.Zoom = Math.Min(20, Math.Max(1, Config.Zoom + 1));
 		}
 
-		public void RefreshData()
-		{
+		public void RefreshData() {
 			DebugPaletteInfo paletteInfo = DebugApi.GetPaletteInfo(CpuType);
 			uint[] paletteColors = paletteInfo.GetRgbPalette();
-			uint[]? paletteValues;
-			if(paletteInfo.RawFormat == RawPaletteFormat.Indexed) {
-				paletteValues = paletteInfo.GetRawPalette();
-			} else {
-				paletteValues = null;
-			}
+			uint[]? paletteValues = paletteInfo.RawFormat == RawPaletteFormat.Indexed ? paletteInfo.GetRawPalette() : null;
 			int paletteColumnCount = (int)paletteInfo.ColorsPerPalette;
 
 			Dispatcher.UIThread.Post(() => {
@@ -199,23 +181,21 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		private void UpdatePreviewPanel()
-		{
+		private void UpdatePreviewPanel() {
 			PreviewPanel = GetPreviewPanel(SelectedPalette, PreviewPanel);
-			
-			if(ViewerTooltip != null && ViewerMouseOverPalette >= 0) {
+
+			if (ViewerTooltip != null && ViewerMouseOverPalette >= 0) {
 				GetPreviewPanel(ViewerMouseOverPalette, ViewerTooltip);
 			}
 		}
 
-		public DynamicTooltip? GetPreviewPanel(int index, DynamicTooltip? tooltipToUpdate)
-		{
-			if(_palette == null) {
+		public DynamicTooltip? GetPreviewPanel(int index, DynamicTooltip? tooltipToUpdate) {
+			if (_palette == null) {
 				return null;
 			}
 
 			DebugPaletteInfo palette = _palette.Get();
-			if(index >= palette.ColorCount) {
+			if (index >= palette.ColorCount) {
 				return null;
 			}
 
@@ -225,8 +205,7 @@ namespace Mesen.Debugger.ViewModels
 			return PaletteHelper.GetPreviewPanel(rgbPalette, rawPalette, palette.RawFormat, index, tooltipToUpdate);
 		}
 
-		public void OnGameLoaded()
-		{
+		public void OnGameLoaded() {
 			RefreshData();
 		}
 	}

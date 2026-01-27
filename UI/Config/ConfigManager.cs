@@ -1,29 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Reflection;
-using Mesen.Interop;
 using System.Diagnostics;
-using Mesen.Utilities;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using Mesen.Interop;
+using Mesen.Utilities;
 
-namespace Mesen.Config
-{
-	public static class ConfigManager
-	{
+namespace Mesen.Config {
+	public static class ConfigManager {
 		private static Configuration? _config;
-		private static string? _homeFolder = null;
 		private static object _initLock = new object();
 
 		public static string DefaultPortableFolder { get { return Path.GetDirectoryName(Program.ExePath) ?? "./"; } }
-		public static string DefaultDocumentsFolder
-		{
-			get
-			{
+		public static string DefaultDocumentsFolder {
+			get {
 				Environment.SpecialFolder folder = OperatingSystem.IsWindows() ? Environment.SpecialFolder.MyDocuments : Environment.SpecialFolder.ApplicationData;
 				return Path.Combine(Environment.GetFolderPath(folder, Environment.SpecialFolderOption.Create), "Mesen2");
 			}
@@ -38,34 +33,22 @@ namespace Mesen.Config
 
 		public static bool DisableSaveSettings { get; internal set; }
 
-		public static string GetConfigFile()
-		{
+		public static string GetConfigFile() {
 			return Path.Combine(HomeFolder, "settings.json");
 		}
 
-		public static void CreateConfig(bool portable)
-		{
-			string homeFolder;
-			if(portable) {
-				homeFolder = DefaultPortableFolder;
-			} else {
-				homeFolder = DefaultDocumentsFolder;
-			}
+		public static void CreateConfig(bool portable) {
+			string homeFolder = portable ? DefaultPortableFolder : DefaultDocumentsFolder;
 			DependencyHelper.ExtractNativeDependencies(homeFolder);
-			_homeFolder = homeFolder;
+			HomeFolder = homeFolder;
 			Config.Save();
 		}
-		
-		public static void LoadConfig()
-		{
-			if(_config == null) {
-				lock(_initLock) {
-					if(_config == null) {
-						if(File.Exists(ConfigFile) && !Design.IsDesignMode) {
-							_config = Configuration.Deserialize(ConfigFile);
-						} else {
-							_config = Configuration.CreateConfig();
-						}
+
+		public static void LoadConfig() {
+			if (_config == null) {
+				lock (_initLock) {
+					if (_config == null) {
+						_config = File.Exists(ConfigFile) && !Design.IsDesignMode ? Configuration.Deserialize(ConfigFile) : Configuration.CreateConfig();
 						ConfigManager.ActiveTheme = _config.Preferences.Theme;
 					}
 				}
@@ -74,35 +57,34 @@ namespace Mesen.Config
 
 		public static MesenTheme ActiveTheme { get; set; }
 
-		private static bool ApplySetting(object instance, PropertyInfo property, string value)
-		{
+		private static bool ApplySetting(object instance, PropertyInfo property, string value) {
 			Type t = property.PropertyType;
 			try {
-				if(!property.CanWrite) {
+				if (!property.CanWrite) {
 					return false;
 				}
 
-				if(t == typeof(int) || t == typeof(uint) || t == typeof(double)) {
-					if(property.GetCustomAttribute<MinMaxAttribute>() is MinMaxAttribute minMaxAttribute) {
-						if(t == typeof(int)) {
-							if(int.TryParse(value, out int result)) {
-								if(result >= (int)minMaxAttribute.Min && result <= (int)minMaxAttribute.Max) {
+				if (t == typeof(int) || t == typeof(uint) || t == typeof(double)) {
+					if (property.GetCustomAttribute<MinMaxAttribute>() is MinMaxAttribute minMaxAttribute) {
+						if (t == typeof(int)) {
+							if (int.TryParse(value, out int result)) {
+								if (result >= (int)minMaxAttribute.Min && result <= (int)minMaxAttribute.Max) {
 									property.SetValue(instance, result);
 								} else {
 									return false;
 								}
 							}
-						} else if(t == typeof(uint)) {
-							if(uint.TryParse(value, out uint result)) {
-								if(result >= (uint)(int)minMaxAttribute.Min && result <= (uint)(int)minMaxAttribute.Max) {
+						} else if (t == typeof(uint)) {
+							if (uint.TryParse(value, out uint result)) {
+								if (result >= (uint)(int)minMaxAttribute.Min && result <= (uint)(int)minMaxAttribute.Max) {
 									property.SetValue(instance, result);
 								} else {
 									return false;
 								}
 							}
-						} else if(t == typeof(double)) {
-							if(double.TryParse(value, out double result)) {
-								if(result >= (double)minMaxAttribute.Min && result <= (double)minMaxAttribute.Max) {
+						} else if (t == typeof(double)) {
+							if (double.TryParse(value, out double result)) {
+								if (result >= (double)minMaxAttribute.Min && result <= (double)minMaxAttribute.Max) {
 									property.SetValue(instance, result);
 								} else {
 									return false;
@@ -110,16 +92,16 @@ namespace Mesen.Config
 							}
 						}
 					}
-				} else if(t == typeof(bool)) {
-					if(bool.TryParse(value, out bool boolValue)) {
+				} else if (t == typeof(bool)) {
+					if (bool.TryParse(value, out bool boolValue)) {
 						property.SetValue(instance, boolValue);
 					} else {
 						return false;
 					}
-				} else if(t.IsEnum) {
-					if(Enum.TryParse(t, value, true, out object? enumValue)) {
-						if(property.GetCustomAttribute<ValidValuesAttribute>() is ValidValuesAttribute validValuesAttribute) {
-							if(validValuesAttribute.ValidValues.Contains(enumValue)) {
+				} else if (t.IsEnum) {
+					if (Enum.TryParse(t, value, true, out object? enumValue)) {
+						if (property.GetCustomAttribute<ValidValuesAttribute>() is ValidValuesAttribute validValuesAttribute) {
+							if (validValuesAttribute.ValidValues.Contains(enumValue)) {
 								property.SetValue(instance, enumValue);
 							} else {
 								return false;
@@ -134,29 +116,29 @@ namespace Mesen.Config
 			} catch {
 				return false;
 			}
+
 			return true;
 		}
 
-		public static bool ProcessSwitch(string switchArg)
-		{
+		public static bool ProcessSwitch(string switchArg) {
 			Regex regex = new Regex("([a-z0-9_A-Z.]+)=([a-z0-9_A-Z.\\-]+)");
 			Match match = regex.Match(switchArg);
-			if(match.Success) {
+			if (match.Success) {
 				string[] switchPath = match.Groups[1].Value.Split(".");
 				string switchValue = match.Groups[2].Value;
 
 				object? cfg = ConfigManager.Config;
 				PropertyInfo? property;
-				for(int i = 0; i < switchPath.Length; i++) {
+				for (int i = 0; i < switchPath.Length; i++) {
 					property = cfg.GetType().GetProperty(switchPath[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-					if(property == null) {
+					if (property == null) {
 						//Invalid switch name
 						return false;
 					}
 
-					if(i < switchPath.Length - 1) {
+					if (i < switchPath.Length - 1) {
 						cfg = property.GetValue(cfg);
-						if(cfg == null) {
+						if (cfg == null) {
 							//Invalid
 							return false;
 						}
@@ -169,43 +151,32 @@ namespace Mesen.Config
 			return false;
 		}
 
-		public static void ResetHomeFolder()
-		{
-			_homeFolder = null;
+		public static void ResetHomeFolder() {
+			HomeFolder = null;
 		}
 
 		public static string HomeFolder {
-			get
-			{
-				if(_homeFolder == null) {
+			get {
+				if (field == null) {
 					string portableFolder = DefaultPortableFolder;
 					string documentsFolder = DefaultDocumentsFolder;
 
 					string portableConfig = Path.Combine(portableFolder, "settings.json");
-					if(File.Exists(portableConfig)) {
-						_homeFolder = portableFolder;
-					} else {
-						_homeFolder = documentsFolder;
-					}
+					field = File.Exists(portableConfig) ? portableFolder : documentsFolder;
 
-					Directory.CreateDirectory(_homeFolder);
+					Directory.CreateDirectory(field);
 				}
 
-				return _homeFolder;
-			}
-		}
-
-		public static string GetFolder(string defaultFolderName, string? overrideFolder, bool useOverride)
-		{
-			string folder;
-			if(useOverride && overrideFolder != null) {
-				folder = overrideFolder;
-			} else {
-				folder = defaultFolderName;
+				return field;
 			}
 
+			private set;
+		} = null;
+
+		public static string GetFolder(string defaultFolderName, string? overrideFolder, bool useOverride) {
+			string folder = useOverride && overrideFolder != null ? overrideFolder : defaultFolderName;
 			try {
-				if(!Directory.Exists(folder)) {
+				if (!Directory.Exists(folder)) {
 					Directory.CreateDirectory(folder);
 				}
 			} catch {
@@ -213,6 +184,7 @@ namespace Mesen.Config
 				EmuApi.WriteLogEntry("[UI] Folder could not be created: " + folder);
 				folder = defaultFolderName;
 			}
+
 			return folder;
 		}
 
@@ -234,11 +206,9 @@ namespace Mesen.Config
 		public static string HdPackFolder { get { return GetFolder(Path.Combine(ConfigManager.HomeFolder, "HdPacks"), null, false); } }
 		public static string RecentGamesFolder { get { return GetFolder(Path.Combine(ConfigManager.HomeFolder, "RecentGames"), null, false); } }
 
-		public static string ConfigFile
-		{
-			get
-			{
-				if(!Directory.Exists(HomeFolder)) {
+		public static string ConfigFile {
+			get {
+				if (!Directory.Exists(HomeFolder)) {
 					Directory.CreateDirectory(HomeFolder);
 				}
 
@@ -246,38 +216,36 @@ namespace Mesen.Config
 			}
 		}
 
-		public static Configuration Config
-		{
-			get 
-			{
+		public static Configuration Config {
+			get {
 				LoadConfig();
 				return _config!;
 			}
 		}
 
-		public static void ResetSettings(bool initDefaults = true)
-		{
+		public static void ResetSettings(bool initDefaults = true) {
 			DefaultKeyMappingType defaultMappings = Config.DefaultKeyMappings;
-			if(defaultMappings == DefaultKeyMappingType.None) {
+			if (defaultMappings == DefaultKeyMappingType.None) {
 				defaultMappings = DefaultKeyMappingType.Xbox | DefaultKeyMappingType.ArrowKeys;
 			}
 
 			_config = Configuration.CreateConfig();
 			Config.DefaultKeyMappings = defaultMappings;
-			if(initDefaults) {
+			if (initDefaults) {
 				Config.InitializeDefaults();
 				Config.ConfigUpgrade = (int)ConfigUpgradeHint.NextValue - 1;
 			}
+
 			Config.Save();
 			Config.ApplyConfig();
 		}
 
-		public static void RestartMesen()
-		{
+		public static void RestartMesen() {
 			ProcessModule? mainModule = Process.GetCurrentProcess().MainModule;
-			if(mainModule?.FileName == null) {
+			if (mainModule?.FileName == null) {
 				return;
 			}
+
 			SingleInstance.Instance.Dispose();
 			Process.Start(mainModule.FileName);
 		}

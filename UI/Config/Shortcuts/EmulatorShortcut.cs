@@ -1,13 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Config.Shortcuts
-{
-	public enum EmulatorShortcut
-	{
+namespace Mesen.Config.Shortcuts {
+	public enum EmulatorShortcut {
 		FastForward,
 		Rewind,
 		RewindTenSecs,
@@ -145,19 +143,18 @@ namespace Mesen.Config.Shortcuts
 		[Obsolete] LoadRandomGame,
 	}
 
-	public static class EmulatorShortcutExtensions
-	{
-		public static KeyCombination? GetShortcutKeys(this EmulatorShortcut shortcut)
-		{
+	public static class EmulatorShortcutExtensions {
+		public static KeyCombination? GetShortcutKeys(this EmulatorShortcut shortcut) {
 			PreferencesConfig cfg = ConfigManager.Config.Preferences;
 			int keyIndex = cfg.ShortcutKeys.FindIndex((ShortcutKeyInfo shortcutInfo) => shortcutInfo.Shortcut == shortcut);
-			if(keyIndex >= 0) {
-				if(!cfg.ShortcutKeys[keyIndex].KeyCombination.IsEmpty) {
+			if (keyIndex >= 0) {
+				if (!cfg.ShortcutKeys[keyIndex].KeyCombination.IsEmpty) {
 					return cfg.ShortcutKeys[keyIndex].KeyCombination;
-				} else if(!cfg.ShortcutKeys[keyIndex].KeyCombination2.IsEmpty) {
+				} else if (!cfg.ShortcutKeys[keyIndex].KeyCombination2.IsEmpty) {
 					return cfg.ShortcutKeys[keyIndex].KeyCombination2;
 				}
 			}
+
 			return null;
 		}
 	}

@@ -1,16 +1,14 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class GbaConfig : BaseConfig<GbaConfig>
-	{
+namespace Mesen.Config {
+	public class GbaConfig : BaseConfig<GbaConfig> {
 		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 		[Reactive] public ControllerConfig Controller { get; set; } = new();
@@ -19,7 +17,7 @@ namespace Mesen.Config
 		[Reactive] public bool DisableFrameSkipping { get; set; } = false;
 		[Reactive] public bool BlendFrames { get; set; } = true;
 		[Reactive] public bool GbaAdjustColors { get; set; } = true;
-		
+
 		[Reactive] public bool HideBgLayer1 { get; set; } = false;
 		[Reactive] public bool HideBgLayer2 { get; set; } = false;
 		[Reactive] public bool HideBgLayer3 { get; set; } = false;
@@ -40,8 +38,7 @@ namespace Mesen.Config
 		[Reactive][MinMax(0, 100)] public UInt32 ChannelAVol { get; set; } = 100;
 		[Reactive][MinMax(0, 100)] public UInt32 ChannelBVol { get; set; } = 100;
 
-		public void ApplyConfig()
-{
+		public void ApplyConfig() {
 			ConfigManager.Config.Video.ApplyConfig();
 
 			ConfigApi.SetGbaConfig(new InteropGbaConfig() {
@@ -73,22 +70,20 @@ namespace Mesen.Config
 			});
 		}
 
-		internal void InitializeDefaults(DefaultKeyMappingType defaultMappings)
-		{
+		internal void InitializeDefaults(DefaultKeyMappingType defaultMappings) {
 			Controller.InitDefaults(defaultMappings, ControllerType.GbaController);
 		}
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct InteropGbaConfig
-	{
+	public struct InteropGbaConfig {
 		public InteropControllerConfig Controller;
 
 		[MarshalAs(UnmanagedType.I1)] public bool SkipBootScreen;
 		[MarshalAs(UnmanagedType.I1)] public bool DisableFrameSkipping;
 		[MarshalAs(UnmanagedType.I1)] public bool BlendFrames;
 		[MarshalAs(UnmanagedType.I1)] public bool GbaAdjustColors;
-		
+
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer1;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer2;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer3;
@@ -110,8 +105,7 @@ namespace Mesen.Config
 		public UInt32 WaveVol;
 	}
 
-	public enum GbaSaveType
-	{
+	public enum GbaSaveType {
 		AutoDetect = 0,
 		None = 1,
 		Sram = 2,
@@ -122,8 +116,7 @@ namespace Mesen.Config
 		Flash128 = 7
 	}
 
-	public enum GbaRtcType
-	{
+	public enum GbaRtcType {
 		AutoDetect = 0,
 		Enabled = 1,
 		Disabled = 2,

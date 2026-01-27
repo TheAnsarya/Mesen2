@@ -1,29 +1,27 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Threading;
 using Mesen.Config;
 using Mesen.Debugger.Utilities;
 using Mesen.Debugger.Windows;
 using Mesen.Interop;
+using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Reactive.Linq;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Mesen.Localization;
-using Avalonia.Threading;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class ScriptWindowViewModel : ViewModelBase
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class ScriptWindowViewModel : ViewModelBase {
 		public ScriptWindowConfig Config { get; } = ConfigManager.Config.Debug.ScriptWindow;
 
 		[Reactive] public string Code { get; set; } = "";
@@ -48,29 +46,29 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public ScriptWindowViewModel() : this(null) { }
 
-		public ScriptWindowViewModel(ScriptStartupBehavior? behavior)
-		{
+		public ScriptWindowViewModel(ScriptStartupBehavior? behavior) {
 			this.WhenAnyValue(x => x.ScriptName).Select(x => {
 				string wndTitle = ResourceHelper.GetViewLabel(nameof(ScriptWindow), "wndTitle");
-				if(!string.IsNullOrWhiteSpace(x)) {
+				if (!string.IsNullOrWhiteSpace(x)) {
 					return wndTitle + " - " + x;
 				}
+
 				return wndTitle;
 			}).ToPropertyEx(this, x => x.WindowTitle);
 
-			switch(behavior ?? Config.ScriptStartupBehavior) {
+			switch (behavior ?? Config.ScriptStartupBehavior) {
 				case ScriptStartupBehavior.ShowBlankWindow: break;
 				case ScriptStartupBehavior.ShowTutorial: LoadScriptFromResource("Mesen.Debugger.Utilities.LuaScripts.Example.lua"); break;
 				case ScriptStartupBehavior.LoadLastScript:
-					if(Config.RecentScripts.Count > 0) {
+					if (Config.RecentScripts.Count > 0) {
 						LoadScript(Config.RecentScripts[0]);
 					}
+
 					break;
 			}
 		}
 
-		public void InitActions(ScriptWindow wnd)
-		{
+		public void InitActions(ScriptWindow wnd) {
 			_wnd = wnd;
 
 			ScriptMenuActions = GetScriptMenuActions();
@@ -126,30 +124,25 @@ namespace Mesen.Debugger.ViewModels
 			DebugShortcutManager.RegisterActions(_wnd, FileMenuActions);
 		}
 
-		private MainMenuAction GetRecentMenuItem(int index)
-		{
+		private MainMenuAction GetRecentMenuItem(int index) {
 			return new MainMenuAction() {
 				ActionType = ActionType.Custom,
 				DynamicText = () => index < ConfigManager.Config.Debug.ScriptWindow.RecentScripts.Count ? ConfigManager.Config.Debug.ScriptWindow.RecentScripts[index] : "",
 				IsVisible = () => index < ConfigManager.Config.Debug.ScriptWindow.RecentScripts.Count,
 				OnClick = () => {
-					if(index < ConfigManager.Config.Debug.ScriptWindow.RecentScripts.Count) {
+					if (index < ConfigManager.Config.Debug.ScriptWindow.RecentScripts.Count) {
 						LoadScript(ConfigManager.Config.Debug.ScriptWindow.RecentScripts[index]);
 					}
 				}
 			};
 		}
 
-		private List<ContextMenuAction> GetSharedFileActions()
-		{
+		private List<ContextMenuAction> GetSharedFileActions() {
 			return new() {
 				new ContextMenuAction() {
 					ActionType = ActionType.NewScript,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.ScriptWindow_NewScript),
-					OnClick = () => {
-						new ScriptWindow(new ScriptWindowViewModel(ScriptStartupBehavior.ShowBlankWindow)).Show();
-					}
-				},
+					OnClick = () => new ScriptWindow(new ScriptWindowViewModel(ScriptStartupBehavior.ShowBlankWindow)).Show()               },
 				new ContextMenuAction() {
 					ActionType = ActionType.Open,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.ScriptWindow_OpenScript),
@@ -163,8 +156,7 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private List<ContextMenuAction> GetToolbarActions()
-		{
+		private List<ContextMenuAction> GetToolbarActions() {
 			List<ContextMenuAction> actions = GetSharedFileActions();
 			actions.Add(new ContextMenuSeparator());
 			actions.AddRange(GetScriptMenuActions());
@@ -173,16 +165,15 @@ namespace Mesen.Debugger.ViewModels
 				ActionType = ActionType.BuiltInScripts,
 				AlwaysShowLabel = true,
 				SubActions = GetBuiltInScriptActions()
-			});			
+			});
 			return actions;
 		}
 
-		private List<object> GetBuiltInScriptActions()
-		{
+		private List<object> GetBuiltInScriptActions() {
 			List<object> actions = new();
 			Assembly assembly = Assembly.GetExecutingAssembly();
-			foreach(string name in assembly.GetManifestResourceNames()) {
-				if(Path.GetExtension(name).ToLower() == ".lua") {
+			foreach (string name in assembly.GetManifestResourceNames()) {
+				if (Path.GetExtension(name).ToLower() == ".lua") {
 					string scriptName = name.Substring(name.LastIndexOf('.', name.Length - 5) + 1);
 
 					actions.Add(new ContextMenuAction() {
@@ -192,16 +183,16 @@ namespace Mesen.Debugger.ViewModels
 					});
 				}
 			}
+
 			actions.Sort((a, b) => ((ContextMenuAction)a).Name.CompareTo(((ContextMenuAction)b).Name));
 			return actions;
 		}
 
-		private void LoadScriptFromResource(string resName)
-		{
+		private void LoadScriptFromResource(string resName) {
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			string scriptName = resName.Substring(resName.LastIndexOf('.', resName.Length - 5) + 1);
 			using Stream? stream = assembly.GetManifestResourceStream(resName);
-			if(stream != null) {
+			if (stream != null) {
 				using StreamReader sr = new StreamReader(stream);
 				LoadScriptFromString(sr.ReadToEnd());
 				ScriptName = scriptName;
@@ -209,9 +200,8 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public async void RunScript()
-		{
-			if(Config.SaveScriptBeforeRun && !string.IsNullOrWhiteSpace(FilePath)) {
+		public async void RunScript() {
+			if (Config.SaveScriptBeforeRun && !string.IsNullOrWhiteSpace(FilePath)) {
 				await SaveScript();
 			}
 
@@ -219,18 +209,16 @@ namespace Mesen.Debugger.ViewModels
 			UpdateScriptId(DebugApi.LoadScript(ScriptName.Length == 0 ? "DefaultName" : ScriptName, path, Code, ScriptId));
 		}
 
-		private void UpdateScriptId(int scriptId)
-		{
-			if(Dispatcher.UIThread.CheckAccess()) {
+		private void UpdateScriptId(int scriptId) {
+			if (Dispatcher.UIThread.CheckAccess()) {
 				ScriptId = scriptId;
 			} else {
 				Dispatcher.UIThread.Post(() => ScriptId = scriptId);
 			}
 		}
 
-		private List<ContextMenuAction> GetScriptMenuActions()
-		{
-			 return new() {
+		private List<ContextMenuAction> GetScriptMenuActions() {
+			return new() {
 				new ContextMenuAction() {
 					ActionType = ActionType.RunScript,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.ScriptWindow_RunScript),
@@ -250,62 +238,55 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		public void StopScript()
-		{
+		public void StopScript() {
 			DebugApi.RemoveScript(ScriptId);
 			UpdateScriptId(-1);
 		}
 
-		public void RestartScript()
-		{
+		public void RestartScript() {
 			DebugApi.RemoveScript(ScriptId);
 			string path = (Path.GetDirectoryName(FilePath) ?? Program.OriginalFolder) + Path.DirectorySeparatorChar;
 			UpdateScriptId(DebugApi.LoadScript(ScriptName.Length == 0 ? "DefaultName" : ScriptName, path, Code, -1));
 		}
 
-		private string? InitialFolder
-		{
-			get
-			{
-				if(ConfigManager.Config.Debug.ScriptWindow.RecentScripts.Count > 0) {
+		private string? InitialFolder {
+			get {
+				if (ConfigManager.Config.Debug.ScriptWindow.RecentScripts.Count > 0) {
 					return Path.GetDirectoryName(ConfigManager.Config.Debug.ScriptWindow.RecentScripts[0]);
 				}
+
 				return null;
 			}
 		}
 
-		private async void OpenScript()
-		{
-			if(!await SavePrompt()) {
+		private async void OpenScript() {
+			if (!await SavePrompt()) {
 				return;
 			}
 
 			string? filename = await FileDialogHelper.OpenFile(InitialFolder, _wnd, FileDialogHelper.LuaExt);
-			if(filename != null) {
+			if (filename != null) {
 				LoadScript(filename);
 			}
 		}
 
-		private void AddRecentScript(string filename)
-		{
+		private void AddRecentScript(string filename) {
 			ConfigManager.Config.Debug.ScriptWindow.AddRecentScript(filename);
 		}
 
-		private void LoadScriptFromString(string scriptContent)
-		{
+		private void LoadScriptFromString(string scriptContent) {
 			Code = scriptContent;
 			_originalText = Code;
 
-			if(Config.AutoStartScriptOnLoad) {
+			if (Config.AutoStartScriptOnLoad) {
 				RunScript();
 			}
 		}
 
-		public void LoadScript(string filename)
-		{
-			if(File.Exists(filename)) {
+		public void LoadScript(string filename) {
+			if (File.Exists(filename)) {
 				string? code = FileHelper.ReadAllText(filename);
-				if(code != null) {
+				if (code != null) {
 					AddRecentScript(filename);
 					SetFilePath(filename);
 					LoadScriptFromString(code);
@@ -313,8 +294,7 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private void SetFilePath(string filename)
-		{
+		private void SetFilePath(string filename) {
 			FilePath = filename;
 			ScriptName = Path.GetFileName(filename);
 
@@ -322,55 +302,53 @@ namespace Mesen.Debugger.ViewModels
 
 			_fileWatcher = new(Path.GetDirectoryName(FilePath) ?? "", Path.GetFileName(FilePath));
 			_fileWatcher.Changed += (s, e) => {
-				if(Config.AutoReloadScriptWhenFileChanges) {
+				if (Config.AutoReloadScriptWhenFileChanges) {
 					System.Threading.Thread.Sleep(100);
-					Dispatcher.UIThread.Post(() => {
-						LoadScript(FilePath);
-					});
+					Dispatcher.UIThread.Post(() => LoadScript(FilePath));
 				}
 			};
 			_fileWatcher.EnableRaisingEvents = true;
 		}
 
-		public async Task<bool> SavePrompt()
-		{
-			if(_originalText != Code) {
+		public async Task<bool> SavePrompt() {
+			if (_originalText != Code) {
 				DialogResult result = await MesenMsgBox.Show(_wnd, "ScriptSaveConfirmation", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
-				if(result == DialogResult.Yes) {
+				if (result == DialogResult.Yes) {
 					return await SaveScript();
-				} else if(result == DialogResult.Cancel) {
+				} else if (result == DialogResult.Cancel) {
 					return false;
 				}
 			}
+
 			return true;
 		}
 
-		private async Task<bool> SaveScript()
-		{
-			if(!string.IsNullOrWhiteSpace(FilePath)) {
-				if(_originalText != Code) {
-					if(FileHelper.WriteAllText(FilePath, Code, Encoding.UTF8)) {
+		private async Task<bool> SaveScript() {
+			if (!string.IsNullOrWhiteSpace(FilePath)) {
+				if (_originalText != Code) {
+					if (FileHelper.WriteAllText(FilePath, Code, Encoding.UTF8)) {
 						_originalText = Code;
 					} else {
 						return false;
 					}
 				}
+
 				return true;
 			} else {
 				return await SaveAs("NewScript.lua");
 			}
 		}
 
-		private async Task<bool> SaveAs(string newName)
-		{
+		private async Task<bool> SaveAs(string newName) {
 			string? filename = await FileDialogHelper.SaveFile(InitialFolder, newName, _wnd, FileDialogHelper.LuaExt);
-			if(filename != null) {
-				if(FileHelper.WriteAllText(filename, Code, Encoding.UTF8)) {
+			if (filename != null) {
+				if (FileHelper.WriteAllText(filename, Code, Encoding.UTF8)) {
 					AddRecentScript(filename);
 					SetFilePath(filename);
 					return true;
 				}
 			}
+
 			return false;
 		}
 	}

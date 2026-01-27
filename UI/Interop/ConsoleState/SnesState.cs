@@ -1,18 +1,16 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Mesen.Interop;
 
-public enum SnesCpuStopState : byte
-{
+public enum SnesCpuStopState : byte {
 	Running = 0,
 	Stopped = 1,
 	WaitingForIrq = 2
 }
 
 [Flags]
-public enum SnesCpuFlags : byte
-{
+public enum SnesCpuFlags : byte {
 	Carry = 0x01,
 	Zero = 0x02,
 	IrqDisable = 0x04,
@@ -24,8 +22,7 @@ public enum SnesCpuFlags : byte
 }
 
 [Flags]
-public enum SpcFlags : byte
-{
+public enum SpcFlags : byte {
 	Carry = 0x01,
 	Zero = 0x02,
 	IrqEnable = 0x04,
@@ -36,15 +33,13 @@ public enum SpcFlags : byte
 	Negative = 0x80
 }
 
-public enum SnesIrqSource
-{
+public enum SnesIrqSource {
 	None = 0,
 	Ppu = 1,
 	Coprocessor = 2
 }
 
-public struct SnesCpuState : BaseState
-{
+public struct SnesCpuState : BaseState {
 	public UInt64 CycleCount;
 
 	public UInt16 A;
@@ -70,8 +65,7 @@ public struct SnesCpuState : BaseState
 	public SnesCpuStopState StopState;
 }
 
-public struct SnesPpuState : BaseState
-{
+public struct SnesPpuState : BaseState {
 	public UInt16 Cycle;
 	public UInt16 Scanline;
 	public UInt16 HClock;
@@ -145,8 +139,7 @@ public struct SnesPpuState : BaseState
 	public UInt16 FixedColor;
 }
 
-public struct LayerConfig
-{
+public struct LayerConfig {
 	public UInt16 TilemapAddress;
 	public UInt16 ChrAddress;
 
@@ -159,8 +152,7 @@ public struct LayerConfig
 	[MarshalAs(UnmanagedType.I1)] public bool LargeTiles;
 }
 
-public struct WindowConfig
-{
+public struct WindowConfig {
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
 	public byte[] ActiveLayers;
 
@@ -171,8 +163,7 @@ public struct WindowConfig
 	public Byte Right;
 }
 
-public struct Mode7Config
-{
+public struct Mode7Config {
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 	public Int16[] Matrix;
 
@@ -192,24 +183,21 @@ public struct Mode7Config
 	public Int16 VScrollLatch;
 }
 
-public enum WindowMaskLogic
-{
+public enum WindowMaskLogic {
 	Or = 0,
 	And = 1,
 	Xor = 2,
 	Xnor = 3
 }
 
-public enum ColorWindowMode
-{
+public enum ColorWindowMode {
 	Never = 0,
 	OutsideWindow = 1,
 	InsideWindow = 2,
 	Always = 3
 }
 
-public struct SpcTimer
-{
+public struct SpcTimer {
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
 	[MarshalAs(UnmanagedType.I1)] public bool TimersEnabled;
 	public byte Output;
@@ -220,8 +208,7 @@ public struct SpcTimer
 	public byte Target;
 }
 
-public struct SpcState : BaseState
-{
+public struct SpcState : BaseState {
 	public UInt64 Cycle;
 	public UInt16 PC;
 	public byte A;
@@ -257,8 +244,7 @@ public struct SpcState : BaseState
 	public SpcTimer Timer2;
 }
 
-public struct DspState
-{
+public struct DspState {
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
 	public byte[] ExternalRegs;
 
@@ -311,8 +297,7 @@ public struct DspState
 	[MarshalAs(UnmanagedType.I1)] public bool EchoEnabled;
 }
 
-public struct NecDspAccFlags
-{
+public struct NecDspAccFlags {
 	[MarshalAs(UnmanagedType.I1)] public bool Carry;
 	[MarshalAs(UnmanagedType.I1)] public bool Zero;
 	[MarshalAs(UnmanagedType.I1)] public bool Overflow0;
@@ -321,8 +306,7 @@ public struct NecDspAccFlags
 	[MarshalAs(UnmanagedType.I1)] public bool Sign1;
 }
 
-public struct NecDspState : BaseState
-{
+public struct NecDspState : BaseState {
 	public UInt64 CycleCount;
 	public UInt16 A;
 	public NecDspAccFlags FlagsA;
@@ -345,8 +329,7 @@ public struct NecDspState : BaseState
 }
 
 
-public enum ArmV3CpuMode : byte
-{
+public enum ArmV3CpuMode : byte {
 	User = 0b10000,
 	Fiq = 0b10001,
 	Irq = 0b10010,
@@ -356,8 +339,7 @@ public enum ArmV3CpuMode : byte
 	System = 0b11111,
 }
 
-public struct ArmV3CpuFlags
-{
+public struct ArmV3CpuFlags {
 	public ArmV3CpuMode Mode;
 	[MarshalAs(UnmanagedType.I1)] public bool FiqDisable;
 	[MarshalAs(UnmanagedType.I1)] public bool IrqDisable;
@@ -368,14 +350,12 @@ public struct ArmV3CpuFlags
 	[MarshalAs(UnmanagedType.I1)] public bool Negative;
 }
 
-public struct ArmV3InstructionData
-{
+public struct ArmV3InstructionData {
 	public UInt32 Address;
 	public UInt32 OpCode;
 }
 
-public struct ArmV3CpuPipeline
-{
+public struct ArmV3CpuPipeline {
 	public ArmV3InstructionData Fetch;
 	public ArmV3InstructionData Decode;
 	public ArmV3InstructionData Execute;
@@ -383,8 +363,7 @@ public struct ArmV3CpuPipeline
 	public byte Mode;
 }
 
-public struct ArmV3CpuState : BaseState
-{
+public struct ArmV3CpuState : BaseState {
 	public ArmV3CpuPipeline Pipeline;
 
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
@@ -414,8 +393,7 @@ public struct ArmV3CpuState : BaseState
 	public UInt64 CycleCount;
 }
 
-public struct St018State : BaseState
-{
+public struct St018State : BaseState {
 	[MarshalAs(UnmanagedType.I1)] public bool HasDataForSnes;
 	public byte DataSnes;
 
@@ -426,8 +404,7 @@ public struct St018State : BaseState
 	[MarshalAs(UnmanagedType.I1)] public bool Ack;
 }
 
-public struct GsuFlags
-{
+public struct GsuFlags {
 	[MarshalAs(UnmanagedType.I1)] public bool Zero;
 	[MarshalAs(UnmanagedType.I1)] public bool Carry;
 	[MarshalAs(UnmanagedType.I1)] public bool Sign;
@@ -442,8 +419,7 @@ public struct GsuFlags
 	[MarshalAs(UnmanagedType.I1)] public bool Irq;
 }
 
-public struct GsuPixelCache
-{
+public struct GsuPixelCache {
 	public byte X;
 	public byte Y;
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
@@ -451,8 +427,7 @@ public struct GsuPixelCache
 	public byte ValidBits;
 }
 
-public struct GsuState : BaseState
-{
+public struct GsuState : BaseState {
 	public UInt64 CycleCount;
 
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
@@ -505,8 +480,7 @@ public struct GsuState : BaseState
 	public GsuPixelCache SecondaryCache;
 }
 
-public struct Cx4Dma
-{
+public struct Cx4Dma {
 	public UInt32 Source;
 	public UInt32 Dest;
 	public UInt16 Length;
@@ -514,14 +488,12 @@ public struct Cx4Dma
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
 }
 
-public struct Cx4Suspend
-{
+public struct Cx4Suspend {
 	public UInt32 Duration;
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
 }
 
-public struct Cx4Cache
-{
+public struct Cx4Cache {
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
 	public byte Page;
 
@@ -537,8 +509,7 @@ public struct Cx4Cache
 	public UInt16 Pos;
 }
 
-public struct Cx4Bus
-{
+public struct Cx4Bus {
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
 	[MarshalAs(UnmanagedType.I1)] public bool Reading;
 	[MarshalAs(UnmanagedType.I1)] public bool Writing;
@@ -546,8 +517,7 @@ public struct Cx4Bus
 	public UInt32 Address;
 }
 
-public struct Cx4State : BaseState
-{
+public struct Cx4State : BaseState {
 	public UInt64 CycleCount;
 	public UInt16 PB;
 	public byte PC;
@@ -597,8 +567,7 @@ public struct Cx4State : BaseState
 	public byte[] Vectors;
 }
 
-public struct Sa1State
-{
+public struct Sa1State {
 	public UInt16 Sa1ResetVector;
 	public UInt16 Sa1IrqVector;
 	public UInt16 Sa1NmiVector;
@@ -686,29 +655,25 @@ public struct Sa1State
 	public byte[] Banks;
 }
 
-public enum Sa1MathOp
-{
+public enum Sa1MathOp {
 	Mul = 0,
 	Div = 1,
 	Sum = 2
 }
 
-public enum Sa1DmaSrcDevice
-{
+public enum Sa1DmaSrcDevice {
 	PrgRom = 0,
 	BwRam = 1,
 	InternalRam = 2,
 	Reserved = 3
 }
 
-public enum Sa1DmaDestDevice
-{
+public enum Sa1DmaDestDevice {
 	InternalRam = 0,
 	BwRam = 1
 }
 
-public struct AluState
-{
+public struct AluState {
 	public byte MultOperand1;
 	public byte MultOperand2;
 	public UInt16 MultOrRemainderResult;
@@ -718,8 +683,7 @@ public struct AluState
 	public UInt16 DivResult;
 }
 
-public struct InternalRegisterState
-{
+public struct InternalRegisterState {
 	[MarshalAs(UnmanagedType.I1)] public bool EnableAutoJoypadRead;
 	[MarshalAs(UnmanagedType.I1)] public bool EnableFastRom;
 
@@ -735,16 +699,14 @@ public struct InternalRegisterState
 	public UInt16[] ControllerData;
 }
 
-public struct SnesDmaControllerState
-{
+public struct SnesDmaControllerState {
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
 	public DmaChannelConfig[] Channels;
 
 	public byte HdmaChannels;
 }
 
-public struct SnesState : BaseState
-{
+public struct SnesState : BaseState {
 	public UInt64 MasterClock;
 	public SnesCpuState Cpu;
 	public SnesPpuState Ppu;
@@ -763,8 +725,7 @@ public struct SnesState : BaseState
 	public UInt32 WramPosition;
 }
 
-public struct SnesPpuToolsState : BaseState
-{
+public struct SnesPpuToolsState : BaseState {
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 239)]
 	public byte[] ScanlineBgMode;
 

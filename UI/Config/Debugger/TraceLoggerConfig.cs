@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,10 +13,8 @@ using Mesen.Interop;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class TraceLoggerConfig : BaseWindowConfig<TraceLoggerConfig>
-	{
+namespace Mesen.Config {
+	public class TraceLoggerConfig : BaseWindowConfig<TraceLoggerConfig> {
 		[Reactive] public bool AutoRefresh { get; set; } = true;
 		[Reactive] public bool RefreshOnBreakPause { get; set; } = true;
 		[Reactive] public bool ShowToolbar { get; set; } = true;
@@ -35,12 +33,10 @@ namespace Mesen.Config
 		[Reactive] public TraceLoggerCpuConfig GbaConfig { get; set; } = new();
 		[Reactive] public TraceLoggerCpuConfig WsConfig { get; set; } = new();
 
-		public TraceLoggerConfig()
-		{
+		public TraceLoggerConfig() {
 		}
 
-		public TraceLoggerCpuConfig GetCpuConfig(CpuType type)
-		{
+		public TraceLoggerCpuConfig GetCpuConfig(CpuType type) {
 			return type switch {
 				CpuType.Snes => SnesConfig,
 				CpuType.Spc => SpcConfig,

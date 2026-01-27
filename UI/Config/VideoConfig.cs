@@ -1,19 +1,17 @@
-﻿using Mesen.Interop;
-using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using Mesen.Utilities;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class VideoConfig : BaseConfig<VideoConfig>
-	{
-		[Reactive] [MinMax(0.1, 5.0)] public double CustomAspectRatio { get; set; } = 1.0;
+namespace Mesen.Config {
+	public class VideoConfig : BaseConfig<VideoConfig> {
+		[Reactive][MinMax(0.1, 5.0)] public double CustomAspectRatio { get; set; } = 1.0;
 		[Reactive] public VideoFilterType VideoFilter { get; set; } = VideoFilterType.None;
 		[Reactive] public VideoAspectRatio AspectRatio { get; set; } = VideoAspectRatio.NoStretching;
 
@@ -23,29 +21,29 @@ namespace Mesen.Config
 		[Reactive] public bool VerticalSync { get; set; } = false;
 		[Reactive] public bool IntegerFpsMode { get; set; } = false;
 
-		[Reactive] [MinMax(-100, 100)] public int Brightness { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int Contrast { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int Hue { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int Saturation { get; set; } = 0;
-		[Reactive] [MinMax(0, 100)] public int ScanlineIntensity { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Brightness { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Contrast { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Hue { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Saturation { get; set; } = 0;
+		[Reactive][MinMax(0, 100)] public int ScanlineIntensity { get; set; } = 0;
 
 		[Reactive][MinMax(0, 100)] public int LcdGridTopLeftBrightness { get; set; } = 100;
 		[Reactive][MinMax(0, 100)] public int LcdGridTopRightBrightness { get; set; } = 85;
 		[Reactive][MinMax(0, 100)] public int LcdGridBottomLeftBrightness { get; set; } = 85;
 		[Reactive][MinMax(0, 100)] public int LcdGridBottomRightBrightness { get; set; } = 85;
 
-		[Reactive] [MinMax(-100, 100)] public int NtscArtifacts { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscBleed { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscFringing { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscGamma { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscResolution { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscSharpness { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscArtifacts { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscBleed { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscFringing { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscGamma { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscResolution { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscSharpness { get; set; } = 0;
 		[Reactive] public bool NtscMergeFields { get; set; } = false;
 
 		[Reactive] public NtscBisqwitFilterScale NtscScale { get; set; } = NtscBisqwitFilterScale._2x;
-		[Reactive] [MinMax(-50, 400)] public Int32 NtscYFilterLength { get; set; } = 0;
-		[Reactive] [MinMax(0, 400)] public Int32 NtscIFilterLength { get; set; } = 50;
-		[Reactive] [MinMax(0, 400)] public Int32 NtscQFilterLength { get; set; } = 50;
+		[Reactive][MinMax(-50, 400)] public Int32 NtscYFilterLength { get; set; } = 0;
+		[Reactive][MinMax(0, 400)] public Int32 NtscIFilterLength { get; set; } = 50;
+		[Reactive][MinMax(0, 400)] public Int32 NtscQFilterLength { get; set; } = 50;
 
 		[Reactive] public bool FullscreenForceIntegerScale { get; set; } = false;
 		[Reactive] public bool UseExclusiveFullscreen { get; set; } = false;
@@ -55,22 +53,20 @@ namespace Mesen.Config
 
 		[Reactive] public ScreenRotation ScreenRotation { get; set; } = ScreenRotation.None;
 
-		public VideoConfig()
-		{
+		public VideoConfig() {
 		}
 
-		public void ApplyConfig()
-		{
+		public void ApplyConfig() {
 			double customAspectRatio = CustomAspectRatio;
 			VideoAspectRatio aspectRatio = AspectRatio;
 			VideoFilterType videoFilter = VideoFilter;
 
 			ConsoleOverrideConfig? overrides = ConsoleOverrideConfig.GetActiveOverride();
-			if(overrides?.OverrideVideoFilter == true) {
+			if (overrides?.OverrideVideoFilter == true) {
 				videoFilter = overrides.VideoFilter;
 			}
 
-			if(overrides?.OverrideAspectRatio == true) {
+			if (overrides?.OverrideAspectRatio == true) {
 				aspectRatio = overrides.AspectRatio;
 				customAspectRatio = overrides.CustomAspectRatio;
 			}
@@ -122,8 +118,7 @@ namespace Mesen.Config
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct InteropVideoConfig
-	{
+	public struct InteropVideoConfig {
 		public double CustomAspectRatio;
 		public VideoFilterType VideoFilter;
 		public VideoAspectRatio AspectRatio;
@@ -167,8 +162,7 @@ namespace Mesen.Config
 		public UInt32 ScreenRotation;
 	}
 
-	public enum VideoFilterType
-	{
+	public enum VideoFilterType {
 		None = 0,
 		NtscBlargg,
 		NtscBisqwit,
@@ -195,8 +189,7 @@ namespace Mesen.Config
 		Prescale10x
 	}
 
-	public enum VideoAspectRatio
-	{
+	public enum VideoAspectRatio {
 		NoStretching = 0,
 		Auto = 1,
 		NTSC = 2,
@@ -206,23 +199,20 @@ namespace Mesen.Config
 		Custom = 6
 	}
 
-	public enum ScreenRotation
-	{
+	public enum ScreenRotation {
 		None = 0,
 		_90Degrees = 90,
 		_180Degrees = 180,
 		_270Degrees = 270
 	}
 
-	public enum NtscBisqwitFilterScale
-	{
+	public enum NtscBisqwitFilterScale {
 		_2x,
 		_4x,
 		_8x
 	}
 
-	public enum FullscreenResolution
-	{
+	public enum FullscreenResolution {
 		Default,
 		_3840x2160,
 		_2560x1440,
@@ -247,15 +237,12 @@ namespace Mesen.Config
 		_640x480
 	}
 
-	public static class FullscreenResolutionExtensions
-	{
-		public static int GetWidth(this FullscreenResolution res)
-		{
+	public static class FullscreenResolutionExtensions {
+		public static int GetWidth(this FullscreenResolution res) {
 			return Int32.Parse(res.ToString().Substring(1, res.ToString().IndexOf("x") - 1));
 		}
 
-		public static int GetHeight(this FullscreenResolution res)
-		{
+		public static int GetHeight(this FullscreenResolution res) {
 			return Int32.Parse(res.ToString().Substring(res.ToString().IndexOf("x") + 1));
 		}
 	}

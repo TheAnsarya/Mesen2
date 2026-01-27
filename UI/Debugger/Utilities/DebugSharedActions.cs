@@ -1,21 +1,18 @@
-﻿using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Mesen.Config;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
 
-namespace Mesen.Debugger.Utilities
-{
-	internal class DebugSharedActions
-	{
-		public static List<ContextMenuAction> GetStepActions(Control wnd, Func<CpuType> getCpuType)
-		{
+namespace Mesen.Debugger.Utilities {
+	internal class DebugSharedActions {
+		public static List<ContextMenuAction> GetStepActions(Control wnd, Func<CpuType> getCpuType) {
 			return new List<ContextMenuAction>() {
 				new ContextMenuAction() {
 					ActionType = ActionType.Continue,
@@ -107,7 +104,7 @@ namespace Mesen.Debugger.Utilities
 				},
 
 				new ContextMenuSeparator(),
-				
+
 				new ContextMenuAction() {
 					ActionType = ActionType.RunToNmi,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.RunToNmi),
@@ -136,9 +133,8 @@ namespace Mesen.Debugger.Utilities
 			};
 		}
 
-		public static void Step(CpuType cpuType, StepType type, int instructionCount = 1)
-		{
-			switch(type) {
+		public static void Step(CpuType cpuType, StepType type, int instructionCount = 1) {
+			switch (type) {
 				case StepType.PpuStep:
 				case StepType.PpuScanline:
 				case StepType.PpuFrame:
@@ -151,17 +147,15 @@ namespace Mesen.Debugger.Utilities
 			}
 		}
 
-		private static void ResumeExecution()
-		{
+		private static void ResumeExecution() {
 			DebugApi.ResumeExecution();
-			if(ConfigManager.Config.Debug.Debugger.FocusGameOnResume) {
+			if (ConfigManager.Config.Debug.Debugger.FocusGameOnResume) {
 				ApplicationHelper.GetMainWindow()?.BringToFront();
 			}
 		}
 	}
 
-	enum StepBackType
-	{
+	enum StepBackType {
 		Instruction,
 		Scanline,
 		Frame

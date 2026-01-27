@@ -1,9 +1,7 @@
-﻿using Mesen.Interop;
+using Mesen.Interop;
 
-namespace Mesen.Debugger.Utilities
-{
-	public interface ISelectableModel
-	{
+namespace Mesen.Debugger.Utilities {
+	public interface ISelectableModel {
 		void ResizeSelectionTo(int rowNumber);
 		void MoveCursor(int rowOffset, bool extendSelection);
 		void ScrollToTop(bool extendSelection);

@@ -1,16 +1,15 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Config;
 
-public class CvConfig : BaseConfig<CvConfig>
-{
+public class CvConfig : BaseConfig<CvConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 	[Reactive] public CvControllerConfig Port1 { get; set; } = new();
@@ -30,8 +29,7 @@ public class CvConfig : BaseConfig<CvConfig>
 	[Reactive][MinMax(0, 100)] public UInt32 Tone3Vol { get; set; } = 100;
 	[Reactive][MinMax(0, 100)] public UInt32 NoiseVol { get; set; } = 100;
 
-	public void ApplyConfig()
-	{
+	public void ApplyConfig() {
 		ConfigManager.Config.Video.ApplyConfig();
 
 		ConfigApi.SetCvConfig(new InteropCvConfig() {
@@ -52,15 +50,13 @@ public class CvConfig : BaseConfig<CvConfig>
 		});
 	}
 
-	internal void InitializeDefaults(DefaultKeyMappingType defaultMappings)
-	{
+	internal void InitializeDefaults(DefaultKeyMappingType defaultMappings) {
 		Port1.InitDefaults<CvKeyMapping>(defaultMappings, ControllerType.ColecoVisionController);
 	}
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct InteropCvConfig
-{
+public struct InteropCvConfig {
 	public InteropControllerConfig Port1;
 	public InteropControllerConfig Port2;
 

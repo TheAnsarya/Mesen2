@@ -1,4 +1,10 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Mesen.Config;
@@ -10,32 +16,24 @@ using Mesen.Utilities;
 using Mesen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mesen.ViewModels
-{
-	public class HistoryViewerViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class HistoryViewerViewModel : DisposableViewModel {
 		public HistoryViewerConfig Config { get; init; }
 
 		[Reactive] public bool IsPaused { get; set; }
 
 		[Reactive] public string TotalTimeText { get; set; } = "00:00";
 		[Reactive] public string CurrentTimeText { get; set; } = "00:00";
-		
+
 		[Reactive] public uint MaxPosition { get; set; }
 		[Reactive] public uint CurrentPosition { get; set; }
-		
+
 		[Reactive] public Size RendererSize { get; set; }
 
 		[Reactive] public List<ContextMenuAction> FileMenuItems { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> OptionsMenuItems { get; private set; } = new();
-		
+
 		public SoftwareRendererViewModel SoftwareRenderer { get; } = new();
 		[Reactive] public bool IsSoftwareRendererVisible { get; set; } = false;
 
@@ -43,42 +41,37 @@ namespace Mesen.ViewModels
 		private uint[] _segments = Array.Empty<uint>();
 		private double _fps = 60.0;
 
-		public HistoryViewerViewModel()
-		{
+		public HistoryViewerViewModel() {
 			Config = ConfigManager.Config.HistoryViewer;
 
 			_blockCoreUpdates = true;
 			AddDisposable(this.WhenAnyValue(x => x.CurrentPosition).Subscribe(x => {
-				if(!_blockCoreUpdates) {
+				if (!_blockCoreUpdates) {
 					HistoryApi.HistoryViewerSetPosition((uint)CurrentPosition);
 				}
 			}));
 
 			AddDisposable(this.WhenAnyValue(x => x.Config.Volume, x => x.IsPaused, x => x.RendererSize).Subscribe(x => {
-				if(!_blockCoreUpdates) {
+				if (!_blockCoreUpdates) {
 					SetCoreOptions();
 				}
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.SoftwareRenderer.FrameSurface).Subscribe(x => {
-				IsSoftwareRendererVisible = SoftwareRenderer.FrameSurface != null;
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.SoftwareRenderer.FrameSurface).Subscribe(x => IsSoftwareRendererVisible = SoftwareRenderer.FrameSurface != null));
 
 			_blockCoreUpdates = false;
 		}
 
-		public void SetCoreOptions()
-		{
+		public void SetCoreOptions() {
 			HistoryApi.HistoryViewerSetOptions(new HistoryViewerOptions() {
 				IsPaused = IsPaused,
 				Volume = (uint)Config.Volume,
-				Width = (uint)RendererSize.Width ,
+				Width = (uint)RendererSize.Width,
 				Height = (uint)RendererSize.Height
 			});
 		}
 
-		public void InitActions(HistoryViewerWindow wnd)
-		{
+		public void InitActions(HistoryViewerWindow wnd) {
 			FileMenuItems = new List<ContextMenuAction>() {
 				new ContextMenuAction() {
 					ActionType = ActionType.ExportMovie,
@@ -91,10 +84,7 @@ namespace Mesen.ViewModels
 				},
 				new ContextMenuAction() {
 					ActionType = ActionType.ResumeGameplay,
-					OnClick = () => {
-						HistoryApi.HistoryViewerResumeGameplay(CurrentPosition);
-					}
-				},
+					OnClick = () => HistoryApi.HistoryViewerResumeGameplay(CurrentPosition)             },
 				new ContextMenuSeparator(),
 				new ContextMenuAction() {
 					ActionType = ActionType.Exit,
@@ -105,7 +95,7 @@ namespace Mesen.ViewModels
 			OptionsMenuItems = new List<ContextMenuAction>() {
 				new ContextMenuAction() {
 					ActionType = ActionType.VideoScale,
-					SubActions = new List<object>() { 
+					SubActions = new List<object>() {
 						GetScaleMenuItem(wnd, 1),
 						GetScaleMenuItem(wnd, 2),
 						GetScaleMenuItem(wnd, 3),
@@ -123,13 +113,12 @@ namespace Mesen.ViewModels
 			DebugShortcutManager.RegisterActions(wnd, OptionsMenuItems);
 		}
 
-		private List<object> InitExportItems(HistoryViewerWindow wnd)
-		{
+		private List<object> InitExportItems(HistoryViewerWindow wnd) {
 			uint segmentStart = 0;
 			int itemCount = 0;
 			List<object> actions = new();
-			for(int i = 0; i < _segments.Length; i++) {
-				if((_segments[i] - segmentStart) / _fps > 2) {
+			for (int i = 0; i < _segments.Length; i++) {
+				if ((_segments[i] - segmentStart) / _fps > 2) {
 					//Only list segments that are at least 2 seconds long
 					UInt32 segStart = segmentStart;
 					UInt32 segEnd = _segments[i];
@@ -171,31 +160,28 @@ namespace Mesen.ViewModels
 			return actions;
 		}
 
-		private async void ExportMovie(HistoryViewerWindow wnd, UInt32 segStart, UInt32 segEnd)
-		{
+		private async void ExportMovie(HistoryViewerWindow wnd, UInt32 segStart, UInt32 segEnd) {
 			string initialFile = MainWindowViewModel.Instance.RomInfo.GetRomName();
 			string? file = await FileDialogHelper.SaveFile(ConfigManager.MovieFolder, initialFile, wnd, FileDialogHelper.MesenMovieExt);
-			if(file != null) {
-				if(!HistoryApi.HistoryViewerSaveMovie(file, segStart, segEnd)) {
+			if (file != null) {
+				if (!HistoryApi.HistoryViewerSaveMovie(file, segStart, segEnd)) {
 					await MesenMsgBox.Show(wnd, "MovieSaveError", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 		}
 
-		private async void CreateSaveState(HistoryViewerWindow wnd)
-		{
+		private async void CreateSaveState(HistoryViewerWindow wnd) {
 			uint position = CurrentPosition;
 			string initialFile = MainWindowViewModel.Instance.RomInfo.GetRomName();
 			string? file = await FileDialogHelper.SaveFile(ConfigManager.SaveStateFolder, initialFile, wnd, FileDialogHelper.MesenSaveStateExt);
-			if(file != null) {
-				if(!HistoryApi.HistoryViewerCreateSaveState(file, position)) {
+			if (file != null) {
+				if (!HistoryApi.HistoryViewerCreateSaveState(file, position)) {
 					await MesenMsgBox.Show(wnd, "FileSaveError", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 		}
 
-		private ContextMenuAction GetScaleMenuItem(HistoryViewerWindow wnd, int scale)
-		{
+		private ContextMenuAction GetScaleMenuItem(HistoryViewerWindow wnd, int scale) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.Custom,
 				CustomText = scale + "x",
@@ -205,8 +191,7 @@ namespace Mesen.ViewModels
 			};
 		}
 
-		public void Update()
-		{
+		public void Update() {
 			HistoryViewerState state = HistoryApi.HistoryViewerGetState();
 
 			_blockCoreUpdates = true;
@@ -229,11 +214,11 @@ namespace Mesen.ViewModels
 			_blockCoreUpdates = false;
 		}
 
-		public void TogglePause()
-		{
-			if(IsPaused && CurrentPosition == MaxPosition) {
+		public void TogglePause() {
+			if (IsPaused && CurrentPosition == MaxPosition) {
 				CurrentPosition = 0;
 			}
+
 			IsPaused = !IsPaused;
 		}
 	}

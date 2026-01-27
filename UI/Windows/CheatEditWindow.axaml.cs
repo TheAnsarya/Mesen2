@@ -1,3 +1,6 @@
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -6,21 +9,15 @@ using Mesen.Config;
 using Mesen.Controls;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using System;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
-namespace Mesen.Windows
-{
-	public class CheatEditWindow : MesenWindow
-	{
+namespace Mesen.Windows {
+	public class CheatEditWindow : MesenWindow {
 		private CheatEditWindowViewModel _model;
 
 		[Obsolete("For designer only")]
 		public CheatEditWindow() : this(new CheatCode()) { }
 
-		public CheatEditWindow(CheatCode cheat)
-		{
+		public CheatEditWindow(CheatCode cheat) {
 			InitializeComponent();
 #if DEBUG
 			this.AttachDevTools();
@@ -30,40 +27,34 @@ namespace Mesen.Windows
 			DataContext = _model;
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnOpened(EventArgs e)
-		{
+		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
 			this.GetControl<TextBox>("txtCodes").Focus();
 		}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Ok_OnClick(object sender, RoutedEventArgs e) {
 			Close(true);
 		}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
 			Close(false);
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e)
-		{
+		protected override void OnClosing(WindowClosingEventArgs e) {
 			base.OnClosing(e);
 			_model.Dispose();
 		}
 
-		public static async Task<bool> EditCheat(CheatCode cheat, Control parent)
-		{
+		public static async Task<bool> EditCheat(CheatCode cheat, Control parent) {
 			CheatCode copy = cheat.Clone();
 			CheatEditWindow wnd = new CheatEditWindow(copy);
 
 			bool result = await wnd.ShowCenteredDialog<bool>(parent);
-			if(result) {
+			if (result) {
 				cheat.CopyFrom(copy);
 			}
 

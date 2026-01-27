@@ -6,10 +6,8 @@ using Avalonia.Layout;
 
 namespace DataBoxControl;
 
-public class DataBoxCheckBoxColumn : DataBoxBoundColumn
-{
-	public DataBoxCheckBoxColumn()
-	{
+public class DataBoxCheckBoxColumn : DataBoxBoundColumn {
+	public DataBoxCheckBoxColumn() {
 		CellTemplate = new FuncDataTemplate(
 			 _ => true,
 			 (_, _) => {
@@ -20,11 +18,11 @@ public class DataBoxCheckBoxColumn : DataBoxBoundColumn
 					 Focusable = false
 				 };
 
-				 if(Binding is { }) {
+				 if (Binding is { }) {
 					 checkBox.Bind(ToggleButton.IsCheckedProperty, Binding);
 				 }
 
-				 if(IsVisible is { }) {
+				 if (IsVisible is { }) {
 					 checkBox.Bind(ToggleButton.IsVisibleProperty, IsVisible);
 				 }
 

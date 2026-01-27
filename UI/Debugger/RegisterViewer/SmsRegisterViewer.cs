@@ -1,14 +1,12 @@
-﻿using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
 using System.Collections.Generic;
+using Mesen.Debugger.ViewModels;
+using Mesen.Interop;
 using static Mesen.Debugger.ViewModels.RegEntry;
 
 namespace Mesen.Debugger.RegisterViewer;
 
-public class SmsRegisterViewer
-{
-	public static List<RegisterViewerTab> GetTabs(ref SmsState smsState, RomFormat romFormat)
-	{
+public class SmsRegisterViewer {
+	public static List<RegisterViewerTab> GetTabs(ref SmsState smsState, RomFormat romFormat) {
 		List<RegisterViewerTab> tabs = new() {
 			GetSmsVdpTab(ref smsState),
 			GetSmsPsgTab(ref smsState, romFormat == RomFormat.GameGear),
@@ -17,8 +15,7 @@ public class SmsRegisterViewer
 		return tabs;
 	}
 
-	private static RegisterViewerTab GetSmsVdpTab(ref SmsState sms)
-	{
+	private static RegisterViewerTab GetSmsVdpTab(ref SmsState sms) {
 		List<RegEntry> entries = new List<RegEntry>();
 
 		SmsVdpState vdp = sms.Vdp;
@@ -73,15 +70,14 @@ public class SmsRegisterViewer
 		return new RegisterViewerTab("VDP", entries, CpuType.Sms);
 	}
 
-	private static RegisterViewerTab GetSmsPsgTab(ref SmsState sms, bool isGameGear)
-	{
+	private static RegisterViewerTab GetSmsPsgTab(ref SmsState sms, bool isGameGear) {
 		List<RegEntry> entries = new List<RegEntry>();
 
 		SmsPsgState psg = sms.Psg;
 
 		entries.Add(new RegEntry("", "Latched register", psg.SelectedReg));
 
-		for(int i = 0; i < 3; i++) {
+		for (int i = 0; i < 3; i++) {
 			entries.AddRange(new List<RegEntry>() {
 				new RegEntry("", "Tone " + (i + 1)),
 				new RegEntry("", "Volume", psg.Tone[i].Volume, Format.X8),
@@ -100,7 +96,7 @@ public class SmsRegisterViewer
 			new RegEntry("", "Output", psg.Noise.Output),
 		});
 
-		if(isGameGear) {
+		if (isGameGear) {
 			entries.AddRange(new List<RegEntry>() {
 				new RegEntry("", "Panning"),
 				new RegEntry("$06.0", "Right tone 1 enabled", (psg.GameGearPanningReg & 0x01) != 0),
@@ -117,8 +113,7 @@ public class SmsRegisterViewer
 		return new RegisterViewerTab("PSG", entries, CpuType.Sms);
 	}
 
-	private static RegisterViewerTab GetSmsMiscTab(ref SmsState sms)
-	{
+	private static RegisterViewerTab GetSmsMiscTab(ref SmsState sms) {
 		List<RegEntry> entries = new List<RegEntry>();
 
 		SmsControlManagerState ctrl = sms.ControlManager;

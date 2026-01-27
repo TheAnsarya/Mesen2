@@ -1,21 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using System;
-using System.ComponentModel;
-using Avalonia.Data;
 using Mesen.Interop;
-using System.Collections.Generic;
-using Avalonia.Input;
 using Mesen.Utilities;
-using System.Runtime.CompilerServices;
 
-namespace Mesen.Windows
-{
-	public class AboutWindow : MesenWindow
-	{
+namespace Mesen.Windows {
+	public class AboutWindow : MesenWindow {
 		public string Version { get; }
 		public string BuildDate { get; }
 		public string RuntimeVersion { get; }
@@ -24,13 +22,12 @@ namespace Mesen.Windows
 		public List<AboutListEntry> LibraryList { get; }
 		public List<AboutListEntry> AcknowledgeList { get; }
 
-		public AboutWindow()
-		{
+		public AboutWindow() {
 			Version = EmuApi.GetMesenVersion().ToString();
 			BuildDate = EmuApi.GetMesenBuildDate();
 			RuntimeVersion = ".NET " + Environment.Version;
 			RuntimeVersion += RuntimeFeature.IsDynamicCodeSupported ? " (JIT)" : " (AOT)";
-			
+
 			string? commitHash = UpdateHelper.GetCommitHash();
 			BuildSha = commitHash ?? "";
 			BuildShortSha = commitHash?.Substring(0, 7) ?? "";
@@ -89,38 +86,31 @@ namespace Mesen.Windows
 			this.GetControl<TextBlock>("lblCopyright").Text = $"Copyright 2014-{DateTime.Now.Year} Sour";
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void btnOk_OnClick(object? sender, RoutedEventArgs e)
-		{
+		private void btnOk_OnClick(object? sender, RoutedEventArgs e) {
 			Close();
 		}
 
-		private void OnLinkPressed(object? sender, PointerPressedEventArgs e)
-		{
-			if(sender is TextBlock text && text.DataContext is AboutListEntry entry) {
+		private void OnLinkPressed(object? sender, PointerPressedEventArgs e) {
+			if (sender is TextBlock text && text.DataContext is AboutListEntry entry) {
 				ApplicationHelper.OpenBrowser(entry.Url);
 			}
 		}
 
-		private void OnMesenLinkTapped(object? sender, TappedEventArgs e)
-		{
+		private void OnMesenLinkTapped(object? sender, TappedEventArgs e) {
 			ApplicationHelper.OpenBrowser("https://www.mesen.ca");
 		}
 
-		private void OnCommitLinkTapped(object? sender, TappedEventArgs e)
-		{
+		private void OnCommitLinkTapped(object? sender, TappedEventArgs e) {
 			ApplicationHelper.OpenBrowser("https://github.com/SourMesen/Mesen2/commit/" + BuildSha);
 		}
 	}
 
-	public class AboutListEntry
-	{
-		public AboutListEntry(string name, string author, string note, string url)
-		{
+	public class AboutListEntry {
+		public AboutListEntry(string name, string author, string note, string url) {
 			Name = name;
 			Author = author;
 			Note = note;

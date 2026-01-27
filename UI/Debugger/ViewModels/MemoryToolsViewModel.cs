@@ -1,4 +1,11 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Labels;
@@ -9,18 +16,9 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class MemoryToolsViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class MemoryToolsViewModel : DisposableViewModel {
 		[Reactive] public HexEditorConfig Config { get; set; }
 		[Reactive] public int ScrollPosition { get; set; }
 		[Reactive] public HexEditorDataProvider? DataProvider { get; set; }
@@ -30,7 +28,7 @@ namespace Mesen.Debugger.ViewModels
 
 		[Reactive] public int SelectionStart { get; set; }
 		[Reactive] public int SelectionLength { get; set; }
-		
+
 		[Reactive] public string LocationText { get; private set; } = "";
 		[Reactive] public string LengthText { get; private set; } = "";
 
@@ -48,8 +46,7 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public MemoryToolsViewModel() : this(null!) { }
 
-		public MemoryToolsViewModel(HexEditor editor)
-		{
+		public MemoryToolsViewModel(HexEditor editor) {
 			Config = ConfigManager.Config.Debug.HexEditor.Clone();
 
 			Search = AddDisposable(new MemoryViewerFindViewModel(this));
@@ -58,11 +55,11 @@ namespace Mesen.Debugger.ViewModels
 			Options = AddDisposable(new MemoryToolsDisplayOptionsViewModel(this));
 			ScrollPosition = 0;
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
-			if(DebugWorkspaceManager.Workspace.TblMappings.Length > 0) {
+			if (DebugWorkspaceManager.Workspace.TblMappings.Length > 0) {
 				TblConverter = TblLoader.Load(DebugWorkspaceManager.Workspace.TblMappings);
 			}
 
@@ -71,23 +68,23 @@ namespace Mesen.Debugger.ViewModels
 			AddDisposable(this.WhenAnyValue(x => x.SelectionStart, x => x.SelectionLength).Subscribe(((int start, int length) o) => {
 				string location;
 				string length = "";
-				if(o.length <= 1) {
+				if (o.length <= 1) {
 					location = ResourceHelper.GetMessage("HexEditor_Location", o.start.ToString("X2"));
 				} else {
 					location = ResourceHelper.GetMessage("HexEditor_Selection", o.start.ToString("X2"), (o.start + o.length - 1).ToString("X2"));
 					length = ResourceHelper.GetMessage("HexEditor_Length", o.length, o.length.ToString("X2"));
 				}
 
-				if(Config.MemoryType.IsWordAddressing()) {
-					if(o.length <= 1) {
+				if (Config.MemoryType.IsWordAddressing()) {
+					if (o.length <= 1) {
 						location += $" (${o.start / 2:X2}.w)";
 					} else {
-						location += $" (${o.start / 2:X2}.w - ${(o.start + o.length - 1)/2:X2}.w)";
+						location += $" (${o.start / 2:X2}.w - ${(o.start + o.length - 1) / 2:X2}.w)";
 					}
 				}
 
 				CodeLabel? label = LabelManager.GetLabel(new AddressInfo() { Address = o.start, Type = Config.MemoryType });
-				if(label != null && (o.length <= 1 || o.length == label.Length)) {
+				if (label != null && (o.length <= 1 || o.length == label.Length)) {
 					location += $" ({label.Label})";
 				}
 
@@ -107,8 +104,7 @@ namespace Mesen.Debugger.ViewModels
 			}));
 		}
 
-		private void UpdateDataProvider()
-		{
+		private void UpdateDataProvider() {
 			DataProvider = new HexEditorDataProvider(
 				Config.MemoryType,
 				Config,
@@ -118,10 +114,9 @@ namespace Mesen.Debugger.ViewModels
 			MaxScrollValue = (DataProvider.Length / Config.BytesPerRow) - 1;
 		}
 
-		public void UpdateAvailableMemoryTypes()
-		{
+		public void UpdateAvailableMemoryTypes() {
 			AvailableMemoryTypes = Enum.GetValues<MemoryType>().Where(t => t.SupportsMemoryViewer() && DebugApi.GetMemorySize(t) > 0).Cast<Enum>().ToArray();
-			if(!AvailableMemoryTypes.Contains(Config.MemoryType)) {
+			if (!AvailableMemoryTypes.Contains(Config.MemoryType)) {
 				Config.MemoryType = (MemoryType)(AvailableMemoryTypes.FirstOrDefault() ?? MemoryType.SnesMemory);
 			}
 
@@ -129,9 +124,8 @@ namespace Mesen.Debugger.ViewModels
 			UpdateDataProvider();
 		}
 
-		public void NavigateTo(NavType nav)
-		{
-			switch(nav) {
+		public void NavigateTo(NavType nav) {
+			switch (nav) {
 				case NavType.PrevCode:
 				case NavType.NextCode:
 				case NavType.PrevData:
@@ -152,16 +146,13 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private void SearchNextCdlMatch(NavType nav)
-		{
-			if(!Config.MemoryType.SupportsCdl()) {
+		private void SearchNextCdlMatch(NavType nav) {
+			if (!Config.MemoryType.SupportsCdl()) {
 				return;
 			}
 
 			int memSize = DebugApi.GetMemorySize(Config.MemoryType);
-			VirtualArray<CdlFlags> cdlData = new VirtualArray<CdlFlags>(memSize, (start, end) => {
-				return DebugApi.GetCdlData((uint)start, (uint)(end - start + 1), Config.MemoryType);
-			});
+			VirtualArray<CdlFlags> cdlData = new VirtualArray<CdlFlags>(memSize, (start, end) => DebugApi.GetCdlData((uint)start, (uint)(end - start + 1), Config.MemoryType));
 
 			Func<int, bool> predicate = nav switch {
 				NavType.PrevCode or NavType.NextCode => (x) => cdlData[x].HasFlag(CdlFlags.Code),
@@ -173,17 +164,14 @@ namespace Mesen.Debugger.ViewModels
 			SearchNextMatch(nav, predicate, memSize);
 		}
 
-		private void SearchNextAccessMatch(NavType nav)
-		{
+		private void SearchNextAccessMatch(NavType nav) {
 			int memSize = DebugApi.GetMemorySize(Config.MemoryType);
-			VirtualArray<AddressCounters> counters = new VirtualArray<AddressCounters>(memSize, (start, end) => {
-				return DebugApi.GetMemoryAccessCounts((uint)start, (uint)(end - start + 1), Config.MemoryType);
-			});
+			VirtualArray<AddressCounters> counters = new VirtualArray<AddressCounters>(memSize, (start, end) => DebugApi.GetMemoryAccessCounts((uint)start, (uint)(end - start + 1), Config.MemoryType));
 
 			TimingInfo timing = EmuApi.GetTimingInfo(Config.MemoryType.ToCpuType());
 			double cyclesPerFrame = timing.MasterClockRate / timing.Fps;
 			int framesToFade = Config.FadeSpeed.ToFrameCount();
-			double targetClock = framesToFade == 0 ? 0 : timing.MasterClock - cyclesPerFrame * framesToFade;
+			double targetClock = framesToFade == 0 ? 0 : timing.MasterClock - (cyclesPerFrame * framesToFade);
 
 			Func<int, bool> predicate = nav switch {
 				NavType.PrevRead or NavType.NextRead => (x) => counters[x].ReadStamp > targetClock,
@@ -195,18 +183,17 @@ namespace Mesen.Debugger.ViewModels
 			SearchNextMatch(nav, predicate, memSize);
 		}
 
-		private void SearchNextMatch(NavType nav, Func<int, bool> predicate, int memSize)
-		{
+		private void SearchNextMatch(NavType nav, Func<int, bool> predicate, int memSize) {
 			int direction = nav.ToString().Contains("Prev") ? -1 : 1;
 			bool skipCurrent = predicate(_editor.SelectionStart);
-			for(int i = 0; i < memSize; i++) {
-				int index = (i * direction + _editor.SelectionStart) % memSize;
-				if(index < 0) {
+			for (int i = 0; i < memSize; i++) {
+				int index = ((i * direction) + _editor.SelectionStart) % memSize;
+				if (index < 0) {
 					index += memSize;
 				}
 
-				if(predicate(index)) {
-					if(!skipCurrent) {
+				if (predicate(index)) {
+					if (!skipCurrent) {
 						_editor.SetCursorPosition(index);
 						break;
 					}
@@ -216,13 +203,12 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public bool Find(SearchDirection direction)
-		{
+		public bool Find(SearchDirection direction) {
 			SearchData? data = Search.GetSearchData();
-			if(data == null) {
+			if (data == null) {
 				return false;
 			}
-			
+
 			MemoryType memType = Config.MemoryType;
 			TimingInfo timingInfo = Search.IsAccessFiltered && Search.FilterTimeSpanEnabled ? EmuApi.GetTimingInfo(memType.ToCpuType()) : new();
 
@@ -235,39 +221,37 @@ namespace Mesen.Debugger.ViewModels
 
 			//TODO this can be a bit slow in edge cases depending on search+filters.
 			//(e.g search 00 00 00 in a code segment with no matches)
-			VirtualArray<byte> mem = new VirtualArray<byte>(memSize, (start, end) => {
-				return DebugApi.GetMemoryValues(memType, (uint)start, (uint)end);
-			});
+			VirtualArray<byte> mem = new VirtualArray<byte>(memSize, (start, end) => DebugApi.GetMemoryValues(memType, (uint)start, (uint)end));
 
 			bool firstLoop = true;
-			for(int i = startPos; ; i += offset) {
-				if(i < 0) {
+			for (int i = startPos; ; i += offset) {
+				if (i < 0) {
 					//Wrap around to the end
 					i = memSize - searchLen;
-				} else if(i > memSize - searchLen) {
+				} else if (i > memSize - searchLen) {
 					//Wrap around to the start
 					i = 0;
 				}
 
-				if(firstLoop) {
+				if (firstLoop) {
 					//Adjust startPos based on wrap around calculated above
 					startPos = i;
 					firstLoop = false;
 				} else {
-					if(i == startPos) {
+					if (i == startPos) {
 						//Break if all start positions were checked
 						break;
 					}
 				}
 
 				int j = 0;
-				while(j < searchLen && i + j < memSize) {
+				while (j < searchLen && i + j < memSize) {
 					byte val = mem[i + j];
-					if(data.Data[j] >= 0 && data.Data[j] != val && (data.DataAlt == null || data.DataAlt[j] != val)) {
+					if (data.Data[j] >= 0 && data.Data[j] != val && (data.DataAlt == null || data.DataAlt[j] != val)) {
 						break;
-					} else if(j == searchLen - 1) {
+					} else if (j == searchLen - 1) {
 						//Match
-						if(CheckSearchFilters(memType, i, searchLen, timingInfo)) {
+						if (CheckSearchFilters(memType, i, searchLen, timingInfo)) {
 							_editor.SetCursorPosition(i, scrollToTop: true);
 							_editor.SelectionLength = searchLen;
 							Search.ShowNotFoundError = false;
@@ -283,36 +267,35 @@ namespace Mesen.Debugger.ViewModels
 			return false;
 		}
 
-		private bool CheckSearchFilters(MemoryType memType, int pos, int searchLen, TimingInfo timingInfo)
-		{
-			if(Search.IsDataTypeFiltered) {
+		private bool CheckSearchFilters(MemoryType memType, int pos, int searchLen, TimingInfo timingInfo) {
+			if (Search.IsDataTypeFiltered) {
 				CdlFlags[] cdlData = DebugApi.GetCdlData((uint)pos, (uint)searchLen, memType);
-				foreach(CdlFlags flags in cdlData) {
+				foreach (CdlFlags flags in cdlData) {
 					bool match = false;
 					match |= Search.FilterCode && flags.HasFlag(CdlFlags.Code);
 					match |= Search.FilterData && flags.HasFlag(CdlFlags.Data);
-					match |= Search.FilterUnidentified && (!flags.HasFlag(CdlFlags.Code) && !flags.HasFlag(CdlFlags.Data));
-					if(!match) {
+					match |= Search.FilterUnidentified && !flags.HasFlag(CdlFlags.Code) && !flags.HasFlag(CdlFlags.Data);
+					if (!match) {
 						return false;
 					}
 				}
 			}
 
-			if(Search.IsAccessFiltered) {
+			if (Search.IsAccessFiltered) {
 				AddressCounters[] memCounters = DebugApi.GetMemoryAccessCounts((uint)pos, (uint)searchLen, memType);
 				ulong stamp = 0;
-				if(Search.FilterTimeSpanEnabled) {
+				if (Search.FilterTimeSpanEnabled) {
 					double clocksPerFrame = timingInfo.MasterClockRate / timingInfo.Fps;
 					stamp = timingInfo.MasterClock - (ulong)(clocksPerFrame * Search.FilterTimeSpan);
 				}
 
-				foreach(AddressCounters counters in memCounters) {
+				foreach (AddressCounters counters in memCounters) {
 					bool match = false;
 					match |= Search.FilterRead && counters.ReadStamp > stamp;
 					match |= Search.FilterWrite && counters.WriteStamp > stamp;
 					match |= Search.FilterExec && counters.ExecStamp > stamp;
-					match |= Search.FilterNotAccessed && (counters.ReadStamp <= stamp && counters.WriteStamp <= stamp && counters.ExecStamp <= stamp);
-					if(!match) {
+					match |= Search.FilterNotAccessed && counters.ReadStamp <= stamp && counters.WriteStamp <= stamp && counters.ExecStamp <= stamp;
+					if (!match) {
 						return false;
 					}
 				}

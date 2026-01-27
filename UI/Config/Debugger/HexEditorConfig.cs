@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,10 +14,8 @@ using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class HexEditorConfig : BaseWindowConfig<HexEditorConfig>
-	{
+namespace Mesen.Config {
+	public class HexEditorConfig : BaseWindowConfig<HexEditorConfig> {
 		[Reactive] public bool ShowOptionPanel { get; set; } = true;
 		[Reactive] public bool AutoRefresh { get; set; } = true;
 		[Reactive] public bool IgnoreRedundantWrites { get; set; } = false;
@@ -42,9 +40,9 @@ namespace Mesen.Config
 		[Reactive] public HighlightConfig LabelHighlight { get; set; } = new() { Highlight = false, ColorCode = Colors.LightPink.ToUInt32() };
 		[Reactive] public HighlightConfig CodeHighlight { get; set; } = new() { Highlight = false, ColorCode = Colors.DarkSeaGreen.ToUInt32() };
 		[Reactive] public HighlightConfig DataHighlight { get; set; } = new() { Highlight = false, ColorCode = Colors.LightSteelBlue.ToUInt32() };
-		
+
 		[Reactive] public HighlightConfig FrozenHighlight { get; set; } = new() { Highlight = true, ColorCode = Colors.Magenta.ToUInt32() };
-		
+
 		[Reactive] public HighlightConfig NesPcmDataHighlight { get; set; } = new() { Highlight = false, ColorCode = Colors.Khaki.ToUInt32() };
 		[Reactive] public HighlightConfig NesDrawnChrRomHighlight { get; set; } = new() { Highlight = false, ColorCode = Colors.Thistle.ToUInt32() };
 
@@ -52,23 +50,19 @@ namespace Mesen.Config
 
 		[Reactive] public MemoryType MemoryType { get; set; } = MemoryType.SnesMemory;
 
-		public HexEditorConfig()
-		{
+		public HexEditorConfig() {
 		}
 	}
 
-	public enum HighlightFadeSpeed
-	{
+	public enum HighlightFadeSpeed {
 		NoFade,
 		Slow,
 		Normal,
 		Fast
 	}
 
-	public static class HighlightFadeSpeedExtensions
-	{
-		public static int ToFrameCount(this HighlightFadeSpeed speed)
-		{
+	public static class HighlightFadeSpeedExtensions {
+		public static int ToFrameCount(this HighlightFadeSpeed speed) {
 			return speed switch {
 				HighlightFadeSpeed.NoFade => 0,
 				HighlightFadeSpeed.Slow => 600,
@@ -79,14 +73,12 @@ namespace Mesen.Config
 		}
 	}
 
-	public class HighlightConfig : ReactiveObject
-	{
+	public class HighlightConfig : ReactiveObject {
 		[Reactive] public bool Highlight { get; set; }
 		[Reactive] public UInt32 ColorCode { get; set; }
 
 		[JsonIgnore]
-		public Color Color
-		{
+		public Color Color {
 			get { return Color.FromUInt32(ColorCode); }
 			set { ColorCode = value.ToUInt32(); }
 		}

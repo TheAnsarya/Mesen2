@@ -1,37 +1,32 @@
-﻿using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
 
-namespace Mesen.Config.Shortcuts
-{
-	public class KeyCombination
-	{
+namespace Mesen.Config.Shortcuts {
+	public class KeyCombination {
 		public UInt16 Key1 { get; set; }
 		public UInt16 Key2 { get; set; }
 		public UInt16 Key3 { get; set; }
 
 		public bool IsEmpty { get { return Key1 == 0 && Key2 == 0 && Key3 == 0; } }
 
-		public override string ToString()
-		{
-			if(IsEmpty) {
+		public override string ToString() {
+			if (IsEmpty) {
 				return "";
 			} else {
 				return GetKeyNames();
 			}
 		}
 
-		public KeyCombination()
-		{
+		public KeyCombination() {
 		}
 
-		public KeyCombination(List<UInt16>? keyCodes = null)
-		{
-			if(keyCodes != null) {
-				if(keyCodes.Any(code => code > 0xFFFF)) {
+		public KeyCombination(List<UInt16>? keyCodes = null) {
+			if (keyCodes != null) {
+				if (keyCodes.Any(code => code > 0xFFFF)) {
 					//If both keyboard & gamepad buttons/keys exist, only use the gamepad buttons
 					//This fixes an issue with Steam where Steam can remap gamepad buttons to send keyboard keys
 					//See: Settings -> Controller Settings -> General Controller Settings -> Checking the Xbox/PS4/Generic/etc controller checkboxes will cause this
@@ -48,15 +43,14 @@ namespace Mesen.Config.Shortcuts
 			}
 		}
 
-		private string GetKeyNames()
-		{
+		private string GetKeyNames() {
 			List<UInt16> scanCodes = new List<UInt16>() { Key1, Key2, Key3 };
 			List<string> keyNames = scanCodes.Select((UInt16 scanCode) => InputApi.GetKeyName(scanCode)).Where((keyName) => !string.IsNullOrWhiteSpace(keyName)).ToList();
 
-			if(keyNames.Count > 1) {
+			if (keyNames.Count > 1) {
 				//Merge left/right ctrl/alt/shift for key combinations
 				keyNames = keyNames.Select(key => {
-					switch(key) {
+					switch (key) {
 						case "Left Ctrl":
 						case "Right Ctrl":
 							return "Ctrl";
@@ -76,25 +70,25 @@ namespace Mesen.Config.Shortcuts
 			}
 
 			keyNames.Sort((string a, string b) => {
-				if(a == b) {
+				if (a == b) {
 					return 0;
 				}
 
-				if(a.Contains("Ctrl")) {
+				if (a.Contains("Ctrl")) {
 					return -1;
-				} else if(b.Contains("Ctrl")) {
+				} else if (b.Contains("Ctrl")) {
 					return 1;
 				}
 
-				if(a.Contains("Alt")) {
+				if (a.Contains("Alt")) {
 					return -1;
-				} else if(b.Contains("Alt")) {
+				} else if (b.Contains("Alt")) {
 					return 1;
 				}
 
-				if(a.Contains("Shift")) {
+				if (a.Contains("Shift")) {
 					return -1;
-				} else if(b.Contains("Shift")) {
+				} else if (b.Contains("Shift")) {
 					return 1;
 				}
 
@@ -104,8 +98,7 @@ namespace Mesen.Config.Shortcuts
 			return string.Join("+", keyNames);
 		}
 
-		public InteropKeyCombination ToInterop()
-		{
+		public InteropKeyCombination ToInterop() {
 			return new InteropKeyCombination() {
 				Key1 = Key1,
 				Key2 = Key2,

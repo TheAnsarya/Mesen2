@@ -1,20 +1,18 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class NesStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class NesStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public byte RegA { get; set; }
 		[Reactive] public byte RegX { get; set; }
 		[Reactive] public byte RegY { get; set; }
 		[Reactive] public byte RegSP { get; set; }
 		[Reactive] public UInt16 RegPC { get; set; }
 		[Reactive] public byte RegPS { get; set; }
-		
+
 		[Reactive] public bool FlagN { get; set; }
 		[Reactive] public bool FlagV { get; set; }
 		[Reactive] public bool FlagD { get; set; }
@@ -23,7 +21,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagC { get; set; }
 
 		[Reactive] public bool FlagNmi { get; set; }
-		
+
 		[Reactive] public bool FlagIrqExternal { get; set; }
 		[Reactive] public bool FlagIrqFrameCount { get; set; }
 		[Reactive] public bool FlagIrqDmc { get; set; }
@@ -40,7 +38,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool SpriteOverflow { get; set; }
 		[Reactive] public bool VerticalBlank { get; set; }
 		[Reactive] public bool WriteToggle { get; set; }
-		
+
 		//Mask
 		[Reactive] public bool BgEnabled { get; set; }
 		[Reactive] public bool SpritesEnabled { get; set; }
@@ -60,18 +58,15 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public string StackPreview { get; private set; } = "";
 
-		public NesStatusViewModel()
-		{
-			this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ).Subscribe(x => {
-				RegPS = (byte)(
+		public NesStatusViewModel() {
+			this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ).Subscribe(x => RegPS = (byte)(
 					(FlagN ? (byte)NesCpuFlags.Negative : 0) |
 					(FlagV ? (byte)NesCpuFlags.Overflow : 0) |
 					(FlagD ? (byte)NesCpuFlags.Decimal : 0) |
 					(FlagI ? (byte)NesCpuFlags.IrqDisable : 0) |
 					(FlagZ ? (byte)NesCpuFlags.Zero : 0) |
 					(FlagC ? (byte)NesCpuFlags.Carry : 0)
-				);
-			});
+				));
 
 			this.WhenAnyValue(x => x.RegPS).Subscribe(x => {
 				using var delayNotifs = DelayChangeNotifications(); //don't reupdate PS while updating the flags
@@ -84,8 +79,7 @@ namespace Mesen.Debugger.StatusViews
 			});
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			NesCpuState cpu = DebugApi.GetCpuState<NesCpuState>(CpuType.Nes);
 			NesPpuState ppu = DebugApi.GetPpuState<NesPpuState>(CpuType.Nes);
 
@@ -105,9 +99,10 @@ namespace Mesen.Debugger.StatusViews
 			FlagIrqFdsDisk = (cpu.IRQFlag & (byte)NesIrqSources.FdsDisk) != 0;
 
 			StringBuilder sb = new StringBuilder();
-			for(UInt32 i = (UInt32)0x100 + cpu.SP + 1; i < 0x200; i++) {
+			for (UInt32 i = (UInt32)0x100 + cpu.SP + 1; i < 0x200; i++) {
 				sb.Append($"${DebugApi.GetMemoryValue(MemoryType.NesMemory, i):X2} ");
 			}
+
 			StackPreview = sb.ToString();
 
 			Cycle = ppu.Cycle;
@@ -139,8 +134,7 @@ namespace Mesen.Debugger.StatusViews
 			IntensifyBlue = ppu.Mask.IntensifyBlue;
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			NesCpuState cpu = DebugApi.GetCpuState<NesCpuState>(CpuType.Nes);
 			NesPpuState ppu = DebugApi.GetPpuState<NesPpuState>(CpuType.Nes);
 

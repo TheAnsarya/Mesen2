@@ -1,4 +1,11 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Platform;
@@ -12,18 +19,9 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
 		public CpuType CpuType { get; set; }
 
 		public TileViewerConfig Config { get; }
@@ -50,7 +48,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public int GridSizeY { get; set; } = 8;
 
 		[Reactive] public Rect SelectionRect { get; set; }
-		
+
 		[Reactive] public List<PictureViewerLine>? PageDelimiters { get; set; }
 
 		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
@@ -64,7 +62,7 @@ namespace Mesen.Debugger.ViewModels
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
 
-		public int ColumnCount => Math.Clamp(Config.ColumnCount, 4, 256); 
+		public int ColumnCount => Math.Clamp(Config.ColumnCount, 4, 256);
 		public int RowCount => Math.Clamp(Config.RowCount, 4, 256);
 
 		private BaseState? _ppuState;
@@ -78,15 +76,14 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public TileViewerViewModel() : this(CpuType.Snes, new(), new(), null) { }
 
-		public TileViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Window? wnd)
-		{
+		public TileViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Window? wnd) {
 			Config = ConfigManager.Config.Debug.TileViewer.Clone();
 			CpuType = cpuType;
 			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, cpuType);
 
 			InitBitmap();
 
-			if(Design.IsDesignMode || wnd == null) {
+			if (Design.IsDesignMode || wnd == null) {
 				return;
 			}
 
@@ -199,11 +196,11 @@ namespace Mesen.Debugger.ViewModels
 					_ => PaletteSelectionMode.None
 				};
 
-				if(selMode != PaletteSelectionMode) {
+				if (selMode != PaletteSelectionMode) {
 					PaletteSelectionMode = selMode;
 
 					PixelSize tileSize = x.Item1.GetTileSize();
-					if(GridSizeX != tileSize.Width || GridSizeY != tileSize.Height) {
+					if (GridSizeX != tileSize.Width || GridSizeY != tileSize.Height) {
 						GridSizeX = tileSize.Width;
 						GridSizeY = tileSize.Height;
 						SelectionRect = default;
@@ -214,13 +211,9 @@ namespace Mesen.Debugger.ViewModels
 				}
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Layout).Subscribe(x => {
-				ApplyColumnRowCountRestrictions();
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.Config.Layout).Subscribe(x => ApplyColumnRowCountRestrictions()));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.StartAddress).Subscribe(x => {
-				RefreshData();
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.Config.StartAddress).Subscribe(x => RefreshData()));
 
 			AddDisposable(this.WhenAnyValue(x => x.Config.ColumnCount, x => x.Config.RowCount, x => x.Config.Format).Subscribe(x => {
 				//Enforce min/max values for column/row counts
@@ -235,9 +228,10 @@ namespace Mesen.Debugger.ViewModels
 
 			AddDisposable(this.WhenAnyValue(x => x.Config.Source).Subscribe(memType => {
 				MaximumAddress = Math.Max(0, DebugApi.GetMemorySize(memType) - 1);
-				if(Config.StartAddress > MaximumAddress) {
+				if (Config.StartAddress > MaximumAddress) {
 					Config.StartAddress = 0;
 				}
+
 				ShowFilterDropdown = memType.SupportsCdl();
 				RefreshData();
 			}));
@@ -251,21 +245,19 @@ namespace Mesen.Debugger.ViewModels
 				x => x.Config.Source, x => x.Config.StartAddress, x => x.Config.ColumnCount,
 				x => x.Config.RowCount, x => x.Config.Format
 			).Skip(1).Subscribe(x => ClearPresetSelection()));
-			
+
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, Config_PropertyChanged));
 		}
 
-		private void ApplyColumnRowCountRestrictions()
-		{
-			if(Config.Layout != TileLayout.Normal || Config.Format == TileFormat.PceSpriteBpp4) {
+		private void ApplyColumnRowCountRestrictions() {
+			if (Config.Layout != TileLayout.Normal || Config.Format == TileFormat.PceSpriteBpp4) {
 				//Force multiple of 2 when in 8x16 or 16x16 display modes
 				Config.ColumnCount &= ~0x01;
 				Config.RowCount &= ~0x01;
 			}
 		}
 
-		private void InitForCpuType()
-		{
+		private void InitForCpuType() {
 			string selectedPreset = Config.SelectedPreset;
 
 			AvailableFormats = CpuType switch {
@@ -282,35 +274,37 @@ namespace Mesen.Debugger.ViewModels
 			ConfigPresets = GetConfigPresets();
 			ConfigPresetRows = new(ConfigPresetRows); //Force UI update
 
-			if(!AvailableFormats.Contains(Config.Format)) {
+			if (!AvailableFormats.Contains(Config.Format)) {
 				Config.Format = (TileFormat)AvailableFormats[0];
 			}
+
 			ShowFormatDropdown = AvailableFormats.Length > 1;
 
 			AvailableMemoryTypes = Enum.GetValues<MemoryType>().Where(t => t.SupportsTileViewer() && DebugApi.GetMemorySize(t) > 0).Cast<Enum>().ToArray();
-			if(!AvailableMemoryTypes.Contains(Config.Source)) {
+			if (!AvailableMemoryTypes.Contains(Config.Source)) {
 				//Switched to another console, or game doesn't support the same memory type, etc.
 				ResetToDefaultView();
 			}
+
 			ShowFilterDropdown = Config.Source.SupportsCdl();
 			MaximumAddress = Math.Max(0, DebugApi.GetMemorySize(Config.Source) - 1);
 
 			Dispatcher.UIThread.Post(() => {
-				if(!_preventPresetLoad) {
+				if (!_preventPresetLoad) {
 					//Don't load the preset when the tile viewer was opened via "View in tile viewer"
 					Config.SelectedPreset = selectedPreset;
 					LoadSelectedPreset(true);
 				}
+
 				_preventPresetLoad = false;
 			});
 		}
 
-		private void ResetToDefaultView()
-		{
+		private void ResetToDefaultView() {
 			//Reset to the default view for each console (show all of VRAM)
 			Config.Source = CpuType.GetVramMemoryType();
 			Config.StartAddress = 0;
-			switch(CpuType) {
+			switch (CpuType) {
 				case CpuType.Snes:
 				case CpuType.Nes:
 				case CpuType.Gameboy:
@@ -323,8 +317,7 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void SelectTile(MemoryType type, int address, TileFormat format, TileLayout layout, int paletteIndex)
-		{
+		public void SelectTile(MemoryType type, int address, TileFormat format, TileLayout layout, int paletteIndex) {
 			_preventPresetLoad = true;
 			Config.SelectedPreset = "";
 			Config.Source = type;
@@ -344,23 +337,22 @@ namespace Mesen.Debugger.ViewModels
 			SelectionRect = new Rect(pos.X * tileSize.Width, pos.Y * tileSize.Height, tileSize.Width, tileSize.Height);
 		}
 
-		private PixelPoint ToLayoutCoordinates(TileLayout layout, PixelPoint pos)
-		{
+		private PixelPoint ToLayoutCoordinates(TileLayout layout, PixelPoint pos) {
 			int column = pos.X;
 			int row = pos.Y;
 
-			switch(layout) {
+			switch (layout) {
 				case TileLayout.SingleLine8x16: {
-					int displayColumn = column / 2 + ((row & 0x01) != 0 ? ColumnCount / 2 : 0);
-					int displayRow = (row & ~0x01) + ((column & 0x01) != 0 ? 1 : 0);
-					return new PixelPoint(displayColumn, displayRow);
-				}
+						int displayColumn = (column / 2) + ((row & 0x01) != 0 ? ColumnCount / 2 : 0);
+						int displayRow = (row & ~0x01) + ((column & 0x01) != 0 ? 1 : 0);
+						return new PixelPoint(displayColumn, displayRow);
+					}
 
 				case TileLayout.SingleLine16x16: {
-					int displayColumn = (column / 2) + (column & 0x01) + ((row & 0x01) != 0 ? ColumnCount / 2 : 0) + ((column & 0x02) != 0 ? -1 : 0);
-					int displayRow = (row & ~0x01) + ((column & 0x02) != 0 ? 1 : 0);
-					return new PixelPoint(displayColumn, displayRow);
-				}
+						int displayColumn = (column / 2) + (column & 0x01) + ((row & 0x01) != 0 ? ColumnCount / 2 : 0) + ((column & 0x02) != 0 ? -1 : 0);
+						int displayRow = (row & ~0x01) + ((column & 0x02) != 0 ? 1 : 0);
+						return new PixelPoint(displayColumn, displayRow);
+					}
 
 				case TileLayout.Normal:
 					return pos;
@@ -370,29 +362,28 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private PixelPoint FromLayoutCoordinates(TileLayout layout, PixelPoint pos)
-		{
+		private PixelPoint FromLayoutCoordinates(TileLayout layout, PixelPoint pos) {
 			int column = pos.X;
 			int row = pos.Y;
 
-			switch(layout) {
+			switch (layout) {
 				case TileLayout.SingleLine8x16: {
-					//A0 B0 C0 D0 -> A0 A1 B0 B1
-					//A1 B1 C1 D1    C0 C1 D0 D1
-					int displayColumn = (column * 2) % ColumnCount + (row & 0x01);
-					int displayRow = (row & ~0x01) + ((column >= ColumnCount / 2) ? 1 : 0);
-					return new PixelPoint(displayColumn, displayRow);
-				}
+						//A0 B0 C0 D0 -> A0 A1 B0 B1
+						//A1 B1 C1 D1    C0 C1 D0 D1
+						int displayColumn = (column * 2 % ColumnCount) + (row & 0x01);
+						int displayRow = (row & ~0x01) + ((column >= ColumnCount / 2) ? 1 : 0);
+						return new PixelPoint(displayColumn, displayRow);
+					}
 
 				case TileLayout.SingleLine16x16: {
-					//A0 A1 B0 B1 C0 C1 D0 D1 -> A0 A1 A2 A3 B0 B1 B2 B3
-					//A2 A3 B2 B3 C2 C3 D2 D3    C0 C1 C2 C3 D0 D1 D2 D3
-					//E0 E1 F0 F1 G0 G1 H0 H1 -> E0 E1 E2 E3 F0 F1 F2 F3
-					//E2 E3 F2 F3 G2 G3 H2 H3    G0 G1 G2 G3 H0 H1 H2 H3
-					int displayColumn = ((column & ~0x01) * 2 + ((row & 0x01) != 0 ? 2 : 0) + (column & 0x01)) % ColumnCount;
-					int displayRow = (row & ~0x01) + ((column >= ColumnCount / 2) ? 1 : 0);
-					return new PixelPoint(displayColumn, displayRow);
-				}
+						//A0 A1 B0 B1 C0 C1 D0 D1 -> A0 A1 A2 A3 B0 B1 B2 B3
+						//A2 A3 B2 B3 C2 C3 D2 D3    C0 C1 C2 C3 D0 D1 D2 D3
+						//E0 E1 F0 F1 G0 G1 H0 H1 -> E0 E1 E2 E3 F0 F1 F2 F3
+						//E2 E3 F2 F3 G2 G3 H2 H3    G0 G1 G2 G3 H0 H1 H2 H3
+						int displayColumn = (((column & ~0x01) * 2) + ((row & 0x01) != 0 ? 2 : 0) + (column & 0x01)) % ColumnCount;
+						int displayRow = (row & ~0x01) + ((column >= ColumnCount / 2) ? 1 : 0);
+						return new PixelPoint(displayColumn, displayRow);
+					}
 
 				case TileLayout.Normal:
 					return pos;
@@ -402,45 +393,37 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private void UpdatePreviewPanel()
-		{
-			if(SelectionRect == default) {
-				PreviewPanel = null;
-			} else {
-				PreviewPanel = GetPreviewPanel(PixelPoint.FromPoint(SelectionRect.TopLeft, 1), PreviewPanel);
-			}
+		private void UpdatePreviewPanel() {
+			PreviewPanel = SelectionRect == default ? null : GetPreviewPanel(PixelPoint.FromPoint(SelectionRect.TopLeft, 1), PreviewPanel);
 
-			if(ViewerTooltip != null && ViewerMousePos != null) {
+			if (ViewerTooltip != null && ViewerMousePos != null) {
 				GetPreviewPanel(ViewerMousePos.Value, ViewerTooltip);
 			}
 		}
 
-		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-		{
-			if(!_inGameLoaded) {
+		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+			if (!_inGameLoaded) {
 				RefreshTab();
 			}
 		}
 
-		public void RefreshData()
-		{
+		public void RefreshData() {
 			_ppuState = DebugApi.GetPpuState(CpuType);
-			
+
 			RefreshPalette();
 
 			int bytesPerTile = Config.Format.GetBytesPerTile();
 			int tileCount = Config.RowCount * Config.ColumnCount;
 			int totalSize = bytesPerTile * tileCount;
 
-			lock(_updateLock) {
+			lock (_updateLock) {
 				DebugApi.GetMemoryValues(Config.Source, (uint)Config.StartAddress, (uint)(Config.StartAddress + totalSize - 1), ref _coreSourceData);
 			}
 
 			RefreshTab();
 		}
 
-		private void RefreshPalette()
-		{
+		private void RefreshPalette() {
 			DebugPaletteInfo palette = DebugApi.GetPaletteInfo(CpuType, new GetPaletteInfoOptions() { Format = Config.Format });
 			var paletteColors = palette.GetRgbPalette();
 			var rawPalette = palette.GetRawPalette();
@@ -455,9 +438,8 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		private void RefreshTab()
-		{
-			if(_refreshPending) {
+		private void RefreshTab() {
+			if (_refreshPending) {
 				return;
 			}
 
@@ -468,24 +450,23 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		private void InternalRefreshTab()
-		{
-			if(Disposed || PaletteColors.Length == 0) {
+		private void InternalRefreshTab() {
+			if (Disposed || PaletteColors.Length == 0) {
 				return;
 			}
 
 			InitBitmap();
-				
-			lock(_updateLock) {
+
+			lock (_updateLock) {
 				Array.Resize(ref _sourceData, _coreSourceData.Length);
 				Array.Copy(_coreSourceData, _sourceData, _coreSourceData.Length);
 			}
 
-			using(var framebuffer = ViewerBitmap.Lock()) {
+			using (var framebuffer = ViewerBitmap.Lock()) {
 				DebugApi.GetTileView(CpuType, GetOptions(), _sourceData, _sourceData.Length, PaletteColors, framebuffer.FrameBuffer.Address);
 			}
 
-			if(IsNesChrModeEnabled) {
+			if (IsNesChrModeEnabled) {
 				DrawNesChrPageDelimiters();
 			} else {
 				PageDelimiters = null;
@@ -495,32 +476,30 @@ namespace Mesen.Debugger.ViewModels
 			LoadSelectedPreset(true);
 		}
 
-		private int GetTileAddress(PixelPoint pixelPosition)
-		{
+		private int GetTileAddress(PixelPoint pixelPosition) {
 			PixelSize tileSize = Config.Format.GetTileSize();
 			int bytesPerTile = Config.Format.GetBytesPerTile();
 			PixelPoint pos = FromLayoutCoordinates(Config.Layout, new PixelPoint(pixelPosition.X / tileSize.Width, pixelPosition.Y / tileSize.Height));
-			int offset = (pos.Y * ColumnCount * 8 / tileSize.Width + pos.X) * bytesPerTile;
+			int offset = ((pos.Y * ColumnCount * 8 / tileSize.Width) + pos.X) * bytesPerTile;
 			return (Config.StartAddress + offset) % (MaximumAddress + 1);
 		}
 
-		private int GetSelectedTileAddress()
-		{
+		private int GetSelectedTileAddress() {
 			PixelPoint p;
-			if(ViewerMousePos.HasValue) {
+			if (ViewerMousePos.HasValue) {
 				p = ViewerMousePos.Value;
 			} else {
-				if(SelectionRect == default) {
+				if (SelectionRect == default) {
 					return -1;
 				}
+
 				p = PixelPoint.FromPoint(SelectionRect.TopLeft, 1);
 			}
 
 			return GetTileAddress(p);
 		}
 
-		public DynamicTooltip? GetPreviewPanel(PixelPoint p, DynamicTooltip? tooltipToUpdate)
-		{
+		public DynamicTooltip? GetPreviewPanel(PixelPoint p, DynamicTooltip? tooltipToUpdate) {
 			TooltipEntries entries = tooltipToUpdate?.Items ?? new();
 
 			entries.StartUpdate();
@@ -530,41 +509,39 @@ namespace Mesen.Debugger.ViewModels
 			entries.AddPicture("Tile", ViewerBitmap, 6, cropRect);
 
 			int address = GetTileAddress(cropRect.TopLeft);
-			if(Config.Source.IsRelativeMemory()) {
+			if (Config.Source.IsRelativeMemory()) {
 				entries.AddEntry("Tile address (" + Config.Source.GetShortName() + ")", FormatAddress(address, Config.Source));
 
 				AddressInfo absAddress = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = address, Type = Config.Source });
-				if(absAddress.Address >= 0) {
+				if (absAddress.Address >= 0) {
 					entries.AddEntry("Tile address (" + absAddress.Type.GetShortName() + ")", FormatAddress(absAddress.Address, absAddress.Type));
 				}
 			} else {
 				entries.AddEntry("Tile address", FormatAddress(address, Config.Source));
 			}
 
-			if(ShowNesTileIndex) {
+			if (ShowNesTileIndex) {
 				entries.AddEntry("Tile index", "$" + ((address >> 4) & 0xFF).ToString("X2"));
 			}
 
 			entries.EndUpdate();
 
-			if(tooltipToUpdate != null) {
+			if (tooltipToUpdate != null) {
 				return tooltipToUpdate;
 			} else {
 				return new DynamicTooltip() { Items = entries };
 			}
 		}
 
-		private string FormatAddress(int address, MemoryType memType)
-		{
-			if(memType.IsWordAddressing()) {
+		private string FormatAddress(int address, MemoryType memType) {
+			if (memType.IsWordAddressing()) {
 				return $"${address / 2:X4}.w";
 			} else {
 				return $"${address:X4}";
 			}
 		}
 
-		private ContextMenuAction GetEditTileAction(int columnCount, int rowCount, Window wnd)
-		{
+		private ContextMenuAction GetEditTileAction(int columnCount, int rowCount, Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.Custom,
 				CustomText = $"{columnCount}x{rowCount} ({GridSizeX * columnCount}px x {GridSizeY * rowCount}px)",
@@ -573,15 +550,15 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private void EditTileGrid(int columnCount, int rowCount, Window wnd)
-		{
+		private void EditTileGrid(int columnCount, int rowCount, Window wnd) {
 			PixelPoint p = ViewerMousePos ?? PixelPoint.FromPoint(SelectionRect.TopLeft, 1);
 			List<AddressInfo> addresses = new();
-			for(int row = 0; row < rowCount; row++) {
-				for(int col = 0; col < columnCount; col++) {
-					addresses.Add(new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + col*GridSizeX, p.Y + row*GridSizeY)), Type = Config.Source });
+			for (int row = 0; row < rowCount; row++) {
+				for (int col = 0; col < columnCount; col++) {
+					addresses.Add(new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + (col * GridSizeX), p.Y + (row * GridSizeY))), Type = Config.Source });
 				}
 			}
+
 			TileEditorWindow.OpenAtTile(
 				addresses,
 				columnCount,
@@ -594,45 +571,43 @@ namespace Mesen.Debugger.ViewModels
 			);
 		}
 
-		private void DrawNesChrPageDelimiters()
-		{
-			double pageHeight = ((double)256 / ColumnCount) * 8;
+		private void DrawNesChrPageDelimiters() {
+			double pageHeight = (double)256 / ColumnCount * 8;
 			double y = pageHeight;
 			List<PictureViewerLine> delimiters = new List<PictureViewerLine>();
 			int yMax = RowCount * 8;
 
-			while(y < yMax) {
+			while (y < yMax) {
 				//Hide delimiter if the selected tile is right above or below it
-				if(Math.Abs(SelectionRect.Top - y) >= 5 && Math.Abs(SelectionRect.Bottom - y) >= 5) {
+				if (Math.Abs(SelectionRect.Top - y) >= 5 && Math.Abs(SelectionRect.Bottom - y) >= 5) {
 					Point start = new Point(0, y);
-					Point end = new Point(ColumnCount * 8 - 1, y);
+					Point end = new Point((ColumnCount * 8) - 1, y);
 					delimiters.Add(new PictureViewerLine() { Start = start, End = end, Color = Colors.Black });
 					delimiters.Add(new PictureViewerLine() { Start = start, End = end, Color = Colors.White, DashStyle = new DashStyle(DashStyle.Dash.Dashes, 0) });
 				}
+
 				y += pageHeight;
 			}
+
 			PageDelimiters = delimiters;
 		}
 
-		private bool ShowNesTileIndex
-		{
+		private bool ShowNesTileIndex {
 			get { return Config.Source.IsPpuMemory() && Config.Source.ToCpuType() == CpuType.Nes && (Config.StartAddress & 0xFFF) == 0; }
 		}
 
-		private bool IsNesChrModeEnabled
-		{
-			get
-			{
-				if(ShowNesTileIndex) {
+		private bool IsNesChrModeEnabled {
+			get {
+				if (ShowNesTileIndex) {
 					double rowsPerPage = (double)256 / ColumnCount;
 					return rowsPerPage == Math.Floor(rowsPerPage);
 				}
+
 				return false;
 			}
 		}
 
-		private GetTileViewOptions GetOptions()
-		{
+		private GetTileViewOptions GetOptions() {
 			return new GetTileViewOptions() {
 				MemType = Config.Source,
 				Format = Config.Format,
@@ -648,17 +623,15 @@ namespace Mesen.Debugger.ViewModels
 		}
 
 		[MemberNotNull(nameof(ViewerBitmap))]
-		private void InitBitmap()
-		{
+		private void InitBitmap() {
 			int width = ColumnCount * 8;
 			int height = RowCount * 8;
-			if(ViewerBitmap == null || ViewerBitmap.PixelSize.Width != width || ViewerBitmap.PixelSize.Height != height) {
+			if (ViewerBitmap == null || ViewerBitmap.PixelSize.Width != width || ViewerBitmap.PixelSize.Height != height) {
 				ViewerBitmap = new DynamicBitmap(new PixelSize(width, height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 			}
 		}
 
-		public void OnGameLoaded()
-		{
+		public void OnGameLoaded() {
 			Dispatcher.UIThread.Post(() => {
 				_inGameLoaded = true;
 				InitForCpuType();
@@ -667,28 +640,26 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		private void ApplyPresetValues(PresetValues preset, bool keepUserConfig)
-		{
+		private void ApplyPresetValues(PresetValues preset, bool keepUserConfig) {
 			Config.Source = preset.Source ?? Config.Source;
 			Config.Format = preset.Format ?? Config.Format;
 			Config.Filter = preset.Filter ?? Config.Filter;
 			Config.RowCount = preset.RowCount ?? Config.RowCount;
 			Config.ColumnCount = preset.ColumnCount ?? Config.ColumnCount;
 			Config.StartAddress = preset.StartAddress ?? Config.StartAddress;
-			if(!keepUserConfig) {
+			if (!keepUserConfig) {
 				SelectedPalette = preset.SelectedPalette ?? SelectedPalette;
 				Config.Background = preset.Background ?? Config.Background;
 				Config.Layout = preset.Layout ?? Config.Layout;
 			}
 		}
 
-		private void LoadSelectedPreset(bool keepUserConfig)
-		{
-			if(Config.SelectedPreset != "") {
+		private void LoadSelectedPreset(bool keepUserConfig) {
+			if (Config.SelectedPreset != "") {
 				ConfigPreset? preset = ConfigPresets.Find(x => x.Name == Config.SelectedPreset);
-				if(preset != null) {
+				if (preset != null) {
 					PresetValues? values = preset.GetPresetValues();
-					if(values != null) {
+					if (values != null) {
 						ApplyPresetValues(values, keepUserConfig);
 						Config.SelectedPreset = preset.Name;
 						preset.Selected = true;
@@ -699,31 +670,30 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private void ClearPresetSelection()
-		{
-			if(Config.SelectedPreset != "") {
+		private void ClearPresetSelection() {
+			if (Config.SelectedPreset != "") {
 				ConfigPreset? preset = ConfigPresets.Find(x => x.Name == Config.SelectedPreset);
-				if(preset != null) {
+				if (preset != null) {
 					preset.Selected = false;
 				}
+
 				Config.SelectedPreset = "";
 			}
 		}
 
-		private ConfigPreset CreatePreset(int row, string name, Func<PresetValues?> getPresetValues)
-		{
+		private ConfigPreset CreatePreset(int row, string name, Func<PresetValues?> getPresetValues) {
 			ConfigPreset preset = new ConfigPreset(name, getPresetValues, () => {
 				PresetValues? preset = getPresetValues();
-				if(preset == null) {
+				if (preset == null) {
 					return;
 				}
 
 				ApplyPresetValues(preset, false);
 
-				if(Config.SelectedPreset != name) {
+				if (Config.SelectedPreset != name) {
 					ClearPresetSelection();
 					ConfigPreset? cfgPeset = ConfigPresets.Find(x => x.Name == name);
-					if(cfgPeset != null) {
+					if (cfgPeset != null) {
 						Config.SelectedPreset = name;
 						cfgPeset.Selected = true;
 					}
@@ -734,11 +704,10 @@ namespace Mesen.Debugger.ViewModels
 			return preset;
 		}
 
-		private List<ConfigPreset> GetConfigPresets()
-		{
+		private List<ConfigPreset> GetConfigPresets() {
 			ConfigPresetRows = new() { new(), new(), new() };
 
-			switch(CpuType) {
+			switch (CpuType) {
 				case CpuType.Snes:
 					return new() {
 						CreatePreset(0, "PPU", () => ApplyPpuPreset()),
@@ -761,7 +730,7 @@ namespace Mesen.Debugger.ViewModels
 					};
 
 				case CpuType.Gameboy:
-					if(DebugApi.GetPpuState<GbPpuState>(CpuType.Gameboy).CgbEnabled) {
+					if (DebugApi.GetPpuState<GbPpuState>(CpuType.Gameboy).CgbEnabled) {
 						return new() {
 							CreatePreset(0, "PPU", () => ApplyPpuPreset()),
 							CreatePreset(0, "ROM", () => ApplyPrgPreset()),
@@ -780,7 +749,7 @@ namespace Mesen.Debugger.ViewModels
 					}
 
 				case CpuType.Pce:
-					if(DebugApi.GetConsoleState<PceState>(ConsoleType.PcEngine).IsSuperGrafx) {
+					if (DebugApi.GetConsoleState<PceState>(ConsoleType.PcEngine).IsSuperGrafx) {
 						return new() {
 							CreatePreset(0, "BG1", () => ApplyBgPreset(0)),
 							CreatePreset(0, "SPR1", () => ApplySpritePreset(0)),
@@ -795,7 +764,7 @@ namespace Mesen.Debugger.ViewModels
 							CreatePreset(0, "ROM", () => ApplyPrgPreset()),
 						};
 					}
-				
+
 				case CpuType.Sms:
 					return new() {
 						CreatePreset(0, "VDP", () => ApplyPpuPreset()),
@@ -826,10 +795,9 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private PresetValues? ApplyPrgPreset()
-		{
+		private PresetValues? ApplyPrgPreset() {
 			BaseState? state = _ppuState;
-			if(state == null) {
+			if (state == null) {
 				return null;
 			}
 
@@ -840,7 +808,7 @@ namespace Mesen.Debugger.ViewModels
 			preset.RowCount = 32;
 			preset.Layout = TileLayout.Normal;
 
-			if(CpuType == CpuType.Ws) {
+			if (CpuType == CpuType.Ws) {
 				WsPpuState ppu = (WsPpuState)state;
 				preset.Format = ppu.Mode.ToTileFormat();
 			} else {
@@ -850,8 +818,7 @@ namespace Mesen.Debugger.ViewModels
 			return preset;
 		}
 
-		private PresetValues? ApplyChrPreset()
-		{
+		private PresetValues? ApplyChrPreset() {
 			PresetValues preset = new();
 			preset.Source = DebugApi.GetMemorySize(MemoryType.NesChrRam) > 0 ? MemoryType.NesChrRam : MemoryType.NesChrRom;
 			preset.StartAddress = 0;
@@ -862,291 +829,301 @@ namespace Mesen.Debugger.ViewModels
 			return preset;
 		}
 
-		private PresetValues? ApplyPpuPreset()
-		{
+		private PresetValues? ApplyPpuPreset() {
 			BaseState? state = _ppuState;
-			if(state == null) {
+			if (state == null) {
 				return null;
 			}
 
 			PresetValues preset = new();
 
-			switch(CpuType) {
+			switch (CpuType) {
 				case CpuType.Snes: {
-					preset.Source = MemoryType.SnesVideoRam;
-					preset.StartAddress = 0;
-					preset.ColumnCount = 16;
-					preset.RowCount = 128;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.Bpp4;
-					break;
-				}
-
-				case CpuType.Nes: {
-					preset.Source = MemoryType.NesPpuMemory;
-					preset.StartAddress = 0;
-					preset.ColumnCount = 16;
-					preset.RowCount = 32;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.NesBpp2;
-					break;
-				}
-
-				case CpuType.Gameboy: {
-					preset.Source = MemoryType.GbVideoRam;
-					preset.StartAddress = 0;
-					preset.ColumnCount = 16;
-					preset.RowCount = 32;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.Bpp2;
-					break;
-				}
-
-				case CpuType.Sms: {
-					SmsVdpState vdp = (SmsVdpState)state;
-					preset.Source = MemoryType.SmsVideoRam;
-					preset.StartAddress = 0;
-					preset.ColumnCount = vdp.UseMode4 ? 16 : 32;
-					preset.RowCount = vdp.UseMode4 ? 32 : 64;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = vdp.UseMode4 ? TileFormat.SmsBpp4 : TileFormat.SmsSgBpp1;
-					if(!vdp.UseMode4) {
-						preset.SelectedPalette = 1;
-					}
-					break;
-				}
-
-				case CpuType.Gba: {
-					preset.Source = MemoryType.GbaVideoRam;
-					preset.StartAddress = 0;
-					preset.ColumnCount = 16;
-					preset.RowCount = 128;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.GbaBpp4;
-					break;
-				}
-
-				case CpuType.Ws: {
-					WsPpuState ppu = (WsPpuState)state;
-					preset.Source = MemoryType.WsWorkRam;
-					preset.StartAddress = 0;
-					preset.ColumnCount = 16;
-					preset.RowCount = 128;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = ppu.Mode.ToTileFormat();
-					break;
-				}
-			}
-			return preset;
-		}
-
-		private PresetValues? ApplyBgPreset(int layer)
-		{
-			BaseState? state = _ppuState;
-			if(state == null) {
-				return null;
-			}
-
-			PresetValues preset = new();
-
-			switch(CpuType) {
-				case CpuType.Snes: {
-					int[,] layerBpp = new int[8, 4] { { 2, 2, 2, 2 }, { 4, 4, 2, 0 }, { 4, 4, 0, 0 }, { 8, 4, 0, 0 }, { 8, 2, 0, 0 }, { 4, 2, 0, 0 }, { 4, 0, 0, 0 }, { 8, 0, 0, 0 } };
-					SnesPpuState ppu = (SnesPpuState)state;
-					preset.Source = MemoryType.SnesVideoRam;
-					preset.ColumnCount = 16;
-					preset.RowCount = 64;
-					preset.Layout = TileLayout.Normal;
-					if(ppu.BgMode == 7) {
-						preset.Format = ppu.ExtBgEnabled ? TileFormat.Mode7ExtBg : (ppu.DirectColorMode ? TileFormat.Mode7DirectColor : TileFormat.Mode7);
+						preset.Source = MemoryType.SnesVideoRam;
 						preset.StartAddress = 0;
-						preset.SelectedPalette = 0;
-					} else {
-						preset.StartAddress = ppu.Layers[layer].ChrAddress * 2;
-						preset.Format = layerBpp[ppu.BgMode, layer] switch {
-							2 => TileFormat.Bpp2,
-							4 => TileFormat.Bpp4,
-							8 => ppu.DirectColorMode ? TileFormat.DirectColor : TileFormat.Bpp8,
-							_ => TileFormat.Bpp2
-						};
-
-						if(layerBpp[ppu.BgMode, layer] == 8 || SelectedPalette >= (layerBpp[ppu.BgMode, layer] == 2 ? 32 : 8)) {
-							preset.SelectedPalette = 0;
-						}
+						preset.ColumnCount = 16;
+						preset.RowCount = 128;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.Bpp4;
+						break;
 					}
-					break;
-				}
 
 				case CpuType.Nes: {
-					NesPpuState ppu = (NesPpuState)state;
-					preset.Source = MemoryType.NesPpuMemory;
-					preset.StartAddress = ppu.Control.BackgroundPatternAddr;
-					preset.ColumnCount = 16;
-					preset.RowCount = 16;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.NesBpp2;
-					if(SelectedPalette >= 4) {
-						preset.SelectedPalette = 0;
-					}
-					break;
-				}
-
-				case CpuType.Gameboy: {
-					GbPpuState ppu = (GbPpuState)state;
-					preset.Source = MemoryType.GbVideoRam;
-					preset.StartAddress = (layer == 0 ? 0 : 0x2000) | (ppu.BgTileSelect ? 0 : 0x800);
-					preset.ColumnCount = 16;
-					preset.RowCount = 16;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.Bpp2;
-					preset.Background = ppu.CgbEnabled ? TileBackground.PaletteColor : TileBackground.Default;
-					if(!ppu.CgbEnabled || SelectedPalette > 8) {
-						preset.SelectedPalette = 0;
-					}
-					break;
-				}
-
-				case CpuType.Pce: {
-					preset.Source = layer == 0 ? MemoryType.PceVideoRam : MemoryType.PceVideoRamVdc2;
-					preset.StartAddress = 0;
-					preset.ColumnCount = 32;
-					preset.RowCount = 64;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.Bpp4;
-					preset.Background = TileBackground.Default;
-					if(SelectedPalette >= 16) {
-						preset.SelectedPalette = 0;
-					}
-					break;
-				}
-
-				case CpuType.Gba: {
-					GbaPpuState ppu = (GbaPpuState)state;
-					preset.Source = MemoryType.GbaVideoRam;
-					preset.ColumnCount = 16;
-					preset.RowCount = 64;
-					preset.Layout = TileLayout.Normal;
-					preset.StartAddress = ppu.BgLayers[layer].TilesetAddr;
-					preset.Format = ppu.BgLayers[layer].Bpp8Mode ? TileFormat.GbaBpp8 : TileFormat.GbaBpp4;
-					if(preset.Format == TileFormat.GbaBpp8 || preset.Format == TileFormat.GbaBpp4 && preset.SelectedPalette > 16) {
-						preset.SelectedPalette = 0;
-					}
-					break;
-				}
-
-				case CpuType.Ws: {
-					WsPpuState ppu = (WsPpuState)state;
-					int bank0Addr = ppu.Mode >= WsVideoMode.Color4bpp ? 0x4000 : 0x2000;
-					int bank1Addr = ppu.Mode >= WsVideoMode.Color4bpp ? 0x8000 : (ppu.Mode == WsVideoMode.Monochrome ? 0x2000 : 0x4000);
-					
-					preset.Source = MemoryType.WsWorkRam;
-					preset.StartAddress = layer == 0 ? bank0Addr : bank1Addr;
-					preset.ColumnCount = 16;
-					preset.RowCount = 128;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = ppu.Mode.ToTileFormat();
-					break;
-				}
-			}
-
-			return preset;
-		}
-
-		private PresetValues? ApplySpritePreset(int layer)
-		{
-			BaseState? state = _ppuState;
-			if(state == null) {
-				return null;
-			}
-
-			PresetValues preset = new();
-
-			switch(CpuType) {
-				case CpuType.Snes: {
-					SnesPpuState ppu = (SnesPpuState)state;
-					preset.Source = MemoryType.SnesVideoRam;
-					preset.Format = TileFormat.Bpp4;
-					preset.ColumnCount = 16;
-					preset.RowCount = 16;
-					preset.StartAddress = (ppu.OamBaseAddress + (layer == 1 ? ppu.OamAddressOffset : 0)) * 2;
-					if(SelectedPalette < 8 || SelectedPalette >= 16) {
-						preset.SelectedPalette = 8;
-					}
-					break;
-				}
-
-				case CpuType.Nes: {
-					NesPpuState ppu = (NesPpuState)state;
-					if(ppu.Control.LargeSprites) {
+						preset.Source = MemoryType.NesPpuMemory;
 						preset.StartAddress = 0;
 						preset.ColumnCount = 16;
 						preset.RowCount = 32;
-						preset.Layout = TileLayout.SingleLine8x16;
-					} else {
-						preset.StartAddress = ppu.Control.SpritePatternAddr;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.NesBpp2;
+						break;
+					}
+
+				case CpuType.Gameboy: {
+						preset.Source = MemoryType.GbVideoRam;
+						preset.StartAddress = 0;
+						preset.ColumnCount = 16;
+						preset.RowCount = 32;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.Bpp2;
+						break;
+					}
+
+				case CpuType.Sms: {
+						SmsVdpState vdp = (SmsVdpState)state;
+						preset.Source = MemoryType.SmsVideoRam;
+						preset.StartAddress = 0;
+						preset.ColumnCount = vdp.UseMode4 ? 16 : 32;
+						preset.RowCount = vdp.UseMode4 ? 32 : 64;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = vdp.UseMode4 ? TileFormat.SmsBpp4 : TileFormat.SmsSgBpp1;
+						if (!vdp.UseMode4) {
+							preset.SelectedPalette = 1;
+						}
+
+						break;
+					}
+
+				case CpuType.Gba: {
+						preset.Source = MemoryType.GbaVideoRam;
+						preset.StartAddress = 0;
+						preset.ColumnCount = 16;
+						preset.RowCount = 128;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.GbaBpp4;
+						break;
+					}
+
+				case CpuType.Ws: {
+						WsPpuState ppu = (WsPpuState)state;
+						preset.Source = MemoryType.WsWorkRam;
+						preset.StartAddress = 0;
+						preset.ColumnCount = 16;
+						preset.RowCount = 128;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = ppu.Mode.ToTileFormat();
+						break;
+					}
+			}
+
+			return preset;
+		}
+
+		private PresetValues? ApplyBgPreset(int layer) {
+			BaseState? state = _ppuState;
+			if (state == null) {
+				return null;
+			}
+
+			PresetValues preset = new();
+
+			switch (CpuType) {
+				case CpuType.Snes: {
+						int[,] layerBpp = new int[8, 4] { { 2, 2, 2, 2 }, { 4, 4, 2, 0 }, { 4, 4, 0, 0 }, { 8, 4, 0, 0 }, { 8, 2, 0, 0 }, { 4, 2, 0, 0 }, { 4, 0, 0, 0 }, { 8, 0, 0, 0 } };
+						SnesPpuState ppu = (SnesPpuState)state;
+						preset.Source = MemoryType.SnesVideoRam;
+						preset.ColumnCount = 16;
+						preset.RowCount = 64;
+						preset.Layout = TileLayout.Normal;
+						if (ppu.BgMode == 7) {
+							preset.Format = ppu.ExtBgEnabled ? TileFormat.Mode7ExtBg : (ppu.DirectColorMode ? TileFormat.Mode7DirectColor : TileFormat.Mode7);
+							preset.StartAddress = 0;
+							preset.SelectedPalette = 0;
+						} else {
+							preset.StartAddress = ppu.Layers[layer].ChrAddress * 2;
+							preset.Format = layerBpp[ppu.BgMode, layer] switch {
+								2 => TileFormat.Bpp2,
+								4 => TileFormat.Bpp4,
+								8 => ppu.DirectColorMode ? TileFormat.DirectColor : TileFormat.Bpp8,
+								_ => TileFormat.Bpp2
+							};
+
+							if (layerBpp[ppu.BgMode, layer] == 8 || SelectedPalette >= (layerBpp[ppu.BgMode, layer] == 2 ? 32 : 8)) {
+								preset.SelectedPalette = 0;
+							}
+						}
+
+						break;
+					}
+
+				case CpuType.Nes: {
+						NesPpuState ppu = (NesPpuState)state;
+						preset.Source = MemoryType.NesPpuMemory;
+						preset.StartAddress = ppu.Control.BackgroundPatternAddr;
 						preset.ColumnCount = 16;
 						preset.RowCount = 16;
 						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.NesBpp2;
+						if (SelectedPalette >= 4) {
+							preset.SelectedPalette = 0;
+						}
+
+						break;
 					}
-					preset.Source = MemoryType.NesPpuMemory;
-					if(SelectedPalette < 4 || SelectedPalette >= 8) {
-						preset.SelectedPalette = 4;
-					}
-					preset.Format = TileFormat.NesBpp2;
-					break;
-				}
 
 				case CpuType.Gameboy: {
-					GbPpuState ppu = (GbPpuState)state;
-					preset.Source = MemoryType.GbVideoRam;
-					preset.StartAddress = layer == 0 ? 0 : 0x2000;
-					preset.ColumnCount = 16;
-					preset.RowCount = 16;
-					preset.Layout = TileLayout.Normal;
-					preset.Background = TileBackground.Black;
-					preset.Format = TileFormat.Bpp2;
-					if(ppu.CgbEnabled && SelectedPalette < 8) {
-						preset.SelectedPalette = 8;
-					} else if(!ppu.CgbEnabled && SelectedPalette == 0) {
-						preset.SelectedPalette = 1;
+						GbPpuState ppu = (GbPpuState)state;
+						preset.Source = MemoryType.GbVideoRam;
+						preset.StartAddress = (layer == 0 ? 0 : 0x2000) | (ppu.BgTileSelect ? 0 : 0x800);
+						preset.ColumnCount = 16;
+						preset.RowCount = 16;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.Bpp2;
+						preset.Background = ppu.CgbEnabled ? TileBackground.PaletteColor : TileBackground.Default;
+						if (!ppu.CgbEnabled || SelectedPalette > 8) {
+							preset.SelectedPalette = 0;
+						}
+
+						break;
 					}
-					break;
-				}
 
 				case CpuType.Pce: {
-					preset.Source = layer == 0 ? MemoryType.PceVideoRam : MemoryType.PceVideoRamVdc2;
-					preset.StartAddress = 0;
-					preset.ColumnCount = 32;
-					preset.RowCount = 64;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.PceSpriteBpp4;
-					preset.Background = TileBackground.Default;
-					if(SelectedPalette < 16) {
-						preset.SelectedPalette = 16;
+						preset.Source = layer == 0 ? MemoryType.PceVideoRam : MemoryType.PceVideoRamVdc2;
+						preset.StartAddress = 0;
+						preset.ColumnCount = 32;
+						preset.RowCount = 64;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.Bpp4;
+						preset.Background = TileBackground.Default;
+						if (SelectedPalette >= 16) {
+							preset.SelectedPalette = 0;
+						}
+
+						break;
 					}
-					break;
-				}
 
 				case CpuType.Gba: {
-					preset.Source = MemoryType.GbaVideoRam;
-					preset.StartAddress = 0x10000;
-					preset.ColumnCount = 32;
-					preset.RowCount = 32;
-					preset.Layout = TileLayout.Normal;
-					preset.Format = TileFormat.GbaBpp4;
-					preset.Background = TileBackground.Default;
-					if(SelectedPalette < 16) {
-						preset.SelectedPalette = 16;
+						GbaPpuState ppu = (GbaPpuState)state;
+						preset.Source = MemoryType.GbaVideoRam;
+						preset.ColumnCount = 16;
+						preset.RowCount = 64;
+						preset.Layout = TileLayout.Normal;
+						preset.StartAddress = ppu.BgLayers[layer].TilesetAddr;
+						preset.Format = ppu.BgLayers[layer].Bpp8Mode ? TileFormat.GbaBpp8 : TileFormat.GbaBpp4;
+						if (preset.Format == TileFormat.GbaBpp8 || preset.Format == TileFormat.GbaBpp4 && preset.SelectedPalette > 16) {
+							preset.SelectedPalette = 0;
+						}
+
+						break;
 					}
-					break;
-				}
+
+				case CpuType.Ws: {
+						WsPpuState ppu = (WsPpuState)state;
+						int bank0Addr = ppu.Mode >= WsVideoMode.Color4bpp ? 0x4000 : 0x2000;
+						int bank1Addr = ppu.Mode >= WsVideoMode.Color4bpp ? 0x8000 : (ppu.Mode == WsVideoMode.Monochrome ? 0x2000 : 0x4000);
+
+						preset.Source = MemoryType.WsWorkRam;
+						preset.StartAddress = layer == 0 ? bank0Addr : bank1Addr;
+						preset.ColumnCount = 16;
+						preset.RowCount = 128;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = ppu.Mode.ToTileFormat();
+						break;
+					}
 			}
+
+			return preset;
+		}
+
+		private PresetValues? ApplySpritePreset(int layer) {
+			BaseState? state = _ppuState;
+			if (state == null) {
+				return null;
+			}
+
+			PresetValues preset = new();
+
+			switch (CpuType) {
+				case CpuType.Snes: {
+						SnesPpuState ppu = (SnesPpuState)state;
+						preset.Source = MemoryType.SnesVideoRam;
+						preset.Format = TileFormat.Bpp4;
+						preset.ColumnCount = 16;
+						preset.RowCount = 16;
+						preset.StartAddress = (ppu.OamBaseAddress + (layer == 1 ? ppu.OamAddressOffset : 0)) * 2;
+						if (SelectedPalette is < 8 or >= 16) {
+							preset.SelectedPalette = 8;
+						}
+
+						break;
+					}
+
+				case CpuType.Nes: {
+						NesPpuState ppu = (NesPpuState)state;
+						if (ppu.Control.LargeSprites) {
+							preset.StartAddress = 0;
+							preset.ColumnCount = 16;
+							preset.RowCount = 32;
+							preset.Layout = TileLayout.SingleLine8x16;
+						} else {
+							preset.StartAddress = ppu.Control.SpritePatternAddr;
+							preset.ColumnCount = 16;
+							preset.RowCount = 16;
+							preset.Layout = TileLayout.Normal;
+						}
+
+						preset.Source = MemoryType.NesPpuMemory;
+						if (SelectedPalette is < 4 or >= 8) {
+							preset.SelectedPalette = 4;
+						}
+
+						preset.Format = TileFormat.NesBpp2;
+						break;
+					}
+
+				case CpuType.Gameboy: {
+						GbPpuState ppu = (GbPpuState)state;
+						preset.Source = MemoryType.GbVideoRam;
+						preset.StartAddress = layer == 0 ? 0 : 0x2000;
+						preset.ColumnCount = 16;
+						preset.RowCount = 16;
+						preset.Layout = TileLayout.Normal;
+						preset.Background = TileBackground.Black;
+						preset.Format = TileFormat.Bpp2;
+						if (ppu.CgbEnabled && SelectedPalette < 8) {
+							preset.SelectedPalette = 8;
+						} else if (!ppu.CgbEnabled && SelectedPalette == 0) {
+							preset.SelectedPalette = 1;
+						}
+
+						break;
+					}
+
+				case CpuType.Pce: {
+						preset.Source = layer == 0 ? MemoryType.PceVideoRam : MemoryType.PceVideoRamVdc2;
+						preset.StartAddress = 0;
+						preset.ColumnCount = 32;
+						preset.RowCount = 64;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.PceSpriteBpp4;
+						preset.Background = TileBackground.Default;
+						if (SelectedPalette < 16) {
+							preset.SelectedPalette = 16;
+						}
+
+						break;
+					}
+
+				case CpuType.Gba: {
+						preset.Source = MemoryType.GbaVideoRam;
+						preset.StartAddress = 0x10000;
+						preset.ColumnCount = 32;
+						preset.RowCount = 32;
+						preset.Layout = TileLayout.Normal;
+						preset.Format = TileFormat.GbaBpp4;
+						preset.Background = TileBackground.Default;
+						if (SelectedPalette < 16) {
+							preset.SelectedPalette = 16;
+						}
+
+						break;
+					}
+			}
+
 			return preset;
 		}
 	}
 
-	public class ConfigPreset : ViewModelBase
-	{
+	public class ConfigPreset : ViewModelBase {
 		public string Name { get; }
 		public Func<PresetValues?> GetPresetValues { get; }
 		public ReactiveCommand<Unit, Unit> ClickCommand { get; }
@@ -1154,8 +1131,7 @@ namespace Mesen.Debugger.ViewModels
 
 		[Reactive] public bool Selected { get; set; }
 
-		public ConfigPreset(string name, Func<PresetValues?> getPresetValues, Action applyPreset)
-		{
+		public ConfigPreset(string name, Func<PresetValues?> getPresetValues, Action applyPreset) {
 			Name = name;
 			GetPresetValues = getPresetValues;
 			ApplyPreset = applyPreset;
@@ -1163,8 +1139,7 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class PresetValues
-	{
+	public class PresetValues {
 		public MemoryType? Source { get; set; }
 		public TileFormat? Format { get; set; }
 		public TileLayout? Layout { get; set; }

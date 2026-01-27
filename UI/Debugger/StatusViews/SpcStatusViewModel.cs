@@ -1,20 +1,18 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class SpcStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class SpcStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public byte RegA { get; set; }
 		[Reactive] public byte RegX { get; set; }
 		[Reactive] public byte RegY { get; set; }
 		[Reactive] public byte RegSP { get; set; }
 		[Reactive] public UInt16 RegPC { get; set; }
 		[Reactive] public byte RegPS { get; set; }
-		
+
 		[Reactive] public bool FlagN { get; set; }
 		[Reactive] public bool FlagV { get; set; }
 		[Reactive] public bool FlagP { get; set; }
@@ -26,8 +24,7 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public string StackPreview { get; private set; } = "";
 
-		public SpcStatusViewModel()
-		{
+		public SpcStatusViewModel() {
 			this.WhenAnyValue(x => x.FlagC, x => x.FlagP, x => x.FlagB, x => x.FlagH).Subscribe(x => UpdatePsValue());
 			this.WhenAnyValue(x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ).Subscribe(x => UpdatePsValue());
 
@@ -44,8 +41,7 @@ namespace Mesen.Debugger.StatusViews
 			});
 		}
 
-		private void UpdatePsValue()
-		{
+		private void UpdatePsValue() {
 			RegPS = (byte)(
 				(FlagN ? (byte)SpcFlags.Negative : 0) |
 				(FlagV ? (byte)SpcFlags.Overflow : 0) |
@@ -58,12 +54,11 @@ namespace Mesen.Debugger.StatusViews
 			);
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			SpcState cpu = DebugApi.GetCpuState<SpcState>(CpuType.Spc);
 
 			UpdateCycleCount(cpu.Cycle);
-			
+
 			RegA = cpu.A;
 			RegX = cpu.X;
 			RegY = cpu.Y;
@@ -72,14 +67,14 @@ namespace Mesen.Debugger.StatusViews
 			RegPS = (byte)cpu.PS;
 
 			StringBuilder sb = new StringBuilder();
-			for(UInt32 i = (UInt32)0x100 + cpu.SP + 1; i < 0x200; i++) {
+			for (UInt32 i = (UInt32)0x100 + cpu.SP + 1; i < 0x200; i++) {
 				sb.Append($"${DebugApi.GetMemoryValue(MemoryType.SpcMemory, i):X2} ");
 			}
+
 			StackPreview = sb.ToString();
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			SpcState cpu = DebugApi.GetCpuState<SpcState>(CpuType.Spc);
 
 			cpu.A = RegA;

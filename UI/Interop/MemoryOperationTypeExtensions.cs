@@ -1,12 +1,9 @@
-﻿namespace Mesen.Interop
-{
-	public static class MemoryOperationTypeExtensions
-	{
-		public static bool IsRead(this MemoryOperationType opType)
-		{
-			switch(opType) {
+namespace Mesen.Interop {
+	public static class MemoryOperationTypeExtensions {
+		public static bool IsRead(this MemoryOperationType opType) {
+			switch (opType) {
 				default: return false;
-				
+
 				case MemoryOperationType.Read:
 				case MemoryOperationType.DmaRead:
 				case MemoryOperationType.DummyRead:
@@ -17,9 +14,8 @@
 			}
 		}
 
-		public static bool IsWrite(this MemoryOperationType opType)
-		{
-			switch(opType) {
+		public static bool IsWrite(this MemoryOperationType opType) {
+			switch (opType) {
 				default: return false;
 
 				case MemoryOperationType.Write:

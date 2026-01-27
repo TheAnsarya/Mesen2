@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -17,14 +20,9 @@ using Mesen.Debugger.ViewModels.DebuggerDock;
 using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Mesen.Debugger.Views
-{
-	public class SourceViewView : MesenUserControl
-	{
+namespace Mesen.Debugger.Views {
+	public class SourceViewView : MesenUserControl {
 		private SourceViewViewModel Model => (SourceViewViewModel)DataContext!;
 		private LocationInfo ActionLocation => _selectionHandler?.ActionLocation ?? new LocationInfo();
 		private bool IsMarginClick => _selectionHandler?.IsMarginClick ?? false;
@@ -35,19 +33,18 @@ namespace Mesen.Debugger.Views
 		private DisassemblyViewer _viewer;
 		private BaseToolContainerViewModel? _parentModel;
 
-		public SourceViewView()
-		{
+		public SourceViewView() {
 			InitializeComponent();
 			_viewer = this.GetControl<DisassemblyViewer>("disViewer");
 			_viewer.GetPropertyChangedObservable(DisassemblyViewer.VisibleRowCountProperty).Subscribe(x => {
 				SourceViewViewModel? model = Model;
-				if(model == null) {
+				if (model == null) {
 					return;
 				}
 
 				int rowCount = _viewer.VisibleRowCount;
 				int prevCount = model.VisibleRowCount;
-				if(prevCount != rowCount) {
+				if (prevCount != rowCount) {
 					int pos = model.ScrollPosition + (prevCount / 2);
 					model.VisibleRowCount = rowCount;
 					model.ScrollToRowNumber(pos);
@@ -58,24 +55,24 @@ namespace Mesen.Debugger.Views
 			InitContextMenu();
 		}
 
-		protected override void OnDataContextChanged(EventArgs e)
-		{
-			if(DataContext is SourceViewViewModel model && _model != model) {
-				if(_model != null) {
+		protected override void OnDataContextChanged(EventArgs e) {
+			if (DataContext is SourceViewViewModel model && _model != model) {
+				if (_model != null) {
 					model.VisibleRowCount = _model.VisibleRowCount;
 				}
+
 				_model = model;
 				_model.SetViewer(_viewer);
 				_selectionHandler?.Dispose();
-				if(model != null) {
+				if (model != null) {
 					_selectionHandler = new CodeViewerSelectionHandler(_viewer, _model, (rowIndex, rowAddress) => rowIndex + _model.ScrollPosition, true);
 				}
 			}
+
 			base.OnDataContextChanged(e);
 		}
 
-		private void InitContextMenu()
-		{
+		private void InitContextMenu() {
 			List<ContextMenuAction> actions = new List<ContextMenuAction> {
 				new ContextMenuAction() {
 					ActionType = ActionType.Copy,
@@ -188,10 +185,7 @@ namespace Mesen.Debugger.Views
 					HintText = () => GetHint(ActionLocation),
 					IsVisible = () => !IsMarginClick,
 					IsEnabled = () => ActionLocation.RelAddress != null || ActionLocation.AbsAddress != null,
-					OnClick = () => {
-						Model.Debugger.RunToLocation(ActionLocation);
-					}
-				},
+					OnClick = () => Model.Debugger.RunToLocation(ActionLocation)                },
 				new ContextMenuSeparator() { IsVisible = () => !IsMarginClick },
 				new ContextMenuAction() {
 					ActionType = ActionType.GoToLocation,
@@ -207,61 +201,54 @@ namespace Mesen.Debugger.Views
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.CodeWindow_NavigateBack),
 					IsVisible = () => !IsMarginClick,
 					IsEnabled = () => Model.History.CanGoBack(),
-					OnClick = () => {
-						Model.GoBack();
-					}
-				},
+					OnClick = () => Model.GoBack()              },
 				new ContextMenuAction() {
 					ActionType = ActionType.NavigateForward,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.CodeWindow_NavigateForward),
 					IsVisible = () => !IsMarginClick,
 					IsEnabled = () => Model.History.CanGoForward(),
-					OnClick = () => {
-						Model.GoForward();
-					}
-				},
+					OnClick = () => Model.GoForward()               },
 			};
 
 			actions.AddRange(GetBreakpointContextMenu());
 			AddDisposables(DebugShortcutManager.CreateContextMenu(_viewer, actions));
 		}
 
-		private void GoToLocation(LocationInfo loc)
-		{
-			if(loc.Symbol != null) {
+		private void GoToLocation(LocationInfo loc) {
+			if (loc.Symbol != null) {
 				AddressInfo? addr = DebugWorkspaceManager.SymbolProvider?.GetSymbolAddressInfo(loc.Symbol.Value);
-				if(addr?.Address > 0) {
+				if (addr?.Address > 0) {
 					SourceCodeLocation? srcLoc = DebugWorkspaceManager.SymbolProvider?.GetSourceCodeLineInfo(addr.Value);
-					if(srcLoc != null) {
+					if (srcLoc != null) {
 						_model?.ScrollToLocation(srcLoc.Value, true);
 					}
 				}
-			} else if(loc.RelAddress != null) {
+			} else if (loc.RelAddress != null) {
 				_model?.GoToRelativeAddress(loc.RelAddress.Value.Address, true);
 			}
 		}
 
-		private string? GetSearchString()
-		{
+		private string? GetSearchString() {
 			CodeSegmentInfo? segment = _selectionHandler?.MouseOverSegment;
-			if(segment == null || !AllowSearch(segment.Type)) {
+			if (segment == null || !AllowSearch(segment.Type)) {
 				LocationInfo loc = ActionLocation;
-				if(loc.RelAddress?.Address >= 0) {
+				if (loc.RelAddress?.Address >= 0) {
 					CodeLabel? label = LabelManager.GetLabel(loc.RelAddress.Value);
 					return label?.Label ?? ("$" + loc.RelAddress.Value.Address.ToString("X" + CpuType.GetAddressSize()));
 				}
+
 				return null;
 			}
+
 			return segment.Text.Trim(' ', '[', ']', '=', ':', '.', '+');
 		}
 
-		private bool AllowSearch(CodeSegmentType? type)
-		{
-			if(type == null) {
+		private bool AllowSearch(CodeSegmentType? type) {
+			if (type == null) {
 				return false;
 			}
 
-			switch(type) {
+			switch (type) {
 				case CodeSegmentType.OpCode:
 				case CodeSegmentType.Token:
 				case CodeSegmentType.Address:
@@ -276,10 +263,8 @@ namespace Mesen.Debugger.Views
 			}
 		}
 
-		private List<ContextMenuAction> GetBreakpointContextMenu()
-		{
-			Breakpoint? GetBreakpoint()
-			{
+		private List<ContextMenuAction> GetBreakpointContextMenu() {
+			Breakpoint? GetBreakpoint() {
 				return ActionLocation.AbsAddress != null ? BreakpointManager.GetMatchingBreakpoint(ActionLocation.AbsAddress.Value, CpuType) : null;
 			}
 
@@ -353,51 +338,47 @@ namespace Mesen.Debugger.Views
 			};
 		}
 
-		private string GetFormatString()
-		{
+		private string GetFormatString() {
 			return CpuType.ToMemoryType().GetFormatString();
 		}
 
-		private string GetHint(LocationInfo? loc)
-		{
-			if(loc == null) {
+		private string GetHint(LocationInfo? loc) {
+			if (loc == null) {
 				return string.Empty;
 			}
 
-			if(loc?.Symbol != null) {
+			if (loc?.Symbol != null) {
 				return loc.Symbol.Value.Name + (loc.LabelAddressOffset > 0 ? ("+" + loc.LabelAddressOffset) : "");
-			} else if(loc?.RelAddress != null) {
+			} else if (loc?.RelAddress != null) {
 				return "$" + loc.RelAddress.Value.Address.ToString(GetFormatString());
-			} else if(loc?.AbsAddress != null) {
+			} else if (loc?.AbsAddress != null) {
 				return "[$" + loc.AbsAddress.Value.Address.ToString(GetFormatString()) + "]";
 			}
 
 			return string.Empty;
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-		{
-			if(this.FindLogicalAncestorOfType<DockableControl>()?.DataContext is BaseToolContainerViewModel parentModel) {
+		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) {
+			if (this.FindLogicalAncestorOfType<DockableControl>()?.DataContext is BaseToolContainerViewModel parentModel) {
 				_parentModel = parentModel;
 				_parentModel.Selected += Parent_Selected;
 			}
 
 			_model?.SetViewer(_viewer);
-			if(_model?.ActiveAddress != null) {
+			if (_model?.ActiveAddress != null) {
 				//Go to active address when clicking on the source view tab
 				_model?.GoToRelativeAddress(_model.ActiveAddress.Value, true);
 			}
+
 			FocusViewer();
 		}
 
-		protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-		{
-			if(_parentModel != null) {
+		protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e) {
+			if (_parentModel != null) {
 				_parentModel.Selected -= Parent_Selected;
 				_parentModel = null;
 			}
@@ -405,35 +386,32 @@ namespace Mesen.Debugger.Views
 			_model?.SetViewer(null);
 		}
 
-		protected override void OnPointerPressed(PointerPressedEventArgs e)
-		{
+		protected override void OnPointerPressed(PointerPressedEventArgs e) {
 			base.OnPointerPressed(e);
 
 			//Navigate on double-click left click
-			if(e.Source is DisassemblyViewer) {
+			if (e.Source is DisassemblyViewer) {
 				PointerPointProperties props = e.GetCurrentPoint(this).Properties;
-				if(_selectionHandler?.IsMarginClick == false && props.IsLeftButtonPressed && e.ClickCount == 2) {
+				if (_selectionHandler?.IsMarginClick == false && props.IsLeftButtonPressed && e.ClickCount == 2) {
 					GoToLocation(ActionLocation);
-				} else if(props.IsXButton1Pressed) {
+				} else if (props.IsXButton1Pressed) {
 					Model.GoBack();
-				} else if(props.IsXButton2Pressed) {
+				} else if (props.IsXButton2Pressed) {
 					Model.GoForward();
 				}
 			}
 		}
 
-		private void FocusViewer()
-		{
+		private void FocusViewer() {
 			Dispatcher.UIThread.Post(() => {
 				//Focus source view when selected by code
-				if(_viewer.IsParentWindowFocused()) {
+				if (_viewer.IsParentWindowFocused()) {
 					_viewer.Focus();
 				}
 			});
 		}
 
-		private void Parent_Selected(object? sender, EventArgs e)
-		{
+		private void Parent_Selected(object? sender, EventArgs e) {
 			this.FocusViewer();
 		}
 	}

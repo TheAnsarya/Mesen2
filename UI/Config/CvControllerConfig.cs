@@ -1,21 +1,18 @@
-﻿using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.ViewModels;
 
-namespace Mesen.Config
-{
-	public class CvControllerConfig : ControllerConfig
-	{
+namespace Mesen.Config {
+	public class CvControllerConfig : ControllerConfig {
 		public new CvKeyMapping Mapping1 { get => (CvKeyMapping)_mapping1; set => _mapping1 = value; }
 		public new CvKeyMapping Mapping2 { get => (CvKeyMapping)_mapping2; set => _mapping2 = value; }
 		public new CvKeyMapping Mapping3 { get => (CvKeyMapping)_mapping3; set => _mapping3 = value; }
 		public new CvKeyMapping Mapping4 { get => (CvKeyMapping)_mapping4; set => _mapping4 = value; }
 
-		public CvControllerConfig()
-		{
+		public CvControllerConfig() {
 			_mapping1 = new CvKeyMapping();
 			_mapping2 = new CvKeyMapping();
 			_mapping3 = new CvKeyMapping();
@@ -23,25 +20,22 @@ namespace Mesen.Config
 		}
 	}
 
-	public class CvKeyMapping : KeyMapping
-	{
+	public class CvKeyMapping : KeyMapping {
 		public UInt16[]? LightPhaserButtons { get; set; } = null;
 		public UInt16[]? ColecoVisionControllerButtons { get; set; } = null;
 
-		protected override UInt16[]? GetCustomButtons(ControllerType type)
-		{
+		protected override UInt16[]? GetCustomButtons(ControllerType type) {
 			return type switch {
 				ControllerType.ColecoVisionController => ColecoVisionControllerButtons,
 				_ => null
 			};
 		}
 
-		public override List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex)
-		{
+		public override List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex) {
 			UInt16[]? buttonMappings = GetCustomButtons(type);
-			if(buttonMappings == null) {
-				if(GetDefaultCustomKeys(type, null) != null) {
-					if(mappingIndex == 0) {
+			if (buttonMappings == null) {
+				if (GetDefaultCustomKeys(type, null) != null) {
+					if (mappingIndex == 0) {
 						SetDefaultKeys(type, null);
 					} else {
 						ClearKeys(type);
@@ -49,7 +43,7 @@ namespace Mesen.Config
 				}
 
 				buttonMappings = GetCustomButtons(type);
-				if(buttonMappings == null) {
+				if (buttonMappings == null) {
 					return new List<CustomKeyMapping>();
 				}
 			}
@@ -64,18 +58,16 @@ namespace Mesen.Config
 			return keys;
 		}
 
-		public override void ClearKeys(ControllerType type)
-		{
-			switch(type) {
+		public override void ClearKeys(ControllerType type) {
+			switch (type) {
 				case ControllerType.ColecoVisionController:
 					ColecoVisionControllerButtons = new UInt16[18];
 					break;
 			}
 		}
 
-		public override UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset)
-		{
-			switch(type) {
+		public override UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset) {
+			switch (type) {
 				case ControllerType.ColecoVisionController:
 					Dictionary<KeyPresetType, string[]> presets = new() {
 						{ KeyPresetType.ArrowKeys, new string[] { "Up Arrow", "Down Arrow", "Left Arrow", "Right Arrow",
@@ -118,7 +110,7 @@ namespace Mesen.Config
 						} },
 					};
 
-					if(!presets.TryGetValue(preset ?? KeyPresetType.ArrowKeys, out string[]? keys)) {
+					if (!presets.TryGetValue(preset ?? KeyPresetType.ArrowKeys, out string[]? keys)) {
 						keys = presets[KeyPresetType.ArrowKeys];
 					}
 
@@ -129,9 +121,8 @@ namespace Mesen.Config
 			}
 		}
 
-		public override void SetDefaultKeys(ControllerType type, KeyPresetType? preset)
-		{
-			switch(type) {
+		public override void SetDefaultKeys(ControllerType type, KeyPresetType? preset) {
+			switch (type) {
 				case ControllerType.ColecoVisionController: ColecoVisionControllerButtons = GetDefaultCustomKeys(type, preset); break;
 
 				default:

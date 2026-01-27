@@ -1,16 +1,14 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class GameboyConfig : BaseConfig<GameboyConfig>
-	{
+namespace Mesen.Config {
+	public class GameboyConfig : BaseConfig<GameboyConfig> {
 		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 		[Reactive] public ControllerConfig Controller { get; set; } = new();
@@ -20,7 +18,7 @@ namespace Mesen.Config
 
 		[Reactive] public bool BlendFrames { get; set; } = true;
 		[Reactive] public bool GbcAdjustColors { get; set; } = true;
-		
+
 		[Reactive] public bool DisableBackground { get; set; } = false;
 		[Reactive] public bool DisableSprites { get; set; } = false;
 		[Reactive] public bool HideSgbBorders { get; set; } = false;
@@ -37,8 +35,7 @@ namespace Mesen.Config
 		[Reactive][MinMax(0, 100)] public UInt32 NoiseVol { get; set; } = 100;
 		[Reactive][MinMax(0, 100)] public UInt32 WaveVol { get; set; } = 100;
 
-		public void ApplyConfig()
-		{
+		public void ApplyConfig() {
 			ConfigManager.Config.Video.ApplyConfig();
 
 			ConfigApi.SetGameboyConfig(new InteropGameboyConfig() {
@@ -66,15 +63,13 @@ namespace Mesen.Config
 			});
 		}
 
-		internal void InitializeDefaults(DefaultKeyMappingType defaultMappings)
-		{
+		internal void InitializeDefaults(DefaultKeyMappingType defaultMappings) {
 			Controller.InitDefaults(defaultMappings, ControllerType.GameboyController);
 		}
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct InteropGameboyConfig
-	{
+	public struct InteropGameboyConfig {
 		public InteropControllerConfig Controller;
 
 		public GameboyModel Model;
@@ -82,7 +77,7 @@ namespace Mesen.Config
 
 		[MarshalAs(UnmanagedType.I1)] public bool BlendFrames;
 		[MarshalAs(UnmanagedType.I1)] public bool GbcAdjustColors;
-		
+
 		[MarshalAs(UnmanagedType.I1)] public bool DisableBackground;
 		[MarshalAs(UnmanagedType.I1)] public bool DisableSprites;
 		[MarshalAs(UnmanagedType.I1)] public bool HideSgbBorders;
@@ -92,10 +87,10 @@ namespace Mesen.Config
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 		public UInt32[] BgColors;
-		
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 		public UInt32[] Obj0Colors;
-		
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 		public UInt32[] Obj1Colors;
 
@@ -105,8 +100,7 @@ namespace Mesen.Config
 		public UInt32 WaveVol;
 	}
 
-	public enum GameboyModel
-	{
+	public enum GameboyModel {
 		AutoFavorGbc,
 		AutoFavorSgb,
 		AutoFavorGb,

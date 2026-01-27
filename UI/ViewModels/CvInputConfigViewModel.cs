@@ -1,14 +1,12 @@
-﻿using Avalonia.Threading;
+using System;
+using System.Reactive.Linq;
+using Avalonia.Threading;
 using Mesen.Config;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Reactive.Linq;
 
-namespace Mesen.ViewModels
-{
-	public class CvInputConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class CvInputConfigViewModel : DisposableViewModel {
 		[Reactive] public CvConfig Config { get; set; }
 
 		public Enum[] AvailableControllerTypesP12 => new Enum[] {
@@ -19,8 +17,7 @@ namespace Mesen.ViewModels
 		[Obsolete("For designer only")]
 		public CvInputConfigViewModel() : this(new CvConfig()) { }
 
-		public CvInputConfigViewModel(CvConfig config)
-		{
+		public CvInputConfigViewModel(CvConfig config) {
 			Config = config;
 		}
 	}

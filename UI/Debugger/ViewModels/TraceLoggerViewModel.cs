@@ -1,4 +1,10 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -13,17 +19,9 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class TraceLoggerViewModel : DisposableViewModel, ISelectableModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class TraceLoggerViewModel : DisposableViewModel, ISelectableModel {
 		public TraceLoggerConfig Config { get; }
 		[Reactive] public TraceLoggerStyleProvider StyleProvider { get; set; }
 		[Reactive] public CodeLineData[] TraceLogLines { get; set; } = Array.Empty<CodeLineData>();
@@ -39,7 +37,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public string? TraceFile { get; set; } = null;
 		[Reactive] public bool AllowOpenTraceFile { get; private set; } = false;
 		[Reactive] public bool IsStartLoggingEnabled { get; set; }
-		
+
 		[Reactive] public bool ShowByteCode { get; private set; }
 
 		[Reactive] public int SelectionStart { get; private set; }
@@ -55,15 +53,14 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public List<ContextMenuAction> ViewMenuItems { get; private set; } = new();
 
 		public QuickSearchViewModel QuickSearch { get; } = new();
-		
+
 		private DisassemblyViewer? _viewer = null;
 
-		public TraceLoggerViewModel()
-		{
+		public TraceLoggerViewModel() {
 			Config = ConfigManager.Config.Debug.TraceLogger;
 			StyleProvider = new TraceLoggerStyleProvider(this);
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				Tabs = new() { new TraceLoggerOptionTab(this, CpuType.Nes, Config.GetCpuConfig(CpuType.Nes), true) };
 				SelectedTab = Tabs[0];
 				return;
@@ -72,7 +69,7 @@ namespace Mesen.Debugger.ViewModels
 			QuickSearch.OnFind += QuickSearch_OnFind;
 
 			AddDisposable(this.WhenAnyValue(x => x.QuickSearch.IsSearchBoxVisible).Subscribe(x => {
-				if(!QuickSearch.IsSearchBoxVisible) {
+				if (!QuickSearch.IsSearchBoxVisible) {
 					_viewer?.Focus();
 				}
 			}));
@@ -84,17 +81,11 @@ namespace Mesen.Debugger.ViewModels
 				UpdateLog();
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.MinScrollPosition).Subscribe(x => {
-				ScrollPosition = Math.Max(MinScrollPosition, Math.Min(x, MaxScrollPosition));
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.MinScrollPosition).Subscribe(x => ScrollPosition = Math.Max(MinScrollPosition, Math.Min(x, MaxScrollPosition))));
 
-			AddDisposable(this.WhenAnyValue(x => x.MaxScrollPosition).Subscribe(x => {
-				ScrollPosition = Math.Max(MinScrollPosition, Math.Min(x, MaxScrollPosition));
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.MaxScrollPosition).Subscribe(x => ScrollPosition = Math.Max(MinScrollPosition, Math.Min(x, MaxScrollPosition))));
 
-			AddDisposable(this.WhenAnyValue(x => x.IsLoggingToFile).Subscribe(x => {
-				AllowOpenTraceFile = !IsLoggingToFile && TraceFile != null;
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.IsLoggingToFile).Subscribe(x => AllowOpenTraceFile = !IsLoggingToFile && TraceFile != null));
 
 			AddDisposable(this.WhenAnyValue(x => x.SelectionStart, x => x.SelectionEnd, x => x.SelectedRow, x => x.SelectionAnchor).Subscribe(x => {
 				SelectionStart = Math.Max(MinScrollPosition, Math.Min(DebugApi.TraceLogBufferSize - 1, SelectionStart));
@@ -104,30 +95,30 @@ namespace Mesen.Debugger.ViewModels
 			}));
 		}
 
-		public void SetViewer(DisassemblyViewer viewer)
-		{
+		public void SetViewer(DisassemblyViewer viewer) {
 			_viewer = viewer;
 		}
 
-		private void QuickSearch_OnFind(OnFindEventArgs e)
-		{
+		private void QuickSearch_OnFind(OnFindEventArgs e) {
 			CodeLineData[] lines = GetCodeLines(0, DebugApi.TraceLogBufferSize);
 			string needle = e.SearchString.ToLowerInvariant();
-			
+
 			int startRow = SelectedRow;
-			if(e.Direction == SearchDirection.Backward) {
+			if (e.Direction == SearchDirection.Backward) {
 				startRow--;
-			} else if(e.SkipCurrent) {
+			} else if (e.SkipCurrent) {
 				startRow++;
 			}
+
 			int sign = e.Direction == SearchDirection.Backward ? -1 : 1;
 
-			for(int i = 0; i < lines.Length; i++) {
-				int lineIndex = (i * sign + startRow) % lines.Length;
-				if(lineIndex < 0) {
+			for (int i = 0; i < lines.Length; i++) {
+				int lineIndex = ((i * sign) + startRow) % lines.Length;
+				if (lineIndex < 0) {
 					lineIndex += lines.Length;
 				}
-				if(lines[lineIndex].Text.Contains(needle, StringComparison.OrdinalIgnoreCase)) {
+
+				if (lines[lineIndex].Text.Contains(needle, StringComparison.OrdinalIgnoreCase)) {
 					Dispatcher.UIThread.Post(() => {
 						ScrollToRowNumber(lineIndex);
 						SelectedRow = lineIndex;
@@ -139,11 +130,11 @@ namespace Mesen.Debugger.ViewModels
 					return;
 				}
 			}
+
 			e.Success = false;
 		}
 
-		public void InitializeMenu(Window wnd)
-		{
+		public void InitializeMenu(Window wnd) {
 			FileMenuItems = AddDisposables(new List<ContextMenuAction>() {
 				new ContextMenuAction() {
 					ActionType = ActionType.Exit,
@@ -203,14 +194,12 @@ namespace Mesen.Debugger.ViewModels
 			DebugShortcutManager.RegisterActions(wnd, SearchMenuItems);
 		}
 
-		public void InvalidateVisual()
-		{
+		public void InvalidateVisual() {
 			TraceLogLines = (CodeLineData[])TraceLogLines.Clone();
 		}
 
-		public void UpdateAvailableTabs()
-		{
-			foreach(TraceLoggerOptionTab tab in Tabs) {
+		public void UpdateAvailableTabs() {
+			foreach (TraceLoggerOptionTab tab in Tabs) {
 				tab.Dispose();
 			}
 
@@ -218,7 +207,7 @@ namespace Mesen.Debugger.ViewModels
 			RomInfo romInfo = EmuApi.GetRomInfo();
 			bool showEnableButton = romInfo.CpuTypes.Count > 1;
 			StyleProvider.SetConsoleType(romInfo.ConsoleType);
-			foreach(CpuType type in romInfo.CpuTypes) {
+			foreach (CpuType type in romInfo.CpuTypes) {
 				tabs.Add(AddDisposable(new TraceLoggerOptionTab(this, type, Config.GetCpuConfig(type), showEnableButton)));
 			}
 
@@ -228,14 +217,13 @@ namespace Mesen.Debugger.ViewModels
 			UpdateOptions();
 		}
 
-		public void UpdateOptions()
-		{
+		public void UpdateOptions() {
 			bool forceEnable = Tabs.Count == 1;
 			bool isStartLoggingEnabled = forceEnable;
 			bool showByteCode = false;
 
 			RomInfo romInfo = EmuApi.GetRomInfo();
-			foreach(CpuType cpuType in romInfo.CpuTypes) {
+			foreach (CpuType cpuType in romInfo.CpuTypes) {
 				showByteCode |= Config.GetCpuConfig(cpuType).ShowByteCode;
 				isStartLoggingEnabled |= Config.GetCpuConfig(cpuType).Enabled;
 			}
@@ -247,10 +235,9 @@ namespace Mesen.Debugger.ViewModels
 			UpdateLog();
 		}
 
-		public void UpdateCoreOptions()
-		{
+		public void UpdateCoreOptions() {
 			RomInfo romInfo = EmuApi.GetRomInfo();
-			foreach(CpuType cpuType in romInfo.CpuTypes) {
+			foreach (CpuType cpuType in romInfo.CpuTypes) {
 				TraceLoggerCpuConfig cfg = Config.GetCpuConfig(cpuType);
 				InteropTraceLoggerOptions options = new InteropTraceLoggerOptions() {
 					Enabled = romInfo.CpuTypes.Count == 1 || cfg.Enabled,
@@ -267,8 +254,7 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void UpdateLog(bool scrollToBottom = false)
-		{
+		public void UpdateLog(bool scrollToBottom = false) {
 			int traceSize = (int)DebugApi.GetExecutionTraceSize();
 			CodeLineData[] lines = GetCodeLines(ScrollPosition, VisibleRowCount);
 
@@ -276,14 +262,13 @@ namespace Mesen.Debugger.ViewModels
 				MinScrollPosition = Math.Min(MaxScrollPosition, DebugApi.TraceLogBufferSize - traceSize);
 				TraceLogLines = lines;
 
-				if(scrollToBottom) {
+				if (scrollToBottom) {
 					ScrollToBottom(false);
 				}
 			});
 		}
 
-		public void SetSelectedRow(int rowNumber)
-		{
+		public void SetSelectedRow(int rowNumber) {
 			rowNumber += ScrollPosition;
 			SelectionStart = rowNumber;
 			SelectionEnd = rowNumber;
@@ -292,16 +277,14 @@ namespace Mesen.Debugger.ViewModels
 			InvalidateVisual();
 		}
 
-		public bool IsSelected(int rowNumber)
-		{
+		public bool IsSelected(int rowNumber) {
 			rowNumber += ScrollPosition;
 			return rowNumber >= SelectionStart && rowNumber <= SelectionEnd;
 		}
 
-		public void MoveCursor(int rowOffset, bool extendSelection)
-		{
+		public void MoveCursor(int rowOffset, bool extendSelection) {
 			int rowNumber = SelectedRow + rowOffset - ScrollPosition;
-			if(extendSelection) {
+			if (extendSelection) {
 				ResizeSelectionTo(rowNumber);
 			} else {
 				SetSelectedRow(rowNumber);
@@ -309,24 +292,23 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void ResizeSelectionTo(int rowNumber)
-		{
+		public void ResizeSelectionTo(int rowNumber) {
 			rowNumber += ScrollPosition;
 
-			if(SelectedRow == rowNumber) {
+			if (SelectedRow == rowNumber) {
 				return;
 			}
 
 			bool anchorTop = SelectionAnchor == SelectionStart;
-			if(anchorTop) {
-				if(rowNumber < SelectionStart) {
+			if (anchorTop) {
+				if (rowNumber < SelectionStart) {
 					SelectionEnd = SelectionStart;
 					SelectionStart = rowNumber;
 				} else {
 					SelectionEnd = rowNumber;
 				}
 			} else {
-				if(rowNumber < SelectionEnd) {
+				if (rowNumber < SelectionEnd) {
 					SelectionStart = rowNumber;
 				} else {
 					SelectionStart = SelectionEnd;
@@ -341,14 +323,12 @@ namespace Mesen.Debugger.ViewModels
 			InvalidateVisual();
 		}
 
-		public void Scroll(int offset)
-		{
+		public void Scroll(int offset) {
 			ScrollPosition += offset;
 		}
 
-		public void ScrollToTop(bool extendSelection)
-		{
-			if(extendSelection) {
+		public void ScrollToTop(bool extendSelection) {
+			if (extendSelection) {
 				ResizeSelectionTo(-ScrollPosition);
 			} else {
 				ScrollPosition = 0;
@@ -356,9 +336,8 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void ScrollToBottom(bool extendSelection)
-		{
-			if(extendSelection) {
+		public void ScrollToBottom(bool extendSelection) {
+			if (extendSelection) {
 				ResizeSelectionTo(DebugApi.TraceLogBufferSize - 1 - ScrollPosition);
 			} else {
 				ScrollPosition = MaxScrollPosition;
@@ -366,59 +345,55 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		public void SelectAll()
-		{
+		public void SelectAll() {
 			SelectionStart = 0;
 			SelectionEnd = DebugApi.TraceLogBufferSize - 1;
 			InvalidateVisual();
 		}
 
-		public void CopySelection()
-		{
+		public void CopySelection() {
 			StringBuilder sb = new();
 
 			int len = SelectionEnd - SelectionStart + 1;
 			CodeLineData[] lines = GetCodeLines(SelectionStart, len);
 
-			for(int i = 0; i < len; i++) {
+			for (int i = 0; i < len; i++) {
 				string addrFormat = "X" + lines[i].CpuType.GetAddressSize();
 				sb.AppendLine(lines[i].GetAddressText(AddressDisplayType.CpuAddress, addrFormat).PadRight(6) + " " + lines[i].Text);
 			}
+
 			ApplicationHelper.GetMainWindow()?.Clipboard?.SetTextAsync(sb.ToString());
 		}
 
-		private bool IsRowVisible(int rowNumber)
-		{
+		private bool IsRowVisible(int rowNumber) {
 			return rowNumber > ScrollPosition && rowNumber < ScrollPosition + VisibleRowCount;
 		}
 
-		private void ScrollToRowNumber(int rowNumber, ScrollDisplayPosition position = ScrollDisplayPosition.Center)
-		{
-			if(IsRowVisible(rowNumber)) {
+		private void ScrollToRowNumber(int rowNumber, ScrollDisplayPosition position = ScrollDisplayPosition.Center) {
+			if (IsRowVisible(rowNumber)) {
 				//Row is already visible, don't scroll
 				return;
 			}
 
-			switch(position) {
+			switch (position) {
 				case ScrollDisplayPosition.Top: ScrollPosition = rowNumber; break;
 				case ScrollDisplayPosition.Center: ScrollPosition = rowNumber - (VisibleRowCount / 2) + 1; break;
 				case ScrollDisplayPosition.Bottom: ScrollPosition = rowNumber - VisibleRowCount + 1; break;
 			}
 		}
 
-		private CodeLineData[] GetCodeLines(int startIndex, int rowCount)
-		{
+		private CodeLineData[] GetCodeLines(int startIndex, int rowCount) {
 			TraceRow[] rows = DebugApi.GetExecutionTrace((uint)(DebugApi.TraceLogBufferSize - startIndex - rowCount), (uint)rowCount);
 
 			List<CodeLineData> lines = new(rowCount);
 
 			CodeLineData emptyLine = new CodeLineData(CpuType.Snes);
 			int emptyLineCount = rowCount - rows.Length;
-			for(int i = 0; i < emptyLineCount; i++) {
+			for (int i = 0; i < emptyLineCount; i++) {
 				lines.Add(emptyLine);
 			}
 
-			for(int i = rows.Length - 1; i >= 0; i--) {
+			for (int i = rows.Length - 1; i >= 0; i--) {
 				lines.Add(new CodeLineData(rows[i].Type) {
 					Address = (int)rows[i].ProgramCounter,
 					AbsoluteAddress = new() { Address = -1 },
@@ -431,10 +406,9 @@ namespace Mesen.Debugger.ViewModels
 			return lines.ToArray();
 		}
 
-		public AddressInfo? GetSelectedRowAddress()
-		{
+		public AddressInfo? GetSelectedRowAddress() {
 			TraceRow[] rows = DebugApi.GetExecutionTrace(DebugApi.TraceLogBufferSize - (uint)SelectedRow - 1, 1);
-			if(rows.Length > 0) {
+			if (rows.Length > 0) {
 				return new AddressInfo() {
 					Address = (int)rows[0].ProgramCounter,
 					Type = rows[0].Type.ToMemoryType()
@@ -445,8 +419,7 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class TraceLoggerOptionTab : DisposableViewModel
-	{
+	public class TraceLoggerOptionTab : DisposableViewModel {
 		public string TabName { get; set; } = "";
 		public Control HelpTooltip => ExpressionTooltipHelper.GetHelpTooltip(CpuType, false);
 		public Control FormatTooltip => GetFormatTooltip();
@@ -464,20 +437,19 @@ namespace Mesen.Debugger.ViewModels
 
 		private TraceLoggerViewModel _traceLogger;
 
-		public TraceLoggerOptionTab(TraceLoggerViewModel traceLogger, CpuType cpuType, TraceLoggerCpuConfig options, bool showEnableButton)
-		{
+		public TraceLoggerOptionTab(TraceLoggerViewModel traceLogger, CpuType cpuType, TraceLoggerCpuConfig options, bool showEnableButton) {
 			_traceLogger = traceLogger;
 			CpuType = cpuType;
 			Options = options;
-			
+
 			ShowEnableButton = showEnableButton;
-			ShowStatusFormat = cpuType != CpuType.Cx4 && cpuType != CpuType.NecDsp;
+			ShowStatusFormat = cpuType is not CpuType.Cx4 and not CpuType.NecDsp;
 			ShowIndentCode = cpuType != CpuType.Gsu;
 
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(options, OnOptionsChanged));
 			UpdateFormat();
 
-			if(string.IsNullOrWhiteSpace(Options.Format)) {
+			if (string.IsNullOrWhiteSpace(Options.Format)) {
 				//Set custom format to the default if it's empty
 				Options.Format = GetAutoFormat(Options, CpuType);
 			}
@@ -486,23 +458,22 @@ namespace Mesen.Debugger.ViewModels
 			LogOptionsTitle = string.Format(ResourceHelper.GetViewLabel(nameof(TraceLoggerWindow), "grpLogOptions"), ResourceHelper.GetEnumText(cpuType));
 		}
 
-		private void OnOptionsChanged(object? sender, PropertyChangedEventArgs e)
-		{
+		private void OnOptionsChanged(object? sender, PropertyChangedEventArgs e) {
 			UpdateFormat();
 
-			if(e.PropertyName == nameof(TraceLoggerCpuConfig.UseCustomFormat) && Options.UseCustomFormat && string.IsNullOrWhiteSpace(Options.Format)) {
+			if (e.PropertyName == nameof(TraceLoggerCpuConfig.UseCustomFormat) && Options.UseCustomFormat && string.IsNullOrWhiteSpace(Options.Format)) {
 				//Set custom format to the default if it's empty
 				Options.Format = Format;
 			}
 
-			if(Options.Enabled) {
+			if (Options.Enabled) {
 				//Auto-select current tab when enabled
 				_traceLogger.SelectedTab = this;
 			}
 
-			if(!string.IsNullOrWhiteSpace(Options.Condition)) {
+			if (!string.IsNullOrWhiteSpace(Options.Condition)) {
 				DebugApi.EvaluateExpression(Options.Condition, CpuType, out EvalResultType result, false);
-				IsConditionValid = result == EvalResultType.Numeric || result == EvalResultType.Boolean;
+				IsConditionValid = result is EvalResultType.Numeric or EvalResultType.Boolean;
 			} else {
 				IsConditionValid = true;
 			}
@@ -510,15 +481,13 @@ namespace Mesen.Debugger.ViewModels
 			_traceLogger.UpdateOptions();
 		}
 
-		private void UpdateFormat()
-		{
-			if(!Options.UseCustomFormat) {
+		private void UpdateFormat() {
+			if (!Options.UseCustomFormat) {
 				Format = GetAutoFormat(Options, CpuType);
 			}
 		}
 
-		public static string GetAutoFormat(TraceLoggerCpuConfig cfg, CpuType cpuType)
-		{
+		public static string GetAutoFormat(TraceLoggerCpuConfig cfg, CpuType cpuType) {
 			string format = "";
 			int alignValue = cpuType switch {
 				CpuType.Gba => 42,
@@ -526,9 +495,8 @@ namespace Mesen.Debugger.ViewModels
 				_ => 24
 			};
 
-			void addTag(bool condition, string formatText, int align = 0)
-			{
-				if(condition) {
+			void addTag(bool condition, string formatText, int align = 0) {
+				if (condition) {
 					format += formatText;
 					alignValue += align;
 				}
@@ -539,7 +507,7 @@ namespace Mesen.Debugger.ViewModels
 			addTag(cfg.ShowMemoryValues, " [MemoryValue,h]", 6);
 			format += "[Align," + alignValue.ToString() + "] ";
 
-			switch(cpuType) {
+			switch (cpuType) {
 				case CpuType.Snes:
 				case CpuType.Sa1:
 					addTag(cfg.ShowRegisters, "A:[A,4h] X:[X,4h] Y:[Y,4h] S:[SP,4h] D:[D,4h] DB:[DB,2h] ");
@@ -632,11 +600,11 @@ namespace Mesen.Debugger.ViewModels
 			return format.Trim();
 		}
 
-		private Control GetFormatTooltip()
-		{
+		private Control GetFormatTooltip() {
 			StackPanel panel = new();
 
 			void addRow(string text) { panel.Children.Add(new TextBlock() { Text = text }); }
+
 			void addBoldRow(string text) { panel.Children.Add(new TextBlock() { Text = text, FontWeight = Avalonia.Media.FontWeight.Bold }); }
 
 			addBoldRow("Notes");
@@ -673,7 +641,7 @@ namespace Mesen.Debugger.ViewModels
 				CpuType.Nes => new string[] { "A", "X", "Y", "P", "SP" },
 				CpuType.Pce => new string[] { "A", "X", "Y", "P", "SP" },
 				CpuType.Sms => new string[] { "A", "B", "C", "D", "E", "F", "H", "L", "IX", "IY", "A'", "B'", "C'", "D'", "E'", "F'", "H'", "L'", "I", "R", "PS", "SP" },
-				CpuType.Gba or CpuType.St018  => new string[] { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "CPSR" },
+				CpuType.Gba or CpuType.St018 => new string[] { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "CPSR" },
 				CpuType.Ws => new string[] { "AX", "BX", "CX", "DX", "CS", "IP", "SS", "SP", "BP", "DS", "ES", "SI", "DI", "F" },
 				_ => throw new Exception("unsupported cpu type")
 			};
@@ -688,13 +656,13 @@ namespace Mesen.Debugger.ViewModels
 
 			int col = 0;
 			int row = 0;
-			foreach(string token in tokens) {
+			foreach (string token in tokens) {
 				TextBlock txt = new() { Text = $"[{token}]", Padding = new Thickness(0, 0, 5, 0) };
 				tokenGrid.Children.Add(txt);
 				Grid.SetColumn(txt, col);
 				Grid.SetRow(txt, row);
 				col++;
-				if(col == 4) {
+				if (col == 4) {
 					col = 0;
 					row++;
 				}
@@ -706,13 +674,11 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class TraceLoggerStyleProvider : ILineStyleProvider
-	{
+	public class TraceLoggerStyleProvider : ILineStyleProvider {
 		private ConsoleType _consoleType = ConsoleType.Snes;
 		private TraceLoggerViewModel _model;
 
-		public TraceLoggerStyleProvider(TraceLoggerViewModel model)
-		{
+		public TraceLoggerStyleProvider(TraceLoggerViewModel model) {
 			_model = model;
 		}
 
@@ -722,13 +688,11 @@ namespace Mesen.Debugger.ViewModels
 		private LineProperties GetSecondaryCpuStyle() { return new LineProperties() { AddressColor = Color.FromRgb(30, 145, 30), LineBgColor = Color.FromRgb(230, 245, 230) }; }
 		private LineProperties GetCoprocessorStyle() { return new LineProperties() { AddressColor = Color.FromRgb(30, 30, 145), LineBgColor = Color.FromRgb(230, 230, 245) }; }
 
-		public List<CodeColor> GetCodeColors(CodeLineData lineData, bool highlightCode, string addressFormat, Color? textColor, bool showMemoryValues)
-		{
+		public List<CodeColor> GetCodeColors(CodeLineData lineData, bool highlightCode, string addressFormat, Color? textColor, bool showMemoryValues) {
 			return CodeHighlighting.GetCpuHighlights(lineData, highlightCode, addressFormat, textColor, showMemoryValues);
 		}
 
-		public LineProperties GetLineStyle(CodeLineData lineData, int lineIndex)
-		{
+		public LineProperties GetLineStyle(CodeLineData lineData, int lineIndex) {
 			LineProperties props = lineData.CpuType switch {
 				CpuType.Spc => GetSecondaryCpuStyle(),
 				CpuType.NecDsp or CpuType.Sa1 or CpuType.Gsu or CpuType.Cx4 => GetCoprocessorStyle(),
@@ -736,7 +700,7 @@ namespace Mesen.Debugger.ViewModels
 				_ => GetMainCpuStyle(),
 			};
 
-			if(_model != null && lineData.HasAddress) {
+			if (_model != null && lineData.HasAddress) {
 				int lineNumber = _model.ScrollPosition + lineIndex;
 				props.IsSelectedRow = lineNumber >= _model.SelectionStart && lineNumber <= _model.SelectionEnd;
 				props.IsActiveRow = _model.SelectedRow == lineNumber;
@@ -745,8 +709,7 @@ namespace Mesen.Debugger.ViewModels
 			return props;
 		}
 
-		internal void SetConsoleType(ConsoleType consoleType)
-		{
+		internal void SetConsoleType(ConsoleType consoleType) {
 			_consoleType = consoleType;
 			AddressSize = consoleType.GetMainCpuType().GetAddressSize();
 			ByteCodeSize = consoleType.GetMainCpuType().GetByteCodeSize();

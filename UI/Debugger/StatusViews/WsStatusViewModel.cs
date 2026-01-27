@@ -1,14 +1,13 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Debugger.StatusViews;
 
-public class WsStatusViewModel : BaseConsoleStatusViewModel
-{
+public class WsStatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt16 RegAX { get; set; }
 	[Reactive] public UInt16 RegBX { get; set; }
 	[Reactive] public UInt16 RegCX { get; set; }
@@ -21,7 +20,7 @@ public class WsStatusViewModel : BaseConsoleStatusViewModel
 
 	[Reactive] public UInt16 RegCS { get; set; }
 	[Reactive] public UInt16 RegIP { get; set; }
-	
+
 	[Reactive] public UInt16 RegDI { get; set; }
 	[Reactive] public UInt16 RegSI { get; set; }
 
@@ -46,8 +45,7 @@ public class WsStatusViewModel : BaseConsoleStatusViewModel
 
 	[Reactive] public string StackPreview { get; private set; } = "";
 
-	public WsStatusViewModel()
-	{
+	public WsStatusViewModel() {
 		this.WhenAnyValue(x => x.FlagZero, x => x.FlagCarry, x => x.FlagSign, x => x.FlagOverflow).Subscribe(x => UpdateFlags());
 		this.WhenAnyValue(x => x.FlagParity, x => x.FlagIrq, x => x.FlagTrap, x => x.FlagMode).Subscribe(x => UpdateFlags());
 		this.WhenAnyValue(x => x.FlagAuxCarry, x => x.FlagDirection).Subscribe(x => UpdateFlags());
@@ -67,8 +65,7 @@ public class WsStatusViewModel : BaseConsoleStatusViewModel
 		});
 	}
 
-	private void UpdateFlags()
-	{
+	private void UpdateFlags() {
 		RegFlags = (UInt16)(
 			(FlagCarry ? 0x01 : 0) |
 			(FlagParity ? 0x04 : 0) |
@@ -84,8 +81,7 @@ public class WsStatusViewModel : BaseConsoleStatusViewModel
 		);
 	}
 
-	protected override void InternalUpdateUiState()
-	{
+	protected override void InternalUpdateUiState() {
 		WsCpuState cpu = DebugApi.GetCpuState<WsCpuState>(CpuType.Ws);
 		WsPpuState ppu = DebugApi.GetPpuState<WsPpuState>(CpuType.Ws);
 
@@ -109,10 +105,10 @@ public class WsStatusViewModel : BaseConsoleStatusViewModel
 
 		RegSI = cpu.SI;
 		RegDI = cpu.DI;
-		
+
 		RegIP = cpu.IP;
 		RegCS = cpu.CS;
-		
+
 		RegSS = cpu.SS;
 		RegDS = cpu.DS;
 		RegES = cpu.ES;
@@ -127,16 +123,16 @@ public class WsStatusViewModel : BaseConsoleStatusViewModel
 
 		StringBuilder sb = new StringBuilder();
 		UInt32 stackAddr = (UInt32)((cpu.SS << 4) + cpu.SP);
-		byte[] stackValues = DebugApi.GetMemoryValues(MemoryType.WsMemory, stackAddr, stackAddr + 30 * 4 - 1);
-		for(int i = 0; i < stackValues.Length; i += 2) {
+		byte[] stackValues = DebugApi.GetMemoryValues(MemoryType.WsMemory, stackAddr, stackAddr + (30 * 4) - 1);
+		for (int i = 0; i < stackValues.Length; i += 2) {
 			UInt16 value = (UInt16)(stackValues[i] | (stackValues[i + 1] << 8));
 			sb.Append($"${value:X4} ");
 		}
+
 		StackPreview = sb.ToString();
 	}
 
-	protected override void InternalUpdateConsoleState()
-	{
+	protected override void InternalUpdateConsoleState() {
 		WsCpuState cpu = DebugApi.GetCpuState<WsCpuState>(CpuType.Ws);
 
 		cpu.AX = RegAX;

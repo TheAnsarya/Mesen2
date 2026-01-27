@@ -1,20 +1,18 @@
-﻿using ReactiveUI.Fody.Helpers;
 using System;
-using System.Reactive.Linq;
+using System.Collections.Generic;
 using System.Linq;
-using Mesen.Interop;
-using Mesen.Config;
-using ReactiveUI;
+using System.Reactive.Linq;
 using System.Text;
 using Avalonia.Controls;
-using System.Collections.Generic;
+using Mesen.Config;
+using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.Windows;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels
-{
-	public class CheatEditWindowViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class CheatEditWindowViewModel : DisposableViewModel {
 		public CheatCode Cheat { get; }
 
 		[ObservableAsProperty] public string ConvertedCodes { get; } = "";
@@ -28,8 +26,7 @@ namespace Mesen.ViewModels
 		[Obsolete("For designer only")]
 		public CheatEditWindowViewModel() : this(new CheatCode()) { }
 
-		public CheatEditWindowViewModel(CheatCode cheat)
-		{
+		public CheatEditWindowViewModel(CheatCode cheat) {
 			Cheat = cheat;
 			MainWndModel = MainWindowViewModel.Instance;
 
@@ -38,25 +35,26 @@ namespace Mesen.ViewModels
 				StringBuilder sb = new StringBuilder();
 				bool hasInvalidCode = false;
 				bool hasValidCode = false;
-				foreach(string codeString in codes) {
-					if(sb.Length > 0) {
+				foreach (string codeString in codes) {
+					if (sb.Length > 0) {
 						sb.Append(Environment.NewLine);
 					}
 
 					InteropInternalCheatCode code = new();
-					if(EmuApi.GetConvertedCheat(new InteropCheatCode(cheat.Type, codeString.Trim()), ref code)) {
-						if(code.IsAbsoluteAddress) {
+					if (EmuApi.GetConvertedCheat(new InteropCheatCode(cheat.Type, codeString.Trim()), ref code)) {
+						if (code.IsAbsoluteAddress) {
 							sb.Append(code.MemType.GetShortName() + " ");
 						}
 
-						if(code.Compare >= 0) {
+						if (code.Compare >= 0) {
 							sb.Append($"{code.Address:X2}:{code.Value:X2}:{code.Compare:X2}");
 						} else {
 							sb.Append($"{code.Address:X2}:{code.Value:X2}");
 						}
+
 						hasValidCode = true;
 					} else {
-						if(!string.IsNullOrWhiteSpace(codeString)) {
+						if (!string.IsNullOrWhiteSpace(codeString)) {
 							hasInvalidCode = true;
 							sb.Append("[invalid code]");
 						}
@@ -69,13 +67,13 @@ namespace Mesen.ViewModels
 				return sb.ToString();
 			}).ToPropertyEx(this, x => x.ConvertedCodes));
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			AddDisposable(this.WhenAnyValue(x => x.MainWndModel.RomInfo).Subscribe(romInfo => {
 				AvailableCheatTypes = Enum.GetValues<CheatType>().Where(e => romInfo.CpuTypes.Contains(e.ToCpuType())).Cast<Enum>().ToArray();
-				if(!AvailableCheatTypes.Contains(Cheat.Type)) {
+				if (!AvailableCheatTypes.Contains(Cheat.Type)) {
 					Cheat.Type = (CheatType)AvailableCheatTypes[0];
 				}
 			}));

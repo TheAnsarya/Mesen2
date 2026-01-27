@@ -1,21 +1,19 @@
-﻿using Avalonia.Controls;
-using Mesen.Interop;
-using Mesen.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Mesen.Interop;
+using Mesen.Localization;
 
-namespace Mesen.Debugger.Utilities
-{
-	public static class ExpressionTooltipHelper
-	{
-		public static StackPanel GetHelpTooltip(CpuType cpuType, bool forWatch)
-		{
+namespace Mesen.Debugger.Utilities {
+	public static class ExpressionTooltipHelper {
+		public static StackPanel GetHelpTooltip(CpuType cpuType, bool forWatch) {
 			StackPanel panel = new();
 
 			void addRow(string text) { panel.Children.Add(new TextBlock() { Text = text }); }
+
 			void addBoldRow(string text) { panel.Children.Add(new TextBlock() { Text = text, FontWeight = Avalonia.Media.FontWeight.Bold }); }
 
 			addBoldRow("Notes");
@@ -35,13 +33,13 @@ namespace Mesen.Debugger.Utilities
 
 			int col = 0;
 			int row = 0;
-			foreach(string token in tokens) {
+			foreach (string token in tokens) {
 				TextBlock txt = new() { Text = token, Padding = new Avalonia.Thickness(0, 0, 5, 0) };
 				tokenGrid.Children.Add(txt);
 				Grid.SetColumn(txt, col);
 				Grid.SetRow(txt, row);
 				col++;
-				if(col == 4) {
+				if (col == 4) {
 					col = 0;
 					row++;
 				}
@@ -49,7 +47,7 @@ namespace Mesen.Debugger.Utilities
 
 			panel.Children.Add(tokenGrid);
 
-			if(!forWatch) {
+			if (!forWatch) {
 				addRow(" ");
 				addBoldRow("Other values");
 				addRow("  OpPc: Program counter of the first byte of the current instruction");
@@ -83,8 +81,7 @@ namespace Mesen.Debugger.Utilities
 		}
 	}
 
-	public interface IToolHelpTooltip
-	{
+	public interface IToolHelpTooltip {
 		object HelpTooltip { get; }
 	}
 }

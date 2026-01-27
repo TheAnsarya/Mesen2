@@ -1,4 +1,9 @@
-﻿using Avalonia;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -15,16 +20,9 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
 		public SpriteViewerConfig Config { get; }
 		public RefreshTimingViewModel RefreshTiming { get; }
 
@@ -75,8 +73,7 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public SpriteViewerViewModel() : this(CpuType.Snes, new(), new(), new(), new(), null) { }
 
-		public SpriteViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Grid spriteGrid, Control listView, Window? wnd)
-		{
+		public SpriteViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Grid spriteGrid, Control listView, Window? wnd) {
 			Config = ConfigManager.Config.Debug.SpriteViewer.Clone();
 
 			ListView = AddDisposable(new SpriteViewerListViewModel(this));
@@ -143,7 +140,7 @@ namespace Mesen.Debugger.ViewModels
 				},
 			});
 
-			if(Design.IsDesignMode || wnd == null) {
+			if (Design.IsDesignMode || wnd == null) {
 				return;
 			}
 
@@ -173,7 +170,7 @@ namespace Mesen.Debugger.ViewModels
 
 			AddDisposable(this.WhenAnyValue(x => x.SelectedSprite).Subscribe(x => {
 				UpdateSelectionPreview();
-				if(x != null) {
+				if (x != null) {
 					ListView.SelectSprite(x.SpriteIndex);
 				}
 			}));
@@ -192,15 +189,14 @@ namespace Mesen.Debugger.ViewModels
 			DebugShortcutManager.RegisterActions(wnd, ViewMenuActions);
 		}
 
-		private ContextMenuAction GetEditTileAction(Window wnd)
-		{
+		private ContextMenuAction GetEditTileAction(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.EditSprite,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.SpriteViewer_EditSprite),
 				IsEnabled = () => GetSelectedSprite() != null,
 				OnClick = () => {
 					SpritePreviewModel? sprite = GetSelectedSprite();
-					if(sprite?.TileAddress >= 0 && _data.Palette != null) {
+					if (sprite?.TileAddress >= 0 && _data.Palette != null) {
 						PixelSize size = sprite.Format.GetTileSize();
 						DebugPaletteInfo pal = _data.Palette.Value;
 						int paletteOffset = (int)(pal.SpritePaletteOffset / pal.ColorsPerPalette);
@@ -219,29 +215,27 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private ContextMenuAction GetViewInMemoryViewerAction()
-		{
+		private ContextMenuAction GetViewInMemoryViewerAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.ViewInMemoryViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.SpriteViewer_ViewInMemoryViewer),
 				IsEnabled = () => GetSelectedSprite() != null,
 				OnClick = () => {
 					SpritePreviewModel? sprite = GetSelectedSprite();
-					if(sprite?.TileAddress >= 0) {
+					if (sprite?.TileAddress >= 0) {
 						MemoryToolsWindow.ShowInMemoryTools(CpuType.GetVramMemoryType(sprite.UseExtendedVram), sprite.TileAddress);
 					}
 				}
 			};
 		}
 
-		private ContextMenuAction GetViewInTileViewerAction()
-		{
+		private ContextMenuAction GetViewInTileViewerAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.ViewInTileViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.SpriteViewer_ViewInTileViewer),
 				OnClick = () => {
 					SpritePreviewModel? sprite = GetSelectedSprite();
-					if(sprite?.TileAddress >= 0 && _data.Palette != null) {
+					if (sprite?.TileAddress >= 0 && _data.Palette != null) {
 						DebugPaletteInfo pal = _data.Palette.Value;
 						int paletteOffset = (int)(pal.SpritePaletteOffset / pal.ColorsPerPalette);
 						TileViewerWindow.OpenAtTile(CpuType, CpuType.GetVramMemoryType(sprite.UseExtendedVram), sprite.TileAddress, sprite.Format, TileLayout.Normal, sprite.Palette + paletteOffset);
@@ -250,13 +244,11 @@ namespace Mesen.Debugger.ViewModels
 			};
 		}
 
-		private ContextMenuAction GetCopyHdPackFormatActionSeparator()
-		{
+		private ContextMenuAction GetCopyHdPackFormatActionSeparator() {
 			return new ContextMenuSeparator() { IsVisible = () => CpuType == CpuType.Nes };
 		}
 
-		private ContextMenuAction GetCopyHdPackFormatAction()
-		{
+		private ContextMenuAction GetCopyHdPackFormatAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.CopyToHdPackFormat,
 				IsVisible = () => CpuType == CpuType.Nes,
@@ -266,45 +258,41 @@ namespace Mesen.Debugger.ViewModels
 				},
 				OnClick = () => {
 					SpritePreviewModel? sprite = GetSelectedSprite();
-					if(sprite != null && sprite.TileAddress >= 0 && _data.Palette != null) {
+					if (sprite != null && sprite.TileAddress >= 0 && _data.Palette != null) {
 						HdPackCopyHelper.CopyToHdPackFormat(sprite.TileAddress, CpuType.GetVramMemoryType(sprite.UseExtendedVram), _data.Palette.Value.GetRawPalette(), sprite.Palette, true, sprite.Height > 8);
 					}
 				}
 			};
 		}
 
-		private SpritePreviewModel? GetSelectedSprite()
-		{
+		private SpritePreviewModel? GetSelectedSprite() {
 			return PreviewPanelSprite ?? SelectedSprite;
 		}
 
-		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-		{
+		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			RefreshTab();
 		}
 
-		public DynamicTooltip? GetPreviewPanel(PixelPoint p, DynamicTooltip? tooltipToUpdate)
-		{
+		public DynamicTooltip? GetPreviewPanel(PixelPoint p, DynamicTooltip? tooltipToUpdate) {
 			SpritePreviewModel? sprite = GetMatchingSprite(p, out _);
 			return sprite == null ? null : GetPreviewPanel(sprite, tooltipToUpdate);
 		}
 
-		public DynamicTooltip? GetPreviewPanel(SpritePreviewModel sprite, DynamicTooltip? existingTooltip)
-		{
-			if(_data.Palette == null) {
+		public DynamicTooltip? GetPreviewPanel(SpritePreviewModel sprite, DynamicTooltip? existingTooltip) {
+			if (_data.Palette == null) {
 				return null;
 			}
 
 			TooltipEntries entries = existingTooltip?.Items ?? new();
 			entries.StartUpdate();
-			if(sprite.SpritePreview != null) {
+			if (sprite.SpritePreview != null) {
 				entries.AddPicture("Sprite", sprite.SpritePreview, 48.0 / sprite.Width);
 			}
 
 			DebugPaletteInfo palette = _data.Palette.Value;
 			int paletteSize = (int)Math.Pow(2, sprite.Bpp);
 			int paletteIndex = (sprite.Palette >= 0 ? sprite.Palette : 0) + (int)(palette.SpritePaletteOffset / paletteSize);
-			if(sprite.Bpp > 1 && sprite.Bpp < 8) {
+			if (sprite.Bpp is > 1 and < 8) {
 				entries.AddEntry("Palette", new TooltipPaletteEntry(paletteIndex, paletteSize, palette.GetRgbPalette(), palette.GetRawPalette(), palette.RawFormat));
 			}
 
@@ -320,11 +308,11 @@ namespace Mesen.Debugger.ViewModels
 			entries.AddEntry("Tile index", "$" + sprite.TileIndex.ToString("X2"));
 
 			MemoryType memType = CpuType.GetVramMemoryType(sprite.UseExtendedVram);
-			if(memType.IsRelativeMemory()) {
+			if (memType.IsRelativeMemory()) {
 				entries.AddEntry("Tile address (" + memType.GetShortName() + ")", FormatAddress(sprite.TileAddress, memType));
 
 				AddressInfo absAddress = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = sprite.TileAddress, Type = memType });
-				if(absAddress.Address >= 0) {
+				if (absAddress.Address >= 0) {
 					entries.AddEntry("Tile address (" + absAddress.Type.GetShortName() + ")", FormatAddress(absAddress.Address, absAddress.Type));
 				}
 			} else {
@@ -334,42 +322,44 @@ namespace Mesen.Debugger.ViewModels
 			entries.AddSeparator("PaletteSeparator");
 
 			entries.AddEntry("Palette index", sprite.Palette.ToString());
-			if(sprite.PaletteAddress >= 0) {
+			if (sprite.PaletteAddress >= 0) {
 				entries.AddEntry("Palette address", "$" + sprite.PaletteAddress.ToString("X2"));
 			}
 
 			entries.AddSeparator("MiscSeparator");
 
 			entries.AddEntry("Visibility", ResourceHelper.GetEnumText(sprite.Visibility));
-			if(sprite.Mode != DebugSpriteMode.Undefined) {
+			if (sprite.Mode != DebugSpriteMode.Undefined) {
 				entries.AddEntry("Mode", sprite.Mode);
 			}
+
 			entries.AddEntry("Horizontal mirror", sprite.HorizontalMirror);
 			entries.AddEntry("Vertical mirror", sprite.VerticalMirror);
-			if(sprite.TransformEnabled != NullableBoolean.Undefined) {
+			if (sprite.TransformEnabled != NullableBoolean.Undefined) {
 				entries.AddEntry("Transform", sprite.TransformEnabled);
-				if(sprite.TransformParamIndex >= 0) {
+				if (sprite.TransformParamIndex >= 0) {
 					entries.AddEntry("Transform Param Index", sprite.TransformParamIndex);
 				}
 			}
+
 			entries.AddEntry("Mosaic", sprite.MosaicEnabled);
 			entries.AddEntry("Second table", sprite.UseSecondTable);
 
-			if(sprite.Priority != DebugSpritePriority.Undefined) {
+			if (sprite.Priority != DebugSpritePriority.Undefined) {
 				entries.AddEntry("Priority", ResourceHelper.GetEnumText(sprite.Priority));
 			}
+
 			entries.EndUpdate();
 
-			if(existingTooltip != null) {
+			if (existingTooltip != null) {
 				return existingTooltip;
 			} else {
 				return new DynamicTooltip() { Items = entries };
 			}
 		}
 
-		private string FormatAddress(int address, MemoryType memType)
-		{
-			if(memType.IsWordAddressing()) {
+		private string FormatAddress(int address, MemoryType memType) {
+			if (memType.IsWordAddressing()) {
 				return $"${address / 2:X4}.w";
 			} else {
 				return $"${address:X4}";
@@ -377,32 +367,30 @@ namespace Mesen.Debugger.ViewModels
 		}
 
 		[MemberNotNull(nameof(ViewerBitmap))]
-		private void InitBitmap(int width, int height)
-		{
-			if(ViewerBitmap == null || ViewerBitmap.PixelSize.Width != width || ViewerBitmap.PixelSize.Height != height) {
+		private void InitBitmap(int width, int height) {
+			if (ViewerBitmap == null || ViewerBitmap.PixelSize.Width != width || ViewerBitmap.PixelSize.Height != height) {
 				ViewerBitmap = new DynamicBitmap(new PixelSize(width, height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 			}
 		}
 
-		private void InitGrid(int spriteCount)
-		{
+		private void InitGrid(int spriteCount) {
 			double dpiScale = LayoutHelper.GetLayoutScale(_spriteGrid);
-			if(_spriteGrid.Children.Count != spriteCount) {
+			if (_spriteGrid.Children.Count != spriteCount) {
 				_spriteGrid.Children.Clear();
 				_spriteGrid.ColumnDefinitions.Clear();
 				_spriteGrid.RowDefinitions.Clear();
-				for(int i = 0; i < 8; i++) {
+				for (int i = 0; i < 8; i++) {
 					_spriteGrid.ColumnDefinitions.Add(new() { Width = new GridLength(1, GridUnitType.Auto) });
 				}
 
-				for(int i = 0; i < spriteCount / 8; i++) {
+				for (int i = 0; i < spriteCount / 8; i++) {
 					_spriteGrid.RowDefinitions.Add(new() { Height = new GridLength(1, GridUnitType.Auto) });
 				}
 
-				for(int i = 0; i < spriteCount; i++) {
+				for (int i = 0; i < spriteCount; i++) {
 					SpritePreviewPanel preview = new SpritePreviewPanel(SpritePreviews[i], Config);
-					preview.InnerHeight = (32.0 / dpiScale);
-					preview.InnerWidth = (32.0 / dpiScale);
+					preview.InnerHeight = 32.0 / dpiScale;
+					preview.InnerWidth = 32.0 / dpiScale;
 					Grid.SetColumn(preview, i % 8);
 					Grid.SetRow(preview, i / 8);
 
@@ -414,16 +402,14 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private void SpriteGrid_PointerExited(object? sender, PointerEventArgs e)
-		{
+		private void SpriteGrid_PointerExited(object? sender, PointerEventArgs e) {
 			TooltipHelper.HideTooltip(_spriteGrid);
 			PreviewPanelTooltip = null;
 			PreviewPanelSprite = null;
 		}
 
-		private void SpritePreview_PointerMoved(object? sender, PointerEventArgs e)
-		{
-			if(sender is Control ctrl && ctrl.DataContext is SpritePreviewModel sprite) {
+		private void SpritePreview_PointerMoved(object? sender, PointerEventArgs e) {
+			if (sender is Control ctrl && ctrl.DataContext is SpritePreviewModel sprite) {
 				PreviewPanelTooltip = GetPreviewPanel(sprite, PreviewPanelTooltip);
 				PreviewPanelSprite = sprite;
 
@@ -431,32 +417,30 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private void SpritePreview_PointerPressed(object? sender, PointerPressedEventArgs e)
-		{
-			if(sender is Control ctrl && ctrl.DataContext is SpritePreviewModel sprite) {
+		private void SpritePreview_PointerPressed(object? sender, PointerPressedEventArgs e) {
+			if (sender is Control ctrl && ctrl.DataContext is SpritePreviewModel sprite) {
 				SelectedSprite = sprite;
 				UpdateSelection(sprite);
 			}
 		}
 
-		public void SelectSprite(int spriteIndex)
-		{
+		public void SelectSprite(int spriteIndex) {
 			SelectedSprite = SpritePreviews[spriteIndex];
 			UpdateSelection(SelectedSprite);
 		}
 
-		private void InitPreviews(DebugSpriteInfo[] sprites, UInt32[] spritePreviews, DebugSpritePreviewInfo previewInfo)
-		{
-			if(SpritePreviews.Count != sprites.Length) {
+		private void InitPreviews(DebugSpriteInfo[] sprites, UInt32[] spritePreviews, DebugSpritePreviewInfo previewInfo) {
+			if (SpritePreviews.Count != sprites.Length) {
 				List<SpritePreviewModel> previews = new();
-				for(int i = 0; i < sprites.Length; i++) {
+				for (int i = 0; i < sprites.Length; i++) {
 					SpritePreviewModel model = new SpritePreviewModel();
 					model.Init(ref sprites[i], spritePreviews, previewInfo);
 					previews.Add(model);
 				}
+
 				SpritePreviews = previews;
 			} else {
-				for(int i = 0; i < sprites.Length; i++) {
+				for (int i = 0; i < sprites.Length; i++) {
 					SpritePreviews[i].Init(ref sprites[i], spritePreviews, previewInfo);
 				}
 			}
@@ -464,15 +448,14 @@ namespace Mesen.Debugger.ViewModels
 			InitGrid(sprites.Length);
 		}
 
-		private void UpdateRamData(ref byte[] baseRam, ref byte[] extRam, ref byte[] combinedRam, MemoryType baseType, MemoryType extType)
-		{
-			if(baseType == MemoryType.None) {
+		private void UpdateRamData(ref byte[] baseRam, ref byte[] extRam, ref byte[] combinedRam, MemoryType baseType, MemoryType extType) {
+			if (baseType == MemoryType.None) {
 				Array.Resize(ref baseRam, 0);
 				Array.Resize(ref extRam, 0);
 				Array.Resize(ref combinedRam, 0);
-			} else if(extType != baseType) {
+			} else if (extType != baseType) {
 				DebugApi.GetMemoryState(extType, ref extRam);
-				if(extRam.Length > 0) {
+				if (extRam.Length > 0) {
 					DebugApi.GetMemoryState(baseType, ref baseRam);
 
 					Array.Resize(ref combinedRam, extRam.Length + baseRam.Length);
@@ -487,19 +470,16 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
-		private void UpdateVramData()
-		{
+		private void UpdateVramData() {
 			UpdateRamData(ref _baseVram, ref _extVram, ref _coreData.Vram, CpuType.GetVramMemoryType(), CpuType.GetVramMemoryType(getExtendedRam: true));
 		}
 
-		private void UpdateSpriteRamData()
-		{
+		private void UpdateSpriteRamData() {
 			UpdateRamData(ref _baseSpriteRam, ref _extSpriteRam, ref _coreData.SpriteRam, CpuType.GetSpriteRamMemoryType(), CpuType.GetSpriteRamMemoryType(getExtendedRam: true));
 		}
 
-		public void RefreshData()
-		{
-			lock(_updateLock) {
+		public void RefreshData() {
+			lock (_updateLock) {
 				_coreData.PpuState = DebugApi.GetPpuState(CpuType);
 				_coreData.PpuToolsState = DebugApi.GetPpuToolsState(CpuType);
 
@@ -507,37 +487,35 @@ namespace Mesen.Debugger.ViewModels
 
 				int spriteRamSize;
 				MemoryType spriteRamType = CpuType.GetSpriteRamMemoryType();
-				if(spriteRamType == MemoryType.None) {
+				if (spriteRamType == MemoryType.None) {
 					//SMS-specific
 					spriteRamSize = 0x100;
 				} else {
 					spriteRamSize = DebugApi.GetMemorySize(spriteRamType);
 					MemoryType spriteRamExtType = CpuType.GetSpriteRamMemoryType(getExtendedRam: true);
-					if(spriteRamType != spriteRamExtType) {
+					if (spriteRamType != spriteRamExtType) {
 						spriteRamSize += DebugApi.GetMemorySize(spriteRamExtType);
 					}
 				}
 
-				if(Config.Source == SpriteViewerSource.SpriteRam) {
+				if (Config.Source == SpriteViewerSource.SpriteRam) {
 					UpdateSpriteRamData();
 				} else {
 					MemoryType cpuMemory = CpuType.ToMemoryType();
 					DebugApi.GetMemoryValues(cpuMemory, (uint)Config.SourceOffset, (uint)(Config.SourceOffset + spriteRamSize - 1), ref _coreData.SpriteRam);
 
-					Dispatcher.UIThread.Post(() => {
-						MaxSourceOffset = Math.Max(0, DebugApi.GetMemorySize(cpuMemory) - spriteRamSize);
-					});
+					Dispatcher.UIThread.Post(() => MaxSourceOffset = Math.Max(0, DebugApi.GetMemorySize(cpuMemory) - spriteRamSize));
 				}
 
 				DebugPaletteInfo palette = DebugApi.GetPaletteInfo(CpuType);
 				_coreData.Palette = palette.ColorCount > 0 ? palette : null;
 			}
+
 			RefreshTab();
 		}
 
-		private void RefreshTab()
-		{
-			if(_refreshPending) {
+		private void RefreshTab() {
+			if (_refreshPending) {
 				return;
 			}
 
@@ -548,17 +526,16 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		private void InternalRefreshTab()
-		{
-			if(Disposed) {
+		private void InternalRefreshTab() {
+			if (Disposed) {
 				return;
 			}
 
-			lock(_updateLock) {
+			lock (_updateLock) {
 				_coreData.CopyTo(_data);
 			}
 
-			if(_data.PpuState == null || _data.Palette == null || _data.PpuToolsState == null) {
+			if (_data.PpuState == null || _data.Palette == null || _data.PpuToolsState == null) {
 				return;
 			}
 
@@ -576,36 +553,39 @@ namespace Mesen.Debugger.ViewModels
 			TopClipSize = Config.ShowOffscreenRegions ? 0 : (int)previewInfo.VisibleY;
 			BottomClipSize = Config.ShowOffscreenRegions ? 0 : (int)(previewInfo.Height - (previewInfo.VisibleHeight + previewInfo.VisibleY));
 
-			using(var framebuffer = ViewerBitmap.Lock(true)) {
+			using (var framebuffer = ViewerBitmap.Lock(true)) {
 				DebugApi.GetSpriteList(ref _spriteList, ref _spritePreviews, CpuType, options, _data.PpuState, _data.PpuToolsState, _data.Vram, _data.SpriteRam, palette, framebuffer.FrameBuffer.Address);
 			}
 
 			InitPreviews(_spriteList, _spritePreviews, previewInfo);
 
-			if(Config.ShowOutline) {
+			if (Config.ShowOutline) {
 				List<Rect> spriteRects = new List<Rect>();
-				foreach(SpritePreviewModel sprite in SpritePreviews) {
+				foreach (SpritePreviewModel sprite in SpritePreviews) {
 					(Rect mainRect, Rect alt1, Rect alt2, Rect alt3) = sprite.GetPreviewRect();
 					spriteRects.Add(mainRect);
-					if(alt1 != default) {
+					if (alt1 != default) {
 						spriteRects.Add(alt1);
 					}
-					if(alt2 != default) {
+
+					if (alt2 != default) {
 						spriteRects.Add(alt2);
 					}
-					if(alt3 != default) {
+
+					if (alt3 != default) {
 						spriteRects.Add(alt3);
 					}
 				}
+
 				ViewerBitmap.HighlightRects = spriteRects;
 			} else {
 				ViewerBitmap.HighlightRects = null;
 			}
-				
+
 			ViewerBitmap.Invalidate();
 
 			int selectedIndex = SelectedSprite?.SpriteIndex ?? -1;
-			if(selectedIndex >= 0 && selectedIndex < SpritePreviews.Count) {
+			if (selectedIndex >= 0 && selectedIndex < SpritePreviews.Count) {
 				SelectedSprite = SpritePreviews[selectedIndex];
 				UpdateSelectionPreview();
 			} else {
@@ -620,63 +600,50 @@ namespace Mesen.Debugger.ViewModels
 			UpdateMouseOverRect();
 		}
 
-		private void UpdateSelectionPreview()
-		{
-			if(SelectedSprite != null) {
-				SelectedPreviewPanel = GetPreviewPanel(SelectedSprite, SelectedPreviewPanel);
-			} else {
-				SelectedPreviewPanel = null;
-			}
+		private void UpdateSelectionPreview() {
+			SelectedPreviewPanel = SelectedSprite != null ? GetPreviewPanel(SelectedSprite, SelectedPreviewPanel) : null;
 		}
 
-		private void UpdateMouseOverRect()
-		{
-			if(PreviewPanelSprite != null) {
+		private void UpdateMouseOverRect() {
+			if (PreviewPanelSprite != null) {
 				MouseOverRect = PreviewPanelSprite.GetPreviewRect().Item1;
-			} else if(ViewerMousePos != null && GetMatchingSprite(ViewerMousePos.Value, out Rect matchingRect) is SpritePreviewModel sprite) {
-				MouseOverRect = matchingRect;
 			} else {
-				MouseOverRect = null;
+				MouseOverRect = ViewerMousePos != null && GetMatchingSprite(ViewerMousePos.Value, out Rect matchingRect) is SpritePreviewModel sprite
+					? matchingRect
+					: null;
 			}
 		}
 
-		private void UpdateTooltips()
-		{
-			if(PreviewPanelSprite != null && PreviewPanelTooltip != null) {
+		private void UpdateTooltips() {
+			if (PreviewPanelSprite != null && PreviewPanelTooltip != null) {
 				GetPreviewPanel(PreviewPanelSprite, PreviewPanelTooltip);
-			} else if(ViewerMousePos != null && ViewerTooltip != null) {
+			} else if (ViewerMousePos != null && ViewerTooltip != null) {
 				SpritePreviewModel? sprite = GetMatchingSprite(ViewerMousePos.Value, out _);
-				if(sprite != null) {
+				if (sprite != null) {
 					GetPreviewPanel(sprite, ViewerTooltip);
 				}
 			}
 		}
 
-		public void UpdateSelection(SpritePreviewModel? sprite)
-		{
-			if(sprite != null) {
-				SelectionRect = sprite.GetPreviewRect().Item1;
-			} else {
-				SelectionRect = default;
-			}
+		public void UpdateSelection(SpritePreviewModel? sprite) {
+			SelectionRect = sprite != null ? sprite.GetPreviewRect().Item1 : default;
 		}
 
-		public SpritePreviewModel? GetMatchingSprite(PixelPoint p, out Rect matchingRect)
-		{
+		public SpritePreviewModel? GetMatchingSprite(PixelPoint p, out Rect matchingRect) {
 			Point point = p.ToPoint(1);
-			for(int i = SpritePreviews.Count - 1; i >= 0; i--) {
+			for (int i = SpritePreviews.Count - 1; i >= 0; i--) {
 				SpritePreviewModel sprite = SpritePreviews[i];
 				(Rect mainRect, Rect alt1, Rect alt2, Rect alt3) = sprite.GetPreviewRect();
-				if(mainRect.Contains(point)) {
+				if (mainRect.Contains(point)) {
 					matchingRect = mainRect;
 					return sprite;
-				} else if(alt1.Contains(point)) {
+				} else if (alt1.Contains(point)) {
 					matchingRect = alt1;
 					return sprite;
-				} else if(alt2.Contains(point)) {
+				} else if (alt2.Contains(point)) {
 					matchingRect = alt2;
 					return sprite;
-				} else if(alt3.Contains(point)) {
+				} else if (alt3.Contains(point)) {
 					matchingRect = alt3;
 					return sprite;
 				}
@@ -686,22 +653,19 @@ namespace Mesen.Debugger.ViewModels
 			return null;
 		}
 
-		public void OnGameLoaded()
-		{
+		public void OnGameLoaded() {
 			RefreshData();
 		}
 	}
 
-	public class SpriteViewerData
-	{
+	public class SpriteViewerData {
 		public BaseState? PpuState;
 		public BaseState? PpuToolsState;
 		public byte[] SpriteRam = Array.Empty<byte>();
 		public byte[] Vram = Array.Empty<byte>();
 		public DebugPaletteInfo? Palette = null;
 
-		public void CopyTo(SpriteViewerData dst)
-		{
+		public void CopyTo(SpriteViewerData dst) {
 			dst.PpuState = PpuState;
 			dst.Palette = Palette;
 			dst.PpuToolsState = PpuToolsState;
@@ -709,11 +673,11 @@ namespace Mesen.Debugger.ViewModels
 			CopyArray(Vram, ref dst.Vram);
 		}
 
-		private void CopyArray<T>(T[] src, ref T[] dst)
-		{
-			if(src.Length != dst.Length) {
+		private void CopyArray<T>(T[] src, ref T[] dst) {
+			if (src.Length != dst.Length) {
 				Array.Resize(ref dst, src.Length);
 			}
+
 			Array.Copy(src, dst, src.Length);
 		}
 	}

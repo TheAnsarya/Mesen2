@@ -1,12 +1,10 @@
-﻿using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.ComponentModel;
+using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public abstract class BaseConsoleStatusViewModel : ViewModelBase
-	{
+namespace Mesen.Debugger.StatusViews {
+	public abstract class BaseConsoleStatusViewModel : ViewModelBase {
 		[Reactive] public bool EditAllowed { get; set; }
 		[Reactive] public UInt64 ElapsedCycles { get; set; }
 		[Reactive] public UInt64 CycleCount { get; set; }
@@ -17,15 +15,13 @@ namespace Mesen.Debugger.StatusViews
 		private UInt64 _lastBreakCycleCount = 0;
 		private bool _isRunning = false;
 
-		public BaseConsoleStatusViewModel()
-		{
+		public BaseConsoleStatusViewModel() {
 			PropertyChanged += BaseConsoleStatusViewModel_PropertyChanged;
 		}
 
-		private void BaseConsoleStatusViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-		{
-			if(!_isUpdatingUi) {
-				switch(e.PropertyName) {
+		private void BaseConsoleStatusViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+			if (!_isUpdatingUi) {
+				switch (e.PropertyName) {
 					case nameof(EditAllowed) or nameof(ElapsedCycles) or nameof(CycleCount):
 						//Ignore these properties
 						return;
@@ -35,26 +31,20 @@ namespace Mesen.Debugger.StatusViews
 			}
 		}
 
-		public void UpdateCycleCount(UInt64 newCycleCount)
-		{
+		public void UpdateCycleCount(UInt64 newCycleCount) {
 			CycleCount = newCycleCount;
 
-			if(_isRunning) {
+			if (_isRunning) {
 				//Don't reset elapsed value if refresh done because "refresh while running" is enabled
 				return;
 			}
 
-			if(newCycleCount > _lastBreakCycleCount) {
-				ElapsedCycles = newCycleCount - _lastBreakCycleCount;
-			} else {
-				ElapsedCycles = 0;
-			}
+			ElapsedCycles = newCycleCount > _lastBreakCycleCount ? newCycleCount - _lastBreakCycleCount : 0;
 
 			_lastBreakCycleCount = newCycleCount;
 		}
 
-		public void UpdateUiState(bool isRunning = false)
-		{
+		public void UpdateUiState(bool isRunning = false) {
 			_isUpdatingUi = true;
 			_needUpdate = false;
 			_isRunning = isRunning;
@@ -64,9 +54,8 @@ namespace Mesen.Debugger.StatusViews
 			_needUpdate = false;
 		}
 
-		public void UpdateConsoleState()
-		{
-			if(_needUpdate && !_isUpdatingUi) {
+		public void UpdateConsoleState() {
+			if (_needUpdate && !_isUpdatingUi) {
 				//Only update emulator state if user manually changed the state in the UI
 				//Otherwise this causes issues when a state is loaded (e.g step back)
 				InternalUpdateConsoleState();

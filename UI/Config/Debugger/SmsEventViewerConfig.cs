@@ -1,12 +1,10 @@
-﻿using Avalonia.Media;
+using Avalonia.Media;
 using Mesen.Interop;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class SmsEventViewerConfig : ViewModelBase
-	{
+namespace Mesen.Config {
+	public class SmsEventViewerConfig : ViewModelBase {
 		[Reactive] public EventViewerCategoryCfg VdpPaletteWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
 		[Reactive] public EventViewerCategoryCfg VdpVramWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));
 		[Reactive] public EventViewerCategoryCfg VdpVCounterRead { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x53, 0xD7, 0x44));
@@ -18,7 +16,7 @@ namespace Mesen.Config
 		[Reactive] public EventViewerCategoryCfg PsgWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xFF, 0x5E, 0x5E));
 		[Reactive] public EventViewerCategoryCfg IoWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0xE4));
 		[Reactive] public EventViewerCategoryCfg IoRead { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x9F, 0x93, 0xC6));
-		
+
 		[Reactive] public EventViewerCategoryCfg MemoryControlWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x4A, 0xFE, 0xAC));
 
 		[Reactive] public EventViewerCategoryCfg GameGearPortWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xF9, 0xFE, 0xAC));
@@ -31,22 +29,21 @@ namespace Mesen.Config
 
 		[Reactive] public bool ShowPreviousFrameEvents { get; set; } = true;
 
-		public InteropSmsEventViewerConfig ToInterop()
-		{
+		public InteropSmsEventViewerConfig ToInterop() {
 			return new InteropSmsEventViewerConfig() {
 				Irq = this.Irq,
 				Nmi = this.Nmi,
 				MarkedBreakpoints = this.MarkedBreakpoints,
-				
+
 				VdpPaletteWrite = this.VdpPaletteWrite,
 				VdpVramWrite = this.VdpVramWrite,
-				
+
 				VdpVCounterRead = this.VdpVCounterRead,
 				VdpHCounterRead = this.VdpHCounterRead,
 				VdpVramRead = this.VdpVramRead,
 				VdpControlPortRead = this.VdpControlPortRead,
 				VdpControlPortWrite = this.VdpControlPortWrite,
-				
+
 				PsgWrite = this.PsgWrite,
 				IoWrite = this.IoWrite,
 				IoRead = this.IoRead,

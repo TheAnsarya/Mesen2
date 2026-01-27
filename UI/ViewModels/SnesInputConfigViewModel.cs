@@ -1,16 +1,14 @@
-﻿using Mesen.Config;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Mesen.Config;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels
-{
-	public class SnesInputConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class SnesInputConfigViewModel : DisposableViewModel {
 		[Reactive] public SnesConfig Config { get; set; }
-		
+
 		[ObservableAsProperty] public bool HasMultitap1 { get; }
 		[ObservableAsProperty] public bool HasMultitap2 { get; }
 
@@ -41,10 +39,9 @@ namespace Mesen.ViewModels
 		[Obsolete("For designer only")]
 		public SnesInputConfigViewModel() : this(new SnesConfig()) { }
 
-		public SnesInputConfigViewModel(SnesConfig config)
-		{
+		public SnesInputConfigViewModel(SnesConfig config) {
 			Config = config;
-		
+
 			AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type)
 				.Select(x => x == ControllerType.Multitap)
 				.ToPropertyEx(this, x => x.HasMultitap1));

@@ -1,6 +1,3 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,58 +5,54 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 
-namespace Mesen.Utilities
-{
-	public static class ApplicationHelper
-	{
-		public static Window? GetMainWindow()
-		{
-			if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is Window wnd) {
+namespace Mesen.Utilities {
+	public static class ApplicationHelper {
+		public static Window? GetMainWindow() {
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is Window wnd) {
 				return wnd;
 			}
 
 			return null;
 		}
 
-		public static Window? GetActiveOrMainWindow()
-		{
-			if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+		public static Window? GetActiveOrMainWindow() {
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 				return desktop.Windows.Where(w => w.IsActive).FirstOrDefault() ?? GetMainWindow();
 			}
 
 			return GetMainWindow();
 		}
 
-		public static Window? GetActiveWindow()
-		{
-			if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+		public static Window? GetActiveWindow() {
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 				return desktop.Windows.Where(w => w.IsActive).FirstOrDefault();
 			}
 
 			return null;
 		}
 
-		public static T? GetExistingWindow<T>() where T : MesenWindow
-		{
-			if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+		public static T? GetExistingWindow<T>() where T : MesenWindow {
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 				return desktop.Windows.Where(w => w is T).FirstOrDefault() as T;
 			}
 
 			return null;
 		}
 
-		public static T GetOrCreateUniqueWindow<T>(Control? centerParent, Func<T> createWindow) where T : MesenWindow
-		{
-			if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
-				T? wnd = desktop.Windows.Where(w => w is T).FirstOrDefault() as T;
-				if(wnd == null) {
+		public static T GetOrCreateUniqueWindow<T>(Control? centerParent, Func<T> createWindow) where T : MesenWindow {
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+				if (desktop.Windows.Where(w => w is T).FirstOrDefault() is not T wnd) {
 					wnd = createWindow();
-					if(centerParent != null) {
+					if (centerParent != null) {
 						wnd.ShowCentered((Control)centerParent);
 					} else {
 						wnd.Show();
 					}
+
 					return wnd;
 				} else {
 					wnd.BringToFront();
@@ -70,9 +63,8 @@ namespace Mesen.Utilities
 			throw new NotSupportedException();
 		}
 
-		public static List<Window> GetOpenedWindows()
-		{
-			if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+		public static List<Window> GetOpenedWindows() {
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 				return new List<Window>(desktop.Windows);
 			}
 
@@ -80,9 +72,8 @@ namespace Mesen.Utilities
 		}
 
 		//Taken from Avalonia's code (MIT): https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Dialogs/AboutAvaloniaDialog.xaml.cs
-		public static void OpenBrowser(string url)
-		{
-			if(OperatingSystem.IsLinux()) {
+		public static void OpenBrowser(string url) {
+			if (OperatingSystem.IsLinux()) {
 				// If no associated application/json MimeType is found xdg-open opens retrun error
 				// but it tries to open it anyway using the console editor (nano, vim, other..)
 				ShellExec($"xdg-open {url}", waitForExit: false);
@@ -96,11 +87,10 @@ namespace Mesen.Utilities
 			}
 		}
 
-		private static void ShellExec(string cmd, bool waitForExit = true)
-		{
+		private static void ShellExec(string cmd, bool waitForExit = true) {
 			var escapedArgs = Regex.Replace(cmd, "(?=[`~!#&*()|;'<>])", "\\").Replace("\"", "\\\\\\\"");
 
-			using(Process? process = Process.Start(
+			using (Process? process = Process.Start(
 				 new ProcessStartInfo {
 					 FileName = "/bin/sh",
 					 Arguments = $"-c \"{escapedArgs}\"",
@@ -110,7 +100,7 @@ namespace Mesen.Utilities
 					 WindowStyle = ProcessWindowStyle.Hidden
 				 }
 			)) {
-				if(waitForExit) {
+				if (waitForExit) {
 					process?.WaitForExit();
 				}
 			}

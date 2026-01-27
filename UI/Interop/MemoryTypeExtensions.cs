@@ -1,12 +1,9 @@
-﻿using System;
+using System;
 
-namespace Mesen.Interop
-{
-	public static class MemoryTypeExtensions
-	{
-		public static CpuType ToCpuType(this MemoryType memType)
-		{
-			switch(memType) {
+namespace Mesen.Interop {
+	public static class MemoryTypeExtensions {
+		public static CpuType ToCpuType(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SpcMemory:
 				case MemoryType.SpcRam:
 				case MemoryType.SpcRom:
@@ -128,13 +125,12 @@ namespace Mesen.Interop
 			}
 		}
 
-		public static bool IsPpuMemory(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool IsPpuMemory(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SnesVideoRam:
 				case MemoryType.SnesSpriteRam:
 				case MemoryType.SnesCgRam:
-				
+
 				case MemoryType.GbVideoRam:
 				case MemoryType.GbSpriteRam:
 
@@ -151,7 +147,7 @@ namespace Mesen.Interop
 				case MemoryType.PcePaletteRam:
 				case MemoryType.PceSpriteRam:
 				case MemoryType.PceSpriteRamVdc2:
-				
+
 				case MemoryType.SmsVideoRam:
 				case MemoryType.SmsPaletteRam:
 					return true;
@@ -164,21 +160,20 @@ namespace Mesen.Interop
 			}
 		}
 
-		public static bool SupportsMemoryViewer(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool SupportsMemoryViewer(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SnesRegister:
 				case MemoryType.SmsPort:
 				case MemoryType.WsPort:
 					return false;
 			}
+
 			return true;
 		}
 
-		public static bool SupportsTileViewer(this MemoryType memType)
-		{
+		public static bool SupportsTileViewer(this MemoryType memType) {
 			//Hide sprite/palette ram/etc. from tile viewer dropdown, these will never contain tiles
-			switch(memType) {
+			switch (memType) {
 				case MemoryType.SnesCgRam:
 				case MemoryType.SnesSpriteRam:
 				case MemoryType.SpcRom:
@@ -198,11 +193,11 @@ namespace Mesen.Interop
 				case MemoryType.PceSpriteRam:
 				case MemoryType.PceSpriteRamVdc2:
 				case MemoryType.PcePaletteRam:
-				
+
 				case MemoryType.SmsBootRom:
 				case MemoryType.SmsPaletteRam:
 				case MemoryType.SmsPort:
-				
+
 				case MemoryType.GbaBootRom:
 				case MemoryType.GbaPaletteRam:
 				case MemoryType.GbaSpriteRam:
@@ -214,9 +209,8 @@ namespace Mesen.Interop
 			return true;
 		}
 
-		public static bool IsRelativeMemory(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool IsRelativeMemory(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SnesMemory:
 				case MemoryType.SpcMemory:
 				case MemoryType.Sa1Memory:
@@ -233,12 +227,12 @@ namespace Mesen.Interop
 				case MemoryType.WsMemory:
 					return true;
 			}
+
 			return false;
 		}
-		
-		public static bool IsRomMemory(this MemoryType memType)
-		{
-			switch(memType) {
+
+		public static bool IsRomMemory(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SnesPrgRom:
 				case MemoryType.GbPrgRom:
 				case MemoryType.GbBootRom:
@@ -259,12 +253,12 @@ namespace Mesen.Interop
 				case MemoryType.WsPrgRom:
 					return true;
 			}
+
 			return false;
 		}
 
-		public static bool SupportsLabels(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool SupportsLabels(this MemoryType memType) {
+			switch (memType) {
 				//SNES
 				case MemoryType.SnesPrgRom:
 				case MemoryType.SnesWorkRam:
@@ -338,9 +332,8 @@ namespace Mesen.Interop
 			return false;
 		}
 
-		public static bool SupportsWatch(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool SupportsWatch(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SnesMemory:
 				case MemoryType.SpcMemory:
 				case MemoryType.Sa1Memory:
@@ -360,9 +353,8 @@ namespace Mesen.Interop
 			return false;
 		}
 
-		public static bool SupportsCdl(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool SupportsCdl(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.SnesMemory:
 				case MemoryType.Sa1Memory:
 				case MemoryType.Cx4Memory:
@@ -397,9 +389,8 @@ namespace Mesen.Interop
 			return false;
 		}
 
-		public static bool SupportsBreakpoints(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool SupportsBreakpoints(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.NesSecondarySpriteRam:
 				case MemoryType.SpcDspRegisters:
 					return false;
@@ -408,9 +399,8 @@ namespace Mesen.Interop
 			return true;
 		}
 
-		public static bool SupportsExecBreakpoints(this MemoryType memType)
-		{
-			switch(memType) {
+		public static bool SupportsExecBreakpoints(this MemoryType memType) {
+			switch (memType) {
 				case MemoryType.PceAdpcmRam:
 				case MemoryType.SmsPort:
 				case MemoryType.WsPort:
@@ -427,13 +417,11 @@ namespace Mesen.Interop
 		}
 
 
-		public static bool SupportsFreezeAddress(this MemoryType memType)
-		{
+		public static bool SupportsFreezeAddress(this MemoryType memType) {
 			return memType.IsRelativeMemory() && !memType.IsPpuMemory();
 		}
 
-		public static string GetShortName(this MemoryType memType)
-		{
+		public static string GetShortName(this MemoryType memType) {
 			return memType switch {
 				MemoryType.SnesMemory => "CPU",
 				MemoryType.SpcMemory => "SPC",
@@ -469,7 +457,7 @@ namespace Mesen.Interop
 
 				MemoryType.BsxPsRam => "PSRAM",
 				MemoryType.BsxMemoryPack => "MPACK",
-				
+
 				MemoryType.SufamiTurboFirmware => "BOOT",
 				MemoryType.SufamiTurboSecondCart => "BPRG",
 				MemoryType.SufamiTurboSecondCartRam => "BRAM",
@@ -511,7 +499,7 @@ namespace Mesen.Interop
 				MemoryType.PcePaletteRam => "PAL",
 				MemoryType.PceSpriteRam => "SPR",
 				MemoryType.PceSpriteRamVdc2 => "SPR2",
-				
+
 				MemoryType.SmsMemory => "CPU",
 				MemoryType.SmsPrgRom => "ROM",
 				MemoryType.SmsWorkRam => "WRAM",
@@ -546,9 +534,8 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static bool IsUnmapped(this MemoryType memoryType)
-		{
-			switch(memoryType) {
+		public static bool IsUnmapped(this MemoryType memoryType) {
+			switch (memoryType) {
 				case MemoryType.SmsPort:
 				case MemoryType.WsPort:
 				case MemoryType.WsCartEeprom:
@@ -559,11 +546,10 @@ namespace Mesen.Interop
 			return false;
 		}
 
-		public static string GetFormatString(this MemoryType memType)
-		{
+		public static string GetFormatString(this MemoryType memType) {
 			//TODO performance
 			CpuType cpuType = memType.ToCpuType();
-			if(memType == cpuType.ToMemoryType()) {
+			if (memType == cpuType.ToMemoryType()) {
 				return "X" + cpuType.GetAddressSize();
 			}
 
@@ -574,8 +560,7 @@ namespace Mesen.Interop
 			};
 		}
 
-		public static bool IsWordAddressing(this MemoryType memType)
-		{
+		public static bool IsWordAddressing(this MemoryType memType) {
 			return memType switch {
 				MemoryType.SnesVideoRam => true,
 				MemoryType.SnesSpriteRam => true,

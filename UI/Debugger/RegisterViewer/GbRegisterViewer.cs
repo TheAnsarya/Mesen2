@@ -1,28 +1,26 @@
-﻿using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
 using System.Collections.Generic;
+using Mesen.Debugger.ViewModels;
+using Mesen.Interop;
 using static Mesen.Debugger.ViewModels.RegEntry;
 
 namespace Mesen.Debugger.RegisterViewer;
 
-public class GbRegisterViewer
-{
-	public static List<RegisterViewerTab> GetTabs(ref GbState gbState)
-	{
+public class GbRegisterViewer {
+	public static List<RegisterViewerTab> GetTabs(ref GbState gbState) {
 		List<RegisterViewerTab> tabs = new() {
 			GetGbLcdTab(ref gbState),
 			GetGbApuTab(ref gbState),
 			GetGbMiscTab(ref gbState),
 		};
 
-		if(gbState.Type == GbType.Cgb) {
+		if (gbState.Type == GbType.Cgb) {
 			tabs.Add(GetGbCgbTab(ref gbState));
 		}
+
 		return tabs;
 	}
 
-	public static RegisterViewerTab GetGbLcdTab(ref GbState gb, string tabPrefix = "")
-	{
+	public static RegisterViewerTab GetGbLcdTab(ref GbState gb, string tabPrefix = "") {
 		List<RegEntry> entries = new List<RegEntry>();
 
 		GbPpuState ppu = gb.Ppu;
@@ -65,8 +63,7 @@ public class GbRegisterViewer
 		return new RegisterViewerTab(tabPrefix + "LCD", entries, CpuType.Gameboy, MemoryType.GameboyMemory);
 	}
 
-	private static RegisterViewerTab GetGbCgbTab(ref GbState gb)
-	{
+	private static RegisterViewerTab GetGbCgbTab(ref GbState gb) {
 		List<RegEntry> entries = new List<RegEntry>();
 
 		GbPpuState ppu = gb.Ppu;
@@ -102,8 +99,7 @@ public class GbRegisterViewer
 		return new RegisterViewerTab("CGB", entries, CpuType.Gameboy, MemoryType.GameboyMemory);
 	}
 
-	public static RegisterViewerTab GetGbMiscTab(ref GbState gb, string tabPrefix = "")
-	{
+	public static RegisterViewerTab GetGbMiscTab(ref GbState gb, string tabPrefix = "") {
 		List<RegEntry> entries = new List<RegEntry>();
 
 		GbTimerState timer = gb.Timer;
@@ -149,8 +145,7 @@ public class GbRegisterViewer
 		return new RegisterViewerTab(tabPrefix + "Timer/DMA/IRQ", entries, CpuType.Gameboy, MemoryType.GameboyMemory);
 	}
 
-	public static RegisterViewerTab GetGbApuTab(ref GbState gb, string tabPrefix = "")
-	{
+	public static RegisterViewerTab GetGbApuTab(ref GbState gb, string tabPrefix = "") {
 		List<RegEntry> entries = new List<RegEntry>();
 
 		GbApuState apu = gb.Apu.Common;

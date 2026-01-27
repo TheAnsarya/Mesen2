@@ -1,14 +1,12 @@
-﻿using Avalonia.Collections;
+using System;
+using System.Text;
+using Avalonia.Collections;
 using Mesen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Text;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class GsuStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class GsuStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public UInt16 Reg0 { get; set; }
 		[Reactive] public UInt16 Reg1 { get; set; }
 		[Reactive] public UInt16 Reg2 { get; set; }
@@ -32,7 +30,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public byte RegSrc { get; set; }
 		[Reactive] public byte RegDst { get; set; }
 		[Reactive] public byte RegColor { get; set; }
-		[Reactive] public byte RegPor { get; set;}
+		[Reactive] public byte RegPor { get; set; }
 
 		[Reactive] public byte RegPbr { get; set; }
 		[Reactive] public byte RomBank { get; set; }
@@ -42,7 +40,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagCarry { get; set; }
 		[Reactive] public bool FlagSign { get; set; }
 		[Reactive] public bool FlagOverflow { get; set; }
-		
+
 		[Reactive] public bool FlagAlt1 { get; set; }
 		[Reactive] public bool FlagAlt2 { get; set; }
 		[Reactive] public bool FlagIrq { get; set; }
@@ -59,8 +57,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagColorFreezeHigh { get; set; }
 		[Reactive] public bool FlagObjMode { get; set; }
 
-		public GsuStatusViewModel()
-		{
+		public GsuStatusViewModel() {
 			this.WhenAnyValue(x => x.FlagZero, x => x.FlagCarry, x => x.FlagSign, x => x.FlagOverflow).Subscribe(x => UpdateSfrValue());
 			this.WhenAnyValue(x => x.FlagAlt1, x => x.FlagAlt2, x => x.FlagIrq, x => x.FlagRomReadPending).Subscribe(x => UpdateSfrValue());
 			this.WhenAnyValue(x => x.FlagRunning, x => x.FlagImmLow, x => x.FlagImmHigh, x => x.FlagPrefix).Subscribe(x => UpdateSfrValue());
@@ -69,8 +66,7 @@ namespace Mesen.Debugger.StatusViews
 			this.WhenAnyValue(x => x.FlagColorFreezeHigh, x => x.FlagObjMode).Subscribe(x => UpdatePorValue());
 		}
 
-		private void UpdateSfrValue()
-		{
+		private void UpdateSfrValue() {
 			RegSfr = (UInt16)(
 				(FlagZero ? 0x02 : 0) |
 				(FlagCarry ? 0x04 : 0) |
@@ -87,8 +83,7 @@ namespace Mesen.Debugger.StatusViews
 			);
 		}
 
-		private void UpdatePorValue()
-		{
+		private void UpdatePorValue() {
 			RegPor = (byte)(
 				(FlagPlotTransparent ? 0x01 : 0) |
 				(FlagPlotDither ? 0x02 : 0) |
@@ -98,8 +93,7 @@ namespace Mesen.Debugger.StatusViews
 			);
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			GsuState cpu = DebugApi.GetCpuState<GsuState>(CpuType.Gsu);
 
 			UpdateCycleCount(cpu.CycleCount);
@@ -149,8 +143,7 @@ namespace Mesen.Debugger.StatusViews
 			FlagObjMode = cpu.ObjMode;
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			GsuState cpu = DebugApi.GetCpuState<GsuState>(CpuType.Gsu);
 
 			cpu.R[0] = Reg0;

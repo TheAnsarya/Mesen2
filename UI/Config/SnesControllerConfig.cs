@@ -1,21 +1,18 @@
-﻿using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.ViewModels;
 
-namespace Mesen.Config
-{
-	public class SnesControllerConfig : ControllerConfig
-	{
+namespace Mesen.Config {
+	public class SnesControllerConfig : ControllerConfig {
 		public new SnesKeyMapping Mapping1 { get => (SnesKeyMapping)_mapping1; set => _mapping1 = value; }
 		public new SnesKeyMapping Mapping2 { get => (SnesKeyMapping)_mapping2; set => _mapping2 = value; }
 		public new SnesKeyMapping Mapping3 { get => (SnesKeyMapping)_mapping3; set => _mapping3 = value; }
 		public new SnesKeyMapping Mapping4 { get => (SnesKeyMapping)_mapping4; set => _mapping4 = value; }
 
-		public SnesControllerConfig()
-		{
+		public SnesControllerConfig() {
 			_mapping1 = new SnesKeyMapping();
 			_mapping2 = new SnesKeyMapping();
 			_mapping3 = new SnesKeyMapping();
@@ -23,13 +20,11 @@ namespace Mesen.Config
 		}
 	}
 
-	public class SnesKeyMapping : KeyMapping
-	{
+	public class SnesKeyMapping : KeyMapping {
 		public UInt16[]? MouseButtons { get; set; } = null;
 		public UInt16[]? SuperScopeButtons { get; set; } = null;
 
-		protected override UInt16[]? GetCustomButtons(ControllerType type)
-		{
+		protected override UInt16[]? GetCustomButtons(ControllerType type) {
 			return type switch {
 				ControllerType.SnesMouse => MouseButtons,
 				ControllerType.SuperScope => SuperScopeButtons,
@@ -37,12 +32,11 @@ namespace Mesen.Config
 			};
 		}
 
-		public override List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex)
-		{
+		public override List<CustomKeyMapping> ToCustomKeys(ControllerType type, int mappingIndex) {
 			UInt16[]? buttonMappings = GetCustomButtons(type);
-			if(buttonMappings == null) {
-				if(GetDefaultCustomKeys(type, null) != null) {
-					if(mappingIndex == 0) {
+			if (buttonMappings == null) {
+				if (GetDefaultCustomKeys(type, null) != null) {
+					if (mappingIndex == 0) {
 						SetDefaultKeys(type, null);
 					} else {
 						ClearKeys(type);
@@ -50,7 +44,7 @@ namespace Mesen.Config
 				}
 
 				buttonMappings = GetCustomButtons(type);
-				if(buttonMappings == null) {
+				if (buttonMappings == null) {
 					return new List<CustomKeyMapping>();
 				}
 			}
@@ -66,9 +60,8 @@ namespace Mesen.Config
 			return keys;
 		}
 
-		public override void ClearKeys(ControllerType type)
-		{
-			switch(type) {
+		public override void ClearKeys(ControllerType type) {
+			switch (type) {
 				case ControllerType.SnesMouse:
 					MouseButtons = new UInt16[2];
 					break;
@@ -84,9 +77,8 @@ namespace Mesen.Config
 			}
 		}
 
-		public override UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset)
-		{
-			switch(type) {
+		public override UInt16[]? GetDefaultCustomKeys(ControllerType type, KeyPresetType? preset) {
+			switch (type) {
 				case ControllerType.SnesMouse:
 					return new UInt16[2] {
 						InputApi.GetKeyCode("Mouse Left"),
@@ -106,9 +98,8 @@ namespace Mesen.Config
 			}
 		}
 
-		public override void SetDefaultKeys(ControllerType type, KeyPresetType? preset)
-		{
-			switch(type) {
+		public override void SetDefaultKeys(ControllerType type, KeyPresetType? preset) {
+			switch (type) {
 				case ControllerType.SnesMouse: MouseButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.SuperScope: SuperScopeButtons = GetDefaultCustomKeys(type, preset); break;
 

@@ -1,12 +1,10 @@
-﻿using Avalonia.Media;
+using Avalonia.Media;
 using Mesen.Interop;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class GbaEventViewerConfig : ViewModelBase
-	{
+namespace Mesen.Config {
+	public class GbaEventViewerConfig : ViewModelBase {
 		[Reactive] public EventViewerCategoryCfg PaletteReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x29, 0xC9, 0x29));
 		[Reactive] public EventViewerCategoryCfg PaletteWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
 		[Reactive] public EventViewerCategoryCfg VramReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xDA, 0xB4, 0x7A));
@@ -45,8 +43,7 @@ namespace Mesen.Config
 
 		[Reactive] public bool ShowPreviousFrameEvents { get; set; } = true;
 
-		public InteropGbaEventViewerConfig ToInterop()
-		{
+		public InteropGbaEventViewerConfig ToInterop() {
 			return new InteropGbaEventViewerConfig() {
 				PaletteWrites = this.PaletteWrites,
 				VramWrites = this.VramWrites,

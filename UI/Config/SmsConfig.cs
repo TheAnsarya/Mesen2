@@ -1,5 +1,3 @@
-﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,11 +6,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mesen.Interop;
+using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Config;
 
-public class SmsConfig : BaseConfig<SmsConfig>
-{
+public class SmsConfig : BaseConfig<SmsConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 	[Reactive] public ConsoleOverrideConfig GgConfigOverrides { get; set; } = new();
 
@@ -46,10 +45,9 @@ public class SmsConfig : BaseConfig<SmsConfig>
 
 	[Reactive] public OverscanConfig NtscOverscan { get; set; } = new() { Top = 24, Bottom = 24 };
 	[Reactive] public OverscanConfig PalOverscan { get; set; } = new() { Top = 24, Bottom = 24 };
-	[Reactive] public OverscanConfig GameGearOverscan { get; set; } = new() { Top = 48, Bottom = 48, Left = 48, Right = 48};
+	[Reactive] public OverscanConfig GameGearOverscan { get; set; } = new() { Top = 48, Bottom = 48, Left = 48, Right = 48 };
 
-	public void ApplyConfig()
-	{
+	public void ApplyConfig() {
 		ConfigManager.Config.Video.ApplyConfig();
 
 		ConfigApi.SetSmsConfig(new InteropSmsConfig() {
@@ -81,15 +79,13 @@ public class SmsConfig : BaseConfig<SmsConfig>
 		});
 	}
 
-	internal void InitializeDefaults(DefaultKeyMappingType defaultMappings)
-	{
+	internal void InitializeDefaults(DefaultKeyMappingType defaultMappings) {
 		Port1.InitDefaults<SmsKeyMapping>(defaultMappings, ControllerType.SmsController);
 	}
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct InteropSmsConfig
-{
+public struct InteropSmsConfig {
 	public InteropControllerConfig Port1;
 	public InteropControllerConfig Port2;
 
@@ -117,8 +113,7 @@ public struct InteropSmsConfig
 	public InteropOverscanDimensions GameGearOverscan;
 }
 
-public enum SmsRevision
-{
+public enum SmsRevision {
 	Compatibility,
 	Sms1,
 	Sms2

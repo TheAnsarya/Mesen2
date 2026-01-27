@@ -1,20 +1,18 @@
-﻿using Mesen.Config;
+using System;
+using System.Reactive.Linq;
+using Mesen.Config;
 using Mesen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Reactive.Linq;
 
-namespace Mesen.ViewModels
-{
-	public class ConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class ConfigViewModel : DisposableViewModel {
 		[Reactive] public AudioConfigViewModel? Audio { get; set; }
 		[Reactive] public InputConfigViewModel? Input { get; set; }
 		[Reactive] public VideoConfigViewModel? Video { get; set; }
 		[Reactive] public PreferencesConfigViewModel? Preferences { get; set; }
 		[Reactive] public EmulationConfigViewModel? Emulation { get; set; }
-		
+
 		[Reactive] public SnesConfigViewModel? Snes { get; set; }
 		[Reactive] public NesConfigViewModel? Nes { get; set; }
 		[Reactive] public GameboyConfigViewModel? Gameboy { get; set; }
@@ -30,20 +28,16 @@ namespace Mesen.ViewModels
 		[Obsolete("For designer only")]
 		public ConfigViewModel() : this(ConfigWindowTab.Audio) { }
 
-		public ConfigViewModel(ConfigWindowTab selectedTab)
-		{
+		public ConfigViewModel(ConfigWindowTab selectedTab) {
 			AlwaysOnTop = ConfigManager.Config.Preferences.AlwaysOnTop;
 			SelectedIndex = selectedTab;
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedIndex).Subscribe((tab) => {
-				this.SelectTab(tab);
-			}));
+			AddDisposable(this.WhenAnyValue(x => x.SelectedIndex).Subscribe((tab) => this.SelectTab(tab)));
 		}
 
-		public void SelectTab(ConfigWindowTab tab)
-		{
+		public void SelectTab(ConfigWindowTab tab) {
 			//Create each view model when the corresponding tab is clicked, for performance
-			switch(tab) {
+			switch (tab) {
 				case ConfigWindowTab.Audio: Audio ??= AddDisposable(new AudioConfigViewModel()); break;
 				case ConfigWindowTab.Emulation: Emulation ??= AddDisposable(new EmulationConfigViewModel()); break;
 				case ConfigWindowTab.Input: Input ??= AddDisposable(new InputConfigViewModel()); break;
@@ -69,15 +63,13 @@ namespace Mesen.ViewModels
 			SelectedIndex = tab;
 		}
 
-		public void SaveConfig()
-		{
+		public void SaveConfig() {
 			ConfigManager.Config.ApplyConfig();
 			ConfigManager.Config.Save();
 			ConfigManager.Config.Preferences.UpdateFileAssociations();
 		}
 
-		public void RevertConfig()
-		{
+		public void RevertConfig() {
 			ConfigManager.Config.Audio = Audio?.OriginalConfig ?? ConfigManager.Config.Audio;
 			ConfigManager.Config.Input = Input?.OriginalConfig ?? ConfigManager.Config.Input;
 			ConfigManager.Config.Video = Video?.OriginalConfig ?? ConfigManager.Config.Video;
@@ -94,9 +86,8 @@ namespace Mesen.ViewModels
 			ConfigManager.Config.Save();
 		}
 
-		public bool IsDirty()
-		{
-			return (
+		public bool IsDirty() {
+			return 
 				Audio?.OriginalConfig.IsIdentical(ConfigManager.Config.Audio) == false ||
 				Input?.OriginalConfig.IsIdentical(ConfigManager.Config.Input) == false ||
 				Video?.OriginalConfig.IsIdentical(ConfigManager.Config.Video) == false ||
@@ -110,12 +101,11 @@ namespace Mesen.ViewModels
 				Sms?.OriginalConfig.IsIdentical(ConfigManager.Config.Sms) == false ||
 				Ws?.OriginalConfig.IsIdentical(ConfigManager.Config.Ws) == false ||
 				OtherConsoles?.CvOriginalConfig.IsIdentical(ConfigManager.Config.Cv) == false
-			);
+			;
 		}
-   }
+	}
 
-	public enum ConfigWindowTab
-	{
+	public enum ConfigWindowTab {
 		Audio = 0,
 		Emulation = 1,
 		Input = 2,

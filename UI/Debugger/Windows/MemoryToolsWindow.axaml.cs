@@ -1,28 +1,26 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using System;
+using Mesen.Config;
 using Mesen.Debugger.Controls;
+using Mesen.Debugger.Disassembly;
+using Mesen.Debugger.Labels;
+using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
-using System.ComponentModel;
-using Avalonia.Interactivity;
-using Mesen.Debugger.Utilities;
-using System.IO;
-using Mesen.Utilities;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using System.Linq;
-using System.Collections.Generic;
 using Mesen.Localization;
-using Avalonia.Input;
-using Mesen.Debugger.Disassembly;
+using Mesen.Utilities;
 
-namespace Mesen.Debugger.Windows
-{
-	public class MemoryToolsWindow : MesenWindow, INotificationHandler
-	{
+namespace Mesen.Debugger.Windows {
+	public class MemoryToolsWindow : MesenWindow, INotificationHandler {
 		private HexEditor _editor;
 		private MemoryToolsViewModel _model;
 		private MemoryViewerFindWindow? _searchWnd;
@@ -30,8 +28,7 @@ namespace Mesen.Debugger.Windows
 		private int _prevByteOffset;
 		private DynamicTooltip? _prevTooltip;
 
-		public MemoryToolsWindow()
-		{
+		public MemoryToolsWindow() {
 			InitializeComponent();
 #if DEBUG
 			this.AttachDevTools();
@@ -41,7 +38,7 @@ namespace Mesen.Debugger.Windows
 			_model = new MemoryToolsViewModel(_editor);
 			DataContext = _model;
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
@@ -50,71 +47,64 @@ namespace Mesen.Debugger.Windows
 			_editor.PointerMoved += editor_PointerMoved;
 		}
 
-		public static void ShowInMemoryTools(MemoryType memType, int address)
-		{
+		public static void ShowInMemoryTools(MemoryType memType, int address) {
 			MemoryToolsWindow wnd = DebugWindowManager.GetOrOpenDebugWindow(() => new MemoryToolsWindow());
 			wnd.SetCursorPosition(memType, address);
 		}
 
-		public void SetCursorPosition(MemoryType memType, int address)
-		{
-			if(_model.AvailableMemoryTypes.Contains(memType)) {
+		public void SetCursorPosition(MemoryType memType, int address) {
+			if (_model.AvailableMemoryTypes.Contains(memType)) {
 				_model.Config.MemoryType = memType;
 				_editor.SetCursorPosition(address, scrollToTop: true);
 				_editor.Focus();
 			}
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e)
-		{
+		protected override void OnClosing(WindowClosingEventArgs e) {
 			base.OnClosing(e);
 			_model.Config.SaveWindowSettings(this);
 			ConfigManager.Config.Debug.HexEditor = _model.Config;
 		}
 
-		protected override void OnOpened(EventArgs e)
-		{
+		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
 			InitializeActions();
 			_editor.Focus();
 		}
 
-		protected override void OnGotFocus(GotFocusEventArgs e)
-		{
+		protected override void OnGotFocus(GotFocusEventArgs e) {
 			base.OnGotFocus(e);
-			if(FocusManager?.GetFocusedElement() == this) {
+			if (FocusManager?.GetFocusedElement() == this) {
 				//Focus on editor whenever the window itself is focused
 				_editor.Focus();
 			}
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void OnSettingsClick(object sender, RoutedEventArgs e)
-		{
+		private void OnSettingsClick(object sender, RoutedEventArgs e) {
 			_model.Config.ShowOptionPanel = !_model.Config.ShowOptionPanel;
 		}
 
-		private void editor_PointerMoved(object? sender, PointerEventArgs e)
-		{
+		private void editor_PointerMoved(object? sender, PointerEventArgs e) {
 			Point point = e.GetPosition(_editor);
-			if(point == _prevMousePos) {
+			if (point == _prevMousePos) {
 				return;
 			}
+
 			_prevMousePos = point;
 
 			int byteOffset = _model.Config.ShowTooltips ? _editor.GetByteOffset(point) : -1;
-			if(byteOffset >= 0) {
-				if(byteOffset != _prevByteOffset) {
+			if (byteOffset >= 0) {
+				if (byteOffset != _prevByteOffset) {
 					CpuType cpuType = _model.Config.MemoryType.ToCpuType();
-					
+
 					AddressInfo addr = new AddressInfo() { Address = byteOffset, Type = _model.Config.MemoryType };
 					AddressInfo relAddr;
 					AddressInfo absAddr;
-					if(addr.Type.IsRelativeMemory()) {
+					if (addr.Type.IsRelativeMemory()) {
 						relAddr = addr;
 						absAddr = DebugApi.GetAbsoluteAddress(relAddr);
 					} else {
@@ -143,12 +133,11 @@ namespace Mesen.Debugger.Windows
 			_prevByteOffset = byteOffset;
 		}
 
-		private void editor_ByteUpdated(object? sender, ByteUpdatedEventArgs e)
-		{
-			if(e.Values != null) {
+		private void editor_ByteUpdated(object? sender, ByteUpdatedEventArgs e) {
+			if (e.Values != null) {
 				DebugApi.SetMemoryValues(_model.Config.MemoryType, (uint)e.ByteOffset, e.Values, e.Values.Length);
-			} else if(e.Value != null) {
-				if(e.Length > 0) {
+			} else if (e.Value != null) {
+				if (e.Length > 0) {
 					byte[] data = new byte[e.Length];
 					Array.Fill<byte>(data, e.Value.Value);
 					DebugApi.SetMemoryValues(_model.Config.MemoryType, (uint)e.ByteOffset, data, data.Length);
@@ -158,8 +147,7 @@ namespace Mesen.Debugger.Windows
 			}
 		}
 
-		private void InitializeActions()
-		{
+		private void InitializeActions() {
 			DebugConfig cfg = ConfigManager.Config.Debug;
 
 			_model.AddDisposables(DebugShortcutManager.CreateContextMenu(_editor, new ContextMenuAction[] {
@@ -378,9 +366,8 @@ namespace Mesen.Debugger.Windows
 			DebugShortcutManager.RegisterActions(this, _model.SearchMenuItems);
 		}
 
-		private void OpenSearchWindow()
-		{
-			if(_searchWnd == null) {
+		private void OpenSearchWindow() {
+			if (_searchWnd == null) {
 				_searchWnd = new MemoryViewerFindWindow(_model.Search, _model);
 				_searchWnd.Closed += (s, e) => _searchWnd = null;
 				_searchWnd.ShowCenteredWithParent(this);
@@ -389,22 +376,19 @@ namespace Mesen.Debugger.Windows
 			}
 		}
 
-		private void Find(SearchDirection direction)
-		{
-			if(!_model.Search.IsValid) {
+		private void Find(SearchDirection direction) {
+			if (!_model.Search.IsValid) {
 				OpenSearchWindow();
 			} else {
 				_model.Find(direction);
 			}
 		}
 
-		private ContextMenuAction GetViewInMemoryAction()
-		{
-			AddressInfo? GetAddress()
-			{
+		private ContextMenuAction GetViewInMemoryAction() {
+			AddressInfo? GetAddress() {
 				MemoryType memType = _model.Config.MemoryType;
-				if(_editor.SelectionLength <= 1) {
-					if(memType.IsRelativeMemory()) {
+				if (_editor.SelectionLength <= 1) {
+					if (memType.IsRelativeMemory()) {
 						AddressInfo absAddr = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = _model.SelectionStart, Type = memType });
 						return absAddr.Address >= 0 ? absAddr : null;
 					} else {
@@ -412,6 +396,7 @@ namespace Mesen.Debugger.Windows
 						return relAddr.Address >= 0 ? relAddr : null;
 					}
 				}
+
 				return null;
 			}
 
@@ -421,7 +406,7 @@ namespace Mesen.Debugger.Windows
 				IsVisible = () => GetAddress() != null,
 				HintText = () => "$" + _editor.SelectionStart.ToString("X2"),
 				OnClick = () => {
-					if(GetAddress() is AddressInfo addr) {
+					if (GetAddress() is AddressInfo addr) {
 						SetCursorPosition(addr.Type, addr.Address);
 					}
 				},
@@ -429,20 +414,19 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		private ContextMenuAction GetViewInDebuggerAction()
-		{
-			AddressInfo? GetAddress()
-			{
+		private ContextMenuAction GetViewInDebuggerAction() {
+			AddressInfo? GetAddress() {
 				MemoryType memType = _model.Config.MemoryType;
-				if(_editor.SelectionLength <= 1 && !memType.IsPpuMemory()) {
+				if (_editor.SelectionLength <= 1 && !memType.IsPpuMemory()) {
 					AddressInfo relAddr;
-					if(!memType.IsRelativeMemory()) {
+					if (!memType.IsRelativeMemory()) {
 						relAddr = DebugApi.GetRelativeAddress(new AddressInfo() { Address = _model.SelectionStart, Type = memType }, memType.ToCpuType());
 						return relAddr.Address >= 0 ? relAddr : null;
 					} else {
 						return new AddressInfo() { Address = _model.SelectionStart, Type = memType };
 					}
 				}
+
 				return null;
 			}
 
@@ -453,7 +437,7 @@ namespace Mesen.Debugger.Windows
 				HintText = () => "$" + _editor.SelectionStart.ToString("X2"),
 				OnClick = () => {
 					AddressInfo? relAddr = GetAddress();
-					if(relAddr?.Address >= 0) {
+					if (relAddr?.Address >= 0) {
 						CpuType cpuType = relAddr.Value.Type.ToCpuType();
 						DebuggerWindow.OpenWindowAtAddress(cpuType, relAddr.Value.Address);
 					}
@@ -461,8 +445,7 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		private ContextMenuAction GetResetAccessCountersAction()
-		{
+		private ContextMenuAction GetResetAccessCountersAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.ResetAccessCounters,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.MemoryViewer_ResetAccessCounters),
@@ -473,8 +456,7 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		private ContextMenuAction GetImportAction()
-		{
+		private ContextMenuAction GetImportAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.Import,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.MemoryViewer_Import),
@@ -483,8 +465,7 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		private ContextMenuAction GetExportAction()
-		{
+		private ContextMenuAction GetExportAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.Export,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.MemoryViewer_Export),
@@ -492,31 +473,27 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		public async void Import()
-		{
+		public async void Import() {
 			string? filename = await FileDialogHelper.OpenFile(ConfigManager.DebuggerFolder, this, FileDialogHelper.DmpExt);
-			if(filename != null) {
+			if (filename != null) {
 				byte[]? dmpData = FileHelper.ReadAllBytes(filename);
-				if(dmpData != null) {
+				if (dmpData != null) {
 					DebugApi.SetMemoryState(_model.Config.MemoryType, dmpData, dmpData.Length);
 				}
 			}
 		}
 
-		public async void Export()
-		{
+		public async void Export() {
 			string name = EmuApi.GetRomInfo().GetRomName() + " - " + _model.Config.MemoryType.ToString() + ".dmp";
 			string? filename = await FileDialogHelper.SaveFile(ConfigManager.DebuggerFolder, name, this, FileDialogHelper.DmpExt);
-			if(filename != null) {
+			if (filename != null) {
 				FileHelper.WriteAllBytes(filename, DebugApi.GetMemoryState(_model.Config.MemoryType));
 			}
 		}
 
-		private ContextMenuAction GetEditLabelAction()
-		{
-			AddressInfo? GetAddress(MemoryType memType, int address)
-			{
-				if(memType.IsRelativeMemory()) {
+		private ContextMenuAction GetEditLabelAction() {
+			AddressInfo? GetAddress(MemoryType memType, int address) {
+				if (memType.IsRelativeMemory()) {
 					AddressInfo relAddress = new AddressInfo() {
 						Address = address,
 						Type = memType
@@ -538,19 +515,20 @@ namespace Mesen.Debugger.Windows
 
 				OnClick = () => {
 					AddressInfo? addr = GetAddress(_model.Config.MemoryType, _editor.SelectionStart);
-					if(addr == null) {
+					if (addr == null) {
 						return;
 					}
 
 					CodeLabel? label = LabelManager.GetLabel((uint)addr.Value.Address, addr.Value.Type);
-					if(label == null) {
+					if (label == null) {
 						int length = 1;
-						if(_editor.SelectionLength > 1) {
+						if (_editor.SelectionLength > 1) {
 							int end = addr.Value.Address + _editor.SelectionLength;
 							int memSize = DebugApi.GetMemorySize(addr.Value.Type);
-							if(end >= memSize) {
+							if (end >= memSize) {
 								end = memSize;
 							}
+
 							length = end - addr.Value.Address;
 						}
 
@@ -566,8 +544,7 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		private ContextMenuAction GetAddWatchAction()
-		{
+		private ContextMenuAction GetAddWatchAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.AddWatch,
 				HintText = () => GetAddressRange(),
@@ -582,8 +559,7 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		private ContextMenuAction GetEditBreakpointAction()
-		{
+		private ContextMenuAction GetEditBreakpointAction() {
 			return new ContextMenuAction() {
 				ActionType = ActionType.EditBreakpoint,
 				HintText = () => GetAddressRange(),
@@ -596,30 +572,29 @@ namespace Mesen.Debugger.Windows
 					MemoryType memType = _model.Config.MemoryType;
 					Breakpoint? bp = BreakpointManager.GetMatchingBreakpoint(startAddress, endAddress, memType);
 					CpuType cpuType = memType.ToCpuType();
-					if(bp == null) {
-						bp = new Breakpoint() { 
-							MemoryType = memType, 
-							CpuType = cpuType, 
+					if (bp == null) {
+						bp = new Breakpoint() {
+							MemoryType = memType,
+							CpuType = cpuType,
 							StartAddress = startAddress,
 							EndAddress = endAddress,
 							BreakOnWrite = true,
 							BreakOnRead = true
 						};
-						if(bp.SupportsExec) {
+						if (bp.SupportsExec) {
 							bp.BreakOnExec = true;
 						}
 					}
 
 					bool result = await BreakpointEditWindow.EditBreakpointAsync(bp, this);
-					if(result && DebugWindowManager.GetDebugWindow<DebuggerWindow>(x => x.CpuType == cpuType) == null) {
+					if (result && DebugWindowManager.GetDebugWindow<DebuggerWindow>(x => x.CpuType == cpuType) == null) {
 						DebuggerWindow.GetOrOpenWindow(cpuType);
 					}
 				}
 			};
 		}
 
-		private ContextMenuAction GetFreezeAction(ActionType action, DebuggerShortcut shortcut)
-		{
+		private ContextMenuAction GetFreezeAction(ActionType action, DebuggerShortcut shortcut) {
 			DebugConfig cfg = ConfigManager.Config.Debug;
 			return new ContextMenuAction() {
 				ActionType = action,
@@ -634,8 +609,7 @@ namespace Mesen.Debugger.Windows
 			};
 		}
 
-		private ContextMenuAction GetMarkSelectionAction()
-		{
+		private ContextMenuAction GetMarkSelectionAction() {
 			return MarkSelectionHelper.GetAction(
 				() => _model.Config.MemoryType,
 				() => _model.SelectionStart,
@@ -644,37 +618,31 @@ namespace Mesen.Debugger.Windows
 			);
 		}
 
-		private string GetAddressRange()
-		{
+		private string GetAddressRange() {
 			string address = "$" + _editor.SelectionStart.ToString("X2");
-			if(_editor.SelectionLength > 1) {
+			if (_editor.SelectionLength > 1) {
 				address += "-$" + (_editor.SelectionStart + _editor.SelectionLength - 1).ToString("X2");
 			}
+
 			return address;
 		}
 
-		public void ProcessNotification(NotificationEventArgs e)
-		{
-			switch(e.NotificationType) {
+		public void ProcessNotification(NotificationEventArgs e) {
+			switch (e.NotificationType) {
 				case ConsoleNotificationType.CodeBreak:
 				case ConsoleNotificationType.StateLoaded:
-					Dispatcher.UIThread.Post(() => {
-						_editor.InvalidateVisual();
-					});
+					Dispatcher.UIThread.Post(() => _editor.InvalidateVisual());
 					break;
 
 				case ConsoleNotificationType.PpuFrameDone:
-					if(!ToolRefreshHelper.LimitFps(this, 80)) {
-						Dispatcher.UIThread.Post(() => {
-							_editor.InvalidateVisual();
-						});
+					if (!ToolRefreshHelper.LimitFps(this, 80)) {
+						Dispatcher.UIThread.Post(() => _editor.InvalidateVisual());
 					}
+
 					break;
 
 				case ConsoleNotificationType.GameLoaded:
-					Dispatcher.UIThread.Post(() => {
-						_model.UpdateAvailableMemoryTypes();
-					});
+					Dispatcher.UIThread.Post(() => _model.UpdateAvailableMemoryTypes());
 					break;
 			}
 		}

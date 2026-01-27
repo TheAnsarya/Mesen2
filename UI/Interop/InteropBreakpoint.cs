@@ -1,11 +1,9 @@
-﻿using Mesen.Debugger;
 using System;
 using System.Runtime.InteropServices;
+using Mesen.Debugger;
 
-namespace Mesen.Interop
-{
-	public struct InteropBreakpoint
-	{
+namespace Mesen.Interop {
+	public struct InteropBreakpoint {
 		public Int32 Id;
 		public CpuType CpuType;
 		public MemoryType MemoryType;

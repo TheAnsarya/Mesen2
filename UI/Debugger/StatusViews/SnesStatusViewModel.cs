@@ -1,16 +1,14 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Reactive.Linq;
+using System.Text;
+using Avalonia.Controls;
 using Mesen.Interop;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Reactive.Linq;
-using System.Text;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class SnesStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class SnesStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public UInt16 RegA { get; set; }
 		[Reactive] public UInt16 RegX { get; set; }
 		[Reactive] public UInt16 RegY { get; set; }
@@ -30,7 +28,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagC { get; set; }
 
 		[Reactive] public bool FlagE { get; set; }
-		
+
 		[Reactive] public bool FlagNmi { get; set; }
 		[Reactive] public bool FlagIrqHvCounters { get; set; }
 		[Reactive] public bool FlagIrqCoprocessor { get; set; }
@@ -38,7 +36,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public int Cycle { get; private set; }
 		[Reactive] public int Scanline { get; private set; }
 		[Reactive] public int HClock { get; private set; }
-		
+
 		[Reactive] public int VramAddress { get; private set; }
 		[Reactive] public int OamAddress { get; private set; }
 		[Reactive] public int CgRamAddress { get; private set; }
@@ -50,8 +48,7 @@ namespace Mesen.Debugger.StatusViews
 		[Obsolete("For designer only")]
 		public SnesStatusViewModel() : this(CpuType.Snes) { }
 
-		public SnesStatusViewModel(CpuType cpuType)
-		{
+		public SnesStatusViewModel(CpuType cpuType) {
 			_cpuType = cpuType;
 
 			this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN).Subscribe(x => UpdatePsValue());
@@ -70,8 +67,7 @@ namespace Mesen.Debugger.StatusViews
 			});
 		}
 
-		private void UpdatePsValue()
-		{
+		private void UpdatePsValue() {
 			RegPS = (byte)(
 				(FlagN ? (byte)SnesCpuFlags.Negative : 0) |
 				(FlagV ? (byte)SnesCpuFlags.Overflow : 0) |
@@ -84,8 +80,7 @@ namespace Mesen.Debugger.StatusViews
 			);
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			SnesCpuState cpu = DebugApi.GetCpuState<SnesCpuState>(_cpuType);
 			SnesPpuState ppu = DebugApi.GetPpuState<SnesPpuState>(CpuType.Snes);
 
@@ -109,22 +104,22 @@ namespace Mesen.Debugger.StatusViews
 
 			StringBuilder sb = new StringBuilder();
 			MemoryType memType = _cpuType.ToMemoryType();
-			for(UInt32 i = (uint)cpu.SP + 1; (i & 0xFF) != 0; i++) {
+			for (UInt32 i = (uint)cpu.SP + 1; (i & 0xFF) != 0; i++) {
 				sb.Append($"${DebugApi.GetMemoryValue(memType, i):X2} ");
 			}
+
 			StackPreview = sb.ToString();
 
 			Cycle = ppu.Cycle;
 			HClock = ppu.HClock;
 			Scanline = ppu.Scanline;
-			
+
 			VramAddress = ppu.VramAddress;
 			OamAddress = ppu.InternalOamRamAddress;
 			CgRamAddress = ppu.CgramAddress;
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			SnesCpuState cpu = DebugApi.GetCpuState<SnesCpuState>(_cpuType);
 
 			cpu.A = RegA;
@@ -140,11 +135,12 @@ namespace Mesen.Debugger.StatusViews
 			cpu.PS = (SnesCpuFlags)RegPS;
 
 			cpu.EmulationMode = FlagE;
-			if(FlagNmi && cpu.NmiFlagCounter == 0 && !cpu.NeedNmi) {
+			if (FlagNmi && cpu.NmiFlagCounter == 0 && !cpu.NeedNmi) {
 				cpu.NmiFlagCounter = (byte)(FlagNmi ? 1 : 0);
 			}
+
 			cpu.IrqSource = (byte)(
-				(FlagIrqHvCounters ? (byte)SnesIrqSource.Ppu : 0) | 
+				(FlagIrqHvCounters ? (byte)SnesIrqSource.Ppu : 0) |
 				(FlagIrqCoprocessor ? (byte)SnesIrqSource.Coprocessor : 0)
 			);
 

@@ -1,11 +1,3 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Media;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,11 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
+using Mesen.Config.Shortcuts;
+using Mesen.Interop;
+using Mesen.Utilities;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public partial class Configuration : ReactiveObject
-	{
+namespace Mesen.Config {
+	public partial class Configuration : ReactiveObject {
 		private string _fileData = "";
 
 		public string Version { get; set; } = "2.1.1";
@@ -46,30 +44,26 @@ namespace Mesen.Config
 		[Reactive] public NetplayConfig Netplay { get; set; } = new();
 		[Reactive] public HistoryViewerConfig HistoryViewer { get; set; } = new();
 		[Reactive] public MainWindowConfig MainWindow { get; set; } = new();
-		
+
 		public DefaultKeyMappingType DefaultKeyMappings { get; set; } = DefaultKeyMappingType.Xbox | DefaultKeyMappingType.ArrowKeys;
 
-		public Configuration()
-		{
+		public Configuration() {
 			//Used by JSON deserializer, don't call directly - use CreateConfig
 		}
 
-		public static Configuration CreateConfig()
-		{
+		public static Configuration CreateConfig() {
 			Configuration cfg = new();
 			cfg.ConfigUpgrade = (int)ConfigUpgradeHint.FirstRun;
 			return cfg;
 		}
 
-		~Configuration()
-		{
+		~Configuration() {
 			//Try to save before destruction if we were unable to save at a previous point in time
 			Save();
 		}
 
-		public void Save()
-		{
-			if(ConfigManager.DisableSaveSettings) {
+		public void Save() {
+			if (ConfigManager.DisableSaveSettings) {
 				//Don't save to disk if command line option to disable setting updates was set
 				return;
 			}
@@ -77,8 +71,7 @@ namespace Mesen.Config
 			Serialize(ConfigManager.ConfigFile);
 		}
 
-		public void ApplyConfig()
-		{
+		public void ApplyConfig() {
 			Video.ApplyConfig();
 			Audio.ApplyConfig();
 			Input.ApplyConfig();
@@ -96,9 +89,8 @@ namespace Mesen.Config
 			Debug.ApplyConfig();
 		}
 
-		public void InitializeFontDefaults()
-		{
-			if(ConfigUpgrade == (int)ConfigUpgradeHint.FirstRun) {
+		public void InitializeFontDefaults() {
+			if (ConfigUpgrade == (int)ConfigUpgradeHint.FirstRun) {
 				Preferences.InitializeFontDefaults();
 
 				Debug.Fonts.DisassemblyFont = GetDefaultMonospaceFont();
@@ -110,21 +102,20 @@ namespace Mesen.Config
 			}
 		}
 
-		public void UpgradeConfig()
-		{
-			if(ConfigUpgrade < (int)ConfigUpgradeHint.SmsInput) {
+		public void UpgradeConfig() {
+			if (ConfigUpgrade < (int)ConfigUpgradeHint.SmsInput) {
 				Sms.InitializeDefaults(DefaultKeyMappings);
-			} 
-			
-			if(ConfigUpgrade < (int)ConfigUpgradeHint.GbaInput) {
+			}
+
+			if (ConfigUpgrade < (int)ConfigUpgradeHint.GbaInput) {
 				Gba.InitializeDefaults(DefaultKeyMappings);
 			}
 
-			if(ConfigUpgrade < (int)ConfigUpgradeHint.CvInput) {
+			if (ConfigUpgrade < (int)ConfigUpgradeHint.CvInput) {
 				Cv.InitializeDefaults(DefaultKeyMappings);
 			}
 
-			if(ConfigUpgrade < (int)ConfigUpgradeHint.WsInput) {
+			if (ConfigUpgrade < (int)ConfigUpgradeHint.WsInput) {
 				Ws.InitializeDefaults(DefaultKeyMappings);
 			}
 
@@ -132,9 +123,8 @@ namespace Mesen.Config
 			Version = EmuApi.GetMesenVersion().ToString(3);
 		}
 
-		public void InitializeDefaults()
-		{
-			if(ConfigUpgrade == (int)ConfigUpgradeHint.FirstRun) {
+		public void InitializeDefaults() {
+			if (ConfigUpgrade == (int)ConfigUpgradeHint.FirstRun) {
 				Snes.InitializeDefaults(DefaultKeyMappings);
 				Nes.InitializeDefaults(DefaultKeyMappings);
 				Gameboy.InitializeDefaults(DefaultKeyMappings);
@@ -145,6 +135,7 @@ namespace Mesen.Config
 				Ws.InitializeDefaults(DefaultKeyMappings);
 				ConfigUpgrade = (int)ConfigUpgradeHint.NextValue - 1;
 			}
+
 			Preferences.InitializeDefaultShortcuts();
 		}
 
@@ -152,16 +143,15 @@ namespace Mesen.Config
 		private static List<string>? _sortedFonts = null;
 
 		[MemberNotNull(nameof(_installedFonts), nameof(_sortedFonts))]
-		private static void InitInstalledFonts()
-		{
+		private static void InitInstalledFonts() {
 			_installedFonts = new();
 			_sortedFonts = new();
 			try {
 				int count = FontManager.Current.SystemFonts.Count;
-				for(int i = 0; i < count; i++) {
+				for (int i = 0; i < count; i++) {
 					try {
 						string? fontName = FontManager.Current.SystemFonts[i]?.Name;
-						if(!string.IsNullOrWhiteSpace(fontName)) {
+						if (!string.IsNullOrWhiteSpace(fontName)) {
 							_installedFonts.Add(fontName);
 						}
 					} catch { }
@@ -173,22 +163,21 @@ namespace Mesen.Config
 			}
 		}
 
-		public static List<string> GetSortedFontList()
-		{
-			if(_sortedFonts == null) {
+		public static List<string> GetSortedFontList() {
+			if (_sortedFonts == null) {
 				InitInstalledFonts();
 			}
+
 			return new List<string>(_sortedFonts);
 		}
 
-		private static string FindMatchingFont(string defaultFont, params string[] fontNames)
-		{
-			if(_installedFonts == null) {
+		private static string FindMatchingFont(string defaultFont, params string[] fontNames) {
+			if (_installedFonts == null) {
 				InitInstalledFonts();
 			}
 
-			foreach(string name in fontNames) {
-				if(_installedFonts.Contains(name)) {
+			foreach (string name in fontNames) {
+				if (_installedFonts.Contains(name)) {
 					return name;
 				}
 			}
@@ -196,20 +185,19 @@ namespace Mesen.Config
 			return defaultFont;
 		}
 
-		public static string GetValidFontFamily(string requestedFont, bool preferMonoFont)
-		{
-			if(_installedFonts == null) {
+		public static string GetValidFontFamily(string requestedFont, bool preferMonoFont) {
+			if (_installedFonts == null) {
 				InitInstalledFonts();
 			}
 
-			if(_installedFonts.Contains(requestedFont)) {
+			if (_installedFonts.Contains(requestedFont)) {
 				return requestedFont;
 			}
 
-			foreach(string name in _installedFonts) {
-				if(preferMonoFont && name.Contains("Mono", StringComparison.InvariantCultureIgnoreCase)) {
+			foreach (string name in _installedFonts) {
+				if (preferMonoFont && name.Contains("Mono", StringComparison.InvariantCultureIgnoreCase)) {
 					return name;
-				} else if(!preferMonoFont && name.Contains("Sans", StringComparison.InvariantCultureIgnoreCase)) {
+				} else if (!preferMonoFont && name.Contains("Sans", StringComparison.InvariantCultureIgnoreCase)) {
 					return name;
 				}
 			}
@@ -217,41 +205,37 @@ namespace Mesen.Config
 			return _installedFonts.First();
 		}
 
-		public static FontConfig GetDefaultFont()
-		{
-			if(OperatingSystem.IsWindows()) {
+		public static FontConfig GetDefaultFont() {
+			if (OperatingSystem.IsWindows()) {
 				return new FontConfig() { FontFamily = "Microsoft Sans Serif", FontSize = 11 };
-			} else if(OperatingSystem.IsMacOS()) {
+			} else if (OperatingSystem.IsMacOS()) {
 				return new FontConfig() { FontFamily = FindMatchingFont("Microsoft Sans Serif"), FontSize = 11 };
 			} else {
 				return new FontConfig() { FontFamily = FindMatchingFont("FreeSans", "DejaVu Sans", "Noto Sans"), FontSize = 11 };
 			}
 		}
 
-		public static FontConfig GetDefaultMenuFont()
-		{
-			if(OperatingSystem.IsWindows()) {
+		public static FontConfig GetDefaultMenuFont() {
+			if (OperatingSystem.IsWindows()) {
 				return new FontConfig() { FontFamily = "Segoe UI", FontSize = 12 };
-			} else if(OperatingSystem.IsMacOS()) {
+			} else if (OperatingSystem.IsMacOS()) {
 				return new FontConfig() { FontFamily = FindMatchingFont("Microsoft Sans Serif"), FontSize = 12 };
 			} else {
 				return new FontConfig() { FontFamily = FindMatchingFont("FreeSans", "DejaVu Sans", "Noto Sans"), FontSize = 12 };
 			}
 		}
 
-		public static FontConfig GetDefaultMonospaceFont(bool useSmallFont = false)
-		{
-			if(OperatingSystem.IsWindows()) {
+		public static FontConfig GetDefaultMonospaceFont(bool useSmallFont = false) {
+			if (OperatingSystem.IsWindows()) {
 				return new FontConfig() { FontFamily = "Consolas", FontSize = useSmallFont ? 12 : 14 };
-			} else if(OperatingSystem.IsMacOS()) {
+			} else if (OperatingSystem.IsMacOS()) {
 				return new FontConfig() { FontFamily = FindMatchingFont("PT Mono"), FontSize = useSmallFont ? 11 : 12 };
 			} else {
 				return new FontConfig() { FontFamily = FindMatchingFont("FreeMono", "DejaVu Sans Mono", "Noto Sans Mono"), FontSize = 12 };
 			}
 		}
 
-		public static Configuration Deserialize(string configFile)
-		{
+		public static Configuration Deserialize(string configFile) {
 			Configuration config;
 
 			try {
@@ -270,20 +254,18 @@ namespace Mesen.Config
 			return config;
 		}
 
-		public static void BackupSettings(string configFile)
-		{
+		public static void BackupSettings(string configFile) {
 			//File exists but couldn't be loaded, make a backup of the old settings before we overwrite them
 			string? folder = Path.GetDirectoryName(configFile);
-			if(folder != null) {
+			if (folder != null) {
 				File.Copy(configFile, Path.Combine(folder, "settings." + DateTime.Now.ToString("yyyy-M-dd_HH-mm-ss") + ".bak"), true);
 			}
 		}
 
-		public void Serialize(string configFile)
-		{
+		public void Serialize(string configFile) {
 			try {
 				string cfgData = JsonSerializer.Serialize(this, typeof(Configuration), MesenSerializerContext.Default);
-				if(_fileData != cfgData && !Design.IsDesignMode) {
+				if (_fileData != cfgData && !Design.IsDesignMode) {
 					FileHelper.WriteAllText(configFile, cfgData);
 					_fileData = cfgData;
 				}
@@ -292,11 +274,10 @@ namespace Mesen.Config
 			}
 		}
 
-		public void RemoveObsoleteConfig()
-		{
+		public void RemoveObsoleteConfig() {
 			//Clean up configuration to remove any obsolete values that existed in older versions
-			for(int i = Preferences.ShortcutKeys.Count - 1; i >= 0; i--) {
-				if(Preferences.ShortcutKeys[i].Shortcut >= EmulatorShortcut.LastValidValue) {
+			for (int i = Preferences.ShortcutKeys.Count - 1; i >= 0; i--) {
+				if (Preferences.ShortcutKeys[i].Shortcut >= EmulatorShortcut.LastValidValue) {
 					Preferences.ShortcutKeys.RemoveAt(i);
 				}
 			}
@@ -304,8 +285,7 @@ namespace Mesen.Config
 	}
 
 	[Flags]
-	public enum DefaultKeyMappingType
-	{
+	public enum DefaultKeyMappingType {
 		None = 0,
 		Xbox = 1,
 		Ps4 = 2,
@@ -313,8 +293,7 @@ namespace Mesen.Config
 		ArrowKeys = 8
 	}
 
-	public enum ConfigUpgradeHint
-	{
+	public enum ConfigUpgradeHint {
 		Uninitialized = 0,
 		FirstRun,
 		SmsInput,

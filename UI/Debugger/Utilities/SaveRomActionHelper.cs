@@ -1,21 +1,18 @@
-﻿using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Mesen.Config;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
 
-namespace Mesen.Debugger.Utilities
-{
-	internal class SaveRomActionHelper
-	{
-		public static ContextMenuAction GetSaveRomAction(Window wnd)
-		{
+namespace Mesen.Debugger.Utilities {
+	internal class SaveRomActionHelper {
+		public static ContextMenuAction GetSaveRomAction(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.SaveRom,
 				IsEnabled = () => IsSaveRomSupported() && !((ResourcePath)MainWindowViewModel.Instance.RomInfo.RomPath).Compressed,
@@ -24,8 +21,7 @@ namespace Mesen.Debugger.Utilities
 			};
 		}
 
-		public static ContextMenuAction GetSaveRomAsAction(Window wnd)
-		{
+		public static ContextMenuAction GetSaveRomAsAction(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.SaveRomAs,
 				IsEnabled = () => IsSaveRomSupported(),
@@ -34,8 +30,7 @@ namespace Mesen.Debugger.Utilities
 			};
 		}
 
-		public static ContextMenuAction GetSaveEditsAsIpsAction(Window wnd)
-		{
+		public static ContextMenuAction GetSaveEditsAsIpsAction(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.SaveEditsAsIps,
 				IsEnabled = () => IsSaveRomSupported(),
@@ -44,8 +39,7 @@ namespace Mesen.Debugger.Utilities
 			};
 		}
 
-		private static bool IsSaveRomSupported()
-		{
+		private static bool IsSaveRomSupported() {
 			return MainWindowViewModel.Instance.RomInfo.Format switch {
 				RomFormat.Sfc => true,
 				RomFormat.Gb => true,
@@ -63,23 +57,21 @@ namespace Mesen.Debugger.Utilities
 			};
 		}
 
-		private static async void SaveRom(Window wnd)
-		{
+		private static async void SaveRom(Window wnd) {
 			string romName = MainWindowViewModel.Instance.RomInfo.RomPath;
-			if(!DebugApi.SaveRomToDisk(romName, false, CdlStripOption.StripNone)) {
+			if (!DebugApi.SaveRomToDisk(romName, false, CdlStripOption.StripNone)) {
 				await MesenMsgBox.Show(wnd, "FileSaveError", Mesen.Windows.MessageBoxButtons.OK, Mesen.Windows.MessageBoxIcon.Error);
 			}
 		}
 
-		public static async void SaveRomAs(Window wnd, bool saveAsIps, CdlStripOption cdlOption = CdlStripOption.StripNone)
-		{
+		public static async void SaveRomAs(Window wnd, bool saveAsIps, CdlStripOption cdlOption = CdlStripOption.StripNone) {
 			string romName = Path.GetFileName(MainWindowViewModel.Instance.RomInfo.RomPath);
 			string ext = saveAsIps ? FileDialogHelper.IpsExt : Path.GetExtension(romName).Substring(1);
 			romName = Path.ChangeExtension(romName, ext);
 
 			string? filename = await FileDialogHelper.SaveFile(null, romName, wnd, ext);
-			if(filename != null) {
-				if(!DebugApi.SaveRomToDisk(filename, saveAsIps, cdlOption)) {
+			if (filename != null) {
+				if (!DebugApi.SaveRomToDisk(filename, saveAsIps, cdlOption)) {
 					await MesenMsgBox.Show(wnd, "FileSaveError", Mesen.Windows.MessageBoxButtons.OK, Mesen.Windows.MessageBoxIcon.Error);
 				}
 			}

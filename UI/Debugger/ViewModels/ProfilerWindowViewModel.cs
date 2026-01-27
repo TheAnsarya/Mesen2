@@ -1,8 +1,13 @@
-﻿using Avalonia.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
-using Avalonia.VisualTree;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using DataBoxControl;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
@@ -13,36 +18,28 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class ProfilerWindowViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class ProfilerWindowViewModel : DisposableViewModel {
 		[Reactive] public List<ProfilerTab> ProfilerTabs { get; set; } = new List<ProfilerTab>();
 		[Reactive] public ProfilerTab? SelectedTab { get; set; } = null;
-		
+
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
 
 		public ProfilerConfig Config { get; }
 
-		public ProfilerWindowViewModel(Window? wnd)
-		{
+		public ProfilerWindowViewModel(Window? wnd) {
 			Config = ConfigManager.Config.Debug.Profiler;
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
 			UpdateAvailableTabs();
 
 			AddDisposable(this.WhenAnyValue(x => x.SelectedTab).Subscribe(x => {
-				if(SelectedTab != null && EmuApi.IsPaused()) {
+				if (SelectedTab != null && EmuApi.IsPaused()) {
 					RefreshData();
 				}
 			}));
@@ -83,7 +80,7 @@ namespace Mesen.Debugger.ViewModels
 				}
 			});
 
-			if(Design.IsDesignMode || wnd == null) {
+			if (Design.IsDesignMode || wnd == null) {
 				return;
 			}
 
@@ -93,24 +90,19 @@ namespace Mesen.Debugger.ViewModels
 			LabelManager.OnLabelUpdated += LabelManager_OnLabelUpdated;
 		}
 
-		protected override void DisposeView()
-		{
+		protected override void DisposeView() {
 			LabelManager.OnLabelUpdated -= LabelManager_OnLabelUpdated;
 		}
 
-		private void LabelManager_OnLabelUpdated(object? sender, EventArgs e)
-		{
-			ProfilerTab tab = (SelectedTab ?? ProfilerTabs[0]);
-			Dispatcher.UIThread.Post(() => {
-				tab?.RefreshGrid();
-			});
+		private void LabelManager_OnLabelUpdated(object? sender, EventArgs e) {
+			ProfilerTab tab = SelectedTab ?? ProfilerTabs[0];
+			Dispatcher.UIThread.Post(() => tab?.RefreshGrid());
 		}
 
-		public void UpdateAvailableTabs()
-		{
+		public void UpdateAvailableTabs() {
 			List<ProfilerTab> tabs = new();
-			foreach(CpuType type in EmuApi.GetRomInfo().CpuTypes) {
-				if(type.SupportsCallStack()) {
+			foreach (CpuType type in EmuApi.GetRomInfo().CpuTypes) {
+				if (type.SupportsCallStack()) {
 					tabs.Add(new ProfilerTab() {
 						TabName = ResourceHelper.GetEnumText(type),
 						CpuType = type
@@ -122,18 +114,14 @@ namespace Mesen.Debugger.ViewModels
 			SelectedTab = tabs[0];
 		}
 
-		public void RefreshData()
-		{
-			ProfilerTab tab = (SelectedTab ?? ProfilerTabs[0]);
+		public void RefreshData() {
+			ProfilerTab tab = SelectedTab ?? ProfilerTabs[0];
 			tab.RefreshData();
-			Dispatcher.UIThread.Post(() => {
-				tab.RefreshGrid();
-			});
+			Dispatcher.UIThread.Post(() => tab.RefreshGrid());
 		}
 	}
 
-	public class ProfilerTab : ReactiveObject
-	{
+	public class ProfilerTab : ReactiveObject {
 		[Reactive] public string TabName { get; set; } = "";
 		[Reactive] public CpuType CpuType { get; set; } = CpuType.Snes;
 		[Reactive] public MesenList<ProfiledFunctionViewModel> GridData { get; private set; } = new();
@@ -142,45 +130,41 @@ namespace Mesen.Debugger.ViewModels
 		public ProfilerConfig Config => ConfigManager.Config.Debug.Profiler;
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Profiler.ColumnWidths;
 
-		private object _updateLock = new();		
+		private object _updateLock = new();
 		private int _dataSize = 0;
 		private ProfiledFunction[] _coreProfilerData = new ProfiledFunction[100000];
 		private ProfiledFunction[] _profilerData = Array.Empty<ProfiledFunction>();
 
 		private UInt64 _totalCycles;
 
-		public ProfilerTab()
-		{
+		public ProfilerTab() {
 			SortState.SetColumnSort("InclusiveTime", ListSortDirection.Descending, false);
 		}
 
-		public ProfiledFunction? GetRawData(int index)
-		{
+		public ProfiledFunction? GetRawData(int index) {
 			ProfiledFunction[] data = _profilerData;
-			if(index < data.Length) {
+			if (index < data.Length) {
 				return data[index];
 			}
+
 			return null;
 		}
 
-		public void ResetData()
-		{
+		public void ResetData() {
 			DebugApi.ResetProfiler(CpuType);
 			GridData.Clear();
 			RefreshData();
 			RefreshGrid();
 		}
 
-		public void RefreshData()
-		{
-			lock(_updateLock) {
+		public void RefreshData() {
+			lock (_updateLock) {
 				_dataSize = DebugApi.GetProfilerData(CpuType, ref _coreProfilerData);
 			}
 		}
 
-		public void RefreshGrid()
-		{
-			lock(_updateLock) {
+		public void RefreshGrid() {
+			lock (_updateLock) {
 				Array.Resize(ref _profilerData, _dataSize);
 				Array.Copy(_coreProfilerData, _profilerData, _dataSize);
 			}
@@ -189,27 +173,26 @@ namespace Mesen.Debugger.ViewModels
 
 			UInt64 totalCycles = 0;
 			ProfiledFunction[] profilerData = _profilerData;
-			foreach(ProfiledFunction f in profilerData) {
+			foreach (ProfiledFunction f in profilerData) {
 				totalCycles += f.ExclusiveCycles;
 			}
+
 			_totalCycles = totalCycles;
 
-			while(GridData.Count < profilerData.Length) {
+			while (GridData.Count < profilerData.Length) {
 				GridData.Add(new ProfiledFunctionViewModel());
 			}
 
-			for(int i = 0; i < profilerData.Length; i++) {
+			for (int i = 0; i < profilerData.Length; i++) {
 				GridData[i].Update(profilerData[i], CpuType, _totalCycles);
 			}
 		}
 
-		public void SortCommand(object? param)
-		{
+		public void SortCommand(object? param) {
 			RefreshGrid();
 		}
 
-		public void Sort()
-		{
+		public void Sort() {
 			CpuType cpuType = CpuType;
 
 			Dictionary<string, Func<ProfiledFunction, ProfiledFunction, int>> comparers = new() {
@@ -228,27 +211,25 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public static class ProfiledFunctionExtensions
-	{
-		public static string GetFunctionName(this ProfiledFunction func, CpuType cpuType)
-		{
+	public static class ProfiledFunctionExtensions {
+		public static string GetFunctionName(this ProfiledFunction func, CpuType cpuType) {
 			string functionName;
 
-			if(func.Address.Address == -1) {
+			if (func.Address.Address == -1) {
 				functionName = "[Reset]";
 			} else {
 				CodeLabel? label = LabelManager.GetLabel((UInt32)func.Address.Address, func.Address.Type);
 
 				int hexCount = cpuType.GetAddressSize();
 				functionName = func.Address.Type.GetShortName() + ": $" + func.Address.Address.ToString("X" + hexCount.ToString());
-				if(label != null) {
+				if (label != null) {
 					functionName = label.Label + " (" + functionName + ")";
 				}
 			}
 
-			if(func.Flags.HasFlag(StackFrameFlags.Irq)) {
+			if (func.Flags.HasFlag(StackFrameFlags.Irq)) {
 				functionName = "[irq] " + functionName;
-			} else if(func.Flags.HasFlag(StackFrameFlags.Nmi)) {
+			} else if (func.Flags.HasFlag(StackFrameFlags.Nmi)) {
 				functionName = "[nmi] " + functionName;
 			}
 
@@ -256,19 +237,17 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class ProfiledFunctionViewModel : INotifyPropertyChanged
-	{
+	public class ProfiledFunctionViewModel : INotifyPropertyChanged {
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		private string _functionName = "";
-		public string FunctionName
-		{
-			get
-			{
+		public string FunctionName {
+			get {
 				UpdateFields();
-				return _functionName;
+				return field;
 			}
-		}
+
+			private set;
+		} = "";
 
 		public string ExclusiveCycles { get; set; } = "";
 		public string InclusiveCycles { get; set; } = "";
@@ -284,8 +263,7 @@ namespace Mesen.Debugger.ViewModels
 		private CpuType _cpuType;
 		private UInt64 _totalCycles;
 
-		public void Update(ProfiledFunction func, CpuType cpuType, UInt64 totalCycles)
-		{
+		public void Update(ProfiledFunction func, CpuType cpuType, UInt64 totalCycles) {
 			_funcData = func;
 			_cpuType = cpuType;
 			_totalCycles = totalCycles;
@@ -301,9 +279,8 @@ namespace Mesen.Debugger.ViewModels
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProfiledFunctionViewModel.AvgCycles)));
 		}
 
-		private void UpdateFields()
-		{
-			_functionName = _funcData.GetFunctionName(_cpuType);
+		private void UpdateFields() {
+			FunctionName = _funcData.GetFunctionName(_cpuType);
 			ExclusiveCycles = _funcData.ExclusiveCycles.ToString();
 			InclusiveCycles = _funcData.InclusiveCycles.ToString();
 			CallCount = _funcData.CallCount.ToString();

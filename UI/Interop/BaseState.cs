@@ -1,9 +1,7 @@
-﻿namespace Mesen.Interop;
+namespace Mesen.Interop;
 
-public interface BaseState
-{
+public interface BaseState {
 }
 
-public struct EmptyPpuToolsState : BaseState
-{
+public struct EmptyPpuToolsState : BaseState {
 }

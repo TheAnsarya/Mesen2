@@ -1,22 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Mesen.ViewModels;
-using System;
 using Avalonia.Interactivity;
-using ReactiveUI;
-using System.Collections.Generic;
-using Mesen.Interop;
-using Mesen.Config;
+using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using System.Linq;
+using Mesen.Config;
+using Mesen.Interop;
+using Mesen.ViewModels;
+using ReactiveUI;
 
-namespace Mesen.Controls
-{
-	public class StateGrid : UserControl
-	{
+namespace Mesen.Controls {
+	public class StateGrid : UserControl {
 		public static readonly StyledProperty<List<RecentGameInfo>> EntriesProperty = AvaloniaProperty.Register<StateGrid, List<RecentGameInfo>>(nameof(Entries));
-		
+
 		public static readonly StyledProperty<string> TitleProperty = AvaloniaProperty.Register<StateGrid, string>(nameof(Title));
 		public static readonly StyledProperty<int> SelectedPageProperty = AvaloniaProperty.Register<StateGrid, int>(nameof(SelectedPage));
 		public static readonly StyledProperty<bool> ShowArrowsProperty = AvaloniaProperty.Register<StateGrid, bool>(nameof(ShowArrows));
@@ -24,44 +22,37 @@ namespace Mesen.Controls
 		public static readonly StyledProperty<GameScreenMode> ModeProperty = AvaloniaProperty.Register<StateGrid, GameScreenMode>(nameof(Mode));
 		public static readonly StyledProperty<int> SelectedIndexProperty = AvaloniaProperty.Register<StateGrid, int>(nameof(SelectedIndex));
 
-		public string Title
-		{
+		public string Title {
 			get { return GetValue(TitleProperty); }
 			set { SetValue(TitleProperty, value); }
 		}
 
-		public int SelectedPage
-		{
+		public int SelectedPage {
 			get { return GetValue(SelectedPageProperty); }
 			set { SetValue(SelectedPageProperty, value); }
 		}
 
-		public int SelectedIndex
-		{
+		public int SelectedIndex {
 			get { return GetValue(SelectedIndexProperty); }
 			set { SetValue(SelectedIndexProperty, value); }
 		}
 
-		public bool ShowArrows
-		{
+		public bool ShowArrows {
 			get { return GetValue(ShowArrowsProperty); }
 			set { SetValue(ShowArrowsProperty, value); }
 		}
 
-		public bool ShowClose
-		{
+		public bool ShowClose {
 			get { return GetValue(ShowCloseProperty); }
 			set { SetValue(ShowCloseProperty, value); }
 		}
 
-		public GameScreenMode Mode
-		{
+		public GameScreenMode Mode {
 			get { return GetValue(ModeProperty); }
 			set { SetValue(ModeProperty, value); }
 		}
 
-		public List<RecentGameInfo> Entries
-		{
+		public List<RecentGameInfo> Entries {
 			get { return GetValue(EntriesProperty); }
 			set { SetValue(EntriesProperty, value); }
 		}
@@ -73,8 +64,7 @@ namespace Mesen.Controls
 		private int ElementsPerPage => _rowCount * _colCount;
 		private int PageCount => (int)Math.Ceiling((double)Entries.Count / ElementsPerPage);
 
-		static StateGrid()
-		{
+		static StateGrid() {
 			BoundsProperty.Changed.AddClassHandler<StateGrid>((x, e) => x.InitGrid());
 			EntriesProperty.Changed.AddClassHandler<StateGrid>((x, e) => {
 				x.SelectedPage = 0;
@@ -85,86 +75,80 @@ namespace Mesen.Controls
 			SelectedIndexProperty.Changed.AddClassHandler<StateGrid>((x, e) => x.UpdateSelectedEntry());
 
 			IsVisibleProperty.Changed.AddClassHandler<StateGrid>((x, e) => {
-				if(x.IsVisible) {
+				if (x.IsVisible) {
 					x.Focus();
 				}
 			});
 		}
 
-		private void UpdateSelectedEntry()
-		{
-			if(SelectedIndex < SelectedPage * ElementsPerPage || SelectedIndex >= (SelectedPage + 1) * ElementsPerPage) {
+		private void UpdateSelectedEntry() {
+			if (SelectedIndex < SelectedPage * ElementsPerPage || SelectedIndex >= (SelectedPage + 1) * ElementsPerPage) {
 				//Change page
 				SelectedPage = SelectedIndex / ElementsPerPage;
 				return;
 			} else {
 				Grid grid = this.GetControl<Grid>("Grid");
-				int startIndex = ElementsPerPage * SelectedPage; 
-				for(int i = 0; i < grid.Children.Count; i++) {
-					if(grid.Children[i] is StateGridEntry entry) {
+				int startIndex = ElementsPerPage * SelectedPage;
+				for (int i = 0; i < grid.Children.Count; i++) {
+					if (grid.Children[i] is StateGridEntry entry) {
 						entry.IsActiveEntry = startIndex + i == SelectedIndex;
 					}
 				}
 			}
 		}
 
-		public StateGrid()
-		{
+		public StateGrid() {
 			InitializeComponent();
 			Focusable = true;
 			_timerInput.Interval = TimeSpan.FromMilliseconds(50);
 			_timerInput.Tick += timerInput_Tick;
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-		{
+		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) {
 			base.OnAttachedToVisualTree(e);
 			_timerInput.Start();
 			Focus();
 		}
 
-		protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-		{
+		protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e) {
 			base.OnDetachedFromVisualTree(e);
 			_timerInput.Stop();
 		}
 
-		private void OnCloseClick(object sender, RoutedEventArgs e)
-		{
-			if(DataContext is RecentGamesViewModel model) {
-				if(model.NeedResume) {
+		private void OnCloseClick(object sender, RoutedEventArgs e) {
+			if (DataContext is RecentGamesViewModel model) {
+				if (model.NeedResume) {
 					EmuApi.Resume();
 				}
+
 				model.Visible = false;
 			}
 		}
 
-		private void OnPrevPageClick(object sender, RoutedEventArgs e)
-		{
+		private void OnPrevPageClick(object sender, RoutedEventArgs e) {
 			int page = SelectedPage - 1;
-			if(page < 0) {
+			if (page < 0) {
 				page = PageCount - 1;
 			}
+
 			SelectedPage = page;
 		}
 
-		private void OnNextPageClick(object sender, RoutedEventArgs e)
-		{
+		private void OnNextPageClick(object sender, RoutedEventArgs e) {
 			int page = SelectedPage + 1;
-			if(page >= PageCount) {
+			if (page >= PageCount) {
 				page = 0;
 			}
+
 			SelectedPage = page;
 		}
 
-		private void InitGrid(bool forceUpdate = false)
-		{
-			if(Entries == null) {
+		private void InitGrid(bool forceUpdate = false) {
+			if (Entries == null) {
 				return;
 			}
 
@@ -174,26 +158,26 @@ namespace Mesen.Controls
 			int colCount = Math.Min(4, Math.Max(1, (int)(size.Width / 205)));
 			int rowCount = Math.Min(3, Math.Max(1, (int)(size.Height / 200)));
 
-			if(Entries.Count <= 1) {
+			if (Entries.Count <= 1) {
 				colCount = 1;
 				rowCount = 1;
-			} else if(Entries.Count <= 4) {
+			} else if (Entries.Count <= 4) {
 				colCount = Math.Min(2, colCount);
 				rowCount = colCount;
 			}
 
-			if(Mode != GameScreenMode.RecentGames) {
+			if (Mode != GameScreenMode.RecentGames) {
 				colCount = 4;
 				rowCount = 3;
 			}
 
 			bool layoutChanged = _colCount != colCount || _rowCount != rowCount;
-			if(!forceUpdate && !layoutChanged) {
+			if (!forceUpdate && !layoutChanged) {
 				//Grid is already the same size
 				return;
 			}
 
-			if(layoutChanged) {
+			if (layoutChanged) {
 				SelectedPage = 0;
 			}
 
@@ -203,15 +187,17 @@ namespace Mesen.Controls
 			grid.Children.Clear();
 
 			ColumnDefinitions columnDefinitions = new ColumnDefinitions();
-			for(int i = 0; i < colCount; i++) {
+			for (int i = 0; i < colCount; i++) {
 				columnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
 			}
+
 			grid.ColumnDefinitions = columnDefinitions;
 
 			RowDefinitions rowDefinitions = new RowDefinitions();
-			for(int i = 0; i < rowCount; i++) {
+			for (int i = 0; i < rowCount; i++) {
 				rowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
 			}
+
 			grid.RowDefinitions = rowDefinitions;
 
 			int elementsPerPage = ElementsPerPage;
@@ -221,11 +207,11 @@ namespace Mesen.Controls
 			ShowClose = Mode != GameScreenMode.RecentGames;
 
 			List<StateGridEntry> entries = new();
-			for(int row = 0; row < rowCount; row++) {
-				for(int col = 0; col < colCount; col++) {
-					int index = startIndex + row * colCount + col;
+			for (int row = 0; row < rowCount; row++) {
+				for (int col = 0; col < colCount; col++) {
+					int index = startIndex + (row * colCount) + col;
 
-					if(index >= Entries.Count) {
+					if (index >= Entries.Count) {
 						break;
 					}
 
@@ -240,15 +226,15 @@ namespace Mesen.Controls
 					entries.Add(ctrl);
 				}
 			}
+
 			grid.Children.AddRange(entries);
 		}
 
 		private bool _loadRequested = false;
 		private HashSet<ushort> _pressedKeyCodes = new();
 
-		private void timerInput_Tick(object? sender, EventArgs e)
-		{
-			if(!IsEffectivelyVisible || !IsKeyboardFocusWithin || Entries == null || Entries.Count == 0) {
+		private void timerInput_Tick(object? sender, EventArgs e) {
+			if (!IsEffectivelyVisible || !IsKeyboardFocusWithin || Entries == null || Entries.Count == 0) {
 				_loadRequested = false;
 				return;
 			}
@@ -261,35 +247,38 @@ namespace Mesen.Controls
 
 			List<ushort> keyCodes = InputApi.GetPressedKeys();
 
-			foreach(ushort keyCode in keyCodes) {
+			foreach (ushort keyCode in keyCodes) {
 				//Use player 1's controls to navigate the recent game selection screen
-				if(keyCode > 0 && _pressedKeyCodes.Add(keyCode)) {
-					foreach(KeyMapping mapping in mappings) {
-						if(mapping.Left == keyCode) {
-							if(SelectedIndex == 0) {
+				if (keyCode > 0 && _pressedKeyCodes.Add(keyCode)) {
+					foreach (KeyMapping mapping in mappings) {
+						if (mapping.Left == keyCode) {
+							if (SelectedIndex == 0) {
 								SelectedIndex = Entries.Count - 1;
 							} else {
 								SelectedIndex--;
 							}
+
 							break;
-						} else if(mapping.Right == keyCode) {
+						} else if (mapping.Right == keyCode) {
 							SelectedIndex = (SelectedIndex + 1) % Entries.Count;
 							break;
-						} else if(mapping.Down == keyCode) {
-							if(SelectedIndex + _colCount < Entries.Count) {
+						} else if (mapping.Down == keyCode) {
+							if (SelectedIndex + _colCount < Entries.Count) {
 								SelectedIndex += _colCount;
 							} else {
 								SelectedIndex = Math.Min(SelectedIndex % _colCount, Entries.Count - 1);
 							}
+
 							break;
-						} else if(mapping.Up == keyCode) {
-							if(SelectedIndex < _colCount) {
+						} else if (mapping.Up == keyCode) {
+							if (SelectedIndex < _colCount) {
 								SelectedIndex = Entries.Count - (_colCount - (SelectedIndex % _colCount));
 							} else {
 								SelectedIndex -= _colCount;
 							}
+
 							break;
-						} else if(mapping.A == keyCode || mapping.B == keyCode || mapping.X == keyCode || mapping.Y == keyCode || mapping.Select == keyCode || mapping.Start == keyCode) {
+						} else if (mapping.A == keyCode || mapping.B == keyCode || mapping.X == keyCode || mapping.Y == keyCode || mapping.Select == keyCode || mapping.Start == keyCode) {
 							_loadRequested = true;
 							break;
 						}
@@ -300,12 +289,13 @@ namespace Mesen.Controls
 			_pressedKeyCodes.Clear();
 			_pressedKeyCodes.UnionWith(keyCodes);
 
-			if(_loadRequested && keyCodes.Count == 0 && Entries.Count > 0) {
+			if (_loadRequested && keyCodes.Count == 0 && Entries.Count > 0) {
 				//Load game/state once all buttons are released to avoid game processing pressed button
 				RecentGameInfo entry = Entries[SelectedIndex % Entries.Count];
-				if(entry.IsEnabled() == true) {
+				if (entry.IsEnabled() == true) {
 					entry.Load();
 				}
+
 				_loadRequested = false;
 			}
 		}

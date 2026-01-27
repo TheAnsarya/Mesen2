@@ -1,17 +1,15 @@
-﻿using Mesen.Interop;
+using Mesen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class TileViewerConfig : BaseWindowConfig<TileViewerConfig>
-	{
+namespace Mesen.Config {
+	public class TileViewerConfig : BaseWindowConfig<TileViewerConfig> {
 		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 
 		[Reactive] public double ImageScale { get; set; } = 3;
 		[Reactive] public bool ShowTileGrid { get; set; } = false;
 
 		[Reactive] public string SelectedPreset { get; set; } = "PPU";
-		
+
 		[Reactive] public MemoryType Source { get; set; }
 		[Reactive] public TileFormat Format { get; set; } = TileFormat.Bpp4;
 		[Reactive] public TileLayout Layout { get; set; } = TileLayout.Normal;
@@ -24,8 +22,7 @@ namespace Mesen.Config
 
 		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
 
-		public TileViewerConfig()
-		{
+		public TileViewerConfig() {
 		}
 	}
 }

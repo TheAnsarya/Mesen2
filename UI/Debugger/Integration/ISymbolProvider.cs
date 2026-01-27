@@ -1,12 +1,10 @@
-﻿using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Mesen.Interop;
 
-namespace Mesen.Debugger.Integration
-{
-	public interface ISymbolProvider
-	{
+namespace Mesen.Debugger.Integration {
+	public interface ISymbolProvider {
 		DateTime SymbolFileStamp { get; }
 		string SymbolPath { get; }
 
@@ -25,31 +23,27 @@ namespace Mesen.Debugger.Integration
 		//int GetSymbolSize(SourceSymbol symbol);
 	}
 
-	public interface IFileDataProvider
-	{
+	public interface IFileDataProvider {
 		string[] Data { get; }
 	}
 
-	public class SourceFileInfo
-	{
+	public class SourceFileInfo {
 		public string Name { get; }
 		public IFileDataProvider InternalFile { get; }
 		public bool IsAssembly { get; }
 		public string[] Data => InternalFile.Data;
 		public string FileData => string.Join(Environment.NewLine, InternalFile.Data);
 
-		public SourceFileInfo(string name, bool isAssembly, IFileDataProvider internalFile)
-		{
+		public SourceFileInfo(string name, bool isAssembly, IFileDataProvider internalFile) {
 			Name = name;
 			IsAssembly = isAssembly;
 			InternalFile = internalFile;
 		}
 
-		public override string ToString()
-		{
+		public override string ToString() {
 			string? folderName = Path.GetDirectoryName(Name);
 			string fileName = Path.GetFileName(Name);
-			if(string.IsNullOrWhiteSpace(folderName)) {
+			if (string.IsNullOrWhiteSpace(folderName)) {
 				return fileName;
 			} else {
 				return $"{folderName}/{fileName}";
@@ -57,35 +51,30 @@ namespace Mesen.Debugger.Integration
 		}
 	}
 
-	public readonly struct SourceSymbol
-	{
+	public readonly struct SourceSymbol {
 		public string Name { get; }
 		public int? Address { get; }
 		public object InternalSymbol { get; }
 
-		public SourceSymbol(string name, int? address, object internalSymbol)
-		{
+		public SourceSymbol(string name, int? address, object internalSymbol) {
 			Name = name;
 			Address = address;
 			InternalSymbol = internalSymbol;
 		}
 	}
 
-	public readonly struct SourceCodeLocation : IEquatable<SourceCodeLocation>
-	{
+	public readonly struct SourceCodeLocation : IEquatable<SourceCodeLocation> {
 		public SourceFileInfo File { get; }
 		public int LineNumber { get; }
 		public object? InternalLine { get; }
 
-		public SourceCodeLocation(SourceFileInfo file, int lineNumber, object? internalLine = null)
-		{
+		public SourceCodeLocation(SourceFileInfo file, int lineNumber, object? internalLine = null) {
 			File = file;
 			LineNumber = lineNumber;
 			InternalLine = internalLine;
 		}
 
-		public bool Equals(SourceCodeLocation other)
-		{
+		public bool Equals(SourceCodeLocation other) {
 			return File == other.File && LineNumber == other.LineNumber;
 		}
 	}

@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -6,26 +7,21 @@ using Mesen.Controls;
 using Mesen.Interop;
 using Mesen.Utilities;
 using ReactiveUI.Fody.Helpers;
-using System;
 
-namespace Mesen.Debugger.Windows
-{
-	public class BreakInWindow : MesenWindow
-	{
+namespace Mesen.Debugger.Windows {
+	public class BreakInWindow : MesenWindow {
 		public static int _lastValue { get; set; } = 0;
 		public static StepType _lastStepType { get; set; } = StepType.Step;
-		
+
 		public static readonly StyledProperty<int> ValueProperty = AvaloniaProperty.Register<BreakInWindow, int>(nameof(Value), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 		public static readonly StyledProperty<StepType> StepTypeProperty = AvaloniaProperty.Register<BreakInWindow, StepType>(nameof(StepType));
 
-		public int Value
-		{
+		public int Value {
 			get { return GetValue(ValueProperty); }
 			set { SetValue(ValueProperty, value); }
 		}
 
-		public StepType StepType
-		{
+		public StepType StepType {
 			get { return GetValue(StepTypeProperty); }
 			set { SetValue(StepTypeProperty, value); }
 		}
@@ -37,15 +33,14 @@ namespace Mesen.Debugger.Windows
 		[Obsolete("For designer only")]
 		public BreakInWindow() : this(CpuType.Snes) { }
 
-		public BreakInWindow(CpuType cpuType)
-		{
+		public BreakInWindow(CpuType cpuType) {
 			_cpuType = cpuType;
 			StepType = _lastStepType;
 			Value = _lastValue;
 
-			if(!Design.IsDesignMode) {
+			if (!Design.IsDesignMode) {
 				ShowCpuCycles = DebugApi.GetDebuggerFeatures(cpuType).CpuCycleStep;
-				if(!ShowCpuCycles && StepType == StepType.CpuCycleStep) {
+				if (!ShowCpuCycles && StepType == StepType.CpuCycleStep) {
 					StepType = StepType.Step;
 				}
 			}
@@ -56,19 +51,16 @@ namespace Mesen.Debugger.Windows
 #endif
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnOpened(EventArgs e)
-		{
+		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
 			this.GetControl<MesenNumericTextBox>("txtValue").FocusAndSelectAll();
 		}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Ok_OnClick(object sender, RoutedEventArgs e) {
 			_lastValue = Value;
 			_lastStepType = StepType;
 
@@ -77,8 +69,7 @@ namespace Mesen.Debugger.Windows
 			Close();
 		}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
 			Close();
 		}
 	}

@@ -1,13 +1,11 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
+using Mesen.Interop;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class GbStatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class GbStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public byte RegA { get; set; }
 		[Reactive] public byte RegB { get; set; }
 		[Reactive] public byte RegC { get; set; }
@@ -17,7 +15,7 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public byte RegH { get; set; }
 		[Reactive] public byte RegL { get; set; }
-		
+
 		[Reactive] public UInt16 RegSP { get; set; }
 		[Reactive] public UInt16 RegPC { get; set; }
 
@@ -35,8 +33,7 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public string StackPreview { get; private set; } = "";
 
-		public GbStatusViewModel()
-		{
+		public GbStatusViewModel() {
 			this.WhenAnyValue(x => x.FlagCarry, x => x.FlagHalf, x => x.FlagAddSub, x => x.FlagZero).Subscribe(x => UpdateFlagsValue());
 
 			this.WhenAnyValue(x => x.RegFlags).Subscribe(x => {
@@ -48,8 +45,7 @@ namespace Mesen.Debugger.StatusViews
 			});
 		}
 
-		private void UpdateFlagsValue()
-		{
+		private void UpdateFlagsValue() {
 			RegFlags = (byte)(
 				(FlagCarry ? (byte)GameboyFlags.Carry : 0) |
 				(FlagHalf ? (byte)GameboyFlags.HalfCarry : 0) |
@@ -58,8 +54,7 @@ namespace Mesen.Debugger.StatusViews
 			);
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			GbState state = DebugApi.GetConsoleState<GbState>(ConsoleType.Gameboy);
 
 			GbCpuState cpu = state.Cpu;
@@ -88,14 +83,14 @@ namespace Mesen.Debugger.StatusViews
 			Cycle = ppu.Cycle;
 
 			StringBuilder sb = new StringBuilder();
-			for(UInt32 i = (UInt32)cpu.SP; (i & 0xFF) != 0; i++) {
+			for (UInt32 i = (UInt32)cpu.SP; (i & 0xFF) != 0; i++) {
 				sb.Append($"${DebugApi.GetMemoryValue(MemoryType.GameboyMemory, i):X2} ");
 			}
+
 			StackPreview = sb.ToString();
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			GbCpuState cpu = DebugApi.GetCpuState<GbCpuState>(CpuType.Gameboy);
 
 			cpu.A = RegA;
@@ -112,11 +107,12 @@ namespace Mesen.Debugger.StatusViews
 			cpu.SP = RegSP;
 
 			cpu.EiPending = FlagEiPending;
-			if(cpu.HaltCounter == 0 && FlagHalted) {
+			if (cpu.HaltCounter == 0 && FlagHalted) {
 				cpu.HaltCounter = 1;
-			} else if(!FlagHalted) {
+			} else if (!FlagHalted) {
 				cpu.HaltCounter = 0;
 			}
+
 			cpu.IME = FlagIme;
 
 			DebugApi.SetCpuState(cpu, CpuType.Gameboy);

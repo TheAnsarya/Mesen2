@@ -1,26 +1,24 @@
-﻿using Mesen.Localization;
-using Mesen.Config.Shortcuts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using ReactiveUI.Fody.Helpers;
-using Avalonia.Styling;
 using Avalonia;
 using Avalonia.Markup.Xaml.Styling;
-using Mesen.Interop;
-using System.Reflection;
-using Mesen.Utilities;
-using Avalonia.Threading;
 using Avalonia.Media;
+using Avalonia.Styling;
+using Avalonia.Threading;
+using Mesen.Config.Shortcuts;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
 using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config
-{
-	public class PreferencesConfig : BaseConfig<PreferencesConfig>
-	{
+namespace Mesen.Config {
+	public class PreferencesConfig : BaseConfig<PreferencesConfig> {
 		[Reactive] public MesenTheme Theme { get; set; } = MesenTheme.Light;
 		[Reactive] public bool AutomaticallyCheckForUpdates { get; set; } = true;
 		[Reactive] public bool SingleInstance { get; set; } = true;
@@ -91,19 +89,16 @@ namespace Mesen.Config
 		[Reactive] public string ScreenshotFolder { get; set; } = "";
 		[Reactive] public string WaveFolder { get; set; } = "";
 
-		public PreferencesConfig()
-		{
+		public PreferencesConfig() {
 		}
 
-		private void AddShortcut(ShortcutKeyInfo shortcut)
-		{
-			if(!ShortcutKeys.Exists(a => a.Shortcut == shortcut.Shortcut)) {
+		private void AddShortcut(ShortcutKeyInfo shortcut) {
+			if (!ShortcutKeys.Exists(a => a.Shortcut == shortcut.Shortcut)) {
 				ShortcutKeys.Add(shortcut);
 			}
 		}
 
-		public void InitializeDefaultShortcuts()
-		{
+		public void InitializeDefaultShortcuts() {
 			UInt16 ctrl = InputApi.GetKeyCode("Left Ctrl");
 			UInt16 alt = InputApi.GetKeyCode("Left Alt");
 			UInt16 shift = InputApi.GetKeyCode("Left Shift");
@@ -159,76 +154,74 @@ namespace Mesen.Config
 			AddShortcut(new ShortcutKeyInfo { Shortcut = EmulatorShortcut.LoadStateSlotAuto, KeyCombination = new KeyCombination() { Key1 = InputApi.GetKeyCode("F8") } });
 			AddShortcut(new ShortcutKeyInfo { Shortcut = EmulatorShortcut.LoadStateFromFile, KeyCombination = new KeyCombination() { Key1 = ctrl, Key2 = InputApi.GetKeyCode("L") } });
 
-			foreach(EmulatorShortcut value in Enum.GetValues<EmulatorShortcut>()) {
-				if(value < EmulatorShortcut.LastValidValue) {
+			foreach (EmulatorShortcut value in Enum.GetValues<EmulatorShortcut>()) {
+				if (value < EmulatorShortcut.LastValidValue) {
 					AddShortcut(new ShortcutKeyInfo { Shortcut = value });
 				}
 			}
 		}
 
-		public void UpdateFileAssociations()
-		{
+		public void UpdateFileAssociations() {
 			FileAssociationHelper.UpdateFileAssociations();
 		}
 
-		public void ApplyFontOptions()
-		{
+		public void ApplyFontOptions() {
 			UpdateFonts();
 		}
 
-		private void UpdateFonts()
-		{
-			if(Application.Current != null) {
+		private void UpdateFonts() {
+			if (Application.Current != null) {
 				string mesenFont = Configuration.GetValidFontFamily(MesenFont.FontFamily, false);
 				string menuFont = Configuration.GetValidFontFamily(MesenMenuFont.FontFamily, false);
 
-				if(Application.Current.Resources["MesenFont"] is FontFamily curMesenFont && curMesenFont.Name != mesenFont) {
+				if (Application.Current.Resources["MesenFont"] is FontFamily curMesenFont && curMesenFont.Name != mesenFont) {
 					Application.Current.Resources["MesenFont"] = new FontFamily(mesenFont);
 				}
-				if(Application.Current.Resources["MesenMenuFont"] is FontFamily curMesenMenuFont && curMesenMenuFont.Name != menuFont) {
+
+				if (Application.Current.Resources["MesenMenuFont"] is FontFamily curMesenMenuFont && curMesenMenuFont.Name != menuFont) {
 					Application.Current.Resources["MesenMenuFont"] = new FontFamily(menuFont);
 				}
 
-				if(Application.Current.Resources["MesenFontSize"] is double curMesenFontSize && curMesenFontSize != MesenFont.FontSize) {
+				if (Application.Current.Resources["MesenFontSize"] is double curMesenFontSize && curMesenFontSize != MesenFont.FontSize) {
 					Application.Current.Resources["MesenFontSize"] = (double)MesenFont.FontSize;
 				}
-				if(Application.Current.Resources["MesenMenuFontSize"] is double curMesenMenuFontSize && curMesenMenuFontSize != MesenMenuFont.FontSize) {
+
+				if (Application.Current.Resources["MesenMenuFontSize"] is double curMesenMenuFontSize && curMesenMenuFontSize != MesenMenuFont.FontSize) {
 					Application.Current.Resources["MesenMenuFontSize"] = (double)MesenMenuFont.FontSize;
 				}
 			}
 		}
 
-		public void InitializeFontDefaults()
-		{
+		public void InitializeFontDefaults() {
 			MesenFont = Configuration.GetDefaultFont();
 			MesenMenuFont = Configuration.GetDefaultMenuFont();
 			ApplyFontOptions();
 		}
 
-		public static void UpdateTheme()
-		{
-			if(Application.Current != null) {
+		public static void UpdateTheme() {
+			if (Application.Current != null) {
 				ThemeVariant newTheme = ConfigManager.Config.Preferences.Theme == MesenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
-				if(Application.Current.RequestedThemeVariant != newTheme) {
+				if (Application.Current.RequestedThemeVariant != newTheme) {
 					ConfigManager.ActiveTheme = ConfigManager.Config.Preferences.Theme;
 					Application.Current.RequestedThemeVariant = newTheme;
 				}
 			}
 		}
 
-		public void ApplyConfig()
-		{
+		public void ApplyConfig() {
 			UpdateFonts();
 
 			List<InteropShortcutKeyInfo> shortcutKeys = new List<InteropShortcutKeyInfo>();
-			foreach(ShortcutKeyInfo shortcutInfo in ShortcutKeys) {
-				if(!shortcutInfo.KeyCombination.IsEmpty) {
+			foreach (ShortcutKeyInfo shortcutInfo in ShortcutKeys) {
+				if (!shortcutInfo.KeyCombination.IsEmpty) {
 					shortcutKeys.Add(new InteropShortcutKeyInfo(shortcutInfo.Shortcut, shortcutInfo.KeyCombination.ToInterop()));
 				}
-				if(!shortcutInfo.KeyCombination2.IsEmpty) {
+
+				if (!shortcutInfo.KeyCombination2.IsEmpty) {
 					shortcutKeys.Add(new InteropShortcutKeyInfo(shortcutInfo.Shortcut, shortcutInfo.KeyCombination2.ToInterop()));
 				}
 			}
+
 			ConfigApi.SetShortcutKeys(shortcutKeys.ToArray(), (UInt32)shortcutKeys.Count);
 
 			ConfigApi.SetPreferences(new InteropPreferencesConfig() {
@@ -253,34 +246,29 @@ namespace Mesen.Config
 		}
 	}
 
-	public enum MesenTheme
-	{
+	public enum MesenTheme {
 		Light = 0,
 		Dark = 1
 	}
 
-	public enum FontAntialiasing
-	{
+	public enum FontAntialiasing {
 		Disabled,
 		Antialias,
 		SubPixelAntialias
 	}
 
-	public enum GameSelectionMode
-	{
+	public enum GameSelectionMode {
 		Disabled,
 		ResumeState,
 		PowerOn
 	}
 
-	public enum HudDisplaySize
-	{
+	public enum HudDisplaySize {
 		Fixed,
 		Scaled,
 	}
 
-	public struct InteropPreferencesConfig
-	{
+	public struct InteropPreferencesConfig {
 		[MarshalAs(UnmanagedType.I1)] public bool ShowFps;
 		[MarshalAs(UnmanagedType.I1)] public bool ShowFrameCounter;
 		[MarshalAs(UnmanagedType.I1)] public bool ShowGameTimer;

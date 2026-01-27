@@ -1,12 +1,3 @@
-﻿using Avalonia;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,11 +6,18 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
+using Mesen.Config;
+using Mesen.Controls;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
+using Mesen.Windows;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels
-{
-	public class MainWindowViewModel : ViewModelBase
-	{
+namespace Mesen.ViewModels {
+	public class MainWindowViewModel : ViewModelBase {
 		public static MainWindowViewModel Instance { get; private set; } = null!;
 
 		[Reactive] public MainMenuViewModel MainMenu { get; set; }
@@ -31,7 +29,7 @@ namespace Mesen.ViewModels
 		[Reactive] public Size RendererSize { get; set; }
 
 		[Reactive] public bool IsMenuVisible { get; set; }
-		
+
 		[Reactive] public bool IsNativeRendererVisible { get; set; }
 		[Reactive] public bool IsSoftwareRendererVisible { get; set; }
 
@@ -39,8 +37,7 @@ namespace Mesen.ViewModels
 
 		public Configuration Config { get; }
 
-		public MainWindowViewModel()
-		{
+		public MainWindowViewModel() {
 			Instance = this;
 
 			Config = ConfigManager.Config;
@@ -51,8 +48,7 @@ namespace Mesen.ViewModels
 			IsMenuVisible = !Config.Preferences.AutoHideMenu;
 		}
 
-		public void Init(MainWindow wnd)
-		{
+		public void Init(MainWindow wnd) {
 			MainMenu.Initialize(wnd);
 			RecentGames.Init(GameScreenMode.RecentGames);
 
@@ -60,12 +56,12 @@ namespace Mesen.ViewModels
 				IsNativeRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface == null;
 				IsSoftwareRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface != null;
 			});
-			
+
 			this.WhenAnyValue(x => x.RomInfo).Subscribe(x => {
-				bool showAudioPlayer = x.Format == RomFormat.Nsf || x.Format == RomFormat.Spc || x.Format == RomFormat.Gbs || x.Format == RomFormat.PceHes;
-				if(AudioPlayer == null && showAudioPlayer) {
+				bool showAudioPlayer = x.Format is RomFormat.Nsf or RomFormat.Spc or RomFormat.Gbs or RomFormat.PceHes;
+				if (AudioPlayer == null && showAudioPlayer) {
 					AudioPlayer = new AudioPlayerViewModel();
-				} else if(!showAudioPlayer) {
+				} else if (!showAudioPlayer) {
 					AudioPlayer = null;
 				}
 			});
@@ -76,20 +72,17 @@ namespace Mesen.ViewModels
 				x => x.Config.Preferences.ShowTitleBarInfo,
 				x => x.Config.Video.AspectRatio,
 				x => x.Config.Video.VideoFilter
-			).Subscribe(x => {
-				UpdateWindowTitle();
-			});
+			).Subscribe(x => UpdateWindowTitle());
 
 			UpdateWindowTitle();
 		}
 
-		private void UpdateWindowTitle()
-		{
+		private void UpdateWindowTitle() {
 			string title = "Mesen";
 			string romName = RomInfo.GetRomName();
-			if(!string.IsNullOrWhiteSpace(romName)) {
+			if (!string.IsNullOrWhiteSpace(romName)) {
 				title += " - " + romName;
-				if(ConfigManager.Config.Preferences.ShowTitleBarInfo) {
+				if (ConfigManager.Config.Preferences.ShowTitleBarInfo) {
 					FrameInfo baseSize = EmuApi.GetBaseScreenSize();
 					double scale = (double)RendererSize.Height / baseSize.Height;
 					title += string.Format(" - {0}x{1} ({2:0.###}x, {3})",
@@ -99,6 +92,7 @@ namespace Mesen.ViewModels
 						ResourceHelper.GetEnumText(ConfigManager.Config.Video.VideoFilter));
 				}
 			}
+
 			WindowTitle = title;
 		}
 	}

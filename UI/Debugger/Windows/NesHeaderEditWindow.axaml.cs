@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -8,16 +9,12 @@ using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using System;
 
-namespace Mesen.Debugger.Windows
-{
-	public class NesHeaderEditWindow : MesenWindow
-	{
+namespace Mesen.Debugger.Windows {
+	public class NesHeaderEditWindow : MesenWindow {
 		NesHeaderEditViewModel _model;
 
-		public NesHeaderEditWindow()
-		{
+		public NesHeaderEditWindow() {
 			_model = new NesHeaderEditViewModel();
 			DataContext = _model;
 
@@ -28,20 +25,17 @@ namespace Mesen.Debugger.Windows
 #endif
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private async void Ok_OnClick(object sender, RoutedEventArgs e)
-		{
-			if(await _model.Save(this)) {
+		private async void Ok_OnClick(object sender, RoutedEventArgs e) {
+			if (await _model.Save(this)) {
 				Close();
 			}
 		}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
 			Close();
 		}
 	}

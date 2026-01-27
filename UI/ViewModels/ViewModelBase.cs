@@ -1,30 +1,27 @@
-﻿using ReactiveUI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ReactiveUI;
 
-namespace Mesen.ViewModels
-{
-	public class ViewModelBase : ReactiveObject
-	{
+namespace Mesen.ViewModels {
+	public class ViewModelBase : ReactiveObject {
 	}
 
-	public class DisposableViewModel : ViewModelBase, IDisposable
-	{
+	public class DisposableViewModel : ViewModelBase, IDisposable {
 		private HashSet<IDisposable> _disposables = new();
 		public bool Disposed { get; private set; } = false;
 
-		public void Dispose()
-		{
-			if(Disposed) {
+		public void Dispose() {
+			if (Disposed) {
 				return;
 			}
 
 			Disposed = true;
 
-			foreach(IDisposable obj in _disposables) {
+			foreach (IDisposable obj in _disposables) {
 				obj.Dispose();
 			}
+
 			_disposables.Clear();
 			_disposables = new();
 
@@ -33,19 +30,18 @@ namespace Mesen.ViewModels
 
 		protected virtual void DisposeView() { }
 
-		public T AddDisposable<T>(T obj) where T : IDisposable
-		{
+		public T AddDisposable<T>(T obj) where T : IDisposable {
 			_disposables.Add(obj);
 			return obj;
 		}
 
-		public T AddDisposables<T>(T disposables) where T : IEnumerable
-		{
-			foreach(object obj in disposables) {
-				if(obj is IDisposable disposable) {
+		public T AddDisposables<T>(T disposables) where T : IEnumerable {
+			foreach (object obj in disposables) {
+				if (obj is IDisposable disposable) {
 					_disposables.Add(disposable);
 				}
 			}
+
 			return disposables;
 		}
 	}

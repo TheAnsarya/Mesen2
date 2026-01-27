@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -6,24 +6,21 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Localization;
-using Mesen.Config.Shortcuts;
-using Mesen.Utilities;
 using Avalonia.Media.Imaging;
+using Mesen.Config.Shortcuts;
+using Mesen.Localization;
+using Mesen.Utilities;
 
-namespace Mesen.Interop
-{
-	public class EmuApi
-	{
+namespace Mesen.Interop {
+	public class EmuApi {
 		public const string DllName = "MesenCore.dll";
 		private const string DllPath = EmuApi.DllName;
 
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool TestDll();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool TestDll();
 		[DllImport(DllPath)] public static extern void InitDll();
 
 		[DllImport(DllPath, EntryPoint = "GetMesenVersion")] private static extern UInt32 GetMesenVersionWrapper();
-		public static Version GetMesenVersion()
-		{
+		public static Version GetMesenVersion() {
 			UInt32 version = GetMesenVersionWrapper();
 			UInt32 revision = version & 0xFF;
 			UInt32 minor = (version >> 8) & 0xFF;
@@ -32,48 +29,48 @@ namespace Mesen.Interop
 		}
 
 		[DllImport(DllPath, EntryPoint = "GetMesenBuildDate")] private static extern IntPtr GetMesenBuildDateWrapper();
-		public static string GetMesenBuildDate()
-		{
+		public static string GetMesenBuildDate() {
 			return Utf8Utilities.PtrToStringUtf8(GetMesenBuildDateWrapper());
 		}
 
 		[DllImport(DllPath)] public static extern IntPtr RegisterNotificationCallback(NotificationListener.NotificationCallback callback);
 		[DllImport(DllPath)] public static extern void UnregisterNotificationCallback(IntPtr notificationListener);
 
-		[DllImport(DllPath)] public static extern void InitializeEmu([MarshalAs(UnmanagedType.LPUTF8Str)]string homeFolder, IntPtr windowHandle, IntPtr dxViewerHandle, [MarshalAs(UnmanagedType.I1)] bool useSoftwareRenderer, [MarshalAs(UnmanagedType.I1)]bool noAudio, [MarshalAs(UnmanagedType.I1)]bool noVideo, [MarshalAs(UnmanagedType.I1)]bool noInput);
+		[DllImport(DllPath)] public static extern void InitializeEmu([MarshalAs(UnmanagedType.LPUTF8Str)] string homeFolder, IntPtr windowHandle, IntPtr dxViewerHandle, [MarshalAs(UnmanagedType.I1)] bool useSoftwareRenderer, [MarshalAs(UnmanagedType.I1)] bool noAudio, [MarshalAs(UnmanagedType.I1)] bool noVideo, [MarshalAs(UnmanagedType.I1)] bool noInput);
 
 		[DllImport(DllPath)] public static extern void Release();
 
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsRunning();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool IsRunning();
 		[DllImport(DllPath)] public static extern void Stop();
 		[DllImport(DllPath)] public static extern Int32 GetStopCode();
 
 		[DllImport(DllPath)] public static extern void Pause();
 		[DllImport(DllPath)] public static extern void Resume();
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsPaused();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool IsPaused();
 
 		[DllImport(DllPath)] public static extern void TakeScreenshot();
 
 		[DllImport(DllPath)] public static extern void ProcessAudioPlayerAction(AudioPlayerActionParams p);
 
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool LoadRom(
-			[MarshalAs(UnmanagedType.LPUTF8Str)]string filepath,
-			[MarshalAs(UnmanagedType.LPUTF8Str)]string? patchFile = null
+		[DllImport(DllPath)]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static extern bool LoadRom(
+			[MarshalAs(UnmanagedType.LPUTF8Str)] string filepath,
+			[MarshalAs(UnmanagedType.LPUTF8Str)] string? patchFile = null
 		);
 
 		[DllImport(DllPath, EntryPoint = "GetRomInfo")] private static extern void GetRomInfoWrapper(out InteropRomInfo romInfo);
-		public static RomInfo GetRomInfo()
-		{
+		public static RomInfo GetRomInfo() {
 			InteropRomInfo info;
 			EmuApi.GetRomInfoWrapper(out info);
 			return new RomInfo(info);
 		}
 
-		[DllImport(DllPath)] public static extern void LoadRecentGame([MarshalAs(UnmanagedType.LPUTF8Str)]string filepath, [MarshalAs(UnmanagedType.I1)]bool resetGame);
+		[DllImport(DllPath)] public static extern void LoadRecentGame([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath, [MarshalAs(UnmanagedType.I1)] bool resetGame);
 
-		[DllImport(DllPath)] public static extern void AddKnownGameFolder([MarshalAs(UnmanagedType.LPUTF8Str)]string folder);
+		[DllImport(DllPath)] public static extern void AddKnownGameFolder([MarshalAs(UnmanagedType.LPUTF8Str)] string folder);
 
-		[DllImport(DllPath)] public static extern void SetExclusiveFullscreenMode([MarshalAs(UnmanagedType.I1)]bool fullscreen, IntPtr windowHandle);
+		[DllImport(DllPath)] public static extern void SetExclusiveFullscreenMode([MarshalAs(UnmanagedType.I1)] bool fullscreen, IntPtr windowHandle);
 
 		[DllImport(DllPath)] public static extern TimingInfo GetTimingInfo(CpuType cpuType);
 
@@ -84,52 +81,51 @@ namespace Mesen.Interop
 		[DllImport(DllPath)] public static extern void SetRendererSize(UInt32 width, UInt32 height);
 
 		[DllImport(DllPath)] public static extern void ExecuteShortcut(ExecuteShortcutParams p);
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsShortcutAllowed(EmulatorShortcut shortcut, UInt32 shortcutParam = 0);
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool IsShortcutAllowed(EmulatorShortcut shortcut, UInt32 shortcutParam = 0);
 
 		[DllImport(DllPath, EntryPoint = "GetLog")] private static extern void GetLogWrapper(IntPtr outLog, Int32 maxLength);
 		public static string GetLog() { return Utf8Utilities.CallStringApi(GetLogWrapper, 100000); }
 
-		[DllImport(DllPath)] public static extern void WriteLogEntry([MarshalAs(UnmanagedType.LPUTF8Str)]string message);
-		[DllImport(DllPath)] public static extern void DisplayMessage([MarshalAs(UnmanagedType.LPUTF8Str)]string title, [MarshalAs(UnmanagedType.LPUTF8Str)]string message, [MarshalAs(UnmanagedType.LPUTF8Str)]string? param1 = null);
+		[DllImport(DllPath)] public static extern void WriteLogEntry([MarshalAs(UnmanagedType.LPUTF8Str)] string message);
+		[DllImport(DllPath)] public static extern void DisplayMessage([MarshalAs(UnmanagedType.LPUTF8Str)] string title, [MarshalAs(UnmanagedType.LPUTF8Str)] string message, [MarshalAs(UnmanagedType.LPUTF8Str)] string? param1 = null);
 
 		[DllImport(DllPath, EntryPoint = "GetRomHash")] private static extern void GetRomHashWrapper(HashType hashType, IntPtr outLog, Int32 maxLength);
-		public static string GetRomHash(HashType hashType) { return Utf8Utilities.CallStringApi((IntPtr outLog, Int32 maxLength) => {
-			GetRomHashWrapper(hashType, outLog, maxLength);
-		}, 1000000); }
+		public static string GetRomHash(HashType hashType) {
+			return Utf8Utilities.CallStringApi((IntPtr outLog, Int32 maxLength) => GetRomHashWrapper(hashType, outLog, maxLength), 1000000);
+		}
 
-		[DllImport(DllPath)] public static extern IntPtr GetArchiveRomList([MarshalAs(UnmanagedType.LPUTF8Str)]string filename, IntPtr outFileList, Int32 maxLength);
+		[DllImport(DllPath)] public static extern IntPtr GetArchiveRomList([MarshalAs(UnmanagedType.LPUTF8Str)] string filename, IntPtr outFileList, Int32 maxLength);
 
 		[DllImport(DllPath)] public static extern void SaveState(UInt32 stateIndex);
 		[DllImport(DllPath)] public static extern void LoadState(UInt32 stateIndex);
-		[DllImport(DllPath)] public static extern void SaveStateFile([MarshalAs(UnmanagedType.LPUTF8Str)]string filepath);
-		[DllImport(DllPath)] public static extern void LoadStateFile([MarshalAs(UnmanagedType.LPUTF8Str)]string filepath);
+		[DllImport(DllPath)] public static extern void SaveStateFile([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath);
+		[DllImport(DllPath)] public static extern void LoadStateFile([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath);
 
-		[DllImport(DllPath, EntryPoint = "GetSaveStatePreview")] private static extern Int32 GetSaveStatePreviewWrapper([MarshalAs(UnmanagedType.LPUTF8Str)]string saveStatePath, [Out]byte[] imgData);
-		public static Bitmap? GetSaveStatePreview(string saveStatePath)
-		{
-			if(File.Exists(saveStatePath)) {
-				byte[] buffer = new byte[512*478*4];
+		[DllImport(DllPath, EntryPoint = "GetSaveStatePreview")] private static extern Int32 GetSaveStatePreviewWrapper([MarshalAs(UnmanagedType.LPUTF8Str)] string saveStatePath, [Out] byte[] imgData);
+		public static Bitmap? GetSaveStatePreview(string saveStatePath) {
+			if (File.Exists(saveStatePath)) {
+				byte[] buffer = new byte[512 * 478 * 4];
 				Int32 size = EmuApi.GetSaveStatePreviewWrapper(saveStatePath, buffer);
-				if(size > 0) {
+				if (size > 0) {
 					Array.Resize(ref buffer, size);
-					using(MemoryStream stream = new MemoryStream(buffer)) {
+					using (MemoryStream stream = new MemoryStream(buffer)) {
 						return new Bitmap(stream);
 					}
 				}
 			}
+
 			return null;
 		}
 
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool GetConvertedCheat([In]InteropCheatCode input, ref InteropInternalCheatCode output);
-		[DllImport(DllPath)] public static extern void SetCheats([In]InteropCheatCode[] cheats, UInt32 cheatCount);
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool GetConvertedCheat([In] InteropCheatCode input, ref InteropInternalCheatCode output);
+		[DllImport(DllPath)] public static extern void SetCheats([In] InteropCheatCode[] cheats, UInt32 cheatCount);
 		[DllImport(DllPath)] public static extern void ClearCheats();
 
 		[DllImport(DllPath)] public static extern void InputBarcode(UInt64 barcode, UInt32 digitCount);
 		[DllImport(DllPath)] public static extern void ProcessTapeRecorderAction(TapeRecorderAction action, [MarshalAs(UnmanagedType.LPUTF8Str)] string filename = "");
 	}
 
-	public struct TimingInfo
-	{
+	public struct TimingInfo {
 		public double Fps;
 		public UInt64 MasterClock;
 		public UInt32 MasterClockRate;
@@ -140,14 +136,12 @@ namespace Mesen.Interop
 		public UInt32 CycleCount;
 	}
 
-	public struct FrameInfo
-	{
+	public struct FrameInfo {
 		public UInt32 Width;
 		public UInt32 Height;
 	}
 
-	public enum RomFormat
-	{
+	public enum RomFormat {
 		Unknown,
 
 		Sfc,
@@ -178,8 +172,7 @@ namespace Mesen.Interop
 		Ws
 	}
 
-	public enum ConsoleType
-	{
+	public enum ConsoleType {
 		Snes = 0,
 		Gameboy = 1,
 		Nes = 2,
@@ -189,14 +182,12 @@ namespace Mesen.Interop
 		Ws = 6,
 	}
 
-	public struct InteropDipSwitchInfo
-	{
+	public struct InteropDipSwitchInfo {
 		public UInt32 DatabaseId;
 		public UInt32 DipSwitchCount;
 	}
 
-	public struct InteropRomInfo
-	{
+	public struct InteropRomInfo {
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 2000)]
 		public byte[] RomPath;
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 2000)]
@@ -211,8 +202,7 @@ namespace Mesen.Interop
 		public UInt32 CpuTypeCount;
 	}
 
-	public class RomInfo
-	{
+	public class RomInfo {
 		public string RomPath = "";
 		public string PatchPath = "";
 		public RomFormat Format = RomFormat.Unknown;
@@ -222,27 +212,24 @@ namespace Mesen.Interop
 
 		public RomInfo() { }
 
-		public RomInfo(InteropRomInfo romInfo)
-		{
+		public RomInfo(InteropRomInfo romInfo) {
 			RomPath = (ResourcePath)Utf8Utilities.GetStringFromArray(romInfo.RomPath);
 			PatchPath = (ResourcePath)Utf8Utilities.GetStringFromArray(romInfo.PatchPath);
 			Format = romInfo.Format;
 			ConsoleType = romInfo.ConsoleType;
 			DipSwitches = romInfo.DipSwitches;
 
-			for(int i = 0; i < romInfo.CpuTypeCount; i++) {
+			for (int i = 0; i < romInfo.CpuTypeCount; i++) {
 				CpuTypes.Add(romInfo.CpuTypes[i]);
 			}
 		}
 
-		public string GetRomName()
-		{
+		public string GetRomName() {
 			return Path.GetFileNameWithoutExtension(((ResourcePath)RomPath).FileName);
 		}
 	}
 
-	public enum FirmwareType
-	{
+	public enum FirmwareType {
 		DSP1,
 		DSP1B,
 		DSP2,
@@ -273,49 +260,42 @@ namespace Mesen.Interop
 		GgBootRom
 	}
 
-	public struct MissingFirmwareMessage
-	{
+	public struct MissingFirmwareMessage {
 		public IntPtr Filename;
 		public FirmwareType Firmware;
 		public UInt32 Size;
 		public UInt32 AltSize;
 	}
 
-	public struct SufamiTurboFilePromptMessage
-	{
+	public struct SufamiTurboFilePromptMessage {
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 5000)]
 		public byte[] Filename;
 	}
 
-	public struct ExecuteShortcutParams
-	{
+	public struct ExecuteShortcutParams {
 		public EmulatorShortcut Shortcut;
 		public UInt32 Param;
 		public IntPtr ParamPtr;
 	};
 
-	public enum AudioPlayerAction
-	{
+	public enum AudioPlayerAction {
 		NextTrack,
 		PrevTrack,
 		SelectTrack,
 	}
 
-	public struct AudioPlayerActionParams
-	{
+	public struct AudioPlayerActionParams {
 		public AudioPlayerAction Action;
 		public UInt32 TrackNumber;
 	}
 
-	public enum TapeRecorderAction
-	{
+	public enum TapeRecorderAction {
 		Play,
 		StartRecord,
 		StopRecord
 	}
 
-	public enum CheatType : byte
-	{
+	public enum CheatType : byte {
 		NesGameGenie = 0,
 		NesProActionRocky,
 		NesCustom,
@@ -329,10 +309,8 @@ namespace Mesen.Interop
 		SmsGameGenie
 	}
 
-	public static class CheatTypeExtensions
-	{
-		public static CpuType ToCpuType(this CheatType cheatType)
-		{
+	public static class CheatTypeExtensions {
+		public static CpuType ToCpuType(this CheatType cheatType) {
 			return cheatType switch {
 				CheatType.NesGameGenie or CheatType.NesProActionRocky or CheatType.NesCustom => CpuType.Nes,
 				CheatType.SnesGameGenie or CheatType.SnesProActionReplay => CpuType.Snes,
@@ -344,15 +322,13 @@ namespace Mesen.Interop
 		}
 	}
 
-	public struct InteropCheatCode
-	{
+	public struct InteropCheatCode {
 		public CheatType Type;
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
 		public byte[] Code;
 
-		public InteropCheatCode(CheatType type, string code)
-		{
+		public InteropCheatCode(CheatType type, string code) {
 			Type = type;
 
 			Code = new byte[16];
@@ -361,8 +337,7 @@ namespace Mesen.Interop
 		}
 	}
 
-	public struct InteropInternalCheatCode
-	{
+	public struct InteropInternalCheatCode {
 		public MemoryType MemType;
 		public UInt32 Address;
 		public Int16 Compare;
@@ -373,22 +348,19 @@ namespace Mesen.Interop
 		[MarshalAs(UnmanagedType.I1)] public bool IsAbsoluteAddress;
 	}
 
-	public enum HashType
-	{
+	public enum HashType {
 		Sha1,
 		Sha1Cheat
 	}
 
-	public struct SoftwareRendererSurface
-	{
+	public struct SoftwareRendererSurface {
 		public IntPtr FrameBuffer;
 		public UInt32 Width;
 		public UInt32 Height;
 		[MarshalAs(UnmanagedType.I1)] public bool IsDirty;
 	}
 
-	public struct SoftwareRendererFrame
-	{
+	public struct SoftwareRendererFrame {
 		public SoftwareRendererSurface Frame;
 		public SoftwareRendererSurface EmuHud;
 		public SoftwareRendererSurface ScriptHud;

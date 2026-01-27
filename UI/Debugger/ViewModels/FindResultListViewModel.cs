@@ -1,31 +1,30 @@
-﻿using ReactiveUI.Fody.Helpers;
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reactive.Linq;
-using System.Linq;
-using Mesen.Interop;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
-using Mesen.Debugger.Windows;
-using Avalonia.Controls;
-using Mesen.ViewModels;
 using System.ComponentModel;
-using Mesen.Utilities;
-using System.Collections;
-using DataBoxControl;
+using System.Linq;
+using System.Reactive.Linq;
 using Avalonia.Collections;
+using Avalonia.Controls;
 using Avalonia.Controls.Selection;
-using Mesen.Debugger.Views.DebuggerDock;
-using Mesen.Debugger.ViewModels.DebuggerDock;
-using Dock.Model.Core;
-using Mesen.Debugger.Disassembly;
 using Avalonia.Threading;
+using DataBoxControl;
+using Dock.Model.Core;
+using Mesen.Config;
+using Mesen.Debugger.Disassembly;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.ViewModels.DebuggerDock;
+using Mesen.Debugger.Views.DebuggerDock;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class FindResultListViewModel : DisposableViewModel
-{
+public class FindResultListViewModel : DisposableViewModel {
 	[Reactive] public MesenList<FindResultViewModel> FindResults { get; private set; } = new();
 	[Reactive] public SelectionModel<FindResultViewModel?> Selection { get; set; } = new() { SingleSelect = false };
 	[Reactive] public SortState SortState { get; set; } = new();
@@ -39,28 +38,23 @@ public class FindResultListViewModel : DisposableViewModel
 	[Obsolete("For designer only")]
 	public FindResultListViewModel() : this(new()) { }
 
-	public FindResultListViewModel(DebuggerWindowViewModel debugger)
-	{
+	public FindResultListViewModel(DebuggerWindowViewModel debugger) {
 		Debugger = debugger;
-		
+
 		_format = "X" + debugger.CpuType.GetAddressSize();
 		SortState.SetColumnSort("Address", ListSortDirection.Ascending, true);
 	}
 
-	public void Sort(object? param)
-	{
+	public void Sort(object? param) {
 		UpdateResults(FindResults);
 	}
 
-	public void SetResults(IEnumerable<FindResultViewModel> results)
-	{
+	public void SetResults(IEnumerable<FindResultViewModel> results) {
 		Selection.Clear();
 		UpdateResults(results);
 		Selection.SelectedIndex = 0;
-		Dispatcher.UIThread.Post(() => {
-			//TODOv2 - run this in a post to bypass a bug that might be fixed in the latest Avalonia preview, to re-test after upgrading
-			Debugger.OpenTool(Debugger.DockFactory.FindResultListTool);
-		});
+		Dispatcher.UIThread.Post(() =>          //TODOv2 - run this in a post to bypass a bug that might be fixed in the latest Avalonia preview, to re-test after upgrading
+			Debugger.OpenTool(Debugger.DockFactory.FindResultListTool));
 	}
 
 	private Dictionary<string, Func<FindResultViewModel, FindResultViewModel, int>> _comparers = new() {
@@ -68,8 +62,7 @@ public class FindResultListViewModel : DisposableViewModel
 		{ "Result", (a, b) => string.Compare(a.Text, b.Text, StringComparison.OrdinalIgnoreCase) },
 	};
 
-	private void UpdateResults(IEnumerable<FindResultViewModel> results)
-	{
+	private void UpdateResults(IEnumerable<FindResultViewModel> results) {
 		List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 		List<FindResultViewModel> sortedResults = results.ToList();
 
@@ -79,17 +72,15 @@ public class FindResultListViewModel : DisposableViewModel
 		Selection.SelectIndexes(selectedIndexes, FindResults.Count);
 	}
 
-	public void GoToResult(FindResultViewModel result)
-	{
-		if(result.Location.RelAddress?.Address >= 0) {
+	public void GoToResult(FindResultViewModel result) {
+		if (result.Location.RelAddress?.Address >= 0) {
 			Debugger.ScrollToAddress(result.Location.RelAddress.Value.Address);
-		} else if(result.Location.SourceLocation != null) {
+		} else if (result.Location.SourceLocation != null) {
 			Debugger.SourceView?.ScrollToLocation(result.Location.SourceLocation.Value);
 		}
 	}
 
-	public void InitContextMenu(Control parent)
-	{
+	public void InitContextMenu(Control parent) {
 		AddDisposables(DebugShortcutManager.CreateContextMenu(parent, new object[] {
 			new ContextMenuAction() {
 				ActionType = ActionType.AddWatch,
@@ -136,21 +127,18 @@ public class FindResultListViewModel : DisposableViewModel
 	}
 }
 
-public class FindResultViewModel
-{
+public class FindResultViewModel {
 	public LocationInfo Location { get; }
 	public string Address { get; }
 	public string Text { get; }
 
-	public FindResultViewModel(LocationInfo location, string loc, string text)
-	{
+	public FindResultViewModel(LocationInfo location, string loc, string text) {
 		Location = location;
 		Address = loc;
 		Text = text;
 	}
 
-	public FindResultViewModel(CodeLineData line)
-	{
+	public FindResultViewModel(CodeLineData line) {
 		Location = new LocationInfo() {
 			RelAddress = new AddressInfo() { Address = line.Address, Type = line.CpuType.ToMemoryType() },
 			AbsAddress = line.AbsoluteAddress
@@ -159,7 +147,7 @@ public class FindResultViewModel
 		string format = "X" + line.CpuType.GetAddressSize();
 		Address = "$" + line.Address.ToString(format);
 		Text = line.Text;
-		if(line.EffectiveAddress >= 0) {
+		if (line.EffectiveAddress >= 0) {
 			Text += " " + line.GetEffectiveAddressString(format, out _);
 		}
 	}

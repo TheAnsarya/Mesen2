@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -6,37 +7,30 @@ using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using System.Collections.Generic;
 
-namespace Mesen.Windows
-{
-	public class MovieRecordWindow : MesenWindow
-	{
-		public MovieRecordWindow()
-		{
+namespace Mesen.Windows {
+	public class MovieRecordWindow : MesenWindow {
+		public MovieRecordWindow() {
 			InitializeComponent();
 #if DEBUG
 			this.AttachDevTools();
 #endif
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private async void OnBrowseClick(object sender, RoutedEventArgs e)
-		{
+		private async void OnBrowseClick(object sender, RoutedEventArgs e) {
 			MovieRecordConfigViewModel model = (MovieRecordConfigViewModel)DataContext!;
 
 			string? filename = await FileDialogHelper.SaveFile(ConfigManager.MovieFolder, EmuApi.GetRomInfo().GetRomName() + "." + FileDialogHelper.MesenMovieExt, VisualRoot, FileDialogHelper.MesenMovieExt);
-			if(filename != null) {
+			if (filename != null) {
 				model.SavePath = filename;
 			}
 		}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Ok_OnClick(object sender, RoutedEventArgs e) {
 			MovieRecordConfigViewModel model = (MovieRecordConfigViewModel)DataContext!;
 			model.SaveConfig();
 
@@ -45,8 +39,7 @@ namespace Mesen.Windows
 			Close(true);
 		}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e)
-		{
+		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
 			Close(false);
 		}
 	}

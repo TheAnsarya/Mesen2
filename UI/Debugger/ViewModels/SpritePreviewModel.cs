@@ -1,16 +1,14 @@
-﻿using Avalonia;
+using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using System;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class SpritePreviewModel : ViewModelBase
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class SpritePreviewModel : ViewModelBase {
 		[Reactive] public int SpriteIndex { get; set; }
 		[Reactive] public int X { get; set; }
 		[Reactive] public int Y { get; set; }
@@ -30,7 +28,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public int PaletteAddress { get; set; }
 		[Reactive] public SpriteVisibility Visibility { get; set; }
 		[Reactive] public string? Flags { get; set; }
-		
+
 		[Reactive] public NullableBoolean HorizontalMirror { get; set; }
 		[Reactive] public NullableBoolean VerticalMirror { get; set; }
 		[Reactive] public NullableBoolean MosaicEnabled { get; set; }
@@ -39,13 +37,13 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public sbyte TransformParamIndex { get; set; }
 		[Reactive] public bool UseExtendedVram { get; set; }
 		[Reactive] public NullableBoolean UseSecondTable { get; set; }
-		
+
 		public UInt32 TileCount { get; set; }
 		public UInt32 WrapWidth { get; set; }
 		public UInt32 WrapHeight { get; set; }
 		public UInt32[] TileAddresses { get; set; } = Array.Empty<UInt32>();
 
-		private UInt32[] _rawPreview = new UInt32[128*128];
+		private UInt32[] _rawPreview = new UInt32[128 * 128];
 
 		[Reactive] public DynamicBitmap? SpritePreview { get; set; }
 		[Reactive] public double SpritePreviewZoom { get; set; }
@@ -54,10 +52,9 @@ namespace Mesen.Debugger.ViewModels
 		public int RealWidth => Width / (DoubleSize == NullableBoolean.True ? 2 : 1);
 		public int RealHeight => Height / (DoubleSize == NullableBoolean.True ? 2 : 1);
 
-		public unsafe void Init(ref DebugSpriteInfo sprite, UInt32[] spritePreviews, DebugSpritePreviewInfo previewInfo)
-		{
+		public unsafe void Init(ref DebugSpriteInfo sprite, UInt32[] spritePreviews, DebugSpritePreviewInfo previewInfo) {
 			SpriteIndex = sprite.SpriteIndex;
-			
+
 			X = sprite.X;
 			Y = sprite.Y;
 			RawX = sprite.RawX;
@@ -82,42 +79,44 @@ namespace Mesen.Debugger.ViewModels
 			WrapHeight = previewInfo.WrapBottomToTop ? previewInfo.Height : 0;
 
 			TileCount = sprite.TileCount;
-			fixed(UInt32* p = sprite.TileAddresses) {
-				if(TileAddresses == null || TileAddresses.Length != TileCount) {
+			fixed (UInt32* p = sprite.TileAddresses) {
+				if (TileAddresses == null || TileAddresses.Length != TileCount) {
 					TileAddresses = new UInt32[TileCount];
 				}
-				for(int i = 0; i < sprite.TileCount; i++) {
+
+				for (int i = 0; i < sprite.TileCount; i++) {
 					TileAddresses[i] = p[i];
 				}
 			}
 
-			fixed(UInt32* p = spritePreviews) {
+			fixed (UInt32* p = spritePreviews) {
 				bool needUpdate = false;
 
 				UInt32* spritePreview = p + (sprite.SpriteIndex * 128 * 128);
-				
-				if(SpritePreview == null || SpritePreview.PixelSize.Width != sprite.Width || SpritePreview.PixelSize.Height != sprite.Height) {
+
+				if (SpritePreview == null || SpritePreview.PixelSize.Width != sprite.Width || SpritePreview.PixelSize.Height != sprite.Height) {
 					SpritePreview = new DynamicBitmap(new PixelSize(Width, Height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 					needUpdate = true;
 				}
 
 				int len = Width * Height;
-				for(int i = 0; i < len; i++) {
-					if(_rawPreview[i] != spritePreview[i]) {
+				for (int i = 0; i < len; i++) {
+					if (_rawPreview[i] != spritePreview[i]) {
 						needUpdate = true;
 					}
+
 					_rawPreview[i] = spritePreview[i];
 				}
 
-				if(needUpdate) {
+				if (needUpdate) {
 					int spriteSize = len * sizeof(UInt32);
-					using(var bitmapLock = SpritePreview.Lock()) {
+					using (var bitmapLock = SpritePreview.Lock()) {
 						Buffer.MemoryCopy(spritePreview, (void*)bitmapLock.FrameBuffer.Address, spriteSize, spriteSize);
 					}
 				}
 			}
 
-			if(Width == 0 && Height == 0) {
+			if (Width == 0 && Height == 0) {
 				//Can happen when reloading rom while the UI is updating the sprite list (sprite list will be empty data - all 0s)
 				SpritePreviewZoom = 1.0;
 			} else {
@@ -145,8 +144,7 @@ namespace Mesen.Debugger.ViewModels
 			Flags = flags;
 		}
 
-		public ValueTuple<Rect,Rect,Rect,Rect> GetPreviewRect()
-		{
+		public ValueTuple<Rect, Rect, Rect, Rect> GetPreviewRect() {
 			Rect mainRect = new Rect(PreviewX, PreviewY, Width, Height);
 			Rect wrapTopRect = default;
 			Rect wrapLeftRect = default;
@@ -154,33 +152,34 @@ namespace Mesen.Debugger.ViewModels
 
 			bool wrapVertical = WrapHeight > 0 && PreviewY + Height > WrapHeight;
 			bool wrapHorizontal = WrapWidth > 0 && PreviewX + Width > WrapWidth;
-			if(wrapVertical) {
+			if (wrapVertical) {
 				//Generate a 2nd rect for the portion of the sprite that wraps
 				//around to the top of the screen when it goes past the screen's
 				//bottom, when the WrapBottomToTop flag is set (used by SNES/SMS/GBA)
 				wrapTopRect = new Rect(PreviewX, PreviewY - WrapHeight, Width, Height);
 			}
-			if(wrapHorizontal) {
+
+			if (wrapHorizontal) {
 				//Generate a 2nd rect for the portion of the sprite that wraps
 				//around to the left of the screen when it goes past the screen's
 				//right side, when the WrapRightToLeft flag is set (used by GBA)
 				wrapLeftRect = new Rect(PreviewX - WrapWidth, PreviewY, Width, Height);
 			}
-			if(wrapVertical && wrapHorizontal) {
+
+			if (wrapVertical && wrapHorizontal) {
 				wrapBothRect = new Rect(PreviewX - WrapWidth, PreviewY - WrapHeight, Width, Height);
 			}
+
 			return (mainRect, wrapTopRect, wrapLeftRect, wrapBothRect);
 		}
 
-		public SpritePreviewModel Clone()
-		{
+		public SpritePreviewModel Clone() {
 			SpritePreviewModel copy = new SpritePreviewModel();
 			CopyTo(copy);
 			return copy;
 		}
 
-		public void CopyTo(SpritePreviewModel dst)
-		{
+		public void CopyTo(SpritePreviewModel dst) {
 			dst.SpriteIndex = SpriteIndex;
 			dst.X = X;
 			dst.Y = Y;

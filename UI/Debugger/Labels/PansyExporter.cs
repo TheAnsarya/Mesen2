@@ -1,18 +1,17 @@
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Hashing;
 using System.Linq;
 using System.Text;
+using Mesen.Config;
+using Mesen.Debugger.Labels;
+using Mesen.Debugger.Utilities;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.Windows;
 
-namespace Mesen.Debugger.Labels
-{
+namespace Mesen.Debugger.Labels {
 	/// <summary>
 	/// Pansy file header structure for reading existing files.
 	/// </summary>
@@ -22,8 +21,7 @@ namespace Mesen.Debugger.Labels
 	/// Exports Mesen2 debugger data to Pansy metadata format.
 	/// Pansy is a universal disassembly metadata format for retro game analysis.
 	/// </summary>
-	public static class PansyExporter
-	{
+	public static class PansyExporter {
 		// Pansy file format constants
 		private const string MAGIC = "PANSY\0\0\0";
 		private const ushort VERSION = 0x0100; // v1.0
@@ -63,8 +61,7 @@ namespace Mesen.Debugger.Labels
 		/// </summary>
 		/// <param name="romInfo">ROM information containing console type</param>
 		/// <returns>CRC32 hash of the ROM data, or 0 if unavailable</returns>
-		public static uint CalculateRomCrc32(RomInfo romInfo)
-		{
+		public static uint CalculateRomCrc32(RomInfo romInfo) {
 			try {
 				var cpuType = romInfo.ConsoleType.GetMainCpuType();
 				var memType = cpuType.GetPrgRomMemoryType();
@@ -83,8 +80,7 @@ namespace Mesen.Debugger.Labels
 		/// </summary>
 		/// <param name="path">Path to the pansy file</param>
 		/// <returns>PansyHeader if valid, null otherwise</returns>
-		public static PansyHeader? ReadHeader(string path)
-		{
+		public static PansyHeader? ReadHeader(string path) {
 			try {
 				if (!File.Exists(path))
 					return null;
@@ -120,8 +116,7 @@ namespace Mesen.Debugger.Labels
 		/// <param name="memoryType">Memory type to export CDL data for</param>
 		/// <param name="romCrc32Override">Optional CRC32 value to use (if 0, will be calculated)</param>
 		/// <returns>True if export succeeded</returns>
-		public static bool Export(string path, RomInfo romInfo, MemoryType memoryType, uint romCrc32Override = 0)
-		{
+		public static bool Export(string path, RomInfo romInfo, MemoryType memoryType, uint romCrc32Override = 0) {
 			try {
 				using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
 				using var writer = new BinaryWriter(stream);
@@ -273,10 +268,9 @@ namespace Mesen.Debugger.Labels
 		/// </summary>
 		/// <param name="romInfo">Current ROM information</param>
 		/// <param name="memoryType">Memory type for CDL</param>
-		public static void AutoExport(RomInfo romInfo, MemoryType memoryType)
-		{
+		public static void AutoExport(RomInfo romInfo, MemoryType memoryType) {
 			System.Diagnostics.Debug.WriteLine($"[Pansy] AutoExport called - AutoExportPansy={ConfigManager.Config.Debug.Integration.AutoExportPansy}");
-			
+
 			if (!ConfigManager.Config.Debug.Integration.AutoExportPansy) {
 				System.Diagnostics.Debug.WriteLine("[Pansy] Auto-export disabled, skipping");
 				return;
@@ -294,7 +288,7 @@ namespace Mesen.Debugger.Labels
 			var existingHeader = ReadHeader(pansyPath);
 			if (existingHeader != null) {
 				System.Diagnostics.Debug.WriteLine($"[Pansy] Existing file CRC32: {existingHeader.RomCrc32:X8}");
-				
+
 				if (existingHeader.RomCrc32 != 0 && currentCrc != 0 && existingHeader.RomCrc32 != currentCrc) {
 					// CRC mismatch - this is likely a hacked/translated ROM
 					// Create a separate file with CRC suffix instead of overwriting
@@ -314,8 +308,7 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Get the default Pansy file path for a ROM.
 		/// </summary>
-		public static string GetPansyFilePath(string romName)
-		{
+		public static string GetPansyFilePath(string romName) {
 			string filename = Path.GetFileNameWithoutExtension(romName);
 			return Path.Combine(ConfigManager.DebuggerFolder, $"{filename}.pansy");
 		}
@@ -323,19 +316,16 @@ namespace Mesen.Debugger.Labels
 		/// <summary>
 		/// Get Pansy file path with CRC suffix for mismatched ROMs.
 		/// </summary>
-		public static string GetPansyFilePathWithCrc(string romName, uint crc32)
-		{
+		public static string GetPansyFilePathWithCrc(string romName, uint crc32) {
 			string filename = Path.GetFileNameWithoutExtension(romName);
 			return Path.Combine(ConfigManager.DebuggerFolder, $"{filename}_{crc32:x8}.pansy");
 		}
 
-		private static byte GetPlatformId(RomFormat format)
-		{
+		private static byte GetPlatformId(RomFormat format) {
 			return PlatformIds.TryGetValue(format, out byte id) ? id : (byte)0xFF;
 		}
 
-		private static byte[]? GetCdlData(MemoryType memoryType)
-		{
+		private static byte[]? GetCdlData(MemoryType memoryType) {
 			try {
 				int size = DebugApi.GetMemorySize(memoryType);
 				if (size <= 0) return null;
@@ -345,14 +335,14 @@ namespace Mesen.Debugger.Labels
 				for (int i = 0; i < cdlData.Length; i++) {
 					data[i] = (byte)cdlData[i];
 				}
+
 				return data;
 			} catch {
 				return null;
 			}
 		}
 
-		private static uint[] GetFunctions(MemoryType memoryType)
-		{
+		private static uint[] GetFunctions(MemoryType memoryType) {
 			try {
 				return DebugApi.GetCdlFunctions(memoryType);
 			} catch {
@@ -360,27 +350,25 @@ namespace Mesen.Debugger.Labels
 			}
 		}
 
-		private static uint[] GetJumpTargets(MemoryType memoryType)
-		{
+		private static uint[] GetJumpTargets(MemoryType memoryType) {
 			try {
 				// Get CDL data and extract jump targets
 				byte[] cdl = GetCdlData(memoryType) ?? [];
 				List<uint> targets = [];
-				
+
 				for (int i = 0; i < cdl.Length; i++) {
 					if ((cdl[i] & 0x04) != 0) { // JumpTarget flag
 						targets.Add((uint)i);
 					}
 				}
-				
+
 				return [.. targets];
 			} catch {
 				return [];
 			}
 		}
 
-		private static byte[] BuildSymbolSection(List<CodeLabel> labels)
-		{
+		private static byte[] BuildSymbolSection(List<CodeLabel> labels) {
 			using var ms = new MemoryStream();
 			using var writer = new BinaryWriter(ms);
 
@@ -414,8 +402,7 @@ namespace Mesen.Debugger.Labels
 			return ms.ToArray();
 		}
 
-		private static byte[] BuildCommentSection(List<CodeLabel> labels)
-		{
+		private static byte[] BuildCommentSection(List<CodeLabel> labels) {
 			using var ms = new MemoryStream();
 			using var writer = new BinaryWriter(ms);
 
@@ -445,8 +432,7 @@ namespace Mesen.Debugger.Labels
 			return ms.ToArray();
 		}
 
-		private static byte[] BuildAddressListSection(uint[] addresses)
-		{
+		private static byte[] BuildAddressListSection(uint[] addresses) {
 			using var ms = new MemoryStream();
 			using var writer = new BinaryWriter(ms);
 
@@ -462,8 +448,7 @@ namespace Mesen.Debugger.Labels
 		/// Build memory regions section from labels with length > 1.
 		/// Phase 3: Enhanced data export.
 		/// </summary>
-		private static byte[] BuildMemoryRegionsSection(List<CodeLabel> labels, MemoryType memType)
-		{
+		private static byte[] BuildMemoryRegionsSection(List<CodeLabel> labels, MemoryType memType) {
 			using var ms = new MemoryStream();
 			using var writer = new BinaryWriter(ms);
 
@@ -501,8 +486,7 @@ namespace Mesen.Debugger.Labels
 		/// Build data blocks section from CDL data.
 		/// Phase 3: Enhanced data export - identifies contiguous data regions.
 		/// </summary>
-		private static byte[] BuildDataBlocksSection(byte[]? cdlData)
-		{
+		private static byte[] BuildDataBlocksSection(byte[]? cdlData) {
 			using var ms = new MemoryStream();
 			using var writer = new BinaryWriter(ms);
 
@@ -517,7 +501,7 @@ namespace Mesen.Debugger.Labels
 
 			for (int i = 0; i < cdlData.Length; i++) {
 				bool isData = (cdlData[i] & 0x02) != 0 && (cdlData[i] & 0x01) == 0; // Data flag, not code
-				
+
 				if (isData && blockStart == null) {
 					blockStart = i;
 				} else if (!isData && blockStart != null) {
@@ -525,7 +509,7 @@ namespace Mesen.Debugger.Labels
 					blockStart = null;
 				}
 			}
-			
+
 			// Handle final block
 			if (blockStart != null) {
 				blocks.Add(((uint)blockStart.Value, (uint)(cdlData.Length - 1)));
@@ -535,9 +519,9 @@ namespace Mesen.Debugger.Labels
 			var significantBlocks = blocks.Where(b => b.End - b.Start >= 4).ToList();
 			writer.Write((uint)significantBlocks.Count);
 
-			foreach (var block in significantBlocks) {
-				writer.Write(block.Start);  // Start address (4 bytes)
-				writer.Write(block.End);    // End address (4 bytes)
+			foreach (var (Start, End) in significantBlocks) {
+				writer.Write(Start);  // Start address (4 bytes)
+				writer.Write(End);    // End address (4 bytes)
 				writer.Write((byte)2);      // Type: Data
 				writer.Write((byte)0);      // Flags
 				writer.Write((ushort)0);    // Reserved
@@ -550,8 +534,7 @@ namespace Mesen.Debugger.Labels
 		/// Build cross-references section from label data.
 		/// Phase 3: Enhanced data export - tracks who references whom.
 		/// </summary>
-		private static byte[] BuildCrossRefsSection(List<CodeLabel> labels)
-		{
+		private static byte[] BuildCrossRefsSection(List<CodeLabel> labels) {
 			using var ms = new MemoryStream();
 			using var writer = new BinaryWriter(ms);
 
@@ -575,8 +558,7 @@ namespace Mesen.Debugger.Labels
 			return ms.ToArray();
 		}
 
-		private sealed class SectionInfo
-		{
+		private sealed class SectionInfo {
 			public ushort Type;
 			public uint Offset;
 			public uint CompressedSize;

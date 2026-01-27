@@ -8,17 +8,13 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
 
-namespace Mesen.Debugger.Views
-{
-	public class ControllerInputView : UserControl
-	{
-		public ControllerInputView()
-		{
+namespace Mesen.Debugger.Views {
+	public class ControllerInputView : UserControl {
+		public ControllerInputView() {
 			InitializeComponent();
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 	}

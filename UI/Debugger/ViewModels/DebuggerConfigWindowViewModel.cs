@@ -1,21 +1,19 @@
-﻿using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using Avalonia.Controls;
+using Mesen.Config;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels
-{
-	public class DebuggerConfigWindowViewModel : DisposableViewModel
-	{
+namespace Mesen.Debugger.ViewModels {
+	public class DebuggerConfigWindowViewModel : DisposableViewModel {
 		public DebuggerFontConfig Fonts { get; set; }
 		public DebuggerConfig Debugger { get; set; }
 		public ScriptWindowConfig Script { get; set; }
@@ -41,8 +39,7 @@ namespace Mesen.Debugger.ViewModels
 		[Obsolete("For designer only")]
 		public DebuggerConfigWindowViewModel() : this(DebugConfigWindowTab.Debugger) { }
 
-		public DebuggerConfigWindowViewModel(DebugConfigWindowTab tab)
-		{
+		public DebuggerConfigWindowViewModel(DebugConfigWindowTab tab) {
 			SelectedIndex = tab;
 			Debugger = ConfigManager.Config.Debug.Debugger;
 			Fonts = ConfigManager.Config.Debug.Fonts;
@@ -63,13 +60,12 @@ namespace Mesen.Debugger.ViewModels
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Integration, Config_PropertyChanged));
 		}
 
-		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-		{
-			if(sender == null || e.PropertyName == null) {
+		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+			if (sender == null || e.PropertyName == null) {
 				return;
 			}
 
-			if(!_changes.TryGetValue(sender, out HashSet<string>? changes)) {
+			if (!_changes.TryGetValue(sender, out HashSet<string>? changes)) {
 				_changes[sender] = new HashSet<string>() { e.PropertyName };
 			} else {
 				changes.Add(e.PropertyName);
@@ -79,12 +75,11 @@ namespace Mesen.Debugger.ViewModels
 			ConfigManager.Config.Debug.Fonts.ApplyConfig();
 		}
 
-		public void RevertChanges()
-		{
+		public void RevertChanges() {
 			RevertChanges(Debugger, _backupDebugger);
 			RevertChanges(Script, _backupScript);
 			RevertChanges(Integration, _backupIntegration);
-			
+
 			RevertChanges(Fonts.DisassemblyFont, _backupFont.DisassemblyFont);
 			RevertChanges(Fonts.AssemblerFont, _backupFont.AssemblerFont);
 			RevertChanges(Fonts.MemoryViewerFont, _backupFont.MemoryViewerFont);
@@ -94,30 +89,27 @@ namespace Mesen.Debugger.ViewModels
 			ConfigManager.Config.Debug.Shortcuts = _backupShortcuts;
 		}
 
-		public bool IsDirty()
-		{
-			return (
+		public bool IsDirty() {
+			return 
 				!Debugger.IsIdentical(_backupDebugger) ||
 				!Script.IsIdentical(_backupScript) ||
 				!Integration.IsIdentical(_backupIntegration) ||
 				!Fonts.IsIdentical(_backupFont)
-			);
+			;
 		}
 
-		private void RevertChanges<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties)] T>(T current, T original) where T : ReactiveObject
-		{
-			if(_changes.TryGetValue(current, out HashSet<string>? changes)) {
-				foreach(string propertyName in changes) {
+		private void RevertChanges<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties)] T>(T current, T original) where T : ReactiveObject {
+			if (_changes.TryGetValue(current, out HashSet<string>? changes)) {
+				foreach (string propertyName in changes) {
 					PropertyInfo? prop = typeof(T).GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-					if(prop != null) {
+					if (prop != null) {
 						prop.SetValue(current, prop.GetValue(original));
 					}
 				}
 			}
 		}
 
-		private void InitShortcutLists()
-		{
+		private void InitShortcutLists() {
 			SharedShortcuts = CreateShortcutList(new DebuggerShortcut[] {
 				//DebuggerShortcut.IncreaseFontSize,
 				//DebuggerShortcut.DecreaseFontSize,
@@ -316,15 +308,13 @@ namespace Mesen.Debugger.ViewModels
 			});
 		}
 
-		private List<DebuggerShortcutInfo> CreateShortcutList(DebuggerShortcut[] debuggerShortcuts)
-		{
+		private List<DebuggerShortcutInfo> CreateShortcutList(DebuggerShortcut[] debuggerShortcuts) {
 			DebuggerShortcutsConfig shortcuts = ConfigManager.Config.Debug.Shortcuts;
 			return debuggerShortcuts.Select(s => shortcuts.GetBindable(s)).ToList();
 		}
 	}
 
-	public enum DebugConfigWindowTab
-	{
+	public enum DebugConfigWindowTab {
 		Debugger = 0,
 		ScriptWindow = 1,
 		//separator

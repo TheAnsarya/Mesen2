@@ -1,4 +1,9 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reactive.Linq;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using Mesen.Config;
 using Mesen.Controls;
@@ -6,16 +11,9 @@ using Mesen.Interop;
 using Mesen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reactive.Linq;
 
-namespace Mesen.ViewModels
-{
-	public class NesConfigViewModel : DisposableViewModel
-	{
+namespace Mesen.ViewModels {
+	public class NesConfigViewModel : DisposableViewModel {
 		private NotificationListener? _listener = null;
 
 		[Reactive] public NesConfig Config { get; set; }
@@ -28,7 +26,7 @@ namespace Mesen.ViewModels
 		[ObservableAsProperty] public bool IsDelayStereoEffect { get; }
 		[ObservableAsProperty] public bool IsPanningStereoEffect { get; }
 		[ObservableAsProperty] public bool IsCombStereoEffect { get; }
-		
+
 		public Enum[] AvailableRegions => new Enum[] {
 			ConsoleRegion.Auto,
 			ConsoleRegion.Ntsc,
@@ -53,13 +51,12 @@ namespace Mesen.ViewModels
 		//For designer
 		public NesConfigViewModel() : this(new PreferencesConfig()) { }
 
-		public NesConfigViewModel(PreferencesConfig preferences)
-		{
+		public NesConfigViewModel(PreferencesConfig preferences) {
 			Config = ConfigManager.Config.Nes;
 			OriginalConfig = Config.Clone();
 			Input = new NesInputConfigViewModel(Config, preferences);
 
-			if(Design.IsDesignMode) {
+			if (Design.IsDesignMode) {
 				return;
 			}
 
@@ -67,25 +64,21 @@ namespace Mesen.ViewModels
 			_listener.OnNotification += listener_OnNotification;
 
 			AddDisposable(Input);
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => Config.ApplyConfig()));
 			AddDisposable(this.WhenAnyValue(x => x.Config.StereoFilter).Select(x => x == StereoFilter.Delay).ToPropertyEx(this, x => x.IsDelayStereoEffect));
 			AddDisposable(this.WhenAnyValue(x => x.Config.StereoFilter).Select(x => x == StereoFilter.Panning).ToPropertyEx(this, x => x.IsPanningStereoEffect));
 			AddDisposable(this.WhenAnyValue(x => x.Config.StereoFilter).Select(x => x == StereoFilter.CombFilter).ToPropertyEx(this, x => x.IsCombStereoEffect));
 		}
 
-		private void listener_OnNotification(NotificationEventArgs e)
-		{
-			if(e.NotificationType == ConsoleNotificationType.RequestConfigChange) {
+		private void listener_OnNotification(NotificationEventArgs e) {
+			if (e.NotificationType == ConsoleNotificationType.RequestConfigChange) {
 				//Update configuration when game is loaded
-				Dispatcher.UIThread.Post(() => {
-					Config.UpdateInputFromCoreConfig();
-				});
+				Dispatcher.UIThread.Post(() => Config.UpdateInputFromCoreConfig());
 			}
 		}
 	}
 
-	public enum NesConfigTab
-	{
+	public enum NesConfigTab {
 		General,
 		Audio,
 		Emulation,

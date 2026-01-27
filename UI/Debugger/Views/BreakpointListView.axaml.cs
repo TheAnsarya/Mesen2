@@ -1,56 +1,51 @@
+using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using System.Linq;
-using Mesen.ViewModels;
+using DataBoxControl;
+using Mesen.Config;
 using Mesen.Debugger;
+using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Debugger.Windows;
 using Mesen.Utilities;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
-using System;
+using Mesen.ViewModels;
 using static Mesen.Debugger.ViewModels.BreakpointListViewModel;
-using Avalonia.Input;
-using DataBoxControl;
 
-namespace Mesen.Debugger.Views
-{
-	public class BreakpointListView : UserControl
-	{
-		public BreakpointListView()
-		{
+namespace Mesen.Debugger.Views {
+	public class BreakpointListView : UserControl {
+		public BreakpointListView() {
 			InitializeComponent();
 		}
 
-		private void InitializeComponent()
-		{
+		private void InitializeComponent() {
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		protected override void OnDataContextChanged(EventArgs e)
-		{
-			if(DataContext is BreakpointListViewModel vm) {
+		protected override void OnDataContextChanged(EventArgs e) {
+			if (DataContext is BreakpointListViewModel vm) {
 				vm.InitContextMenu(this);
 			}
+
 			base.OnDataContextChanged(e);
 		}
 
-		private void OnCellClick(DataBoxCell cell)
-		{
-			if(DataContext is BreakpointListViewModel bpList && cell.DataContext is BreakpointViewModel) {
+		private void OnCellClick(DataBoxCell cell) {
+			if (DataContext is BreakpointListViewModel bpList && cell.DataContext is BreakpointViewModel) {
 				string? header = cell.Column?.Header?.ToString() ?? "";
-				if(header == "E" || header == "M") {
+				if (header is "E" or "M") {
 					bool isEnabledColumn = header == "E";
 					bool newValue = !bpList.Selection.SelectedItems.Any(bp => (isEnabledColumn ? bp?.Breakpoint.Enabled : bp?.Breakpoint.MarkEvent) == true);
 
-					foreach(BreakpointViewModel? bp in bpList.Selection.SelectedItems) {
-						if(bp != null) {
-							if(isEnabledColumn) {
+					foreach (BreakpointViewModel? bp in bpList.Selection.SelectedItems) {
+						if (bp != null) {
+							if (isEnabledColumn) {
 								bp.Breakpoint.Enabled = newValue;
 							} else {
-								if(!bp.Breakpoint.Forbid) {
+								if (!bp.Breakpoint.Forbid) {
 									bp.Breakpoint.MarkEvent = newValue;
 								}
 							}
@@ -63,9 +58,8 @@ namespace Mesen.Debugger.Views
 			}
 		}
 
-		private void OnCellDoubleClick(DataBoxCell cell)
-		{
-			if(cell.DataContext is BreakpointViewModel vm) {
+		private void OnCellDoubleClick(DataBoxCell cell) {
+			if (cell.DataContext is BreakpointViewModel vm) {
 				BreakpointEditWindow.EditBreakpoint(vm.Breakpoint, this);
 			}
 		}

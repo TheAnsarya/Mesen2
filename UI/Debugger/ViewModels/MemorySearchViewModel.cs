@@ -1,4 +1,11 @@
-﻿using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using DataBoxControl;
@@ -11,18 +18,10 @@ using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class MemorySearchViewModel : DisposableViewModel
-{
+public class MemorySearchViewModel : DisposableViewModel {
 	public MemorySearchConfig Config { get; }
 
 	[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
@@ -48,51 +47,41 @@ public class MemorySearchViewModel : DisposableViewModel
 	[Reactive] public string MaxValue { get; set; } = "";
 
 	[Reactive] public int MaxAddress { get; set; } = 0;
-	
+
 	[Reactive] public bool IsUndoEnabled { get; set; } = false;
 	[Reactive] public bool IsSpecificValueEnabled { get; set; } = false;
 	[Reactive] public bool IsSpecificAddressEnabled { get; set; } = false;
-	
-	public int[] AddressLookup => _addressLookup;
-	public byte[] MemoryState => _memoryState;
-	public byte[] PrevMemoryState => _prevMemoryState;
+
+	public int[] AddressLookup { get; private set; } = Array.Empty<int>();
+	public byte[] MemoryState { get; private set; } = Array.Empty<byte>();
+	public byte[] PrevMemoryState { get; private set; } = Array.Empty<byte>();
 
 	private List<MemoryAddressViewModel> _innerData = new();
-
-	private int[] _addressLookup = Array.Empty<int>();
-	
 	private byte[] _lastSearchSnapshot = Array.Empty<byte>();
-	private HashSet<int> _hiddenAddresses = new();	
-	
+	private HashSet<int> _hiddenAddresses = new();
+
 	private List<SearchHistory> _undoHistory = new();
-
-	private byte[] _memoryState = Array.Empty<byte>();
-	private byte[] _prevMemoryState = Array.Empty<byte>();
-
 	private bool _isRefreshing;
 
-	public MemorySearchViewModel()
-	{
+	public MemorySearchViewModel() {
 		Config = ConfigManager.Config.Debug.MemorySearch;
 
-		if(Design.IsDesignMode) {
+		if (Design.IsDesignMode) {
 			return;
 		}
 
 		OnGameLoaded();
 		SortState.SetColumnSort("Address", ListSortDirection.Ascending, false);
 
-		AddDisposable(this.WhenAnyValue(x => x.MemoryType).Subscribe(x => {
-			ResetSearch();
-		}));
-		
+		AddDisposable(this.WhenAnyValue(x => x.MemoryType).Subscribe(x => ResetSearch()));
+
 		AddDisposable(this.WhenAnyValue(x => x.Operator, x => x.CompareTo, x => x.ValueSize, x => x.Format).Subscribe(x => {
 			IsSpecificValueEnabled = CompareTo == MemorySearchCompareTo.SpecificValue;
 			IsSpecificAddressEnabled = CompareTo == MemorySearchCompareTo.SpecificAddress;
 
 			IsValueHex = Format == MemorySearchFormat.Hex;
 			bool isSigned = Format == MemorySearchFormat.Signed;
-			switch(ValueSize) {
+			switch (ValueSize) {
 				case MemorySearchValueSize.Byte:
 					MinValue = isSigned ? sbyte.MinValue.ToString() : byte.MinValue.ToString();
 					MaxValue = isSigned ? sbyte.MaxValue.ToString() : byte.MaxValue.ToString();
@@ -108,46 +97,39 @@ public class MemorySearchViewModel : DisposableViewModel
 					MaxValue = isSigned ? Int32.MaxValue.ToString() : UInt32.MaxValue.ToString();
 					break;
 			}
+
 			RefreshList(true);
 		}));
 
-		AddDisposable(this.WhenAnyValue(x => x.SpecificValue, x => x.SpecificAddress).Subscribe(x => {
-			RefreshList(false);
-		}));
+		AddDisposable(this.WhenAnyValue(x => x.SpecificValue, x => x.SpecificAddress).Subscribe(x => RefreshList(false)));
 	}
 
-	public void SortCommand()
-	{
+	public void SortCommand() {
 		RefreshList(true);
 	}
 
-	public void OnGameLoaded()
-	{
+	public void OnGameLoaded() {
 		AvailableMemoryTypes = Enum.GetValues<MemoryType>().Where(t => t.SupportsMemoryViewer() && !t.IsRelativeMemory() && DebugApi.GetMemorySize(t) > 0).Cast<Enum>().ToArray();
 		MemoryType = EmuApi.GetRomInfo().ConsoleType.GetMainCpuType().GetSystemRamType();
 	}
 
-	public void RefreshData(bool forceSort)
-	{
-		_prevMemoryState = _memoryState;
-		_memoryState = DebugApi.GetMemoryState(MemoryType);
+	public void RefreshData(bool forceSort) {
+		PrevMemoryState = MemoryState;
+		MemoryState = DebugApi.GetMemoryState(MemoryType);
 
-		Dispatcher.UIThread.Post(() => {
-			RefreshList(forceSort);
-		});
+		Dispatcher.UIThread.Post(() => RefreshList(forceSort));
 	}
 
-	private void RefreshList(bool forceSort)
-	{
-		byte[] memoryState = _memoryState;
-		byte[] prevMemoryState = _prevMemoryState;
+	private void RefreshList(bool forceSort) {
+		byte[] memoryState = MemoryState;
+		byte[] prevMemoryState = PrevMemoryState;
 
-		if(memoryState.Length != prevMemoryState.Length) {
+		if (memoryState.Length != prevMemoryState.Length) {
 			//Mismatching arrays - happens when changing game or mem type
 			return;
 		}
 
-		if(_isRefreshing) {
+		if (_isRefreshing) {
 			return;
 		}
 
@@ -156,7 +138,7 @@ public class MemorySearchViewModel : DisposableViewModel
 
 		Task.Run(() => {
 			bool isDefaultSort = sortOrder.Count == 1 && sortOrder[0].Item2 == ListSortDirection.Ascending && sortOrder[0].Item1 == "Address";
-			if(!isDefaultSort || forceSort) {
+			if (!isDefaultSort || forceSort) {
 				Sort(sortOrder);
 			}
 
@@ -164,41 +146,39 @@ public class MemorySearchViewModel : DisposableViewModel
 		});
 	}
 
-	private void RefreshUiList(byte[] memoryState)
-	{
-		if(Disposed) {
+	private void RefreshUiList(byte[] memoryState) {
+		if (Disposed) {
 			return;
 		}
 
 		MemoryType memType = MemoryType;
 
-		if(_innerData.Count < memoryState.Length) {
+		if (_innerData.Count < memoryState.Length) {
 			_innerData.AddRange(Enumerable.Range(_innerData.Count, memoryState.Length - _innerData.Count).Select(i => new MemoryAddressViewModel(i, this)));
-		} else if(_innerData.Count > memoryState.Length) {
+		} else if (_innerData.Count > memoryState.Length) {
 			_innerData.RemoveRange(memoryState.Length, _innerData.Count - memoryState.Length);
 		}
 
 		int visibleCount = memoryState.Length - _hiddenAddresses.Count;
-		if(ListData.Count != visibleCount) {
+		if (ListData.Count != visibleCount) {
 			ListData.Replace(_innerData.GetRange(0, visibleCount));
 		}
 
 		List<MemoryAddressViewModel> list = ListData.GetInnerList();
-		for(int i = 0, len = list.Count; i < len; i++) {
+		for (int i = 0, len = list.Count; i < len; i++) {
 			list[i].Update();
 		}
 
 		_isRefreshing = false;
 	}
 
-	public void Sort(List<Tuple<string, ListSortDirection>> sortOrder)
-	{
-		byte[] mem = _memoryState;
-		byte[] prevMem = _prevMemoryState;
+	public void Sort(List<Tuple<string, ListSortDirection>> sortOrder) {
+		byte[] mem = MemoryState;
+		byte[] prevMem = PrevMemoryState;
 
 		AddressCounters[] counters = Array.Empty<AddressCounters>();
-		foreach((string column, ListSortDirection order) in SortState.SortOrder) {
-			if(column.Contains("Read") || column.Contains("Write") || column.Contains("Exec")) {
+		foreach ((string column, ListSortDirection order) in SortState.SortOrder) {
+			if (column.Contains("Read") || column.Contains("Write") || column.Contains("Exec")) {
 				//Only get counters if user sorted on a counter column
 				counters = DebugApi.GetMemoryAccessCounts(MemoryType);
 				break;
@@ -217,24 +197,23 @@ public class MemorySearchViewModel : DisposableViewModel
 			{ "LastExec", (a, b) => -counters[a].ExecStamp.CompareTo(counters[b].ExecStamp) },
 		};
 
-		SortHelper.SortArray(_addressLookup, sortOrder, comparers, "Address");
+		SortHelper.SortArray(AddressLookup, sortOrder, comparers, "Address");
 	}
 
-	public long GetValue(int address, byte[] memoryState)
-	{
+	public long GetValue(int address, byte[] memoryState) {
 		uint value = 0;
-		for(int i = 0; i < (int)ValueSize && address + i < memoryState.Length; i++) {
+		for (int i = 0; i < (int)ValueSize && address + i < memoryState.Length; i++) {
 			value |= (uint)memoryState[address + i] << (i * 8);
 		}
 
-		switch(Format) {
+		switch (Format) {
 			default:
 			case MemorySearchFormat.Hex: {
-				return value;
-			}
+					return value;
+				}
 
 			case MemorySearchFormat.Signed:
-				switch(ValueSize) {
+				switch (ValueSize) {
 					default:
 					case MemorySearchValueSize.Byte: return (sbyte)value;
 					case MemorySearchValueSize.Word: return (short)value;
@@ -242,7 +221,7 @@ public class MemorySearchViewModel : DisposableViewModel
 				}
 
 			case MemorySearchFormat.Unsigned:
-				switch(ValueSize) {
+				switch (ValueSize) {
 					default:
 					case MemorySearchValueSize.Byte: return (byte)value;
 					case MemorySearchValueSize.Word: return (ushort)value;
@@ -251,14 +230,13 @@ public class MemorySearchViewModel : DisposableViewModel
 		}
 	}
 
-	public bool IsMatch(int address)
-	{
-		long value = GetValue(address, _memoryState);
-		
+	public bool IsMatch(int address) {
+		long value = GetValue(address, MemoryState);
+
 		long compareValue = CompareTo switch {
 			MemorySearchCompareTo.PreviousSearchValue => GetValue(address, _lastSearchSnapshot),
-			MemorySearchCompareTo.PreviousRefreshValue => GetValue(address, _prevMemoryState),
-			MemorySearchCompareTo.SpecificAddress => GetValue(SpecificAddress, _memoryState),
+			MemorySearchCompareTo.PreviousRefreshValue => GetValue(address, PrevMemoryState),
+			MemorySearchCompareTo.SpecificAddress => GetValue(SpecificAddress, MemoryState),
 			MemorySearchCompareTo.SpecificValue => SpecificValue,
 			_ => throw new Exception("Unsupported compare type")
 		};
@@ -274,16 +252,15 @@ public class MemorySearchViewModel : DisposableViewModel
 		};
 	}
 
-	public void AddFilter()
-	{
+	public void AddFilter() {
 		_undoHistory.Add(new SearchHistory(_hiddenAddresses, _lastSearchSnapshot));
 		IsUndoEnabled = true;
 
 		int count = _lastSearchSnapshot.Length;
-		for(int i = 0; i < count; i++) {
-			if(_hiddenAddresses.Contains(i)) {
+		for (int i = 0; i < count; i++) {
+			if (_hiddenAddresses.Contains(i)) {
 				continue;
-			} else if(!IsMatch(i)) {
+			} else if (!IsMatch(i)) {
 				_hiddenAddresses.Add(i);
 			}
 		}
@@ -294,38 +271,35 @@ public class MemorySearchViewModel : DisposableViewModel
 		RefreshList(true);
 	}
 
-	private void UpdateAddressLookup()
-	{
+	private void UpdateAddressLookup() {
 		int count = _lastSearchSnapshot.Length;
 		int[] addressLookup = new int[count];
 		int visibleRowCounter = 0;
 
-		for(int i = 0; i < count; i++) {
-			if(!_hiddenAddresses.Contains(i)) {
+		for (int i = 0; i < count; i++) {
+			if (!_hiddenAddresses.Contains(i)) {
 				addressLookup[visibleRowCounter] = i;
 				visibleRowCounter++;
 			}
 		}
 
 		Array.Resize(ref addressLookup, visibleRowCounter);
-		_addressLookup = addressLookup;
+		AddressLookup = addressLookup;
 	}
 
-	public void ResetSearch()
-	{
+	public void ResetSearch() {
 		_lastSearchSnapshot = DebugApi.GetMemoryState(MemoryType);
-		_addressLookup = Enumerable.Range(0, _lastSearchSnapshot.Length).ToArray();
+		AddressLookup = Enumerable.Range(0, _lastSearchSnapshot.Length).ToArray();
 		MaxAddress = Math.Max(0, _lastSearchSnapshot.Length - 1);
 		_hiddenAddresses.Clear();
 		_undoHistory.Clear();
 		IsUndoEnabled = false;
-		_memoryState = DebugApi.GetMemoryState(MemoryType);
+		MemoryState = DebugApi.GetMemoryState(MemoryType);
 		RefreshData(true);
 	}
 
-	public void Undo()
-	{
-		if(_undoHistory.Count > 0) {
+	public void Undo() {
+		if (_undoHistory.Count > 0) {
 			_hiddenAddresses = _undoHistory[^1].HiddenAddresses;
 			_lastSearchSnapshot = _undoHistory[^1].SearchSnapshot;
 			_undoHistory.RemoveAt(_undoHistory.Count - 1);
@@ -335,38 +309,32 @@ public class MemorySearchViewModel : DisposableViewModel
 		}
 	}
 
-	public void ResetCounters()
-	{
+	public void ResetCounters() {
 		DebugApi.ResetMemoryAccessCounts();
 		RefreshList(true);
 	}
 
-	private class SearchHistory
-	{
+	private class SearchHistory {
 		public HashSet<int> HiddenAddresses;
 		public byte[] SearchSnapshot;
 
-		public SearchHistory(HashSet<int> hiddenAddresses, byte[] searchSnapshot)
-		{
+		public SearchHistory(HashSet<int> hiddenAddresses, byte[] searchSnapshot) {
 			HiddenAddresses = new(hiddenAddresses);
 			SearchSnapshot = searchSnapshot;
 		}
 	}
 }
 
-public class MemoryAddressViewModel : INotifyPropertyChanged
-{
+public class MemoryAddressViewModel : INotifyPropertyChanged {
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	private string _addressString = "";
-	public string AddressString
-	{
-		get
-		{
+	public string AddressString { get {
 			UpdateFields();
-			return _addressString;
+			return field;
 		}
-	}
+
+		private set;
+	} = "";
 
 	public string Value { get; set; } = "";
 	public string PrevValue { get; set; } = "";
@@ -384,8 +352,7 @@ public class MemoryAddressViewModel : INotifyPropertyChanged
 	private int _index;
 	private MemorySearchViewModel _search;
 
-	public MemoryAddressViewModel(int index, MemorySearchViewModel memorySearch)
-	{
+	public MemoryAddressViewModel(int index, MemorySearchViewModel memorySearch) {
 		_index = index;
 		_search = memorySearch;
 	}
@@ -404,9 +371,8 @@ public class MemoryAddressViewModel : INotifyPropertyChanged
 		};
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Update()
-	{
-		if(PropertyChanged != null) {
+	public void Update() {
+		if (PropertyChanged != null) {
 			PropertyChanged(this, _args[0]);
 			PropertyChanged(this, _args[1]);
 			PropertyChanged(this, _args[2]);
@@ -420,65 +386,66 @@ public class MemoryAddressViewModel : INotifyPropertyChanged
 		}
 	}
 
-	private void UpdateFields()
-	{
-		if(_index >= _search.AddressLookup.Length) {
+	private void UpdateFields() {
+		if (_index >= _search.AddressLookup.Length) {
 			return;
 		}
 
 		int address = _search.AddressLookup[_index];
-		_addressString = address.ToString("X4");
+		AddressString = address.ToString("X4");
 
 		uint value = 0;
 		uint prevValue = 0;
-		for(int i = 0; i < (int)_search.ValueSize && address + i < _search.MemoryState.Length; i++) {
+		for (int i = 0; i < (int)_search.ValueSize && address + i < _search.MemoryState.Length; i++) {
 			value |= (uint)_search.MemoryState[address + i] << (i * 8);
 			prevValue |= (uint)_search.PrevMemoryState[address + i] << (i * 8);
 		}
 
-		switch(_search.Format) {
+		switch (_search.Format) {
 			case MemorySearchFormat.Hex: {
-				string format = "X" + (((int)_search.ValueSize) * 2);
-				Value = value.ToString(format);
-				PrevValue = prevValue.ToString(format);
-				break;
-			}
+					string format = "X" + (((int)_search.ValueSize) * 2);
+					Value = value.ToString(format);
+					PrevValue = prevValue.ToString(format);
+					break;
+				}
 
 			case MemorySearchFormat.Signed: {
-				switch(_search.ValueSize) {
-					case MemorySearchValueSize.Byte:
-						Value = ((sbyte)value).ToString();
-						PrevValue = ((sbyte)prevValue).ToString();
-						break;
-					case MemorySearchValueSize.Word:
-						Value = ((short)value).ToString();
-						PrevValue = ((short)prevValue).ToString();
-						break;
-					case MemorySearchValueSize.Dword:
-						Value = ((int)value).ToString();
-						PrevValue = ((int)prevValue).ToString();
-						break;
+					switch (_search.ValueSize) {
+						case MemorySearchValueSize.Byte:
+							Value = ((sbyte)value).ToString();
+							PrevValue = ((sbyte)prevValue).ToString();
+							break;
+						case MemorySearchValueSize.Word:
+							Value = ((short)value).ToString();
+							PrevValue = ((short)prevValue).ToString();
+							break;
+						case MemorySearchValueSize.Dword:
+							Value = ((int)value).ToString();
+							PrevValue = ((int)prevValue).ToString();
+							break;
+					}
+
+					break;
 				}
-				break;
-			}
 
 			case MemorySearchFormat.Unsigned: {
-				switch(_search.ValueSize) {
-					case MemorySearchValueSize.Byte:
-						Value = ((byte)value).ToString();
-						PrevValue = ((byte)prevValue).ToString();
-						break;
-					case MemorySearchValueSize.Word:
-						Value = ((ushort)value).ToString();
-						PrevValue = ((ushort)prevValue).ToString();
-						break;
-					case MemorySearchValueSize.Dword:
-						Value = ((uint)value).ToString();
-						PrevValue = ((uint)prevValue).ToString();
-						break;
+					switch (_search.ValueSize) {
+						case MemorySearchValueSize.Byte:
+							Value = ((byte)value).ToString();
+							PrevValue = ((byte)prevValue).ToString();
+							break;
+						case MemorySearchValueSize.Word:
+							Value = ((ushort)value).ToString();
+							PrevValue = ((ushort)prevValue).ToString();
+							break;
+						case MemorySearchValueSize.Dword:
+							Value = ((uint)value).ToString();
+							PrevValue = ((uint)prevValue).ToString();
+							break;
+					}
+
+					break;
 				}
-				break;
-			}
 		}
 
 		AddressCounters counters = DebugApi.GetMemoryAccessCounts((uint)address, 1, _search.MemoryType)[0];
@@ -496,30 +463,26 @@ public class MemoryAddressViewModel : INotifyPropertyChanged
 	}
 }
 
-public enum MemorySearchFormat
-{
+public enum MemorySearchFormat {
 	Hex,
 	Signed,
 	Unsigned,
 }
 
-public enum MemorySearchValueSize
-{
+public enum MemorySearchValueSize {
 	Byte = 1,
 	Word = 2,
 	Dword = 4,
 }
 
-public enum MemorySearchCompareTo
-{
+public enum MemorySearchCompareTo {
 	PreviousSearchValue,
 	PreviousRefreshValue,
 	SpecificValue,
 	SpecificAddress
 }
 
-public enum MemorySearchOperator
-{
+public enum MemorySearchOperator {
 	Equal,
 	NotEqual,
 	LessThan,

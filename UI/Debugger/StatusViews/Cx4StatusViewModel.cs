@@ -1,14 +1,12 @@
-﻿using Avalonia.Collections;
+using System;
+using System.Text;
+using Avalonia.Collections;
 using Mesen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Text;
 
-namespace Mesen.Debugger.StatusViews
-{
-	public class Cx4StatusViewModel : BaseConsoleStatusViewModel
-	{
+namespace Mesen.Debugger.StatusViews {
+	public class Cx4StatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public UInt32 Reg0 { get; set; }
 		[Reactive] public UInt32 Reg1 { get; set; }
 		[Reactive] public UInt32 Reg2 { get; set; }
@@ -34,10 +32,10 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public UInt32 RegMdr { get; set; }
 		[Reactive] public UInt32 RegMar { get; set; }
 		[Reactive] public UInt32 RegDpr { get; set; }
-		
+
 		[Reactive] public UInt32 RegA { get; set; }
 		[Reactive] public UInt64 RegMult { get; set; }
-		
+
 		[Reactive] public UInt32 RomBuffer { get; set; }
 		[Reactive] public UInt32 RamBuffer { get; set; }
 
@@ -47,12 +45,10 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagOverflow { get; set; }
 		[Reactive] public bool FlagIrq { get; set; }
 
-		public Cx4StatusViewModel()
-		{
+		public Cx4StatusViewModel() {
 		}
 
-		protected override void InternalUpdateUiState()
-		{
+		protected override void InternalUpdateUiState() {
 			Cx4State cpu = DebugApi.GetCpuState<Cx4State>(CpuType.Cx4);
 
 			UpdateCycleCount(cpu.CycleCount);
@@ -77,7 +73,7 @@ namespace Mesen.Debugger.StatusViews
 			RegPb = cpu.PB;
 			RegP = cpu.P;
 			RegPc = cpu.PC;
-			
+
 			RegMdr = cpu.MemoryDataReg;
 			RegMar = cpu.MemoryAddressReg;
 			RegDpr = cpu.DataPointerReg;
@@ -95,8 +91,7 @@ namespace Mesen.Debugger.StatusViews
 			FlagIrq = cpu.IrqFlag;
 		}
 
-		protected override void InternalUpdateConsoleState()
-		{
+		protected override void InternalUpdateConsoleState() {
 			Cx4State cpu = DebugApi.GetCpuState<Cx4State>(CpuType.Cx4);
 
 			cpu.Regs[0] = Reg0;
