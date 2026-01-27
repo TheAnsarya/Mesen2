@@ -408,7 +408,9 @@ namespace Mesen.Debugger.Controls
 		{
 			var clipboard = ApplicationHelper.GetMainWindow()?.Clipboard;
 			if(clipboard != null) {
+#pragma warning disable CS0618 // Type or member is obsolete
 				string? text = await clipboard.GetTextAsync();
+#pragma warning restore CS0618
 				if(text != null) {
 					text = text.Replace("\n", "").Replace("\r", "");
 					if(Regex.IsMatch(text, "^[ a-f0-9]+$", RegexOptions.IgnoreCase)) {

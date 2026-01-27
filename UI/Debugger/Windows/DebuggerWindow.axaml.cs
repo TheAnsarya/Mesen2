@@ -232,7 +232,9 @@ namespace Mesen.Debugger.Windows
 
 		private void OnDrop(object? sender, DragEventArgs e)
 		{
+#pragma warning disable CS0618 // Type or member is obsolete
 			string? filename = e.Data.GetFiles()?.FirstOrDefault()?.Path.LocalPath;
+#pragma warning restore CS0618
 			if(filename != null && File.Exists(filename)) {
 				Activate();
 				DebugWorkspaceManager.LoadSupportedFile(filename, true);
