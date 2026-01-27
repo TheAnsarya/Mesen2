@@ -56,15 +56,19 @@ Major modernization milestone achieved: Upgraded Mesen2 from .NET 8 to .NET 10, 
 - `Tests/Debugger/Labels/PansyExporterTests.cs` - System.IO.Hashing for CRC32
 
 ## Warnings to Address (Future)
-1. `DragEventArgs.Data` obsolete → Use `DataTransfer` instead
-2. `IClipboard.GetTextAsync()` obsolete → Use `ClipboardExtensions.TryGetTextAsync`
-3. Various `IL2075` trimming warnings for reflection usage
-4. `CA2022` - Use exact read instead of inexact `FileStream.Read`
+The remaining 6 warnings are all IL2075 trimming warnings related to reflection usage.
+These are less critical and can be addressed in a future PR:
+1. ConfigManager.cs - GetProperty reflection
+2. ReactiveHelper.cs (2x) - GetProperties reflection
+3. EnumExtensions.cs - GetMember reflection
+4. EventViewerViewModel.cs (2x) - GetProperties reflection
 
 ## Git Status
 - Tag: `v2.0.0-pansy-phase3` pushed to origin
 - Branch: `modernization` (sub-branch of `pansy-export`)
-- Commit pending for modernization changes
+- Commits:
+  - `bd6e891d` - .NET 10, Avalonia 11.3.9, System.IO.Hashing
+  - `eca19ecb` - Deprecation suppressions, ReadExactly fix
 
 ## Next Steps
 1. Commit modernization changes
