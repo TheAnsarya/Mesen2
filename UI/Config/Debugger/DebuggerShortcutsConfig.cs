@@ -278,6 +278,11 @@ namespace Mesen.Config {
 			Add(new() { Shortcut = DebuggerShortcut.TileEditor_TranslateRight, KeyBinding = new(KeyModifiers.Shift, Key.Right) });
 			Add(new() { Shortcut = DebuggerShortcut.TileEditor_TranslateUp, KeyBinding = new(KeyModifiers.Shift, Key.Up) });
 			Add(new() { Shortcut = DebuggerShortcut.TileEditor_TranslateDown, KeyBinding = new(KeyModifiers.Shift, Key.Down) });
+
+			//Pansy integration
+			Add(new() { Shortcut = DebuggerShortcut.ExportPansy, KeyBinding = new(KeyModifiers.Control | KeyModifiers.Shift, Key.P) });
+			Add(new() { Shortcut = DebuggerShortcut.ImportPansy, KeyBinding = new(KeyModifiers.Control | KeyModifiers.Alt, Key.P) });
+			Add(new() { Shortcut = DebuggerShortcut.SyncPansyFolder, KeyBinding = new() });
 		}
 	}
 
@@ -458,6 +463,11 @@ namespace Mesen.Config {
 		TileEditor_TranslateRight,
 		TileEditor_TranslateUp,
 		TileEditor_TranslateDown,
+
+		// Pansy integration shortcuts
+		ExportPansy,
+		ImportPansy,
+		SyncPansyFolder,
 	}
 
 	public class DebuggerShortcutInfo : ViewModelBase {

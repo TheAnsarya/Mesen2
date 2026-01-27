@@ -304,7 +304,10 @@ namespace Mesen.Debugger.ViewModels {
 				DebuggerShortcut.ExportLabels,
 				DebuggerShortcut.ImportWatchEntries,
 				DebuggerShortcut.ExportWatchEntries,
-				DebuggerShortcut.ResetWorkspace
+				DebuggerShortcut.ResetWorkspace,
+				DebuggerShortcut.ExportPansy,
+				DebuggerShortcut.ImportPansy,
+				DebuggerShortcut.SyncPansyFolder
 			});
 		}
 

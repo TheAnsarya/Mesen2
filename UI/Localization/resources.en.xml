@@ -3413,6 +3413,10 @@ E
 			<Value ID="TileEditor_TranslateRight">Tile Editor - Translate right</Value>
 			<Value ID="TileEditor_TranslateUp">Tile Editor - Translate up</Value>
 			<Value ID="TileEditor_TranslateDown">Tile Editor - Translate down</Value>
+
+			<Value ID="ExportPansy">Integration - Export Pansy File</Value>
+			<Value ID="ImportPansy">Integration - Import Pansy File</Value>
+			<Value ID="SyncPansyFolder">Integration - Sync Folder</Value>
 		</Enum>
 		<Enum ID="ActionType">
 			<Value ID="Copy">Copy</Value>
