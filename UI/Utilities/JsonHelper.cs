@@ -22,7 +22,7 @@ namespace Mesen.Utilities
 			using MemoryStream stream = new MemoryStream();
 			byte[] jsonData = JsonSerializer.SerializeToUtf8Bytes(obj, obj.GetType(), MesenSerializerContext.Default);
 			T? clone = (T?)JsonSerializer.Deserialize(jsonData.AsSpan<byte>(), obj.GetType(), MesenSerializerContext.Default);
-			if(clone == null) {
+			if(clone is null) {
 				throw new Exception("Invalid object");
 			}
 			return clone;

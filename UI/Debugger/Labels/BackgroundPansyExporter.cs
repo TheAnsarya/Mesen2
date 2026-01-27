@@ -44,7 +44,7 @@ namespace Mesen.Debugger.Labels
 			System.Diagnostics.Debug.WriteLine("[BackgroundPansy] OnRomUnloaded");
 			StopAutoSaveTimer();
 
-			if (_currentRomInfo != null && ConfigManager.Config.Debug.Integration.SavePansyOnRomUnload) {
+			if (_currentRomInfo is not null && ConfigManager.Config.Debug.Integration.SavePansyOnRomUnload) {
 				ExportPansy();
 			}
 
@@ -57,7 +57,7 @@ namespace Mesen.Debugger.Labels
 		/// </summary>
 		private static void StartCdlRecording()
 		{
-			if (_currentRomInfo == null) return;
+			if (_currentRomInfo is null) return;
 
 			try {
 				// Initialize debugger if not already done
@@ -83,7 +83,7 @@ namespace Mesen.Debugger.Labels
 		/// </summary>
 		private static void StopCdlRecording()
 		{
-			if (!_cdlEnabled || _currentRomInfo == null) return;
+			if (!_cdlEnabled || _currentRomInfo is null) return;
 
 			try {
 				var cpuType = _currentRomInfo.ConsoleType.GetMainCpuType();
@@ -119,7 +119,7 @@ namespace Mesen.Debugger.Labels
 		/// </summary>
 		private static void StopAutoSaveTimer()
 		{
-			if (_autoSaveTimer != null) {
+			if (_autoSaveTimer is not null) {
 				System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Stopping auto-save timer");
 				_autoSaveTimer.Dispose();
 				_autoSaveTimer = null;
@@ -140,7 +140,7 @@ namespace Mesen.Debugger.Labels
 		/// </summary>
 		private static void ExportPansy()
 		{
-			if (_currentRomInfo == null || string.IsNullOrEmpty(_currentRomInfo.RomPath)) {
+			if (_currentRomInfo is null || string.IsNullOrEmpty(_currentRomInfo.RomPath)) {
 				System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Cannot export - no ROM loaded");
 				return;
 			}

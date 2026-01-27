@@ -16,12 +16,12 @@ namespace Mesen.Debugger.Labels
 	{
 		public static void Import(string path, bool showResult)
 		{
-			List<CodeLabel> labels = new List<CodeLabel>(1000);
+			List<CodeLabel> labels = new(1000);
 
 			int errorCount = 0;
 			foreach(string row in File.ReadAllLines(path, Encoding.UTF8)) {
 				CodeLabel? label = CodeLabel.FromString(row);
-				if(label == null) {
+				if(label is null) {
 					errorCount++;
 				} else {
 					if(ConfigManager.Config.Debug.Integration.IsMemoryTypeImportEnabled(label.MemoryType)) {

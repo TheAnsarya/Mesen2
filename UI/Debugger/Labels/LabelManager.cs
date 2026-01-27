@@ -19,9 +19,9 @@ namespace Mesen.Debugger.Labels
 		public static Regex InvalidLabelRegex { get; } = new Regex("[^@_a-zA-Z0-9]", RegexOptions.Compiled);
 		public static Regex AssertRegex { get; } = new Regex(@"assert\((.*)\)", RegexOptions.Compiled);
 
-		private static Dictionary<UInt64, CodeLabel> _labelsByKey = new Dictionary<UInt64, CodeLabel>();
-		private static HashSet<CodeLabel> _labels = new HashSet<CodeLabel>();
-		private static Dictionary<string, CodeLabel> _reverseLookup = new Dictionary<string, CodeLabel>();
+		private static Dictionary<UInt64, CodeLabel> _labelsByKey = new();
+		private static HashSet<CodeLabel> _labels = [];
+		private static Dictionary<string, CodeLabel> _reverseLookup = new();
 
 		public static event EventHandler? OnLabelUpdated;
 
@@ -49,7 +49,7 @@ namespace Mesen.Debugger.Labels
 		public static CodeLabel? GetLabel(AddressInfo addr)
 		{
 			CodeLabel? label = GetLabel((UInt32)addr.Address, addr.Type);
-			if(label != null) {
+			if(label is not null) {
 				return label;
 			}
 
@@ -192,7 +192,7 @@ namespace Mesen.Debugger.Labels
 		public static void RefreshLabels(bool raiseEvent)
 		{
 			DebugApi.ClearLabels();
-			LabelManager.SetLabels(new List<CodeLabel>(_labels), raiseEvent);
+			LabelManager.SetLabels([.._labels], raiseEvent);
 		}
 
 		private static void ProcessLabelUpdate()
@@ -205,7 +205,7 @@ namespace Mesen.Debugger.Labels
 
 		private static void UpdateAssertBreakpoints()
 		{
-			List<Breakpoint> asserts = new List<Breakpoint>();
+			List<Breakpoint> asserts = [];
 
 			Action<CodeLabel, string, CpuType> addAssert = (CodeLabel label, string condition, CpuType cpuType) => {
 				asserts.Add(new Breakpoint() {

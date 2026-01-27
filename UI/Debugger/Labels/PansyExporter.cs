@@ -42,19 +42,19 @@ namespace Mesen.Debugger.Labels
 
 		// Platform IDs matching Pansy specification
 		private static readonly Dictionary<RomFormat, byte> PlatformIds = new() {
-			{ RomFormat.Sfc, 0x02 },    // SNES
-			{ RomFormat.Spc, 0x0D },    // SPC700
-			{ RomFormat.iNes, 0x01 },   // NES
-			{ RomFormat.Fds, 0x0E },    // FDS
-			{ RomFormat.Nsf, 0x01 },    // NSF (uses NES)
-			{ RomFormat.Gb, 0x03 },     // Game Boy
-			{ RomFormat.Gbs, 0x03 },    // GBS
-			{ RomFormat.Gba, 0x04 },    // GBA
-			{ RomFormat.Pce, 0x07 },    // PC Engine
-			{ RomFormat.Sms, 0x06 },    // SMS
-			{ RomFormat.GameGear, 0x06 }, // Game Gear (SMS compatible)
-			{ RomFormat.Sg, 0x06 },     // SG-1000
-			{ RomFormat.Ws, 0x0B },     // WonderSwan
+			[RomFormat.Sfc] = 0x02,      // SNES
+			[RomFormat.Spc] = 0x0D,      // SPC700
+			[RomFormat.iNes] = 0x01,     // NES
+			[RomFormat.Fds] = 0x0E,      // FDS
+			[RomFormat.Nsf] = 0x01,      // NSF (uses NES)
+			[RomFormat.Gb] = 0x03,       // Game Boy
+			[RomFormat.Gbs] = 0x03,      // GBS
+			[RomFormat.Gba] = 0x04,      // GBA
+			[RomFormat.Pce] = 0x07,      // PC Engine
+			[RomFormat.Sms] = 0x06,      // SMS
+			[RomFormat.GameGear] = 0x06, // Game Gear (SMS compatible)
+			[RomFormat.Sg] = 0x06,       // SG-1000
+			[RomFormat.Ws] = 0x0B,       // WonderSwan
 		};
 
 		/// <summary>
@@ -69,7 +69,7 @@ namespace Mesen.Debugger.Labels
 				var cpuType = romInfo.ConsoleType.GetMainCpuType();
 				var memType = cpuType.GetPrgRomMemoryType();
 				byte[] romData = DebugApi.GetMemoryState(memType);
-				if (romData == null || romData.Length == 0)
+				if (romData is null or { Length: 0 })
 					return 0;
 				return Crc32.HashToUInt32(romData);
 			} catch (Exception ex) {
@@ -133,11 +133,11 @@ namespace Mesen.Debugger.Labels
 				var jumpTargets = GetJumpTargets(memoryType);
 
 				// Build sections
-				var sections = new List<SectionInfo>();
-				var sectionData = new List<byte[]>();
+				List<SectionInfo> sections = [];
+				List<byte[]> sectionData = [];
 
 				// Section 1: CODE_DATA_MAP (CDL data)
-				if (cdlData != null && cdlData.Length > 0) {
+				if (cdlData is { Length: > 0 }) {
 					sections.Add(new SectionInfo {
 						Type = SECTION_CODE_DATA_MAP,
 						UncompressedSize = (uint)cdlData.Length
@@ -356,7 +356,7 @@ namespace Mesen.Debugger.Labels
 			try {
 				return DebugApi.GetCdlFunctions(memoryType);
 			} catch {
-				return Array.Empty<uint>();
+				return [];
 			}
 		}
 
@@ -364,8 +364,8 @@ namespace Mesen.Debugger.Labels
 		{
 			try {
 				// Get CDL data and extract jump targets
-				byte[] cdl = GetCdlData(memoryType) ?? Array.Empty<byte>();
-				var targets = new List<uint>();
+				byte[] cdl = GetCdlData(memoryType) ?? [];
+				List<uint> targets = [];
 				
 				for (int i = 0; i < cdl.Length; i++) {
 					if ((cdl[i] & 0x04) != 0) { // JumpTarget flag
@@ -373,9 +373,9 @@ namespace Mesen.Debugger.Labels
 					}
 				}
 				
-				return targets.ToArray();
+				return [.. targets];
 			} catch {
-				return Array.Empty<uint>();
+				return [];
 			}
 		}
 
@@ -506,13 +506,13 @@ namespace Mesen.Debugger.Labels
 			using var ms = new MemoryStream();
 			using var writer = new BinaryWriter(ms);
 
-			if (cdlData == null || cdlData.Length == 0) {
+			if (cdlData is null or { Length: 0 }) {
 				writer.Write((uint)0);
 				return ms.ToArray();
 			}
 
 			// Find contiguous data blocks (CDL flag 0x02 = Data)
-			var blocks = new List<(uint Start, uint End)>();
+			List<(uint Start, uint End)> blocks = [];
 			int? blockStart = null;
 
 			for (int i = 0; i < cdlData.Length; i++) {
@@ -557,7 +557,7 @@ namespace Mesen.Debugger.Labels
 
 			// For now, create cross-refs for labeled subroutines
 			// Future: Could query actual disassembly for JSR/JMP/branch targets
-			var xrefs = new List<(uint From, uint To, byte Type)>();
+			List<(uint From, uint To, byte Type)> xrefs = [];
 
 			// Placeholder - in a full implementation, we would scan the disassembly
 			// for instructions that reference labeled addresses
@@ -575,7 +575,7 @@ namespace Mesen.Debugger.Labels
 			return ms.ToArray();
 		}
 
-		private class SectionInfo
+		private sealed class SectionInfo
 		{
 			public ushort Type;
 			public uint Offset;
