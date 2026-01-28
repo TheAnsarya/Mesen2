@@ -1,14 +1,15 @@
 <Styles
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:sys="clr-namespace:System;assembly=netstandard"	
+	xmlns:sys="clr-namespace:System;assembly=netstandard"
 	xmlns:c="using:Mesen.Controls"
 	xmlns:du="using:Mesen.Debugger.Utilities"
+	xmlns:dft="using:Dock.Avalonia.Themes.Fluent"
 >
 	<StyleInclude Source="/Styles/MesenStyles.Light.xaml" />
 	<StyleInclude Source="/Styles/MesenStyles.Dark.xaml" />
 
-	<StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml" />
+	<dft:DockFluentTheme />
 	<StyleInclude Source="/ThirdParty/DataBox/Themes/Fluent.axaml" />
 	<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
 	<StyleInclude Source="/Styles/DockStyles.xaml" />
@@ -19,7 +20,7 @@
 	<StyleInclude Source="/Styles/AvaloniaNumericUpDownStyles.xaml" />
 	<StyleInclude Source="/Styles/AvaloniaScrollViewerStyles.xaml" />
 	<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
-	
+
 	<Design.PreviewWith>
 		<Window Width="440" Height="620" Padding="5">
 			<StackPanel>
@@ -101,7 +102,7 @@
 
 		<Thickness x:Key="ComboBoxItemThemePadding">3,3,3,3</Thickness>
 		<Thickness x:Key="ComboBoxDropdownContentMargin">0,0,0,0</Thickness>
-		
+
 		<!-- Menu items -->
 		<Thickness x:Key="MenuFlyoutPresenterThemePadding">0</Thickness>
 		<Thickness x:Key="MenuFlyoutScrollerMargin">0</Thickness>
@@ -131,7 +132,7 @@
 			<x:Double x:Key="NavigationViewItemOnLeftMinHeight">32</x:Double>
 		</Style.Resources>
 	</Style>
-	
+
 	<Style Selector="Window">
 		<Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
 		<Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
@@ -147,7 +148,7 @@
 			</Transitions>
 		</Setter>
 	</Style>
-	
+
 	<Style Selector="ComboBox">
 		<Setter Property="ItemsPanel">
 			<ItemsPanelTemplate>
@@ -155,7 +156,7 @@
 			</ItemsPanelTemplate>
 		</Setter>
 	</Style>
-	
+
 	<Style Selector="ItemsControl,ItemsPresenter">
 		<Setter Property="KeyboardNavigation.TabNavigation" Value="Continue" />
 	</Style>
@@ -169,7 +170,7 @@
 		<Setter Property="ItemsSource" Value="{Binding SubActions, DataType={x:Type du:BaseMenuAction}}" />
 		<Setter Property="Command" Value="{Binding ClickCommand, DataType={x:Type du:BaseMenuAction}}" />
 	</Style>
-	
+
 	<Style Selector="Button:pressed, RepeatButton:pressed, ToggleButton:pressed">
 		<Setter Property="RenderTransform" Value="scale(1)" />
 	</Style>
@@ -190,7 +191,7 @@
 	<Style Selector="MenuItem[Header=-]">
 		<Setter Property="Height" Value="4" />
 	</Style>
-	
+
 	<Style Selector="MenuItem > Separator, ContextMenu > Separator">
 		<Setter Property="Background" Value="{DynamicResource MesenMenuSeparatorBackground}" />
 	</Style>
@@ -226,7 +227,7 @@
 		<Setter Property="BorderBrush" Value="{DynamicResource MesenMenuBorderHighlight}" />
 		<Setter Property="BorderThickness" Value="1" />
 	</Style>
-	
+
 	<Style Selector="Button, NumericUpDown RepeatButton">
 		<Setter Property="Height" Value="NaN" />
 		<Setter Property="Padding" Value="4 3" />
@@ -235,20 +236,20 @@
 		<Setter Property="HorizontalContentAlignment" Value="Center" />
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 	</Style>
-	
+
 	<Style Selector="Button.ButtonWithIcon">
 		<Setter Property="Padding" Value="4 2" />
 	</Style>
-	
+
 	<Style Selector="TimePicker Button">
 		<Setter Property="Height" Value="21" />
 	</Style>
-	
+
 	<Style Selector="DatePicker, TimePicker, TextBox, NumericUpDown">
 		<Setter Property="FontSize" Value="{DynamicResource MesenFontSize}" />
 		<Setter Property="FontFamily" Value="{DynamicResource MesenFont}" />
 	</Style>
-	
+
 	<Style Selector="TextBlock, AccessText">
 		<Setter Property="FontSize" Value="{DynamicResource MesenFontSize}" />
 		<Setter Property="FontFamily" Value="{DynamicResource MesenFont}" />
@@ -261,7 +262,7 @@
 
 	<Style Selector="TextBox">
 		<Setter Property="MinWidth" Value="30" />
-		
+
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 
 		<Setter Property="Margin" Value="1" />
@@ -269,7 +270,7 @@
 		<Setter Property="MinHeight" Value="21" />
 		<Setter Property="Height" Value="21" />
 		<Setter Property="SelectionBrush" Value="{DynamicResource TextBoxSelectionBrush}" />
-		
+
 		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
 		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
 	</Style>
@@ -283,7 +284,7 @@
 		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
 		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
 	</Style>
-	
+
 	<Style Selector="TextBox[AcceptsReturn=True] ScrollViewer ScrollContentPresenter">
 		<Setter Property="Margin" Value="2" />
 	</Style>
@@ -291,11 +292,11 @@
 	<Style Selector="ScrollBar">
 		<Setter Property="Cursor" Value="Arrow" />
 	</Style>
-	
+
 	<Style Selector="ScrollContentPresenter ScrollBar">
 		<Setter Property="Cursor" Value="Arrow" />
 	</Style>
-	
+
 	<Style Selector="ScrollViewer">
 		<Setter Property="AllowAutoHide" Value="False" />
 	</Style>
@@ -309,7 +310,7 @@
 	<Style Selector="CheckBox">
 		<Setter Property="MinHeight" Value="20" />
 		<Setter Property="MinWidth" Value="20" />
-		<Setter Property="Padding" Value="2 0 0 0" />		
+		<Setter Property="Padding" Value="2 0 0 0" />
 	</Style>
 	<Style Selector="CheckBox /template/ Grid">
 		<Setter Property="Height" Value="20" />
@@ -369,7 +370,7 @@
 		<Setter Property="Height" Value="NaN" />
 		<Setter Property="Margin" Value="0" />
 	</Style>
-	
+
 	<Style Selector="NumericUpDown TextBox /template/ Border#PART_BorderElement">
 		<Setter Property="IsVisible" Value="True" />
 	</Style>
@@ -404,11 +405,11 @@
 	<Style Selector="TimePicker Button, DatePicker Button">
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 	</Style>
-	
+
 	<Style Selector="TimePickerPresenter Button Path, DatePickerPresenter Button Path">
 		<Setter Property="HorizontalAlignment" Value="Center" />
 	</Style>
-	
+
 	<Style Selector="DatePicker /template/ TextBlock, TimePicker /template/ TextBlock">
 		<Setter Property="Margin" Value="10 0" />
 		<Setter Property="Padding" Value="0" />
@@ -449,7 +450,7 @@
 		<Setter Property="Height" Value="16" />
 		<Setter Property="Width" Value="16" />
 	</Style>
-	
+
 	<!-- Used by configuration dialogs -->
 	<Style Selector="TabControl[TabStripPlacement=Left]">
 		<Setter Property="Template">
@@ -533,7 +534,7 @@
 							<ItemsPresenter Name="PART_ItemsPresenter"
 												 ItemsPanel="{TemplateBinding ItemsPanel}" />
 						</Panel>
-						
+
 						<Rectangle
 							DockPanel.Dock="{TemplateBinding TabStripPlacement}"
 							Fill="LightGray"
@@ -542,7 +543,7 @@
 							VerticalAlignment="Stretch"
 							Margin="0 0 0 3"
 						/>
-						
+
 						<!--<ScrollViewer HorizontalScrollBarVisibility="Auto">-->
 						<ContentPresenter Name="PART_SelectedContentHost"
 												Margin="3 0 0 0"
