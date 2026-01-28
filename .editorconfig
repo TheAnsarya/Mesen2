@@ -187,7 +187,20 @@ insert_final_newline = true
 # Disable IDE0046: Convert to conditional expression
 dotnet_diagnostic.IDE0046.severity = none
 
-# Disable IDE0305: Use collection expression for fluent
+# Collection expression preferences - simplify collection initializations
+# IDE0028: Use collection initializers
+dotnet_diagnostic.IDE0028.severity = suggestion
+# IDE0300: Use collection expression for Create
+dotnet_diagnostic.IDE0300.severity = suggestion
+# IDE0301: Use collection expression for Empty
+dotnet_diagnostic.IDE0301.severity = suggestion
+# IDE0302: Use collection expression for stackalloc
+dotnet_diagnostic.IDE0302.severity = suggestion
+# IDE0303: Use collection expression for Array.Empty
+dotnet_diagnostic.IDE0303.severity = suggestion
+# IDE0304: Use collection expression for ToArray
+dotnet_diagnostic.IDE0304.severity = suggestion
+# Disable IDE0305: Use collection expression for fluent (can make code less readable)
 dotnet_diagnostic.IDE0305.severity = none
 
 # Ignore IDE0060: unused parameter (handled intentionally)
