@@ -45,7 +45,7 @@ namespace Mesen.Config {
 
 				buttonMappings = GetCustomButtons(type);
 				if (buttonMappings == null) {
-					return new List<CustomKeyMapping>();
+					return [];
 				}
 			}
 

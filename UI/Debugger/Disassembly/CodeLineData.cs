@@ -21,7 +21,7 @@ namespace Mesen.Debugger {
 		public LineFlags Flags;
 
 		public byte OpSize = 0;
-		public byte[] ByteCode = Array.Empty<byte>();
+		public byte[] ByteCode = [];
 
 		public string ByteCodeStr {
 			get {

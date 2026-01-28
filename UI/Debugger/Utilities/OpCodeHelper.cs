@@ -374,7 +374,7 @@ public enum CpuFlag {
 }
 
 public class DocFileFormat {
-	public OpCodeDesc[] Instructions { get; set; } = Array.Empty<OpCodeDesc>();
+	public OpCodeDesc[] Instructions { get; set; } = [];
 	public AddrMode[]? AddressingModes { get; set; } = null;
 	public int[]? MinCycles { get; set; }
 	public int[]? MaxCycles { get; set; }

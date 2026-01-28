@@ -395,7 +395,7 @@ namespace Mesen.Debugger.Labels {
 		public static List<string> GetAllDebugFolders() {
 			string basePath = GetDebugBasePath();
 			if (!Directory.Exists(basePath)) {
-				return new List<string>();
+				return [];
 			}
 
 			return Directory.GetDirectories(basePath).ToList();

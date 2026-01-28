@@ -15,13 +15,13 @@ namespace Mesen.Debugger {
 		private MemoryType _memoryType;
 		private CpuType _cpuType;
 		private HexEditorConfig _cfg;
-		private AddressCounters[] _counters = Array.Empty<AddressCounters>();
+		private AddressCounters[] _counters = [];
 		private CdlFlags[]? _cdlData;
-		private bool[] _hasLabel = Array.Empty<bool>();
+		private bool[] _hasLabel = [];
 		private TimingInfo _timing;
 		private ByteInfo _byteInfo = new ByteInfo();
 		private BreakpointTypeFlags[]? _breakpointTypes;
-		private byte[] _data = Array.Empty<byte>();
+		private byte[] _data = [];
 		private long _firstByteIndex = 0;
 		private TblByteCharConverter? _tblConverter = null;
 		private byte[]? _frozenAddresses = null;

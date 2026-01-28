@@ -61,13 +61,13 @@ namespace Mesen.Debugger.ViewModels {
 		private SpriteViewerData _data = new();
 		private SpriteViewerData _coreData = new();
 
-		private byte[] _baseVram = Array.Empty<byte>();
-		private byte[] _baseSpriteRam = Array.Empty<byte>();
-		private byte[] _extVram = Array.Empty<byte>();
-		private byte[] _extSpriteRam = Array.Empty<byte>();
+		private byte[] _baseVram = [];
+		private byte[] _baseSpriteRam = [];
+		private byte[] _extVram = [];
+		private byte[] _extSpriteRam = [];
 
-		private DebugSpriteInfo[] _spriteList = Array.Empty<DebugSpriteInfo>();
-		private UInt32[] _spritePreviews = Array.Empty<UInt32>();
+		private DebugSpriteInfo[] _spriteList = [];
+		private UInt32[] _spritePreviews = [];
 		private bool _refreshPending;
 
 		[Obsolete("For designer only")]

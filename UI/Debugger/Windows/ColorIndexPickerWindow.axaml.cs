@@ -12,7 +12,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Debugger.Windows {
 	public class ColorIndexPickerWindow : MesenWindow {
-		public UInt32[] Palette { get; set; } = Array.Empty<UInt32>();
+		public UInt32[] Palette { get; set; } = [];
 		public int SelectedPalette { get; set; }
 		public int BlockSize { get; set; } = 24;
 		public int ColumnCount { get; set; } = 16;

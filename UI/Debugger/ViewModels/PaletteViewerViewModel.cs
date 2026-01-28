@@ -22,7 +22,7 @@ namespace Mesen.Debugger.ViewModels {
 		public PaletteViewerConfig Config { get; }
 		public RefreshTimingViewModel RefreshTiming { get; }
 
-		[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
+		[Reactive] public UInt32[] PaletteColors { get; set; } = [];
 		[Reactive] public UInt32[]? PaletteValues { get; set; } = null;
 		[Reactive] public int PaletteColumnCount { get; private set; } = 16;
 

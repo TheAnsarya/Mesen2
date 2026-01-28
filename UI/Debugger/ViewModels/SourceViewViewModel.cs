@@ -31,7 +31,7 @@ public class SourceViewViewModel : DisposableViewModel, ISelectableModel {
 	[Reactive] public SourceFileInfo? SelectedFile { get; set; }
 	[Reactive] public int MaxScrollPosition { get; private set; }
 	[Reactive] public int ScrollPosition { get; set; }
-	[Reactive] public CodeLineData[] Lines { get; private set; } = Array.Empty<CodeLineData>();
+	[Reactive] public CodeLineData[] Lines { get; private set; } = [];
 
 	[Reactive] public int? ActiveAddress { get; set; }
 	[Reactive] public int SelectedRow { get; set; }

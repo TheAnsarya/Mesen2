@@ -21,7 +21,7 @@ namespace Mesen.Debugger.ViewModels {
 
 		public bool AllowDelete { get; } = false;
 
-		public Enum[] AvailableMemoryTypes { get; private set; } = Array.Empty<Enum>();
+		public Enum[] AvailableMemoryTypes { get; private set; } = [];
 		public CpuType CpuType { get; }
 
 		private CodeLabel? _originalLabel;

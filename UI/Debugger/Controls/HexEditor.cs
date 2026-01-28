@@ -132,8 +132,8 @@ namespace Mesen.Debugger.Controls {
 		private int _cursorPosition = 0;
 		private int _lastClickedPosition = -1;
 		private bool _inStringView = false;
-		private float[] _startPositionByByte = Array.Empty<float>();
-		private float[] _endPositionByByte = Array.Empty<float>();
+		private float[] _startPositionByByte = [];
+		private float[] _endPositionByByte = [];
 		private FontAntialiasing _fontAntialiasing;
 		private Point _pointerPressedPos;
 		private double _scrollAccumulator = 0.0;

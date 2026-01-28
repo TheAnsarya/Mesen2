@@ -17,7 +17,7 @@ namespace Mesen.Debugger.Utilities {
 
 		static CodeCompletionHelper() {
 			using StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Mesen.Debugger.Documentation.LuaDocumentation.json")!);
-			DocEntryViewModel[] documentation = (DocEntryViewModel[]?)JsonSerializer.Deserialize(reader.ReadToEnd(), typeof(DocEntryViewModel[]), MesenCamelCaseSerializerContext.Default) ?? Array.Empty<DocEntryViewModel>();
+			DocEntryViewModel[] documentation = (DocEntryViewModel[]?)JsonSerializer.Deserialize(reader.ReadToEnd(), typeof(DocEntryViewModel[]), MesenCamelCaseSerializerContext.Default) ?? [];
 
 			_documentation = new Dictionary<string, DocEntryViewModel>();
 			foreach (DocEntryViewModel entry in documentation) {

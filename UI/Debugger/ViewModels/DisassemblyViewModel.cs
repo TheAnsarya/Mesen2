@@ -25,7 +25,7 @@ namespace Mesen.Debugger.ViewModels {
 		[Reactive] public int ScrollPosition { get; set; } = 0;
 		[Reactive] public int MaxScrollPosition { get; private set; } = 1000000000;
 		[Reactive] public int TopAddress { get; private set; } = 0;
-		[Reactive] public CodeLineData[] Lines { get; private set; } = Array.Empty<CodeLineData>();
+		[Reactive] public CodeLineData[] Lines { get; private set; } = [];
 
 		[Reactive] public int? ActiveAddress { get; set; }
 		[Reactive] public int SelectedRowAddress { get; set; }

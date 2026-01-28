@@ -23,8 +23,8 @@ namespace Mesen.Debugger.ViewModels;
 public class TileEditorViewModel : DisposableViewModel {
 	[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
 
-	[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
-	[Reactive] public UInt32[] RawPalette { get; set; } = Array.Empty<UInt32>();
+	[Reactive] public UInt32[] PaletteColors { get; set; } = [];
+	[Reactive] public UInt32[] RawPalette { get; set; } = [];
 	[Reactive] public RawPaletteFormat RawFormat { get; set; }
 	[Reactive] public int PaletteColumnCount { get; private set; } = 16;
 	[Reactive] public int SelectedColor { get; set; } = 0;
@@ -42,7 +42,7 @@ public class TileEditorViewModel : DisposableViewModel {
 	private int _columnCount = 1;
 	private int _rowCount = 1;
 	private TileFormat _tileFormat;
-	private UInt32[] _tileBuffer = Array.Empty<UInt32>();
+	private UInt32[] _tileBuffer = [];
 
 	[Obsolete("For designer only")]
 	public TileEditorViewModel() : this(new() { new() }, 1, TileFormat.Bpp4, 0) { }

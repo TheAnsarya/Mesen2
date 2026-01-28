@@ -34,8 +34,8 @@ namespace Mesen.Debugger.ViewModels {
 		[Reactive] public DynamicTooltip? ViewerTooltip { get; set; }
 		[Reactive] public PixelPoint? ViewerMousePos { get; set; }
 
-		[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
-		[Reactive] public UInt32[] RawPalette { get; set; } = Array.Empty<UInt32>();
+		[Reactive] public UInt32[] PaletteColors { get; set; } = [];
+		[Reactive] public UInt32[] RawPalette { get; set; } = [];
 		[Reactive] public RawPaletteFormat RawFormat { get; set; }
 		[Reactive] public PaletteSelectionMode PaletteSelectionMode { get; private set; }
 		[Reactive] public int PaletteColumnCount { get; private set; } = 16;
@@ -51,8 +51,8 @@ namespace Mesen.Debugger.ViewModels {
 
 		[Reactive] public List<PictureViewerLine>? PageDelimiters { get; set; }
 
-		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
-		[Reactive] public Enum[] AvailableFormats { get; set; } = Array.Empty<Enum>();
+		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = [];
+		[Reactive] public Enum[] AvailableFormats { get; set; } = [];
 		[Reactive] public bool ShowFormatDropdown { get; set; }
 		[Reactive] public bool ShowFilterDropdown { get; set; }
 
@@ -67,8 +67,8 @@ namespace Mesen.Debugger.ViewModels {
 
 		private BaseState? _ppuState;
 		private object _updateLock = new();
-		private byte[] _coreSourceData = Array.Empty<byte>();
-		private byte[] _sourceData = Array.Empty<byte>();
+		private byte[] _coreSourceData = [];
+		private byte[] _sourceData = [];
 		private bool _refreshPending;
 		private bool _inGameLoaded;
 		private bool _preventPresetLoad;

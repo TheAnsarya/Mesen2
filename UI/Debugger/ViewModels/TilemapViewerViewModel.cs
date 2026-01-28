@@ -48,7 +48,7 @@ namespace Mesen.Debugger.ViewModels {
 		[Reactive] public Rect ScrollOverlayRect { get; private set; }
 		[Reactive] public List<PictureViewerLine>? OverlayLines { get; private set; } = null;
 
-		[Reactive] public Enum[] AvailableDisplayModes { get; set; } = Array.Empty<Enum>();
+		[Reactive] public Enum[] AvailableDisplayModes { get; set; } = [];
 
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
@@ -798,12 +798,12 @@ namespace Mesen.Debugger.ViewModels {
 		public UInt64 MasterClock;
 		public BaseState? PpuState;
 		public BaseState? PpuToolsState;
-		public byte[] PrevVram = Array.Empty<byte>();
-		public byte[] Vram = Array.Empty<byte>();
-		public UInt32[] RgbPalette = Array.Empty<UInt32>();
-		public UInt32[] RawPalette = Array.Empty<UInt32>();
+		public byte[] PrevVram = [];
+		public byte[] Vram = [];
+		public UInt32[] RgbPalette = [];
+		public UInt32[] RawPalette = [];
 		public RawPaletteFormat RawFormat;
-		public AddressCounters[] AccessCounters = Array.Empty<AddressCounters>();
+		public AddressCounters[] AccessCounters = [];
 
 		public void CopyTo(TilemapViewerData dst) {
 			dst.TilemapInfo = TilemapInfo;

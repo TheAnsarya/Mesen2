@@ -253,7 +253,7 @@ namespace Mesen.Debugger.Utilities {
 
 	public class DebugWorkspace {
 		public Dictionary<CpuType, CpuDebugWorkspace> WorkspaceByCpu { get; set; } = new();
-		public string[] TblMappings { get; set; } = Array.Empty<string>();
+		public string[] TblMappings { get; set; } = [];
 
 		public static DebugWorkspace Load(string path) {
 			DebugWorkspace dbgWorkspace = new();

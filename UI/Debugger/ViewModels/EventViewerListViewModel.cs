@@ -16,7 +16,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Debugger.ViewModels {
 	public class EventViewerListViewModel : DisposableViewModel {
-		public DebugEventInfo[] RawDebugEvents { get; private set; } = new DebugEventInfo[0];
+		public DebugEventInfo[] RawDebugEvents { get; private set; } = [];
 
 		public MesenList<DebugEventViewModel> DebugEvents { get; }
 		public SelectionModel<DebugEventViewModel?> Selection { get; set; } = new();

@@ -133,7 +133,7 @@ namespace Mesen.Debugger.ViewModels {
 		private object _updateLock = new();
 		private int _dataSize = 0;
 		private ProfiledFunction[] _coreProfilerData = new ProfiledFunction[100000];
-		private ProfiledFunction[] _profilerData = Array.Empty<ProfiledFunction>();
+		private ProfiledFunction[] _profilerData = [];
 
 		private UInt64 _totalCycles;
 

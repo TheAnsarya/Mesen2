@@ -24,7 +24,7 @@ namespace Mesen.Debugger.ViewModels {
 		[Reactive] public HexEditorDataProvider? DataProvider { get; set; }
 		[Reactive] public TblByteCharConverter? TblConverter { get; set; }
 
-		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
+		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = [];
 
 		[Reactive] public int SelectionStart { get; set; }
 		[Reactive] public int SelectionLength { get; set; }

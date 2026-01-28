@@ -25,7 +25,7 @@ namespace Mesen.Debugger.ViewModels {
 		[Reactive] public bool CanExec { get; private set; } = false;
 		[Reactive] public bool HasDummyOperations { get; private set; } = false;
 
-		public Enum[] AvailableMemoryTypes { get; private set; } = Array.Empty<Enum>();
+		public Enum[] AvailableMemoryTypes { get; private set; } = [];
 
 		[Obsolete("For designer only")]
 		public BreakpointEditViewModel() : this(null!) { }

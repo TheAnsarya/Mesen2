@@ -24,7 +24,7 @@ namespace Mesen.Debugger.ViewModels {
 	public class TraceLoggerViewModel : DisposableViewModel, ISelectableModel {
 		public TraceLoggerConfig Config { get; }
 		[Reactive] public TraceLoggerStyleProvider StyleProvider { get; set; }
-		[Reactive] public CodeLineData[] TraceLogLines { get; set; } = Array.Empty<CodeLineData>();
+		[Reactive] public CodeLineData[] TraceLogLines { get; set; } = [];
 		[Reactive] public int VisibleRowCount { get; set; } = 100;
 		[Reactive] public int ScrollPosition { get; set; } = 0;
 		[Reactive] public int MinScrollPosition { get; set; } = 0;

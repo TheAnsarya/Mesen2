@@ -494,7 +494,7 @@ namespace Mesen.Debugger.ViewModels {
 	}
 
 	public class DebugEventViewModel : INotifyPropertyChanged {
-		private DebugEventInfo[] _events = Array.Empty<DebugEventInfo>();
+		private DebugEventInfo[] _events = [];
 		private int _index;
 		private CpuType _cpuType;
 

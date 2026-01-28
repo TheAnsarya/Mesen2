@@ -32,7 +32,7 @@ public class FindResultListViewModel : DisposableViewModel {
 
 	public DebuggerWindowViewModel Debugger { get; }
 
-	private CodeLineData[] _results = Array.Empty<CodeLineData>();
+	private CodeLineData[] _results = [];
 	private string _format;
 
 	[Obsolete("For designer only")]

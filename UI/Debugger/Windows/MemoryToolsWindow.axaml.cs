@@ -219,7 +219,7 @@ namespace Mesen.Debugger.Windows {
 					ActionType = ActionType.ResetTblMappings,
 					OnClick = () => {
 						_model.TblConverter = null;
-						DebugWorkspaceManager.Workspace.TblMappings = Array.Empty<string>();
+						DebugWorkspaceManager.Workspace.TblMappings = [];
 					}
 				},
 				new ContextMenuSeparator(),

@@ -68,7 +68,7 @@ namespace Mesen.Utilities {
 				return new List<Window>(desktop.Windows);
 			}
 
-			return new List<Window>();
+			return [];
 		}
 
 		//Taken from Avalonia's code (MIT): https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Dialogs/AboutAvaloniaDialog.xaml.cs

@@ -24,7 +24,7 @@ namespace Mesen.Debugger.ViewModels;
 public class MemorySearchViewModel : DisposableViewModel {
 	public MemorySearchConfig Config { get; }
 
-	[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
+	[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = [];
 
 	[Reactive] public MemoryType MemoryType { get; set; } = MemoryType.SnesMemory;
 	[Reactive] public MemorySearchFormat Format { get; set; } = MemorySearchFormat.Hex;
@@ -52,12 +52,12 @@ public class MemorySearchViewModel : DisposableViewModel {
 	[Reactive] public bool IsSpecificValueEnabled { get; set; } = false;
 	[Reactive] public bool IsSpecificAddressEnabled { get; set; } = false;
 
-	public int[] AddressLookup { get; private set; } = Array.Empty<int>();
-	public byte[] MemoryState { get; private set; } = Array.Empty<byte>();
-	public byte[] PrevMemoryState { get; private set; } = Array.Empty<byte>();
+	public int[] AddressLookup { get; private set; } = [];
+	public byte[] MemoryState { get; private set; } = [];
+	public byte[] PrevMemoryState { get; private set; } = [];
 
 	private List<MemoryAddressViewModel> _innerData = new();
-	private byte[] _lastSearchSnapshot = Array.Empty<byte>();
+	private byte[] _lastSearchSnapshot = [];
 	private HashSet<int> _hiddenAddresses = new();
 
 	private List<SearchHistory> _undoHistory = new();

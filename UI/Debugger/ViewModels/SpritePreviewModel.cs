@@ -41,7 +41,7 @@ namespace Mesen.Debugger.ViewModels {
 		public UInt32 TileCount { get; set; }
 		public UInt32 WrapWidth { get; set; }
 		public UInt32 WrapHeight { get; set; }
-		public UInt32[] TileAddresses { get; set; } = Array.Empty<UInt32>();
+		public UInt32[] TileAddresses { get; set; } = [];
 
 		private UInt32[] _rawPreview = new UInt32[128 * 128];
 

@@ -42,7 +42,7 @@ namespace Mesen.Debugger.ViewModels {
 		public int? MaxAddress { get; }
 
 		private int _originalAddress = -1;
-		private byte[] _originalCode = Array.Empty<byte>();
+		private byte[] _originalCode = [];
 		[Reactive] public int OriginalByteCount { get; private set; } = 0;
 
 		[Obsolete("For designer only")]
