@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UI\Mesen.csproj" />
+		<ProjectReference Include="..\UI\UI.csproj" />
 	</ItemGroup>
 
 </Project>
