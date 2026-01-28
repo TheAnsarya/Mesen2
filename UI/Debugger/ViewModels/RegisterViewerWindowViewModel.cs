@@ -259,8 +259,8 @@ namespace Mesen.Debugger.ViewModels {
 		private string GetValue(object? value) {
 			if (value is string str) {
 				return str;
-			} else if (value is bool) {
-				return (bool)value ? "☑ true" : "☐ false";
+			} else if (value is bool boolValue) {
+				return boolValue ? "☑ true" : "☐ false";
 			} else if (value is IFormattable formattable) {
 				return formattable.ToString() ?? "";
 			} else if (value == null) {

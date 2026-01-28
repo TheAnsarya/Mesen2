@@ -173,8 +173,8 @@ namespace Mesen.Debugger.Controls {
 		public void AddEntry(string name, object value, bool useMonoFont = false) {
 			_updatedKeys.Add(name);
 
-			if (value is Enum) {
-				value = ResourceHelper.GetEnumText((Enum)value);
+			if (value is Enum enumValue) {
+				value = ResourceHelper.GetEnumText(enumValue);
 			}
 
 			if (_entries.TryGetValue(name, out TooltipEntry? entry)) {

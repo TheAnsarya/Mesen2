@@ -419,8 +419,8 @@ namespace Mesen.Debugger.ViewModels {
 		}
 
 		private ToolDock? FindToolDock(IDock dock) {
-			if (dock is ToolDock) {
-				return (ToolDock)dock;
+			if (dock is ToolDock toolDock) {
+				return toolDock;
 			}
 
 			if (dock.VisibleDockables == null) {
@@ -428,8 +428,8 @@ namespace Mesen.Debugger.ViewModels {
 			}
 
 			foreach (IDockable dockable in dock.VisibleDockables) {
-				if (dockable is IDock) {
-					ToolDock? result = FindToolDock((IDock)dockable);
+				if (dockable is IDock childDock) {
+					ToolDock? result = FindToolDock(childDock);
 					if (result != null) {
 						return result;
 					}

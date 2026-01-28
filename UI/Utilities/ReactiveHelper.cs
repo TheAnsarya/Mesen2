@@ -21,8 +21,8 @@ namespace Mesen.Utilities {
 						ReactiveHelper.RegisterRecursiveObserver(propValue, handler);
 					} else if (value is IList list) {
 						foreach (object listValue in list) {
-							if (listValue is ReactiveObject) {
-								ReactiveHelper.RegisterRecursiveObserver((ReactiveObject)listValue, handler);
+							if (listValue is ReactiveObject reactiveListValue) {
+								ReactiveHelper.RegisterRecursiveObserver(reactiveListValue, handler);
 							}
 						}
 					}
@@ -60,8 +60,8 @@ namespace Mesen.Utilities {
 						ReactiveHelper.UnregisterRecursiveObserver(propValue, handler);
 					} else if (value is IList list) {
 						foreach (object listValue in list) {
-							if (listValue is ReactiveObject) {
-								ReactiveHelper.UnregisterRecursiveObserver((ReactiveObject)listValue, handler);
+							if (listValue is ReactiveObject reactiveListValue) {
+								ReactiveHelper.UnregisterRecursiveObserver(reactiveListValue, handler);
 							}
 						}
 					}
