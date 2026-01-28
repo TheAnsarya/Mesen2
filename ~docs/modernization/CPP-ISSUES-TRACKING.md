@@ -2,26 +2,29 @@
 
 > **Document Created:** January 28, 2026
 > **Last Updated:** January 28, 2026
-> **Status:** 📋 **PLANNING**
+> **Status:** � **IN PROGRESS**
 
 This document tracks the GitHub issues and epics for the C++ core modernization project.
 
+**GitHub Issues:** https://github.com/TheAnsarya/Mesen2/issues?q=label%3Acpp
+
 ## 📊 Status Overview
 
-| Epic | Status | Issues | Priority |
-|------|--------|--------|----------|
-| Epic 8: Build System Modernization | 📋 Planned | 6 | HIGH |
-| Epic 9: Testing Infrastructure | 📋 Planned | 8 | HIGH |
-| Epic 10: Memory Safety | 📋 Planned | 10 | MEDIUM |
-| Epic 11: Standard Library Modernization | 📋 Planned | 8 | MEDIUM |
-| Epic 12: Performance Optimization | 📋 Planned | 6 | LOW |
-| Epic 13: Documentation | 📋 Planned | 5 | LOW |
+| Epic | GitHub | Status | Issues | Priority |
+|------|--------|--------|--------|----------|
+| Epic 8: Build System | [#40](https://github.com/TheAnsarya/Mesen2/issues/40) | 🔄 In Progress | 6 | HIGH |
+| Epic 9: Testing | [#41](https://github.com/TheAnsarya/Mesen2/issues/41) | 📋 Planned | 8 | HIGH |
+| Epic 10: Memory Safety | [#42](https://github.com/TheAnsarya/Mesen2/issues/42) | 📋 Planned | 6 | MEDIUM |
+| Epic 11: Standard Library | [#43](https://github.com/TheAnsarya/Mesen2/issues/43) | 📋 Planned | 3 | MEDIUM |
+| Epic 12: Performance | [#44](https://github.com/TheAnsarya/Mesen2/issues/44) | 📋 Planned | 2 | LOW |
+| Epic 13: Documentation | [#45](https://github.com/TheAnsarya/Mesen2/issues/45) | 📋 Planned | 2 | LOW |
 
 ---
 
 ## Epic 8: C++ Build System Modernization
 
-**Status:** 📋 Planned
+**GitHub:** [#40](https://github.com/TheAnsarya/Mesen2/issues/40)
+**Status:** 🔄 In Progress
 **Priority:** HIGH
 **Estimated Effort:** 1 week
 **Depends On:** None
@@ -32,6 +35,7 @@ Modernize the C++ build system to use VS2026 tooling, enable C++23, and integrat
 ### Issues
 
 #### Issue 8.1: Update Platform Toolset to v144 (VS2026)
+**GitHub:** [#46](https://github.com/TheAnsarya/Mesen2/issues/46) ✅ CLOSED
 **Priority:** HIGH
 **Labels:** `build`, `modernization`, `cpp`
 
@@ -39,21 +43,23 @@ Modernize the C++ build system to use VS2026 tooling, enable C++23, and integrat
 Update all C++ project files to use the VS2026 platform toolset (v144).
 
 **Tasks:**
-- [ ] Update Core.vcxproj
-- [ ] Update Utilities.vcxproj
-- [ ] Update Windows.vcxproj
-- [ ] Update InteropDLL.vcxproj
-- [ ] Update Lua.vcxproj
-- [ ] Update Sdl.vcxproj (if applicable)
-- [ ] Verify builds on Windows
+- [x] Update Core.vcxproj
+- [x] Update Utilities.vcxproj
+- [x] Update Windows.vcxproj
+- [x] Update InteropDLL.vcxproj
+- [x] Update Lua.vcxproj
+- [x] Update SevenZip.vcxproj
+- [x] Update PGOHelper.vcxproj
+- [x] Verify builds on Windows
 
 **Acceptance Criteria:**
-- All projects use PlatformToolset v144
-- All projects build without errors
+- All projects use PlatformToolset v144 ✅
+- All projects build without errors ✅
 
 ---
 
 #### Issue 8.2: Enable C++23 Language Standard
+**GitHub:** [#47](https://github.com/TheAnsarya/Mesen2/issues/47) ✅ CLOSED
 **Priority:** HIGH
 **Labels:** `build`, `modernization`, `cpp`
 
