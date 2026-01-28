@@ -462,15 +462,11 @@ namespace Mesen.Debugger.ViewModels {
 					dmaInfo += "Mode: " + evt.DmaChannelInfo.TransferMode;
 					dmaInfo += singleLine ? " - " : Environment.NewLine;
 
-					int aBusAddress;
-					if (indirectHdma) {
-						aBusAddress = (evt.DmaChannelInfo.HdmaBank << 16) | evt.DmaChannelInfo.TransferSize;
-					} else {
-						aBusAddress = isHdma
+					int aBusAddress = indirectHdma
+						? (evt.DmaChannelInfo.HdmaBank << 16) | evt.DmaChannelInfo.TransferSize
+						: isHdma
 							? (evt.DmaChannelInfo.SrcBank << 16) | evt.DmaChannelInfo.HdmaTableAddress
 							: (evt.DmaChannelInfo.SrcBank << 16) | evt.DmaChannelInfo.SrcAddress;
-					}
-
 					if (!evt.DmaChannelInfo.InvertDirection) {
 						dmaInfo += "$" + aBusAddress.ToString("X4") + " -> $" + (0x2100 | evt.DmaChannelInfo.DestAddress).ToString("X4");
 					} else {

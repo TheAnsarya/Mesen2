@@ -999,7 +999,7 @@ namespace Mesen.Debugger.ViewModels {
 						preset.Layout = TileLayout.Normal;
 						preset.StartAddress = ppu.BgLayers[layer].TilesetAddr;
 						preset.Format = ppu.BgLayers[layer].Bpp8Mode ? TileFormat.GbaBpp8 : TileFormat.GbaBpp4;
-						if (preset.Format == TileFormat.GbaBpp8 || preset.Format == TileFormat.GbaBpp4 && preset.SelectedPalette > 16) {
+						if (preset.Format == TileFormat.GbaBpp8 || (preset.Format == TileFormat.GbaBpp4 && preset.SelectedPalette > 16)) {
 							preset.SelectedPalette = 0;
 						}
 

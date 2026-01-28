@@ -242,11 +242,9 @@ namespace Mesen.Debugger.Utilities {
 			get {
 				string? img = null;
 				if (AbsoluteAddress?.Address >= 0) {
-					if (SearchResultType == SearchResultType.Function) {
-						img = "Assets/Function.png";
-					} else {
-						img = SearchResultType == SearchResultType.JumpTarget ? "Assets/JumpTarget.png" : "Assets/CheatCode.png";
-					}
+					img = SearchResultType == SearchResultType.Function
+						? "Assets/Function.png"
+						: SearchResultType == SearchResultType.JumpTarget ? "Assets/JumpTarget.png" : "Assets/CheatCode.png";
 				} else if (SearchResultType == SearchResultType.File) {
 					img = "Assets/LogWindow.png";
 				} else if (SearchResultType == SearchResultType.Constant) {

@@ -87,7 +87,7 @@ namespace Mesen.ViewModels {
 		}
 
 		public bool IsDirty() {
-			return 
+			return
 				Audio?.OriginalConfig.IsIdentical(ConfigManager.Config.Audio) == false ||
 				Input?.OriginalConfig.IsIdentical(ConfigManager.Config.Input) == false ||
 				Video?.OriginalConfig.IsIdentical(ConfigManager.Config.Video) == false ||

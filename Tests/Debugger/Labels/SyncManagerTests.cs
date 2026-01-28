@@ -159,7 +159,7 @@ public class SyncManagerTests
 	public void Enable_InitializesWatcher()
 	{
 		var state = new SyncManagerState();
-		
+
 		Assert.False(state.IsEnabled);
 		state.Enable();
 		Assert.True(state.IsEnabled);
@@ -170,7 +170,7 @@ public class SyncManagerTests
 	{
 		var state = new SyncManagerState();
 		state.Enable();
-		
+
 		Assert.True(state.IsEnabled);
 		state.Disable();
 		Assert.False(state.IsEnabled);
@@ -182,7 +182,7 @@ public class SyncManagerTests
 		var state = new SyncManagerState();
 		state.Enable();
 		int enableCount = state.EnableCount;
-		
+
 		state.Enable(); // Should be no-op
 		Assert.Equal(enableCount, state.EnableCount);
 	}
@@ -192,7 +192,7 @@ public class SyncManagerTests
 	{
 		var state = new SyncManagerState();
 		int disableCount = state.DisableCount;
-		
+
 		state.Disable(); // Should be no-op
 		Assert.Equal(disableCount, state.DisableCount);
 	}
@@ -222,7 +222,7 @@ public class SyncManagerTests
 		bool localChanged = localModified > lastSyncTime;
 		bool remoteChanged = remoteModified > lastSyncTime;
 		bool hasConflict = localChanged && remoteChanged;
-		
+
 		Assert.False(localChanged);
 		Assert.True(remoteChanged);
 		Assert.False(hasConflict);
@@ -237,7 +237,7 @@ public class SyncManagerTests
 	{
 		var expectedFiles = new[] { "symbols.mlb", "coverage.cdl", "metadata.pansy" };
 		var createdFiles = SimulateExportAll();
-		
+
 		Assert.Equal(3, createdFiles.Length);
 	}
 
@@ -258,9 +258,9 @@ public class SyncManagerTests
 	{
 		var state = new SyncManagerState();
 		state.Enable();
-		
+
 		await state.ForceSyncAsync();
-		
+
 		Assert.True(state.LastSyncTime > DateTime.MinValue);
 	}
 
@@ -269,9 +269,9 @@ public class SyncManagerTests
 	{
 		var state = new SyncManagerState();
 		DateTime before = state.LastSyncTime;
-		
+
 		await state.ForceSyncAsync();
-		
+
 		Assert.Equal(before, state.LastSyncTime);
 	}
 
@@ -348,7 +348,7 @@ public class SyncManagerTests
 	{
 		// Filter out common temporary/build directories
 		string[] ignoredDirs = ["build", "temp", ".git", "node_modules", "bin", "obj"];
-		
+
 		string normalizedPath = path.Replace('\\', '/').ToLowerInvariant();
 		foreach (var dir in ignoredDirs) {
 			if (normalizedPath.Contains($"{dir}/") || normalizedPath.StartsWith($"{dir}/"))
@@ -361,7 +361,7 @@ public class SyncManagerTests
 	{
 		if (isEmpty)
 			return ["symbols.mlb", "coverage.cdl", "metadata.pansy"];
-		
+
 		return ["symbols.mlb", "coverage.cdl", "metadata.pansy"];
 	}
 

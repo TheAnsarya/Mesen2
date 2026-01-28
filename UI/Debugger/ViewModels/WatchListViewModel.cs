@@ -124,7 +124,7 @@ namespace Mesen.Debugger.ViewModels {
 			if (match.Success) {
 				string address = match.Groups[3].Value;
 
-				if (address[0] is >= '0' and <= '9' or '$') {
+				if (address[0] is (>= '0' and <= '9') or '$') {
 					//CPU Address
 					bool isHex = address[0] == '$';
 					string addrString = isHex ? address.Substring(1) : address;

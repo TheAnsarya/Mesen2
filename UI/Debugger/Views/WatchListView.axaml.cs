@@ -112,7 +112,7 @@ namespace Mesen.Debugger.Views {
 		}
 
 		private static bool IsTextKey(Key key) {
-			return key is >= Key.A and <= Key.Z or >= Key.D0 and <= Key.D9 or >= Key.NumPad0 and <= Key.Divide or >= Key.OemSemicolon and <= Key.Oem102;
+			return key is (>= Key.A and <= Key.Z) or (>= Key.D0 and <= Key.D9) or (>= Key.NumPad0 and <= Key.Divide) or (>= Key.OemSemicolon and <= Key.Oem102);
 		}
 
 		private void OnGridKeyDown(object? sender, KeyEventArgs e) {

@@ -275,13 +275,13 @@ namespace Mesen.Debugger.ViewModels {
 			if (addr.Address >= 0) {
 				Breakpoint? bp = BreakpointManager.GetMatchingBreakpoint(addr, CpuType);
 				bp ??= new Breakpoint() {
-						BreakOnWrite = true,
-						BreakOnRead = true,
-						CpuType = CpuType,
-						StartAddress = (uint)addr.Address,
-						EndAddress = (uint)addr.Address,
-						MemoryType = addr.Type
-					};
+					BreakOnWrite = true,
+					BreakOnRead = true,
+					CpuType = CpuType,
+					StartAddress = (uint)addr.Address,
+					EndAddress = (uint)addr.Address,
+					MemoryType = addr.Type
+				};
 
 				bool result = await BreakpointEditWindow.EditBreakpointAsync(bp, wnd);
 				if (result && DebugWindowManager.GetDebugWindow<DebuggerWindow>(x => x.CpuType == CpuType) == null) {

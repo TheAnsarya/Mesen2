@@ -28,11 +28,7 @@ namespace Mesen.Utilities {
 			} else {
 				hsl.S = hsl.L is < 0.0001 or > 0.9999 ? 0 : (max - hsl.L) / Math.Min(hsl.L, 1 - hsl.L);
 
-				if (r == max) {
-					hsl.H = 0 + ((g - b) / c);
-				} else {
-					hsl.H = g == max ? 2 + ((b - r) / c) : 4 + ((r - g) / c);
-				}
+				hsl.H = r == max ? 0 + ((g - b) / c) : g == max ? 2 + ((b - r) / c) : 4 + ((r - g) / c);
 
 				hsl.H *= 60;
 				if (hsl.H < 0) {

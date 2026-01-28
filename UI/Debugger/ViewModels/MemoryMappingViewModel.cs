@@ -131,7 +131,7 @@ namespace Mesen.Debugger.ViewModels {
 
 			for (int i = 0x40; i < 0x100; i++) {
 				if (state.PrgMemoryAccess[i] != NesMemoryAccessType.NoAccess) {
-					bool forceNewBlock = 
+					bool forceNewBlock =
 						(memoryType == NesPrgMemoryType.PrgRom && state.PrgMemoryOffset[i] % state.PrgPageSize == 0) ||
 						(memoryType == NesPrgMemoryType.WorkRam && state.PrgMemoryOffset[i] % state.WorkRamPageSize == 0) ||
 						(memoryType == NesPrgMemoryType.SaveRam && state.PrgMemoryOffset[i] % state.SaveRamPageSize == 0)
@@ -225,7 +225,7 @@ namespace Mesen.Debugger.ViewModels {
 
 			for (int i = 0x00; i < 0x30; i++) {
 				if (state.ChrMemoryAccess[i] != NesMemoryAccessType.NoAccess) {
-					bool forceNewBlock = 
+					bool forceNewBlock =
 						(memoryType == NesChrMemoryType.NametableRam && state.ChrMemoryOffset[i] % 0x400 == 0) ||
 						(memoryType == NesChrMemoryType.ChrRom && state.ChrMemoryOffset[i] % state.ChrPageSize == 0) ||
 						(memoryType == NesChrMemoryType.ChrRam && state.ChrMemoryOffset[i] % state.ChrRamPageSize == 0)
@@ -324,7 +324,7 @@ namespace Mesen.Debugger.ViewModels {
 				}
 
 				if (state.MemoryAccessType[i] != GbRegisterAccess.None) {
-					bool forceNewBlock = 
+					bool forceNewBlock =
 						(memoryType == GbMemoryType.PrgRom && state.MemoryOffset[i] % prgBankSize == 0) ||
 						(memoryType == GbMemoryType.WorkRam && state.MemoryOffset[i] % wramBankSize == 0) ||
 						(memoryType == GbMemoryType.CartRam && state.MemoryOffset[i] % cartBankSize == 0)

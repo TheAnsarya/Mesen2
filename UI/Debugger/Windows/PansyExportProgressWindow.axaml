@@ -44,19 +44,19 @@
 				<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 					<TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Translate lblSymbolsExported}" Margin="0 0 15 3" />
 					<TextBlock Grid.Row="0" Grid.Column="1" Name="txtSymbolCount" FontWeight="SemiBold" />
-					
+
 					<TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Translate lblCommentsExported}" Margin="0 0 15 3" />
 					<TextBlock Grid.Row="1" Grid.Column="1" Name="txtCommentCount" FontWeight="SemiBold" />
-					
+
 					<TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Translate lblCodeBytesMarked}" Margin="0 0 15 3" />
 					<TextBlock Grid.Row="2" Grid.Column="1" Name="txtCodeBytes" FontWeight="SemiBold" />
-					
+
 					<TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Translate lblDataBytesMarked}" Margin="0 0 15 3" />
 					<TextBlock Grid.Row="3" Grid.Column="1" Name="txtDataBytes" FontWeight="SemiBold" />
-					
+
 					<TextBlock Grid.Row="4" Grid.Column="0" Text="{l:Translate lblFileSize}" Margin="0 0 15 3" />
 					<TextBlock Grid.Row="4" Grid.Column="1" Name="txtFileSize" FontWeight="SemiBold" />
-					
+
 					<TextBlock Grid.Row="5" Grid.Column="0" Text="{l:Translate lblExportTime}" Margin="0 0 15 0" />
 					<TextBlock Grid.Row="5" Grid.Column="1" Name="txtExportTime" FontWeight="SemiBold" />
 				</Grid>

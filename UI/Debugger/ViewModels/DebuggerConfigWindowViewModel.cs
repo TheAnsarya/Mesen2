@@ -90,7 +90,7 @@ namespace Mesen.Debugger.ViewModels {
 		}
 
 		public bool IsDirty() {
-			return 
+			return
 				!Debugger.IsIdentical(_backupDebugger) ||
 				!Script.IsIdentical(_backupScript) ||
 				!Integration.IsIdentical(_backupIntegration) ||

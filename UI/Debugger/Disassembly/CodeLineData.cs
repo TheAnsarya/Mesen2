@@ -89,7 +89,7 @@ namespace Mesen.Debugger {
 
 		public bool IsAddressHidden {
 			get {
-				return 
+				return
 					Flags.HasFlag(LineFlags.Empty) || //block start/end, etc.
 					(Flags.HasFlag(LineFlags.Comment) && Text.Length == 0) || //multi-line comment
 					Flags.HasFlag(LineFlags.Label) //label definition

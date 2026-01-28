@@ -319,7 +319,7 @@ namespace Mesen.Debugger.Controls {
 					CommitByteChanges();
 					MoveCursor(SelectionLength == 0 ? 1 : SelectionLength);
 				} else {
-					if (c is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F') {
+					if (c is (>= '0' and <= '9') or (>= 'a' and <= 'f') or (>= 'A' and <= 'F')) {
 						int keyValue = Int32.Parse(c.ToString(), System.Globalization.NumberStyles.HexNumber);
 
 						if (NewByteValue < 0) {

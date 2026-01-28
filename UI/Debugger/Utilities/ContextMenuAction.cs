@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
@@ -34,13 +34,9 @@ namespace Mesen.Debugger.Utilities {
 
 		public virtual string Name {
 			get {
-				string label;
-				if (DynamicText != null) {
-					label = DynamicText();
-				} else {
-					label = ActionType == ActionType.Custom ? CustomText ?? "" : ResourceHelper.GetEnumText(ActionType);
-				}
-
+				string label = DynamicText != null
+					? DynamicText()
+					: ActionType == ActionType.Custom ? CustomText ?? "" : ResourceHelper.GetEnumText(ActionType);
 				if (HintText != null) {
 					string hint = HintText();
 					if (!string.IsNullOrWhiteSpace(hint)) {

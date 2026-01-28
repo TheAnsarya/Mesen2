@@ -605,13 +605,11 @@ namespace Mesen.Debugger.ViewModels {
 		}
 
 		private void UpdateMouseOverRect() {
-			if (PreviewPanelSprite != null) {
-				MouseOverRect = PreviewPanelSprite.GetPreviewRect().Item1;
-			} else {
-				MouseOverRect = ViewerMousePos != null && GetMatchingSprite(ViewerMousePos.Value, out Rect matchingRect) is SpritePreviewModel sprite
+			MouseOverRect = PreviewPanelSprite != null
+				? PreviewPanelSprite.GetPreviewRect().Item1
+				: (Rect?)(ViewerMousePos != null && GetMatchingSprite(ViewerMousePos.Value, out Rect matchingRect) is SpritePreviewModel sprite
 					? matchingRect
-					: null;
-			}
+					: null);
 		}
 
 		private void UpdateTooltips() {

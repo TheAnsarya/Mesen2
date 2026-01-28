@@ -1021,7 +1021,8 @@ namespace Mesen.Debugger.Integration {
 			public SourceFileInfo SourceFile { get; }
 
 			private string? _sourceFile = null;
-			public string[] Data { get {
+			public string[] Data {
+				get {
 					if (field != null) {
 						return field;
 					} else {
@@ -1029,7 +1030,8 @@ namespace Mesen.Debugger.Integration {
 					}
 
 					return field;
-				} } = null;
+				}
+			} = null;
 
 			public FileInfo(int id, string filename, bool isAsm) {
 				ID = id;

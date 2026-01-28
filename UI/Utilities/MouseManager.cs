@@ -166,7 +166,7 @@ namespace Mesen.Utilities {
 				} else {
 					PixelPoint wndTopLeft = _wnd.PointToScreen(new Point(0, 0));
 					double scale = LayoutHelper.GetLayoutScale(_wnd);
-					bool showMenu = 
+					bool showMenu =
 						mousePos.Y >= wndTopLeft.Y - 15 && mousePos.Y <= wndTopLeft.Y + Math.Max((_mainMenu.Bounds.Height * scale) + 10, 35 * scale) &&
 						mousePos.X >= wndTopLeft.X && mousePos.X <= wndTopLeft.X + (_wnd.Bounds.Width * scale)
 					;
@@ -193,7 +193,7 @@ namespace Mesen.Utilities {
 					return false;
 				}
 
-				bool hasMouseDevice = 
+				bool hasMouseDevice =
 					InputApi.HasControlDevice(ControllerType.SnesMouse) ||
 					InputApi.HasControlDevice(ControllerType.SuborMouse) ||
 					InputApi.HasControlDevice(ControllerType.FamicomArkanoidController) ||
@@ -215,7 +215,7 @@ namespace Mesen.Utilities {
 					return CursorImage.Arrow;
 				}
 
-				bool hasLightGun = 
+				bool hasLightGun =
 					InputApi.HasControlDevice(ControllerType.FamicomZapper) ||
 					InputApi.HasControlDevice(ControllerType.NesZapper) ||
 					InputApi.HasControlDevice(ControllerType.SmsLightPhaser) ||

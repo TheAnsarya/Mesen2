@@ -44,6 +44,7 @@ namespace Mesen.Debugger.Labels {
 			if (!string.IsNullOrWhiteSpace(config.DebugFolderPath) && Directory.Exists(config.DebugFolderPath)) {
 				return config.DebugFolderPath;
 			}
+
 			return Path.Combine(ConfigManager.HomeFolder, DEBUG_FOLDER_NAME);
 		}
 
@@ -396,6 +397,7 @@ namespace Mesen.Debugger.Labels {
 			if (!Directory.Exists(basePath)) {
 				return new List<string>();
 			}
+
 			return Directory.GetDirectories(basePath).ToList();
 		}
 
@@ -412,6 +414,7 @@ namespace Mesen.Debugger.Labels {
 					System.Diagnostics.Debug.WriteLine($"[DebugFolderManager] Delete failed: {ex.Message}");
 				}
 			}
+
 			return false;
 		}
 	}

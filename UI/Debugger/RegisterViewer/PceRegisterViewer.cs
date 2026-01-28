@@ -297,7 +297,7 @@ public class PceRegisterViewer {
 			new RegEntry("$1801", "Data Port (Read)", scsi.ReadDataPort),
 			new RegEntry("", "SCSI Phase", scsi.Phase),
 			new RegEntry("", "SCSI Signals"),
-			new RegEntry("$1800.3-7", "Status", 
+			new RegEntry("$1800.3-7", "Status",
 				(scsi.Signals[4] != 0 ? 0x08 : 0) |
 				(scsi.Signals[3] != 0 ? 0x10 : 0) |
 				(scsi.Signals[5] != 0 ? 0x20 : 0) |

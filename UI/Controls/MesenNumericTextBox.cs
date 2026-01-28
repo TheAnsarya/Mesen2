@@ -127,7 +127,7 @@ namespace Mesen.Controls {
 
 			if (Hex) {
 				foreach (char c in e.Text.ToLowerInvariant()) {
-					if (c is not (>= '0' and <= '9' or >= 'a' and <= 'f')) {
+					if (c is not ((>= '0' and <= '9') or (>= 'a' and <= 'f'))) {
 						//not hex
 						e.Handled = true;
 						return;

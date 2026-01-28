@@ -15,8 +15,7 @@ namespace Mesen.Debugger.Integration;
 /// Imports Pansy metadata files into Mesen's debugger.
 /// Supports loading symbols, comments, memory regions, and cross-references.
 /// </summary>
-public class PansyImporter
-{
+public class PansyImporter {
 	private const string MAGIC = "PANSY\0\0\0";
 	private const ushort MIN_VERSION = 0x0100;
 	private const ushort MAX_VERSION = 0x0101;
@@ -28,8 +27,7 @@ public class PansyImporter
 	/// <param name="path">Path to the .pansy file</param>
 	/// <param name="showResult">Whether to show a message box with results</param>
 	/// <returns>Import result with statistics</returns>
-	public static ImportResult Import(string path, bool showResult = true)
-	{
+	public static ImportResult Import(string path, bool showResult = true) {
 		var result = new ImportResult { SourceFile = path };
 
 		try {
@@ -68,7 +66,7 @@ public class PansyImporter
 					byte sectionType = contentReader.ReadByte();
 					uint sectionSize = contentReader.ReadUInt32();
 
-					if (sectionSize == 0 || sectionSize > 100_000_000) // Sanity check
+					if (sectionSize is 0 or > 100_000_000) // Sanity check
 						break;
 
 					byte[] sectionData = contentReader.ReadBytes((int)sectionSize);
@@ -102,15 +100,13 @@ public class PansyImporter
 							// Unknown section, skip
 							break;
 					}
-				}
-				catch (EndOfStreamException) {
+				} catch (EndOfStreamException) {
 					break;
 				}
 			}
 
 			result.Success = true;
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			result.Error = ex.Message;
 		}
 
@@ -124,14 +120,12 @@ public class PansyImporter
 	/// <summary>
 	/// Import only labels from a Pansy file, merging with existing labels.
 	/// </summary>
-	public static int ImportLabelsOnly(string path)
-	{
+	public static int ImportLabelsOnly(string path) {
 		var result = Import(path, showResult: false);
 		return result.Success ? result.SymbolsImported : 0;
 	}
 
-	private static PansyHeader? ReadHeader(BinaryReader reader)
-	{
+	private static PansyHeader? ReadHeader(BinaryReader reader) {
 		try {
 			// Magic (8 bytes)
 			byte[] magic = reader.ReadBytes(8);
@@ -141,7 +135,7 @@ public class PansyImporter
 
 			// Version (2 bytes)
 			ushort version = reader.ReadUInt16();
-			if (version < MIN_VERSION || version > MAX_VERSION)
+			if (version is < MIN_VERSION or > MAX_VERSION)
 				return null;
 
 			// Platform (1 byte)
@@ -170,14 +164,12 @@ public class PansyImporter
 				RomCrc32 = romCrc,
 				Timestamp = DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime
 			};
-		}
-		catch {
+		} catch {
 			return null;
 		}
 	}
 
-	private static int ImportSymbols(byte[] data, PansyHeader header)
-	{
+	private static int ImportSymbols(byte[] data, PansyHeader header) {
 		var labels = new List<CodeLabel>();
 
 		using var ms = new MemoryStream(data);
@@ -210,8 +202,7 @@ public class PansyImporter
 					Label = name,
 					Comment = "" // Comments are in separate section
 				});
-			}
-			catch {
+			} catch {
 				break;
 			}
 		}
@@ -223,8 +214,7 @@ public class PansyImporter
 		return labels.Count;
 	}
 
-	private static int ImportComments(byte[] data, PansyHeader header)
-	{
+	private static int ImportComments(byte[] data, PansyHeader header) {
 		int count = 0;
 		var config = ConfigManager.Config.Debug.Integration;
 
@@ -257,8 +247,7 @@ public class PansyImporter
 					existingLabel.Comment = comment;
 					count++;
 				}
-			}
-			catch {
+			} catch {
 				break;
 			}
 		}
@@ -266,30 +255,25 @@ public class PansyImporter
 		return count;
 	}
 
-	private static int ImportCodeOffsets(byte[] data, PansyHeader header)
-	{
+	private static int ImportCodeOffsets(byte[] data, PansyHeader header) {
 		// Code offsets are typically handled by CDL data
 		// This imports as drawn code regions
 		return ImportAddressList(data, CdlFlags.Code);
 	}
 
-	private static int ImportDataOffsets(byte[] data, PansyHeader header)
-	{
+	private static int ImportDataOffsets(byte[] data, PansyHeader header) {
 		return ImportAddressList(data, CdlFlags.Data);
 	}
 
-	private static int ImportJumpTargets(byte[] data, PansyHeader header)
-	{
+	private static int ImportJumpTargets(byte[] data, PansyHeader header) {
 		return ImportAddressList(data, CdlFlags.JumpTarget);
 	}
 
-	private static int ImportSubEntryPoints(byte[] data, PansyHeader header)
-	{
+	private static int ImportSubEntryPoints(byte[] data, PansyHeader header) {
 		return ImportAddressList(data, CdlFlags.SubEntryPoint);
 	}
 
-	private static int ImportAddressList(byte[] data, CdlFlags flag)
-	{
+	private static int ImportAddressList(byte[] data, CdlFlags flag) {
 		using var ms = new MemoryStream(data);
 		using var reader = new BinaryReader(ms);
 
@@ -299,8 +283,7 @@ public class PansyImporter
 		return (int)count;
 	}
 
-	private static int ImportMemoryRegions(byte[] data, PansyHeader header)
-	{
+	private static int ImportMemoryRegions(byte[] data, PansyHeader header) {
 		// Memory regions can be imported as label ranges
 		// This is a placeholder for extended functionality
 		using var ms = new MemoryStream(data);
@@ -310,8 +293,7 @@ public class PansyImporter
 		return (int)count;
 	}
 
-	private static int ImportCrossReferences(byte[] data, PansyHeader header)
-	{
+	private static int ImportCrossReferences(byte[] data, PansyHeader header) {
 		// Cross-references could be used for navigation
 		// This is a placeholder for extended functionality
 		using var ms = new MemoryStream(data);
@@ -321,8 +303,7 @@ public class PansyImporter
 		return (int)count;
 	}
 
-	private static MemoryType? MapMemoryType(byte pansyMemType, byte platform)
-	{
+	private static MemoryType? MapMemoryType(byte pansyMemType, byte platform) {
 		// Pansy memory type IDs:
 		// 0x01 = PRG ROM, 0x02 = Work RAM, 0x03 = Save RAM
 		// 0x10 = SNES specific types, etc.
@@ -336,8 +317,7 @@ public class PansyImporter
 		};
 	}
 
-	private static MemoryType? GetPrgRomType(byte platform)
-	{
+	private static MemoryType? GetPrgRomType(byte platform) {
 		return platform switch {
 			0x01 => MemoryType.NesPrgRom,
 			0x02 => MemoryType.SnesPrgRom,
@@ -349,8 +329,7 @@ public class PansyImporter
 		};
 	}
 
-	private static MemoryType? GetWorkRamType(byte platform)
-	{
+	private static MemoryType? GetWorkRamType(byte platform) {
 		return platform switch {
 			0x01 => MemoryType.NesInternalRam,
 			0x02 => MemoryType.SnesWorkRam,
@@ -360,8 +339,7 @@ public class PansyImporter
 		};
 	}
 
-	private static MemoryType? GetSaveRamType(byte platform)
-	{
+	private static MemoryType? GetSaveRamType(byte platform) {
 		return platform switch {
 			0x01 => MemoryType.NesSaveRam,
 			0x02 => MemoryType.SnesSaveRam,
@@ -371,8 +349,7 @@ public class PansyImporter
 		};
 	}
 
-	private static bool ShouldImportLabel(MemoryType memType)
-	{
+	private static bool ShouldImportLabel(MemoryType memType) {
 		var config = ConfigManager.Config.Debug.Integration;
 
 		// Check memory type against import filters using IsRomMemory extension
@@ -390,8 +367,7 @@ public class PansyImporter
 		return config.ImportOtherLabels;
 	}
 
-	private static bool IsWorkRamType(MemoryType memType)
-	{
+	private static bool IsWorkRamType(MemoryType memType) {
 		return memType switch {
 			MemoryType.SnesWorkRam or
 			MemoryType.NesWorkRam or
@@ -408,8 +384,7 @@ public class PansyImporter
 		};
 	}
 
-	private static bool IsSaveRamType(MemoryType memType)
-	{
+	private static bool IsSaveRamType(MemoryType memType) {
 		return memType switch {
 			MemoryType.SnesSaveRam or
 			MemoryType.NesSaveRam or
@@ -421,8 +396,7 @@ public class PansyImporter
 		};
 	}
 
-	private static string GetPlatformName(byte platform)
-	{
+	private static string GetPlatformName(byte platform) {
 		return platform switch {
 			0x01 => "NES",
 			0x02 => "SNES",
@@ -436,8 +410,7 @@ public class PansyImporter
 		};
 	}
 
-	private static void ShowImportResult(ImportResult result)
-	{
+	private static void ShowImportResult(ImportResult result) {
 		// Format import stats as arguments for the resource string
 		string stats = $"Platform: {result.Platform}\n" +
 			$"Version: {result.Version >> 8}.{result.Version & 0xFF}\n\n" +
@@ -452,8 +425,7 @@ public class PansyImporter
 		MesenMsgBox.Show(null, "PansyImportComplete", MessageBoxButtons.OK, MessageBoxIcon.Info, stats);
 	}
 
-	private class PansyHeader
-	{
+	private class PansyHeader {
 		public ushort Version { get; set; }
 		public byte Platform { get; set; }
 		public byte Flags { get; set; }
@@ -466,8 +438,7 @@ public class PansyImporter
 /// <summary>
 /// Result of a Pansy import operation.
 /// </summary>
-public class ImportResult
-{
+public class ImportResult {
 	public string SourceFile { get; set; } = "";
 	public bool Success { get; set; }
 	public string? Error { get; set; }

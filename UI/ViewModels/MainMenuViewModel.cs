@@ -394,9 +394,9 @@ namespace Mesen.ViewModels {
 				new MainMenuAction() {
 					ActionType = ActionType.Region,
 					IsEnabled = () => IsGameRunning,
-					IsVisible = () => 
+					IsVisible = () =>
 						!IsGameRunning ||
-						MainWindow.RomInfo.ConsoleType != ConsoleType.Gameboy && MainWindow.RomInfo.ConsoleType != ConsoleType.Gba
+						(MainWindow.RomInfo.ConsoleType != ConsoleType.Gameboy && MainWindow.RomInfo.ConsoleType != ConsoleType.Gba)
 					,
 					SubActions = new List<object>() {
 						GetRegionMenuItem(ConsoleRegion.Auto),
@@ -544,7 +544,7 @@ namespace Mesen.ViewModels {
 				IsSelected = () => MainWindow.RomInfo.ConsoleType switch {
 					ConsoleType.Snes => ConfigManager.Config.Snes.Region == region,
 					ConsoleType.Nes => ConfigManager.Config.Nes.Region == region,
-					ConsoleType.Sms => 
+					ConsoleType.Sms =>
 						MainWindow.RomInfo.Format switch {
 							RomFormat.ColecoVision => ConfigManager.Config.Cv.Region,
 							RomFormat.GameGear => ConfigManager.Config.Sms.GameGearRegion,

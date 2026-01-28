@@ -328,7 +328,8 @@ public class MemorySearchViewModel : DisposableViewModel {
 public class MemoryAddressViewModel : INotifyPropertyChanged {
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public string AddressString { get {
+	public string AddressString {
+		get {
 			UpdateFields();
 			return field;
 		}

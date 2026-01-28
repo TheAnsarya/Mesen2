@@ -53,8 +53,6 @@ public class SyncManager : IDisposable {
 
 	private CancellationTokenSource? _processingCts;
 	private RomInfo? _currentRom;
-	private bool _isEnabled;
-	private bool _isSyncing;
 	private bool _disposed;
 
 	/// <summary>
@@ -78,12 +76,12 @@ public class SyncManager : IDisposable {
 	/// <summary>
 	/// Whether sync is currently enabled.
 	/// </summary>
-	public bool IsEnabled => _isEnabled;
+	public bool IsEnabled { get; private set; }
 
 	/// <summary>
 	/// Whether a sync operation is in progress.
 	/// </summary>
-	public bool IsSyncing => _isSyncing;
+	public bool IsSyncing { get; private set; }
 
 	/// <summary>
 	/// Number of pending changes in the queue.
@@ -98,7 +96,7 @@ public class SyncManager : IDisposable {
 
 		lock (_syncLock) {
 			_currentRom = romInfo;
-			_isEnabled = true;
+			IsEnabled = true;
 
 			// Get the debug folder for this ROM
 			string debugFolder = DebugFolderManager.GetRomDebugFolder(romInfo);
@@ -116,7 +114,7 @@ public class SyncManager : IDisposable {
 	/// </summary>
 	public void Disable() {
 		lock (_syncLock) {
-			_isEnabled = false;
+			IsEnabled = false;
 			_currentRom = null;
 			StopAllWatchers();
 		}
@@ -164,6 +162,7 @@ public class SyncManager : IDisposable {
 			watcher.EnableRaisingEvents = false;
 			watcher.Dispose();
 		}
+
 		_watchers.Clear();
 	}
 
@@ -243,9 +242,7 @@ public class SyncManager : IDisposable {
 		_pendingChanges.Enqueue(change);
 
 		// Fire event on UI thread
-		Dispatcher.UIThread.Post(() => {
-			ChangeDetected?.Invoke(this, change);
-		});
+		Dispatcher.UIThread.Post(() => ChangeDetected?.Invoke(this, change));
 
 		// Start processing if not already
 		StartProcessingChanges();
@@ -270,7 +267,7 @@ public class SyncManager : IDisposable {
 
 		await _processingSemaphore.WaitAsync(cancellationToken);
 		try {
-			_isSyncing = true;
+			IsSyncing = true;
 			SyncStatusChanged?.Invoke(this, true);
 
 			while (_pendingChanges.TryDequeue(out var change)) {
@@ -279,13 +276,11 @@ public class SyncManager : IDisposable {
 				await ProcessChangeAsync(change, cancellationToken);
 			}
 		} finally {
-			_isSyncing = false;
+			IsSyncing = false;
 			_processingCts = null;
 			_processingSemaphore.Release();
 
-			Dispatcher.UIThread.Post(() => {
-				SyncStatusChanged?.Invoke(this, false);
-			});
+			Dispatcher.UIThread.Post(() => SyncStatusChanged?.Invoke(this, false));
 		}
 	}
 
@@ -393,32 +388,28 @@ public class SyncManager : IDisposable {
 	/// Force a sync of all files in the debug folder.
 	/// </summary>
 	public async Task ForceSyncAsync() {
-		if (_currentRom == null || !_isEnabled) return;
+		if (_currentRom == null || !IsEnabled) return;
 
 		string debugFolder = DebugFolderManager.GetRomDebugFolder(_currentRom);
 		if (!Directory.Exists(debugFolder)) return;
 
-		_isSyncing = true;
+		IsSyncing = true;
 		SyncStatusChanged?.Invoke(this, true);
 
 		try {
 			// Import MLB if exists
 			string mlbPath = DebugFolderManager.GetMlbPath(_currentRom);
 			if (File.Exists(mlbPath)) {
-				await Dispatcher.UIThread.InvokeAsync(() => {
-					MesenLabelFile.Import(mlbPath, showResult: false);
-				});
+				await Dispatcher.UIThread.InvokeAsync(() => MesenLabelFile.Import(mlbPath, showResult: false));
 			}
 
 			// Import CDL if exists
 			string cdlPath = DebugFolderManager.GetCdlPath(_currentRom);
 			if (File.Exists(cdlPath)) {
-				await Dispatcher.UIThread.InvokeAsync(() => {
-					ImportCdlFile(cdlPath);
-				});
+				await Dispatcher.UIThread.InvokeAsync(() => ImportCdlFile(cdlPath));
 			}
 		} finally {
-			_isSyncing = false;
+			IsSyncing = false;
 			SyncStatusChanged?.Invoke(this, false);
 		}
 	}

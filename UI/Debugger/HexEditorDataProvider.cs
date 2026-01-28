@@ -128,11 +128,11 @@ namespace Mesen.Debugger {
 			bool isUnused = !isRead && !isWritten && !isExecuted;
 
 			byte alpha = 0;
-			if (isRead && _cfg.HideReadBytes || isWritten && _cfg.HideWrittenBytes || isExecuted && _cfg.HideExecutedBytes || isUnused && _cfg.HideUnusedBytes) {
+			if ((isRead && _cfg.HideReadBytes) || (isWritten && _cfg.HideWrittenBytes) || (isExecuted && _cfg.HideExecutedBytes) || (isUnused && _cfg.HideUnusedBytes)) {
 				alpha = 128;
 			}
 
-			if (isRead && !_cfg.HideReadBytes || isWritten && !_cfg.HideWrittenBytes || isExecuted && !_cfg.HideExecutedBytes || isUnused && !_cfg.HideUnusedBytes) {
+			if ((isRead && !_cfg.HideReadBytes) || (isWritten && !_cfg.HideWrittenBytes) || (isExecuted && !_cfg.HideExecutedBytes) || (isUnused && !_cfg.HideUnusedBytes)) {
 				alpha = 255;
 			}
 
@@ -177,15 +177,13 @@ namespace Mesen.Debugger {
 			}
 
 			int framesToFade = _cfg.FadeSpeed.ToFrameCount();
-			if (_cfg.ExecHighlight.Highlight && _counters[index].ExecStamp != 0 && framesSinceExec >= 0 && (framesSinceExec < framesToFade || framesToFade == 0)) {
-				_byteInfo.ForeColor = DarkerColor(alpha, _cfg.ExecHighlight.Color, (framesToFade - framesSinceExec) / framesToFade);
-			} else if (_cfg.WriteHighlight.Highlight && _counters[index].WriteStamp != 0 && framesSinceWrite >= 0 && (framesSinceWrite < framesToFade || framesToFade == 0)) {
-				_byteInfo.ForeColor = DarkerColor(alpha, _cfg.WriteHighlight.Color, (framesToFade - framesSinceWrite) / framesToFade);
-			} else {
-				_byteInfo.ForeColor = _cfg.ReadHighlight.Highlight && _counters[index].ReadStamp != 0 && framesSinceRead >= 0 && (framesSinceRead < framesToFade || framesToFade == 0)
+			_byteInfo.ForeColor = _cfg.ExecHighlight.Highlight && _counters[index].ExecStamp != 0 && framesSinceExec >= 0 && (framesSinceExec < framesToFade || framesToFade == 0)
+				? DarkerColor(alpha, _cfg.ExecHighlight.Color, (framesToFade - framesSinceExec) / framesToFade)
+				: _cfg.WriteHighlight.Highlight && _counters[index].WriteStamp != 0 && framesSinceWrite >= 0 && (framesSinceWrite < framesToFade || framesToFade == 0)
+					? DarkerColor(alpha, _cfg.WriteHighlight.Color, (framesToFade - framesSinceWrite) / framesToFade)
+					: _cfg.ReadHighlight.Highlight && _counters[index].ReadStamp != 0 && framesSinceRead >= 0 && (framesSinceRead < framesToFade || framesToFade == 0)
 					? DarkerColor(alpha, _cfg.ReadHighlight.Color, (framesToFade - framesSinceRead) / framesToFade)
 					: Color.FromArgb(alpha, 0, 0, 0);
-			}
 
 			if (_frozenAddresses != null && _frozenAddresses[index] != 0) {
 				_byteInfo.ForeColor = _cfg.FrozenHighlight.Color;

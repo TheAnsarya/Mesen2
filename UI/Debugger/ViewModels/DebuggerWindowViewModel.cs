@@ -322,7 +322,7 @@ namespace Mesen.Debugger.ViewModels {
 						if (bp?.IsAssert == true) {
 							breakReason = "Assert failed: " + bp.Condition.Substring(2, bp.Condition.Length - 3);
 						} else {
-							breakReason += 
+							breakReason +=
 								": " +
 								ResourceHelper.GetEnumText(brkEvent.Operation.Type) + " " +
 								brkEvent.Operation.MemType.GetShortName() +

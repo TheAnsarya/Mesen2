@@ -129,14 +129,14 @@ public class WsRegisterViewer {
 
 		WsApuState apu = ws.Apu;
 
-		int rightOutput = 
+		int rightOutput =
 			apu.Ch1.RightOutput +
 			apu.Ch2.RightOutput +
 			apu.Ch3.RightOutput +
 			apu.Ch4.RightOutput
 		;
 
-		int leftOutput = 
+		int leftOutput =
 			apu.Ch1.LeftOutput +
 			apu.Ch2.LeftOutput +
 			apu.Ch3.LeftOutput +

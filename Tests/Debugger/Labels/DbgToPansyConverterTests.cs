@@ -146,13 +146,13 @@ public class DbgToPansyConverterTests
 	public void BatchConvert_WithDebugFiles_ProcessesAll()
 	{
 		using var tempDir = new TempDirectory();
-		
+
 		// Create test files
 		File.WriteAllText(Path.Combine(tempDir.Path, "test1.dbg"), "version\tmajor 2");
 		File.WriteAllText(Path.Combine(tempDir.Path, "test2.sym"), "; WLA-DX");
 		File.WriteAllText(Path.Combine(tempDir.Path, "test3.mlb"), "P:8000 Test");
 		File.WriteAllText(Path.Combine(tempDir.Path, "readme.txt"), "Not a debug file");
-		
+
 		var debugFiles = GetDebugFilesInDirectory(tempDir.Path);
 		Assert.Equal(3, debugFiles.Length);
 	}
@@ -276,7 +276,7 @@ public class DbgToPansyConverterTests
 			foreach (var pair in data.Split(',')) {
 				var kv = pair.Split('=');
 				if (kv.Length != 2) continue;
-				
+
 				string key = kv[0].Trim();
 				string value = kv[1].Trim().Trim('"');
 
@@ -311,11 +311,11 @@ public class DbgToPansyConverterTests
 			if (addrPart.StartsWith("$")) {
 				var bankAddr = addrPart[1..].Split(':');
 				if (bankAddr.Length != 2) return null;
-				
+
 				uint bank = Convert.ToUInt32(bankAddr[0], 16);
 				uint offset = Convert.ToUInt32(bankAddr[1], 16);
 				uint fullAddr = (bank << 16) | offset;
-				
+
 				return new SymbolParseResult { Address = fullAddr, Name = name };
 			}
 

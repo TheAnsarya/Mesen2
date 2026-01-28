@@ -232,14 +232,14 @@ namespace Mesen.Debugger.Utilities {
 				int dwordValue;
 				if (useAbsAddress && absAddress != null) {
 					wordValue = (DebugApi.GetMemoryValue(absAddress.Value.Type, (uint)absAddress.Value.Address + 1) << 8) | byteValue;
-					dwordValue = 
+					dwordValue =
 						(DebugApi.GetMemoryValue(absAddress.Value.Type, (uint)absAddress.Value.Address + 3) << 24) |
 						(DebugApi.GetMemoryValue(absAddress.Value.Type, (uint)absAddress.Value.Address + 2) << 16) |
 						wordValue
 					;
 				} else {
 					wordValue = (DebugApi.GetMemoryValue(cpuMemType, (uint)relAddress + 1) << 8) | byteValue;
-					dwordValue = 
+					dwordValue =
 						(DebugApi.GetMemoryValue(cpuMemType, (uint)relAddress + 3) << 24) |
 						(DebugApi.GetMemoryValue(cpuMemType, (uint)relAddress + 2) << 16) |
 						wordValue
@@ -249,7 +249,7 @@ namespace Mesen.Debugger.Utilities {
 				StackPanel mainPanel = new StackPanel() { Spacing = -4, Margin = new Avalonia.Thickness(0, -1, 0, 0) };
 				mainPanel.Children.Add(GetHexDecPanel(byteValue, "X2", monoFont, fontSize));
 				mainPanel.Children.Add(GetHexDecPanel(wordValue, "X4", monoFont, fontSize));
-				if (cpuType.GetConsoleType() == ConsoleType.Gba || cpuType.GetConsoleType() == ConsoleType.Snes) {
+				if (cpuType.GetConsoleType() is ConsoleType.Gba or ConsoleType.Snes) {
 					//Only show 32-bit values for GBA/SNES since these are the 2 systems that are most likely to be using 32-bit values in memory
 					mainPanel.Children.Add(GetHexDecPanel(dwordValue, "X8", monoFont, fontSize));
 				}

@@ -14,20 +14,17 @@ namespace Mesen.Debugger.Windows;
 /// Progress window for Pansy export operations.
 /// Shows progress, current operation, and statistics on completion.
 /// </summary>
-public partial class PansyExportProgressWindow : MesenWindow
-{
+public partial class PansyExportProgressWindow : MesenWindow {
 	private CancellationTokenSource? _cts;
 	private readonly Stopwatch _stopwatch = new();
 	private bool _isComplete;
 	private ExportStatistics? _stats;
 
-	public PansyExportProgressWindow()
-	{
+	public PansyExportProgressWindow() {
 		InitializeComponent();
 	}
 
-	private void InitializeComponent()
-	{
+	private void InitializeComponent() {
 		AvaloniaXamlLoader.Load(this);
 	}
 
@@ -37,13 +34,12 @@ public partial class PansyExportProgressWindow : MesenWindow
 	public static async Task<bool> ShowAndRun(
 		Window parent,
 		string romName,
-		Func<IProgress<ExportProgress>, CancellationToken, Task<ExportStatistics>> exportAction)
-	{
+		Func<IProgress<ExportProgress>, CancellationToken, Task<ExportStatistics>> exportAction) {
 		var window = new PansyExportProgressWindow();
 		window.SetRomName(romName);
-		
+
 		var tcs = new TaskCompletionSource<bool>();
-		
+
 		window.Closed += (_, _) => {
 			if (!tcs.Task.IsCompleted)
 				tcs.TrySetResult(window._isComplete);
@@ -55,9 +51,7 @@ public partial class PansyExportProgressWindow : MesenWindow
 		window._cts = new CancellationTokenSource();
 		window._stopwatch.Start();
 
-		var progress = new Progress<ExportProgress>(p => {
-			Dispatcher.UIThread.Post(() => window.UpdateProgress(p));
-		});
+		var progress = new Progress<ExportProgress>(p => Dispatcher.UIThread.Post(() => window.UpdateProgress(p)));
 
 		try {
 			var stats = await exportAction(progress, window._cts.Token);
@@ -65,31 +59,23 @@ public partial class PansyExportProgressWindow : MesenWindow
 			window._stats = stats;
 			window._isComplete = true;
 
-			await Dispatcher.UIThread.InvokeAsync(() => {
-				window.ShowCompletion(stats);
-			});
+			await Dispatcher.UIThread.InvokeAsync(() => window.ShowCompletion(stats));
 
 			return await tcs.Task;
-		}
-		catch (OperationCanceledException) {
+		} catch (OperationCanceledException) {
 			window.Close();
 			return false;
-		}
-		catch (Exception ex) {
-			await Dispatcher.UIThread.InvokeAsync(() => {
-				window.ShowError(ex.Message);
-			});
+		} catch (Exception ex) {
+			await Dispatcher.UIThread.InvokeAsync(() => window.ShowError(ex.Message));
 			return false;
 		}
 	}
 
-	private void SetRomName(string romName)
-	{
+	private void SetRomName(string romName) {
 		this.FindControl<TextBlock>("txtRomName")!.Text = romName;
 	}
 
-	private void UpdateProgress(ExportProgress progress)
-	{
+	private void UpdateProgress(ExportProgress progress) {
 		var progressMain = this.FindControl<ProgressBar>("progressMain")!;
 		var txtProgressPercent = this.FindControl<TextBlock>("txtProgressPercent")!;
 		var txtStatus = this.FindControl<TextBlock>("txtStatus")!;
@@ -109,8 +95,7 @@ public partial class PansyExportProgressWindow : MesenWindow
 		}
 	}
 
-	private void ShowCompletion(ExportStatistics stats)
-	{
+	private void ShowCompletion(ExportStatistics stats) {
 		var txtTitle = this.FindControl<TextBlock>("txtTitle")!;
 		var txtStatus = this.FindControl<TextBlock>("txtStatus")!;
 		var progressMain = this.FindControl<ProgressBar>("progressMain")!;
@@ -142,8 +127,7 @@ public partial class PansyExportProgressWindow : MesenWindow
 		btnClose.IsVisible = true;
 	}
 
-	private void ShowError(string message)
-	{
+	private void ShowError(string message) {
 		var txtTitle = this.FindControl<TextBlock>("txtTitle")!;
 		var txtStatus = this.FindControl<TextBlock>("txtStatus")!;
 		var progressDetail = this.FindControl<ProgressBar>("progressDetail")!;
@@ -158,8 +142,7 @@ public partial class PansyExportProgressWindow : MesenWindow
 		btnClose.IsVisible = true;
 	}
 
-	private static string FormatBytes(long bytes)
-	{
+	private static string FormatBytes(long bytes) {
 		if (bytes < 1024)
 			return $"{bytes} B";
 		if (bytes < 1024 * 1024)
@@ -167,14 +150,12 @@ public partial class PansyExportProgressWindow : MesenWindow
 		return $"{bytes / (1024.0 * 1024.0):F2} MB";
 	}
 
-	private void Cancel_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-	{
+	private void Cancel_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
 		_cts?.Cancel();
 		Close();
 	}
 
-	private void Close_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-	{
+	private void Close_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
 		Close();
 	}
 }
@@ -182,8 +163,7 @@ public partial class PansyExportProgressWindow : MesenWindow
 /// <summary>
 /// Progress information for export operations.
 /// </summary>
-public class ExportProgress
-{
+public class ExportProgress {
 	public int OverallPercent { get; set; }
 	public string StatusMessage { get; set; } = "";
 	public string? CurrentOperation { get; set; }
@@ -194,8 +174,7 @@ public class ExportProgress
 /// <summary>
 /// Statistics from a completed export operation.
 /// </summary>
-public class ExportStatistics
-{
+public class ExportStatistics {
 	public int SymbolCount { get; set; }
 	public int CommentCount { get; set; }
 	public long CodeBytes { get; set; }

@@ -29,7 +29,7 @@ public class DebugFolderManagerTests
 	{
 		string romPath = @"C:\Roms\SNES\Game.sfc";
 		string expected = @"C:\Roms\SNES\Game_debug";
-		
+
 		string result = GetDebugFolderPath(romPath);
 		Assert.Equal(expected, result);
 	}
@@ -85,7 +85,7 @@ public class DebugFolderManagerTests
 	{
 		using var tempDir = new TempDirectory();
 		string debugFolder = Path.Combine(tempDir.Path, "Game_debug");
-		
+
 		Assert.False(Directory.Exists(debugFolder));
 		EnsureDebugFolderExists(debugFolder);
 		Assert.True(Directory.Exists(debugFolder));
@@ -96,10 +96,10 @@ public class DebugFolderManagerTests
 	{
 		using var tempDir = new TempDirectory();
 		string debugFolder = Path.Combine(tempDir.Path, "Game_debug");
-		
+
 		Directory.CreateDirectory(debugFolder);
 		DateTime created = Directory.GetCreationTimeUtc(debugFolder);
-		
+
 		EnsureDebugFolderExists(debugFolder);
 		Assert.True(Directory.Exists(debugFolder));
 	}
@@ -112,7 +112,7 @@ public class DebugFolderManagerTests
 	public void CreateManifest_ContainsRequiredFields()
 	{
 		var manifest = CreateManifest("Test.sfc", 0xDEADBEEF, "SNES");
-		
+
 		Assert.NotNull(manifest.RomName);
 		Assert.NotNull(manifest.RomCrc);
 		Assert.NotNull(manifest.Platform);
@@ -124,7 +124,7 @@ public class DebugFolderManagerTests
 	{
 		var manifest = CreateManifest("Test.sfc", 0xDEADBEEF, "SNES");
 		string json = JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true });
-		
+
 		Assert.NotNull(json);
 		Assert.Contains("RomName", json);
 		Assert.Contains("Test.sfc", json);
@@ -136,7 +136,7 @@ public class DebugFolderManagerTests
 		var original = CreateManifest("Test.sfc", 0xDEADBEEF, "SNES");
 		string json = JsonSerializer.Serialize(original);
 		var restored = JsonSerializer.Deserialize<DebugManifest>(json);
-		
+
 		Assert.NotNull(restored);
 		Assert.Equal(original.RomName, restored.RomName);
 		Assert.Equal(original.RomCrc, restored.RomCrc);
@@ -152,9 +152,9 @@ public class DebugFolderManagerTests
 		using var tempDir = new TempDirectory();
 		string mlbPath = Path.Combine(tempDir.Path, "test.mlb");
 		var labels = new[] { ("P", 0x8000u, "Reset") };
-		
+
 		WriteMlbFile(mlbPath, labels);
-		
+
 		Assert.True(File.Exists(mlbPath));
 		string content = File.ReadAllText(mlbPath);
 		Assert.Contains("P:8000", content);
@@ -172,9 +172,9 @@ public class DebugFolderManagerTests
 			("P", 0x8200u, "IRQ"),
 			("R", 0x0000u, "ZeroPage")
 		};
-		
+
 		WriteMlbFile(mlbPath, labels);
-		
+
 		string content = File.ReadAllText(mlbPath);
 		Assert.Contains("Reset", content);
 		Assert.Contains("NMI", content);
@@ -192,9 +192,9 @@ public class DebugFolderManagerTests
 		using var tempDir = new TempDirectory();
 		string cdlPath = Path.Combine(tempDir.Path, "test.cdl");
 		byte[] cdlData = [0x01, 0x02, 0x00, 0x01, 0x02];
-		
+
 		File.WriteAllBytes(cdlPath, cdlData);
-		
+
 		Assert.True(File.Exists(cdlPath));
 		byte[] read = File.ReadAllBytes(cdlPath);
 		Assert.Equal(cdlData.Length, read.Length);
@@ -206,9 +206,9 @@ public class DebugFolderManagerTests
 		using var tempDir = new TempDirectory();
 		string cdlPath = Path.Combine(tempDir.Path, "test.cdl");
 		byte[] cdlData = [];
-		
+
 		File.WriteAllBytes(cdlPath, cdlData);
-		
+
 		Assert.True(File.Exists(cdlPath));
 		Assert.Equal(0, new FileInfo(cdlPath).Length);
 	}
@@ -223,11 +223,11 @@ public class DebugFolderManagerTests
 		using var tempDir = new TempDirectory();
 		string historyDir = Path.Combine(tempDir.Path, ".history");
 		string originalFile = Path.Combine(tempDir.Path, "test.mlb");
-		
+
 		File.WriteAllText(originalFile, "P:8000 Reset");
-		
+
 		CreateHistoryEntry(originalFile, historyDir);
-		
+
 		Assert.True(Directory.Exists(historyDir));
 		var backups = Directory.GetFiles(historyDir, "*.mlb");
 		Assert.Single(backups);
@@ -240,17 +240,17 @@ public class DebugFolderManagerTests
 		string historyDir = Path.Combine(tempDir.Path, ".history");
 		string originalFile = Path.Combine(tempDir.Path, "test.mlb");
 		int maxEntries = 3;
-		
+
 		Directory.CreateDirectory(historyDir);
 		File.WriteAllText(originalFile, "content");
-		
+
 		// Create more backups than limit
 		for (int i = 0; i < 5; i++) {
 			CreateHistoryEntry(originalFile, historyDir, $"backup_{i:D3}.mlb");
 		}
-		
+
 		PruneHistory(historyDir, maxEntries, "*.mlb");
-		
+
 		var remaining = Directory.GetFiles(historyDir, "*.mlb");
 		Assert.Equal(maxEntries, remaining.Length);
 	}
@@ -265,9 +265,9 @@ public class DebugFolderManagerTests
 		using var tempDir = new TempDirectory();
 		string mlbPath = Path.Combine(tempDir.Path, "test.mlb");
 		File.WriteAllText(mlbPath, "P:8000 Reset\nP:8100 NMI\nR:0000 Counter");
-		
+
 		var labels = ParseMlbFile(mlbPath);
-		
+
 		Assert.Equal(3, labels.Count);
 	}
 
@@ -277,9 +277,9 @@ public class DebugFolderManagerTests
 		using var tempDir = new TempDirectory();
 		string mlbPath = Path.Combine(tempDir.Path, "test.mlb");
 		File.WriteAllText(mlbPath, "// Comment\nP:8000 Reset\n; Another comment\nP:8100 NMI");
-		
+
 		var labels = ParseMlbFile(mlbPath);
-		
+
 		Assert.Equal(2, labels.Count);
 	}
 
@@ -289,9 +289,9 @@ public class DebugFolderManagerTests
 		using var tempDir = new TempDirectory();
 		string mlbPath = Path.Combine(tempDir.Path, "test.mlb");
 		File.WriteAllText(mlbPath, "P:8000 Reset\n\n\nP:8100 NMI\n");
-		
+
 		var labels = ParseMlbFile(mlbPath);
-		
+
 		Assert.Equal(2, labels.Count);
 	}
 
@@ -365,7 +365,7 @@ public class DebugFolderManagerTests
 		string ext = Path.GetExtension(originalFile);
 		string name = backupName ?? $"{DateTime.Now:yyyyMMdd_HHmmss}{ext}";
 		string backupPath = Path.Combine(historyDir, name);
-		
+
 		File.Copy(originalFile, backupPath, overwrite: true);
 	}
 

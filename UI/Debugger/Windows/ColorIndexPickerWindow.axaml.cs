@@ -32,11 +32,9 @@ namespace Mesen.Debugger.Windows {
 					break;
 
 				case CpuType.Gameboy:
-					if (selectedPalette < 4) {
-						Palette = ConfigManager.Config.Gameboy.BgColors;
-					} else {
-						Palette = selectedPalette < 8 ? ConfigManager.Config.Gameboy.Obj0Colors : ConfigManager.Config.Gameboy.Obj1Colors;
-					}
+					Palette = selectedPalette < 4
+						? ConfigManager.Config.Gameboy.BgColors
+						: selectedPalette < 8 ? ConfigManager.Config.Gameboy.Obj0Colors : ConfigManager.Config.Gameboy.Obj1Colors;
 
 					ColumnCount = 4;
 					SelectedPalette = selectedPalette % 4;

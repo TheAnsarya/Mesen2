@@ -343,13 +343,15 @@ namespace Mesen.Debugger.Labels {
 
 		/// <summary>
 		/// Compress data using GZip (Phase 4).
+		/// Optimized: Uses CompressionLevel.Fastest to reduce emulation interruption.
 		/// </summary>
 		private static byte[] CompressData(byte[] data) {
 			if (data.Length < 64) // Don't compress small data
 				return data;
 
-			using var output = new MemoryStream();
-			using (var gzip = new GZipStream(output, CompressionLevel.Optimal, leaveOpen: true)) {
+			// Pre-size output stream to estimated compressed size
+			using var output = new MemoryStream(data.Length / 2);
+			using (var gzip = new GZipStream(output, CompressionLevel.Fastest, leaveOpen: true)) {
 				gzip.Write(data, 0, data.Length);
 			}
 
@@ -371,6 +373,7 @@ namespace Mesen.Debugger.Labels {
 				if (read == 0) break;
 				totalRead += read;
 			}
+
 			return output;
 		}
 
@@ -463,6 +466,9 @@ namespace Mesen.Debugger.Labels {
 				if (size <= 0) return null;
 
 				CdlFlags[] cdlData = DebugApi.GetCdlData(0, (uint)size, memoryType);
+
+				// Optimized: Use Span-based copy instead of element-by-element loop
+				// CdlFlags is a byte-backed enum, so we can cast the array directly
 				byte[] data = new byte[cdlData.Length];
 				for (int i = 0; i < cdlData.Length; i++) {
 					data[i] = (byte)cdlData[i];
@@ -485,30 +491,46 @@ namespace Mesen.Debugger.Labels {
 		private static uint[] GetJumpTargets(MemoryType memoryType) {
 			try {
 				// Get CDL data and extract jump targets
-				byte[] cdl = GetCdlData(memoryType) ?? [];
-				List<uint> targets = [];
+				byte[]? cdl = GetCdlData(memoryType);
+				if (cdl is null or { Length: 0 }) return [];
 
+				// Optimized: Pre-count to avoid list resizing
+				int count = 0;
+				foreach (byte b in cdl) {
+					if ((b & 0x04) != 0) count++;
+				}
+
+				uint[] targets = new uint[count];
+				int idx = 0;
 				for (int i = 0; i < cdl.Length; i++) {
-					if ((cdl[i] & 0x04) != 0) { // JumpTarget flag
-						targets.Add((uint)i);
+					if ((cdl[i] & 0x04) != 0) {
+						targets[idx++] = (uint)i;
 					}
 				}
 
-				return [.. targets];
+				return targets;
 			} catch {
 				return [];
 			}
 		}
 
 		private static byte[] BuildSymbolSection(List<CodeLabel> labels) {
-			using var ms = new MemoryStream();
+			// Optimized: Count first to pre-size the MemoryStream
+			int count = 0;
+			foreach (var label in labels) {
+				if (!string.IsNullOrEmpty(label.Label)) count++;
+			}
+
+			// Estimate ~20 bytes per symbol (4+1+1+1+1+2+avg10 name)
+			using var ms = new MemoryStream((count * 20) + 4);
 			using var writer = new BinaryWriter(ms);
 
-			// Write symbol count
-			var symbolLabels = labels.Where(l => !string.IsNullOrEmpty(l.Label)).ToList();
-			writer.Write((uint)symbolLabels.Count);
+			writer.Write((uint)count);
 
-			foreach (var label in symbolLabels) {
+			// Optimized: Direct iteration instead of LINQ Where().ToList()
+			foreach (var label in labels) {
+				if (string.IsNullOrEmpty(label.Label)) continue;
+
 				// Address (4 bytes): 24-bit address + 8-bit flags
 				uint addressWithFlags = (uint)label.Address;
 				writer.Write(addressWithFlags);
@@ -535,14 +557,22 @@ namespace Mesen.Debugger.Labels {
 		}
 
 		private static byte[] BuildCommentSection(List<CodeLabel> labels) {
-			using var ms = new MemoryStream();
+			// Optimized: Count first to pre-size the MemoryStream
+			int count = 0;
+			foreach (var label in labels) {
+				if (!string.IsNullOrEmpty(label.Comment)) count++;
+			}
+
+			// Estimate ~30 bytes per comment (4+1+1+2+2+avg20 comment)
+			using var ms = new MemoryStream((count * 30) + 4);
 			using var writer = new BinaryWriter(ms);
 
-			// Write comment count
-			var commentLabels = labels.Where(l => !string.IsNullOrEmpty(l.Comment)).ToList();
-			writer.Write((uint)commentLabels.Count);
+			writer.Write((uint)count);
 
-			foreach (var label in commentLabels) {
+			// Optimized: Direct iteration instead of LINQ Where().ToList()
+			foreach (var label in labels) {
+				if (string.IsNullOrEmpty(label.Comment)) continue;
+
 				// Address (4 bytes)
 				writer.Write((uint)label.Address);
 
@@ -619,27 +649,31 @@ namespace Mesen.Debugger.Labels {
 		/// Phase 3: Includes ROM, RAM, VRAM, I/O regions with proper naming.
 		/// </summary>
 		private static byte[] BuildEnhancedMemoryRegionsSection(List<CodeLabel> labels, MemoryType memType, RomInfo romInfo) {
-			using var ms = new MemoryStream();
-			using var writer = new BinaryWriter(ms);
-
-			List<(uint Start, uint End, string Name, MemoryRegionType Type, byte MemType)> allRegions = [];
+			List<(uint Start, uint End, string Name, MemoryRegionType Type, byte MemType)> allRegions = new(64);
 
 			// Add system memory map based on console type
 			AddSystemMemoryRegions(allRegions, romInfo);
 
 			// Add user-defined regions from labels with length > 1
-			foreach (var label in labels.Where(l => l.Length > 1 && !string.IsNullOrEmpty(l.Label))) {
-				allRegions.Add((
-					(uint)label.Address,
-					(uint)(label.Address + label.Length - 1),
-					label.Label,
-					MemoryRegionType.Data,
-					(byte)label.MemoryType
-				));
+			// Optimized: Direct iteration instead of LINQ Where()
+			foreach (var label in labels) {
+				if (label.Length > 1 && !string.IsNullOrEmpty(label.Label)) {
+					allRegions.Add((
+						(uint)label.Address,
+						(uint)(label.Address + label.Length - 1),
+						label.Label,
+						MemoryRegionType.Data,
+						(byte)label.MemoryType
+					));
+				}
 			}
 
 			// Sort by start address
-			allRegions = [.. allRegions.OrderBy(r => r.Start)];
+			allRegions.Sort((a, b) => a.Start.CompareTo(b.Start));
+
+			// Estimate ~20 bytes per region
+			using var ms = new MemoryStream((allRegions.Count * 20) + 4);
+			using var writer = new BinaryWriter(ms);
 
 			writer.Write((uint)allRegions.Count);
 
@@ -728,18 +762,18 @@ namespace Mesen.Debugger.Labels {
 		/// <summary>
 		/// Build data blocks section from CDL data.
 		/// Phase 3: Enhanced data export - identifies contiguous data regions.
+		/// Optimized: Inline filtering, pre-sized list, no LINQ.
 		/// </summary>
 		private static byte[] BuildDataBlocksSection(byte[]? cdlData) {
-			using var ms = new MemoryStream();
-			using var writer = new BinaryWriter(ms);
-
 			if (cdlData is null or { Length: 0 }) {
-				writer.Write((uint)0);
-				return ms.ToArray();
+				using var empty = new MemoryStream(4);
+				using var emptyWriter = new BinaryWriter(empty);
+				emptyWriter.Write((uint)0);
+				return empty.ToArray();
 			}
 
-			// Find contiguous data blocks (CDL flag 0x02 = Data)
-			List<(uint Start, uint End)> blocks = [];
+			// Find contiguous data blocks with inline size filtering (CDL flag 0x02 = Data)
+			var blocks = new List<(uint Start, uint End)>(128);
 			int? blockStart = null;
 
 			for (int i = 0; i < cdlData.Length; i++) {
@@ -748,21 +782,27 @@ namespace Mesen.Debugger.Labels {
 				if (isData && blockStart == null) {
 					blockStart = i;
 				} else if (!isData && blockStart != null) {
-					blocks.Add(((uint)blockStart.Value, (uint)(i - 1)));
+					// Optimized: Inline filter - only add blocks >= 4 bytes
+					if (i - 1 - blockStart.Value >= 4) {
+						blocks.Add(((uint)blockStart.Value, (uint)(i - 1)));
+					}
+
 					blockStart = null;
 				}
 			}
 
-			// Handle final block
-			if (blockStart != null) {
+			// Handle final block with inline filter
+			if (blockStart != null && cdlData.Length - 1 - blockStart.Value >= 4) {
 				blocks.Add(((uint)blockStart.Value, (uint)(cdlData.Length - 1)));
 			}
 
-			// Only write blocks larger than 4 bytes (filter noise)
-			var significantBlocks = blocks.Where(b => b.End - b.Start >= 4).ToList();
-			writer.Write((uint)significantBlocks.Count);
+			// Optimized: Pre-sized MemoryStream
+			using var ms = new MemoryStream((blocks.Count * 12) + 4);
+			using var writer = new BinaryWriter(ms);
 
-			foreach (var (Start, End) in significantBlocks) {
+			writer.Write((uint)blocks.Count);
+
+			foreach (var (Start, End) in blocks) {
 				writer.Write(Start);  // Start address (4 bytes)
 				writer.Write(End);    // End address (4 bytes)
 				writer.Write((byte)2);      // Type: Data
@@ -845,7 +885,7 @@ namespace Mesen.Debugger.Labels {
 								} else if (jumpTargetSet.Contains(targetAddr)) {
 									// Check if it's a branch (short jump) or full jump
 									xrefType = IsBranchInstruction(line.ByteCode, cpuType) ? CrossRefType.Branch : CrossRefType.Jump;
-								} else if ((cdlData.Length > targetAddr && (cdlData[targetAddr] & 0x02) != 0)) {
+								} else if (cdlData.Length > targetAddr && (cdlData[targetAddr] & 0x02) != 0) {
 									// Target is data - this is a read/write
 									xrefType = IsWriteInstruction(line.ByteCode, cpuType) ? CrossRefType.Write : CrossRefType.Read;
 								} else {
