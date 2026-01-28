@@ -4,15 +4,30 @@ This document tracks the GitHub issues and epics for the Mesen2 modernization pr
 
 ## ✅ Completion Status
 
+### Phase 1: .NET / UI Modernization (Complete)
+
 | Epic | Status | Notes |
 |------|--------|-------|
 | Epic 1: .NET 10 Migration | ✅ **Complete** | Upgraded to .NET 10.0 |
-| Epic 2: Avalonia Update | ✅ **Complete** | Updated to 11.3.9 |
+| Epic 2: Avalonia Update | ✅ **Complete** | Updated to 11.3.11 |
 | Epic 3: Built-in Libraries | ✅ **Complete** | System.IO.Hashing |
 | Epic 4: Comprehensive Testing | ✅ **Complete** | 24 tests |
 | Epic 5: Lua Runtime Update | ✅ **Complete** | Lua 5.4.4 → 5.4.8 |
 | Epic 6: Code Modernization | ✅ **Complete** | K&R, tabs, formatting |
 | Epic 7: Documentation | ✅ **Complete** | Updated all docs |
+
+### Phase 2: C++ Core Modernization (Planned)
+
+| Epic | Status | Notes |
+|------|--------|-------|
+| Epic 8: Build System | 📋 **Planned** | VS2026, C++23, clang-tidy |
+| Epic 9: Testing Infrastructure | 📋 **Planned** | Google Test/Catch2 |
+| Epic 10: Memory Safety | 📋 **Planned** | Smart pointers, std::span |
+| Epic 11: Standard Library | 📋 **Planned** | ranges, format, filesystem |
+| Epic 12: Performance | 📋 **Planned** | Profiling, SIMD |
+| Epic 13: Documentation | 📋 **Planned** | Doxygen, API docs |
+
+**See:** [CPP-ISSUES-TRACKING.md](CPP-ISSUES-TRACKING.md) for detailed C++ issues
 
 ## 📋 Epics
 
@@ -123,7 +138,8 @@ This document tracks the GitHub issues and epics for the Mesen2 modernization pr
 | Jan 26, 2026 | .NET 10 upgrade, Avalonia 11.3.9, System.IO.Hashing, 24 tests |
 | Jan 27, 2026 | K&R formatting, .editorconfig merge, 500+ files formatted, documentation |
 | Jan 27, 2026 | Lua runtime 5.4.4 → 5.4.8 |
+| Jan 28, 2026 | Avalonia 11.3.11, Dock 11.3.9, VS2026 tooling, C++ roadmap & issues |
 
 ---
 
-*Last Updated: January 27, 2026*
+*Last Updated: January 28, 2026*
