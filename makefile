@@ -103,14 +103,14 @@ ifeq ($(PGO),optimize)
 endif
 
 ifneq ($(STATICLINK),false)
-	LINKOPTIONS += -static-libgcc -static-libstdc++ 
+	LINKOPTIONS += -static-libgcc -static-libstdc++
 endif
 
 ifeq ($(MESENOS),osx)
 	LINKOPTIONS += -framework Foundation -framework Cocoa -framework GameController -framework CoreHaptics -Wl,-rpath,/opt/local/lib
 endif
 
-CXXFLAGS = -fPIC -Wall --std=c++17 $(MESENFLAGS) $(SDL2INC) -I $(realpath ./) -I $(realpath ./Core) -I $(realpath ./Utilities) -I $(realpath ./Sdl) -I $(realpath ./Linux) -I $(realpath ./MacOS)
+CXXFLAGS = -fPIC -Wall --std=c++23 $(MESENFLAGS) $(SDL2INC) -I $(realpath ./) -I $(realpath ./Core) -I $(realpath ./Utilities) -I $(realpath ./Sdl) -I $(realpath ./Linux) -I $(realpath ./MacOS)
 OBJCXXFLAGS = $(CXXFLAGS)
 CFLAGS = -fPIC -Wall $(MESENFLAGS)
 
@@ -185,10 +185,10 @@ endif
 FSLIB := -lstdc++fs
 
 ifeq ($(MESENOS),osx)
-	LIBEVDEVOBJ := 
-	LIBEVDEVINC := 
-	LIBEVDEVSRC := 
-	FSLIB := 
+	LIBEVDEVOBJ :=
+	LIBEVDEVINC :=
+	LIBEVDEVSRC :=
+	FSLIB :=
 	ifeq ($(USE_AOT),true)
 		PUBLISHFLAGS := -t:BundleApp -p:UseAppHost=true -p:RuntimeIdentifier=$(MESENPLATFORM) -p:PublishSingleFile=false -p:PublishAot=true -p:SelfContained=true
 	else
@@ -214,7 +214,7 @@ pgohelper: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
-	
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
