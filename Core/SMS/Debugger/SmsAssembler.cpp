@@ -1,4 +1,6 @@
 #include "pch.h"
+#include <algorithm>
+#include <ranges>
 #include <regex>
 #include "Debugger/LabelManager.h"
 #include "SMS/Debugger/SmsAssembler.h"
@@ -44,7 +46,7 @@ void SmsAssembler::InitAssembler() {
 				}
 			}
 
-			uint32_t paramCount = std::count(op.begin(), op.end(), ',') + 1;
+			uint32_t paramCount = std::ranges::count(op, ',') + 1;
 			size_t spaceIndex = op.find(' ');
 			string opName;
 
@@ -65,14 +67,14 @@ void SmsAssembler::InitAssembler() {
 				entry.OpCode = (i << 16) | opType.Prefix;
 			}
 
-			std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+			std::ranges::transform(opName, opName.begin(), ::tolower);
 			if (_opCodes.find(opName) == _opCodes.end()) {
 				_opCodes[opName] = vector<OpCodeEntry>();
 			}
 
 			if (entry.ParamCount > 0) {
 				string operands = op.substr(spaceIndex + 1);
-				operands.erase(std::remove_if(operands.begin(), operands.end(), isspace), operands.end());
+				std::erase_if(operands, isspace);
 				if (entry.ParamCount > 1) {
 					vector<string> operandList = StringUtilities::Split(operands, ',');
 					InitParamEntry(entry.Param1, operandList[0], opType.HlType);
@@ -180,14 +182,14 @@ void SmsAssembler::InitParamEntry(ParamEntry& entry, string param, HlRegType hlR
 				break;
 		}
 	} else {
-		std::transform(param.begin(), param.end(), param.begin(), ::tolower);
+		std::ranges::transform(param, param.begin(), ::tolower);
 		entry.Type = ParamType::Literal;
 		entry.Param = param;
 	}
 }
 
 bool SmsAssembler::IsRegisterName(string op) {
-	std::transform(op.begin(), op.end(), op.begin(), ::tolower);
+	std::ranges::transform(op, op.begin(), ::tolower);
 	if (op.size() > 2 && op[0] == '(' && op[op.size() - 1] == ')') {
 		op = op.substr(1, op.size() - 2);
 		return op == "hl" || op == "af" || op == "bc" || op == "de" || op == "a" || op == "b" || op == "c" || op == "d" || op == "e" || op == "f" || op == "l" || op == "h" || op == "ix" || op == "iy" || op == "ixl" || op == "ixh" || op == "iyl" || op == "iyh";
@@ -273,8 +275,8 @@ bool SmsAssembler::IsMatch(ParamEntry& entry, string operand, uint32_t address, 
 
 		case ParamType::Literal: {
 			string param = entry.Param;
-			std::transform(param.begin(), param.end(), param.begin(), ::tolower);
-			std::transform(operand.begin(), operand.end(), operand.begin(), ::tolower);
+			std::ranges::transform(param, param.begin(), ::tolower);
+			std::ranges::transform(operand, operand.begin(), ::tolower);
 			return operand == param;
 		}
 
@@ -470,7 +472,7 @@ void SmsAssembler::RunPass(vector<int16_t>& output, string code, uint32_t addres
 			continue;
 		}
 
-		std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+		std::ranges::transform(opName, opName.begin(), ::tolower);
 
 		if (_opCodes.find(opName) == _opCodes.end()) {
 			// No matching opcode found, mark it as invalid
@@ -483,9 +485,9 @@ void SmsAssembler::RunPass(vector<int16_t>& output, string code, uint32_t addres
 		vector<string> operandList;
 		if (spaceIndex != string::npos) {
 			string operands = line.substr(spaceIndex + 1);
-			operands.erase(std::remove_if(operands.begin(), operands.end(), isspace), operands.end());
+			std::erase_if(operands, isspace);
 			if (!operands.empty()) {
-				paramCount = std::count(operands.begin(), operands.end(), ',') + 1;
+				paramCount = std::ranges::count(operands, ',') + 1;
 
 				if (paramCount > 1) {
 					operandList = StringUtilities::Split(operands, ',');

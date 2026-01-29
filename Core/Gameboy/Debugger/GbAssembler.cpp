@@ -1,4 +1,6 @@
 #include "pch.h"
+#include <algorithm>
+#include <ranges>
 #include <regex>
 #include "Debugger/LabelManager.h"
 #include "Gameboy/Debugger/GbAssembler.h"
@@ -34,14 +36,14 @@ void GbAssembler::InitAssembler() {
 
 		entry.OpCode = i < 256 ? i : ((i << 8) | 0xCB);
 
-		std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+		std::ranges::transform(opName, opName.begin(), ::tolower);
 		if (_opCodes.find(opName) == _opCodes.end()) {
 			_opCodes[opName] = vector<OpCodeEntry>();
 		}
 
 		if (entry.ParamCount > 0) {
 			string operands = op.substr(spaceIndex + 1);
-			operands.erase(std::remove_if(operands.begin(), operands.end(), isspace), operands.end());
+			std::erase_if(operands, isspace);
 			if (entry.ParamCount == 2) {
 				vector<string> operandList = StringUtilities::Split(operands, ',');
 				InitParamEntry(entry.Param1, operandList[0]);
@@ -70,7 +72,7 @@ void GbAssembler::InitParamEntry(ParamEntry& entry, string param) {
 	} else if (param == "SP+d") {
 		entry.Type = ParamType::StackOffset;
 	} else {
-		std::transform(param.begin(), param.end(), param.begin(), ::tolower);
+		std::ranges::transform(param, param.begin(), ::tolower);
 		entry.Type = ParamType::Literal;
 		entry.Param = param;
 	}
@@ -78,7 +80,7 @@ void GbAssembler::InitParamEntry(ParamEntry& entry, string param) {
 }
 
 bool GbAssembler::IsRegisterName(string op) {
-	std::transform(op.begin(), op.end(), op.begin(), ::tolower);
+	std::ranges::transform(op, op.begin(), ::tolower);
 	return op == "hl" || op == "af" || op == "bc" || op == "de" || op == "a" || op == "b" || op == "c" || op == "d" || op == "e" || op == "f" || op == "l" || op == "h";
 }
 
@@ -151,8 +153,8 @@ bool GbAssembler::IsMatch(ParamEntry& entry, string operand, uint32_t address, u
 
 		case ParamType::Literal: {
 			string param = entry.Param;
-			std::transform(param.begin(), param.end(), param.begin(), ::tolower);
-			std::transform(operand.begin(), operand.end(), operand.begin(), ::tolower);
+			std::ranges::transform(param, param.begin(), ::tolower);
+			std::ranges::transform(operand, operand.begin(), ::tolower);
 			return operand == param;
 		}
 
@@ -175,7 +177,7 @@ bool GbAssembler::IsMatch(ParamEntry& entry, string operand, uint32_t address, u
 			return false;
 
 		case ParamType::StackOffset:
-			std::transform(operand.begin(), operand.end(), operand.begin(), ::tolower);
+			std::ranges::transform(operand, operand.begin(), ::tolower);
 			if (operand.size() > 3 && operand.substr(0, 3) == "sp+") {
 				return ReadValue(operand.substr(3), 0, 0xFF, localLabels, firstPass) >= 0;
 			}
@@ -245,7 +247,7 @@ void GbAssembler::ProcessOperand(ParamEntry& entry, string operand, vector<int16
 			break;
 
 		case ParamType::StackOffset:
-			std::transform(operand.begin(), operand.end(), operand.begin(), ::tolower);
+			std::ranges::transform(operand, operand.begin(), ::tolower);
 			if (operand.size() > 3 && operand.substr(0, 3) == "sp+") {
 				PushByte((uint8_t)ReadValue(operand.substr(3), 0, 0xFF, localLabels, firstPass), output, address);
 			}
@@ -327,7 +329,7 @@ void GbAssembler::RunPass(vector<int16_t>& output, string code, uint32_t address
 			continue;
 		}
 
-		std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+		std::ranges::transform(opName, opName.begin(), ::tolower);
 
 		if (_opCodes.find(opName) == _opCodes.end()) {
 			// No matching opcode found, mark it as invalid
@@ -340,7 +342,7 @@ void GbAssembler::RunPass(vector<int16_t>& output, string code, uint32_t address
 		vector<string> operandList;
 		if (spaceIndex != string::npos) {
 			string operands = line.substr(spaceIndex + 1);
-			operands.erase(std::remove_if(operands.begin(), operands.end(), isspace), operands.end());
+			std::erase_if(operands, isspace);
 			if (!operands.empty()) {
 				size_t commaIndex = line.find(',');
 				if (commaIndex != string::npos) {

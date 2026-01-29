@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <ranges>
 #include "NES/HdPacks/HdPackBuilder.h"
 #include "NES/HdPacks/HdNesPack.h"
 #include "NES/BaseMapper.h"
@@ -287,7 +288,7 @@ void HdPackBuilder::SaveHdPack() {
 						tiles.push_back({_tileUsageCount[paletteMap.second[i]->GetKey(false)], paletteMap.second[i]});
 					}
 				}
-				std::sort(tiles.begin(), tiles.end(), [=](std::pair<uint32_t, HdPackTileInfo*>& a, std::pair<uint32_t, HdPackTileInfo*>& b) {
+				std::ranges::sort(tiles, [=](std::pair<uint32_t, HdPackTileInfo*>& a, std::pair<uint32_t, HdPackTileInfo*>& b) {
 					return a.first > b.first;
 				});
 
@@ -427,7 +428,7 @@ void HdPackBuilder::GetBankPreview(uint32_t bankNumber, uint32_t pageNumber, uin
                     }
                 }
 
-                std::sort(tiles.begin(), tiles.end(), [=](std::pair<uint32_t, HdPackTileInfo*> &a, std::pair<uint32_t, HdPackTileInfo*> &b) {
+                std::ranges::sort(tiles, [=](std::pair<uint32_t, HdPackTileInfo*> &a, std::pair<uint32_t, HdPackTileInfo*> &b) {
                     return a.first > b.first;
                 });
 
