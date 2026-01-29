@@ -25,8 +25,11 @@ This document tracks the GitHub issues and epics for the C++ core modernization 
 |-------|-------|--------|---------|
 | [#75](https://github.com/TheAnsarya/Mesen2/issues/75) | [[likely]]/[[unlikely]] Branch Hints | ✅ COMPLETE | 41 attributes in error paths |
 | [#76](https://github.com/TheAnsarya/Mesen2/issues/76) | Expand constexpr Usage | 🔄 In Progress | 14 functions (ColorUtilities, Dsp, etc.) |
-| [#77](https://github.com/TheAnsarya/Mesen2/issues/77) | Add [[nodiscard]] Attributes | 🔄 In Progress | ~85 attributes across utilities/core |
+| [#77](https://github.com/TheAnsarya/Mesen2/issues/77) | Add [[nodiscard]] Attributes | 🔄 In Progress | ~179 attributes across all platforms |
 | [#78](https://github.com/TheAnsarya/Mesen2/issues/78) | Adopt std::bit_cast | ✅ Research Done | LOW PRIORITY - minimal candidates |
+| [#79](https://github.com/TheAnsarya/Mesen2/issues/79) | C++ Unit Testing Infrastructure | 📋 PLANNED | Epic 12 - Google Test integration |
+| [#80](https://github.com/TheAnsarya/Mesen2/issues/80) | C++ Performance Benchmarking | 📋 PLANNED | Epic 13 - Benchmark framework |
+| [#81](https://github.com/TheAnsarya/Mesen2/issues/81) | Code Documentation & Comments | 📋 PLANNED | Epic 14 - XML docs, Doxygen |
 | [#82](https://github.com/TheAnsarya/Mesen2/issues/82) | Adopt std::span for buffers | ✅ COMPLETE | BatteryManager API, 26 files |
 
 **Commits:**
@@ -36,6 +39,8 @@ This document tracks the GitHub issues and epics for the C++ core modernization 
 - `8db3eeef`, `1672f627` - [[nodiscard]] Core/Shared getters
 - `e3d73e45` - style: newlines at end of header files
 - `6af709d1` - feat: std::span for BatteryManager API (#82)
+- `6df6486e` - feat: [[nodiscard]] to WonderSwan getters
+- `59738a1e` - docs: update cpp-modernization-opportunities with current status
 
 ---
 
