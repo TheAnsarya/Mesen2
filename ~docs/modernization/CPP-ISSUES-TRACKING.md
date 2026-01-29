@@ -1,8 +1,8 @@
 # 🎫 Mesen2 C++ Modernization Issues
 
 > **Document Created:** January 28, 2026
-> **Last Updated:** January 28, 2026
-> **Status:** � **IN PROGRESS**
+> **Last Updated:** January 29, 2026
+> **Status:** 🚀 **IN PROGRESS**
 
 This document tracks the GitHub issues and epics for the C++ core modernization project.
 
@@ -12,35 +12,40 @@ This document tracks the GitHub issues and epics for the C++ core modernization 
 
 | Epic | GitHub | Status | Issues | Priority |
 |------|--------|--------|--------|----------|
-| Epic 8: Build System | [#40](https://github.com/TheAnsarya/Mesen2/issues/40) | 🔄 In Progress | 6 | HIGH |
-| Epic 9: Testing | [#41](https://github.com/TheAnsarya/Mesen2/issues/41) | 📋 Planned | 8 | HIGH |
-| Epic 10: Memory Safety | [#42](https://github.com/TheAnsarya/Mesen2/issues/42) | 📋 Planned | 6 | MEDIUM |
-| Epic 11: Standard Library | [#43](https://github.com/TheAnsarya/Mesen2/issues/43) | 📋 Planned | 3 | MEDIUM |
-| Epic 12: Performance | [#44](https://github.com/TheAnsarya/Mesen2/issues/44) | 📋 Planned | 2 | LOW |
-| Epic 13: Documentation | [#45](https://github.com/TheAnsarya/Mesen2/issues/45) | 📋 Planned | 2 | LOW |
+| Epic 8: Build System | [#40](https://github.com/TheAnsarya/Mesen2/issues/40) | ✅ Complete | 6/6 | HIGH |
+| Epic 9: Testing | [#41](https://github.com/TheAnsarya/Mesen2/issues/41) | 🔄 In Progress | 1/8 | HIGH |
+| Epic 10: Memory Safety | [#42](https://github.com/TheAnsarya/Mesen2/issues/42) | 📋 Planned | 0/6 | MEDIUM |
+| Epic 11: Standard Library | [#43](https://github.com/TheAnsarya/Mesen2/issues/43) | ✅ Complete | 4/4 | MEDIUM |
+| Epic 12: Performance | [#44](https://github.com/TheAnsarya/Mesen2/issues/44) | 🔄 In Progress | 0/2 | LOW |
+| Epic 13: Documentation | [#45](https://github.com/TheAnsarya/Mesen2/issues/45) | 📋 Planned | 0/2 | LOW |
+| Epic 14: Code Documentation | [#81](https://github.com/TheAnsarya/Mesen2/issues/81) | 🔄 In Progress | Partial | MEDIUM |
 
-### 🚀 Recent Progress (January 29, 2026 - Session 6)
+### 🚀 Recent Progress (January 29, 2026 - Sessions 6-8)
 
 | Issue | Title | Status | Details |
 |-------|-------|--------|---------|
-| [#75](https://github.com/TheAnsarya/Mesen2/issues/75) | [[likely]]/[[unlikely]] Branch Hints | ✅ COMPLETE | 41 attributes in error paths |
-| [#76](https://github.com/TheAnsarya/Mesen2/issues/76) | Expand constexpr Usage | 🔄 In Progress | 14 functions (ColorUtilities, Dsp, etc.) |
-| [#77](https://github.com/TheAnsarya/Mesen2/issues/77) | Add [[nodiscard]] Attributes | 🔄 In Progress | ~179 attributes across all platforms |
-| [#78](https://github.com/TheAnsarya/Mesen2/issues/78) | Adopt std::bit_cast | ✅ Research Done | LOW PRIORITY - minimal candidates |
-| [#79](https://github.com/TheAnsarya/Mesen2/issues/79) | C++ Unit Testing Infrastructure | 📋 PLANNED | Epic 12 - Google Test integration |
-| [#80](https://github.com/TheAnsarya/Mesen2/issues/80) | C++ Performance Benchmarking | 📋 PLANNED | Epic 13 - Benchmark framework |
-| [#81](https://github.com/TheAnsarya/Mesen2/issues/81) | Code Documentation & Comments | 📋 PLANNED | Epic 14 - XML docs, Doxygen |
-| [#82](https://github.com/TheAnsarya/Mesen2/issues/82) | Adopt std::span for buffers | ✅ COMPLETE | BatteryManager API, 26 files |
+| [#52](https://github.com/TheAnsarya/Mesen2/issues/52) | Integrate Testing Framework | ✅ CLOSED | gtest 1.17.0, Core.Tests project |
+| [#75](https://github.com/TheAnsarya/Mesen2/issues/75) | [[likely]]/[[unlikely]] Branch Hints | ✅ CLOSED | 41 attributes in error paths |
+| [#76](https://github.com/TheAnsarya/Mesen2/issues/76) | Expand constexpr Usage | ✅ CLOSED | 14 functions (ColorUtilities, Dsp, etc.) |
+| [#77](https://github.com/TheAnsarya/Mesen2/issues/77) | Add [[nodiscard]] Attributes | ✅ CLOSED | ~179 attributes across all platforms |
+| [#78](https://github.com/TheAnsarya/Mesen2/issues/78) | Adopt std::bit_cast | ⏸️ LOW PRIORITY | Minimal candidates identified |
+| [#70](https://github.com/TheAnsarya/Mesen2/issues/70) | Create Performance Benchmarks | 🔄 In Progress | Infrastructure ready, benchmarks WIP |
+| [#81](https://github.com/TheAnsarya/Mesen2/issues/81) | Code Documentation & Comments | 🔄 In Progress | 32 classes/73+ files documented |
+
+**Session 8 Fixes:**
+- Fixed vcpkg manifest mode for Core.Tests and Core.Benchmarks
+- Added missing `Rgb555ToRgb` function to ColorUtilities.h
+- Commented out UI pre-build script (packaging-only, not needed for dev builds)
 
 **Commits:**
+- `18e362e8` - fix: Enable vcpkg manifest mode for test projects
+- `f6a3360c` - feat: add Core.Tests and Core.Benchmarks projects
 - `2e9c5aaf`, `2b2e90a9` - [[unlikely]] implementation
 - `e5232022` - [[nodiscard]] utility functions
 - `9220b5d3` - constexpr expansion
 - `8db3eeef`, `1672f627` - [[nodiscard]] Core/Shared getters
-- `e3d73e45` - style: newlines at end of header files
-- `6af709d1` - feat: std::span for BatteryManager API (#82)
-- `6df6486e` - feat: [[nodiscard]] to WonderSwan getters
-- `59738a1e` - docs: update cpp-modernization-opportunities with current status
+- `6af709d1` - feat: std::span for BatteryManager API
+- 25+ documentation commits (Session 7)
 
 ---
 
