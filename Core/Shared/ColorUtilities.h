@@ -73,6 +73,23 @@ public:
 	}
 
 	/// <summary>
+	/// Extracts RGB components from RGB555 (15-bit) color to individual 8-bit values.
+	/// </summary>
+	/// <param name="rgb555">RGB555 color in format: xBBBBBGGGGGRRRRR (MSB unused)</param>
+	/// <param name="r">Output red component (0-255)</param>
+	/// <param name="g">Output green component (0-255)</param>
+	/// <param name="b">Output blue component (0-255)</param>
+	/// <remarks>
+	/// Each 5-bit component is expanded to 8-bit using Convert5BitTo8Bit.
+	/// Useful when individual color channels need to be processed separately.
+	/// </remarks>
+	static constexpr void Rgb555ToRgb(uint16_t rgb555, uint8_t& r, uint8_t& g, uint8_t& b) {
+		b = Convert5BitTo8Bit((rgb555 >> 10) & 0x1F);
+		g = Convert5BitTo8Bit((rgb555 >> 5) & 0x1F);
+		r = Convert5BitTo8Bit(rgb555 & 0x1F);
+	}
+
+	/// <summary>
 	/// Converts 2-bit-per-channel RGB (6-bit total) to RGB555 format.
 	/// </summary>
 	/// <param name="value">RGB222 value with 2 bits per channel (bits 5-0: RRGGBB)</param>

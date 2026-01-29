@@ -12,6 +12,7 @@
 		<RootNamespace>CoreBenchmarks</RootNamespace>
 		<ProjectName>Core.Benchmarks</ProjectName>
 		<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+		<VcpkgEnableManifest>true</VcpkgEnableManifest>
 	</PropertyGroup>
 	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
