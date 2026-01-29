@@ -2,9 +2,23 @@
 #include "pch.h"
 
 /// <summary>
-/// Provides compile-time color conversion utilities for retro gaming systems.
-/// All functions are constexpr and marked [[nodiscard]] for optimal performance and safety.
+/// Compile-time color format conversion utilities.
+/// All functions are constexpr for zero-cost compile-time evaluation.
 /// </summary>
+/// <remarks>
+/// Supports color depth conversions between:
+/// - 2-bit (WonderSwan grayscale: 4 colors)
+/// - 4-bit per channel (Genesis/SMS: 4096 colors RGB444)
+/// - 5-bit per channel (SNES/GBA: 32768 colors RGB555)
+/// - 8-bit per channel (Modern: 16.7M colors RGB888/ARGB8888)
+/// 
+/// Bit expansion preserves relative brightness:
+/// - 2-bit to 8-bit: 0→0, 1→85, 2→170, 3→255 (evenly spaced)
+/// - 4-bit to 8-bit: 0→0, 1→17, ... 15→255 (value * 17)
+/// - 5-bit to 8-bit: 0→0, 1→8, ... 31→255 (value * 8 + value / 4)
+/// 
+/// All conversions marked [[nodiscard]] to prevent accidental discard.
+/// </remarks>
 class ColorUtilities {
 public:
 	/// <summary>

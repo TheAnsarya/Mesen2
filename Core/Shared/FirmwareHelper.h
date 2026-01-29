@@ -5,42 +5,60 @@
 #include "Shared/NotificationManager.h"
 #include "Utilities/FolderUtilities.h"
 
+/// <summary>
+/// Firmware types for various coprocessors and system BIOSes.
+/// </summary>
+/// <remarks>
+/// Covers:
+/// - SNES DSP chips (DSP1-4, ST010/ST011/ST018) - math/graphics coprocessors
+/// - Satellaview, SufamiTurbo - SNES peripherals
+/// - Game Boy/Color/Advance, SGB1/2 - boot ROMs and CPU firmwares
+/// - FDS, StudyBox - Famicom peripherals
+/// - PC Engine - Super CD BIOS
+/// - ColecoVision - system BIOS
+/// - WonderSwan variants - boot ROMs
+/// - YMF288 - Yamaha ADPCM sample ROM
+/// - SMS/GG - Master System and Game Gear boot ROMs
+/// </remarks>
 enum class FirmwareType {
-	DSP1,
-	DSP1B,
-	DSP2,
-	DSP3,
-	DSP4,
-	ST010,
-	ST011,
-	ST018,
-	Satellaview,
-	SufamiTurbo,
-	Gameboy,
-	GameboyColor,
-	GameboyAdvance,
-	Sgb1GameboyCpu,
-	Sgb2GameboyCpu,
-	SGB1,
-	SGB2,
-	FDS,
-	StudyBox,
-	PceSuperCd,
-	PceGamesExpress,
-	ColecoVision,
-	WonderSwan,
-	WonderSwanColor,
-	SwanCrystal,
-	Ymf288AdpcmRom,
-	SmsBootRom,
-	GgBootRom
+	DSP1,           ///< SNES DSP-1 math coprocessor (Pilotwings, Super Mario Kart)
+	DSP1B,          ///< DSP-1B variant (different ROM mapping)
+	DSP2,           ///< DSP-2 bitmap/sprite scaler (Dungeon Master)
+	DSP3,           ///< DSP-3 decompression (SD Gundam GX)
+	DSP4,           ///< DSP-4 path finding/strategy AI (Top Gear 3000)
+	ST010,          ///< Seta ST010 coprocessor (F1 ROC II)
+	ST011,          ///< Seta ST011 coprocessor (Hayazashi Nidan Morita Shougi)
+	ST018,          ///< Seta ST018 coprocessor (Hayazashi Nidan Morita Shougi 2)
+	Satellaview,    ///< BS-X Satellaview base cartridge BIOS
+	SufamiTurbo,    ///< Sufami Turbo base cartridge BIOS
+	Gameboy,        ///< Game Boy boot ROM (256 bytes)
+	GameboyColor,   ///< Game Boy Color boot ROM (2304 bytes)
+	GameboyAdvance, ///< Game Boy Advance BIOS (16KB)
+	Sgb1GameboyCpu, ///< Super Game Boy 1 - Game Boy CPU firmware
+	Sgb2GameboyCpu, ///< Super Game Boy 2 - Game Boy CPU firmware
+	SGB1,           ///< Super Game Boy 1 SNES-side firmware
+	SGB2,           ///< Super Game Boy 2 SNES-side firmware
+	FDS,            ///< Famicom Disk System BIOS
+	StudyBox,       ///< Famicom StudyBox cassette tape system BIOS
+	PceSuperCd,     ///< PC Engine Super CD-ROM² system card
+	PceGamesExpress, ///< PC Engine Games Express card
+	ColecoVision,   ///< ColecoVision system BIOS
+	WonderSwan,     ///< WonderSwan boot ROM
+	WonderSwanColor, ///< WonderSwan Color boot ROM
+	SwanCrystal,    ///< SwanCrystal boot ROM
+	Ymf288AdpcmRom, ///< Yamaha YMF288 ADPCM sample ROM (percussion sounds)
+	SmsBootRom,     ///< Sega Master System boot ROM
+	GgBootRom       ///< Sega Game Gear boot ROM
 };
 
+/// <summary>
+/// Error message when required firmware file is missing.
+/// </summary>
 struct MissingFirmwareMessage {
-	const char* Filename = {};
-	FirmwareType Firmware;
-	uint32_t Size = 0;
-	uint32_t AltSize = 0;
+	const char* Filename = {};  ///< Expected filename
+	FirmwareType Firmware;      ///< Firmware type identifier
+	uint32_t Size = 0;          ///< Expected file size (bytes)
+	uint32_t AltSize = 0;       ///< Alternative valid size (0 if none)
 
 	MissingFirmwareMessage(const char* filename, FirmwareType type, uint32_t size, uint32_t altSize = 0) {
 		Filename = filename;
@@ -50,6 +68,14 @@ struct MissingFirmwareMessage {
 	}
 };
 
+/// <summary>
+/// Firmware and BIOS file loader for all supported systems.
+/// </summary>
+/// <remarks>
+/// Searches firmware folder (Documents/Mesen/Firmware) for required files.
+/// Supports split DSP firmware files (separate program/data ROMs).
+/// Displays user-facing error messages when firmware is missing.
+/// </remarks>
 class FirmwareHelper {
 private:
 	static bool AttemptLoadDspFirmware(string combinedFilename, string splitFilenameProgram, string splitFilenameData, vector<uint8_t>& programRom, vector<uint8_t>& dataRom, uint32_t programSize, uint32_t dataSize) {
