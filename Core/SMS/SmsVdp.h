@@ -187,10 +187,10 @@ public:
 	void SetRegion(ConsoleRegion region);
 
 	void DebugSendFrame();
-	uint16_t GetScanline() { return _state.Scanline; }
-	uint16_t GetScanlineCount() { return _scanlineCount; }
-	uint16_t GetCycle() { return _state.Cycle; }
-	uint16_t GetFrameCount() { return _state.FrameCount; }
+	[[nodiscard]] uint16_t GetScanline() { return _state.Scanline; }
+	[[nodiscard]] uint16_t GetScanlineCount() { return _scanlineCount; }
+	[[nodiscard]] uint16_t GetCycle() { return _state.Cycle; }
+	[[nodiscard]] uint16_t GetFrameCount() { return _state.FrameCount; }
 	uint32_t GetPixelBrightness(uint8_t x, uint8_t y);
 	int GetViewportYOffset();
 	const uint16_t* GetSmsSgPalette() { return _activeSgPalette; }

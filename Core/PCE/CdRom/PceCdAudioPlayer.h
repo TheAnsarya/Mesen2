@@ -42,11 +42,11 @@ public:
 
 	PceCdAudioPlayerState& GetState() { return _state; }
 
-	CdAudioStatus GetStatus() { return _state.Status; }
+	[[nodiscard]] CdAudioStatus GetStatus() { return _state.Status; }
 
-	uint32_t GetSubcodeSector() { return _subcodeSector; }
-	uint8_t GetSubcodePosition() { return _subcodePosition; }
-	uint32_t GetCurrentSector() { return _state.CurrentSector; }
+	[[nodiscard]] uint32_t GetSubcodeSector() { return _subcodeSector; }
+	[[nodiscard]] uint8_t GetSubcodePosition() { return _subcodePosition; }
+	[[nodiscard]] uint32_t GetCurrentSector() { return _state.CurrentSector; }
 
 	__forceinline void Exec() {
 		_clockCounter += 3;
@@ -72,8 +72,8 @@ public:
 		}
 	}
 
-	int16_t GetLeftSample() { return _state.LeftSample; }
-	int16_t GetRightSample() { return _state.RightSample; }
+	[[nodiscard]] int16_t GetLeftSample() { return _state.LeftSample; }
+	[[nodiscard]] int16_t GetRightSample() { return _state.RightSample; }
 
 	void MixAudio(int16_t* out, uint32_t sampleCount, uint32_t sampleRate) override;
 

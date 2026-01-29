@@ -17,11 +17,11 @@ public:
 	PceVce(Emulator* emu, PceConsole* console);
 	~PceVce();
 
-	uint16_t GetScanlineCount() { return _state.ScanlineCount; }
-	uint8_t GetClockDivider() { return _state.ClockDivider; }
-	bool IsGrayscale() { return _state.Grayscale; }
+	[[nodiscard]] uint16_t GetScanlineCount() { return _state.ScanlineCount; }
+	[[nodiscard]] uint8_t GetClockDivider() { return _state.ClockDivider; }
+	[[nodiscard]] bool IsGrayscale() { return _state.Grayscale; }
 
-	uint16_t GetPalette(uint16_t addr) { return _paletteRam[addr]; }
+	[[nodiscard]] uint16_t GetPalette(uint16_t addr) { return _paletteRam[addr]; }
 	PceVceState& GetState() { return _state; }
 
 	uint8_t Read(uint16_t addr);

@@ -75,7 +75,7 @@ public:
 	PcePsg* GetPsg();
 	PceMemoryManager* GetMemoryManager();
 
-	bool IsSuperGrafx() { return _vdc2 != nullptr; }
+	[[nodiscard]] bool IsSuperGrafx() { return _vdc2 != nullptr; }
 
 	uint64_t GetMasterClock() override;
 	uint32_t GetMasterClockRate() override;

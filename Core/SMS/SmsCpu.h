@@ -249,7 +249,7 @@ public:
 
 	SmsCpuState& GetState();
 
-	uint64_t GetCycleCount() { return _state.CycleCount; }
+	[[nodiscard]] uint64_t GetCycleCount() { return _state.CycleCount; }
 
 	void SetIrqSource(SmsIrqSource source) { _state.ActiveIrqs |= (int)source; }
 	void ClearIrqSource(SmsIrqSource source) { _state.ActiveIrqs &= ~(int)source; }

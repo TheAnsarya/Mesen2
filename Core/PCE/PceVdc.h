@@ -192,10 +192,10 @@ public:
 
 	PceVdcState& GetState();
 
-	uint16_t GetHClock() { return _state.HClock; }
-	uint16_t GetScanline() { return _state.Scanline; }
+	[[nodiscard]] uint16_t GetHClock() { return _state.HClock; }
+	[[nodiscard]] uint16_t GetScanline() { return _state.Scanline; }
 	uint16_t* GetRowBuffer() { return _rowBuffer; }
-	uint16_t GetFrameCount() { return _state.FrameCount; }
+	[[nodiscard]] uint16_t GetFrameCount() { return _state.FrameCount; }
 
 	void Exec();
 	void DrawScanline();
