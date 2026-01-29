@@ -20,7 +20,7 @@ public:
 	bool IsFullState = false;
 
 	void GetStateData(stringstream& stateData, deque<RewindData>& prevStates, int32_t position);
-	uint32_t GetStateSize() { return (uint32_t)_saveStateData.size(); }
+	[[nodiscard]] uint32_t GetStateSize() { return (uint32_t)_saveStateData.size(); }
 
 	void LoadState(Emulator* emu, deque<RewindData>& prevStates, int32_t position = -1, bool sendNotification = true);
 	void SaveState(Emulator* emu, deque<RewindData>& prevStates, int32_t position = -1);

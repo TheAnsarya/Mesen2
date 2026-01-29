@@ -69,15 +69,15 @@ public:
 		_endTime = _startTime + displayDuration;
 	}
 
-	string GetTitle() {
+	[[nodiscard]] string GetTitle() {
 		return _title;
 	}
 
-	string GetMessage() {
+	[[nodiscard]] string GetMessage() {
 		return _message;
 	}
 
-	float GetOpacity() {
+	[[nodiscard]] float GetOpacity() {
 		uint64_t currentTime = GetCurrentTime();
 		if (currentTime - _startTime < 100) {
 			return (currentTime - _startTime) * 10.0f / 1000.0f;
@@ -90,7 +90,7 @@ public:
 		}
 	}
 
-	bool IsExpired() {
+	[[nodiscard]] bool IsExpired() {
 		return _endTime < GetCurrentTime();
 	}
 };

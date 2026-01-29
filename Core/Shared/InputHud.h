@@ -30,7 +30,7 @@ public:
 	void DrawNumber(int number, int x, int y);
 	void EndDrawController();
 
-	int GetControllerIndex() { return _controllerIndex; }
+	[[nodiscard]] int GetControllerIndex() { return _controllerIndex; }
 
 	void DrawControllers(FrameInfo size, vector<ControllerData> controllerData);
 };

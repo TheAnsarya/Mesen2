@@ -180,7 +180,7 @@ public:
 	void Unlock();
 	bool IsThreadPaused();
 
-	bool IsDebuggerBlocked() { return _blockDebuggerRequestCount > 0; }
+	[[nodiscard]] bool IsDebuggerBlocked() { return _blockDebuggerRequestCount > 0; }
 	void SuspendDebugger(bool release);
 
 	void Serialize(ostream& out, bool includeSettings, int compressionLevel = 1);
@@ -216,13 +216,13 @@ public:
 	void InitDebugger();
 	void StopDebugger();
 	DebuggerRequest GetDebugger(bool autoInit = false);
-	bool IsDebugging() { return !!_debugger; }
+	[[nodiscard]] bool IsDebugging() { return !!_debugger; }
 	Debugger* InternalGetDebugger() { return _debugger.get(); }
 
 	thread::id GetEmulationThreadId() { return _emulationThreadId; }
 	bool IsEmulationThread();
 
-	int32_t GetStopCode() { return _stopCode; }
+	[[nodiscard]] int32_t GetStopCode() { return _stopCode; }
 	void SetStopCode(int32_t stopCode);
 
 	void RegisterMemory(MemoryType type, void* memory, uint32_t size);
@@ -232,8 +232,8 @@ public:
 	void ProcessAudioPlayerAction(AudioPlayerActionParams p);
 	AudioPlayerHud* GetAudioPlayerHud() { return _audioPlayerHud.get(); }
 
-	bool IsRunning() { return _console != nullptr; }
-	bool IsRunAheadFrame() { return _isRunAheadFrame; }
+	[[nodiscard]] bool IsRunning() { return _console != nullptr; }
+	[[nodiscard]] bool IsRunAheadFrame() { return _isRunAheadFrame; }
 
 	TimingInfo GetTimingInfo(CpuType cpuType);
 	uint32_t GetFrameCount();

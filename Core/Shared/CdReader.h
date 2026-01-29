@@ -56,7 +56,7 @@ struct TrackInfo {
 	uint32_t FirstSector;
 	uint32_t LastSector;
 
-	uint32_t GetSectorSize() {
+	[[nodiscard]] uint32_t GetSectorSize() {
 		switch (Format) {
 			default:
 			case TrackFormat::Audio:
@@ -80,7 +80,7 @@ struct DiscInfo {
 	uint32_t DiscSectorCount;
 	DiscPosition EndPosition;
 
-	int32_t GetTrack(uint32_t sector) {
+	[[nodiscard]] int32_t GetTrack(uint32_t sector) {
 		for (size_t i = 0; i < Tracks.size(); i++) {
 			if (sector >= Tracks[i].FirstSector && sector <= Tracks[i].LastSector) {
 				return (int32_t)i;
@@ -89,7 +89,7 @@ struct DiscInfo {
 		return -1;
 	}
 
-	int32_t GetTrackFirstSector(int32_t track) {
+	[[nodiscard]] int32_t GetTrackFirstSector(int32_t track) {
 		if (track < Tracks.size()) {
 			return Tracks[track].FirstSector;
 		} else if (track > 0 && track == Tracks.size()) {
@@ -102,7 +102,7 @@ struct DiscInfo {
 		return -1;
 	}
 
-	int32_t GetTrackLastSector(int32_t track) {
+	[[nodiscard]] int32_t GetTrackLastSector(int32_t track) {
 		if (track < Tracks.size()) {
 			return Tracks[track].LastSector;
 		}
