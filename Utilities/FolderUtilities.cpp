@@ -10,6 +10,7 @@ namespace fs = std::experimental::filesystem;
 
 #include <unordered_set>
 #include <algorithm>
+#include <ranges>
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/PathUtil.h"
 #include "Utilities/UTF8Util.h"
@@ -36,10 +37,10 @@ string FolderUtilities::GetHomeFolder() {
 void FolderUtilities::AddKnownGameFolder(string gameFolder) {
 	bool alreadyExists = false;
 	string lowerCaseFolder = gameFolder;
-	std::transform(lowerCaseFolder.begin(), lowerCaseFolder.end(), lowerCaseFolder.begin(), ::tolower);
+	std::ranges::transform(lowerCaseFolder, lowerCaseFolder.begin(), ::tolower);
 
 	for (string folder : _gameFolders) {
-		std::transform(folder.begin(), folder.end(), folder.begin(), ::tolower);
+		std::ranges::transform(folder, folder.begin(), ::tolower);
 		if (folder.compare(lowerCaseFolder) == 0) {
 			alreadyExists = true;
 			break;
@@ -128,7 +129,7 @@ string FolderUtilities::GetExtension(string filename) {
 	size_t position = filename.find_last_of('.');
 	if (position != string::npos) {
 		string ext = filename.substr(position, filename.size() - position);
-		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		std::ranges::transform(ext, ext.begin(), ::tolower);
 		return ext;
 	}
 	return "";
@@ -177,7 +178,7 @@ vector<string> FolderUtilities::GetFilesInFolder(string rootFolder, std::unorder
 				i.disable_recursion_pending();
 			} else {
 				string extension = PathUtil::ToUtf8(i->path().extension());
-				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+				std::ranges::transform(extension, extension.begin(), ::tolower);
 				if (extensions.empty() || extensions.find(extension) != extensions.end()) {
 					files.push_back(PathUtil::ToUtf8(i->path()));
 				}
@@ -186,7 +187,7 @@ vector<string> FolderUtilities::GetFilesInFolder(string rootFolder, std::unorder
 	} else {
 		for (fs::directory_iterator i(PathUtil::FromUtf8(rootFolder)), end; i != end; i++) {
 			string extension = PathUtil::ToUtf8(i->path().extension());
-			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+			std::ranges::transform(extension, extension.begin(), ::tolower);
 			if (extensions.empty() || extensions.find(extension) != extensions.end()) {
 				files.push_back(PathUtil::ToUtf8(i->path()));
 			}
