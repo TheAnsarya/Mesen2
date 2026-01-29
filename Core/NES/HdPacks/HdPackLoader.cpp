@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <ranges>
 #include <unordered_map>
 #include "NES/HdPacks/HdPackLoader.h"
 #include "NES/HdPacks/HdPackConditions.h"
@@ -144,7 +145,7 @@ bool HdPackLoader::LoadPack() {
 			}
 
 			vector<HdPackCondition*> conditions;
-			if (lineContent.substr(0, 1) == "[") {
+			if (lineContent.starts_with("[")) {
 				size_t endOfCondition = lineContent.find_first_of(']', 1);
 				if (endOfCondition == string::npos) {
 					logError("Invalid condition tag: " + lineContent);
@@ -155,53 +156,53 @@ bool HdPackLoader::LoadPack() {
 			}
 
 			vector<string> tokens;
-			if (lineContent.substr(0, 6) == "<tile>") {
+			if (lineContent.starts_with("<tile>")) {
 				tokens = StringUtilities::Split(lineContent.substr(6), ',');
 				ProcessTileTag(tokens, conditions);
-			} else if (lineContent.substr(0, 12) == "<background>") {
+			} else if (lineContent.starts_with("<background>")) {
 				tokens = StringUtilities::Split(lineContent.substr(12), ',');
 				ProcessBackgroundTag(tokens, conditions);
-			} else if (lineContent.substr(0, 11) == "<condition>") {
+			} else if (lineContent.starts_with("<condition>")) {
 				tokens = StringUtilities::Split(lineContent.substr(11), ',');
 				ProcessConditionTag(tokens, false);
 				ProcessConditionTag(tokens, true);
-			} else if (lineContent.substr(0, 5) == "<img>") {
+			} else if (lineContent.starts_with("<img>")) {
 				lineContent = lineContent.substr(5);
 				if (!ProcessImgTag(lineContent)) {
 					return false;
 				}
-			} else if (lineContent.substr(0, 10) == "<addition>") {
+			} else if (lineContent.starts_with("<addition>")) {
 				tokens = StringUtilities::Split(lineContent.substr(10), ',');
 				ProcessAdditionTag(tokens);
-			} else if (lineContent.substr(0, 10) == "<fallback>") {
+			} else if (lineContent.starts_with("<fallback>")) {
 				tokens = StringUtilities::Split(lineContent.substr(10), ',');
 				ProcessFallbackTag(tokens);
-			} else if (lineContent.substr(0, 5) == "<bgm>") {
+			} else if (lineContent.starts_with("<bgm>")) {
 				tokens = StringUtilities::Split(lineContent.substr(5), ',');
 				ProcessBgmTag(tokens);
-			} else if (lineContent.substr(0, 5) == "<sfx>") {
+			} else if (lineContent.starts_with("<sfx>")) {
 				tokens = StringUtilities::Split(lineContent.substr(5), ',');
 				ProcessSfxTag(tokens);
-			} else if (lineContent.substr(0, 5) == "<ver>") {
+			} else if (lineContent.starts_with("<ver>")) {
 				_data->Version = stoi(lineContent.substr(5));
 				if (_data->Version > BaseHdNesPack::CurrentVersion) {
 					logError("This HD Pack was built with a more recent version of Mesen - update Mesen to the latest version and try again.");
 					return false;
 				}
-			} else if (lineContent.substr(0, 7) == "<scale>") {
+			} else if (lineContent.starts_with("<scale>")) {
 				lineContent = lineContent.substr(7);
 				_data->Scale = std::stoi(lineContent);
 				if (_data->Scale > 10) {
 					logError("Scale ratios higher than 10 are not supported.");
 					return false;
 				}
-			} else if (lineContent.substr(0, 10) == "<overscan>") {
+			} else if (lineContent.starts_with("<overscan>")) {
 				tokens = StringUtilities::Split(lineContent.substr(10), ',');
 				ProcessOverscanTag(tokens);
-			} else if (lineContent.substr(0, 7) == "<patch>") {
+			} else if (lineContent.starts_with("<patch>")) {
 				tokens = StringUtilities::Split(lineContent.substr(7), ',');
 				ProcessPatchTag(tokens);
-			} else if (lineContent.substr(0, 9) == "<options>") {
+			} else if (lineContent.starts_with("<options>")) {
 				tokens = StringUtilities::Split(lineContent.substr(9), ',');
 				ProcessOptionTag(tokens);
 			}
@@ -497,7 +498,7 @@ void HdPackLoader::ProcessConditionTag(vector<string>& tokens, bool createInvert
 			checkConstraint(tokens.size() >= 5, "Condition tag should contain at least 5 parameters");
 			checkConstraintEx(tokens.size() < 7, "Condition tag contains too many parameters");
 
-			bool usePpuMemory = tokens[1].substr(0, 3) == "ppu";
+			bool usePpuMemory = tokens[1].starts_with("ppu");
 			uint32_t operandA = HexUtilities::FromHex(tokens[index++]);
 
 			if (usePpuMemory) {

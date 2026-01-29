@@ -178,7 +178,7 @@ bool GbAssembler::IsMatch(ParamEntry& entry, string operand, uint32_t address, u
 
 		case ParamType::StackOffset:
 			std::ranges::transform(operand, operand.begin(), ::tolower);
-			if (operand.size() > 3 && operand.substr(0, 3) == "sp+") {
+			if (operand.starts_with("sp+")) {
 				return ReadValue(operand.substr(3), 0, 0xFF, localLabels, firstPass) >= 0;
 			}
 			return false;
@@ -248,7 +248,7 @@ void GbAssembler::ProcessOperand(ParamEntry& entry, string operand, vector<int16
 
 		case ParamType::StackOffset:
 			std::ranges::transform(operand, operand.begin(), ::tolower);
-			if (operand.size() > 3 && operand.substr(0, 3) == "sp+") {
+			if (operand.starts_with("sp+")) {
 				PushByte((uint8_t)ReadValue(operand.substr(3), 0, 0xFF, localLabels, firstPass), output, address);
 			}
 			break;
@@ -299,7 +299,7 @@ void GbAssembler::RunPass(vector<int16_t>& output, string code, uint32_t address
 		}
 
 		// Check if this is a .db statement
-		if (line.size() > 3 && line.substr(0, 3) == ".db") {
+		if (line.starts_with(".db")) {
 			line = line.substr(3);
 			for (string byte : StringUtilities::Split(line, ' ')) {
 				if (byte.empty()) {
