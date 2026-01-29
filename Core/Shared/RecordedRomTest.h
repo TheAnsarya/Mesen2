@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.h"
+#include <array>
 #include <deque>
 #include "Core/Shared/Interfaces/INotificationListener.h"
 #include "Utilities/AutoResetEvent.h"
@@ -78,7 +79,7 @@ private:
 	bool _isLastFrameGood = false; ///< Last frame matched flag
 
 	uint8_t _previousHash[16] = {};  ///< Previous frame MD5 hash
-	std::deque<uint8_t*> _screenshotHashes;  ///< Recorded frame hashes
+	std::deque<std::array<uint8_t, 16>> _screenshotHashes;  ///< Recorded frame hashes (no manual memory management)
 	std::deque<uint8_t> _repetitionCount;    ///< RLE repetition counts
 	uint8_t _currentCount = 0;     ///< Current repetition count
 

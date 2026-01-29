@@ -32,8 +32,8 @@ void RecordedRomTest::SaveFrame() {
 	if (memcmp(_previousHash, md5Hash, 16) == 0 && _currentCount < 255) {
 		_currentCount++;
 	} else {
-		uint8_t* hash = new uint8_t[16];
-		memcpy(hash, md5Hash, 16);
+		std::array<uint8_t, 16> hash;
+		std::copy_n(md5Hash, 16, hash.begin());
 		_screenshotHashes.push_back(hash);
 		if (_currentCount > 0) {
 			_repetitionCount.push_back(_currentCount);
@@ -59,7 +59,7 @@ void RecordedRomTest::ValidateFrame() {
 	}
 	_currentCount--;
 
-	if (memcmp(_screenshotHashes.front(), md5Hash, 16) != 0) {
+	if (memcmp(_screenshotHashes.front().data(), md5Hash, 16) != 0) {
 		_badFrameCount++;
 		_isLastFrameGood = false;
 		//_console->BreakIfDebugging();
@@ -95,9 +95,7 @@ void RecordedRomTest::Reset() {
 	_currentCount = 0;
 	_repetitionCount.clear();
 
-	for (uint8_t* hash : _screenshotHashes) {
-		delete[] hash;
-	}
+	// No manual delete needed - std::array handles memory automatically
 	_screenshotHashes.clear();
 
 	_runningTest = false;
@@ -192,8 +190,8 @@ RomTestResult RecordedRomTest::Run(string filename) {
 			testData.read((char*)&repeatCount, sizeof(uint8_t));
 			_repetitionCount.push_back(repeatCount);
 
-			uint8_t* screenshotHash = new uint8_t[16];
-			testData.read((char*)screenshotHash, 16);
+			std::array<uint8_t, 16> screenshotHash;
+			testData.read(reinterpret_cast<char*>(screenshotHash.data()), 16);
 			_screenshotHashes.push_back(screenshotHash);
 		}
 
