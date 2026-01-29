@@ -1197,7 +1197,7 @@ uint8_t SnesPpu::GetTilePixelColor(const uint16_t chrData[4], const uint8_t shif
 		color |= ((chrData[2] >> (7 + shift)) & 0x02) << 4;
 		color |= ((chrData[3] >> shift) & 0x01) << 6;
 		color |= ((chrData[3] >> (7 + shift)) & 0x02) << 6;
-	} else {
+	} else [[unlikely]] {
 		throw std::runtime_error("unsupported bpp");
 	}
 	return color;

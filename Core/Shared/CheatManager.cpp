@@ -39,7 +39,7 @@ optional<InternalCheatCode> CheatManager::TryConvertCode(CheatCode code) {
 		case CheatType::SmsProActionReplay:
 			return ConvertFromSmsProActionReplay(code.Code);
 
-		default:
+		default: [[unlikely]]
 			throw std::runtime_error("unsupported cheat type");
 	}
 }

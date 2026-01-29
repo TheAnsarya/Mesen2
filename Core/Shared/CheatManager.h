@@ -79,7 +79,7 @@ private:
 				return 13;
 			case CpuType::Sms:
 				return 8;
-			default:
+			default: [[unlikely]]
 				throw std::runtime_error("unsupported cpu type");
 		}
 	}

@@ -23,7 +23,7 @@ NesMemoryManager::NesMemoryManager(NesConsole* console, BaseMapper* mapper) {
 	} else if (_internalRamSize == NesMemoryManager::FamicomBoxInternalRamSize) {
 		_internalRamHandler.reset(new InternalRamHandler<0x1FFF>());
 		((InternalRamHandler<0x1FFF>*)_internalRamHandler.get())->SetInternalRam(_internalRam);
-	} else {
+	} else [[unlikely]] {
 		throw std::runtime_error("unsupported memory size");
 	}
 
@@ -55,7 +55,7 @@ void NesMemoryManager::Reset(bool softReset) {
 
 void NesMemoryManager::InitializeMemoryHandlers(INesMemoryHandler** memoryHandlers, INesMemoryHandler* handler, vector<uint16_t>* addresses, bool allowOverride) {
 	for (uint16_t address : *addresses) {
-		if (!allowOverride && memoryHandlers[address] != &_openBusHandler && memoryHandlers[address] != handler) {
+		if (!allowOverride && memoryHandlers[address] != &_openBusHandler && memoryHandlers[address] != handler) [[unlikely]] {
 			throw std::runtime_error("Can't override existing mapping");
 		}
 		memoryHandlers[address] = handler;

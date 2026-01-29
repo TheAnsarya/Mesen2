@@ -148,7 +148,7 @@ void EmuSettings::Serialize(Serializer& s) {
 			// TODOWS
 			break;
 
-		default:
+		default: [[unlikely]]
 			throw std::runtime_error("unsupported console type");
 	}
 }

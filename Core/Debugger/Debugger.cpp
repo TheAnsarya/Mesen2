@@ -125,7 +125,7 @@ Debugger::Debugger(Emulator* emu, IConsole* console) {
 			case CpuType::Ws:
 				debugger.reset(new WsDebugger(this));
 				break;
-			default:
+			default: [[unlikely]]
 				throw std::runtime_error("Unsupported CPU type");
 		}
 
@@ -536,7 +536,7 @@ void Debugger::ProcessPpuRead(uint16_t addr, T& value, MemoryType memoryType, Me
 		case CpuType::Sms:
 			GetDebugger<type, SmsDebugger>()->ProcessPpuRead(addr, value, memoryType);
 			break;
-		default:
+		default: [[unlikely]]
 			throw std::runtime_error("Invalid cpu type");
 	}
 
@@ -567,7 +567,7 @@ void Debugger::ProcessPpuWrite(uint16_t addr, T& value, MemoryType memoryType) {
 		case CpuType::Sms:
 			GetDebugger<type, SmsDebugger>()->ProcessPpuWrite(addr, value, memoryType);
 			break;
-		default:
+		default: [[unlikely]]
 			throw std::runtime_error("Invalid cpu type");
 	}
 
@@ -604,7 +604,7 @@ void Debugger::ProcessPpuCycle() {
 		case CpuType::Ws:
 			GetDebugger<type, WsDebugger>()->ProcessPpuCycle();
 			break;
-		default:
+		default: [[unlikely]]
 			throw std::runtime_error("Invalid cpu type");
 	}
 }

@@ -613,7 +613,7 @@ shared_ptr<IConsole> Emulator::GetConsole() {
 
 IConsole* Emulator::GetConsoleUnsafe() {
 #ifdef _DEBUG
-	if (!IsEmulationThread()) {
+	if (!IsEmulationThread()) [[unlikely]] {
 		throw std::runtime_error("GetConsoleUnsafe should only be called from the emulation thread");
 	}
 #endif
@@ -636,7 +636,7 @@ TimingInfo Emulator::GetTimingInfo(CpuType cpuType) {
 
 uint64_t Emulator::GetMasterClock() {
 #if DEBUG
-	if (!IsEmulationThread()) {
+	if (!IsEmulationThread()) [[unlikely]] {
 		throw std::runtime_error("called on wrong thread");
 	}
 #endif
@@ -646,7 +646,7 @@ uint64_t Emulator::GetMasterClock() {
 
 uint32_t Emulator::GetMasterClockRate() {
 #if DEBUG
-	if (!IsEmulationThread()) {
+	if (!IsEmulationThread()) [[unlikely]] {
 		throw std::runtime_error("called on wrong thread");
 	}
 #endif

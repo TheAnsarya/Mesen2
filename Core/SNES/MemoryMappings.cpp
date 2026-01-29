@@ -25,7 +25,7 @@ void MemoryMappings::RegisterHandler(uint8_t startBank, uint8_t endBank, uint16_
 }
 
 void MemoryMappings::RegisterHandler(uint8_t startBank, uint8_t endBank, uint16_t startAddr, uint16_t endAddr, IMemoryHandler* handler) {
-	if ((startAddr & 0xFFF) != 0 || (endAddr & 0xFFF) != 0xFFF || startBank > endBank || startAddr > endAddr) {
+	if ((startAddr & 0xFFF) != 0 || (endAddr & 0xFFF) != 0xFFF || startBank > endBank || startAddr > endAddr) [[unlikely]] {
 		throw std::runtime_error("invalid start/end address");
 	}
 
