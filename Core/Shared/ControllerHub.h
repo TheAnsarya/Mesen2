@@ -12,11 +12,47 @@
 #include "Utilities/Serializer.h"
 #include "Utilities/StringUtilities.h"
 
+/// <summary>
+/// Multi-controller hub (multitap) for connecting multiple controllers to single port.
+/// Template supports 2-5 controller ports (NES Four Score, SNES Super Multitap, etc.).
+/// </summary>
+/// <remarks>
+/// Multitap types:
+/// - NES Four Score (4 ports)
+/// - SNES Super Multitap (4 or 5 ports)
+/// - PCE Multitap (5 ports)
+/// 
+/// Architecture:
+/// - Template parameter HubPortCount specifies number of sub-ports
+/// - Each sub-port can have different controller type
+/// - Hub aggregates input state from all connected controllers
+/// - State serialized as length-prefixed chunks
+/// 
+/// Input flow:
+/// 1. InternalSetStateFromInput() - Poll all sub-port controllers
+/// 2. UpdateStateFromPorts() - Aggregate states into hub state
+/// 3. ReadRam/WriteRam - Multiplex hardware reads/writes
+/// 
+/// State format:
+/// - [length:1][port0_data:length][length:1][port1_data:length]...
+/// - Length-prefixed for variable controller types
+/// - Text state: "port0:port1:port2:port3"
+/// 
+/// Features:
+/// - Dynamic controller types per port
+/// - Save state support
+/// - Input HUD visualization
+/// - Text state import/export
+/// - RefreshHubState() for debugger controller changes
+/// 
+/// Thread safety: Inherits lock from BaseControlDevice.
+/// </remarks>
 template <int HubPortCount>
 class ControllerHub : public BaseControlDevice, public IControllerHub {
 protected:
-	shared_ptr<BaseControlDevice> _ports[HubPortCount];
+	shared_ptr<BaseControlDevice> _ports[HubPortCount];  ///< Sub-port controller instances
 
+	/// <summary>Poll input from all connected controllers</summary>
 	void InternalSetStateFromInput() override {
 		for (int i = 0; i < HubPortCount; i++) {
 			if (_ports[i]) {
@@ -27,6 +63,10 @@ protected:
 		UpdateStateFromPorts();
 	}
 
+	/// <summary>
+	/// Aggregate state from sub-ports into hub state.
+	/// Format: [length:1][data...] for each port.
+	/// </summary>
 	void UpdateStateFromPorts() {
 		for (int i = 0; i < HubPortCount; i++) {
 			if (_ports[i]) {
@@ -37,6 +77,7 @@ protected:
 		}
 	}
 
+	/// <summary>Read byte from sub-port controller</summary>
 	uint8_t ReadPort(int i) {
 		if (_ports[i]) {
 			return _ports[i]->ReadRam(0x4016);
@@ -45,6 +86,7 @@ protected:
 		}
 	}
 
+	/// <summary>Write byte to sub-port controller</summary>
 	void WritePort(int i, uint8_t value) {
 		if (_ports[i]) {
 			_ports[i]->WriteRam(0x4016, value);
@@ -52,6 +94,13 @@ protected:
 	}
 
 public:
+	/// <summary>
+	/// Construct controller hub with specified sub-port controllers.
+	/// </summary>
+	/// <param name="emu">Emulator instance</param>
+	/// <param name="type">Hub type (FourScore, SuperMultitap, etc.)</param>
+	/// <param name="port">Physical port number</param>
+	/// <param name="controllers">Array of controller configurations</param>
 	ControllerHub(Emulator* emu, ControllerType type, int port, ControllerConfig controllers[]) : BaseControlDevice(emu, type, port) {
 		static_assert(HubPortCount <= MaxSubPorts, "Port count too large");
 
@@ -82,6 +131,7 @@ public:
 		}
 	}
 
+	/// <summary>Write strobe and broadcast to all sub-ports</summary>
 	void WriteRam(uint16_t addr, uint8_t value) override {
 		StrobeProcessWrite(value);
 		for (int i = 0; i < HubPortCount; i++) {
@@ -91,6 +141,7 @@ public:
 		}
 	}
 
+	/// <summary>Draw all sub-port controllers on input HUD</summary>
 	void DrawController(InputHud& hud) override {
 		for (int i = 0; i < HubPortCount; i++) {
 			if (_ports[i]) {
@@ -101,6 +152,10 @@ public:
 		}
 	}
 
+	/// <summary>
+	/// Set state from text format (e.g., "RLDU:A:B:START").
+	/// Colon-separated for each sub-port.
+	/// </summary>
 	void SetTextState(string state) override {
 		vector<string> portStates = StringUtilities::Split(state, ':');
 		int i = 0;
@@ -114,6 +169,10 @@ public:
 		UpdateStateFromPorts();
 	}
 
+	/// <summary>
+	/// Get state as text format (e.g., "RLDU:A:B:START").
+	/// Colon-separated for each sub-port.
+	/// </summary>
 	string GetTextState() override {
 		auto lock = _stateLock.AcquireSafe();
 
@@ -130,6 +189,9 @@ public:
 		return state;
 	}
 
+	/// <summary>
+	/// Set raw state from binary format (length-prefixed chunks).
+	/// </summary>
 	void SetRawState(ControlDeviceState state) override {
 		auto lock = _stateLock.AcquireSafe();
 		_state = state;
@@ -153,6 +215,9 @@ public:
 		}
 	}
 
+	/// <summary>
+	/// Check if specific controller type connected to any sub-port.
+	/// </summary>
 	bool HasControllerType(ControllerType type) override {
 		if (_type == type) {
 			return true;
@@ -167,16 +232,24 @@ public:
 		return false;
 	}
 
+	/// <summary>
+	/// Refresh hub state after debugger controller changes.
+	/// </summary>
 	void RefreshHubState() override {
 		// Used when the connected devices are updated by code (e.g by the debugger)
 		_state.State.clear();
 		UpdateStateFromPorts();
 	}
 
+	/// <summary>Get number of sub-ports</summary>
 	int GetHubPortCount() override {
 		return HubPortCount;
 	}
 
+	/// <summary>
+	/// Get controller at sub-port index.
+	/// </summary>
+	/// <param name="index">Sub-port index (0-based)</param>
 	shared_ptr<BaseControlDevice> GetController(int index) override {
 		if (index >= HubPortCount) {
 			return nullptr;
