@@ -63,7 +63,7 @@ public:
 		_state.Regs[voiceIndex * 0x10 + (int)reg] = value;
 	}
 
-	static int16_t Clamp16(int32_t val) {
+	[[nodiscard]] static constexpr int16_t Clamp16(int32_t val) {
 		if (val < INT16_MIN) {
 			return INT16_MIN;
 		} else if (val > INT16_MAX) {

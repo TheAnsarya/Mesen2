@@ -19,7 +19,7 @@ enum class CpuType : uint8_t {
 
 class CpuTypeUtilities {
 public:
-	static constexpr int GetCpuTypeCount() {
+	[[nodiscard]] static constexpr int GetCpuTypeCount() {
 		return (int)CpuType::Ws + 1;
 	}
 };

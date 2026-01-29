@@ -15,7 +15,7 @@ public:
 	static bool IsUnconditionalJump(uint8_t opCode);
 	static bool IsJumpToSub(uint8_t opCode);
 	static bool IsReturnInstruction(uint8_t opCode);
-	static uint8_t GetOpSize() { return 2; }
+	[[nodiscard]] static constexpr uint8_t GetOpSize() { return 2; }
 
 	static bool CanDisassembleNextOp(uint8_t opCode);
 };

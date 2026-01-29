@@ -3,7 +3,7 @@
 
 class ScanlineFilter {
 private:
-	static uint32_t ApplyScanlineEffect(uint32_t argb, uint8_t scanlineIntensity) {
+	[[nodiscard]] static constexpr uint32_t ApplyScanlineEffect(uint32_t argb, uint8_t scanlineIntensity) {
 		uint8_t r = ((argb & 0xFF0000) >> 16) * scanlineIntensity / 255;
 		uint8_t g = ((argb & 0xFF00) >> 8) * scanlineIntensity / 255;
 		uint8_t b = (argb & 0xFF) * scanlineIntensity / 255;
