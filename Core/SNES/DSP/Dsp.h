@@ -8,20 +8,19 @@ class Emulator;
 class SnesConsole;
 class Spc;
 
-class Dsp final : public ISerializable
-{
+class Dsp final : public ISerializable {
 private:
 	DspState _state = {};
 	DspVoice _voices[8] = {};
 	Emulator* _emu = nullptr;
 	Spc* _spc = nullptr;
 
-	//Output buffer
+	// Output buffer
 	uint16_t _outSampleCount = 0;
 	int16_t _dspOutput[0x2000] = {};
 
 	void UpdateCounter();
-	
+
 	int32_t CalculateFir(int index, int ch);
 
 	void EchoStep22();
@@ -53,24 +52,21 @@ public:
 	void Write(uint8_t reg, uint8_t value);
 
 	uint8_t ReadReg(DspGlobalRegs reg) { return _state.Regs[(int)reg]; }
-	
-	void WriteGlobalReg(DspGlobalRegs reg, uint8_t value)
-	{
+
+	void WriteGlobalReg(DspGlobalRegs reg, uint8_t value) {
 		_state.ExternalRegs[(int)reg] = value;
 		_state.Regs[(int)reg] = value;
 	}
 
-	void WriteVoiceReg(uint8_t voiceIndex, DspVoiceRegs reg, uint8_t value)
-	{
+	void WriteVoiceReg(uint8_t voiceIndex, DspVoiceRegs reg, uint8_t value) {
 		_state.ExternalRegs[voiceIndex * 0x10 + (int)reg] = value;
 		_state.Regs[voiceIndex * 0x10 + (int)reg] = value;
 	}
 
-	static int16_t Clamp16(int32_t val)
-	{
-		if(val < INT16_MIN) {
+	static int16_t Clamp16(int32_t val) {
+		if (val < INT16_MIN) {
 			return INT16_MIN;
-		} else if(val > INT16_MAX) {
+		} else if (val > INT16_MAX) {
 			return INT16_MAX;
 		}
 		return val;

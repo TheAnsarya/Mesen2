@@ -4,8 +4,7 @@
 #include "SNES/SnesCpuTypes.h"
 #include "Shared/BaseState.h"
 
-struct SpcState : BaseState
-{
+struct SpcState : BaseState {
 	uint64_t Cycle = 0;
 	uint16_t PC = 0;
 	uint8_t A = 0;
@@ -34,48 +33,44 @@ struct SpcState : BaseState
 };
 
 namespace SpcFlags {
-	enum SpcFlags : uint8_t
-	{
-		Carry = 0x01,
-		Zero = 0x02,
-		IrqEnable = 0x04, //unused
-		HalfCarry = 0x08,
-		Break = 0x10, /* Set by the BRK instruction */
-		DirectPage = 0x20, /* Selects page 0 or 1 for direct mode addressing */
-		Overflow = 0x40,
-		Negative = 0x80
-	};
-}
+enum SpcFlags : uint8_t {
+	Carry = 0x01,
+	Zero = 0x02,
+	IrqEnable = 0x04, // unused
+	HalfCarry = 0x08,
+	Break = 0x10,      /* Set by the BRK instruction */
+	DirectPage = 0x20, /* Selects page 0 or 1 for direct mode addressing */
+	Overflow = 0x40,
+	Negative = 0x80
+};
+} // namespace SpcFlags
 
 namespace SpcControlFlags {
-	enum SpcControlFlags : uint8_t
-	{
-		Timer0 = 0x01,
-		Timer1 = 0x02,
-		Timer2 = 0x04,
+enum SpcControlFlags : uint8_t {
+	Timer0 = 0x01,
+	Timer1 = 0x02,
+	Timer2 = 0x04,
 
-		ClearPortsA = 0x10,
-		ClearPortsB = 0x20,
+	ClearPortsA = 0x10,
+	ClearPortsB = 0x20,
 
-		EnableRom = 0x80
-	};
-}
+	EnableRom = 0x80
+};
+} // namespace SpcControlFlags
 
 namespace SpcTestFlags {
-	enum SpcTestFlags : uint8_t
-	{
-		TimersDisabled = 0x01,
-		WriteEnabled = 0x02,
-		Unknown = 0x04,
-		TimersEnabled = 0x08,
+enum SpcTestFlags : uint8_t {
+	TimersDisabled = 0x01,
+	WriteEnabled = 0x02,
+	Unknown = 0x04,
+	TimersEnabled = 0x08,
 
-		ExternalSpeed = 0x30,
-		InternalSpeed = 0xC0,
-	};
-}
+	ExternalSpeed = 0x30,
+	InternalSpeed = 0xC0,
+};
+} // namespace SpcTestFlags
 
-enum class SpcOpStep : uint8_t
-{
+enum class SpcOpStep : uint8_t {
 	ReadOpCode = 0,
 	Addressing = 1,
 	AfterAddressing = 2,

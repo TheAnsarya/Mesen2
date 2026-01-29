@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-enum class MouseButton
-{
+enum class MouseButton {
 	LeftButton = 0,
 	RightButton = 1,
 	MiddleButton = 2,
@@ -10,22 +9,19 @@ enum class MouseButton
 	Button5 = 4
 };
 
-struct MousePosition
-{
+struct MousePosition {
 	int16_t X;
 	int16_t Y;
 	double RelativeX;
 	double RelativeY;
 };
 
-struct MouseMovement
-{
+struct MouseMovement {
 	int16_t dx;
 	int16_t dy;
 };
 
-class IKeyManager
-{
+class IKeyManager {
 public:
 	static constexpr int BaseMouseButtonIndex = 0x200;
 	static constexpr int BaseGamepadIndex = 0x1000;

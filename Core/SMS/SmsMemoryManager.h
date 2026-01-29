@@ -18,8 +18,7 @@ class SmsPsg;
 class SmsFmAudio;
 class SmsBiosMapper;
 
-class SmsMemoryManager final : public ISerializable
-{
+class SmsMemoryManager final : public ISerializable {
 private:
 	static constexpr uint32_t SmsWorkRamSize = 0x2000;
 	static constexpr uint32_t CartRamMaxSize = 0x8000;
@@ -59,14 +58,18 @@ private:
 
 	void LoadBattery();
 
-	template<bool isPeek = false> __forceinline uint8_t InternalReadPort(uint8_t port);
-	template<bool isPeek> uint8_t ReadSmsPort(uint8_t port);
-	template<bool isPeek> uint8_t ReadColecoVisionPort(uint8_t port);
-	template<bool isPeek> uint8_t ReadGameGearPort(uint8_t port);
+	template <bool isPeek = false>
+	__forceinline uint8_t InternalReadPort(uint8_t port);
+	template <bool isPeek>
+	uint8_t ReadSmsPort(uint8_t port);
+	template <bool isPeek>
+	uint8_t ReadColecoVisionPort(uint8_t port);
+	template <bool isPeek>
+	uint8_t ReadGameGearPort(uint8_t port);
 	void WriteGameGearPort(uint8_t port, uint8_t value);
 	void WriteSmsPort(uint8_t port, uint8_t value);
 	void WriteColecoVisionPort(uint8_t port, uint8_t value);
-	
+
 	uint32_t DetectSgCartRam(vector<uint8_t>& romData);
 
 public:
@@ -74,13 +77,11 @@ public:
 	SmsMemoryManager();
 	~SmsMemoryManager();
 
-	SmsMemoryManagerState& GetState()
-	{
+	SmsMemoryManagerState& GetState() {
 		return _state;
 	}
 
-	__forceinline void Exec(uint8_t clocks)
-	{
+	__forceinline void Exec(uint8_t clocks) {
 		_masterClock += clocks;
 		_vdp->Run(_masterClock);
 	}
@@ -98,17 +99,16 @@ public:
 
 	uint8_t GetOpenBus();
 
-	__forceinline uint8_t Read(uint16_t addr, MemoryOperationType opType)
-	{
+	__forceinline uint8_t Read(uint16_t addr, MemoryOperationType opType) {
 		uint8_t value;
-		if(_state.IsReadRegister[addr >> 8]) {
+		if (_state.IsReadRegister[addr >> 8]) {
 			value = _cart->ReadRegister(addr);
-		} else if(_reads[addr >> 8]) {
+		} else if (_reads[addr >> 8]) {
 			value = _reads[addr >> 8][(uint8_t)addr];
 		} else {
 			value = GetOpenBus();
 		}
-		if(_emu->GetCheatManager()->HasCheats<CpuType::Sms>()) {
+		if (_emu->GetCheatManager()->HasCheats<CpuType::Sms>()) {
 			_emu->GetCheatManager()->ApplyCheat<CpuType::Sms>(addr, value);
 		}
 		_state.OpenBus = value;
@@ -120,7 +120,7 @@ public:
 
 	void Write(uint16_t addr, uint8_t value);
 	void DebugWrite(uint16_t addr, uint8_t value);
-	
+
 	uint8_t DebugReadPort(uint8_t port);
 	uint8_t ReadPort(uint8_t port);
 	void WritePort(uint8_t port, uint8_t value);

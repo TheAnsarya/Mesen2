@@ -3,8 +3,7 @@
 #include "pch.h"
 #include <unordered_set>
 
-class FolderUtilities
-{
+class FolderUtilities {
 private:
 	static string _homeFolder;
 	static string _saveFolderOverride;

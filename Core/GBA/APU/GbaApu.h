@@ -17,9 +17,8 @@ class GbaWaveChannel;
 class EmuSettings;
 class SoundMixer;
 
-class GbaApu final : public ISerializable
-{
-	static constexpr int MaxSampleRate = 256*1024;
+class GbaApu final : public ISerializable {
+	static constexpr int MaxSampleRate = 256 * 1024;
 	static constexpr int MaxSamples = MaxSampleRate * 8 / 60;
 
 private:
@@ -29,7 +28,7 @@ private:
 	GbaMemoryManager* _memoryManager = nullptr;
 	EmuSettings* _settings = nullptr;
 	SoundMixer* _soundMixer = nullptr;
-	
+
 	unique_ptr<GbaSquareChannel> _square1;
 	unique_ptr<GbaSquareChannel> _square2;
 	unique_ptr<GbaWaveChannel> _wave;
@@ -45,31 +44,30 @@ private:
 	uint32_t _sampleCount = 0;
 	int16_t _rightSample = 0;
 	int16_t _leftSample = 0;
-	uint32_t _sampleRate = 32*1024;
+	uint32_t _sampleRate = 32 * 1024;
 
 	uint64_t _powerOnCycle = 0;
 	uint64_t _prevClockCount = 0;
 	uint8_t _enabledChannels = 0;
 
-	typedef void(GbaApu::* Func)();
+	typedef void (GbaApu::*Func)();
 	Func _runFunc[16] = {};
 
 	void ClockFrameSequencer();
 	void UpdateSampleRate();
 
-	template<bool sq1Enabled, bool sq2Enabled, bool waveEnabled, bool noiseEnabled>
+	template <bool sq1Enabled, bool sq2Enabled, bool waveEnabled, bool noiseEnabled>
 	void InternalRun();
 
 public:
 	GbaApu();
 	~GbaApu();
-	
+
 	void Init(Emulator* emu, GbaConsole* console, GbaDmaController* dmaController, GbaMemoryManager* memoryManager);
 
 	GbaApuDebugState GetState();
 
-	__forceinline void Run()
-	{
+	__forceinline void Run() {
 		(this->*_runFunc[_enabledChannels])();
 	}
 

@@ -7,8 +7,7 @@ class GbaMemoryManager;
 class GbaCpu;
 class GbaRomPrefetch;
 
-class GbaDmaController final : public ISerializable
-{
+class GbaDmaController final : public ISerializable {
 private:
 	GbaCpu* _cpu = nullptr;
 	GbaMemoryManager* _memoryManager = nullptr;
@@ -39,17 +38,15 @@ public:
 	__forceinline bool HasPendingDma() { return _needStart; }
 	__noinline void RunPendingDma(bool allowStartDma);
 
-	__forceinline void ResetIdleCounter(GbaAccessModeVal& mode)
-	{
-		if(_idleCycleCounter) {
-			//Next access immediately after DMA should always be non-sequential
+	__forceinline void ResetIdleCounter(GbaAccessModeVal& mode) {
+		if (_idleCycleCounter) {
+			// Next access immediately after DMA should always be non-sequential
 			mode &= ~GbaAccessMode::Sequential;
 		}
 		_idleCycleCounter = 0;
 	}
 
-	__forceinline void ResetIdleCounter()
-	{
+	__forceinline void ResetIdleCounter() {
 		_idleCycleCounter = 0;
 	}
 

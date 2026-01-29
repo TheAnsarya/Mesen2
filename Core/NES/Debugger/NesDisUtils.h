@@ -8,8 +8,7 @@ class EmuSettings;
 struct NesCpuState;
 enum class NesAddrMode;
 
-class NesDisUtils
-{
+class NesDisUtils {
 private:
 	static uint32_t GetOperandAddress(DisassemblyInfo& info, uint32_t memoryAddr);
 	static uint8_t GetOpSize(NesAddrMode addrMode);

@@ -8,15 +8,14 @@ class GbPpu;
 class GbCpu;
 class Gameboy;
 
-class GbDmaController final : public ISerializable
-{
+class GbDmaController final : public ISerializable {
 private:
 	GbDmaControllerState _state = {};
 	GbMemoryManager* _memoryManager = nullptr;
 	GbPpu* _ppu = nullptr;
 	GbCpu* _cpu = nullptr;
 	Gameboy* _gameboy = nullptr;
-	
+
 	void ProcessDmaBlock();
 	uint16_t GetOamReadAddress();
 

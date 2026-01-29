@@ -2,8 +2,7 @@
 #include "pch.h"
 #include "Debugger/DebugTypes.h"
 
-struct TraceRow
-{
+struct TraceRow {
 	uint32_t ProgramCounter;
 	CpuType Type;
 	uint8_t ByteCode[8];
@@ -12,8 +11,7 @@ struct TraceRow
 	char LogOutput[500];
 };
 
-struct TraceLoggerOptions
-{
+struct TraceLoggerOptions {
 	bool Enabled;
 	bool IndentCode;
 	bool UseLabels;
@@ -21,8 +19,7 @@ struct TraceLoggerOptions
 	char Format[1000];
 };
 
-class ITraceLogger
-{
+class ITraceLogger {
 protected:
 	bool _enabled = false;
 

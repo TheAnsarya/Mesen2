@@ -2,8 +2,7 @@
 #include "pch.h"
 #include "Shared/SettingTypes.h"
 
-class RotateFilter
-{
+class RotateFilter {
 private:
 	uint32_t* _outputBuffer = nullptr;
 	uint32_t _angle = 0;

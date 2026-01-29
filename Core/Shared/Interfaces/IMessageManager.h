@@ -2,8 +2,7 @@
 
 #include "pch.h"
 
-class IMessageManager
-{
+class IMessageManager {
 public:
 	virtual void DisplayMessage(string title, string message) = 0;
 };

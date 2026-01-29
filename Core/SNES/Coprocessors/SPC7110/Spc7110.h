@@ -10,8 +10,7 @@ class Spc7110Decomp;
 class IMemoryHandler;
 class BaseCartridge;
 
-class Spc7110 : public BaseCoprocessor
-{
+class Spc7110 : public BaseCoprocessor {
 private:
 	unique_ptr<Spc7110Decomp> _decomp;
 	unique_ptr<Rtc4513> _rtc;
@@ -23,7 +22,7 @@ private:
 	bool _useRtc = false;
 	uint32_t _realDataRomSize = 0;
 
-	//Decomp
+	// Decomp
 	uint32_t _directoryBase = 0;
 	uint8_t _directoryIndex = 0;
 	uint16_t _targetOffset = 0;
@@ -36,7 +35,7 @@ private:
 	uint8_t _decompStatus = 0;
 	uint8_t _decompBuffer[32];
 
-	//ALU
+	// ALU
 	uint32_t _dividend = 0;
 	uint16_t _multiplier = 0;
 	uint16_t _divisor = 0;
@@ -45,12 +44,12 @@ private:
 	uint8_t _aluState = 0;
 	uint8_t _aluFlags = 0;
 
-	//Memory mappings
+	// Memory mappings
 	uint8_t _sramEnabled = 0;
-	uint8_t _dataRomBanks[3] = { 0, 1, 2 };
+	uint8_t _dataRomBanks[3] = {0, 1, 2};
 	uint8_t _dataRomSize = 0;
 
-	//Data rom
+	// Data rom
 	uint32_t _readBase = 0;
 	uint16_t _readOffset = 0;
 	uint16_t _readStep = 0;
@@ -70,7 +69,7 @@ private:
 
 public:
 	Spc7110(SnesConsole* console, bool useRtc);
-	
+
 	uint8_t ReadDataRom(uint32_t addr);
 
 	void Serialize(Serializer& s) override;

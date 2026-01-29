@@ -20,14 +20,12 @@ class GbaCart;
 class GbaSerial;
 class MgbaLogHandler;
 
-struct GbaPendingIrq
-{
+struct GbaPendingIrq {
 	GbaIrqSource Source;
 	uint8_t Delay;
 };
 
-class GbaMemoryManager final : public ISerializable
-{
+class GbaMemoryManager final : public ISerializable {
 private:
 	Emulator* _emu = nullptr;
 	GbaConsole* _console = nullptr;
@@ -60,9 +58,9 @@ private:
 
 	uint8_t* _saveRam = nullptr;
 	uint32_t _saveRamSize = 0;
-	
+
 	vector<GbaPendingIrq> _pendingIrqs;
-	
+
 	bool _haltModeUsed = false;
 	bool _biosLocked = false;
 	uint8_t _haltDelay = 0;
@@ -79,10 +77,10 @@ private:
 	__noinline void ProcessVramAccess(GbaAccessModeVal mode, uint32_t addr);
 	__noinline void ProcessVramStalling(uint8_t memType);
 
-	template<uint8_t width>
+	template <uint8_t width>
 	void UpdateOpenBus(uint32_t addr, uint32_t value);
 
-	template<bool debug = false>
+	template <bool debug = false>
 	uint32_t RotateValue(GbaAccessModeVal mode, uint32_t addr, uint32_t value, bool isSigned);
 
 	__forceinline uint8_t InternalRead(GbaAccessModeVal mode, uint32_t addr, uint32_t readAddr);
@@ -107,31 +105,29 @@ public:
 
 	GbaWaitStates* GetWaitStates() { return &_waitStates; }
 
-	__forceinline void ProcessIdleCycle()
-	{
-		if(_dmaController->HasPendingDma()) {
+	__forceinline void ProcessIdleCycle() {
+		if (_dmaController->HasPendingDma()) {
 			_dmaController->RunPendingDma(true);
 		}
 
-		if(_dmaController->CanRunInParallelWithDma()) {
-			//When DMA is running, CPU idle cycles (e.g from MUL or other instructions) can run in parallel
-			//with the DMA. The CPU only stops once it tries to read or write to the bus.
-			//This allows this idle cycle to run in "parallel" with the DMA
+		if (_dmaController->CanRunInParallelWithDma()) {
+			// When DMA is running, CPU idle cycles (e.g from MUL or other instructions) can run in parallel
+			// with the DMA. The CPU only stops once it tries to read or write to the bus.
+			// This allows this idle cycle to run in "parallel" with the DMA
 			ProcessParallelIdleCycle();
 			return;
 		}
 
-		if(_prefetch->NeedExec(_state.PrefetchEnabled)) {
+		if (_prefetch->NeedExec(_state.PrefetchEnabled)) {
 			_prefetch->Exec(1, _state.PrefetchEnabled);
 		}
 
 		ProcessInternalCycle<true>();
 	}
 
-	template<bool firstAccessCycle = false>
-	__forceinline void ProcessInternalCycle()
-	{
-		if(_hasPendingUpdates) {
+	template <bool firstAccessCycle = false>
+	__forceinline void ProcessInternalCycle() {
+		if (_hasPendingUpdates) {
 			ProcessPendingUpdates(firstAccessCycle);
 		} else {
 			_masterClock++;
@@ -139,25 +135,24 @@ public:
 			_timer->Exec(_masterClock);
 		}
 
-		if constexpr(firstAccessCycle) {
-			//The CPU appears to check the IRQ line on the first cycle in each read/write access
-			//So a 4-cycle read to ROM will check the IRQ line's state after the first of these
-			//4 cycles and this will determine whether or not the CPU runs an extra instruction
-			//before processing the IRQ or not.
-			//This is needed to pass the Internal_Cycle_DMA_IRQ test
+		if constexpr (firstAccessCycle) {
+			// The CPU appears to check the IRQ line on the first cycle in each read/write access
+			// So a 4-cycle read to ROM will check the IRQ line's state after the first of these
+			// 4 cycles and this will determine whether or not the CPU runs an extra instruction
+			// before processing the IRQ or not.
+			// This is needed to pass the Internal_Cycle_DMA_IRQ test
 			_irqFirstAccessCycle = _state.IrqLine;
 		}
 
-		if(_hasPendingLateUpdates) {
+		if (_hasPendingLateUpdates) {
 			ProcessPendingLateUpdates();
 		}
 	}
-	
+
 	void ProcessDmaStart();
 
-	__forceinline void ProcessDma()
-	{
-		if(_dmaController->HasPendingDma()) {
+	__forceinline void ProcessDma() {
+		if (_dmaController->HasPendingDma()) {
 			_dmaController->RunPendingDma(true);
 		}
 	}

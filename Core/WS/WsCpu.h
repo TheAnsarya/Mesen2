@@ -15,11 +15,9 @@ class Emulator;
 class WsConsole;
 class WsMemoryManager;
 
-class WsCpu final : public ISerializable
-{
+class WsCpu final : public ISerializable {
 private:
-	struct ModRmState
-	{
+	struct ModRmState {
 		uint16_t Segment;
 		uint16_t Offset;
 		uint8_t Mode;
@@ -27,15 +25,13 @@ private:
 		uint8_t Rm;
 	};
 
-	enum class WsRepMode : uint8_t
-	{
+	enum class WsRepMode : uint8_t {
 		None,
 		Zero,
 		NotZero
 	};
 
-	enum class AluOp : uint8_t
-	{
+	enum class AluOp : uint8_t {
 		Add = 0,
 		Or,
 		Adc,
@@ -46,15 +42,13 @@ private:
 		Cmp
 	};
 
-	enum class Grp2Mode
-	{
+	enum class Grp2Mode {
 		One,
 		CL,
 		Immediate
 	};
 
-	struct PrefixState
-	{
+	struct PrefixState {
 		uint16_t PrefixCount;
 		WsSegment Segment;
 		WsRepMode Rep;
@@ -79,37 +73,45 @@ private:
 	WsCpuPrefetch _prefetch;
 #endif
 
-	uint16_t* _modRegLut8[4] = { &_state.AX, &_state.CX, &_state.DX, &_state.BX };
-	uint16_t* _modSegLut16[4] = { &_state.ES, &_state.CS, &_state.SS, &_state.DS };
+	uint16_t* _modRegLut8[4] = {&_state.AX, &_state.CX, &_state.DX, &_state.BX};
+	uint16_t* _modSegLut16[4] = {&_state.ES, &_state.CS, &_state.SS, &_state.DS};
 	uint16_t* _modRegLut16[8] = {
-		&_state.AX, &_state.CX, &_state.DX, &_state.BX,
-		&_state.SP, &_state.BP, &_state.SI, &_state.DI
-	};
+	    &_state.AX, &_state.CX, &_state.DX, &_state.BX,
+	    &_state.SP, &_state.BP, &_state.SI, &_state.DI};
 
-	//Used to re-fill prefetch buffer with last opcode when REP prefix is used
+	// Used to re-fill prefetch buffer with last opcode when REP prefix is used
 	uint8_t _opCode = 0;
 
-	//Divisions/AAM set carry/overflow to the last carry/overflow produced by the previous MUL operation
+	// Divisions/AAM set carry/overflow to the last carry/overflow produced by the previous MUL operation
 	bool _mulOverflow = false;
 
-	template<typename T> __forceinline T ReadPort(uint16_t port);
-	template<typename T> __forceinline void WritePort(uint16_t port, T value);
+	template <typename T>
+	__forceinline T ReadPort(uint16_t port);
+	template <typename T>
+	__forceinline void WritePort(uint16_t port, T value);
 
 	__forceinline void ProcessMemoryAccess(uint32_t addr);
 	__forceinline void ProcessPortAccess(uint16_t port);
 
 	__forceinline uint8_t ReadCodeByte(bool forOpCode = false);
 	__forceinline uint16_t ReadCodeWord();
-	template<typename T> __forceinline T ReadImmediate();
+	template <typename T>
+	__forceinline T ReadImmediate();
 
-	template<typename T> __forceinline T ReadMemory(uint16_t seg, uint16_t offset);
-	template<typename T> __forceinline void WriteMemory(uint16_t seg, uint16_t offset, T value);
+	template <typename T>
+	__forceinline T ReadMemory(uint16_t seg, uint16_t offset);
+	template <typename T>
+	__forceinline void WriteMemory(uint16_t seg, uint16_t offset, T value);
 
-	template<uint8_t cycles = 1> __forceinline void Idle();
+	template <uint8_t cycles = 1>
+	__forceinline void Idle();
 
-	template<typename T> constexpr uint32_t GetMaxValue();
-	template<typename T> constexpr uint32_t GetBitCount();
-	template<typename T> constexpr uint32_t GetSign();
+	template <typename T>
+	constexpr uint32_t GetMaxValue();
+	template <typename T>
+	constexpr uint32_t GetBitCount();
+	template <typename T>
+	constexpr uint32_t GetSign();
 
 	void Move(uint16_t& dst, uint16_t src);
 	void MoveLo(uint16_t& dst, uint8_t src);
@@ -131,61 +133,100 @@ private:
 
 	__forceinline void ReadModRmByte();
 
-	template<typename T> T GetModRegister(uint8_t reg) = delete;
-	template<typename T> void SetModRegister(uint8_t reg, T value) = delete;
+	template <typename T>
+	T GetModRegister(uint8_t reg) = delete;
+	template <typename T>
+	void SetModRegister(uint8_t reg, T value) = delete;
 
 	uint16_t GetModSegRegister(uint8_t reg);
 	void SetModSegRegister(uint8_t reg, uint16_t value);
 
-	template<typename T> T GetModRm();
-	template<typename T> void SetModRm(T value);
+	template <typename T>
+	T GetModRm();
+	template <typename T>
+	void SetModRm(T value);
 
-	template<bool sign, typename T> void Grp1ModRm();
-	template<typename T, Grp2Mode mode> void Grp2ModRm();
-	template<typename T> void Grp3ModRm();
-	template<typename T> void Grp45ModRm();
+	template <bool sign, typename T>
+	void Grp1ModRm();
+	template <typename T, Grp2Mode mode>
+	void Grp2ModRm();
+	template <typename T>
+	void Grp3ModRm();
+	template <typename T>
+	void Grp45ModRm();
 
-	template<typename T> void TestModRm();
-	template<typename T> void TestImmediate();
+	template <typename T>
+	void TestModRm();
+	template <typename T>
+	void TestImmediate();
 
-	template<typename T> void ExchangeModRm();
+	template <typename T>
+	void ExchangeModRm();
 	void Exchange(uint16_t& x, uint16_t& y);
 
-	template<bool direction, typename T> void MoveModRm();
-	template<bool direction> void MoveSegment();
-	template<bool direction, typename T> void MoveAccumulator();
-	template<typename T> void MoveImmediate();
+	template <bool direction, typename T>
+	void MoveModRm();
+	template <bool direction>
+	void MoveSegment();
+	template <bool direction, typename T>
+	void MoveAccumulator();
+	template <typename T>
+	void MoveImmediate();
 
-	template<AluOp op, bool direction, typename T> void ProcessAluModRm();
-	template<AluOp op, typename T> void ProcessAluImm();
-	template<typename T> T GetAluResult(AluOp op, T param1, T param2);
+	template <AluOp op, bool direction, typename T>
+	void ProcessAluModRm();
+	template <AluOp op, typename T>
+	void ProcessAluImm();
+	template <typename T>
+	T GetAluResult(AluOp op, T param1, T param2);
 
-	template<typename T> void Inc(T& dst);
-	template<typename T> void Dec(T& dst);
+	template <typename T>
+	void Inc(T& dst);
+	template <typename T>
+	void Dec(T& dst);
 
-	template<typename T> T Add(T x, T y, uint8_t carry);
-	template<typename T> T Sub(T x, T y, uint8_t borrow);
+	template <typename T>
+	T Add(T x, T y, uint8_t carry);
+	template <typename T>
+	T Sub(T x, T y, uint8_t borrow);
 
-	template<typename T> void MultSignedModRm();
-	template<typename T> void MulSigned(T x, T y);
-	template<typename T> int32_t GetMultiplyResult(T x, T y);
-	template<typename T> void MulUnsigned(T x, T y);
+	template <typename T>
+	void MultSignedModRm();
+	template <typename T>
+	void MulSigned(T x, T y);
+	template <typename T>
+	int32_t GetMultiplyResult(T x, T y);
+	template <typename T>
+	void MulUnsigned(T x, T y);
 
-	template<typename T> void DivSigned(T y);
-	template<typename T> void DivUnsigned(T y);
+	template <typename T>
+	void DivSigned(T y);
+	template <typename T>
+	void DivUnsigned(T y);
 	void ProcessInvalidDiv();
 
-	template<typename T> void UpdateFlags(T result);
-	template<typename T> T And(T x, T y);
-	template<typename T> T Or(T x, T y);
-	template<typename T> T Xor(T x, T y);
-	template<typename T> T ROL(T x, uint8_t shift);
-	template<typename T> T ROR(T x, uint8_t shift);
-	template<typename T> T RCL(T x, uint8_t shift);
-	template<typename T> T RCR(T x, uint8_t shift);
-	template<typename T> T SHL(T x, uint8_t shift);
-	template<typename T> T SHR(T x, uint8_t shift);
-	template<typename T> T SAR(T x, uint8_t shift);
+	template <typename T>
+	void UpdateFlags(T result);
+	template <typename T>
+	T And(T x, T y);
+	template <typename T>
+	T Or(T x, T y);
+	template <typename T>
+	T Xor(T x, T y);
+	template <typename T>
+	T ROL(T x, uint8_t shift);
+	template <typename T>
+	T ROR(T x, uint8_t shift);
+	template <typename T>
+	T RCL(T x, uint8_t shift);
+	template <typename T>
+	T RCR(T x, uint8_t shift);
+	template <typename T>
+	T SHL(T x, uint8_t shift);
+	template <typename T>
+	T SHR(T x, uint8_t shift);
+	template <typename T>
+	T SAR(T x, uint8_t shift);
 
 	void JumpFar();
 	void Jump(bool condition);
@@ -207,7 +248,7 @@ private:
 
 	void Enter();
 	void Leave();
-	
+
 	void NOP();
 	void FP01();
 
@@ -227,7 +268,7 @@ private:
 	void LDS();
 	void LES();
 	void LEA();
-	
+
 	void XLAT();
 
 	void AdjustAscii(bool forSub);
@@ -241,19 +282,30 @@ private:
 	void DAA();
 	void DAS();
 
-	template<typename T, uint8_t delay> void Out(uint16_t port, T data);
-	template<typename T, bool isDxPort> void InStoreAx(uint16_t port);
+	template <typename T, uint8_t delay>
+	void Out(uint16_t port, T data);
+	template <typename T, bool isDxPort>
+	void InStoreAx(uint16_t port);
 
-	template<typename T> void INS();
-	template<typename T> void OUTS();
+	template <typename T>
+	void INS();
+	template <typename T>
+	void OUTS();
 
-	template<typename T> void ProcessStringOperation(bool incSi, bool incDi);
-	template<typename T> void ProcessStringCmpOperation(bool incSi);
-	template<typename T> void MOVS();
-	template<typename T> void STOS();
-	template<typename T> void LODS();
-	template<typename T> void CMPS();
-	template<typename T> void SCAS();
+	template <typename T>
+	void ProcessStringOperation(bool incSi, bool incDi);
+	template <typename T>
+	void ProcessStringCmpOperation(bool incSi);
+	template <typename T>
+	void MOVS();
+	template <typename T>
+	void STOS();
+	template <typename T>
+	void LODS();
+	template <typename T>
+	void CMPS();
+	template <typename T>
+	void SCAS();
 
 	void Undefined();
 	void Wait();
@@ -298,9 +350,13 @@ public:
 #endif
 };
 
-template<> uint8_t WsCpu::GetModRegister<uint8_t>(uint8_t reg);
-template<> uint16_t WsCpu::GetModRegister<uint16_t>(uint8_t reg);
-template<> void WsCpu::SetModRegister<uint8_t>(uint8_t reg, uint8_t value);
-template<> void WsCpu::SetModRegister<uint16_t>(uint8_t reg, uint16_t value);
+template <>
+uint8_t WsCpu::GetModRegister<uint8_t>(uint8_t reg);
+template <>
+uint16_t WsCpu::GetModRegister<uint16_t>(uint8_t reg);
+template <>
+void WsCpu::SetModRegister<uint8_t>(uint8_t reg, uint8_t value);
+template <>
+void WsCpu::SetModRegister<uint16_t>(uint8_t reg, uint16_t value);
 
 #endif

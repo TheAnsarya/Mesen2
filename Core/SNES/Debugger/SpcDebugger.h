@@ -16,8 +16,7 @@ class EmuSettings;
 
 enum class MemoryOperationType;
 
-class SpcDebugger final : public IDebugger
-{
+class SpcDebugger final : public IDebugger {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
 	MemoryAccessCounter* _memoryAccessCounter;
@@ -37,7 +36,7 @@ class SpcDebugger final : public IDebugger
 	bool _debuggerEnabled = false;
 	bool _predictiveBreakpoints = false;
 	bool _ignoreDspReadWrites = false;
-	
+
 public:
 	SpcDebugger(Debugger* debugger);
 
@@ -47,12 +46,12 @@ public:
 
 	void ProcessInstruction();
 
-	template<MemoryAccessFlags flags>
+	template <MemoryAccessFlags flags>
 	void ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType type);
-	
-	template<MemoryAccessFlags flags>
+
+	template <MemoryAccessFlags flags>
 	void ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType type);
-	
+
 	void Run() override;
 	void Step(int32_t stepCount, StepType type) override;
 

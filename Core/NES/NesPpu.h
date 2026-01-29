@@ -16,8 +16,7 @@ class SnesControlManager;
 class NesConsole;
 class EmuSettings;
 
-enum PpuRegisters
-{
+enum PpuRegisters {
 	Control = 0x00,
 	Mask = 0x01,
 	Status = 0x02,
@@ -29,14 +28,12 @@ enum PpuRegisters
 	SpriteDMA = 0x4014,
 };
 
-template<class T>
-class NesPpu : public BaseNesPpu
-{
+template <class T>
+class NesPpu : public BaseNesPpu {
 private:
 	static constexpr int32_t OamDecayCycleCount = 3000;
 
 protected:
-	
 	void UpdateStatusFlag();
 
 	void SetControlRegister(uint8_t value);
@@ -86,9 +83,8 @@ protected:
 
 	void UpdateApuStatus();
 
-	PpuRegisters GetRegisterID(uint16_t addr)
-	{
-		if(addr == 0x4014) {
+	PpuRegisters GetRegisterID(uint16_t addr) {
+		if (addr == 0x4014) {
 			return PpuRegisters::SpriteDMA;
 		} else {
 			return (PpuRegisters)(addr & 0x07);
@@ -110,9 +106,8 @@ public:
 	uint16_t* GetScreenBuffer(bool previousBuffer, bool processGrayscaleEmphasisBits = false) override;
 	void DebugCopyOutputBuffer(uint16_t* target);
 	void DebugUpdateFrameBuffer(bool toGrayscale);
-	
-	void GetMemoryRanges(MemoryRanges& ranges) override
-	{
+
+	void GetMemoryRanges(MemoryRanges& ranges) override {
 		ranges.AddHandler(MemoryOperation::Read, 0x2000, 0x3FFF);
 		ranges.AddHandler(MemoryOperation::Write, 0x2000, 0x3FFF);
 		ranges.AddHandler(MemoryOperation::Write, 0x4014);
@@ -131,24 +126,22 @@ public:
 
 	uint32_t GetPixelBrightness(uint8_t x, uint8_t y) override;
 
-	uint16_t GetPixel(uint8_t x, uint8_t y)
-	{
+	uint16_t GetPixel(uint8_t x, uint8_t y) {
 		return _currentOutputBuffer[y << 8 | x];
 	}
 };
 
-template<class T>
-void NesPpu<T>::Run(uint64_t runTo)
-{
+template <class T>
+void NesPpu<T>::Run(uint64_t runTo) {
 	do {
-		//Always need to run at least once, check condition at the end of the loop (slightly faster)
+		// Always need to run at least once, check condition at the end of the loop (slightly faster)
 		Exec();
 		_masterClock += _masterClockDivider;
-	} while(_masterClock + _masterClockDivider <= runTo);
+	} while (_masterClock + _masterClockDivider <= runTo);
 }
 
-template<class T> NesPpu<T>::~NesPpu()
-{
+template <class T>
+NesPpu<T>::~NesPpu() {
 	delete[] _outputBuffers[0];
 	delete[] _outputBuffers[1];
 }

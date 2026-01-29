@@ -5,8 +5,7 @@
 struct StudyBoxData;
 struct RomData;
 
-class StudyBoxLoader : public BaseLoader
-{
+class StudyBoxLoader : public BaseLoader {
 private:
 	uint32_t ReadInt(uint8_t*& data);
 	string ReadFourCC(uint8_t*& data);

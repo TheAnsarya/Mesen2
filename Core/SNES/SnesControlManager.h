@@ -15,8 +15,7 @@ class SystemActionManager;
 struct ControllerData;
 enum class ControllerType;
 
-class SnesControlManager final : public BaseControlManager
-{
+class SnesControlManager final : public BaseControlManager {
 private:
 	SnesConfig _prevConfig = {};
 
@@ -31,15 +30,15 @@ public:
 
 	void Reset(bool softReset) override;
 	void UpdateControlDevices() override;
-	
+
 	uint8_t GetLastWriteValue() { return _lastWriteValue; }
 
 	shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override;
 
 	uint8_t Read(uint16_t addr, bool forAutoRead = false);
-	
+
 	void Write(uint16_t addr, uint8_t value);
 	void SetAutoReadStrobe(bool strobe);
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 };

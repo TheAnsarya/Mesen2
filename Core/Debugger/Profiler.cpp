@@ -10,22 +10,19 @@
 
 static constexpr int32_t ResetFunctionIndex = -1;
 
-Profiler::Profiler(Debugger* debugger, IDebugger* cpuDebugger)
-{
+Profiler::Profiler(Debugger* debugger, IDebugger* cpuDebugger) {
 	_debugger = debugger;
 	_cpuDebugger = cpuDebugger;
 	InternalReset();
 }
 
-Profiler::~Profiler()
-{
+Profiler::~Profiler() {
 }
 
-void Profiler::StackFunction(AddressInfo &addr, StackFrameFlags stackFlag)
-{
-	if(addr.Address >= 0) {
+void Profiler::StackFunction(AddressInfo& addr, StackFrameFlags stackFlag) {
+	if (addr.Address >= 0) {
 		uint32_t key = addr.Address | ((uint8_t)addr.Type << 24);
-		if(_functions.find(key) == _functions.end()) {
+		if (_functions.find(key) == _functions.end()) {
 			_functions[key] = ProfiledFunction();
 			_functions[key].Address = addr;
 		}
@@ -36,9 +33,9 @@ void Profiler::StackFunction(AddressInfo &addr, StackFrameFlags stackFlag)
 		_cycleCountStack.push_back(_currentCycleCount);
 		_functionStack.push_back(_currentFunction);
 
-		if(_functionStack.size() > 100) {
-			//Keep stack to 100 functions at most (to prevent performance issues, esp. in debug builds)
-			//Only happens when software doesn't use JSR/RTS normally to enter/leave functions
+		if (_functionStack.size() > 100) {
+			// Keep stack to 100 functions at most (to prevent performance issues, esp. in debug builds)
+			// Only happens when software doesn't use JSR/RTS normally to enter/leave functions
 			_functionStack.pop_front();
 			_cycleCountStack.pop_front();
 			_stackFlags.pop_front();
@@ -53,20 +50,19 @@ void Profiler::StackFunction(AddressInfo &addr, StackFrameFlags stackFlag)
 	}
 }
 
-void Profiler::UpdateCycles()
-{
+void Profiler::UpdateCycles() {
 	uint64_t masterClock = _cpuDebugger->GetCpuCycleCount(true);
-	
+
 	ProfiledFunction& func = _functions[_currentFunction];
 	uint64_t clockGap = masterClock - _prevMasterClock;
 	func.ExclusiveCycles += clockGap;
 	func.InclusiveCycles += clockGap;
-	
+
 	int32_t len = (int32_t)_functionStack.size();
-	for(int32_t i = len - 1; i >= 0; i--) {
+	for (int32_t i = len - 1; i >= 0; i--) {
 		_functions[_functionStack[i]].InclusiveCycles += clockGap;
-		if(_stackFlags[i] != StackFrameFlags::None) {
-			//Don't apply inclusive times to stack frames before an IRQ/NMI
+		if (_stackFlags[i] != StackFrameFlags::None) {
+			// Don't apply inclusive times to stack frames before an IRQ/NMI
 			break;
 		}
 	}
@@ -75,12 +71,11 @@ void Profiler::UpdateCycles()
 	_prevMasterClock = masterClock;
 }
 
-void Profiler::UnstackFunction()
-{
-	if(!_functionStack.empty()) {
+void Profiler::UnstackFunction() {
+	if (!_functionStack.empty()) {
 		UpdateCycles();
 
-		//Return to the previous function
+		// Return to the previous function
 		ProfiledFunction& func = _functions[_currentFunction];
 		func.MinCycles = std::min(func.MinCycles, _currentCycleCount);
 		func.MaxCycles = std::max(func.MaxCycles, _currentCycleCount);
@@ -89,20 +84,18 @@ void Profiler::UnstackFunction()
 		_functionStack.pop_back();
 		_stackFlags.pop_back();
 
-		//Add the subroutine's cycle count to the current routine's cycle count
+		// Add the subroutine's cycle count to the current routine's cycle count
 		_currentCycleCount = _cycleCountStack.back() + _currentCycleCount;
 		_cycleCountStack.pop_back();
 	}
 }
 
-void Profiler::Reset()
-{
+void Profiler::Reset() {
 	DebugBreakHelper helper(_debugger);
 	InternalReset();
 }
 
-void Profiler::ResetState()
-{
+void Profiler::ResetState() {
 	_prevMasterClock = _cpuDebugger->GetCpuCycleCount(true);
 	_currentCycleCount = 0;
 	_functionStack.clear();
@@ -111,27 +104,25 @@ void Profiler::ResetState()
 	_currentFunction = ResetFunctionIndex;
 }
 
-void Profiler::InternalReset()
-{
+void Profiler::InternalReset() {
 	ResetState();
-	
+
 	_functions.clear();
 	_functions[ResetFunctionIndex] = ProfiledFunction();
-	_functions[ResetFunctionIndex].Address = { ResetFunctionIndex, MemoryType::None };
+	_functions[ResetFunctionIndex].Address = {ResetFunctionIndex, MemoryType::None};
 }
 
-void Profiler::GetProfilerData(ProfiledFunction* profilerData, uint32_t& functionCount)
-{
+void Profiler::GetProfilerData(ProfiledFunction* profilerData, uint32_t& functionCount) {
 	DebugBreakHelper helper(_debugger);
-	
+
 	UpdateCycles();
 
 	functionCount = 0;
-	for(auto& func : _functions) {
+	for (auto& func : _functions) {
 		profilerData[functionCount] = func.second;
 		functionCount++;
 
-		if(functionCount >= 100000) {
+		if (functionCount >= 100000) {
 			break;
 		}
 	}

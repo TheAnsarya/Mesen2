@@ -1,13 +1,13 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma warning( disable : 4100 ) //unreferenced formal parameter
-#pragma warning( disable : 4244 ) //conversion from 'x' to 'y', possible loss of data
-#pragma warning( disable : 4245 ) //conversion from 'x' to 'y', signed/unsigned mismatch
-#endif 
+#pragma warning(disable : 4100) // unreferenced formal parameter
+#pragma warning(disable : 4244) // conversion from 'x' to 'y', possible loss of data
+#pragma warning(disable : 4245) // conversion from 'x' to 'y', signed/unsigned mismatch
+#endif
 
 #ifdef __clang__
-//TODO, fix warnings and remove this
+// TODO, fix warnings and remove this
 #pragma clang diagnostic ignored "-Wswitch"
 #endif
 
@@ -37,19 +37,19 @@
 #include "Utilities/UTF8Util.h"
 
 #ifdef _MSC_VER
-	#define __noinline __declspec(noinline)
+#define __noinline __declspec(noinline)
 #elif !defined(__MINGW32__) && (defined(__clang__) || defined(__GNUC__))
-	#define __noinline __attribute__((noinline))
-	// Some headers have functions marked as `__forceinline` but don't provide the bodies;
-	// it fails to compile when LTO is not enabled.
-	#ifdef HAVE_LTO
-		#define __forceinline __attribute__((always_inline)) inline
-	#else
-		#define __forceinline inline
-	#endif
+#define __noinline __attribute__((noinline))
+// Some headers have functions marked as `__forceinline` but don't provide the bodies;
+// it fails to compile when LTO is not enabled.
+#ifdef HAVE_LTO
+#define __forceinline __attribute__((always_inline)) inline
 #else
-	#define __forceinline inline
-	#define __noinline
+#define __forceinline inline
+#endif
+#else
+#define __forceinline inline
+#define __noinline
 #endif
 
 using std::vector;

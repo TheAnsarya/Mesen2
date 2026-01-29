@@ -14,25 +14,23 @@ class EmuSettings;
 struct SnesCpuState;
 enum class CpuType : uint8_t;
 
-struct DisassemblerSource
-{
+struct DisassemblerSource {
 	vector<DisassemblyInfo> Cache;
 	uint32_t Size = 0;
 };
 
-class Disassembler
-{
+class Disassembler {
 private:
 	friend class DisassemblySearch;
 
-	IConsole *_console;
+	IConsole* _console;
 	EmuSettings* _settings;
-	Debugger *_debugger;
+	Debugger* _debugger;
 	LabelManager* _labelManager;
-	MemoryDumper *_memoryDumper;
+	MemoryDumper* _memoryDumper;
 
 	DisassemblerSource _sources[DebugUtilities::GetMemoryTypeCount()] = {};
-	
+
 	void InitSource(MemoryType type);
 	DisassemblerSource& GetSource(MemoryType type);
 
@@ -40,22 +38,21 @@ private:
 	int32_t GetMatchingRow(vector<DisassemblyResult>& rows, uint32_t address, bool returnFirstRow);
 	vector<DisassemblyResult> Disassemble(CpuType cpuType, uint16_t bank);
 	uint16_t GetMaxBank(CpuType cpuType);
-	
+
 public:
 	Disassembler(IConsole* console, Debugger* debugger);
 
-	uint32_t BuildCache(AddressInfo &addrInfo, uint8_t cpuFlags, CpuType type);
+	uint32_t BuildCache(AddressInfo& addrInfo, uint8_t cpuFlags, CpuType type);
 	void ResetPrgCache();
 	void InvalidateCache(AddressInfo addrInfo, CpuType type);
 
-	__forceinline DisassemblyInfo GetDisassemblyInfo(AddressInfo& info, uint32_t cpuAddress, uint8_t cpuFlags, CpuType type)
-	{
+	__forceinline DisassemblyInfo GetDisassemblyInfo(AddressInfo& info, uint32_t cpuAddress, uint8_t cpuFlags, CpuType type) {
 		DisassemblyInfo disassemblyInfo;
-		if(info.Address >= 0) {
+		if (info.Address >= 0) {
 			disassemblyInfo = GetSource(info.Type).Cache[info.Address];
 		}
 
-		if(!disassemblyInfo.IsInitialized()) {
+		if (!disassemblyInfo.IsInitialized()) {
 			disassemblyInfo.Initialize(cpuAddress, cpuFlags, type, DebugUtilities::GetCpuMemoryType(type), _memoryDumper);
 		}
 		return disassemblyInfo;

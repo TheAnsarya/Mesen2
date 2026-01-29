@@ -15,8 +15,7 @@ class WsApuCh4;
 class WsHyperVoice;
 class SoundMixer;
 
-class WsApu final : public ISerializable
-{
+class WsApu final : public ISerializable {
 private:
 	static constexpr int ApuFrequency = 24000;
 	static constexpr int MaxSamples = 256;

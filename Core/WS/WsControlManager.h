@@ -6,8 +6,7 @@
 
 class WsConsole;
 
-class WsControlManager final : public BaseControlManager
-{
+class WsControlManager final : public BaseControlManager {
 private:
 	WsControlManagerState _state = {};
 	WsConfig _prevConfig = {};
@@ -22,7 +21,7 @@ public:
 	WsControlManager(Emulator* emu, WsConsole* console);
 
 	WsControlManagerState& GetState() { return _state; }
-	
+
 	shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override;
 
 	void UpdateControlDevices() override;

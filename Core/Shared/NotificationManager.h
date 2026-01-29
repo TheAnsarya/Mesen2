@@ -3,12 +3,11 @@
 #include "Shared/Interfaces/INotificationListener.h"
 #include "Utilities/SimpleLock.h"
 
-class NotificationManager
-{
+class NotificationManager {
 private:
 	SimpleLock _lock;
 	vector<weak_ptr<INotificationListener>> _listeners;
-	
+
 	void CleanupNotificationListeners();
 
 public:

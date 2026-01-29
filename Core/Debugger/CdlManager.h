@@ -8,8 +8,7 @@ class CodeDataLogger;
 class Debugger;
 class Disassembler;
 
-class CdlManager
-{
+class CdlManager {
 private:
 	CodeDataLogger* _codeDataLoggers[DebugUtilities::GetMemoryTypeCount()] = {};
 	Debugger* _debugger = nullptr;

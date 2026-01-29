@@ -4,8 +4,7 @@
 #include "Shared/SettingTypes.h"
 #include "Shared/Video/DrawCommand.h"
 
-class DebugHud
-{
+class DebugHud {
 private:
 	static constexpr size_t MaxCommandCount = 500000;
 	vector<unique_ptr<DrawCommand>> _commands;
@@ -27,10 +26,9 @@ public:
 	void DrawRectangle(int x, int y, int width, int height, int color, bool fill, int frameCount, int startFrame = -1);
 	void DrawString(int x, int y, string text, int color, int backColor, int frameCount, int startFrame = -1, int maxWidth = 0, bool overwritePixels = false);
 
-	__forceinline void AddCommand(unique_ptr<DrawCommand> cmd)
-	{
+	__forceinline void AddCommand(unique_ptr<DrawCommand> cmd) {
 		auto lock = _commandLock.AcquireSafe();
-		if(_commands.size() < DebugHud::MaxCommandCount) {
+		if (_commands.size() < DebugHud::MaxCommandCount) {
 			_commands.push_back(std::move(cmd));
 			_commandCount++;
 		}

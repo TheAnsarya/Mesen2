@@ -9,8 +9,7 @@ class PceVce;
 class PceConsole;
 class Emulator;
 
-class PceVpc final : public ISerializable
-{
+class PceVpc final : public ISerializable {
 public:
 	static constexpr uint16_t SpritePixelFlag = 0x8000;
 	static constexpr uint16_t TransparentPixelFlag = 0x4000;
@@ -37,7 +36,7 @@ private:
 public:
 	PceVpc(Emulator* emu, PceConsole* console, PceVce* vce);
 	~PceVpc();
-	
+
 	void ConnectVdc(PceVdc* vdc1, PceVdc* vdc2);
 
 	uint8_t Read(uint16_t addr);
@@ -46,7 +45,10 @@ public:
 	void StVdcWrite(uint16_t addr, uint8_t value);
 
 	__forceinline void Exec() { _vdc1->Exec(); }
-	__forceinline void ExecSuperGrafx() { _vdc2->Exec(); _vdc1->Exec(); }
+	__forceinline void ExecSuperGrafx() {
+		_vdc2->Exec();
+		_vdc1->Exec();
+	}
 
 	void DrawScanline();
 	void ProcessStartFrame();
@@ -54,12 +56,12 @@ public:
 	void ProcessScanline();
 	void ProcessScanlineEnd(PceVdc* vdc, uint16_t scanline, uint16_t* rowBuffer);
 	void SendFrame(PceVdc* vdc);
-	
+
 	void DebugSendFrame();
 
 	void SetIrq(PceVdc* vdc);
 	void ClearIrq(PceVdc* vdc);
-	
+
 	bool IsSkipRenderEnabled() { return _skipRender; }
 
 	PceVpcState GetState() { return _state; }

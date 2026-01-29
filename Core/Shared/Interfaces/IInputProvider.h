@@ -2,8 +2,7 @@
 
 class BaseControlDevice;
 
-class IInputProvider
-{
+class IInputProvider {
 public:
 	virtual bool SetInput(BaseControlDevice* device) = 0;
 };

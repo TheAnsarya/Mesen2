@@ -11,8 +11,7 @@ class SmsVdp;
 class SmsConsole;
 class Debugger;
 
-struct SmsEventViewerConfig : public BaseEventViewerConfig
-{
+struct SmsEventViewerConfig : public BaseEventViewerConfig {
 	EventViewerCategoryCfg Irq;
 	EventViewerCategoryCfg Nmi;
 	EventViewerCategoryCfg MarkedBreakpoints;
@@ -29,7 +28,7 @@ struct SmsEventViewerConfig : public BaseEventViewerConfig
 	EventViewerCategoryCfg PsgWrite;
 	EventViewerCategoryCfg IoWrite;
 	EventViewerCategoryCfg IoRead;
-	
+
 	EventViewerCategoryCfg MemoryControlWrite;
 
 	EventViewerCategoryCfg GameGearPortWrite;
@@ -38,10 +37,9 @@ struct SmsEventViewerConfig : public BaseEventViewerConfig
 	bool ShowPreviousFrameEvents;
 };
 
-class SmsEventManager final : public BaseEventManager
-{
+class SmsEventManager final : public BaseEventManager {
 private:
-	static constexpr int ScanlineWidth = 342*2;
+	static constexpr int ScanlineWidth = 342 * 2;
 	static constexpr int ScreenHeight = 262;
 
 	SmsEventViewerConfig _config;

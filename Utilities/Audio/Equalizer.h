@@ -2,8 +2,7 @@
 #include "pch.h"
 #include "orfanidis_eq.h"
 
-class Equalizer
-{
+class Equalizer {
 private:
 	unique_ptr<orfanidis_eq::freq_grid> _eqFrequencyGrid;
 	unique_ptr<orfanidis_eq::eq1> _equalizerLeft;
@@ -13,6 +12,6 @@ private:
 	vector<double> _prevEqualizerGains;
 
 public:
-	void ApplyEqualizer(uint32_t sampleCount, int16_t *samples);
+	void ApplyEqualizer(uint32_t sampleCount, int16_t* samples);
 	void UpdateEqualizers(vector<double> bandGains, uint32_t sampleRate);
 };

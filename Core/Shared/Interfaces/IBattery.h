@@ -1,7 +1,6 @@
 #pragma once
 
-class IBattery
-{
+class IBattery {
 public:
 	virtual void SaveBattery() = 0;
 };

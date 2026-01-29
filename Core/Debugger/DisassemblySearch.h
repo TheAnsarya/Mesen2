@@ -8,23 +8,22 @@ class Disassembler;
 class LabelManager;
 enum class CpuType : uint8_t;
 
-struct DisassemblySearchOptions
-{
+struct DisassemblySearchOptions {
 	bool MatchCase;
 	bool MatchWholeWord;
 	bool SearchBackwards;
 	bool SkipFirstLine;
 };
 
-class DisassemblySearch
-{
+class DisassemblySearch {
 private:
 	Disassembler* _disassembler;
 	LabelManager* _labelManager;
 
 	uint32_t SearchDisassembly(CpuType cpuType, const char* searchString, int32_t startAddress, DisassemblySearchOptions options, CodeLineData searchResults[], uint32_t maxResultCount);
 
-	template<bool matchCase> bool TextContains(string& needle, const char* hay, int size, DisassemblySearchOptions& options);
+	template <bool matchCase>
+	bool TextContains(string& needle, const char* hay, int size, DisassemblySearchOptions& options);
 	bool TextContains(string& needle, const char* hay, int size, DisassemblySearchOptions& options);
 	bool IsWordSeparator(char c);
 

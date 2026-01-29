@@ -11,8 +11,7 @@
 class ZipWriter;
 class Emulator;
 
-class MovieRecorder final : public INotificationListener, public IInputRecorder, public IBatteryRecorder, public IBatteryProvider, public std::enable_shared_from_this<MovieRecorder>
-{
+class MovieRecorder final : public INotificationListener, public IInputRecorder, public IBatteryRecorder, public IBatteryProvider, public std::enable_shared_from_this<MovieRecorder> {
 private:
 	static const uint32_t MovieFormatVersion = 2;
 
@@ -26,10 +25,10 @@ private:
 	bool _hasSaveState = false;
 	stringstream _saveStateData;
 
-	void GetGameSettings(stringstream &out);
-	void WriteString(stringstream &out, string name, string value);
-	void WriteInt(stringstream &out, string name, uint32_t value);
-	void WriteBool(stringstream &out, string name, bool enabled);
+	void GetGameSettings(stringstream& out);
+	void WriteString(stringstream& out, string name, string value);
+	void WriteInt(stringstream& out, string name, uint32_t value);
+	void WriteBool(stringstream& out, string name, bool enabled);
 
 public:
 	MovieRecorder(Emulator* emu);
@@ -46,7 +45,7 @@ public:
 	vector<uint8_t> LoadBattery(string extension) override;
 
 	// Inherited via INotificationListener
-	void ProcessNotification(ConsoleNotificationType type, void *parameter) override;
+	void ProcessNotification(ConsoleNotificationType type, void* parameter) override;
 
 	bool CreateMovie(string movieFile, deque<RewindData>& data, uint32_t startPosition, uint32_t endPosition, bool hasBattery);
 };

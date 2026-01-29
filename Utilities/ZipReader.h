@@ -3,8 +3,7 @@
 #include "miniz.h"
 #include "ArchiveReader.h"
 
-class ZipReader : public ArchiveReader
-{
+class ZipReader : public ArchiveReader {
 private:
 	mz_zip_archive _zipArchive;
 
@@ -16,5 +15,5 @@ public:
 	ZipReader();
 	virtual ~ZipReader();
 
-	bool ExtractFile(string filename, vector<uint8_t> &output);
+	bool ExtractFile(string filename, vector<uint8_t>& output);
 };

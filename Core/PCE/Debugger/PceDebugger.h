@@ -27,8 +27,7 @@ class DummyPceCpu;
 
 enum class MemoryOperationType;
 
-class PceDebugger final : public IDebugger
-{
+class PceDebugger final : public IDebugger {
 	Debugger* _debugger;
 	Emulator* _emu;
 	Disassembler* _disassembler;

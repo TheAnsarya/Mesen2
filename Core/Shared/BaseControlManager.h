@@ -12,8 +12,7 @@ enum class CpuType : uint8_t;
 struct ControllerData;
 enum class ControllerType;
 
-class BaseControlManager : public ISerializable
-{
+class BaseControlManager : public ISerializable {
 private:
 	vector<IInputRecorder*> _inputRecorders;
 	vector<IInputProvider*> _inputProviders;
@@ -35,7 +34,7 @@ protected:
 public:
 	BaseControlManager(Emulator* emu, CpuType cpuType);
 	virtual ~BaseControlManager();
-	
+
 	void Serialize(Serializer& s) override;
 
 	void AddSystemControlDevice(shared_ptr<BaseControlDevice> device);
@@ -71,10 +70,9 @@ public:
 	shared_ptr<BaseControlDevice> GetControlDeviceByIndex(uint8_t index);
 	void RefreshHubState();
 	vector<shared_ptr<BaseControlDevice>> GetControlDevices();
-	
-	template<typename T>
-	shared_ptr<T> GetControlDevice()
-	{
+
+	template <typename T>
+	shared_ptr<T> GetControlDevice() {
 		auto lock = _deviceLock.AcquireSafe();
 
 		for (shared_ptr<BaseControlDevice>& device : _controlDevices) {
@@ -85,5 +83,4 @@ public:
 		}
 		return nullptr;
 	}
-
 };

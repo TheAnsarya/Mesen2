@@ -19,15 +19,13 @@ enum class CpuType : uint8_t;
 enum class EmulatorShortcut;
 enum class HashType;
 
-enum class LoadRomResult
-{
+enum class LoadRomResult {
 	Success,
 	Failure,
 	UnknownType
 };
 
-struct PpuFrameInfo
-{
+struct PpuFrameInfo {
 	uint8_t* FrameBuffer;
 	uint32_t Width;
 	uint32_t Height;
@@ -38,15 +36,13 @@ struct PpuFrameInfo
 	uint32_t CycleCount;
 };
 
-enum class ShortcutState
-{
+enum class ShortcutState {
 	Disabled = 0,
 	Enabled = 1,
 	Default = 2
 };
 
-class IConsole : public ISerializable, public INotificationListener
-{
+class IConsole : public ISerializable, public INotificationListener {
 public:
 	virtual ~IConsole() {}
 
@@ -72,8 +68,7 @@ public:
 
 	virtual double GetFps() = 0;
 
-	virtual TimingInfo GetTimingInfo(CpuType cpuType)
-	{
+	virtual TimingInfo GetTimingInfo(CpuType cpuType) {
 		TimingInfo info = {};
 		info.MasterClock = GetMasterClock();
 		info.MasterClockRate = GetMasterClockRate();
@@ -91,7 +86,7 @@ public:
 	virtual void GetScreenRotationOverride(uint32_t& rotation) {}
 
 	virtual PpuFrameInfo GetPpuFrame() = 0;
-	
+
 	virtual string GetHash(HashType hashType) { return {}; }
 
 	virtual RomFormat GetRomFormat() = 0;
@@ -101,11 +96,10 @@ public:
 	virtual AddressInfo GetAbsoluteAddress(AddressInfo& relAddress) = 0;
 	virtual AddressInfo GetRelativeAddress(AddressInfo& absAddress, CpuType cpuType) = 0;
 	virtual void GetConsoleState(BaseState& state, ConsoleType consoleType) = 0;
-	
+
 	virtual SaveStateCompatInfo ValidateSaveStateCompatibility(ConsoleType stateConsoleType) { return {}; }
 
 	virtual void ProcessCheatCode(InternalCheatCode& code, uint32_t addr, uint8_t& value) {}
 
 	virtual void ProcessNotification(ConsoleNotificationType type, void* parameter) {}
 };
-

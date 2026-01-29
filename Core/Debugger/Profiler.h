@@ -5,8 +5,7 @@
 class Debugger;
 class IDebugger;
 
-struct ProfiledFunction
-{
+struct ProfiledFunction {
 	uint64_t ExclusiveCycles = 0;
 	uint64_t InclusiveCycles = 0;
 	uint64_t CallCount = 0;
@@ -16,14 +15,13 @@ struct ProfiledFunction
 	StackFrameFlags Flags = {};
 };
 
-class Profiler
-{
+class Profiler {
 private:
 	Debugger* _debugger = nullptr;
 	IDebugger* _cpuDebugger = nullptr;
 
 	unordered_map<int32_t, ProfiledFunction> _functions;
-	
+
 	deque<int32_t> _functionStack;
 	deque<StackFrameFlags> _stackFlags;
 	deque<uint64_t> _cycleCountStack;

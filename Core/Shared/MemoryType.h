@@ -1,7 +1,6 @@
 #pragma once
 
-enum class MemoryType
-{
+enum class MemoryType {
 	SnesMemory,
 	SpcMemory,
 	Sa1Memory,
@@ -91,7 +90,7 @@ enum class MemoryType
 	GbaVideoRam,
 	GbaSpriteRam,
 	GbaPaletteRam,
-	
+
 	WsPrgRom,
 	WsWorkRam,
 	WsCartRam,

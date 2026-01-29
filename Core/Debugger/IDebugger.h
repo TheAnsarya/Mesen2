@@ -18,9 +18,8 @@ struct BaseState;
 enum class EventType;
 enum class MemoryOperationType;
 
-//TODOv2 rename/refactor to BaseDebugger
-class IDebugger
-{
+// TODOv2 rename/refactor to BaseDebugger
+class IDebugger {
 protected:
 	unique_ptr<StepRequest> _step;
 	unique_ptr<StepBackManager> _stepBackManager;
@@ -40,7 +39,7 @@ public:
 	bool IsStepBack() { return _stepBackManager->IsRewinding(); }
 	void ResetStepBackCache() { return _stepBackManager->ResetCache(); }
 	void StepBack(int32_t stepCount) { return _stepBackManager->StepBack((StepBackType)stepCount); }
-	virtual StepBackConfig GetStepBackConfig() { return { GetCpuCycleCount(), 0, 0 }; }
+	virtual StepBackConfig GetStepBackConfig() { return {GetCpuCycleCount(), 0, 0}; }
 
 	FrozenAddressManager& GetFrozenAddressManager() { return _frozenAddressManager; }
 
@@ -51,14 +50,14 @@ public:
 	virtual void Step(int32_t stepCount, StepType type) = 0;
 	virtual void Reset() = 0;
 	virtual void Run() = 0;
-	
+
 	virtual void Init() {}
 	virtual void ProcessConfigChange() {}
 
 	virtual void ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi) {}
 	virtual void ProcessInputOverrides(DebugControllerState inputOverrides[8]) {}
 
-	virtual void DrawPartialFrame() { }
+	virtual void DrawPartialFrame() {}
 
 	virtual DebuggerFeatures GetSupportedFeatures() { return {}; }
 	virtual uint64_t GetCpuCycleCount(bool forProfiler = false) { return 0; }

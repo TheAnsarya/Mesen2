@@ -3,8 +3,7 @@
 
 class Emulator;
 
-class DebugStats
-{
+class DebugStats {
 private:
 	double _frameDurations[60] = {};
 	uint32_t _frameDurationIndex = 0;
@@ -12,5 +11,5 @@ private:
 	double _lastFrameMax = 0;
 
 public:
-	void DisplayStats(Emulator *emu, double lastFrameTime);
+	void DisplayStats(Emulator* emu, double lastFrameTime);
 };

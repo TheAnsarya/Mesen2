@@ -18,16 +18,14 @@ class SnesCpu;
 class CheatManager;
 enum class MemoryOperationType;
 
-enum class SnesEventType : uint8_t
-{
+enum class SnesEventType : uint8_t {
 	HdmaInit,
 	DramRefresh,
 	HdmaStart,
 	EndOfScanline
 };
 
-class SnesMemoryManager : public ISerializable
-{
+class SnesMemoryManager : public ISerializable {
 public:
 	constexpr static uint32_t WorkRamSize = 0x20000;
 
@@ -38,12 +36,12 @@ private:
 	unique_ptr<RegisterHandlerA> _registerHandlerA;
 	unique_ptr<RegisterHandlerB> _registerHandlerB;
 
-	InternalRegisters *_regs = nullptr;
+	InternalRegisters* _regs = nullptr;
 	SnesPpu* _ppu = nullptr;
 	SnesCpu* _cpu = nullptr;
 	BaseCartridge* _cart = nullptr;
 	CheatManager* _cheatManager = nullptr;
-	uint8_t *_workRam = nullptr;
+	uint8_t* _workRam = nullptr;
 
 	uint64_t _masterClock = 0;
 	uint16_t _hClock = 0;
@@ -59,11 +57,12 @@ private:
 	vector<unique_ptr<IMemoryHandler>> _workRamHandlers;
 	uint8_t _masterClockTable[0x800] = {};
 
-	typedef void(SnesMemoryManager::*Func)();
+	typedef void (SnesMemoryManager::*Func)();
 	Func _execRead = nullptr;
 	Func _execWrite = nullptr;
-	
-	template<uint8_t clocks> void IncMasterClock();
+
+	template <uint8_t clocks>
+	void IncMasterClock();
 	void UpdateExecCallbacks();
 
 	__forceinline void Exec();
@@ -90,7 +89,7 @@ public:
 
 	uint8_t Peek(uint32_t addr);
 	uint16_t PeekWord(uint32_t addr);
-	void PeekBlock(uint32_t addr, uint8_t * dest);
+	void PeekBlock(uint32_t addr, uint8_t* dest);
 
 	void Write(uint32_t addr, uint8_t value, MemoryOperationType type);
 	void WriteDma(uint32_t addr, uint8_t value, bool forBusA);
@@ -112,5 +111,5 @@ public:
 
 	uint32_t GetWramPosition();
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 };

@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-struct DmaChannelConfig
-{
+struct DmaChannelConfig {
 	uint16_t SrcAddress;
 	uint16_t TransferSize;
 	uint16_t HdmaTableAddress;
@@ -27,8 +26,7 @@ struct DmaChannelConfig
 	uint8_t UnusedRegister;
 };
 
-struct SnesDmaControllerState
-{
+struct SnesDmaControllerState {
 	DmaChannelConfig Channel[8];
 	uint8_t HdmaChannels;
 };

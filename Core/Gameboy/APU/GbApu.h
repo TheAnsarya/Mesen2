@@ -12,13 +12,12 @@ class SoundMixer;
 class EmuSettings;
 struct GameboyConfig;
 
-class GbApu : public ISerializable
-{
+class GbApu : public ISerializable {
 public:
 	static constexpr int SampleRate = 96000;
 
 private:
-	static constexpr int ApuFrequency = 1024 * 1024 * 4; //4mhz
+	static constexpr int ApuFrequency = 1024 * 1024 * 4; // 4mhz
 	static constexpr int MaxSamples = 4000;
 	Emulator* _emu = nullptr;
 	Gameboy* _gameboy = nullptr;
@@ -64,7 +63,7 @@ public:
 
 	void PlayQueuedAudio();
 
-	void GetSoundSamples(int16_t* &samples, uint32_t& sampleCount);
+	void GetSoundSamples(int16_t*& samples, uint32_t& sampleCount);
 
 	void ClockFrameSequencer();
 
@@ -75,7 +74,8 @@ public:
 	uint8_t PeekCgbRegister(uint16_t addr);
 	uint8_t ReadCgbRegister(uint16_t addr);
 
-	template<typename T> void ProcessLengthEnableFlag(uint8_t value, T& length, bool& lengthEnabled, bool& enabled);
+	template <typename T>
+	void ProcessLengthEnableFlag(uint8_t value, T& length, bool& lengthEnabled, bool& enabled);
 
 	void Serialize(Serializer& s) override;
 };

@@ -11,8 +11,7 @@ class FastString;
 struct WsCpuState;
 enum class WsSegment : uint8_t;
 
-class WsDisUtils
-{
+class WsDisUtils {
 private:
 	static void GetModRegParam(FastString& str, uint8_t* byteCode, bool word);
 	static void GetModSegRegParam(FastString& str, uint8_t* byteCode);
@@ -25,7 +24,7 @@ private:
 public:
 	static void GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings);
 	static EffectiveAddressInfo GetEffectiveAddress(DisassemblyInfo& info, WsConsole* console, WsCpuState& state);
-	
+
 	static uint8_t GetOpSize(uint32_t cpuAddress, MemoryType memType, MemoryDumper* memoryDumper);
 
 	static uint16_t GetFullOpCode(uint16_t cs, uint16_t ip, WsMemoryManager* memoryManager);

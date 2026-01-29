@@ -9,15 +9,14 @@ class Emulator;
 class SnesMemoryManager;
 class SnesCpu;
 
-class Cx4 : public BaseCoprocessor
-{
+class Cx4 : public BaseCoprocessor {
 private:
 	static constexpr int DataRamSize = 0xC00;
 
-	Emulator *_emu;
-	SnesConsole *_console;
-	SnesMemoryManager *_memoryManager;
-	SnesCpu *_cpu;
+	Emulator* _emu;
+	SnesConsole* _console;
+	SnesMemoryManager* _memoryManager;
+	SnesCpu* _cpu;
 	MemoryMappings _mappings;
 	double _clockRatio;
 
@@ -121,7 +120,7 @@ public:
 	uint8_t Read(uint32_t addr) override;
 	void Write(uint32_t addr, uint8_t value) override;
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 
 	uint8_t Peek(uint32_t addr) override;
 	void PeekBlock(uint32_t addr, uint8_t* output) override;

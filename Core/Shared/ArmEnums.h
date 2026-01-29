@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-enum class ArmOpCategory
-{
+enum class ArmOpCategory {
 	BranchExchangeRegister,
 	Branch,
 	Msr,
@@ -18,8 +17,7 @@ enum class ArmOpCategory
 	InvalidOp,
 };
 
-enum class ArmAluOperation : uint8_t
-{
+enum class ArmAluOperation : uint8_t {
 	And,
 	Eor,
 	Sub,

@@ -42,8 +42,7 @@ enum class EventType;
 enum class ConsoleRegion;
 enum class ConsoleType;
 
-class SnesConsole final : public IConsole
-{
+class SnesConsole final : public IConsole {
 private:
 	unique_ptr<SnesCpu> _cpu;
 	unique_ptr<SnesPpu> _ppu;
@@ -53,7 +52,7 @@ private:
 	unique_ptr<InternalRegisters> _internalRegisters;
 	unique_ptr<SnesControlManager> _controlManager;
 	unique_ptr<SnesDmaController> _dmaController;
-	
+
 	unique_ptr<Msu1> _msu1;
 	EmuSettings* _settings = nullptr;
 	Emulator* _emu = nullptr;
@@ -71,13 +70,13 @@ private:
 public:
 	SnesConsole(Emulator* emu);
 	~SnesConsole();
-	
-	static vector<string> GetSupportedExtensions() { return { ".sfc", ".swc", ".fig", ".smc", ".bs", ".gb", ".gbc", ".gbx", ".spc", ".st" }; }
-	static vector<string> GetSupportedSignatures() { return { "SNES-SPC700 Sound File Data" }; }
+
+	static vector<string> GetSupportedExtensions() { return {".sfc", ".swc", ".fig", ".smc", ".bs", ".gb", ".gbc", ".gbx", ".spc", ".st"}; }
+	static vector<string> GetSupportedSignatures() { return {"SNES-SPC700 Sound File Data"}; }
 
 	void Initialize();
 	void Release();
-	
+
 	void Reset() override;
 
 	void RunFrame() override;
@@ -103,9 +102,9 @@ public:
 	BaseControlManager* GetControlManager() override;
 	SnesDmaController* GetDmaController();
 	Msu1* GetMsu1();
-	
+
 	Emulator* GetEmulator();
-	
+
 	bool IsRunning();
 
 	void RunAudio();

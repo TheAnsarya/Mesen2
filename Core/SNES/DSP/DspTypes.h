@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-struct DspState
-{
+struct DspState {
 	uint8_t ExternalRegs[128];
 	uint8_t Regs[128];
 
@@ -16,7 +15,7 @@ struct DspState
 	int32_t VoiceOutput = 0;
 	int32_t OutSamples[2] = {};
 
-	//Latched values
+	// Latched values
 	int32_t Pitch = 0;
 	uint16_t SampleAddress = 0;
 	uint16_t BrrNextAddress = 0;
@@ -33,7 +32,7 @@ struct DspState
 	uint8_t Looped = 0;
 	uint8_t Adsr1 = 0;
 
-	//Echo values
+	// Echo values
 	int32_t EchoIn[2] = {};
 	int32_t EchoOut[2] = {};
 	int16_t EchoHistory[8][2] = {};
@@ -46,25 +45,24 @@ struct DspState
 	bool EchoEnabled = false;
 };
 
-enum class DspGlobalRegs
-{
-	MasterVolLeft = 0x0C, //MVOLL
-	MasterVolRight = 0x1C, //MVOLR
-	EchoVolLeft = 0x2C, //EVOLL
-	EchoVolRight = 0x3C, //EVOLR
-	KeyOn = 0x4C, //KON
-	KeyOff = 0x5C, //KOFF
-	Flags = 0x6C, //FLG
-	VoiceEnd = 0x7C, //ENDX
+enum class DspGlobalRegs {
+	MasterVolLeft = 0x0C,  // MVOLL
+	MasterVolRight = 0x1C, // MVOLR
+	EchoVolLeft = 0x2C,    // EVOLL
+	EchoVolRight = 0x3C,   // EVOLR
+	KeyOn = 0x4C,          // KON
+	KeyOff = 0x5C,         // KOFF
+	Flags = 0x6C,          // FLG
+	VoiceEnd = 0x7C,       // ENDX
 
-	EchoFeedbackVol = 0x0D, //EFB
-	PitchModulationOn = 0x2D, //PMON
-	NoiseOn = 0x3D, //NON
-	EchoOn = 0x4D, //EON
+	EchoFeedbackVol = 0x0D,   // EFB
+	PitchModulationOn = 0x2D, // PMON
+	NoiseOn = 0x3D,           // NON
+	EchoOn = 0x4D,            // EON
 
-	DirSampleTableAddress = 0x5D, //DIR
-	EchoRingBufferAddress = 0x6D, //ESA
-	EchoDelay = 0x7D, //EDL
+	DirSampleTableAddress = 0x5D, // DIR
+	EchoRingBufferAddress = 0x6D, // ESA
+	EchoDelay = 0x7D,             // EDL
 
 	EchoFilterCoeff0 = 0x0F,
 	EchoFilterCoeff1 = 0x1F,
@@ -76,22 +74,20 @@ enum class DspGlobalRegs
 	EchoFilterCoeff7 = 0x7F
 };
 
-enum class DspVoiceRegs
-{
-	VolLeft, //VOLL
-	VolRight, //VOLR
-	PitchLow, //PITCHL
-	PitchHigh, //PITCHH
-	SourceNumber, //SRCN
+enum class DspVoiceRegs {
+	VolLeft,      // VOLL
+	VolRight,     // VOLR
+	PitchLow,     // PITCHL
+	PitchHigh,    // PITCHH
+	SourceNumber, // SRCN
 	Adsr1,
 	Adsr2,
 	Gain,
-	Envelope, //ENVX
-	Out //OUTX
+	Envelope, // ENVX
+	Out       // OUTX
 };
 
-enum class EnvelopeMode
-{
+enum class EnvelopeMode {
 	Release,
 	Attack,
 	Decay,

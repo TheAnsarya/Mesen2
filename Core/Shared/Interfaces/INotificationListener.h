@@ -3,8 +3,7 @@
 
 enum class EmulatorShortcut;
 
-enum class ConsoleNotificationType
-{
+enum class ConsoleNotificationType {
 	GameLoaded,
 	StateLoaded,
 	GameReset,
@@ -31,20 +30,17 @@ enum class ConsoleNotificationType
 	RefreshSoftwareRenderer,
 };
 
-struct GameLoadedEventParams
-{
+struct GameLoadedEventParams {
 	bool IsPaused;
 	bool IsPowerCycle;
 };
 
-class INotificationListener
-{
+class INotificationListener {
 public:
 	virtual void ProcessNotification(ConsoleNotificationType type, void* parameter) = 0;
 };
 
-struct ExecuteShortcutParams
-{
+struct ExecuteShortcutParams {
 	EmulatorShortcut Shortcut;
 	uint32_t Param;
 	void* ParamPtr;

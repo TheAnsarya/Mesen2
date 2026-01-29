@@ -7,8 +7,7 @@
 
 class Emulator;
 
-class PceNtscFilter : public PceDefaultVideoFilter
-{
+class PceNtscFilter : public PceDefaultVideoFilter {
 private:
 	snes_ntsc_setup_t _ntscSetup = {};
 	snes_ntsc_t _ntscData = {};
@@ -21,8 +20,8 @@ protected:
 public:
 	PceNtscFilter(Emulator* emu);
 	virtual ~PceNtscFilter();
-	
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 	FrameInfo GetFrameInfo() override;
 	OverscanDimensions GetOverscan() override;
 	HudScaleFactors GetScaleFactor() override;

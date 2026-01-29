@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-struct Sdd1State
-{
+struct Sdd1State {
 	uint8_t AllowDmaProcessing;
 	uint8_t ProcessNextDma;
 	uint8_t SelectedBanks[4];

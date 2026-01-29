@@ -5,10 +5,8 @@
 class LabelManager;
 enum class HlRegType;
 
-class SmsAssembler : public IAssembler
-{
-	enum class ParamType
-	{
+class SmsAssembler : public IAssembler {
+	enum class ParamType {
 		None,
 		Literal,
 		Byte,
@@ -20,14 +18,12 @@ class SmsAssembler : public IAssembler
 		IyOffset
 	};
 
-	struct ParamEntry
-	{
+	struct ParamEntry {
 		string Param;
 		ParamType Type;
 	};
 
-	struct OpCodeEntry
-	{
+	struct OpCodeEntry {
 		uint32_t OpCode;
 		int ParamCount;
 		ParamEntry Param1;

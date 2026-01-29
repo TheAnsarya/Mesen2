@@ -8,8 +8,7 @@
 
 class Debugger;
 
-class ScriptHost
-{
+class ScriptHost {
 private:
 	safe_ptr<ScriptingContext> _context;
 	int _scriptId = 0;
@@ -25,9 +24,8 @@ public:
 
 	void ProcessEvent(EventType eventType, CpuType cpuType);
 
-	template<typename T>
-	__forceinline void CallMemoryCallback(AddressInfo relAddr, T& value, CallbackType callbackType, CpuType cpuType)
-	{
+	template <typename T>
+	__forceinline void CallMemoryCallback(AddressInfo relAddr, T& value, CallbackType callbackType, CpuType cpuType) {
 		_context->CallMemoryCallback(relAddr, value, callbackType, cpuType);
 	}
 };

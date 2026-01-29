@@ -7,8 +7,7 @@ class Spc;
 class Dsp;
 struct SnesConfig;
 
-class DspVoice final : public ISerializable
-{
+class DspVoice final : public ISerializable {
 private:
 	Spc* _spc = nullptr;
 	Dsp* _dsp = nullptr;

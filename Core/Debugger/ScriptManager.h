@@ -8,21 +8,20 @@
 class Debugger;
 enum class MemoryOperationType;
 
-class ScriptManager
-{
+class ScriptManager {
 private:
-	Debugger *_debugger = nullptr;
+	Debugger* _debugger = nullptr;
 	bool _hasScript = false;
 	SimpleLock _scriptLock;
 	int _nextScriptId = 0;
 	bool _isCpuMemoryCallbackEnabled = false;
 	bool _isPpuMemoryCallbackEnabled = false;
 	vector<unique_ptr<ScriptHost>> _scripts;
-	
+
 	void RefreshMemoryCallbackFlags();
 
 public:
-	ScriptManager(Debugger *debugger);
+	ScriptManager(Debugger* debugger);
 	~ScriptManager();
 
 	__forceinline bool HasScript() { return _hasScript; }
@@ -36,16 +35,15 @@ public:
 
 	void EnablePpuMemoryCallbacks() { _isPpuMemoryCallbackEnabled = true; }
 	bool HasPpuMemoryCallbacks() { return _scripts.size() && _isPpuMemoryCallbackEnabled; }
-	
-	template<typename T>
-	__forceinline void ProcessMemoryOperation(AddressInfo relAddr, T& value, MemoryOperationType type, CpuType cpuType, bool processExec)
-	{
-		switch(type) {
+
+	template <typename T>
+	__forceinline void ProcessMemoryOperation(AddressInfo relAddr, T& value, MemoryOperationType type, CpuType cpuType, bool processExec) {
+		switch (type) {
 			case MemoryOperationType::Read:
 			case MemoryOperationType::DmaRead:
 			case MemoryOperationType::PpuRenderingRead:
 			case MemoryOperationType::DummyRead:
-				for(unique_ptr<ScriptHost>& script : _scripts) {
+				for (unique_ptr<ScriptHost>& script : _scripts) {
 					script->CallMemoryCallback(relAddr, value, CallbackType::Read, cpuType);
 				}
 				break;
@@ -53,21 +51,22 @@ public:
 			case MemoryOperationType::Write:
 			case MemoryOperationType::DummyWrite:
 			case MemoryOperationType::DmaWrite:
-				for(unique_ptr<ScriptHost>& script : _scripts) {
+				for (unique_ptr<ScriptHost>& script : _scripts) {
 					script->CallMemoryCallback(relAddr, value, CallbackType::Write, cpuType);
 				}
 				break;
 
 			case MemoryOperationType::ExecOpCode:
 			case MemoryOperationType::ExecOperand:
-				if(processExec) {
-					for(unique_ptr<ScriptHost>& script : _scripts) {
+				if (processExec) {
+					for (unique_ptr<ScriptHost>& script : _scripts) {
 						script->CallMemoryCallback(relAddr, value, CallbackType::Exec, cpuType);
 					}
 				}
 				break;
 
-			default: break;
+			default:
+				break;
 		}
 	}
 };

@@ -9,8 +9,7 @@ class PceConsole;
 struct PceCpuState;
 enum class PceAddrMode;
 
-class PceDisUtils
-{
+class PceDisUtils {
 private:
 	static uint8_t GetOpSize(PceAddrMode addrMode);
 

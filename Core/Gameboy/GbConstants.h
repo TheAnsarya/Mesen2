@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-class GbConstants
-{
+class GbConstants {
 public:
 	static constexpr uint32_t ScreenWidth = 160;
 	static constexpr uint32_t ScreenHeight = 144;

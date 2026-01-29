@@ -3,8 +3,7 @@
 #include "Utilities/Audio/stb_vorbis.h"
 #include "Utilities/Audio/HermiteResampler.h"
 
-class PcmReader
-{
+class PcmReader {
 private:
 	static constexpr int PcmSampleRate = 44100;
 	static constexpr int SamplesToRead = 100;
@@ -29,7 +28,7 @@ private:
 	uint32_t _sampleRate = 0;
 
 	void LoadSamples(uint32_t samplesToLoad);
-	void ReadSample(int16_t &left, int16_t &right);
+	void ReadSample(int16_t& left, int16_t& right);
 
 public:
 	PcmReader();

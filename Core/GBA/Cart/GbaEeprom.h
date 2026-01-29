@@ -3,8 +3,7 @@
 #include "Utilities/ISerializable.h"
 #include "Utilities/Serializer.h"
 
-enum class GbaEepromMode
-{
+enum class GbaEepromMode {
 	Idle,
 	Command,
 	ReadCommand,
@@ -12,8 +11,7 @@ enum class GbaEepromMode
 	WriteCommand,
 };
 
-class GbaEeprom final : public ISerializable
-{
+class GbaEeprom final : public ISerializable {
 private:
 	uint8_t* _saveRam = nullptr;
 
@@ -28,24 +26,22 @@ private:
 	uint64_t _writeData = 0;
 
 public:
-	GbaEeprom(uint8_t* saveRam, GbaSaveType saveType)
-	{
-		if(saveType == GbaSaveType::Eeprom512) {
+	GbaEeprom(uint8_t* saveRam, GbaSaveType saveType) {
+		if (saveType == GbaSaveType::Eeprom512) {
 			_addressSize = 6;
 			_maxAddress = 0x3F;
-		} else if(saveType == GbaSaveType::Eeprom8192) {
+		} else if (saveType == GbaSaveType::Eeprom8192) {
 			_addressSize = 14;
 			_maxAddress = 0x3FF;
 		}
 		_saveRam = saveRam;
 	}
 
-	__noinline uint8_t Read()
-	{
-		switch(_mode) {
+	__noinline uint8_t Read() {
+		switch (_mode) {
 			case GbaEepromMode::ReadCommand:
-				//Auto-detect EEPROM size and then start reading
-				if(_addressSize != 0) {
+				// Auto-detect EEPROM size and then start reading
+				if (_addressSize != 0) {
 					return 1;
 				}
 
@@ -57,15 +53,15 @@ public:
 				[[fallthrough]];
 
 			case GbaEepromMode::ReadDataReady:
-				if(++_counter > 4) {
+				if (++_counter > 4) {
 					uint8_t value;
-					if(_address <= _maxAddress) {
+					if (_address <= _maxAddress) {
 						uint8_t offset = (68 - _counter);
 						value = (_saveRam[(_address << 3) + (offset >> 3)] >> (offset & 0x07)) & 0x01;
 					} else {
 						value = 1;
 					}
-					if(_counter >= 68) {
+					if (_counter >= 68) {
 						_mode = GbaEepromMode::Idle;
 					}
 					return value;
@@ -77,13 +73,12 @@ public:
 		}
 	}
 
-	__noinline void Write(uint8_t value)
-	{
+	__noinline void Write(uint8_t value) {
 		uint8_t bit = value & 0x01;
 
-		switch(_mode) {
+		switch (_mode) {
 			case GbaEepromMode::Idle:
-				if(bit) {
+				if (bit) {
 					_mode = GbaEepromMode::Command;
 				}
 				break;
@@ -96,7 +91,7 @@ public:
 				break;
 
 			case GbaEepromMode::ReadCommand:
-				if(_addressSize && _len == _addressSize){
+				if (_addressSize && _len == _addressSize) {
 					_mode = GbaEepromMode::ReadDataReady;
 					_counter = 0;
 				} else {
@@ -106,18 +101,18 @@ public:
 				break;
 
 			case GbaEepromMode::WriteCommand:
-				if(_addressSize == 0) {
+				if (_addressSize == 0) {
 					_mode = GbaEepromMode::Idle;
 					return;
 				}
 
-				if(++_len > _addressSize) {
-					if(_counter < 64) {
+				if (++_len > _addressSize) {
+					if (_counter < 64) {
 						_writeData = (_writeData << 1) | bit;
 						_counter++;
 					} else {
-						if(_address <= _maxAddress) {
-							for(int i = 0; i < 8; i++) {
+						if (_address <= _maxAddress) {
+							for (int i = 0; i < 8; i++) {
 								_saveRam[(_address << 3) + i] = _writeData & 0xFF;
 								_writeData >>= 8;
 							}
@@ -131,13 +126,11 @@ public:
 		}
 	}
 
-	uint32_t GetSaveSize()
-	{
+	uint32_t GetSaveSize() {
 		return (_maxAddress + 1) * 8;
 	}
 
-	void Serialize(Serializer& s)
-	{
+	void Serialize(Serializer& s) {
 		SV(_addressSize);
 		SV(_maxAddress);
 

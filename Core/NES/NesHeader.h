@@ -3,8 +3,7 @@
 
 enum class RomHeaderVersion;
 
-struct NesHeader
-{
+struct NesHeader {
 	/*
 	Thing 	Archaic			 	iNES 									NES 2.0
 	Byte 6	Mapper low nibble, Mirroring, Battery/Trainer flags

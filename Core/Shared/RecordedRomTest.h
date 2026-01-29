@@ -8,21 +8,18 @@
 class VirtualFile;
 class Emulator;
 
-enum class RomTestState
-{
+enum class RomTestState {
 	Failed,
 	Passed,
 	PassedWithWarnings
 };
 
-struct RomTestResult
-{
+struct RomTestResult {
 	RomTestState State;
 	int32_t ErrorCode;
 };
 
-class RecordedRomTest : public INotificationListener, public std::enable_shared_from_this<RecordedRomTest>
-{
+class RecordedRomTest : public INotificationListener, public std::enable_shared_from_this<RecordedRomTest> {
 private:
 	Emulator* _emu;
 
@@ -36,7 +33,7 @@ private:
 	std::deque<uint8_t*> _screenshotHashes;
 	std::deque<uint8_t> _repetitionCount;
 	uint8_t _currentCount = 0;
-	
+
 	string _filename;
 	ofstream _file;
 

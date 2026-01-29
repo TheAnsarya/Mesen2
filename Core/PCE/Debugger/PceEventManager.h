@@ -16,8 +16,7 @@ class PceVpc;
 class Debugger;
 class PceMemoryManager;
 
-struct PceEventViewerConfig : public BaseEventViewerConfig
-{
+struct PceEventViewerConfig : public BaseEventViewerConfig {
 	EventViewerCategoryCfg Irq;
 	EventViewerCategoryCfg MarkedBreakpoints;
 
@@ -55,8 +54,7 @@ struct PceEventViewerConfig : public BaseEventViewerConfig
 	bool ShowPreviousFrameEvents;
 };
 
-class PceEventManager final : public BaseEventManager
-{
+class PceEventManager final : public BaseEventManager {
 private:
 	PceEventViewerConfig _config;
 	Emulator* _emu;
@@ -79,12 +77,12 @@ protected:
 	bool ShowPreviousFrameEvents() override;
 
 public:
-	PceEventManager(Debugger *debugger, PceConsole *console);
+	PceEventManager(Debugger* debugger, PceConsole* console);
 	~PceEventManager();
 
-	void AddEvent(DebugEventType type, MemoryOperationInfo &operation, int32_t breakpointId = -1) override;
+	void AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId = -1) override;
 	void AddEvent(DebugEventType type) override;
-	
+
 	EventViewerCategoryCfg GetEventConfig(DebugEventInfo& evt) override;
 
 	uint32_t TakeEventSnapshot(bool forAutoRefresh) override;

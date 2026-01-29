@@ -2,9 +2,8 @@
 #include "pch.h"
 #include "Utilities/Serializer.h"
 
-template<uint8_t rate>
-class SpcTimer
-{
+template <uint8_t rate>
+class SpcTimer {
 private:
 	bool _enabled = false;
 	bool _timersEnabled = true;
@@ -15,52 +14,47 @@ private:
 	uint8_t _stage2 = 0;
 	uint8_t _target = 0;
 
-	void ClockTimer()
-	{
+	void ClockTimer() {
 		uint8_t currentState = _stage1;
-		if(!_timersEnabled) {
-			//All timers are disabled
+		if (!_timersEnabled) {
+			// All timers are disabled
 			currentState = 0;
 		}
 
 		uint8_t prevState = _prevStage1;
 		_prevStage1 = currentState;
-		if(!_enabled || !prevState || currentState) {
-			//Only clock on 1->0 transitions, when the timer is enabled
+		if (!_enabled || !prevState || currentState) {
+			// Only clock on 1->0 transitions, when the timer is enabled
 			return;
 		}
 
-		if(++_stage2 == _target) {
+		if (++_stage2 == _target) {
 			_stage2 = 0;
 			_output++;
 		}
 	}
 
 public:
-	void Reset()
-	{
+	void Reset() {
 		_output = 0;
 	}
 
-	void SetEnabled(bool enabled)
-	{
-		if(!_enabled && enabled) {
+	void SetEnabled(bool enabled) {
+		if (!_enabled && enabled) {
 			_stage2 = 0;
 			_output = 0;
 		}
 		_enabled = enabled;
 	}
 
-	void SetGlobalEnabled(bool enabled)
-	{
+	void SetGlobalEnabled(bool enabled) {
 		_timersEnabled = enabled;
 		ClockTimer();
 	}
 
-	void Run(uint8_t step)
-	{
+	void Run(uint8_t step) {
 		_stage0 += step;
-		if(_stage0 >= rate) {
+		if (_stage0 >= rate) {
 			_stage1 ^= 0x01;
 			_stage0 -= rate;
 
@@ -68,31 +62,33 @@ public:
 		}
 	}
 
-	void SetTarget(uint8_t target)
-	{
+	void SetTarget(uint8_t target) {
 		_target = target;
 	}
 
-	uint8_t DebugRead()
-	{
+	uint8_t DebugRead() {
 		return _output & 0x0F;
 	}
 
-	uint8_t GetOutput()
-	{
+	uint8_t GetOutput() {
 		uint8_t value = _output & 0x0F;
 		_output = 0;
 		return value;
 	}
 
-	void SetOutput(uint8_t value)
-	{
-		//Used when loading SPC files
+	void SetOutput(uint8_t value) {
+		// Used when loading SPC files
 		_output = value;
 	}
 
-	void Serialize(Serializer &s)
-	{
-		SV(_stage0); SV(_stage1); SV(_stage2); SV(_output); SV(_target); SV(_enabled); SV(_timersEnabled); SV(_prevStage1);
+	void Serialize(Serializer& s) {
+		SV(_stage0);
+		SV(_stage1);
+		SV(_stage2);
+		SV(_output);
+		SV(_target);
+		SV(_enabled);
+		SV(_timersEnabled);
+		SV(_prevStage1);
 	}
 };

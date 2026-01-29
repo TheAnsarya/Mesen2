@@ -5,8 +5,7 @@
 
 class WsConsole;
 
-class WsSerial final : public ISerializable
-{
+class WsSerial final : public ISerializable {
 private:
 	WsSerialState _state = {};
 	WsConsole* _console = nullptr;

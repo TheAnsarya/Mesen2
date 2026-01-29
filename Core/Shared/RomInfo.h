@@ -2,10 +2,9 @@
 #include "pch.h"
 #include "Utilities/VirtualFile.h"
 
-enum class RomFormat
-{
+enum class RomFormat {
 	Unknown,
-	
+
 	Sfc,
 	Spc,
 
@@ -34,14 +33,12 @@ enum class RomFormat
 	Ws,
 };
 
-struct DipSwitchInfo
-{
+struct DipSwitchInfo {
 	uint32_t DatabaseId = 0;
 	uint32_t DipSwitchCount = 0;
 };
 
-struct RomInfo
-{
+struct RomInfo {
 	VirtualFile RomFile;
 	VirtualFile PatchFile;
 	RomFormat Format = RomFormat::Unknown;

@@ -20,8 +20,7 @@ class GbaSerial;
 class VirtualFile;
 class BaseControlManager;
 
-class GbaConsole final : public IConsole
-{
+class GbaConsole final : public IConsole {
 public:
 	static constexpr int BootRomSize = 0x4000;
 
@@ -33,7 +32,6 @@ public:
 	static constexpr int ExtWorkRamSize = 0x40000;
 
 private:
-
 	Emulator* _emu = nullptr;
 
 	unique_ptr<GbaCpu> _cpu;
@@ -73,8 +71,8 @@ public:
 	GbaConsole(Emulator* emu);
 	~GbaConsole();
 
-	static vector<string> GetSupportedExtensions() { return { ".gba" }; }
-	static vector<string> GetSupportedSignatures() { return { }; }
+	static vector<string> GetSupportedExtensions() { return {".gba"}; }
+	static vector<string> GetSupportedSignatures() { return {}; }
 
 	void LoadBattery();
 	void SaveBattery() override;

@@ -8,8 +8,7 @@ class Gameboy;
 class GbMemoryManager;
 class GbDmaController;
 
-class GbPpu : public ISerializable
-{
+class GbPpu : public ISerializable {
 private:
 	Emulator* _emu = nullptr;
 	Gameboy* _gameboy = nullptr;
@@ -49,7 +48,7 @@ private:
 	uint8_t _spriteY[10] = {};
 	uint8_t _spriteIndexes[10] = {};
 	uint8_t _oamReadBuffer[2] = {};
-	
+
 	bool _lcdDisabled = true;
 	bool _stopOamBlocked = false;
 	bool _stopVramBlocked = false;
@@ -123,7 +122,7 @@ public:
 	bool IsCgbEnabled();
 	PpuMode GetMode();
 
-	template<bool singleStep>
+	template <bool singleStep>
 	void Exec();
 
 	uint8_t Read(uint16_t addr);
@@ -143,7 +142,7 @@ public:
 	uint8_t PeekOam(uint8_t addr);
 	void WriteOam(uint8_t addr, uint8_t value, bool forDma);
 
-	template<GbOamCorruptionType oamCorruptionType>
+	template <GbOamCorruptionType oamCorruptionType>
 	void ProcessOamCorruption(uint16_t addr);
 
 	void ProcessOamIncDecCorruption(int row);

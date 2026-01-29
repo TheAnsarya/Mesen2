@@ -3,8 +3,7 @@
 #include "Shared/MemoryType.h"
 #include "Shared/BaseState.h"
 
-struct GbCpuState : BaseState
-{
+struct GbCpuState : BaseState {
 	uint64_t CycleCount;
 	uint16_t PC;
 	uint16_t SP;
@@ -17,7 +16,7 @@ struct GbCpuState : BaseState
 	uint8_t C;
 	uint8_t D;
 	uint8_t E;
-	
+
 	uint8_t H;
 	uint8_t L;
 
@@ -27,67 +26,56 @@ struct GbCpuState : BaseState
 	bool Stopped;
 };
 
-namespace GbCpuFlags
-{
-	enum GbCpuFlags
-	{
-		Zero = 0x80,
-		AddSub = 0x40,
-		HalfCarry = 0x20,
-		Carry = 0x10
-	};
-}
+namespace GbCpuFlags {
+enum GbCpuFlags {
+	Zero = 0x80,
+	AddSub = 0x40,
+	HalfCarry = 0x20,
+	Carry = 0x10
+};
+} // namespace GbCpuFlags
 
-namespace GbIrqSource
-{
-	enum GbIrqSource
-	{
-		VerticalBlank = 0x01,
-		LcdStat = 0x02,
-		Timer = 0x04,
-		Serial = 0x08,
-		Joypad = 0x10
-	};
-}
+namespace GbIrqSource {
+enum GbIrqSource {
+	VerticalBlank = 0x01,
+	LcdStat = 0x02,
+	Timer = 0x04,
+	Serial = 0x08,
+	Joypad = 0x10
+};
+} // namespace GbIrqSource
 
-class Register16
-{
+class Register16 {
 	uint8_t* _low;
 	uint8_t* _high;
 
 public:
-	Register16(uint8_t* high, uint8_t* low)
-	{
+	Register16(uint8_t* high, uint8_t* low) {
 		_high = high;
 		_low = low;
 	}
 
-	uint16_t Read()
-	{
+	uint16_t Read() {
 		return (*_high << 8) | *_low;
 	}
 
-	void Write(uint16_t value)
-	{
+	void Write(uint16_t value) {
 		*_high = (uint8_t)(value >> 8);
 		*_low = (uint8_t)value;
 	}
 
-	void Inc()
-	{
+	void Inc() {
 		Write(Read() + 1);
 	}
 
-	void Dec()
-	{
+	void Dec() {
 		Write(Read() - 1);
 	}
 
 	operator uint16_t() { return Read(); }
 };
 
-enum class PpuMode
-{
+enum class PpuMode {
 	HBlank,
 	VBlank,
 	OamEvaluation,
@@ -95,26 +83,22 @@ enum class PpuMode
 	NoIrq,
 };
 
-enum class GbOamCorruptionType
-{
+enum class GbOamCorruptionType {
 	Read,
 	Write,
 	ReadIncDec
 };
 
-namespace GbPpuStatusFlags
-{
-	enum GbPpuStatusFlags
-	{
-		CoincidenceIrq = 0x40,
-		OamIrq = 0x20,
-		VBlankIrq = 0x10,
-		HBlankIrq = 0x08
-	};
-}
+namespace GbPpuStatusFlags {
+enum GbPpuStatusFlags {
+	CoincidenceIrq = 0x40,
+	OamIrq = 0x20,
+	VBlankIrq = 0x10,
+	HBlankIrq = 0x08
+};
+} // namespace GbPpuStatusFlags
 
-enum class EvtColor
-{
+enum class EvtColor {
 	HBlank = 0,
 	VBlank = 1,
 	OamEvaluation = 2,
@@ -123,42 +107,36 @@ enum class EvtColor
 	RenderingOamLoad = 5,
 };
 
-enum class GbPixelType : uint8_t
-{
+enum class GbPixelType : uint8_t {
 	Background,
 	Object
 };
 
-struct GbFifoEntry
-{
+struct GbFifoEntry {
 	uint8_t Color;
 	uint8_t Attributes;
 	uint8_t Index;
 };
 
-struct GbPpuFifo
-{
+struct GbPpuFifo {
 	uint8_t Position = 0;
 	uint8_t Size = 0;
 	GbFifoEntry Content[8] = {};
 
-	void Reset()
-	{
+	void Reset() {
 		Size = 0;
 		Position = 0;
 		memset(Content, 0, sizeof(Content));
 	}
 
-	void Pop()
-	{
+	void Pop() {
 		Content[Position].Color = 0;
 		Position = (Position + 1) & 0x07;
 		Size--;
 	}
 };
 
-struct GbPpuFetcher
-{
+struct GbPpuFetcher {
 	uint16_t Addr = 0;
 	uint8_t Attributes = 0;
 	uint8_t Step = 0;
@@ -166,15 +144,14 @@ struct GbPpuFetcher
 	uint8_t HighByte = 0;
 };
 
-struct GbPpuState : public BaseState
-{
+struct GbPpuState : public BaseState {
 	uint8_t Scanline;
 	uint16_t Cycle;
 	uint16_t IdleCycles;
 	PpuMode Mode;
 	PpuMode IrqMode;
 	bool StatIrqFlag;
-	
+
 	uint8_t Ly;
 	int16_t LyForCompare;
 
@@ -203,18 +180,17 @@ struct GbPpuState : public BaseState
 
 	bool CgbEnabled;
 	uint8_t CgbVramBank;
-	
+
 	uint8_t CgbBgPalPosition;
 	bool CgbBgPalAutoInc;
 	uint16_t CgbBgPalettes[4 * 8];
-	
+
 	uint8_t CgbObjPalPosition;
 	bool CgbObjPalAutoInc;
 	uint16_t CgbObjPalettes[4 * 8];
 };
 
-struct GbDmaControllerState
-{
+struct GbDmaControllerState {
 	uint8_t OamDmaSource;
 	uint8_t DmaStartDelay;
 	uint8_t InternalDest;
@@ -230,12 +206,11 @@ struct GbDmaControllerState
 	bool CgbHdmaTrigger;
 };
 
-struct GbTimerState
-{
+struct GbTimerState {
 	uint16_t Divider;
 
-	bool NeedReload; //Set after TIMA (_counter) overflowed, next cycle will reload TMA into TIMA
-	bool Reloaded; //Set during the cycle on which TIMA is reloaded (affects TMA/TIMA writes)
+	bool NeedReload; // Set after TIMA (_counter) overflowed, next cycle will reload TMA into TIMA
+	bool Reloaded;   // Set during the cycle on which TIMA is reloaded (affects TMA/TIMA writes)
 	uint8_t Counter;
 	uint8_t Modulo;
 
@@ -244,8 +219,7 @@ struct GbTimerState
 	uint16_t TimerDivider;
 };
 
-struct GbSquareState
-{
+struct GbSquareState {
 	uint16_t Frequency;
 	uint16_t Timer;
 
@@ -277,8 +251,7 @@ struct GbSquareState
 	uint8_t Output;
 };
 
-struct GbNoiseState
-{
+struct GbNoiseState {
 	uint8_t Volume;
 	uint8_t EnvVolume;
 	bool EnvRaiseVolume;
@@ -300,8 +273,7 @@ struct GbNoiseState
 	uint8_t Output;
 };
 
-struct GbWaveState
-{
+struct GbWaveState {
 	bool DacEnabled;
 
 	uint8_t SampleBuffer;
@@ -319,8 +291,7 @@ struct GbWaveState
 	uint8_t Output;
 };
 
-struct GbApuState
-{
+struct GbApuState {
 	bool ApuEnabled;
 
 	uint8_t EnableLeftSq1;
@@ -342,8 +313,7 @@ struct GbApuState
 	uint8_t FrameSequenceStep;
 };
 
-struct GbApuDebugState
-{
+struct GbApuDebugState {
 	GbApuState Common;
 	GbSquareState Square1;
 	GbSquareState Square2;
@@ -351,16 +321,14 @@ struct GbApuDebugState
 	GbNoiseState Noise;
 };
 
-enum class RegisterAccess
-{
+enum class RegisterAccess {
 	None = 0,
 	Read = 1,
 	Write = 2,
 	ReadWrite = 3
 };
 
-enum class GbMemoryType
-{
+enum class GbMemoryType {
 	None = 0,
 	PrgRom = (int)MemoryType::GbPrgRom,
 	WorkRam = (int)MemoryType::GbWorkRam,
@@ -368,10 +336,9 @@ enum class GbMemoryType
 	BootRom = (int)MemoryType::GbBootRom,
 };
 
-struct GbMemoryManagerState
-{
+struct GbMemoryManagerState {
 	uint64_t ApuCycleCount;
-	
+
 	uint8_t CgbWorkRamBank;
 	bool CgbSwitchSpeedRequest;
 	bool CgbHighSpeed;
@@ -399,22 +366,19 @@ struct GbMemoryManagerState
 	RegisterAccess MemoryAccessType[0x100];
 };
 
-struct GbControlManagerState
-{
+struct GbControlManagerState {
 	uint8_t InputSelect;
 };
 
-enum class GbType
-{
+enum class GbType {
 	Gb = 0,
 	Cgb = 1,
 };
 
-struct GbState
-{
+struct GbState {
 	GbType Type;
 	GbCpuState Cpu;
-	GbPpuState Ppu;	
+	GbPpuState Ppu;
 	GbApuDebugState Apu;
 	GbMemoryManagerState MemoryManager;
 	GbTimerState Timer;

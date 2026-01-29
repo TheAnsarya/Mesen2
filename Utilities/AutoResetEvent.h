@@ -1,11 +1,10 @@
-#pragma once 
+#pragma once
 #include "pch.h"
 
 #include <condition_variable>
 #include <mutex>
 
-class AutoResetEvent
-{
+class AutoResetEvent {
 private:
 	std::condition_variable _signal;
 	std::mutex _mutex;

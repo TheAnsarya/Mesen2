@@ -13,8 +13,7 @@ class CheatManager;
 class Emulator;
 class NesConsole;
 
-class NesMemoryManager : public ISerializable
-{
+class NesMemoryManager : public ISerializable {
 private:
 	static constexpr int CpuMemorySize = 0x10000;
 	static const int NesInternalRamSize = 0x800;

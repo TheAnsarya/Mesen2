@@ -13,8 +13,7 @@ class Gsu;
 class Cx4;
 class Gameboy;
 
-struct AddressCounters
-{
+struct AddressCounters {
 	uint64_t ReadStamp;
 	uint64_t WriteStamp;
 	uint64_t ExecStamp;
@@ -23,15 +22,13 @@ struct AddressCounters
 	uint32_t ExecCounter;
 };
 
-enum class ReadResult
-{
+enum class ReadResult {
 	Normal,
 	FirstUninitRead,
 	UninitRead
 };
 
-class MemoryAccessCounter
-{
+class MemoryAccessCounter {
 private:
 	vector<AddressCounters> _counters[DebugUtilities::GetMemoryTypeCount()];
 
@@ -39,11 +36,14 @@ private:
 	bool _enableBreakOnUninitRead = false;
 
 public:
-	MemoryAccessCounter(Debugger *debugger);
+	MemoryAccessCounter(Debugger* debugger);
 
-	template<uint8_t accessWidth = 1> ReadResult ProcessMemoryRead(AddressInfo& addressInfo, uint64_t masterClock);
-	template<uint8_t accessWidth = 1> void ProcessMemoryWrite(AddressInfo& addressInfo, uint64_t masterClock);
-	template<uint8_t accessWidth = 1> void ProcessMemoryExec(AddressInfo& addressInfo, uint64_t masterClock);
+	template <uint8_t accessWidth = 1>
+	ReadResult ProcessMemoryRead(AddressInfo& addressInfo, uint64_t masterClock);
+	template <uint8_t accessWidth = 1>
+	void ProcessMemoryWrite(AddressInfo& addressInfo, uint64_t masterClock);
+	template <uint8_t accessWidth = 1>
+	void ProcessMemoryExec(AddressInfo& addressInfo, uint64_t masterClock);
 
 	void ResetCounts();
 

@@ -2,32 +2,41 @@
 #include "pch.h"
 #include "Shared/BaseState.h"
 
-namespace PSFlags
-{
-	enum PSFlags : uint8_t
-	{
-		Carry = 0x01,
-		Zero = 0x02,
-		Interrupt = 0x04,
-		Decimal = 0x08,
-		Break = 0x10,
-		Reserved = 0x20,
-		Overflow = 0x40,
-		Negative = 0x80
-	};
-}
+namespace PSFlags {
+enum PSFlags : uint8_t {
+	Carry = 0x01,
+	Zero = 0x02,
+	Interrupt = 0x04,
+	Decimal = 0x08,
+	Break = 0x10,
+	Reserved = 0x20,
+	Overflow = 0x40,
+	Negative = 0x80
+};
+} // namespace PSFlags
 
-enum class NesAddrMode
-{
-	None, Acc, Imp, Imm, Rel,
-	Zero, Abs, ZeroX, ZeroY,
-	Ind, IndX, IndY, IndYW,
-	AbsX, AbsXW, AbsY, AbsYW,
+enum class NesAddrMode {
+	None,
+	Acc,
+	Imp,
+	Imm,
+	Rel,
+	Zero,
+	Abs,
+	ZeroX,
+	ZeroY,
+	Ind,
+	IndX,
+	IndY,
+	IndYW,
+	AbsX,
+	AbsXW,
+	AbsY,
+	AbsYW,
 	Other
 };
 
-enum class IRQSource
-{
+enum class IRQSource {
 	External = 1,
 	FrameCounter = 2,
 	DMC = 4,
@@ -35,15 +44,13 @@ enum class IRQSource
 	Epsm = 16
 };
 
-enum class MemoryOperation
-{
+enum class MemoryOperation {
 	Read = 1,
 	Write = 2,
 	Any = 3
 };
 
-struct NesCpuState : BaseState
-{
+struct NesCpuState : BaseState {
 	uint64_t CycleCount = 0;
 	uint16_t PC = 0;
 	uint8_t SP = 0;
@@ -55,16 +62,14 @@ struct NesCpuState : BaseState
 	bool NmiFlag = false;
 };
 
-enum class PrgMemoryType
-{
+enum class PrgMemoryType {
 	PrgRom,
 	SaveRam,
 	WorkRam,
 	MapperRam,
 };
 
-enum class ChrMemoryType
-{
+enum class ChrMemoryType {
 	Default,
 	ChrRom,
 	ChrRam,
@@ -72,8 +77,7 @@ enum class ChrMemoryType
 	MapperRam,
 };
 
-enum MemoryAccessType
-{
+enum MemoryAccessType {
 	Unspecified = -1,
 	NoAccess = 0x00,
 	Read = 0x01,
@@ -81,8 +85,7 @@ enum MemoryAccessType
 	ReadWrite = 0x03
 };
 
-enum class MirroringType
-{
+enum class MirroringType {
 	Horizontal,
 	Vertical,
 	ScreenAOnly,
@@ -90,8 +93,7 @@ enum class MirroringType
 	FourScreens
 };
 
-enum class MapperStateValueType
-{
+enum class MapperStateValueType {
 	None,
 	String,
 	Bool,
@@ -100,10 +102,9 @@ enum class MapperStateValueType
 	Number32
 };
 
-struct MapperStateEntry
-{
+struct MapperStateEntry {
 	static constexpr int MaxLength = 40;
-	
+
 	int64_t RawValue = INT64_MIN;
 	MapperStateValueType Type = MapperStateValueType::Number8;
 	uint8_t Address[MapperStateEntry::MaxLength] = {};
@@ -112,29 +113,25 @@ struct MapperStateEntry
 
 	MapperStateEntry() {}
 
-	MapperStateEntry(string address, string name)
-	{
+	MapperStateEntry(string address, string name) {
 		memcpy(Address, address.c_str(), std::min<size_t>(MapperStateEntry::MaxLength - 1, address.size()));
 		memcpy(Name, name.c_str(), std::min<size_t>(MapperStateEntry::MaxLength - 1, name.size()));
 		Type = MapperStateValueType::None;
 	}
 
-	MapperStateEntry(string address, string name, string value, int64_t rawValue = INT64_MIN) : MapperStateEntry(address, name)
-	{
+	MapperStateEntry(string address, string name, string value, int64_t rawValue = INT64_MIN) : MapperStateEntry(address, name) {
 		memcpy(Value, value.c_str(), std::min<size_t>(MapperStateEntry::MaxLength - 1, value.size()));
 		RawValue = rawValue;
 		Type = MapperStateValueType::String;
 	}
 
-	MapperStateEntry(string address, string name, bool value) : MapperStateEntry(address, name)
-	{
+	MapperStateEntry(string address, string name, bool value) : MapperStateEntry(address, name) {
 		Value[0] = value;
 		Type = MapperStateValueType::Bool;
 	}
 
-	MapperStateEntry(string address, string name, int64_t value, MapperStateValueType length) : MapperStateEntry(address, name)
-	{
-		for(int i = 0; i < 8; i++) {
+	MapperStateEntry(string address, string name, int64_t value, MapperStateValueType length) : MapperStateEntry(address, name) {
+		for (int i = 0; i < 8; i++) {
 			Value[i] = value & 0xFF;
 			value >>= 8;
 		}
@@ -142,8 +139,7 @@ struct MapperStateEntry
 	}
 };
 
-struct CartridgeState
-{
+struct CartridgeState {
 	uint32_t PrgRomSize = 0;
 	uint32_t ChrRomSize = 0;
 	uint32_t ChrRamSize = 0;
@@ -171,15 +167,13 @@ struct CartridgeState
 	MapperStateEntry CustomEntries[200] = {};
 };
 
-struct PPUStatusFlags
-{
+struct PPUStatusFlags {
 	bool SpriteOverflow;
 	bool Sprite0Hit;
 	bool VerticalBlank;
 };
 
-struct PpuControlFlags
-{
+struct PpuControlFlags {
 	uint16_t BackgroundPatternAddr;
 	uint16_t SpritePatternAddr;
 	bool VerticalWrite;
@@ -188,8 +182,7 @@ struct PpuControlFlags
 	bool NmiOnVerticalBlank;
 };
 
-struct PpuMaskFlags
-{
+struct PpuMaskFlags {
 	bool Grayscale;
 	bool BackgroundMask;
 	bool SpriteMask;
@@ -200,16 +193,14 @@ struct PpuMaskFlags
 	bool IntensifyBlue;
 };
 
-struct TileInfo
-{
+struct TileInfo {
 	uint16_t TileAddr;
 	uint8_t LowByte;
 	uint8_t HighByte;
 	uint8_t PaletteOffset;
 };
 
-struct NesSpriteInfo
-{
+struct NesSpriteInfo {
 	bool HorizontalMirror;
 	bool BackgroundPriority;
 	uint8_t SpriteX;
@@ -218,8 +209,7 @@ struct NesSpriteInfo
 	uint8_t PaletteOffset;
 };
 
-struct NesPpuState : public BaseState
-{
+struct NesPpuState : public BaseState {
 	PPUStatusFlags StatusFlags;
 	PpuMaskFlags Mask;
 	PpuControlFlags Control;
@@ -232,7 +222,7 @@ struct NesPpuState : public BaseState
 	uint32_t SafeOamScanline;
 	uint16_t BusAddress;
 	uint8_t MemoryReadBuffer;
-	
+
 	uint16_t VideoRamAddr;
 	uint16_t TmpVideoRamAddr;
 	uint8_t ScrollX;
@@ -240,15 +230,13 @@ struct NesPpuState : public BaseState
 	uint8_t SpriteRamAddr;
 };
 
-struct ApuLengthCounterState
-{
+struct ApuLengthCounterState {
 	bool Halt;
 	uint8_t Counter;
 	uint8_t ReloadValue;
 };
 
-struct ApuEnvelopeState
-{
+struct ApuEnvelopeState {
 	bool StartFlag;
 	bool Loop;
 	bool ConstantVolume;
@@ -257,8 +245,7 @@ struct ApuEnvelopeState
 	uint8_t Volume;
 };
 
-struct ApuSquareState
-{
+struct ApuSquareState {
 	uint8_t Duty;
 	uint8_t DutyPosition;
 	uint16_t Period;
@@ -277,8 +264,7 @@ struct ApuSquareState
 	ApuEnvelopeState Envelope;
 };
 
-struct ApuTriangleState
-{
+struct ApuTriangleState {
 	uint16_t Period;
 	uint16_t Timer;
 	uint8_t SequencePosition;
@@ -294,8 +280,7 @@ struct ApuTriangleState
 	ApuLengthCounterState LengthCounter;
 };
 
-struct ApuNoiseState
-{
+struct ApuNoiseState {
 	uint16_t Period;
 	uint16_t Timer;
 	uint16_t ShiftRegister;
@@ -309,8 +294,7 @@ struct ApuNoiseState
 	ApuEnvelopeState Envelope;
 };
 
-struct ApuDmcState
-{
+struct ApuDmcState {
 	double SampleRate;
 	uint16_t SampleAddr;
 	uint16_t NextSampleAddr;
@@ -325,15 +309,13 @@ struct ApuDmcState
 	uint8_t OutputVolume;
 };
 
-struct ApuFrameCounterState
-{
+struct ApuFrameCounterState {
 	bool FiveStepMode;
 	uint8_t SequencePosition;
 	bool IrqEnabled;
 };
 
-struct ApuState
-{
+struct ApuState {
 	ApuSquareState Square1;
 	ApuSquareState Square2;
 	ApuTriangleState Triangle;
@@ -342,8 +324,7 @@ struct ApuState
 	ApuFrameCounterState FrameCounter;
 };
 
-enum class GameSystem
-{
+enum class GameSystem {
 	NesNtsc,
 	NesPal,
 	Famicom,
@@ -355,22 +336,19 @@ enum class GameSystem
 	Unknown,
 };
 
-enum class BusConflictType
-{
+enum class BusConflictType {
 	Default = 0,
 	Yes,
 	No
 };
 
-struct HashInfo
-{
+struct HashInfo {
 	uint32_t Crc32 = 0;
 	uint32_t PrgCrc32 = 0;
 	uint32_t PrgChrCrc32 = 0;
 };
 
-enum class VsSystemType
-{
+enum class VsSystemType {
 	Default = 0,
 	RbiBaseballProtection = 1,
 	TkoBoxingProtection = 2,
@@ -380,8 +358,7 @@ enum class VsSystemType
 	RaidOnBungelingBayProtection = 6,
 };
 
-enum class GameInputType
-{
+enum class GameInputType {
 	Unspecified = 0,
 	StandardControllers = 1,
 	FourScore = 2,
@@ -407,32 +384,31 @@ enum class GameInputType
 	PartyTap = 0x16,
 	OekaKidsTablet = 0x17,
 	BarcodeBattler = 0x18,
-	MiraclePiano = 0x19, //not supported yet
-	PokkunMoguraa = 0x1A, //not supported yet
-	TopRider = 0x1B, //not supported yet
-	DoubleFisted = 0x1C, //not supported yet
-	Famicom3dSystem = 0x1D, //not supported yet
-	DoremikkoKeyboard = 0x1E, //not supported yet
-	ROB = 0x1F, //not supported yet
+	MiraclePiano = 0x19,      // not supported yet
+	PokkunMoguraa = 0x1A,     // not supported yet
+	TopRider = 0x1B,          // not supported yet
+	DoubleFisted = 0x1C,      // not supported yet
+	Famicom3dSystem = 0x1D,   // not supported yet
+	DoremikkoKeyboard = 0x1E, // not supported yet
+	ROB = 0x1F,               // not supported yet
 	FamicomDataRecorder = 0x20,
 	TurboFile = 0x21,
 	BattleBox = 0x22,
 	FamilyBasicKeyboard = 0x23,
-	Pec586Keyboard = 0x24, //not supported yet
-	Bit79Keyboard = 0x25, //not supported yet
+	Pec586Keyboard = 0x24, // not supported yet
+	Bit79Keyboard = 0x25,  // not supported yet
 	SuborKeyboard = 0x26,
 	SuborKeyboardMouse1 = 0x27,
 	SuborKeyboardMouse2 = 0x28,
 	SnesMouse = 0x29,
-	GenericMulticart = 0x2A, //not supported yet
+	GenericMulticart = 0x2A, // not supported yet
 	SnesControllers = 0x2B,
-	RacermateBicycle = 0x2C, //not supported yet
-	UForce = 0x2D, //not supported yet
+	RacermateBicycle = 0x2C, // not supported yet
+	UForce = 0x2D,           // not supported yet
 	LastEntry
 };
 
-enum class PpuModel
-{
+enum class PpuModel {
 	Ppu2C02 = 0,
 	Ppu2C03 = 1,
 	Ppu2C04A = 2,
@@ -446,8 +422,7 @@ enum class PpuModel
 	Ppu2C05E = 10
 };
 
-enum class AudioChannel
-{
+enum class AudioChannel {
 	Square1 = 0,
 	Square2 = 1,
 	Triangle = 2,
@@ -461,8 +436,7 @@ enum class AudioChannel
 	Sunsoft5B = 10
 };
 
-struct NesState
-{
+struct NesState {
 	NesCpuState Cpu;
 	NesPpuState Ppu;
 	CartridgeState Cartridge;

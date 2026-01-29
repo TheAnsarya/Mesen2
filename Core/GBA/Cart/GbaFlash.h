@@ -4,17 +4,15 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Serializer.h"
 
-class GbaFlash final : public ISerializable
-{
+class GbaFlash final : public ISerializable {
 private:
-	enum class ChipMode
-	{
+	enum class ChipMode {
 		WaitingForCommand,
 		Write,
 		Erase,
 		SetMemoryBank
 	};
-	
+
 	Emulator* _emu = nullptr;
 
 	ChipMode _mode = ChipMode::WaitingForCommand;
@@ -28,23 +26,20 @@ private:
 	bool _allowBanking = false;
 
 public:
-	GbaFlash(Emulator* emu, uint8_t* saveRam, uint32_t saveRamSize)
-	{
+	GbaFlash(Emulator* emu, uint8_t* saveRam, uint32_t saveRamSize) {
 		_emu = emu;
 		_saveRam = saveRam;
 		_saveRamSize = saveRamSize;
 		_allowBanking = saveRamSize >= 0x20000;
 	}
 
-	uint32_t GetSelectedBank()
-	{
+	uint32_t GetSelectedBank() {
 		return _selectedBank;
 	}
 
-	uint8_t Read(uint32_t addr)
-	{
-		if(_softwareId && (addr & 0x03) < 2) {
-			if(addr & 0x01) {
+	uint8_t Read(uint32_t addr) {
+		if (_softwareId && (addr & 0x03) < 2) {
+			if (addr & 0x01) {
 				return _saveRamSize == 0x10000 ? 0x1B : 0x13;
 			} else {
 				return _saveRamSize == 0x10000 ? 0x32 : 0x62;
@@ -54,38 +49,36 @@ public:
 		return _saveRam[_selectedBank | (addr & 0xFFFF)];
 	}
 
-	void ResetState()
-	{
+	void ResetState() {
 		_mode = ChipMode::WaitingForCommand;
 		_cycle = 0;
 	}
 
-	void Write(uint32_t addr, uint8_t value)
-	{
+	void Write(uint32_t addr, uint8_t value) {
 		uint16_t cmd = addr & 0xFFFF;
-		if(_mode == ChipMode::SetMemoryBank) {
-			if(cmd == 0) {
+		if (_mode == ChipMode::SetMemoryBank) {
+			if (cmd == 0) {
 				_selectedBank = (value & 0x01) << 16;
 			}
 			ResetState();
 		}
-		if(_mode == ChipMode::WaitingForCommand) {
-			if(_cycle == 0) {
-				if(cmd == 0x5555 && value == 0xAA) {
-					//1st write, $5555 = $AA
+		if (_mode == ChipMode::WaitingForCommand) {
+			if (_cycle == 0) {
+				if (cmd == 0x5555 && value == 0xAA) {
+					// 1st write, $5555 = $AA
 					_cycle++;
-				} else if(value == 0xF0) {
-					//Software ID exit
+				} else if (value == 0xF0) {
+					// Software ID exit
 					ResetState();
 					_softwareId = false;
 				}
-			} else if(_cycle == 1 && cmd == 0x2AAA && value == 0x55) {
-				//2nd write, $2AAA = $55
+			} else if (_cycle == 1 && cmd == 0x2AAA && value == 0x55) {
+				// 2nd write, $2AAA = $55
 				_cycle++;
-			} else if(_cycle == 2 && cmd == 0x5555) {
-				//3rd write, determines command type
+			} else if (_cycle == 2 && cmd == 0x5555) {
+				// 3rd write, determines command type
 				_cycle++;
-				switch(value) {
+				switch (value) {
 					case 0x80:
 						_emu->DebugLog("[Flash] 0x80 - Enter erase mode");
 						_mode = ChipMode::Erase;
@@ -93,7 +86,8 @@ public:
 
 					case 0x90:
 						_emu->DebugLog("[Flash] 0x90 - Enter software ID mode");
-						ResetState();  _softwareId = true;
+						ResetState();
+						_softwareId = true;
 						break;
 
 					case 0xA0:
@@ -102,7 +96,7 @@ public:
 						break;
 
 					case 0xB0:
-						if(_allowBanking) {
+						if (_allowBanking) {
 							//_emu->DebugLog("[Flash] 0xB0 - Set memory bank");
 							_mode = ChipMode::SetMemoryBank;
 						}
@@ -121,35 +115,35 @@ public:
 			} else {
 				_cycle = 0;
 			}
-		} else if(_mode == ChipMode::Write) {
-			//Write a single byte
+		} else if (_mode == ChipMode::Write) {
+			// Write a single byte
 			_saveRam[_selectedBank | (addr & 0xFFFF)] &= value;
 			ResetState();
-		} else if(_mode == ChipMode::Erase) {
-			if(_cycle == 3) {
-				//4th write for erase command, $5555 = $AA
-				if(cmd == 0x5555 && value == 0xAA) {
+		} else if (_mode == ChipMode::Erase) {
+			if (_cycle == 3) {
+				// 4th write for erase command, $5555 = $AA
+				if (cmd == 0x5555 && value == 0xAA) {
 					_cycle++;
 				} else {
 					ResetState();
 				}
-			} else if(_cycle == 4) {
-				//5th write for erase command, $2AAA = $55
-				if(cmd == 0x2AAA && value == 0x55) {
+			} else if (_cycle == 4) {
+				// 5th write for erase command, $2AAA = $55
+				if (cmd == 0x2AAA && value == 0x55) {
 					_cycle++;
 				} else {
 					ResetState();
 				}
-			} else if(_cycle == 5) {
-				if(cmd == 0x5555 && value == 0x10) {
-					//Chip erase
+			} else if (_cycle == 5) {
+				if (cmd == 0x5555 && value == 0x10) {
+					// Chip erase
 					_emu->DebugLog("[Flash] Chip erase");
 					memset(_saveRam, 0xFF, _saveRamSize);
-				} else if(value == 0x30) {
-					//Sector erase
+				} else if (value == 0x30) {
+					// Sector erase
 					uint32_t offset = _selectedBank | (addr & 0xF000);
 					_emu->DebugLog("[Flash] Sector erase: " + HexUtilities::ToHex(offset));
-					if(offset + 0x1000 <= _saveRamSize) {
+					if (offset + 0x1000 <= _saveRamSize) {
 						memset(_saveRam + offset, 0xFF, 0x1000);
 					}
 				}
@@ -158,8 +152,7 @@ public:
 		}
 	}
 
-	void Serialize(Serializer& s)
-	{
+	void Serialize(Serializer& s) {
 		SV(_mode);
 		SV(_cycle);
 		SV(_softwareId);

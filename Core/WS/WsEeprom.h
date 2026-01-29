@@ -6,8 +6,7 @@
 class WsConsole;
 class Emulator;
 
-enum class WsEepromCommand
-{
+enum class WsEepromCommand {
 	Read,
 	Write,
 	Erase,
@@ -18,8 +17,7 @@ enum class WsEepromCommand
 	Unknown
 };
 
-class WsEeprom final : public ISerializable
-{
+class WsEeprom final : public ISerializable {
 private:
 	WsEepromState _state = {};
 	WsConsole* _console = nullptr;

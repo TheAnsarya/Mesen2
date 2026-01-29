@@ -8,8 +8,7 @@ class GameClientConnection;
 class ClientConnectionData;
 class Emulator;
 
-class GameClient : public INotificationListener, public std::enable_shared_from_this<GameClient>
-{
+class GameClient : public INotificationListener, public std::enable_shared_from_this<GameClient> {
 private:
 	Emulator* _emu;
 	unique_ptr<thread> _clientThread;
@@ -25,7 +24,7 @@ public:
 	virtual ~GameClient();
 
 	bool Connected();
-	void Connect(ClientConnectionData &connectionData);
+	void Connect(ClientConnectionData& connectionData);
 	void Disconnect();
 
 	void SelectController(NetplayControllerInfo controller);

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "pch.h"
 #include "Shared/BaseControlDevice.h"
@@ -12,16 +12,14 @@
 #include "Utilities/Serializer.h"
 #include "Utilities/StringUtilities.h"
 
-template<int HubPortCount>
-class ControllerHub : public BaseControlDevice, public IControllerHub
-{
+template <int HubPortCount>
+class ControllerHub : public BaseControlDevice, public IControllerHub {
 protected:
 	shared_ptr<BaseControlDevice> _ports[HubPortCount];
 
-	void InternalSetStateFromInput() override
-	{
-		for(int i = 0; i < HubPortCount; i++) {
-			if(_ports[i]) {
+	void InternalSetStateFromInput() override {
+		for (int i = 0; i < HubPortCount; i++) {
+			if (_ports[i]) {
 				_ports[i]->SetStateFromInput();
 			}
 		}
@@ -29,10 +27,9 @@ protected:
 		UpdateStateFromPorts();
 	}
 
-	void UpdateStateFromPorts()
-	{
-		for(int i = 0; i < HubPortCount; i++) {
-			if(_ports[i]) {
+	void UpdateStateFromPorts() {
+		for (int i = 0; i < HubPortCount; i++) {
+			if (_ports[i]) {
 				ControlDeviceState portState = _ports[i]->GetRawState();
 				_state.State.push_back((uint8_t)portState.State.size());
 				_state.State.insert(_state.State.end(), portState.State.begin(), portState.State.end());
@@ -40,29 +37,26 @@ protected:
 		}
 	}
 
-	uint8_t ReadPort(int i)
-	{
-		if(_ports[i]) {
+	uint8_t ReadPort(int i) {
+		if (_ports[i]) {
 			return _ports[i]->ReadRam(0x4016);
 		} else {
 			return 0;
 		}
 	}
 
-	void WritePort(int i, uint8_t value)
-	{
-		if(_ports[i]) {
+	void WritePort(int i, uint8_t value) {
+		if (_ports[i]) {
 			_ports[i]->WriteRam(0x4016, value);
 		}
 	}
 
 public:
-	ControllerHub(Emulator* emu, ControllerType type, int port, ControllerConfig controllers[]) : BaseControlDevice(emu, type, port)
-	{
+	ControllerHub(Emulator* emu, ControllerType type, int port, ControllerConfig controllers[]) : BaseControlDevice(emu, type, port) {
 		static_assert(HubPortCount <= MaxSubPorts, "Port count too large");
 
-		for(int i = 0; i < HubPortCount; i++) {
-			switch(controllers[i].Type) {
+		for (int i = 0; i < HubPortCount; i++) {
+			switch (controllers[i].Type) {
 				case ControllerType::FamicomController:
 				case ControllerType::FamicomControllerP2:
 				case ControllerType::NesController:
@@ -88,20 +82,18 @@ public:
 		}
 	}
 
-	void WriteRam(uint16_t addr, uint8_t value) override
-	{
+	void WriteRam(uint16_t addr, uint8_t value) override {
 		StrobeProcessWrite(value);
-		for(int i = 0; i < HubPortCount; i++) {
-			if(_ports[i]) {
+		for (int i = 0; i < HubPortCount; i++) {
+			if (_ports[i]) {
 				_ports[i]->WriteRam(addr, value);
 			}
 		}
 	}
 
-	void DrawController(InputHud& hud) override
-	{
-		for(int i = 0; i < HubPortCount; i++) {
-			if(_ports[i]) {
+	void DrawController(InputHud& hud) override {
+		for (int i = 0; i < HubPortCount; i++) {
+			if (_ports[i]) {
 				_ports[i]->DrawController(hud);
 			} else {
 				hud.EndDrawController();
@@ -109,12 +101,11 @@ public:
 		}
 	}
 
-	void SetTextState(string state) override
-	{
+	void SetTextState(string state) override {
 		vector<string> portStates = StringUtilities::Split(state, ':');
 		int i = 0;
-		for(string& portState : portStates) {
-			if(_ports[i]) {
+		for (string& portState : portStates) {
+			if (_ports[i]) {
 				_ports[i]->SetTextState(portState);
 			}
 			i++;
@@ -123,16 +114,15 @@ public:
 		UpdateStateFromPorts();
 	}
 
-	string GetTextState() override
-	{
+	string GetTextState() override {
 		auto lock = _stateLock.AcquireSafe();
 
 		string state;
-		for(int i = 0; i < HubPortCount; i++) {
-			if(i != 0) {
+		for (int i = 0; i < HubPortCount; i++) {
+			if (i != 0) {
 				state += ":";
 			}
-			if(_ports[i]) {
+			if (_ports[i]) {
 				state += _ports[i]->GetTextState();
 			}
 		}
@@ -140,19 +130,18 @@ public:
 		return state;
 	}
 
-	void SetRawState(ControlDeviceState state) override
-	{
+	void SetRawState(ControlDeviceState state) override {
 		auto lock = _stateLock.AcquireSafe();
 		_state = state;
 
 		vector<uint8_t> data = state.State;
 		int pos = 0;
 
-		for(int i = 0; i < HubPortCount; i++) {
-			if(_ports[i] && pos < data.size()) {
+		for (int i = 0; i < HubPortCount; i++) {
+			if (_ports[i] && pos < data.size()) {
 				int length = data[pos++];
 
-				if(pos + length > data.size()) {
+				if (pos + length > data.size()) {
 					break;
 				}
 
@@ -164,14 +153,13 @@ public:
 		}
 	}
 
-	bool HasControllerType(ControllerType type) override
-	{
-		if(_type == type) {
+	bool HasControllerType(ControllerType type) override {
+		if (_type == type) {
 			return true;
 		}
 
-		for(int i = 0; i < HubPortCount; i++) {
-			if(_ports[i] && _ports[i]->HasControllerType(type)) {
+		for (int i = 0; i < HubPortCount; i++) {
+			if (_ports[i] && _ports[i]->HasControllerType(type)) {
 				return true;
 			}
 		}
@@ -179,21 +167,18 @@ public:
 		return false;
 	}
 
-	void RefreshHubState() override
-	{
-		//Used when the connected devices are updated by code (e.g by the debugger)
+	void RefreshHubState() override {
+		// Used when the connected devices are updated by code (e.g by the debugger)
 		_state.State.clear();
 		UpdateStateFromPorts();
 	}
 
-	int GetHubPortCount() override
-	{
+	int GetHubPortCount() override {
 		return HubPortCount;
 	}
 
-	shared_ptr<BaseControlDevice> GetController(int index) override
-	{
-		if(index >= HubPortCount) {
+	shared_ptr<BaseControlDevice> GetController(int index) override {
+		if (index >= HubPortCount) {
 			return nullptr;
 		}
 

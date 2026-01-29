@@ -13,8 +13,7 @@
 
 class Emulator;
 
-class GameClientConnection final : public GameConnection, public INotificationListener, public IInputProvider
-{
+class GameClientConnection final : public GameConnection, public INotificationListener, public IInputProvider {
 private:
 	std::deque<ControlDeviceState> _inputData[BaseControlDevice::PortCount];
 	atomic<uint32_t> _inputSize[BaseControlDevice::PortCount];
@@ -30,7 +29,7 @@ private:
 	atomic<ControllerType> _controllerType;
 	ControlDeviceState _lastInputSent = {};
 	bool _gameLoaded = false;
-	NetplayControllerInfo _controllerPort = { GameConnection::SpectatorPort, 0 };
+	NetplayControllerInfo _controllerPort = {GameConnection::SpectatorPort, 0};
 	ClientConnectionData _connectionData = {};
 	string _serverSalt;
 
@@ -46,14 +45,14 @@ protected:
 	void ProcessMessage(NetMessage* message) override;
 
 public:
-	GameClientConnection(Emulator* emu, unique_ptr<Socket> socket, ClientConnectionData &connectionData);
+	GameClientConnection(Emulator* emu, unique_ptr<Socket> socket, ClientConnectionData& connectionData);
 	virtual ~GameClientConnection();
 
 	void Shutdown();
 
 	void ProcessNotification(ConsoleNotificationType type, void* parameter) override;
 
-	bool SetInput(BaseControlDevice *device) override;
+	bool SetInput(BaseControlDevice* device) override;
 	void InitControlDevice();
 	void SendInput();
 

@@ -2,8 +2,7 @@
 #include "pch.h"
 #include "Shared/BaseState.h"
 
-struct Cx4Dma
-{
+struct Cx4Dma {
 	uint32_t Source;
 	uint32_t Dest;
 	uint16_t Length;
@@ -11,14 +10,12 @@ struct Cx4Dma
 	bool Enabled;
 };
 
-struct Cx4Suspend
-{
+struct Cx4Suspend {
 	uint32_t Duration;
 	bool Enabled;
 };
 
-struct Cx4Cache
-{
+struct Cx4Cache {
 	bool Enabled;
 	uint8_t Page;
 	bool Lock[2];
@@ -29,8 +26,7 @@ struct Cx4Cache
 	uint16_t Pos;
 };
 
-struct Cx4Bus
-{
+struct Cx4Bus {
 	bool Enabled;
 	bool Reading;
 	bool Writing;
@@ -38,26 +34,25 @@ struct Cx4Bus
 	uint32_t Address;
 };
 
-struct Cx4State : BaseState
-{
+struct Cx4State : BaseState {
 	uint64_t CycleCount;
 
-	//Program bank
+	// Program bank
 	uint16_t PB;
 
-	//Program counter
+	// Program counter
 	uint8_t PC;
 
-	//Accumulator
-	uint32_t A; 
+	// Accumulator
+	uint32_t A;
 
-	//Page register
+	// Page register
 	uint16_t P;
 
 	uint8_t SP;
 	uint32_t Stack[8];
 
-	//Multiplier
+	// Multiplier
 	uint64_t Mult;
 
 	uint32_t RomBuffer;
@@ -77,7 +72,7 @@ struct Cx4State : BaseState
 	bool Stopped;
 	bool Locked;
 	bool IrqDisabled;
-	
+
 	bool SingleRom;
 
 	uint8_t RomAccessDelay;

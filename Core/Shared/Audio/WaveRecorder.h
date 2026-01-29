@@ -1,7 +1,6 @@
 #include "pch.h"
 
-class WaveRecorder
-{
+class WaveRecorder {
 private:
 	std::ofstream _stream;
 	uint32_t _streamSize;

@@ -2,24 +2,21 @@
 #include "pch.h"
 #include "Shared/BaseState.h"
 
-enum class  WindowMaskLogic
-{
+enum class WindowMaskLogic {
 	Or = 0,
 	And = 1,
 	Xor = 2,
 	Xnor = 3
 };
 
-enum class ColorWindowMode
-{
+enum class ColorWindowMode {
 	Never = 0,
 	OutsideWindow = 1,
 	InsideWindow = 2,
 	Always = 3
 };
 
-struct SpriteInfo
-{
+struct SpriteInfo {
 	int16_t X;
 	uint8_t Y;
 	uint8_t Index;
@@ -35,36 +32,32 @@ struct SpriteInfo
 	uint16_t FetchAddress;
 	uint16_t ChrData[2];
 
-	bool IsVisible(uint16_t scanline, bool interlace)
-	{
-		if(X != -256 && (X + Width <= 0 || X > 255)) {
-			//Sprite is not visible (and must be ignored for time/range flag calculations)
-			//Sprites at X=-256 are always used when considering Time/Range flag calculations, but not actually drawn.
+	bool IsVisible(uint16_t scanline, bool interlace) {
+		if (X != -256 && (X + Width <= 0 || X > 255)) {
+			// Sprite is not visible (and must be ignored for time/range flag calculations)
+			// Sprites at X=-256 are always used when considering Time/Range flag calculations, but not actually drawn.
 			return false;
 		}
 
 		uint16_t endY = Y + (interlace ? (Height >> 1) : Height);
 		return (
-			(scanline >= Y && scanline < endY) ||
-			((uint8_t)endY < Y && scanline < (uint8_t)endY) //wrap-around occurs after 256 scanlines
+		    (scanline >= Y && scanline < endY) ||
+		    ((uint8_t)endY < Y && scanline < (uint8_t)endY) // wrap-around occurs after 256 scanlines
 		);
 	}
 };
 
-struct TileData
-{
+struct TileData {
 	uint16_t TilemapData;
 	uint16_t VScroll;
 	uint16_t ChrData[4];
 };
 
-struct LayerData
-{
+struct LayerData {
 	TileData Tiles[33];
 };
 
-struct LayerConfig
-{
+struct LayerConfig {
 	uint16_t TilemapAddress = 0;
 	uint16_t ChrAddress = 0;
 
@@ -77,8 +70,7 @@ struct LayerConfig
 	bool LargeTiles = false;
 };
 
-struct Mode7Config
-{
+struct Mode7Config {
 	int16_t Matrix[4] = {};
 
 	int16_t HScroll = 0;
@@ -87,35 +79,33 @@ struct Mode7Config
 	int16_t CenterY = 0;
 
 	uint8_t ValueLatch = 0;
-	
+
 	bool LargeMap = false;
 	bool FillWithTile0 = false;
 	bool HorizontalMirroring = false;
 	bool VerticalMirroring = false;
 
-	//Holds the scroll values at the start of a scanline for the entire scanline
+	// Holds the scroll values at the start of a scanline for the entire scanline
 	int16_t HScrollLatch = 0;
 	int16_t VScrollLatch = 0;
 };
 
-struct WindowConfig
-{
+struct WindowConfig {
 	bool ActiveLayers[6];
 	bool InvertedLayers[6];
 	uint8_t Left;
 	uint8_t Right;
 
-	template<uint8_t layerIndex>
-	bool PixelNeedsMasking(int x)
-	{
-		if(InvertedLayers[layerIndex]) {
-			if(Left > Right) {
+	template <uint8_t layerIndex>
+	bool PixelNeedsMasking(int x) {
+		if (InvertedLayers[layerIndex]) {
+			if (Left > Right) {
 				return true;
 			} else {
 				return x < Left || x > Right;
 			}
 		} else {
-			if(Left > Right) {
+			if (Left > Right) {
 				return false;
 			} else {
 				return x >= Left && x <= Right;
@@ -124,8 +114,7 @@ struct WindowConfig
 	}
 };
 
-struct SnesPpuState : public BaseState
-{
+struct SnesPpuState : public BaseState {
 	uint16_t Cycle = 0;
 	uint16_t Scanline = 0;
 	uint16_t HClock = 0;
@@ -189,8 +178,6 @@ struct SnesPpuState : public BaseState
 	uint16_t FixedColor = 0;
 };
 
-
-enum PixelFlags
-{
+enum PixelFlags {
 	AllowColorMath = 0x80,
 };

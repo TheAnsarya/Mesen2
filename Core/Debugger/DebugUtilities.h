@@ -4,54 +4,76 @@
 #include "Shared/MemoryType.h"
 #include "Utilities/HexUtilities.h"
 
-class DebugUtilities
-{
+class DebugUtilities {
 public:
-	static constexpr MemoryType GetCpuMemoryType(CpuType type)
-	{
-		switch(type) {
-			case CpuType::Snes: return MemoryType::SnesMemory;
-			case CpuType::Spc: return MemoryType::SpcMemory;
-			case CpuType::NecDsp: return MemoryType::NecDspMemory;
-			case CpuType::Sa1: return MemoryType::Sa1Memory;
-			case CpuType::Gsu: return MemoryType::GsuMemory;
-			case CpuType::Cx4: return MemoryType::Cx4Memory;
-			case CpuType::St018: return MemoryType::St018Memory;
-			case CpuType::Gameboy: return MemoryType::GameboyMemory;
-			case CpuType::Nes: return MemoryType::NesMemory;
-			case CpuType::Pce: return MemoryType::PceMemory;
-			case CpuType::Sms: return MemoryType::SmsMemory;
-			case CpuType::Gba: return MemoryType::GbaMemory;
-			case CpuType::Ws: return MemoryType::WsMemory;
+	static constexpr MemoryType GetCpuMemoryType(CpuType type) {
+		switch (type) {
+			case CpuType::Snes:
+				return MemoryType::SnesMemory;
+			case CpuType::Spc:
+				return MemoryType::SpcMemory;
+			case CpuType::NecDsp:
+				return MemoryType::NecDspMemory;
+			case CpuType::Sa1:
+				return MemoryType::Sa1Memory;
+			case CpuType::Gsu:
+				return MemoryType::GsuMemory;
+			case CpuType::Cx4:
+				return MemoryType::Cx4Memory;
+			case CpuType::St018:
+				return MemoryType::St018Memory;
+			case CpuType::Gameboy:
+				return MemoryType::GameboyMemory;
+			case CpuType::Nes:
+				return MemoryType::NesMemory;
+			case CpuType::Pce:
+				return MemoryType::PceMemory;
+			case CpuType::Sms:
+				return MemoryType::SmsMemory;
+			case CpuType::Gba:
+				return MemoryType::GbaMemory;
+			case CpuType::Ws:
+				return MemoryType::WsMemory;
 		}
 
 		throw std::runtime_error("Invalid CPU type");
 	}
 
-	static constexpr int GetProgramCounterSize(CpuType type)
-	{
-		switch(type) {
-			case CpuType::Snes: return 6;
-			case CpuType::Spc: return 4;
-			case CpuType::NecDsp: return 6;
-			case CpuType::Sa1: return 6;
-			case CpuType::Gsu: return 6;
-			case CpuType::Cx4: return 6;
-			case CpuType::St018: return 8;
-			case CpuType::Gameboy: return 4;
-			case CpuType::Nes: return 4;
-			case CpuType::Pce: return 4;
-			case CpuType::Sms: return 4;
-			case CpuType::Gba: return 8;
-			case CpuType::Ws: return 5;
+	static constexpr int GetProgramCounterSize(CpuType type) {
+		switch (type) {
+			case CpuType::Snes:
+				return 6;
+			case CpuType::Spc:
+				return 4;
+			case CpuType::NecDsp:
+				return 6;
+			case CpuType::Sa1:
+				return 6;
+			case CpuType::Gsu:
+				return 6;
+			case CpuType::Cx4:
+				return 6;
+			case CpuType::St018:
+				return 8;
+			case CpuType::Gameboy:
+				return 4;
+			case CpuType::Nes:
+				return 4;
+			case CpuType::Pce:
+				return 4;
+			case CpuType::Sms:
+				return 4;
+			case CpuType::Gba:
+				return 8;
+			case CpuType::Ws:
+				return 5;
 		}
 
 		throw std::runtime_error("Invalid CPU type");
 	}
 
-	static constexpr CpuType ToCpuType(MemoryType type)
-	{
-		switch(type) {
+	static constexpr CpuType ToCpuType(MemoryType type) {
+		switch (type) {
 			case MemoryType::SnesMemory:
 			case MemoryType::SnesCgRam:
 			case MemoryType::SnesPrgRom:
@@ -136,7 +158,7 @@ public:
 			case MemoryType::PceSpriteRam:
 			case MemoryType::PceSpriteRamVdc2:
 				return CpuType::Pce;
-		
+
 			case MemoryType::SmsMemory:
 			case MemoryType::SmsPrgRom:
 			case MemoryType::SmsWorkRam:
@@ -173,25 +195,22 @@ public:
 		}
 	}
 
-	static constexpr bool IsRelativeMemory(MemoryType memType)
-	{
+	static constexpr bool IsRelativeMemory(MemoryType memType) {
 		return memType <= GetLastCpuMemoryType();
 	}
 
-	static constexpr MemoryType GetLastCpuMemoryType()
-	{
+	static constexpr MemoryType GetLastCpuMemoryType() {
 		return MemoryType::WsMemory;
 	}
 
-	static constexpr bool IsPpuMemory(MemoryType memType)
-	{
-		switch(memType) {
+	static constexpr bool IsPpuMemory(MemoryType memType) {
+		switch (memType) {
 			case MemoryType::SnesVideoRam:
 			case MemoryType::SnesSpriteRam:
 			case MemoryType::SnesCgRam:
 			case MemoryType::GbVideoRam:
 			case MemoryType::GbSpriteRam:
-			
+
 			case MemoryType::NesChrRam:
 			case MemoryType::NesChrRom:
 			case MemoryType::NesSpriteRam:
@@ -217,14 +236,13 @@ public:
 			case MemoryType::GbaPaletteRam:
 				return true;
 
-			default: 
+			default:
 				return false;
 		}
 	}
 
-	static constexpr bool IsRom(MemoryType memType)
-	{
-		switch(memType) {
+	static constexpr bool IsRom(MemoryType memType) {
+		switch (memType) {
 			case MemoryType::SnesPrgRom:
 			case MemoryType::GbPrgRom:
 			case MemoryType::GbBootRom:
@@ -250,13 +268,12 @@ public:
 		}
 	}
 
-	static constexpr bool IsVolatileRam(MemoryType memType)
-	{
-		if(IsRom(memType)) {
+	static constexpr bool IsVolatileRam(MemoryType memType) {
+		if (IsRom(memType)) {
 			return false;
 		}
 
-		switch(memType) {
+		switch (memType) {
 			case MemoryType::NesSaveRam:
 			case MemoryType::GbCartRam:
 			case MemoryType::SnesSaveRam:
@@ -273,29 +290,26 @@ public:
 		}
 	}
 
-	static constexpr CpuType GetLastCpuType()
-	{
+	static constexpr CpuType GetLastCpuType() {
 		return CpuType::Ws;
 	}
 
-	static string AddressToHex(CpuType cpuType, int32_t address)
-	{
+	static string AddressToHex(CpuType cpuType, int32_t address) {
 		int size = GetProgramCounterSize(cpuType);
-		if(size == 4) {
+		if (size == 4) {
 			return HexUtilities::ToHex((uint16_t)address);
-		} else if(size == 5) {
+		} else if (size == 5) {
 			return HexUtilities::ToHex20(address);
-		} else if(size == 6) {
+		} else if (size == 6) {
 			return HexUtilities::ToHex24(address);
-		} else if(size == 8) {
+		} else if (size == 8) {
 			return HexUtilities::ToHex32(address);
 		} else {
 			return HexUtilities::ToHex(address);
 		}
 	}
 
-	static constexpr int GetMemoryTypeCount()
-	{
+	static constexpr int GetMemoryTypeCount() {
 		return (int)MemoryType::None + 1;
 	}
 };

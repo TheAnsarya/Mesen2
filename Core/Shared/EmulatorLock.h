@@ -5,8 +5,7 @@ class Emulator;
 class DebuggerRequest;
 class DebugBreakHelper;
 
-class EmulatorLock
-{
+class EmulatorLock {
 private:
 	Emulator* _emu = nullptr;
 	unique_ptr<DebuggerRequest> _debugger;

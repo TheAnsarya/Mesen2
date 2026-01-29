@@ -4,8 +4,7 @@
 class Emulator;
 struct RenderedFrame;
 
-class SaveStateManager
-{
+class SaveStateManager {
 private:
 	static constexpr uint32_t MaxIndex = 10;
 
@@ -29,12 +28,12 @@ public:
 	void SaveState();
 	bool LoadState();
 
-	void GetSaveStateHeader(ostream & stream);
+	void GetSaveStateHeader(ostream& stream);
 
-	void SaveState(ostream &stream);
+	void SaveState(ostream& stream);
 	bool SaveState(string filepath, bool showSuccessMessage = true);
 	void SaveState(int stateIndex, bool displayMessage = true);
-	bool LoadState(istream &stream);
+	bool LoadState(istream& stream);
 	bool LoadState(string filepath, bool showSuccessMessage = true);
 	bool LoadState(int stateIndex);
 

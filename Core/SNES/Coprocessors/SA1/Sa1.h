@@ -13,11 +13,10 @@ class BaseCartridge;
 
 enum class MemoryOperationType;
 
-//TODO: Implement write protection flags
-//TODO: Timers
+// TODO: Implement write protection flags
+// TODO: Timers
 
-class Sa1 : public BaseCoprocessor
-{
+class Sa1 : public BaseCoprocessor {
 private:
 	static constexpr int InternalRamSize = 0x800;
 
@@ -30,7 +29,7 @@ private:
 
 	Sa1State _state = {};
 	uint8_t* _iRam;
-	
+
 	MemoryType _lastAccessMemType;
 	uint8_t _openBus;
 
@@ -38,11 +37,11 @@ private:
 	unique_ptr<IMemoryHandler> _iRamHandlerSa1;
 	unique_ptr<IMemoryHandler> _bwRamHandler;
 	unique_ptr<IMemoryHandler> _cpuVectorHandler;
-	
+
 	vector<unique_ptr<IMemoryHandler>> _cpuBwRamHandlers;
 
 	MemoryMappings _mappings;
-	
+
 	void UpdateBank(uint8_t index, uint8_t value);
 	void UpdatePrgRomMappings();
 	void UpdateVectorMappings();
@@ -51,7 +50,7 @@ private:
 	void IncVarLenPosition();
 	void ProcessMathOp();
 	void RunCharConvertType2();
-	
+
 	void ProcessInterrupts();
 	void RunDma();
 
@@ -66,7 +65,7 @@ private:
 public:
 	Sa1(SnesConsole* console);
 	virtual ~Sa1();
-	
+
 	void WriteSa1(uint32_t addr, uint8_t value, MemoryOperationType type);
 	uint8_t ReadSa1(uint32_t addr, MemoryOperationType type = MemoryOperationType::Read);
 
@@ -76,13 +75,13 @@ public:
 	uint8_t ReadCharConvertType1(uint32_t addr);
 
 	// Inherited via BaseCoprocessor
-	void Serialize(Serializer & s) override;
+	void Serialize(Serializer& s) override;
 	uint8_t Read(uint32_t addr) override;
 	uint8_t Peek(uint32_t addr) override;
-	void PeekBlock(uint32_t addr, uint8_t *output) override;
+	void PeekBlock(uint32_t addr, uint8_t* output) override;
 	void Write(uint32_t addr, uint8_t value) override;
 	AddressInfo GetAbsoluteAddress(uint32_t address) override;
-	
+
 	void Run() override;
 	void Reset() override;
 

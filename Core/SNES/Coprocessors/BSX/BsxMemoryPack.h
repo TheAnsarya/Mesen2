@@ -7,8 +7,7 @@
 class BsxMemoryPackHandler;
 class SnesConsole;
 
-class BsxMemoryPack : public ISerializable
-{
+class BsxMemoryPack : public ISerializable {
 private:
 	SnesConsole* _console = nullptr;
 	vector<uint8_t> _orgData;
@@ -35,13 +34,12 @@ public:
 
 	void ProcessCommand(uint8_t value, uint32_t page);
 	void Reset();
-	
+
 	vector<unique_ptr<IMemoryHandler>>& GetMemoryHandlers();
 	uint8_t* DebugGetMemoryPack();
 	uint32_t DebugGetMemoryPackSize();
-	
-	class BsxMemoryPackHandler : public RamHandler
-	{
+
+	class BsxMemoryPackHandler : public RamHandler {
 		BsxMemoryPack* _memPack;
 		uint32_t _page;
 

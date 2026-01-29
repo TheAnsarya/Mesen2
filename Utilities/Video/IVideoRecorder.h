@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-class IVideoRecorder
-{
+class IVideoRecorder {
 public:
 	virtual ~IVideoRecorder() = default;
 

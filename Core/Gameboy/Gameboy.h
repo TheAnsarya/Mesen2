@@ -20,8 +20,7 @@ class SuperGameboy;
 class VirtualFile;
 class BaseControlManager;
 
-class Gameboy final : public IConsole
-{
+class Gameboy final : public IConsole {
 private:
 	static constexpr int SpriteRamSize = 0xA0;
 	static constexpr int HighRamSize = 0x7F;
@@ -70,14 +69,14 @@ public:
 
 	Gameboy(Emulator* emu, bool allowSgb = false);
 	virtual ~Gameboy();
-	
-	static vector<string> GetSupportedExtensions() { return { ".gb", ".gbc", ".gbx", ".gbs" }; }
-	static vector<string> GetSupportedSignatures() { return { "GBS" }; }
+
+	static vector<string> GetSupportedExtensions() { return {".gb", ".gbc", ".gbx", ".gbs"}; }
+	static vector<string> GetSupportedSignatures() { return {"GBS"}; }
 
 	void PowerOn(SuperGameboy* sgb);
 
 	void Run(uint64_t runUntilClock);
-	
+
 	void LoadBattery();
 	void SaveBattery() override;
 
@@ -86,7 +85,7 @@ public:
 	GbPpu* GetPpu();
 	GbCpu* GetCpu();
 	GbTimer* GetTimer();
-	void GetSoundSamples(int16_t* &samples, uint32_t& sampleCount);
+	void GetSoundSamples(int16_t*& samples, uint32_t& sampleCount);
 	GbState GetState();
 	void GetConsoleState(BaseState& state, ConsoleType consoleType) override;
 	GameboyHeader GetHeader();
@@ -104,7 +103,7 @@ public:
 
 	uint64_t GetCycleCount();
 	uint64_t GetApuCycleCount();
-	
+
 	void ProcessEndOfFrame();
 
 	void RunApu();

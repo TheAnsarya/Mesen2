@@ -9,8 +9,7 @@
 class VirtualFile;
 class Emulator;
 
-class IMovie : public IInputProvider
-{
+class IMovie : public IInputProvider {
 public:
 	virtual ~IMovie() = default;
 
@@ -19,8 +18,7 @@ public:
 	virtual bool IsPlaying() = 0;
 };
 
-class MovieManager
-{
+class MovieManager {
 private:
 	Emulator* _emu = nullptr;
 	safe_ptr<IMovie> _player;

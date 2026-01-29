@@ -44,14 +44,12 @@ enum class EventType;
 enum class MemoryOperationType;
 enum class EvalResultType : int32_t;
 
-struct CpuInfo
-{
+struct CpuInfo {
 	unique_ptr<IDebugger> Debugger;
 	unique_ptr<ExpressionEvaluator> Evaluator;
 };
 
-class Debugger
-{
+class Debugger {
 private:
 	Emulator* _emu = nullptr;
 	IConsole* _console = nullptr;
@@ -85,19 +83,24 @@ private:
 	DebugControllerState _inputOverrides[8] = {};
 
 	bool _waitForBreakResume = false;
-	
+
 	void Reset();
 
 	__noinline bool ProcessStepBack(IDebugger* debugger);
 
-	template<CpuType type, typename DebuggerType> DebuggerType* GetDebugger();
-	template<CpuType type> uint64_t GetCpuCycleCount();
-	template<CpuType type, typename T> void ProcessScripts(uint32_t addr, T& value, MemoryOperationType opType);
-	template<CpuType type, typename T> void ProcessScripts(uint32_t addr, T& value, MemoryType memType, MemoryOperationType opType);
-	
+	template <CpuType type, typename DebuggerType>
+	DebuggerType* GetDebugger();
+	template <CpuType type>
+	uint64_t GetCpuCycleCount();
+	template <CpuType type, typename T>
+	void ProcessScripts(uint32_t addr, T& value, MemoryOperationType opType);
+	template <CpuType type, typename T>
+	void ProcessScripts(uint32_t addr, T& value, MemoryType memType, MemoryOperationType opType);
+
 	bool IsDebugWindowOpened(CpuType cpuType);
 	bool IsBreakOptionEnabled(BreakSource src);
-	template<CpuType type> void SleepOnBreakRequest();
+	template <CpuType type>
+	void SleepOnBreakRequest();
 
 	void ClearPendingBreakExceptions();
 
@@ -108,18 +111,28 @@ public:
 	~Debugger();
 	void Release();
 
-	template<CpuType type> void ProcessInstruction();
-	template<CpuType type, uint8_t accessWidth = 1, MemoryAccessFlags flags = MemoryAccessFlags::None, typename T> void ProcessMemoryRead(uint32_t addr, T& value, MemoryOperationType opType);
-	template<CpuType type, uint8_t accessWidth = 1, MemoryAccessFlags flags = MemoryAccessFlags::None, typename T> bool ProcessMemoryWrite(uint32_t addr, T& value, MemoryOperationType opType);
+	template <CpuType type>
+	void ProcessInstruction();
+	template <CpuType type, uint8_t accessWidth = 1, MemoryAccessFlags flags = MemoryAccessFlags::None, typename T>
+	void ProcessMemoryRead(uint32_t addr, T& value, MemoryOperationType opType);
+	template <CpuType type, uint8_t accessWidth = 1, MemoryAccessFlags flags = MemoryAccessFlags::None, typename T>
+	bool ProcessMemoryWrite(uint32_t addr, T& value, MemoryOperationType opType);
 
-	template<CpuType cpuType, MemoryType memType, MemoryOperationType opType, typename T> void ProcessMemoryAccess(uint32_t addr, T& value);
+	template <CpuType cpuType, MemoryType memType, MemoryOperationType opType, typename T>
+	void ProcessMemoryAccess(uint32_t addr, T& value);
 
-	template<CpuType type> void ProcessIdleCycle();
-	template<CpuType type> void ProcessHaltedCpu();
-	template<CpuType type, typename T> void ProcessPpuRead(uint16_t addr, T& value, MemoryType memoryType, MemoryOperationType opType);
-	template<CpuType type, typename T> void ProcessPpuWrite(uint16_t addr, T& value, MemoryType memoryType);
-	template<CpuType type> void ProcessPpuCycle();
-	template<CpuType type> void ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi);
+	template <CpuType type>
+	void ProcessIdleCycle();
+	template <CpuType type>
+	void ProcessHaltedCpu();
+	template <CpuType type, typename T>
+	void ProcessPpuRead(uint16_t addr, T& value, MemoryType memoryType, MemoryOperationType opType);
+	template <CpuType type, typename T>
+	void ProcessPpuWrite(uint16_t addr, T& value, MemoryType memoryType);
+	template <CpuType type>
+	void ProcessPpuCycle();
+	template <CpuType type>
+	void ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi);
 
 	void InternalProcessInterrupt(CpuType cpuType, IDebugger& dbg, StepRequest& stepRequest, AddressInfo& src, uint32_t srcAddr, AddressInfo& dest, uint32_t destAddr, AddressInfo& ret, uint32_t retAddr, uint32_t retSp, bool forNmi);
 
@@ -128,7 +141,7 @@ public:
 	void ProcessConfigChange();
 
 	void GetTokenList(CpuType cpuType, char* tokenList);
-	int64_t EvaluateExpression(string expression, CpuType cpuType, EvalResultType &resultType, bool useCache);
+	int64_t EvaluateExpression(string expression, CpuType cpuType, EvalResultType& resultType, bool useCache);
 
 	void Run();
 	void PauseOnNextFrame();
@@ -143,8 +156,10 @@ public:
 
 	__noinline void BreakImmediately(CpuType sourceCpu, BreakSource source);
 
-	template<uint8_t accessWidth = 1> void ProcessPredictiveBreakpoint(CpuType sourceCpu, BreakpointManager* bpManager, MemoryOperationInfo& operation, AddressInfo& addressInfo);
-	template<uint8_t accessWidth = 1> void ProcessBreakConditions(CpuType sourceCpu, StepRequest& step, BreakpointManager* bpManager, MemoryOperationInfo& operation, AddressInfo& addressInfo);
+	template <uint8_t accessWidth = 1>
+	void ProcessPredictiveBreakpoint(CpuType sourceCpu, BreakpointManager* bpManager, MemoryOperationInfo& operation, AddressInfo& addressInfo);
+	template <uint8_t accessWidth = 1>
+	void ProcessBreakConditions(CpuType sourceCpu, StepRequest& step, BreakpointManager* bpManager, MemoryOperationInfo& operation, AddressInfo& addressInfo);
 
 	void SleepUntilResume(CpuType sourceCpu, BreakSource source, MemoryOperationInfo* operation = nullptr, int breakpointId = -1);
 
@@ -172,7 +187,7 @@ public:
 
 	void SetInputOverrides(uint32_t index, DebugControllerState state);
 	void GetAvailableInputOverrides(uint8_t* availableIndexes);
-	
+
 	void Log(string message);
 	string GetLog();
 
@@ -180,7 +195,7 @@ public:
 
 	void ClearExecutionTrace();
 	uint32_t GetExecutionTrace(TraceRow output[], uint32_t startOffset, uint32_t maxLineCount);
-	
+
 	CpuType GetMainCpuType() { return _mainCpuType; }
 	IDebugger* GetMainDebugger();
 

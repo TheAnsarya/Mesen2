@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-class CRC32
-{
+class CRC32 {
 private:
 	static uint32_t crc32_16bytes(const void* data, size_t length, uint32_t previousCrc32);
 

@@ -4,8 +4,7 @@
 #include "Shared/Video/BaseVideoFilter.h"
 #include "Shared/SettingTypes.h"
 
-class SnesDefaultVideoFilter : public BaseVideoFilter
-{
+class SnesDefaultVideoFilter : public BaseVideoFilter {
 private:
 	uint32_t _calculatedPalette[0x8000] = {};
 	VideoConfig _videoConfig = {};
@@ -24,7 +23,7 @@ protected:
 
 public:
 	SnesDefaultVideoFilter(Emulator* emu);
-	
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 	OverscanDimensions GetOverscan() override;
 };

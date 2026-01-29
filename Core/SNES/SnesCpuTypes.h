@@ -2,21 +2,19 @@
 #include "pch.h"
 #include "Shared/BaseState.h"
 
-enum class SnesCpuStopState : uint8_t
-{
+enum class SnesCpuStopState : uint8_t {
 	Running = 0,
 	Stopped = 1,
 	WaitingForIrq = 2
 };
 
-struct SnesCpuState : BaseState
-{
+struct SnesCpuState : BaseState {
 	uint64_t CycleCount;
 
 	uint16_t A;
 	uint16_t X;
 	uint16_t Y;
-	
+
 	/* 16-bit stack pointer */
 	uint16_t SP;
 
@@ -50,30 +48,26 @@ struct SnesCpuState : BaseState
 	SnesCpuStopState StopState;
 };
 
-namespace ProcFlags
-{
-	enum ProcFlags : uint8_t
-	{
-		Carry = 0x01,
-		Zero = 0x02,
-		IrqDisable = 0x04,
-		Decimal = 0x08,
+namespace ProcFlags {
+enum ProcFlags : uint8_t {
+	Carry = 0x01,
+	Zero = 0x02,
+	IrqDisable = 0x04,
+	Decimal = 0x08,
 
-		/* Use 8-bit operations on indexes */
-		IndexMode8 = 0x10,
+	/* Use 8-bit operations on indexes */
+	IndexMode8 = 0x10,
 
-		/* Use 8-bit operations on memory accesses and accumulator */
-		MemoryMode8 = 0x20,
+	/* Use 8-bit operations on memory accesses and accumulator */
+	MemoryMode8 = 0x20,
 
-		Overflow = 0x40,
-		Negative = 0x80
-	};
-}
+	Overflow = 0x40,
+	Negative = 0x80
+};
+} // namespace ProcFlags
 
-enum class SnesIrqSource
-{
+enum class SnesIrqSource {
 	None = 0,
 	Ppu = 1,
 	Coprocessor = 2
 };
-

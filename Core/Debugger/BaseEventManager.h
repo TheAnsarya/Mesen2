@@ -5,8 +5,7 @@
 #include "Utilities/SimpleLock.h"
 #include "SNES/DmaControllerTypes.h"
 
-enum class EventFlags
-{
+enum class EventFlags {
 	PreviousFrame = 1 << 0,
 	RegFirstWrite = 1 << 1,
 	RegSecondWrite = 1 << 2,
@@ -15,8 +14,7 @@ enum class EventFlags
 	ReadWriteOp = 1 << 5,
 };
 
-struct DebugEventInfo
-{
+struct DebugEventInfo {
 	MemoryOperationInfo Operation;
 	DebugEventType Type;
 	uint32_t ProgramCounter;
@@ -31,18 +29,15 @@ struct DebugEventInfo
 	uint32_t Color = 0;
 };
 
-struct EventViewerCategoryCfg
-{
+struct EventViewerCategoryCfg {
 	bool Visible;
 	uint32_t Color;
 };
 
-struct BaseEventViewerConfig
-{
+struct BaseEventViewerConfig {
 };
 
-class BaseEventManager
-{
+class BaseEventManager {
 protected:
 	vector<DebugEventInfo> _debugEvents;
 	vector<DebugEventInfo> _prevDebugEvents;
@@ -86,6 +81,6 @@ public:
 	virtual uint32_t TakeEventSnapshot(bool forAutoRefresh) = 0;
 	virtual FrameInfo GetDisplayBufferSize() = 0;
 	virtual DebugEventInfo GetEvent(uint16_t scanline, uint16_t cycle) = 0;
-	
+
 	void GetDisplayBuffer(uint32_t* buffer, uint32_t bufferSize);
 };

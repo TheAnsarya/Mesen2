@@ -6,17 +6,16 @@
 class SnesConsole;
 class Sdd1Mmc;
 
-class Sdd1 : public BaseCoprocessor
-{
+class Sdd1 : public BaseCoprocessor {
 private:
 	Sdd1State _state;
 	unique_ptr<Sdd1Mmc> _sdd1Mmc;
 	IMemoryHandler* _cpuRegisterHandler;
 
 public:
-	Sdd1(SnesConsole *console);
+	Sdd1(SnesConsole* console);
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 	uint8_t Read(uint32_t addr) override;
 	uint8_t Peek(uint32_t addr) override;
 	void PeekBlock(uint32_t addr, uint8_t* output) override;

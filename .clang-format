@@ -3,7 +3,7 @@
 
 ---
 Language: Cpp
-Standard: c++23
+Standard: Latest
 
 # Indentation - Use tabs
 UseTab: ForIndentation
@@ -14,23 +14,23 @@ ColumnLimit: 0
 # Brace wrapping - K&R style (opening brace on same line)
 BreakBeforeBraces: Custom
 BraceWrapping:
-	AfterCaseLabel: false
-	AfterClass: false
-	AfterControlStatement: Never
-	AfterEnum: false
-	AfterFunction: false
-	AfterNamespace: false
-	AfterStruct: false
-	AfterUnion: false
-	AfterExternBlock: false
-	BeforeCatch: false
-	BeforeElse: false
-	BeforeLambdaBody: false
-	BeforeWhile: false
-	IndentBraces: false
-	SplitEmptyFunction: false
-	SplitEmptyRecord: false
-	SplitEmptyNamespace: false
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: false
+  BeforeCatch: false
+  BeforeElse: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
 
 # Alignment
 AlignAfterOpenBracket: Align
@@ -91,8 +91,8 @@ SpacesInCStyleCastParentheses: false
 SpacesInConditionalStatement: false
 SpacesInContainerLiterals: true
 SpacesInLineCommentPrefix:
-	Minimum: 1
-	Maximum: 1
+  Minimum: 1
+  Maximum: 1
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 

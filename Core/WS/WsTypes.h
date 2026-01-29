@@ -3,8 +3,7 @@
 #include "Shared/BaseState.h"
 #include "Shared/SettingTypes.h"
 
-class WsConstants
-{
+class WsConstants {
 public:
 	static constexpr uint32_t ScreenWidth = 224;
 	static constexpr uint32_t ScreenHeight = 144;
@@ -14,38 +13,34 @@ public:
 	static constexpr uint32_t MaxPixelCount = WsConstants::ScreenWidth * (WsConstants::ScreenHeight + 13);
 };
 
-struct WsCpuFlags
-{
-	bool Carry; //0x01
-	bool Parity; //0x04
-	bool AuxCarry; //0x10
-	bool Zero; //0x40
-	bool Sign; //0x80
-	bool Trap; //0x100
-	bool Irq; //0x200
-	bool Direction; //0x400
-	bool Overflow; //0x800
-	bool Mode; //0x8000
+struct WsCpuFlags {
+	bool Carry;     // 0x01
+	bool Parity;    // 0x04
+	bool AuxCarry;  // 0x10
+	bool Zero;      // 0x40
+	bool Sign;      // 0x80
+	bool Trap;      // 0x100
+	bool Irq;       // 0x200
+	bool Direction; // 0x400
+	bool Overflow;  // 0x800
+	bool Mode;      // 0x8000
 
-	uint16_t Get()
-	{
+	uint16_t Get() {
 		return (
-			(uint8_t)Carry |
-			((uint8_t)Parity << 2) |
-			((uint8_t)AuxCarry << 4) |
-			((uint8_t)Zero << 6) |
-			((uint8_t)Sign << 7) |
-			((uint8_t)Trap << 8) |
-			((uint8_t)Irq << 9) |
-			((uint8_t)Direction << 10) |
-			((uint8_t)Overflow << 11) |
-			((uint8_t)Mode << 15) |
-			0x7002
-		);
+		    (uint8_t)Carry |
+		    ((uint8_t)Parity << 2) |
+		    ((uint8_t)AuxCarry << 4) |
+		    ((uint8_t)Zero << 6) |
+		    ((uint8_t)Sign << 7) |
+		    ((uint8_t)Trap << 8) |
+		    ((uint8_t)Irq << 9) |
+		    ((uint8_t)Direction << 10) |
+		    ((uint8_t)Overflow << 11) |
+		    ((uint8_t)Mode << 15) |
+		    0x7002);
 	}
 
-	void Set(uint16_t f)
-	{
+	void Set(uint16_t f) {
 		Carry = f & 0x01;
 		Parity = f & 0x04;
 		AuxCarry = f & 0x10;
@@ -59,8 +54,7 @@ struct WsCpuFlags
 	}
 };
 
-struct WsCpuState : BaseState
-{
+struct WsCpuState : BaseState {
 	uint64_t CycleCount;
 
 	uint16_t CS;
@@ -86,8 +80,7 @@ struct WsCpuState : BaseState
 	bool PowerOff;
 };
 
-struct WsBgLayer
-{
+struct WsBgLayer {
 	uint16_t MapAddress;
 	uint16_t MapAddressLatch;
 
@@ -100,8 +93,7 @@ struct WsBgLayer
 	bool Enabled;
 	bool EnabledLatch;
 
-	void Latch()
-	{
+	void Latch() {
 		EnabledLatch = Enabled;
 		ScrollXLatch = ScrollX;
 		ScrollYLatch = ScrollY;
@@ -109,8 +101,7 @@ struct WsBgLayer
 	}
 };
 
-struct WsWindow
-{
+struct WsWindow {
 	bool Enabled;
 	bool EnabledLatch;
 
@@ -125,8 +116,7 @@ struct WsWindow
 
 	bool IsInsideWindow(uint8_t x, uint8_t y) { return x >= LeftLatch && x <= RightLatch && y >= TopLatch && y <= BottomLatch; }
 
-	void Latch()
-	{
+	void Latch() {
 		EnabledLatch = Enabled;
 		LeftLatch = Left;
 		RightLatch = Right;
@@ -135,8 +125,7 @@ struct WsWindow
 	}
 };
 
-struct WsLcdIcons
-{
+struct WsLcdIcons {
 	bool Sleep;
 	bool Vertical;
 	bool Horizontal;
@@ -147,16 +136,14 @@ struct WsLcdIcons
 	uint8_t Value;
 };
 
-enum class WsVideoMode : uint8_t
-{
+enum class WsVideoMode : uint8_t {
 	Monochrome,
 	Color2bpp,
 	Color4bpp,
 	Color4bppPacked
 };
 
-struct WsPpuState : BaseState
-{
+struct WsPpuState : BaseState {
 	uint32_t FrameCount;
 	uint16_t Cycle;
 	uint16_t Scanline;
@@ -182,7 +169,7 @@ struct WsPpuState : BaseState
 
 	uint8_t BgColor;
 	uint8_t IrqScanline;
-	
+
 	bool LcdEnabled;
 	bool HighContrast;
 	bool SleepEnabled;
@@ -197,12 +184,11 @@ struct WsPpuState : BaseState
 	uint32_t ShowVolumeIconFrame;
 	uint8_t LcdTftConfig[8];
 
-	uint8_t Control; //$00
+	uint8_t Control;       //$00
 	uint8_t ScreenAddress; //$07
 };
 
-enum class WsSegment : uint8_t
-{
+enum class WsSegment : uint8_t {
 	Default,
 	ES,
 	SS,
@@ -210,8 +196,7 @@ enum class WsSegment : uint8_t
 	DS
 };
 
-enum class WsIrqSource : uint8_t
-{
+enum class WsIrqSource : uint8_t {
 	UartSendReady = 0x01,
 	KeyPressed = 0x02,
 	Cart = 0x04,
@@ -222,8 +207,7 @@ enum class WsIrqSource : uint8_t
 	HorizontalBlankTimer = 0x80
 };
 
-struct WsMemoryManagerState
-{
+struct WsMemoryManagerState {
 	uint8_t ActiveIrqs;
 	uint8_t EnabledIrqs;
 	uint8_t IrqVectorOffset;
@@ -234,7 +218,7 @@ struct WsMemoryManagerState
 	bool ColorEnabled;
 	bool Enable4bpp;
 	bool Enable4bppPacked;
-	
+
 	bool BootRomDisabled;
 	bool CartWordBus;
 	bool SlowRom;
@@ -246,13 +230,11 @@ struct WsMemoryManagerState
 	bool PowerOffRequested;
 };
 
-struct WsControlManagerState
-{
+struct WsControlManagerState {
 	uint8_t InputSelect;
 };
 
-struct WsDmaControllerState
-{
+struct WsDmaControllerState {
 	uint32_t GdmaSrc;
 	uint32_t SdmaSrc;
 	uint32_t SdmaLength;
@@ -273,8 +255,7 @@ struct WsDmaControllerState
 	uint8_t SdmaTimer;
 };
 
-struct WsTimerState
-{
+struct WsTimerState {
 	uint16_t HTimer;
 	uint16_t VTimer;
 
@@ -288,8 +269,7 @@ struct WsTimerState
 	bool VBlankAutoReload;
 };
 
-struct BaseWsApuState
-{
+struct BaseWsApuState {
 	uint16_t Frequency;
 	uint16_t Timer;
 
@@ -301,22 +281,19 @@ struct BaseWsApuState
 	uint8_t LeftOutput;
 	uint8_t RightOutput;
 
-	void SetVolume(uint8_t value)
-	{
+	void SetVolume(uint8_t value) {
 		RightVolume = value & 0x0F;
 		LeftVolume = (value >> 4);
 	}
 
-	uint8_t GetVolume()
-	{
+	uint8_t GetVolume() {
 		return RightVolume | (LeftVolume << 4);
 	}
 };
 
 struct WsApuCh1State : public BaseWsApuState {};
 
-struct WsApuCh2State : public BaseWsApuState
-{
+struct WsApuCh2State : public BaseWsApuState {
 	bool PcmEnabled;
 	bool MaxPcmVolumeRight;
 	bool HalfPcmVolumeRight;
@@ -324,8 +301,7 @@ struct WsApuCh2State : public BaseWsApuState
 	bool HalfPcmVolumeLeft;
 };
 
-struct WsApuCh3State : public BaseWsApuState
-{
+struct WsApuCh3State : public BaseWsApuState {
 	uint16_t SweepScaler;
 	bool SweepEnabled;
 	int8_t SweepValue;
@@ -334,8 +310,7 @@ struct WsApuCh3State : public BaseWsApuState
 	bool UseSweepCpuClock;
 };
 
-struct WsApuCh4State : public BaseWsApuState
-{
+struct WsApuCh4State : public BaseWsApuState {
 	bool NoiseEnabled;
 	bool LfsrEnabled;
 	uint8_t TapMode;
@@ -344,24 +319,21 @@ struct WsApuCh4State : public BaseWsApuState
 	uint8_t HoldLfsr;
 };
 
-enum class WsHyperVoiceScalingMode : uint8_t
-{
+enum class WsHyperVoiceScalingMode : uint8_t {
 	Unsigned,
 	UnsignedNegated,
 	Signed,
 	None
 };
 
-enum class WsHyperVoiceChannelMode : uint8_t
-{
+enum class WsHyperVoiceChannelMode : uint8_t {
 	Stereo,
 	MonoLeft,
 	MonoRight,
 	MonoBoth
 };
 
-struct WsApuHyperVoiceState
-{
+struct WsApuHyperVoiceState {
 	int16_t LeftOutput;
 	int16_t RightOutput;
 
@@ -382,8 +354,7 @@ struct WsApuHyperVoiceState
 	uint8_t ControlHigh;
 };
 
-struct WsApuState
-{
+struct WsApuState {
 	WsApuCh1State Ch1;
 	WsApuCh2State Ch2;
 	WsApuCh3State Ch3;
@@ -401,12 +372,11 @@ struct WsApuState
 	bool ForceOutput2;
 	bool ForceOutput4;
 	bool ForceOutputCh2Voice;
-	
+
 	uint8_t SoundTest;
 };
 
-struct WsSerialState
-{
+struct WsSerialState {
 	uint64_t SendClock;
 
 	bool Enabled;
@@ -420,16 +390,14 @@ struct WsSerialState
 	uint8_t SendBuffer;
 };
 
-enum class WsEepromSize : uint16_t
-{
+enum class WsEepromSize : uint16_t {
 	Size0 = 0,
 	Size128 = 0x80,
 	Size1kb = 0x400,
 	Size2kb = 0x800
 };
 
-struct WsEepromState
-{
+struct WsEepromState {
 	uint64_t CmdStartClock;
 	WsEepromSize Size;
 	uint16_t ReadBuffer;
@@ -443,13 +411,11 @@ struct WsEepromState
 	bool InternalEepromWriteProtected;
 };
 
-struct WsCartState
-{
+struct WsCartState {
 	uint8_t SelectedBanks[4];
 };
 
-struct WsState
-{
+struct WsState {
 	WsCpuState Cpu;
 	WsPpuState Ppu;
 	WsApuState Apu;
@@ -464,25 +430,22 @@ struct WsState
 	WsModel Model;
 };
 
-class WsCpuParityTable
-{
+class WsCpuParityTable {
 private:
 	uint8_t _parityTable[0x100];
 
 public:
-	WsCpuParityTable()
-	{
-		for(int i = 0; i < 256; i++) {
+	WsCpuParityTable() {
+		for (int i = 0; i < 256; i++) {
 			int count = 0;
-			for(int j = 0; j < 8; j++) {
+			for (int j = 0; j < 8; j++) {
 				count += (i & (1 << j)) ? 1 : 0;
 			}
 			_parityTable[i] = count & 0x01 ? 0 : 1;
 		}
 	}
 
-	__forceinline bool CheckParity(uint8_t val)
-	{
+	__forceinline bool CheckParity(uint8_t val) {
 		return _parityTable[val];
 	}
 };

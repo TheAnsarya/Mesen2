@@ -4,16 +4,15 @@
 #include "Shared/DebuggerRequest.h"
 #include "Debugger/DebugBreakHelper.h"
 
-EmulatorLock::EmulatorLock(Emulator *emu, bool allowDebuggerLock)
-{
+EmulatorLock::EmulatorLock(Emulator* emu, bool allowDebuggerLock) {
 	_emu = emu;
 
-	if(_emu->_runLock.IsLockedByCurrentThread()) {
+	if (_emu->_runLock.IsLockedByCurrentThread()) {
 		_emu->Lock();
 	} else {
-		if(allowDebuggerLock) {
+		if (allowDebuggerLock) {
 			_debugger.reset(new DebuggerRequest(emu->GetDebugger(false)));
-			if(_debugger->GetDebugger()) {
+			if (_debugger->GetDebugger()) {
 				_breakHelper.reset(new DebugBreakHelper(_debugger->GetDebugger(), true));
 			} else {
 				_debugger.reset();
@@ -25,9 +24,8 @@ EmulatorLock::EmulatorLock(Emulator *emu, bool allowDebuggerLock)
 	}
 }
 
-EmulatorLock::~EmulatorLock()
-{
-	if(_debugger) {
+EmulatorLock::~EmulatorLock() {
+	if (_debugger) {
 		_breakHelper.reset();
 	} else {
 		_emu->Unlock();

@@ -29,11 +29,11 @@ using std::unordered_set;
 using std::optional;
 
 #ifndef _MSC_VER
-	// Some headers have functions marked as `__forceinline` but don't provide the bodies;
-	// it fails to compile when LTO is not enabled.
-	#if !defined(__MINGW32__) && (defined(__clang__) || defined(__GNUC__)) && defined(HAVE_LTO)
-		#define __forceinline __attribute__((always_inline)) inline
-	#else 
-		#define __forceinline inline
-	#endif
+// Some headers have functions marked as `__forceinline` but don't provide the bodies;
+// it fails to compile when LTO is not enabled.
+#if !defined(__MINGW32__) && (defined(__clang__) || defined(__GNUC__)) && defined(HAVE_LTO)
+#define __forceinline __attribute__((always_inline)) inline
+#else
+#define __forceinline inline
+#endif
 #endif

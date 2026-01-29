@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-struct AluState
-{
+struct AluState {
 	uint8_t MultOperand1 = 0;
 	uint8_t MultOperand2 = 0;
 	uint16_t MultOrRemainderResult = 0;
@@ -12,8 +11,7 @@ struct AluState
 	uint16_t DivResult = 0;
 };
 
-struct InternalRegisterState
-{
+struct InternalRegisterState {
 	bool EnableAutoJoypadRead = false;
 	bool EnableFastRom = false;
 

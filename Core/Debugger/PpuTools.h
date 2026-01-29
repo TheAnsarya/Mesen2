@@ -7,28 +7,24 @@
 
 class Debugger;
 
-struct ViewerRefreshConfig
-{
+struct ViewerRefreshConfig {
 	uint16_t Scanline;
 	uint16_t Cycle;
 };
 
-enum class SpriteVisibility : uint8_t
-{
+enum class SpriteVisibility : uint8_t {
 	Visible = 0,
 	Offscreen = 1,
 	Disabled = 2
 };
 
-enum class NullableBoolean : int8_t
-{
+enum class NullableBoolean : int8_t {
 	Undefined = -1,
 	False = 0,
 	True = 1
 };
 
-enum class DebugSpritePriority : int8_t
-{
+enum class DebugSpritePriority : int8_t {
 	Undefined = -1,
 	Number0 = 0,
 	Number1 = 1,
@@ -38,8 +34,7 @@ enum class DebugSpritePriority : int8_t
 	Background = 5
 };
 
-enum class DebugSpriteMode : int8_t
-{
+enum class DebugSpriteMode : int8_t {
 	Undefined = -1,
 	Normal = 0,
 	Blending,
@@ -47,8 +42,7 @@ enum class DebugSpriteMode : int8_t
 	Stereoscopic
 };
 
-struct DebugSpriteInfo
-{
+struct DebugSpriteInfo {
 	int32_t TileIndex;
 	int32_t TileAddress;
 	int32_t PaletteAddress;
@@ -81,8 +75,7 @@ struct DebugSpriteInfo
 	uint32_t TileAddresses[8 * 8];
 
 public:
-	void Init()
-	{
+	void Init() {
 		TileIndex = -1;
 		TileAddress = -1;
 		PaletteAddress = -1;
@@ -111,8 +104,7 @@ public:
 	}
 };
 
-enum class TilemapMirroring
-{
+enum class TilemapMirroring {
 	None,
 	Horizontal,
 	Vertical,
@@ -121,12 +113,11 @@ enum class TilemapMirroring
 	FourScreens,
 };
 
-struct DebugTilemapInfo
-{
+struct DebugTilemapInfo {
 	uint32_t Bpp;
 	TileFormat Format;
 	TilemapMirroring Mirroring;
-	
+
 	uint32_t TileWidth;
 	uint32_t TileHeight;
 
@@ -142,8 +133,7 @@ struct DebugTilemapInfo
 	int8_t Priority = -1;
 };
 
-struct DebugTilemapTileInfo
-{
+struct DebugTilemapTileInfo {
 	int32_t Row = -1;
 	int32_t Column = -1;
 	int32_t Width = -1;
@@ -168,8 +158,7 @@ struct DebugTilemapTileInfo
 	NullableBoolean HighPriority = NullableBoolean::Undefined;
 };
 
-struct DebugSpritePreviewInfo
-{
+struct DebugSpritePreviewInfo {
 	uint32_t Width;
 	uint32_t Height;
 	uint32_t SpriteCount;
@@ -185,8 +174,7 @@ struct DebugSpritePreviewInfo
 	bool WrapRightToLeft;
 };
 
-enum class RawPaletteFormat
-{
+enum class RawPaletteFormat {
 	Indexed,
 	Rgb555,
 	Rgb333,
@@ -195,8 +183,7 @@ enum class RawPaletteFormat
 	Bgr444
 };
 
-struct DebugPaletteInfo
-{
+struct DebugPaletteInfo {
 	MemoryType PaletteMemType;
 	uint32_t PaletteMemOffset;
 	bool HasMemType;
@@ -213,16 +200,14 @@ struct DebugPaletteInfo
 	uint32_t RgbPalette[512];
 };
 
-class PpuTools
-{
+class PpuTools {
 protected:
-	static constexpr uint32_t _spritePreviewSize = 128*128;
-	static constexpr uint32_t _grayscaleColorsBpp1[2] = { 0xFF000000, 0xFFFFFFFF };
-	static constexpr uint32_t _grayscaleColorsBpp2[4] = { 0xFF000000, 0xFF666666, 0xFFBBBBBB, 0xFFFFFFFF };
+	static constexpr uint32_t _spritePreviewSize = 128 * 128;
+	static constexpr uint32_t _grayscaleColorsBpp1[2] = {0xFF000000, 0xFFFFFFFF};
+	static constexpr uint32_t _grayscaleColorsBpp2[4] = {0xFF000000, 0xFF666666, 0xFFBBBBBB, 0xFFFFFFFF};
 	static constexpr uint32_t _grayscaleColorsBpp4[16] = {
-		0xFF000000, 0xFF303030, 0xFF404040, 0xFF505050, 0xFF606060, 0xFF707070, 0xFF808080, 0xFF909090,
-		0xFF989898, 0xFFA0A0A0, 0xFFAAAAAA, 0xFFBBBBBB, 0xFFCCCCCC, 0xFFDDDDDD, 0xFFEEEEEE, 0xFFFFFFFF
-	};
+	    0xFF000000, 0xFF303030, 0xFF404040, 0xFF505050, 0xFF606060, 0xFF707070, 0xFF808080, 0xFF909090,
+	    0xFF989898, 0xFFA0A0A0, 0xFFAAAAAA, 0xFFBBBBBB, 0xFFCCCCCC, 0xFFDDDDDD, 0xFFEEEEEE, 0xFFFFFFFF};
 
 	Emulator* _emu;
 	Debugger* _debugger;
@@ -230,9 +215,11 @@ protected:
 
 	void BlendColors(uint8_t output[4], uint8_t input[4]);
 
-	template<TileFormat format> __forceinline uint32_t GetRgbPixelColor(const uint32_t* colors, uint8_t colorIndex, uint8_t palette);
-	template<TileFormat format> __forceinline uint8_t GetTilePixelColor(const uint8_t* ram, const uint32_t ramMask, uint32_t rowStart, uint8_t pixelIndex);
-	
+	template <TileFormat format>
+	__forceinline uint32_t GetRgbPixelColor(const uint32_t* colors, uint8_t colorIndex, uint8_t palette);
+	template <TileFormat format>
+	__forceinline uint8_t GetTilePixelColor(const uint8_t* ram, const uint32_t ramMask, uint32_t rowStart, uint8_t pixelIndex);
+
 	bool IsTileHidden(MemoryType memType, uint32_t addr, GetTileViewOptions& options);
 
 	uint32_t GetBackgroundColor(TileBackground bgColor, const uint32_t* colors, uint8_t paletteIndex = 0, uint8_t bpp = 0);
@@ -241,18 +228,18 @@ protected:
 	void GetSetTilePixel(AddressInfo tileAddress, TileFormat format, int32_t x, int32_t y, int32_t& color, bool forGet);
 
 public:
-	PpuTools(Debugger* debugger, Emulator *emu);
+	PpuTools(Debugger* debugger, Emulator* emu);
 
 	virtual void GetPpuToolsState(BaseState& state) {};
 
 	virtual DebugPaletteInfo GetPaletteInfo(GetPaletteInfoOptions options) = 0;
 
-	void GetTileView(GetTileViewOptions options, uint8_t *source, uint32_t srcSize, const uint32_t* palette, uint32_t *outBuffer);
+	void GetTileView(GetTileViewOptions options, uint8_t* source, uint32_t srcSize, const uint32_t* palette, uint32_t* outBuffer);
 
 	virtual DebugTilemapTileInfo GetTilemapTileInfo(uint32_t x, uint32_t y, uint8_t* vram, GetTilemapOptions options, BaseState& baseState, BaseState& ppuToolsState) = 0;
 	virtual FrameInfo GetTilemapSize(GetTilemapOptions options, BaseState& state) = 0;
 	virtual DebugTilemapInfo GetTilemap(GetTilemapOptions options, BaseState& state, BaseState& ppuToolsState, uint8_t* vram, uint32_t* palette, uint32_t* outBuffer) = 0;
-	
+
 	virtual DebugSpritePreviewInfo GetSpritePreviewInfo(GetSpritePreviewOptions options, BaseState& state, BaseState& ppuToolsState) = 0;
 	virtual void GetSpriteList(GetSpritePreviewOptions options, BaseState& baseState, BaseState& ppuToolsState, uint8_t* vram, uint8_t* oamRam, uint32_t* palette, DebugSpriteInfo outBuffer[], uint32_t* spritePreviews, uint32_t* screenPreview) = 0;
 
@@ -264,24 +251,22 @@ public:
 	void RemoveViewer(uint32_t viewerId);
 
 	void UpdateViewers(uint16_t scanline, uint16_t cycle);
-	
-	__forceinline bool HasOpenedViewer()
-	{
+
+	__forceinline bool HasOpenedViewer() {
 		return _updateTimings.size() > 0;
 	}
-	template<TileFormat format>
+	template <TileFormat format>
 	void InternalGetTileView(GetTileViewOptions options, uint8_t* source, uint32_t srcSize, const uint32_t* colors, uint32_t* outBuffer);
 };
 
-template<TileFormat format> uint32_t PpuTools::GetRgbPixelColor(const uint32_t* colors, uint8_t colorIndex, uint8_t palette)
-{
-	switch(format) {
+template <TileFormat format>
+uint32_t PpuTools::GetRgbPixelColor(const uint32_t* colors, uint8_t colorIndex, uint8_t palette) {
+	switch (format) {
 		case TileFormat::DirectColor:
 			return ColorUtilities::Rgb555ToArgb(
-				((((colorIndex & 0x07) << 1) | (palette & 0x01)) << 1) |
-				(((colorIndex & 0x38) | ((palette & 0x02) << 1)) << 4) |
-				(((colorIndex & 0xC0) | ((palette & 0x04) << 3)) << 7)
-			);
+			    ((((colorIndex & 0x07) << 1) | (palette & 0x01)) << 1) |
+			    (((colorIndex & 0x38) | ((palette & 0x02) << 1)) << 4) |
+			    (((colorIndex & 0xC0) | ((palette & 0x04) << 3)) << 7));
 
 		case TileFormat::NesBpp2:
 		case TileFormat::Bpp2:
@@ -315,16 +300,16 @@ template<TileFormat format> uint32_t PpuTools::GetRgbPixelColor(const uint32_t* 
 	}
 }
 
-template<TileFormat format> __forceinline uint8_t PpuTools::GetTilePixelColor(const uint8_t* ram, const uint32_t ramMask, uint32_t rowStart, uint8_t pixelIndex)
-{
+template <TileFormat format>
+__forceinline uint8_t PpuTools::GetTilePixelColor(const uint8_t* ram, const uint32_t ramMask, uint32_t rowStart, uint8_t pixelIndex) {
 	uint8_t shift = (7 - pixelIndex);
 	uint8_t color;
-	switch(format) {
+	switch (format) {
 		case TileFormat::PceSpriteBpp4:
 		case TileFormat::PceSpriteBpp2Sp01:
 		case TileFormat::PceSpriteBpp2Sp23:
 			shift = 15 - pixelIndex;
-			if(shift >= 8) {
+			if (shift >= 8) {
 				shift -= 8;
 				rowStart++;
 			}
@@ -334,14 +319,14 @@ template<TileFormat format> __forceinline uint8_t PpuTools::GetTilePixelColor(co
 			break;
 	}
 
-	switch(format) {
+	switch (format) {
 		case TileFormat::PceSpriteBpp4:
 			color = (((ram[(rowStart + 0) & ramMask] >> shift) & 0x01) << 0);
 			color |= (((ram[(rowStart + 32) & ramMask] >> shift) & 0x01) << 1);
 			color |= (((ram[(rowStart + 64) & ramMask] >> shift) & 0x01) << 2);
 			color |= (((ram[(rowStart + 96) & ramMask] >> shift) & 0x01) << 3);
 			return color;
-	
+
 		case TileFormat::PceSpriteBpp2Sp01:
 			color = (((ram[(rowStart + 0) & ramMask] >> shift) & 0x01) << 0);
 			color |= (((ram[(rowStart + 32) & ramMask] >> shift) & 0x01) << 1);
@@ -412,8 +397,8 @@ template<TileFormat format> __forceinline uint8_t PpuTools::GetTilePixelColor(co
 		case TileFormat::GbaBpp4: {
 			uint8_t pixelOffset = (7 - shift);
 			uint32_t addr = (rowStart + (pixelOffset >> 1));
-			if(addr <= ramMask) {
-				if(pixelOffset & 0x01) {
+			if (addr <= ramMask) {
+				if (pixelOffset & 0x01) {
 					return ram[addr] >> 4;
 				} else {
 					return ram[addr] & 0x0F;
@@ -426,7 +411,7 @@ template<TileFormat format> __forceinline uint8_t PpuTools::GetTilePixelColor(co
 		case TileFormat::GbaBpp8: {
 			uint8_t pixelOffset = (7 - shift);
 			uint32_t addr = rowStart + pixelOffset;
-			if(addr <= ramMask) {
+			if (addr <= ramMask) {
 				return ram[addr];
 			} else {
 				return 0;
@@ -436,8 +421,8 @@ template<TileFormat format> __forceinline uint8_t PpuTools::GetTilePixelColor(co
 		case TileFormat::WsBpp4Packed: {
 			uint8_t pixelOffset = (7 - shift);
 			uint32_t addr = (rowStart + (pixelOffset >> 1));
-			if(addr <= ramMask) {
-				if(pixelOffset & 0x01) {
+			if (addr <= ramMask) {
+				if (pixelOffset & 0x01) {
 					return ram[addr] & 0x0F;
 				} else {
 					return ram[addr] >> 4;

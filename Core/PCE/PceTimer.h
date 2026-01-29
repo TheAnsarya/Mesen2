@@ -5,8 +5,7 @@
 
 class PceConsole;
 
-class PceTimer final : public ISerializable
-{
+class PceTimer final : public ISerializable {
 private:
 	PceTimerState _state = {};
 	PceConsole* _console = nullptr;

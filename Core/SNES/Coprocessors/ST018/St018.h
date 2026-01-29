@@ -10,8 +10,7 @@ class Emulator;
 class ArmV3Cpu;
 class SnesMemoryManager;
 
-class St018 final : public BaseCoprocessor
-{
+class St018 final : public BaseCoprocessor {
 private:
 	static constexpr int PrgRomSize = 0x20000;
 	static constexpr int DataRomSize = 0x8000;
@@ -63,7 +62,7 @@ public:
 	void PeekBlock(uint32_t addr, uint8_t* output) override;
 
 	AddressInfo GetAbsoluteAddress(uint32_t address) override;
-	
+
 	AddressInfo GetArmAbsoluteAddress(uint32_t address);
 	int GetArmRelativeAddress(AddressInfo& absoluteAddr);
 

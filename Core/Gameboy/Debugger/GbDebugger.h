@@ -23,8 +23,7 @@ class DummyGbCpu;
 
 enum class MemoryOperationType;
 
-class GbDebugger final : public IDebugger
-{
+class GbDebugger final : public IDebugger {
 	Debugger* _debugger;
 	Emulator* _emu;
 	GbCpu* _cpu;

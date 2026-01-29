@@ -5,8 +5,7 @@
 
 struct RomData;
 
-class UnifLoader : public BaseLoader
-{
+class UnifLoader : public BaseLoader {
 private:
 	static std::unordered_map<string, int> _boardMappings;
 

@@ -1,11 +1,10 @@
-#pragma once 
+#pragma once
 
 #include "pch.h"
 
 class BaseControlDevice;
 
-class IControllerHub
-{
+class IControllerHub {
 public:
 	static constexpr int MaxSubPorts = 5;
 

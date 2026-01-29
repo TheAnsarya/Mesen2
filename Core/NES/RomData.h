@@ -5,15 +5,13 @@
 #include "NES/NesHeader.h"
 #include "Shared/RomInfo.h"
 
-enum class RomHeaderVersion
-{
+enum class RomHeaderVersion {
 	iNes = 0,
 	Nes2_0 = 1,
 	OldiNes = 2
 };
 
-struct NsfHeader
-{
+struct NsfHeader {
 	char Header[5] = {};
 	uint8_t Version = 0;
 	uint8_t TotalSongs = 0;
@@ -31,15 +29,14 @@ struct NsfHeader
 	uint8_t SoundChips = 0;
 	uint8_t Padding[4] = {};
 
-	//NSFe extensions
+	// NSFe extensions
 	char RipperName[256] = {};
 	vector<string> TrackNames;
 	int32_t TrackLength[256] = {};
 	int32_t TrackFade[256] = {};
 };
 
-struct GameInfo
-{
+struct GameInfo {
 	uint32_t Crc = 0;
 	string System;
 	string Board;
@@ -60,8 +57,7 @@ struct GameInfo
 	PpuModel VsPpuModel = {};
 };
 
-struct NesRomInfo
-{
+struct NesRomInfo {
 	string RomName;
 	string Filename;
 	RomFormat Format = {};
@@ -74,7 +70,7 @@ struct NesRomInfo
 
 	uint16_t MapperID = 0;
 	uint8_t SubMapperID = 0;
-	
+
 	GameSystem System = GameSystem::Unknown;
 	VsSystemType VsType = VsSystemType::Default;
 	GameInputType InputType = GameInputType::Unspecified;
@@ -94,22 +90,19 @@ struct NesRomInfo
 	GameInfo DatabaseInfo = {};
 };
 
-struct PageInfo
-{
+struct PageInfo {
 	uint32_t LeadInOffset = 0;
 	uint32_t AudioOffset = 0;
 	vector<uint8_t> Data;
 };
 
-struct StudyBoxData
-{
+struct StudyBoxData {
 	string FileName;
 	vector<uint8_t> AudioFile;
 	vector<PageInfo> Pages;
 };
 
-struct RomData
-{
+struct RomData {
 	NesRomInfo Info = {};
 
 	int32_t ChrRamSize = -1;

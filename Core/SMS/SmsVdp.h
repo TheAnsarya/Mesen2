@@ -11,8 +11,7 @@ class SmsCpu;
 class SmsControlManager;
 class SmsMemoryManager;
 
-enum class SmsVdpMemAccess : uint8_t
-{
+enum class SmsVdpMemAccess : uint8_t {
 	None = 0,
 	BgLoadTable = 1,
 	BgLoadTile = 2,
@@ -22,8 +21,7 @@ enum class SmsVdpMemAccess : uint8_t
 	CpuSlot = 6
 };
 
-class SmsVdp final : public ISerializable
-{
+class SmsVdp final : public ISerializable {
 public:
 	static constexpr int SmsVdpLeftBorder = 8;
 
@@ -38,16 +36,27 @@ private:
 	uint16_t _internalPaletteRam[0x20] = {};
 
 	uint16_t _smsSgPalette[0x10] = {
-		ColorUtilities::Rgb222To555(0x00), ColorUtilities::Rgb222To555(0x00), ColorUtilities::Rgb222To555(0x08), ColorUtilities::Rgb222To555(0x0C),
-		ColorUtilities::Rgb222To555(0x10), ColorUtilities::Rgb222To555(0x30), ColorUtilities::Rgb222To555(0x01), ColorUtilities::Rgb222To555(0x3C),
-		ColorUtilities::Rgb222To555(0x02), ColorUtilities::Rgb222To555(0x03), ColorUtilities::Rgb222To555(0x05), ColorUtilities::Rgb222To555(0x0F),
-		ColorUtilities::Rgb222To555(0x04), ColorUtilities::Rgb222To555(0x33), ColorUtilities::Rgb222To555(0x15), ColorUtilities::Rgb222To555(0x3F),
+	    ColorUtilities::Rgb222To555(0x00),
+	    ColorUtilities::Rgb222To555(0x00),
+	    ColorUtilities::Rgb222To555(0x08),
+	    ColorUtilities::Rgb222To555(0x0C),
+	    ColorUtilities::Rgb222To555(0x10),
+	    ColorUtilities::Rgb222To555(0x30),
+	    ColorUtilities::Rgb222To555(0x01),
+	    ColorUtilities::Rgb222To555(0x3C),
+	    ColorUtilities::Rgb222To555(0x02),
+	    ColorUtilities::Rgb222To555(0x03),
+	    ColorUtilities::Rgb222To555(0x05),
+	    ColorUtilities::Rgb222To555(0x0F),
+	    ColorUtilities::Rgb222To555(0x04),
+	    ColorUtilities::Rgb222To555(0x33),
+	    ColorUtilities::Rgb222To555(0x15),
+	    ColorUtilities::Rgb222To555(0x3F),
 	};
 
-	static constexpr uint16_t _originalSgPalette[0x10] = { 
-		0x0000, 0x0000, 0x2324, 0x3f6b, 0x754a, 0x7dcf, 0x255a, 0x7ba8,
-		0x295f, 0x3dff, 0x2b1a, 0x433c, 0x1ec4, 0x5d79, 0x6739, 0x7fff
-	};
+	static constexpr uint16_t _originalSgPalette[0x10] = {
+	    0x0000, 0x0000, 0x2324, 0x3f6b, 0x754a, 0x7dcf, 0x255a, 0x7ba8,
+	    0x295f, 0x3dff, 0x2b1a, 0x433c, 0x1ec4, 0x5d79, 0x6739, 0x7fff};
 
 	const uint16_t* _activeSgPalette = nullptr;
 	bool _disableBackground = false;
@@ -71,8 +80,7 @@ private:
 	uint8_t _pixelsAvailable = 0;
 	bool _bgHorizontalMirror = false;
 
-	struct SpriteShifter
-	{
+	struct SpriteShifter {
 		uint8_t TileData[4] = {};
 		uint16_t TileAddr = 0;
 		int16_t SpriteX = 0;
@@ -83,7 +91,7 @@ private:
 	uint8_t _evalCounter = 0;
 	uint8_t _inRangeSpriteCount = 0;
 	bool _spriteOverflowPending = false;
-	
+
 	uint8_t _spriteIndex = 0;
 	uint8_t _inRangeSpriteIndex = 0;
 	uint8_t _spriteCount = 0;
@@ -103,7 +111,7 @@ private:
 	bool _needCramDot = false;
 	uint16_t _cramDotColor = 0;
 
-	//Used by SG-1000 modes
+	// Used by SG-1000 modes
 	uint16_t _bgTileIndex = 0;
 	uint8_t _bgPatternData = 0;
 	uint8_t _textModeStep = 0;
@@ -124,7 +132,7 @@ private:
 	void ProcessVramWrite();
 
 	uint8_t ReverseBitOrder(uint8_t val);
-	
+
 	__forceinline void Exec();
 	__forceinline void ExecForcedBlank();
 	__forceinline void ProcessForcedBlankVblank();
@@ -134,7 +142,7 @@ private:
 	void LoadBgTilesSg();
 	void LoadBgTilesSgTextMode();
 	void PushBgPixel(uint8_t color, int index);
-	
+
 	__forceinline void DrawPixel();
 
 	void ProcessScanlineEvents();
@@ -160,7 +168,7 @@ private:
 
 	void InitSmsPostBiosState();
 	void InitGgPowerOnState();
-	
+
 	void UpdateConfig();
 
 public:
@@ -190,8 +198,7 @@ public:
 
 	void DebugWritePalette(uint8_t addr, uint8_t value);
 
-	uint16_t* GetScreenBuffer(bool previousBuffer)
-	{
+	uint16_t* GetScreenBuffer(bool previousBuffer) {
 		return previousBuffer ? ((_currentOutputBuffer == _outputBuffers[0]) ? _outputBuffers[1] : _outputBuffers[0]) : _currentOutputBuffer;
 	}
 

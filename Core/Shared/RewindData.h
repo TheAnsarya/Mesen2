@@ -5,13 +5,12 @@
 
 class Emulator;
 
-class RewindData
-{
+class RewindData {
 private:
 	vector<uint8_t> _saveStateData;
 	vector<uint8_t> _uncompressedData;
 
-	template<typename T>
+	template <typename T>
 	void ProcessXorState(T& data, deque<RewindData>& prevStates, int32_t position);
 
 public:

@@ -10,8 +10,7 @@ class GbCpu;
 class GbPpu;
 class Debugger;
 
-struct GbEventViewerConfig : public BaseEventViewerConfig
-{
+struct GbEventViewerConfig : public BaseEventViewerConfig {
 	EventViewerCategoryCfg Irq;
 	EventViewerCategoryCfg MarkedBreakpoints;
 
@@ -47,10 +46,9 @@ struct GbEventViewerConfig : public BaseEventViewerConfig
 	bool ShowPreviousFrameEvents;
 };
 
-class GbEventManager final : public BaseEventManager
-{
+class GbEventManager final : public BaseEventManager {
 private:
-	static constexpr int ScanlineWidth = 456*2;
+	static constexpr int ScanlineWidth = 456 * 2;
 	static constexpr int ScreenHeight = 154;
 	static constexpr int VBlankScanline = 144;
 

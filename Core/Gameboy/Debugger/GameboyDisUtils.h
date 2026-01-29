@@ -7,8 +7,7 @@ class LabelManager;
 class EmuSettings;
 struct GbCpuState;
 
-class GameboyDisUtils
-{
+class GameboyDisUtils {
 public:
 	static void GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings);
 	static EffectiveAddressInfo GetEffectiveAddress(DisassemblyInfo& info, Gameboy* console, GbCpuState& state);

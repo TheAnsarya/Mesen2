@@ -2,54 +2,50 @@
 #include "pch.h"
 #include "SNES/SnesCpuTypes.h"
 
-enum class Sa1MathOp
-{
+enum class Sa1MathOp {
 	Mul = 0,
 	Div = 1,
 	Sum = 2
 };
 
-enum class Sa1DmaSrcDevice
-{
+enum class Sa1DmaSrcDevice {
 	PrgRom = 0,
 	BwRam = 1,
 	InternalRam = 2,
 	Reserved = 3
 };
 
-enum class Sa1DmaDestDevice
-{
+enum class Sa1DmaDestDevice {
 	InternalRam = 0,
 	BwRam = 1
 };
 
-struct Sa1State
-{
+struct Sa1State {
 	uint16_t Sa1ResetVector;
 	uint16_t Sa1IrqVector;
 	uint16_t Sa1NmiVector;
 
 	bool Sa1IrqRequested;
-	bool Sa1IrqEnabled; //Enables IRQs from S-CPU to SA-1 (SA-1 receives interrupt)
+	bool Sa1IrqEnabled; // Enables IRQs from S-CPU to SA-1 (SA-1 receives interrupt)
 
 	bool Sa1NmiRequested;
-	bool Sa1NmiEnabled; //Enables NMIs from S-CPU to SA-1 (SA-1 receives NMI)
+	bool Sa1NmiEnabled; // Enables NMIs from S-CPU to SA-1 (SA-1 receives NMI)
 	bool Sa1Wait;
 	bool Sa1Reset;
 
 	bool DmaIrqEnabled;
 	bool TimerIrqEnabled;
 
-	uint8_t Sa1MessageReceived; //Sent by the S-CPU
-	uint8_t CpuMessageReceived; //Sent by the SA-1
+	uint8_t Sa1MessageReceived; // Sent by the S-CPU
+	uint8_t CpuMessageReceived; // Sent by the SA-1
 
-	uint16_t CpuIrqVector; //For the S-CPU
-	uint16_t CpuNmiVector; //For the S-CPU
+	uint16_t CpuIrqVector; // For the S-CPU
+	uint16_t CpuNmiVector; // For the S-CPU
 	bool UseCpuIrqVector;
 	bool UseCpuNmiVector;
 
 	bool CpuIrqRequested;
-	bool CpuIrqEnabled; //Enables IRQs from SA-1 to S-CPU
+	bool CpuIrqEnabled; // Enables IRQs from SA-1 to S-CPU
 
 	bool CharConvIrqFlag;
 	bool CharConvIrqEnabled;

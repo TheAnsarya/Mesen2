@@ -11,8 +11,7 @@
 class HandShakeMessage;
 class GameServer;
 
-class GameServerConnection final : public GameConnection, public INotificationListener
-{
+class GameServerConnection final : public GameConnection, public INotificationListener {
 private:
 	GameServer* _server = nullptr;
 
@@ -37,7 +36,7 @@ private:
 
 protected:
 	void ProcessMessage(NetMessage* message) override;
-	
+
 public:
 	GameServerConnection(GameServer* gameServer, Emulator* emu, unique_ptr<Socket> socket, string serverPassword);
 	virtual ~GameServerConnection();

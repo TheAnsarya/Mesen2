@@ -5,43 +5,36 @@
 #include "Utilities/Socket.h"
 #include "Utilities/Serializer.h"
 
-class NetMessage
-{
+class NetMessage {
 protected:
 	MessageType _type;
 	stringstream _receivedData;
 
-	NetMessage(MessageType type)
-	{
+	NetMessage(MessageType type) {
 		_type = type;
 	}
 
-	NetMessage(void* buffer, uint32_t length)
-	{
+	NetMessage(void* buffer, uint32_t length) {
 		_type = (MessageType)((uint8_t*)buffer)[0];
 		_receivedData.write((char*)buffer + 1, length - 1);
 	}
 
 public:
-	virtual ~NetMessage() 
-	{	
+	virtual ~NetMessage() {
 	}
 
-	void Initialize()
-	{
+	void Initialize() {
 		Serializer s(SaveStateManager::FileFormatVersion, false);
-		if(s.LoadFrom(_receivedData)) {
+		if (s.LoadFrom(_receivedData)) {
 			Serialize(s);
 		}
 	}
 
-	MessageType GetType()
-	{
+	MessageType GetType() {
 		return _type;
 	}
 
-	void Send(Socket &socket)
-	{
+	void Send(Socket& socket) {
 		Serializer s(SaveStateManager::FileFormatVersion, true);
 		Serialize(s);
 
@@ -55,5 +48,5 @@ public:
 	}
 
 protected:
-	virtual void Serialize(Serializer &s) = 0;
+	virtual void Serialize(Serializer& s) = 0;
 };

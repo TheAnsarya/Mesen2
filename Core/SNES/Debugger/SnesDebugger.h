@@ -29,8 +29,7 @@ class PpuTools;
 class DummySnesCpu;
 enum class MemoryOperationType;
 
-class SnesDebugger final : public IDebugger
-{
+class SnesDebugger final : public IDebugger {
 	Emulator* _emu;
 	Debugger* _debugger;
 	Disassembler* _disassembler;
@@ -104,11 +103,11 @@ public:
 	StepBackConfig GetStepBackConfig() override;
 
 	void DrawPartialFrame() override;
-	
+
 	DebuggerFeatures GetSupportedFeatures() override;
 	void SetProgramCounter(uint32_t addr, bool updateDebuggerOnly = false) override;
 	uint32_t GetProgramCounter(bool getInstPc) override;
-	
+
 	uint8_t GetCpuFlags(uint32_t addr) override;
 
 	ITraceLogger* GetTraceLogger() override;

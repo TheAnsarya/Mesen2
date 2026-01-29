@@ -13,8 +13,7 @@ class GbaMemoryManager;
 class GbaDmaController;
 class Debugger;
 
-struct GbaEventViewerConfig : public BaseEventViewerConfig
-{
+struct GbaEventViewerConfig : public BaseEventViewerConfig {
 	EventViewerCategoryCfg Irq;
 	EventViewerCategoryCfg MarkedBreakpoints;
 
@@ -53,11 +52,10 @@ struct GbaEventViewerConfig : public BaseEventViewerConfig
 	bool ShowPreviousFrameEvents;
 };
 
-class GbaEventManager final : public BaseEventManager
-{
+class GbaEventManager final : public BaseEventManager {
 private:
-	static constexpr int ScanlineWidth = 308*4;
-	
+	static constexpr int ScanlineWidth = 308 * 4;
+
 	GbaEventViewerConfig _config = {};
 
 	GbaPpu* _ppu = nullptr;

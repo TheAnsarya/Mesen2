@@ -7,13 +7,12 @@
 class GbMemoryManager;
 class GbApu;
 
-class GbTimer : public ISerializable
-{
+class GbTimer : public ISerializable {
 private:
 	GbMemoryManager* _memoryManager = nullptr;
 	GbApu* _apu = nullptr;
 	GbTimerState _state = {};
-	
+
 	void SetDivider(uint16_t value);
 	void ReloadCounter();
 
@@ -25,7 +24,7 @@ public:
 	GbTimerState GetState();
 
 	void Exec();
-	
+
 	bool IsFrameSequencerBitSet();
 
 	uint8_t Read(uint16_t addr);

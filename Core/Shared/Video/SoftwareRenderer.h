@@ -4,18 +4,17 @@
 
 class Emulator;
 
-class SoftwareRenderer : public IRenderingDevice
-{
+class SoftwareRenderer : public IRenderingDevice {
 private:
 	Emulator* _emu = nullptr;
 
 	SimpleLock _frameLock;
 	SimpleLock _textureLock;
-	
+
 	uint32_t _frameWidth = 0;
 	uint32_t _frameHeight = 0;
-	
-	uint32_t* _textureBuffer[2] = { nullptr, nullptr };
+
+	uint32_t* _textureBuffer[2] = {nullptr, nullptr};
 
 	atomic<bool> _needSwap = false;
 

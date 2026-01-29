@@ -6,8 +6,7 @@
 
 class Emulator;
 
-class NesNtscFilter : public BaseVideoFilter
-{
+class NesNtscFilter : public BaseVideoFilter {
 private:
 	nes_ntsc_setup_t _ntscSetup = {};
 	nes_ntsc_t _ntscData = {};
@@ -23,9 +22,9 @@ protected:
 public:
 	NesNtscFilter(Emulator* emu);
 	virtual ~NesNtscFilter();
-	
+
 	OverscanDimensions GetOverscan() override;
 	HudScaleFactors GetScaleFactor() override;
 
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 };

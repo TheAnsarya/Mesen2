@@ -1,7 +1,6 @@
 #pragma once
 
-enum class EventType
-{
+enum class EventType {
 	Nmi,
 	Irq,
 	StartFrame,

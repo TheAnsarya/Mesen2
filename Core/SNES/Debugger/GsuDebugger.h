@@ -15,8 +15,7 @@ class GsuTraceLogger;
 
 enum class MemoryOperationType;
 
-class GsuDebugger final : public IDebugger
-{
+class GsuDebugger final : public IDebugger {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
 	SnesCodeDataLogger* _codeDataLogger;

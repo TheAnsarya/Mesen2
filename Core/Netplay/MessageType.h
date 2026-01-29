@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-enum class MessageType : uint8_t
-{
+enum class MessageType : uint8_t {
 	HandShake = 0,
 	SaveState = 1,
 	InputData = 2,

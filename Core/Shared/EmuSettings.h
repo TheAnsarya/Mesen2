@@ -7,8 +7,7 @@
 
 class Emulator;
 
-class EmuSettings final : public ISerializable
-{
+class EmuSettings final : public ISerializable {
 private:
 	Emulator* _emu;
 	std::mt19937 _mt;
@@ -45,14 +44,14 @@ private:
 
 	SimpleLock _updateShortcutsLock;
 
-	void ProcessString(string &str, const char** strPointer);
+	void ProcessString(string& str, const char** strPointer);
 
 	void ClearShortcutKeys();
 	void SetShortcutKey(EmulatorShortcut shortcut, KeyCombination keyCombination, int keySetIndex);
 
 public:
 	EmuSettings(Emulator* emu);
-	
+
 	void CopySettings(EmuSettings& src);
 
 	void Serialize(Serializer& s) override;
@@ -101,7 +100,7 @@ public:
 
 	void SetPreferences(PreferencesConfig& config);
 	PreferencesConfig& GetPreferences();
-	
+
 	void SetAudioPlayerConfig(AudioPlayerConfig& config);
 	AudioPlayerConfig& GetAudioPlayerConfig();
 
@@ -132,10 +131,9 @@ public:
 	bool IsInputEnabled();
 	double GetControllerDeadzoneRatio();
 
-	template<typename T>
-	bool IsEqual(T& prevCfg, T& newCfg)
-	{
-		if(memcmp(&prevCfg, &newCfg, sizeof(T)) == 0) {
+	template <typename T>
+	bool IsEqual(T& prevCfg, T& newCfg) {
+		if (memcmp(&prevCfg, &newCfg, sizeof(T)) == 0) {
 			return true;
 		}
 		memcpy(&prevCfg, &newCfg, sizeof(T));

@@ -4,8 +4,7 @@
 #include "Shared/BaseState.h"
 #include "Utilities/Serializer.h"
 
-enum class ArmV3CpuMode : uint8_t
-{
+enum class ArmV3CpuMode : uint8_t {
 	User = 0b10000,
 	Fiq = 0b10001,
 	Irq = 0b10010,
@@ -15,8 +14,7 @@ enum class ArmV3CpuMode : uint8_t
 	System = 0b11111,
 };
 
-enum class ArmV3CpuVector : uint32_t
-{
+enum class ArmV3CpuVector : uint32_t {
 	Undefined = 0x04,
 	SoftwareIrq = 0x08,
 	AbortPrefetch = 0x0C,
@@ -27,20 +25,17 @@ enum class ArmV3CpuVector : uint32_t
 
 typedef uint8_t ArmV3AccessModeVal;
 
-namespace ArmV3AccessMode
-{
-	enum Mode
-	{
-		Sequential = (1 << 0),
-		Word = (1 << 1),
-		Byte = (1 << 2),
-		NoRotate = (1 << 3),
-		Prefetch = (1 << 4)
-	};
-}
+namespace ArmV3AccessMode {
+enum Mode {
+	Sequential = (1 << 0),
+	Word = (1 << 1),
+	Byte = (1 << 2),
+	NoRotate = (1 << 3),
+	Prefetch = (1 << 4)
+};
+} // namespace ArmV3AccessMode
 
-struct ArmV3CpuFlags
-{
+struct ArmV3CpuFlags {
 	ArmV3CpuMode Mode;
 	bool FiqDisable;
 	bool IrqDisable;
@@ -50,29 +45,25 @@ struct ArmV3CpuFlags
 	bool Zero;
 	bool Negative;
 
-	uint32_t ToInt32()
-	{
+	uint32_t ToInt32() {
 		return (
-			(Negative << 31) |
-			(Zero << 30) |
-			(Carry << 29) |
-			(Overflow << 28) |
+		    (Negative << 31) |
+		    (Zero << 30) |
+		    (Carry << 29) |
+		    (Overflow << 28) |
 
-			(IrqDisable << 7) |
-			(FiqDisable << 6) |
-			(uint8_t)Mode
-		);
+		    (IrqDisable << 7) |
+		    (FiqDisable << 6) |
+		    (uint8_t)Mode);
 	}
 };
 
-struct ArmV3InstructionData
-{
+struct ArmV3InstructionData {
 	uint32_t Address;
 	uint32_t OpCode;
 };
 
-struct ArmV3CpuPipeline
-{
+struct ArmV3CpuPipeline {
 	ArmV3InstructionData Fetch;
 	ArmV3InstructionData Decode;
 	ArmV3InstructionData Execute;
@@ -80,8 +71,7 @@ struct ArmV3CpuPipeline
 	ArmV3AccessModeVal Mode;
 };
 
-struct ArmV3CpuState : BaseState
-{
+struct ArmV3CpuState : BaseState {
 	ArmV3CpuPipeline Pipeline;
 	uint32_t R[16];
 	ArmV3CpuFlags CPSR;

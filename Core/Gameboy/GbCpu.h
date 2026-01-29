@@ -15,8 +15,7 @@ class Gameboy;
 class GbPpu;
 class Emulator;
 
-class GbCpu : public ISerializable
-{
+class GbCpu : public ISerializable {
 private:
 	GbCpuState _state = {};
 	Register16 _regAF = Register16(&_state.A, &_state.Flags);
@@ -42,7 +41,7 @@ private:
 	__forceinline uint8_t ReadCode();
 	__forceinline uint16_t ReadCodeWord();
 
-	template<GbOamCorruptionType oamCorruptionType = GbOamCorruptionType::Read>
+	template <GbOamCorruptionType oamCorruptionType = GbOamCorruptionType::Read>
 	__forceinline uint8_t Read(uint16_t addr);
 
 	__forceinline void Write(uint16_t addr, uint8_t value);
@@ -82,7 +81,7 @@ private:
 	void AND(uint8_t value);
 	void OR(uint8_t value);
 	void XOR(uint8_t value);
-	
+
 	void CP(uint8_t value);
 
 	void NOP();
@@ -114,22 +113,22 @@ private:
 	void SWAP(uint8_t& dst);
 	void SWAP_Indirect(uint16_t addr);
 
-	template<MemoryOperationType type, GbOamCorruptionType oamCorruptionType>
+	template <MemoryOperationType type, GbOamCorruptionType oamCorruptionType>
 	uint8_t ReadMemory(uint16_t addr);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void BIT(uint8_t src);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void RES(uint8_t& dst);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void RES_Indirect(uint16_t addr);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void SET(uint8_t& dst);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void SET_Indirect(uint16_t addr);
 
 	void DAA();
@@ -146,7 +145,7 @@ private:
 	void RET(bool condition);
 	void RETI();
 	void RST(uint8_t value);
-	
+
 	void POP(Register16& reg);
 	void PUSH(Register16& reg);
 	void POP_AF();
@@ -157,7 +156,7 @@ private:
 	void EI();
 	void DI();
 	void PREFIX();
-	
+
 	__forceinline void ProcessNextCycleStart();
 	__noinline bool HandleStoppedState();
 

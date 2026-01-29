@@ -4,10 +4,8 @@
 
 class LabelManager;
 
-class GbAssembler : public IAssembler
-{
-	enum class ParamType
-	{
+class GbAssembler : public IAssembler {
+	enum class ParamType {
 		None,
 		Literal,
 		Byte,
@@ -18,14 +16,12 @@ class GbAssembler : public IAssembler
 		StackOffset
 	};
 
-	struct ParamEntry
-	{
+	struct ParamEntry {
 		string Param;
 		ParamType Type;
 	};
 
-	struct OpCodeEntry
-	{
+	struct OpCodeEntry {
 		uint16_t OpCode;
 		int ParamCount;
 		ParamEntry Param1;

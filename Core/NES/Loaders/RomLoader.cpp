@@ -16,9 +16,8 @@
 #include "NES/NesHeader.h"
 #include "NES/GameDatabase.h"
 
-bool RomLoader::LoadFile(VirtualFile &romFile, RomData& romData, bool databaseEnabled)
-{
-	if(!romFile.IsValid()) {
+bool RomLoader::LoadFile(VirtualFile& romFile, RomData& romData, bool databaseEnabled) {
+	if (!romFile.IsValid()) {
 		return false;
 	}
 
@@ -26,10 +25,10 @@ bool RomLoader::LoadFile(VirtualFile &romFile, RomData& romData, bool databaseEn
 
 	vector<uint8_t>& fileData = romData.RawData;
 	romFile.ReadFile(fileData);
-	if(fileData.size() < 15) {
+	if (fileData.size() < 15) {
 		return false;
 	}
-	
+
 	string filename = romFile.GetFileName();
 	string romName = FolderUtilities::GetFilename(filename, true);
 
@@ -42,27 +41,27 @@ bool RomLoader::LoadFile(VirtualFile &romFile, RomData& romData, bool databaseEn
 	crcHex << std::hex << std::uppercase << std::setfill('0') << std::setw(8) << crc;
 	MessageManager::Log("File CRC32: 0x" + crcHex.str());
 
-	if(memcmp(fileData.data(), "NES\x1a", 4) == 0) {
+	if (memcmp(fileData.data(), "NES\x1a", 4) == 0) {
 		iNesLoader loader;
 		loader.LoadRom(romData, fileData, nullptr, databaseEnabled);
-	} else if(memcmp(fileData.data(), "FDS\x1a", 4) == 0 || memcmp(fileData.data(), "\x1*NINTENDO-HVC*", 15) == 0) {
+	} else if (memcmp(fileData.data(), "FDS\x1a", 4) == 0 || memcmp(fileData.data(), "\x1*NINTENDO-HVC*", 15) == 0) {
 		FdsLoader loader;
 		loader.LoadRom(romData, fileData);
-	} else if(memcmp(fileData.data(), "NESM\x1a", 5) == 0) {
+	} else if (memcmp(fileData.data(), "NESM\x1a", 5) == 0) {
 		NsfLoader loader;
 		loader.LoadRom(romData, fileData);
-	} else if(memcmp(fileData.data(), "NSFE", 4) == 0) {
+	} else if (memcmp(fileData.data(), "NSFE", 4) == 0) {
 		NsfeLoader loader;
 		loader.LoadRom(romData, fileData);
-	} else if(memcmp(fileData.data(), "UNIF", 4) == 0) {
+	} else if (memcmp(fileData.data(), "UNIF", 4) == 0) {
 		UnifLoader loader;
 		loader.LoadRom(romData, fileData, databaseEnabled);
-	} else if(memcmp(fileData.data(), "STBX", 4) == 0) {
+	} else if (memcmp(fileData.data(), "STBX", 4) == 0) {
 		StudyBoxLoader loader;
 		loader.LoadRom(romData, fileData, romFile.GetFilePath());
 	} else {
 		NesHeader header = {};
-		if(GameDatabase::GetiNesHeader(crc, header)) {
+		if (GameDatabase::GetiNesHeader(crc, header)) {
 			MessageManager::Log("[DB] Headerless ROM file found - using game database data.");
 			iNesLoader loader;
 			loader.LoadRom(romData, fileData, &header, true);
@@ -76,15 +75,15 @@ bool RomLoader::LoadFile(VirtualFile &romFile, RomData& romData, bool databaseEn
 	romData.Info.RomName = romName;
 	romData.Info.Filename = filename;
 
-	if(romData.Info.System == GameSystem::Unknown) {
-		//Use filename to detect PAL/VS system games
+	if (romData.Info.System == GameSystem::Unknown) {
+		// Use filename to detect PAL/VS system games
 		string name = romData.Info.Filename;
 		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 
-		if(name.find("(e)") != string::npos || name.find("(australia)") != string::npos || name.find("(europe)") != string::npos ||
-			name.find("(germany)") != string::npos || name.find("(spain)") != string::npos) {
+		if (name.find("(e)") != string::npos || name.find("(australia)") != string::npos || name.find("(europe)") != string::npos ||
+		    name.find("(germany)") != string::npos || name.find("(spain)") != string::npos) {
 			romData.Info.System = GameSystem::NesPal;
-		} else if(name.find("(vs)") != string::npos) {
+		} else if (name.find("(vs)") != string::npos) {
 			romData.Info.System = GameSystem::VsSystem;
 		} else {
 			romData.Info.System = GameSystem::NesNtsc;

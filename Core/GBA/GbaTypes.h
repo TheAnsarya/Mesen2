@@ -5,8 +5,7 @@
 #include "Shared/ArmEnums.h"
 #include "Utilities/Serializer.h"
 
-enum class GbaCpuMode : uint8_t
-{
+enum class GbaCpuMode : uint8_t {
 	User = 0b10000,
 	Fiq = 0b10001,
 	Irq = 0b10010,
@@ -16,8 +15,7 @@ enum class GbaCpuMode : uint8_t
 	System = 0b11111,
 };
 
-enum class GbaCpuVector : uint32_t
-{
+enum class GbaCpuVector : uint32_t {
 	Undefined = 0x04,
 	SoftwareIrq = 0x08,
 	AbortPrefetch = 0x0C,
@@ -28,23 +26,20 @@ enum class GbaCpuVector : uint32_t
 
 typedef uint8_t GbaAccessModeVal;
 
-namespace GbaAccessMode
-{
-	enum Mode
-	{
-		Sequential = (1 << 0),
-		Word = (1 << 1),
-		HalfWord = (1 << 2),
-		Byte = (1 << 3),
-		Signed = (1 << 4),
-		NoRotate = (1 << 5),
-		Prefetch = (1 << 6),
-		Dma = (1 << 7)
-	};
-}
+namespace GbaAccessMode {
+enum Mode {
+	Sequential = (1 << 0),
+	Word = (1 << 1),
+	HalfWord = (1 << 2),
+	Byte = (1 << 3),
+	Signed = (1 << 4),
+	NoRotate = (1 << 5),
+	Prefetch = (1 << 6),
+	Dma = (1 << 7)
+};
+} // namespace GbaAccessMode
 
-struct GbaCpuFlags
-{
+struct GbaCpuFlags {
 	GbaCpuMode Mode;
 	bool Thumb;
 	bool FiqDisable;
@@ -54,31 +49,27 @@ struct GbaCpuFlags
 	bool Carry;
 	bool Zero;
 	bool Negative;
-	
-	uint32_t ToInt32()
-	{
+
+	uint32_t ToInt32() {
 		return (
-			(Negative << 31) |
-			(Zero << 30) |
-			(Carry << 29) |
-			(Overflow << 28) |
-			
-			(IrqDisable << 7) |
-			(FiqDisable << 6) |
-			(Thumb << 5) |
-			(uint8_t)Mode
-		);
+		    (Negative << 31) |
+		    (Zero << 30) |
+		    (Carry << 29) |
+		    (Overflow << 28) |
+
+		    (IrqDisable << 7) |
+		    (FiqDisable << 6) |
+		    (Thumb << 5) |
+		    (uint8_t)Mode);
 	}
 };
 
-struct GbaInstructionData
-{
+struct GbaInstructionData {
 	uint32_t Address;
 	uint32_t OpCode;
 };
 
-struct GbaCpuPipeline
-{
+struct GbaCpuPipeline {
 	GbaInstructionData Fetch;
 	GbaInstructionData Decode;
 	GbaInstructionData Execute;
@@ -86,8 +77,7 @@ struct GbaCpuPipeline
 	GbaAccessModeVal Mode;
 };
 
-struct GbaCpuState : BaseState
-{
+struct GbaCpuState : BaseState {
 	GbaCpuPipeline Pipeline;
 	uint32_t R[16];
 	GbaCpuFlags CPSR;
@@ -107,20 +97,18 @@ struct GbaCpuState : BaseState
 	GbaCpuFlags SupervisorSpsr;
 	GbaCpuFlags AbortSpsr;
 	GbaCpuFlags UndefinedSpsr;
-	
+
 	uint64_t CycleCount;
 };
 
-enum class GbaBgStereoMode : uint8_t
-{
+enum class GbaBgStereoMode : uint8_t {
 	Disabled,
 	EvenColumns,
 	OddColumns,
 	Both
 };
 
-struct GbaBgConfig
-{
+struct GbaBgConfig {
 	uint16_t Control;
 	uint16_t TilemapAddr;
 	uint16_t TilesetAddr;
@@ -139,8 +127,7 @@ struct GbaBgConfig
 	GbaBgStereoMode StereoMode;
 };
 
-struct GbaTransformConfig
-{
+struct GbaTransformConfig {
 	uint32_t OriginX;
 	uint32_t OriginY;
 
@@ -154,44 +141,38 @@ struct GbaTransformConfig
 	bool NeedInit;
 };
 
-struct GbaWindowConfig
-{
+struct GbaWindowConfig {
 	uint8_t LeftX;
 	uint8_t RightX;
 	uint8_t TopY;
 	uint8_t BottomY;
 };
 
-enum class GbaPpuBlendEffect : uint8_t
-{
+enum class GbaPpuBlendEffect : uint8_t {
 	None,
 	AlphaBlend,
 	IncreaseBrightness,
 	DecreaseBrightness
 };
 
-enum class GbaPpuObjMode : uint8_t
-{
+enum class GbaPpuObjMode : uint8_t {
 	Normal,
 	Blending,
 	Window,
 	Stereoscopic
 };
 
-namespace GbaPpuMemAccess
-{
-	enum GbaPpuMemAccess : uint8_t
-	{
-		None = 0,
-		Palette = 1,
-		Vram = 2,
-		Oam = 4,
-		VramObj = 8
-	};
-}
+namespace GbaPpuMemAccess {
+enum GbaPpuMemAccess : uint8_t {
+	None = 0,
+	Palette = 1,
+	Vram = 2,
+	Oam = 4,
+	VramObj = 8
+};
+} // namespace GbaPpuMemAccess
 
-struct GbaPpuState : BaseState
-{
+struct GbaPpuState : BaseState {
 	uint32_t FrameCount;
 	uint16_t Cycle;
 	uint16_t Scanline;
@@ -243,20 +224,19 @@ struct GbaPpuState : BaseState
 	bool WindowActiveLayers[5][6];
 };
 
-struct GbaMemoryManagerState
-{
-	uint16_t IE; //200-201
-	uint16_t IF; //202-203
+struct GbaMemoryManagerState {
+	uint16_t IE; // 200-201
+	uint16_t IF; // 202-203
 	uint16_t NewIE;
 	uint16_t NewIF;
 
-	uint16_t WaitControl; //204-205
-	uint8_t PrgWaitStates0[2] = { 5,3 };
-	uint8_t PrgWaitStates1[2] = { 5,5 };
-	uint8_t PrgWaitStates2[2] = { 5,9 };
+	uint16_t WaitControl; // 204-205
+	uint8_t PrgWaitStates0[2] = {5, 3};
+	uint8_t PrgWaitStates1[2] = {5, 5};
+	uint8_t PrgWaitStates2[2] = {5, 9};
 	uint8_t SramWaitStates = 5;
 	bool PrefetchEnabled;
-	uint8_t IME; //208-20B
+	uint8_t IME; // 208-20B
 	uint8_t NewIME;
 	uint8_t IrqUpdateCounter;
 	uint8_t IrqLine;
@@ -270,8 +250,7 @@ struct GbaMemoryManagerState
 	uint8_t IwramOpenBus[4];
 };
 
-struct GbaRomPrefetchState
-{
+struct GbaRomPrefetchState {
 	uint32_t ReadAddr;
 	uint32_t PrefetchAddr;
 	uint8_t ClockCounter;
@@ -281,8 +260,7 @@ struct GbaRomPrefetchState
 	bool HitBoundary;
 };
 
-struct GbaTimerState
-{
+struct GbaTimerState {
 	uint16_t ReloadValue;
 	uint16_t NewReloadValue;
 	uint16_t PrescaleMask;
@@ -297,29 +275,25 @@ struct GbaTimerState
 	bool ProcessTimer;
 };
 
-struct GbaTimersState
-{
+struct GbaTimersState {
 	GbaTimerState Timer[4];
 };
 
-enum class GbaDmaTrigger : uint8_t
-{
+enum class GbaDmaTrigger : uint8_t {
 	Immediate = 0,
 	VBlank = 1,
 	HBlank = 2,
 	Special = 3
 };
 
-enum class GbaDmaAddrMode : uint8_t
-{
+enum class GbaDmaAddrMode : uint8_t {
 	Increment,
 	Decrement,
 	Fixed,
 	IncrementReload
 };
 
-struct GbaDmaChannel
-{
+struct GbaDmaChannel {
 	uint64_t StartClock;
 	uint32_t ReadValue;
 
@@ -348,13 +322,11 @@ struct GbaDmaChannel
 	bool Pending;
 };
 
-struct GbaDmaControllerState
-{
+struct GbaDmaControllerState {
 	GbaDmaChannel Ch[4];
 };
 
-struct GbaSquareState
-{
+struct GbaSquareState {
 	uint16_t Frequency;
 	uint16_t Timer;
 
@@ -385,8 +357,7 @@ struct GbaSquareState
 	uint8_t Output;
 };
 
-struct GbaNoiseState
-{
+struct GbaNoiseState {
 	uint8_t Volume;
 	uint8_t EnvVolume;
 	bool EnvRaiseVolume;
@@ -408,8 +379,7 @@ struct GbaNoiseState
 	uint8_t Output;
 };
 
-struct GbaWaveState
-{
+struct GbaWaveState {
 	bool DacEnabled;
 	bool DoubleLength;
 	uint8_t SelectedBank;
@@ -430,8 +400,7 @@ struct GbaWaveState
 	uint8_t Output;
 };
 
-struct GbaApuState
-{
+struct GbaApuState {
 	int8_t DmaSampleA;
 	int8_t DmaSampleB;
 
@@ -439,7 +408,7 @@ struct GbaApuState
 	uint8_t GbVolume;
 	uint8_t VolumeA;
 	uint8_t VolumeB;
-	
+
 	uint8_t DmaSoundControl;
 	bool EnableRightA;
 	bool EnableLeftA;
@@ -470,37 +439,34 @@ struct GbaApuState
 	uint8_t SamplingRate;
 };
 
-struct GbaSerialState
-{
+struct GbaSerialState {
 	uint64_t StartMasterClock;
 	uint64_t EndMasterClock;
 	uint64_t IrqMasterClock;
 
-	uint16_t Data[4]; //120-127
-	
-	uint16_t Control; //128-129
+	uint16_t Data[4]; // 120-127
+
+	uint16_t Control; // 128-129
 	bool InternalShiftClock;
 	bool InternalShiftClockSpeed2MHz;
 	bool Active;
 	bool TransferWord;
 	bool IrqEnabled;
 
-	uint16_t SendData; //12A-12B
-	uint16_t Mode; //134-135
-	uint16_t JoyControl; //140-141
-	uint32_t JoyReceive; //150-153
-	uint32_t JoySend; //154-157
-	uint8_t JoyStatus; //158
+	uint16_t SendData;   // 12A-12B
+	uint16_t Mode;       // 134-135
+	uint16_t JoyControl; // 140-141
+	uint32_t JoyReceive; // 150-153
+	uint32_t JoySend;    // 154-157
+	uint8_t JoyStatus;   // 158
 };
 
-struct GbaControlManagerState
-{
+struct GbaControlManagerState {
 	uint16_t KeyControl;
 	uint16_t ActiveKeys;
 };
 
-struct GbaApuDebugState
-{
+struct GbaApuDebugState {
 	GbaApuState Common;
 	GbaSquareState Square1;
 	GbaSquareState Square2;
@@ -508,21 +474,18 @@ struct GbaApuDebugState
 	GbaNoiseState Noise;
 };
 
-struct GbaGpioState
-{
+struct GbaGpioState {
 	uint8_t Data;
 	uint8_t WritablePins;
 	bool ReadWrite;
 };
 
-struct GbaCartState
-{
+struct GbaCartState {
 	bool HasGpio;
 	GbaGpioState Gpio;
 };
 
-struct GbaState
-{
+struct GbaState {
 	GbaCpuState Cpu;
 	GbaPpuState Ppu;
 	GbaApuDebugState Apu;
@@ -534,8 +497,7 @@ struct GbaState
 	GbaCartState Cart;
 };
 
-enum class GbaThumbOpCategory
-{
+enum class GbaThumbOpCategory {
 	MoveShiftedRegister,
 	AddSubtract,
 	MoveCmpAddSub,
@@ -559,8 +521,7 @@ enum class GbaThumbOpCategory
 	InvalidOp,
 };
 
-enum class GbaIrqSource
-{
+enum class GbaIrqSource {
 	None = 0,
 	LcdVblank = 1 << 0,
 	LcdHblank = 1 << 1,
@@ -582,12 +543,11 @@ enum class GbaIrqSource
 	External = 1 << 13
 };
 
-class GbaConstants
-{
+class GbaConstants {
 public:
 	static constexpr uint32_t ScreenWidth = 240;
 	static constexpr uint32_t ScreenHeight = 160;
 	static constexpr uint32_t PixelCount = GbaConstants::ScreenWidth * GbaConstants::ScreenHeight;
-	
+
 	static constexpr uint32_t ScanlineCount = 228;
 };

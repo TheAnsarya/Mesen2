@@ -7,8 +7,7 @@
 class SmsConsole;
 class SmsVdp;
 
-class SmsControlManager : public BaseControlManager
-{
+class SmsControlManager : public BaseControlManager {
 private:
 	SmsConsole* _console = nullptr;
 	SmsVdp* _vdp = nullptr;

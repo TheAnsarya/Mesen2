@@ -10,8 +10,7 @@ class Emulator;
 class EmuSettings;
 struct RenderedFrame;
 
-enum class RewindState
-{
+enum class RewindState {
 	Stopped = 0,
 	Stopping = 1,
 	Starting = 2,
@@ -19,8 +18,7 @@ enum class RewindState
 	Debugging = 4
 };
 
-struct VideoFrame
-{
+struct VideoFrame {
 	vector<uint32_t> Data;
 	uint32_t Width = 0;
 	uint32_t Height = 0;
@@ -29,22 +27,20 @@ struct VideoFrame
 	vector<ControllerData> InputData;
 };
 
-struct RewindStats
-{
+struct RewindStats {
 	uint32_t MemoryUsage;
 	uint32_t HistorySize;
 	uint32_t HistoryDuration;
 };
 
-class RewindManager : public INotificationListener, public IInputProvider, public IInputRecorder
-{
+class RewindManager : public INotificationListener, public IInputProvider, public IInputRecorder {
 public:
-	static constexpr int32_t BufferSize = 30; //Number of frames between each save state
+	static constexpr int32_t BufferSize = 30; // Number of frames between each save state
 
 private:
 	Emulator* _emu = nullptr;
 	EmuSettings* _settings = nullptr;
-	
+
 	bool _hasHistory = false;
 
 	deque<RewindData> _history;
@@ -69,7 +65,7 @@ private:
 
 	void ProcessFrame(RenderedFrame& frame, bool forRewind);
 	bool ProcessAudio(int16_t* soundBuffer, uint32_t sampleCount);
-	
+
 	void ClearBuffer();
 
 public:
@@ -83,7 +79,7 @@ public:
 	void ProcessEndOfFrame();
 
 	void RecordInput(vector<shared_ptr<BaseControlDevice>> devices) override;
-	bool SetInput(BaseControlDevice *device) override;
+	bool SetInput(BaseControlDevice* device) override;
 
 	void StartRewinding(bool forDebugger = false);
 	void StopRewinding(bool forDebugger = false, bool deleteFutureData = false);
@@ -96,5 +92,5 @@ public:
 	RewindStats GetStats();
 
 	void SendFrame(RenderedFrame& frame, bool forRewind);
-	bool SendAudio(int16_t *soundBuffer, uint32_t sampleCount);
+	bool SendAudio(int16_t* soundBuffer, uint32_t sampleCount);
 };

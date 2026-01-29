@@ -17,8 +17,7 @@ class EmuSettings;
 enum class FrameType;
 enum class ConsoleRegion;
 
-class NesApu : public ISerializable, public INesMemoryHandler
-{
+class NesApu : public ISerializable, public INesMemoryHandler {
 	friend ApuFrameCounter;
 
 private:

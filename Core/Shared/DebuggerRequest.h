@@ -4,8 +4,7 @@
 class Debugger;
 class Emulator;
 
-class DebuggerRequest
-{
+class DebuggerRequest {
 private:
 	shared_ptr<Debugger> _debugger;
 	Emulator* _emu = nullptr;

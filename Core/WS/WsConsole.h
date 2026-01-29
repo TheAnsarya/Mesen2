@@ -16,8 +16,7 @@ class WsDmaController;
 class WsEeprom;
 enum class WsModel : uint8_t;
 
-class WsConsole final : public IConsole
-{
+class WsConsole final : public IConsole {
 private:
 	Emulator* _emu = nullptr;
 	unique_ptr<WsCpu> _cpu;
@@ -52,15 +51,15 @@ private:
 
 	WsModel _model = {};
 	bool _verticalMode = false;
-	
+
 	void InitPostBootRomState();
 
 public:
 	WsConsole(Emulator* emu);
 	~WsConsole();
 
-	static vector<string> GetSupportedExtensions() { return { ".ws", ".wsc" }; }
-	static vector<string> GetSupportedSignatures() { return { }; }
+	static vector<string> GetSupportedExtensions() { return {".ws", ".wsc"}; }
+	static vector<string> GetSupportedSignatures() { return {}; }
 
 	LoadRomResult LoadRom(VirtualFile& romFile) override;
 	void RunFrame() override;
@@ -92,7 +91,7 @@ public:
 	AddressInfo GetAbsoluteAddress(uint32_t relAddr);
 	AddressInfo GetAbsoluteAddress(AddressInfo& relAddress) override;
 	AddressInfo GetRelativeAddress(AddressInfo& absAddress, CpuType cpuType) override;
-	
+
 	WsState GetState();
 	void GetConsoleState(BaseState& state, ConsoleType consoleType) override;
 

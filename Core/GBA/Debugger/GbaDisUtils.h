@@ -8,8 +8,7 @@ class EmuSettings;
 class FastString;
 struct GbaCpuState;
 
-class GbaDisUtils
-{
+class GbaDisUtils {
 private:
 	static void ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings);
 	static void ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings);

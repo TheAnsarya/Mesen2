@@ -23,8 +23,7 @@ class DummySmsCpu;
 
 enum class MemoryOperationType;
 
-class SmsDebugger final : public IDebugger
-{
+class SmsDebugger final : public IDebugger {
 	Debugger* _debugger;
 	Emulator* _emu;
 	SmsCpu* _cpu;
@@ -64,7 +63,7 @@ public:
 	void ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType type);
 	void ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType type);
 
-	template<MemoryOperationType opType>
+	template <MemoryOperationType opType>
 	void ProcessMemoryAccess(uint32_t addr, uint8_t value, MemoryType memType);
 
 	void ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi) override;

@@ -7,8 +7,7 @@
 #include "Shared/RewindManager.h"
 #include "Shared/EmuSettings.h"
 
-void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
-{
+void DebugStats::DisplayStats(Emulator* emu, double lastFrameTime) {
 	AudioStatistics stats = emu->GetSoundMixer()->GetStatistics();
 	AudioConfig audioCfg = emu->GetSettings()->GetAudioConfig();
 	DebugHud* hud = emu->GetDebugHud();
@@ -38,7 +37,7 @@ void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
 	hud->DrawString(134, 10, "Video Stats", 0xFFFFFF, 0xFF000000, 1, startFrame);
 
 	double totalDuration = 0;
-	for(int i = 0; i < 60; i++) {
+	for (int i = 0; i < 60; i++) {
 		totalDuration += _frameDurations[i];
 	}
 
@@ -50,7 +49,7 @@ void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
 	ss << "Last Frame: " << std::fixed << std::setprecision(2) << lastFrameTime << " ms";
 	hud->DrawString(134, 30, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 
-	if(emu->GetFrameCount() > 60) {
+	if (emu->GetFrameCount() > 60) {
 		_lastFrameMin = std::min(lastFrameTime, _lastFrameMin);
 		_lastFrameMax = std::max(lastFrameTime, _lastFrameMax);
 	} else {
@@ -71,7 +70,7 @@ void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
 
 	double expectedFrameDelay = 1000 / emu->GetFps();
 
-	for(int i = 0; i < 59; i++) {
+	for (int i = 0; i < 59; i++) {
 		double duration = _frameDurations[(_frameDurationIndex + i) % 60];
 		double nextDuration = _frameDurations[(_frameDurationIndex + i + 1) % 60];
 
@@ -79,12 +78,12 @@ void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
 		nextDuration = std::min(25.0, std::max(10.0, nextDuration));
 
 		int lineColor = 0x00FF00;
-		if(std::abs(duration - expectedFrameDelay) > 2) {
+		if (std::abs(duration - expectedFrameDelay) > 2) {
 			lineColor = 0xFF0000;
-		} else if(std::abs(duration - expectedFrameDelay) > 1) {
+		} else if (std::abs(duration - expectedFrameDelay) > 1) {
 			lineColor = 0xFFA500;
 		}
-		hud->DrawLine(130 + i*2, 60 + 50 - duration*2, 130 + i*2 + 2, 60 + 50 - nextDuration*2, lineColor, 1, startFrame);
+		hud->DrawLine(130 + i * 2, 60 + 50 - duration * 2, 130 + i * 2 + 2, 60 + 50 - nextDuration * 2, lineColor, 1, startFrame);
 	}
 
 	hud->DrawRectangle(8, 60, 115, 34, 0x40000000, true, 1, startFrame);
@@ -98,7 +97,7 @@ void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
 	ss << "Rewind mem.: " << std::fixed << std::setprecision(2) << memUsage << " MB";
 	hud->DrawString(10, 73, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 
-	if(rewindStats.HistoryDuration > 0) {
+	if (rewindStats.HistoryDuration > 0) {
 		ss = std::stringstream();
 		ss << "   Per min.: " << std::fixed << std::setprecision(2) << (memUsage * 60 * 60 / rewindStats.HistoryDuration) << " MB";
 		hud->DrawString(9, 82, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);

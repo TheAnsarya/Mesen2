@@ -16,8 +16,7 @@ class EmuSettings;
 
 enum class MemoryOperationType;
 
-class Cx4Debugger final : public IDebugger
-{
+class Cx4Debugger final : public IDebugger {
 	Debugger* _debugger;
 	Disassembler* _disassembler;
 	SnesCodeDataLogger* _codeDataLogger;

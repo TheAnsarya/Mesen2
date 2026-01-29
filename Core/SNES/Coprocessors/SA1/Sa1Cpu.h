@@ -7,8 +7,7 @@
 class Sa1;
 class Emulator;
 
-class Sa1Cpu : public ISerializable
-{
+class Sa1Cpu : public ISerializable {
 public:
 	static constexpr uint32_t NmiVector = 0x00FFEA;
 	static constexpr uint32_t ResetVector = 0x00FFFC;
@@ -69,8 +68,8 @@ private:
 	__forceinline void RestrictStackPointerValue();
 	void SetPS(uint8_t ps);
 
-	void SetRegister(uint8_t &reg, uint8_t value);
-	void SetRegister(uint16_t &reg, uint16_t value, bool eightBitMode);
+	void SetRegister(uint8_t& reg, uint8_t value);
+	void SetRegister(uint16_t& reg, uint16_t value, bool eightBitMode);
 
 	void SetZeroNegativeFlags(uint16_t value);
 	void SetZeroNegativeFlags(uint8_t value);
@@ -100,7 +99,7 @@ private:
 	void PushWord(uint16_t value, bool allowEmulationMode = true);
 	uint16_t PopWord(bool allowEmulationMode = true);
 
-	//Add/subtract instructions
+	// Add/subtract instructions
 	void Add8(uint8_t value);
 	void Add16(uint16_t value);
 	void ADC();
@@ -109,7 +108,7 @@ private:
 	void Sub16(uint16_t value);
 	void SBC();
 
-	//Branch instructions
+	// Branch instructions
 	void BCC();
 	void BCS();
 	void BEQ();
@@ -122,7 +121,7 @@ private:
 	void BVS();
 	void BranchRelative(bool branch);
 
-	//Set/clear flag instructions
+	// Set/clear flag instructions
 	void CLC();
 	void CLD();
 	void CLI();
@@ -134,7 +133,7 @@ private:
 	void REP();
 	void SEP();
 
-	//Increment/decrement instructions
+	// Increment/decrement instructions
 	void DEX();
 	void DEY();
 	void INX();
@@ -145,16 +144,16 @@ private:
 	void DEC_Acc();
 	void INC_Acc();
 
-	void IncDecReg(uint16_t & reg, int8_t offset);
+	void IncDecReg(uint16_t& reg, int8_t offset);
 	void IncDec(int8_t offset);
 
-	//Compare instructions
+	// Compare instructions
 	void Compare(uint16_t reg, bool eightBitMode);
 	void CMP();
 	void CPX();
 	void CPY();
 
-	//Jump instructions
+	// Jump instructions
 	void JML();
 	void JMP();
 	void JSL();
@@ -166,22 +165,26 @@ private:
 	void JMP_AbsIdxXInd();
 	void JSR_AbsIdxXInd();
 
-	//Interrupts
+	// Interrupts
 	void ProcessInterrupt(uint16_t vector, bool forHardwareInterrupt);
 	void BRK();
 	void COP();
 
-	//Bitwise operations
+	// Bitwise operations
 	void AND();
 	void EOR();
 	void ORA();
 
-	template<typename T> T ShiftLeft(T value);
-	template<typename T> T RollLeft(T value);
-	template<typename T> T ShiftRight(T value);
-	template<typename T> T RollRight(T value);
+	template <typename T>
+	T ShiftLeft(T value);
+	template <typename T>
+	T RollLeft(T value);
+	template <typename T>
+	T ShiftRight(T value);
+	template <typename T>
+	T RollRight(T value);
 
-	//Shift operations
+	// Shift operations
 	void ASL_Acc();
 	void ASL();
 	void LSR_Acc();
@@ -191,11 +194,11 @@ private:
 	void ROR_Acc();
 	void ROR();
 
-	//Move operations
+	// Move operations
 	void MVN();
 	void MVP();
 
-	//Push/pull instructions
+	// Push/pull instructions
 	void PEA();
 	void PEI();
 	void PER();
@@ -215,10 +218,10 @@ private:
 	void PLY();
 
 	void PushRegister(uint16_t reg, bool eightBitMode);
-	void PullRegister(uint16_t &reg, bool eightBitMode);
+	void PullRegister(uint16_t& reg, bool eightBitMode);
 
-	//Store/load instructions
-	void LoadRegister(uint16_t &reg, bool eightBitMode);
+	// Store/load instructions
+	void LoadRegister(uint16_t& reg, bool eightBitMode);
 	void StoreRegister(uint16_t val, bool eightBitMode);
 
 	void LDA();
@@ -230,14 +233,15 @@ private:
 	void STY();
 	void STZ();
 
-	//Test bits
-	template<typename T> void TestBits(T value, bool alterZeroFlagOnly);
+	// Test bits
+	template <typename T>
+	void TestBits(T value, bool alterZeroFlagOnly);
 	void BIT();
 
 	void TRB();
 	void TSB();
 
-	//Transfer registers
+	// Transfer registers
 	void TAX();
 	void TAY();
 	void TCD();
@@ -253,30 +257,30 @@ private:
 	void XBA();
 	void XCE();
 
-	//No operation
+	// No operation
 	void NOP();
 	void WDM();
 
-	//Misc.
+	// Misc.
 	void STP();
 	void WAI();
 
-	//Addressing modes
-	//Absolute: a
+	// Addressing modes
+	// Absolute: a
 	void AddrMode_Abs();
-	//Absolute Indexed: a,x
+	// Absolute Indexed: a,x
 	void AddrMode_AbsIdxX(bool isWrite);
-	//Absolute Indexed: a,y
+	// Absolute Indexed: a,y
 	void AddrMode_AbsIdxY(bool isWrite);
-	//Absolute Long: al
+	// Absolute Long: al
 	void AddrMode_AbsLng();
-	//Absolute Long Indexed: al,x
+	// Absolute Long Indexed: al,x
 	void AddrMode_AbsLngIdxX();
 
 	void AddrMode_AbsJmp();
 	void AddrMode_AbsLngJmp();
-	void AddrMode_AbsInd(); //JMP only
-	void AddrMode_AbsIndLng(); //JML only
+	void AddrMode_AbsInd();    // JMP only
+	void AddrMode_AbsIndLng(); // JML only
 
 	void AddrMode_Acc();
 
@@ -284,22 +288,22 @@ private:
 
 	uint8_t ReadDirectOperandByte();
 
-	//Direct: d
+	// Direct: d
 	void AddrMode_Dir();
-	//Direct Indexed: d,x
+	// Direct Indexed: d,x
 	void AddrMode_DirIdxX();
-	//Direct Indexed: d,y
+	// Direct Indexed: d,y
 	void AddrMode_DirIdxY();
-	//Direct Indirect: (d)
+	// Direct Indirect: (d)
 	void AddrMode_DirInd();
 
-	//Direct Indexed Indirect: (d,x)
+	// Direct Indexed Indirect: (d,x)
 	void AddrMode_DirIdxIndX();
-	//Direct Indirect Indexed: (d),y
+	// Direct Indirect Indexed: (d),y
 	void AddrMode_DirIndIdxY(bool isWrite);
-	//Direct Indirect Long: [d]
+	// Direct Indirect Long: [d]
 	void AddrMode_DirIndLng();
-	//Direct Indirect Indexed Long: [d],y
+	// Direct Indirect Indexed Long: [d],y
 	void AddrMode_DirIndLngIdxY();
 
 	void AddrMode_Imm8();
@@ -321,7 +325,7 @@ private:
 	__noinline void ProcessHaltedState();
 
 public:
-	Sa1Cpu(Sa1 *sa1, Emulator* emu);
+	Sa1Cpu(Sa1* sa1, Emulator* emu);
 	virtual ~Sa1Cpu();
 
 	void PowerOn();
@@ -332,7 +336,7 @@ public:
 	SnesCpuState& GetState();
 	uint64_t GetCycleCount();
 
-	template<uint64_t value>
+	template <uint64_t value>
 	void IncreaseCycleCount();
 
 	void SetNmiFlag(uint8_t delay);
@@ -343,11 +347,10 @@ public:
 	void IncreaseCycleCount(uint64_t cycleCount);
 
 	// Inherited via ISerializable
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 };
 
-template<uint64_t count>
-void Sa1Cpu::IncreaseCycleCount()
-{
+template <uint64_t count>
+void Sa1Cpu::IncreaseCycleCount() {
 	_state.CycleCount += count;
 }

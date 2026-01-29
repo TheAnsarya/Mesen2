@@ -16,8 +16,7 @@ class PceControlManager;
 class PceCdRom;
 class PceTimer;
 
-class PceMemoryManager final : public ISerializable
-{
+class PceMemoryManager final : public ISerializable {
 private:
 	Emulator* _emu = nullptr;
 	CheatManager* _cheatManager = nullptr;
@@ -30,14 +29,14 @@ private:
 	PceTimer* _timer = nullptr;
 	IPceMapper* _mapper = nullptr;
 
-	typedef void(PceMemoryManager::*Func)();
+	typedef void (PceMemoryManager::*Func)();
 	Func _exec = nullptr;
 	Func _fastExec = nullptr;
 
 	PceMemoryManagerState _state = {};
 	uint8_t* _prgRom = nullptr;
 	uint32_t _prgRomSize = 0;
-	
+
 	uint8_t* _readBanks[0x100] = {};
 	uint8_t* _writeBanks[0x100] = {};
 	MemoryType _bankMemType[0x100] = {};
@@ -53,7 +52,7 @@ private:
 	uint8_t* _unmappedBank = nullptr;
 	uint8_t* _saveRam = nullptr;
 	uint8_t* _cdromRam = nullptr;
-	
+
 	bool _cdromUnitEnabled = false;
 
 public:
@@ -67,8 +66,9 @@ public:
 	void UpdateCdRomBanks();
 
 	void UpdateExecCallback();
-	
-	template<bool hasCdRom, bool isSuperGrafx> void ExecTemplate();
+
+	template <bool hasCdRom, bool isSuperGrafx>
+	void ExecTemplate();
 
 	void ExecSlow();
 
@@ -99,42 +99,40 @@ public:
 	void Serialize(Serializer& s);
 };
 
-__forceinline uint8_t PceMemoryManager::Read(uint16_t addr, MemoryOperationType type)
-{
+__forceinline uint8_t PceMemoryManager::Read(uint16_t addr, MemoryOperationType type) {
 	uint8_t bank = _state.Mpr[(addr & 0xE000) >> 13];
 	uint8_t value;
-	if(bank != 0xFF) {
+	if (bank != 0xFF) {
 		value = _readBanks[bank][addr & 0x1FFF];
 	} else {
 		value = ReadRegister(addr & 0x1FFF);
 	}
 
-	if(_mapper && _mapper->IsBankMapped(bank)) {
+	if (_mapper && _mapper->IsBankMapped(bank)) {
 		value = _mapper->Read(bank, addr, value);
 	}
 
-	if(_cheatManager->HasCheats<CpuType::Pce>()) {
+	if (_cheatManager->HasCheats<CpuType::Pce>()) {
 		_cheatManager->ApplyCheat<CpuType::Pce>((bank << 13) | (addr & 0x1FFF), value);
 	}
 	_emu->ProcessMemoryRead<CpuType::Pce>(addr, value, type);
 	return value;
 }
 
-__forceinline void PceMemoryManager::Write(uint16_t addr, uint8_t value, MemoryOperationType type)
-{
-	if(_emu->ProcessMemoryWrite<CpuType::Pce>(addr, value, type)) {
+__forceinline void PceMemoryManager::Write(uint16_t addr, uint8_t value, MemoryOperationType type) {
+	if (_emu->ProcessMemoryWrite<CpuType::Pce>(addr, value, type)) {
 		uint8_t bank = _state.Mpr[(addr & 0xE000) >> 13];
-		if(_mapper && _mapper->IsBankMapped(bank)) {
+		if (_mapper && _mapper->IsBankMapped(bank)) {
 			_mapper->Write(bank, addr, value);
 		}
 
-		if(bank == 0xF7) {
-			if(_writeBanks[bank] && (addr & 0x1FFF) <= 0x7FF) {
-				//Only allow writes to the first 2kb - save RAM is not mirrored
+		if (bank == 0xF7) {
+			if (_writeBanks[bank] && (addr & 0x1FFF) <= 0x7FF) {
+				// Only allow writes to the first 2kb - save RAM is not mirrored
 				_writeBanks[bank][addr & 0x7FF] = value;
 			}
-		} else if(bank != 0xFF) {
-			if(_writeBanks[bank]) {
+		} else if (bank != 0xFF) {
+			if (_writeBanks[bank]) {
 				_writeBanks[bank][addr & 0x1FFF] = value;
 			}
 		} else {

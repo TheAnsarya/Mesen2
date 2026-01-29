@@ -7,8 +7,7 @@ class SnesMemoryManager;
 class BsxMemoryPack;
 class BsxSatellaview;
 
-class BsxCart : public BaseCoprocessor
-{
+class BsxCart : public BaseCoprocessor {
 private:
 	SnesConsole* _console;
 	SnesMemoryManager* _memoryManager;
@@ -22,7 +21,7 @@ private:
 	uint8_t _regs[0x10] = {};
 	uint8_t _dirtyRegs[0x10] = {};
 	bool _dirty = false;
-	
+
 	void UpdateMemoryMappings();
 
 public:

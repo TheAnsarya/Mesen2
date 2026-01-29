@@ -26,8 +26,7 @@ class NesMemoryManager;
 
 enum class MemoryOperationType;
 
-class NesDebugger final : public IDebugger
-{
+class NesDebugger final : public IDebugger {
 	Debugger* _debugger;
 	Emulator* _emu;
 	Disassembler* _disassembler;
@@ -104,10 +103,8 @@ public:
 	void SetPpuState(BaseState& state) override;
 };
 
-namespace NesCdlFlags
-{
-	enum NesCdlFlags : uint8_t
-	{
-		PcmData = 0x80
-	};
-}
+namespace NesCdlFlags {
+enum NesCdlFlags : uint8_t {
+	PcmData = 0x80
+};
+} // namespace NesCdlFlags

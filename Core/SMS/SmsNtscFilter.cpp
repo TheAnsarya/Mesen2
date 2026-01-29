@@ -8,8 +8,7 @@
 #include "Shared/SettingTypes.h"
 #include "Shared/Emulator.h"
 
-SmsNtscFilter::SmsNtscFilter(Emulator* emu, SmsConsole* console) : BaseVideoFilter(emu)
-{
+SmsNtscFilter::SmsNtscFilter(Emulator* emu, SmsConsole* console) : BaseVideoFilter(emu) {
 	_console = console;
 	_ntscData.reset(new sms_ntsc_t());
 	_ntscSetup.reset(new sms_ntsc_setup_t());
@@ -27,8 +26,7 @@ SmsNtscFilter::SmsNtscFilter(Emulator* emu, SmsConsole* console) : BaseVideoFilt
 	_ntscBuffer = new uint32_t[max * 240];
 }
 
-OverscanDimensions SmsNtscFilter::GetOverscan()
-{
+OverscanDimensions SmsNtscFilter::GetOverscan() {
 	OverscanDimensions overscan = BaseVideoFilter::GetOverscan();
 	overscan.Top *= 2;
 	overscan.Bottom *= 2;
@@ -37,32 +35,29 @@ OverscanDimensions SmsNtscFilter::GetOverscan()
 	return overscan;
 }
 
-FrameInfo SmsNtscFilter::GetFrameInfo()
-{
+FrameInfo SmsNtscFilter::GetFrameInfo() {
 	OverscanDimensions overscan = GetOverscan();
-	
+
 	FrameInfo frameInfo;
-	if(_console->GetModel() == SmsModel::GameGear) {
+	if (_console->GetModel() == SmsModel::GameGear) {
 		frameInfo.Width = SNES_NTSC_OUT_WIDTH(_baseFrameInfo.Width) - overscan.Left - overscan.Right;
 	} else {
 		frameInfo.Width = SMS_NTSC_OUT_WIDTH(_baseFrameInfo.Width) - overscan.Left - overscan.Right;
 	}
-	frameInfo.Height = _baseFrameInfo.Height*2 - overscan.Top - overscan.Bottom;
+	frameInfo.Height = _baseFrameInfo.Height * 2 - overscan.Top - overscan.Bottom;
 	return frameInfo;
 }
 
-HudScaleFactors SmsNtscFilter::GetScaleFactor()
-{
-	if(_console->GetModel() == SmsModel::GameGear) {
-		return { (double)SNES_NTSC_OUT_WIDTH(256) / 256, 2 };
+HudScaleFactors SmsNtscFilter::GetScaleFactor() {
+	if (_console->GetModel() == SmsModel::GameGear) {
+		return {(double)SNES_NTSC_OUT_WIDTH(256) / 256, 2};
 	} else {
-		return { (double)SMS_NTSC_OUT_WIDTH(256) / 256, 2 };
+		return {(double)SMS_NTSC_OUT_WIDTH(256) / 256, 2};
 	}
 }
 
-void SmsNtscFilter::OnBeforeApplyFilter()
-{
-	if(GenericNtscFilter::NtscFilterOptionsChanged(*_ntscSetup.get(), _emu->GetSettings()->GetVideoConfig())) {
+void SmsNtscFilter::OnBeforeApplyFilter() {
+	if (GenericNtscFilter::NtscFilterOptionsChanged(*_ntscSetup.get(), _emu->GetSettings()->GetVideoConfig())) {
 		GenericNtscFilter::InitNtscFilter(*_ntscSetup.get(), _emu->GetSettings()->GetVideoConfig());
 		sms_ntsc_init(_ntscData.get(), _ntscSetup.get());
 
@@ -71,16 +66,15 @@ void SmsNtscFilter::OnBeforeApplyFilter()
 	}
 }
 
-void SmsNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
-{
+void SmsNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 	FrameInfo frame = _frameInfo;
 	OverscanDimensions overscan = GetOverscan();
-	
+
 	uint32_t xOffset = overscan.Left;
 	uint32_t* out = GetOutputBuffer();
-	
+
 	uint32_t baseWidth;
-	if(_console->GetModel() == SmsModel::GameGear) {
+	if (_console->GetModel() == SmsModel::GameGear) {
 		baseWidth = SNES_NTSC_OUT_WIDTH(_baseFrameInfo.Width);
 		snes_ntsc_blit(_snesNtscData.get(), ppuOutputBuffer, _baseFrameInfo.Width, 0, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, SNES_NTSC_OUT_WIDTH(_baseFrameInfo.Width) * 4);
 	} else {
@@ -90,14 +84,21 @@ void SmsNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
 
 	uint32_t linesToSkip;
 	uint32_t scanlineCount = _console->GetVdp()->GetState().VisibleScanlineCount;
-	switch(scanlineCount) {
-		default: case 192: linesToSkip = 24 * 2; break;
-		case 224: linesToSkip = 8 * 2; break;
-		case 240: linesToSkip = 0; break;
+	switch (scanlineCount) {
+		default:
+		case 192:
+			linesToSkip = 24 * 2;
+			break;
+		case 224:
+			linesToSkip = 8 * 2;
+			break;
+		case 240:
+			linesToSkip = 0;
+			break;
 	}
 
-	for(uint32_t y = 0; y < frame.Height; y += 2) {
-		if(y + overscan.Top < linesToSkip || y > linesToSkip + scanlineCount * 2 - overscan.Top) {
+	for (uint32_t y = 0; y < frame.Height; y += 2) {
+		if (y + overscan.Top < linesToSkip || y > linesToSkip + scanlineCount * 2 - overscan.Top) {
 			memset(out + y * frame.Width, 0, frame.Width * sizeof(uint32_t));
 			memset(out + (y + 1) * frame.Width, 0, frame.Width * sizeof(uint32_t));
 		} else {
@@ -108,7 +109,6 @@ void SmsNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
 	}
 }
 
-SmsNtscFilter::~SmsNtscFilter()
-{
+SmsNtscFilter::~SmsNtscFilter() {
 	delete[] _ntscBuffer;
 }

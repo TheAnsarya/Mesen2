@@ -11,8 +11,7 @@ class SoundMixer;
 struct PcEngineConfig;
 struct blip_t;
 
-class PcePsg final : public ISerializable
-{
+class PcePsg final : public ISerializable {
 private:
 	static constexpr int MaxSamples = 4000;
 	static constexpr int SampleRate = 96000;
@@ -32,7 +31,7 @@ private:
 	int16_t _prevRightOutput = 0;
 
 	uint32_t _clockCounter = 0;
-	
+
 	void UpdateOutput(PcEngineConfig& cfg);
 	void UpdateSoundOffset();
 

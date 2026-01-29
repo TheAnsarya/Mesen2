@@ -10,14 +10,13 @@
 
 class Emulator;
 
-class WindowsKeyManager : public IKeyManager
-{
+class WindowsKeyManager : public IKeyManager {
 private:
 	static constexpr int BaseDirectInputIndex = 0x2000;
 
 	HWND _hWnd;
 	Emulator* _emu;
-	
+
 	vector<KeyDefinition> _keyDefinitions;
 
 	bool _keyState[0x205];

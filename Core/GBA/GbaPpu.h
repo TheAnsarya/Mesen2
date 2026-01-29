@@ -9,8 +9,7 @@ class Emulator;
 class GbaConsole;
 class GbaMemoryManager;
 
-struct GbaLayerRendererData
-{
+struct GbaLayerRendererData {
 	uint16_t TilemapData;
 	uint16_t TileData;
 	uint16_t FetchAddr;
@@ -38,8 +37,7 @@ struct GbaLayerRendererData
 	bool LastTile;
 };
 
-struct GbaSpriteRendererData
-{
+struct GbaSpriteRendererData {
 	int16_t MatrixData[4];
 	int32_t XValue;
 	int32_t YValue;
@@ -74,15 +72,13 @@ struct GbaSpriteRendererData
 	uint8_t Height;
 };
 
-struct GbaPixelData
-{
+struct GbaPixelData {
 	uint16_t Color = 0;
 	uint8_t Priority = 0xFF;
 	uint8_t Layer = 5;
 };
 
-class GbaPpu final : public ISerializable
-{
+class GbaPpu final : public ISerializable {
 private:
 	static constexpr int SpriteLayerIndex = 4;
 	static constexpr int BackdropLayerIndex = 5;
@@ -90,7 +86,7 @@ private:
 	static constexpr uint16_t DirectColorFlag = 0x8000;
 	static constexpr uint16_t SpriteBlendFlag = 0x4000;
 	static constexpr uint16_t SpriteMosaicFlag = 0x2000;
-	
+
 	static constexpr uint8_t Window0 = 0;
 	static constexpr uint8_t Window1 = 1;
 	static constexpr uint8_t ObjWindow = 2;
@@ -125,7 +121,7 @@ private:
 
 	GbaPixelData _oamOutputBuffers[2][GbaConstants::ScreenWidth] = {};
 	GbaPixelData _layerOutput[4][GbaConstants::ScreenWidth] = {};
-	
+
 	uint8_t _oamWindow[GbaConstants::ScreenWidth] = {};
 	uint8_t _activeWindow[256] = {};
 
@@ -144,7 +140,7 @@ private:
 	int16_t _lastRenderCycle = -1;
 	GbaLayerRendererData _layerData[4] = {};
 	GbaSpriteRendererData _objData[2] = {};
-	
+
 	int16_t _evalOamIndex = -1;
 	int16_t _loadOamTileCounter = 0;
 	int16_t _oamLastCycle = -1;
@@ -160,32 +156,34 @@ private:
 	bool _newObjLayerEnabled = false;
 
 	uint8_t _memoryAccess[308 * 4] = {};
-	
-	typedef void(GbaPpu::*Func)();
+
+	typedef void (GbaPpu::*Func)();
 	Func _colorMathFunc[128] = {};
 
 	uint16_t _skippedOutput[240];
 
-	template<int i, bool windowEnabled> __forceinline void ProcessLayerPixel(int x, uint8_t wnd, GbaPixelData& main, GbaPixelData& sub)
-	{
-		if constexpr(windowEnabled) {
-			if(!_state.WindowActiveLayers[wnd][i]) {
+	template <int i, bool windowEnabled>
+	__forceinline void ProcessLayerPixel(int x, uint8_t wnd, GbaPixelData& main, GbaPixelData& sub) {
+		if constexpr (windowEnabled) {
+			if (!_state.WindowActiveLayers[wnd][i]) {
 				return;
 			}
 		}
-		
-		if(_layerOutput[i][x].Priority < main.Priority) {
+
+		if (_layerOutput[i][x].Priority < main.Priority) {
 			sub = main;
 			main = _layerOutput[i][x];
-		} else if(_layerOutput[i][x].Priority < sub.Priority) {
+		} else if (_layerOutput[i][x].Priority < sub.Priority) {
 			sub = _layerOutput[i][x];
 		}
 	}
 
-	template<GbaPpuBlendEffect effect, bool bg0Enabled, bool bg1Enabled, bool bg2Enabled, bool bg3Enabled, bool windowEnabled> void ProcessColorMath();
+	template <GbaPpuBlendEffect effect, bool bg0Enabled, bool bg1Enabled, bool bg2Enabled, bool bg3Enabled, bool windowEnabled>
+	void ProcessColorMath();
 
 	void BlendColors(uint16_t* dst, int x, uint16_t a, uint8_t aCoeff, uint16_t b, uint8_t bCoeff);
-	template<bool isSubColor> uint16_t ReadColor(int x, uint16_t addr);
+	template <bool isSubColor>
+	uint16_t ReadColor(int x, uint16_t addr);
 
 	void InitializeWindows();
 	void ProcessWindow();
@@ -194,30 +192,40 @@ private:
 	void SetWindowActiveLayers(int window, uint8_t cfg);
 
 	void SendFrame();
-	
-	template<int i, bool mosaic, bool bpp8> __forceinline void PushBgPixels(int renderX);
-	template<int i, bool mosaic, bool bpp8, bool mirror> __forceinline void PushBgPixels(int renderX);
 
-	template<int layer> void RenderTilemap();
-	template<int layer, bool mosaic, bool bpp8> void RenderTilemap();
+	template <int i, bool mosaic, bool bpp8>
+	__forceinline void PushBgPixels(int renderX);
+	template <int i, bool mosaic, bool bpp8, bool mirror>
+	__forceinline void PushBgPixels(int renderX);
 
-	template<int layer> void RenderTransformTilemap();
-	template<int mode> void RenderBitmapMode();
-	
+	template <int layer>
+	void RenderTilemap();
+	template <int layer, bool mosaic, bool bpp8>
+	void RenderTilemap();
+
+	template <int layer>
+	void RenderTransformTilemap();
+	template <int mode>
+	void RenderBitmapMode();
+
 	__forceinline void SetPixelData(GbaPixelData& pixel, uint16_t color, uint8_t priority, uint8_t layer);
 
 	void ProcessSprites();
-	
+
 	__noinline void InitSpriteEvaluation();
 	void AddVisibleSprite(uint32_t sprData);
 	void LoadSpriteAttr2();
 	void LoadSpriteTransformMatrix();
 
-	template<bool transformEnabled, bool blockFirst16k> __forceinline void RenderSprite(GbaSpriteRendererData& spr);
-	template<bool blockFirst16k> void RenderSprites();
-	template<bool blockFirst16k> __forceinline uint8_t ReadSpriteVram(uint32_t addr);
+	template <bool transformEnabled, bool blockFirst16k>
+	__forceinline void RenderSprite(GbaSpriteRendererData& spr);
+	template <bool blockFirst16k>
+	void RenderSprites();
+	template <bool blockFirst16k>
+	__forceinline uint8_t ReadSpriteVram(uint32_t addr);
 
-	template<int bit> void SetTransformOrigin(uint8_t i, uint8_t value, bool setY);
+	template <int bit>
+	void SetTransformOrigin(uint8_t i, uint8_t value, bool setY);
 	void SetLayerEnabled(int layer, bool enabled);
 
 	void ProcessEndOfScanline();
@@ -228,22 +236,22 @@ private:
 	uint16_t GetCurrentScanline();
 	bool IsScanlineMatch();
 
-	template<int i> void UpdateLayerTransform();
+	template <int i>
+	void UpdateLayerTransform();
 
 public:
 	void Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryManager);
 	~GbaPpu();
 
-	__forceinline void Exec()
-	{
+	__forceinline void Exec() {
 		_state.Cycle++;
 
-		if(_state.Cycle == 308*4) {
+		if (_state.Cycle == 308 * 4) {
 			ProcessEndOfScanline();
-		} else if(_state.Cycle >= 1006) {
-			if(_state.Cycle == 1006) {
+		} else if (_state.Cycle >= 1006) {
+			if (_state.Cycle == 1006) {
 				ProcessHBlank();
-			} else if(_state.Cycle == 1056) {
+			} else if (_state.Cycle == 1056) {
 				RenderScanline();
 			}
 		}
@@ -251,15 +259,14 @@ public:
 		_emu->ProcessPpuCycle<CpuType::Gba>();
 	}
 
-	bool IsAccessingMemory(uint8_t memType)
-	{
+	bool IsAccessingMemory(uint8_t memType) {
 		return _memoryAccess[_state.Cycle] & memType;
 	}
 
 	void ProcessObjEnableChange();
 
 	void RenderScanline(bool forceRender = false);
-	
+
 	void DebugSendFrame();
 
 	void WriteRegister(uint32_t addr, uint8_t value);

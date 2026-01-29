@@ -6,11 +6,10 @@
 #include "Utilities/Video/AviWriter.h"
 #include "Utilities/Video/IVideoRecorder.h"
 
-class AviRecorder final : public IVideoRecorder
-{
+class AviRecorder final : public IVideoRecorder {
 private:
 	std::thread _aviWriterThread;
-	
+
 	unique_ptr<AviWriter> _aviWriter;
 
 	string _outputFile;

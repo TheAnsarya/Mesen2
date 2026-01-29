@@ -10,24 +10,21 @@ class PceConsole;
 class PceVce;
 class PceVpc;
 
-enum class PceVdcModeH
-{
+enum class PceVdcModeH {
 	Hds,
 	Hdw,
 	Hde,
 	Hsw,
 };
 
-enum class PceVdcModeV
-{
+enum class PceVdcModeV {
 	Vds,
 	Vdw,
 	Vde,
 	Vsw,
 };
 
-enum class PceVdcEvent
-{
+enum class PceVdcEvent {
 	None,
 	LatchScrollY,
 	LatchScrollX,
@@ -35,15 +32,13 @@ enum class PceVdcEvent
 	IncRcrCounter,
 };
 
-struct PceTileInfo
-{
+struct PceTileInfo {
 	uint16_t TileData[2];
 	uint16_t TileAddr;
 	uint8_t Palette;
 };
 
-struct PceSpriteInfo
-{
+struct PceSpriteInfo {
 	uint16_t TileData[4];
 	int16_t X;
 	uint16_t TileAddress;
@@ -54,8 +49,7 @@ struct PceSpriteInfo
 	bool LoadSp23;
 };
 
-class PceVdc final : public ISerializable
-{
+class PceVdc final : public ISerializable {
 private:
 	PceVdcState _state = {};
 	Emulator* _emu = nullptr;
@@ -64,7 +58,7 @@ private:
 	PceVpc* _vpc = nullptr;
 	uint16_t* _vram = nullptr;
 	uint16_t* _spriteRam = nullptr;
-	
+
 	uint16_t _rowBuffer[PceConstants::MaxScreenWidth] = {};
 
 	uint16_t _vramOpenBus = 0;
@@ -74,7 +68,7 @@ private:
 
 	PceVdcModeH _hMode = PceVdcModeH::Hds;
 	int16_t _hModeCounter = 0;
-	
+
 	PceVdcModeV _vMode = PceVdcModeV::Vds;
 	int16_t _vModeCounter = 0;
 
@@ -127,10 +121,9 @@ private:
 	PceSpriteInfo _drawSprites[64] = {};
 	PceTileInfo _tiles[100] = {};
 
-	template<uint16_t bitMask = 0xFFFF>
-	void UpdateReg(uint16_t& reg, uint8_t value, bool msb)
-	{
-		if(msb) {
+	template <uint16_t bitMask = 0xFFFF>
+	void UpdateReg(uint16_t& reg, uint8_t value, bool msb) {
+		if (msb) {
 			reg = ((reg & 0xFF) | (value << 8)) & bitMask;
 		} else {
 			reg = ((reg & 0xFF00) | value) & bitMask;
@@ -153,7 +146,7 @@ private:
 	__noinline void IncrementRcrCounter();
 	__noinline void IncScrollY();
 	__noinline void ProcessEndOfScanline();
-	
+
 	void TriggerDmaStart();
 	__noinline void TriggerVerticalBlank();
 	__noinline void ProcessSatbTransfer();
@@ -175,20 +168,21 @@ private:
 	__noinline void LoadSpriteTiles();
 
 	bool IsDmaAllowed();
-	
-	template<bool skipRender>
+
+	template <bool skipRender>
 	__forceinline void LoadBackgroundTiles();
 
 	__noinline void LoadBackgroundTilesWidth2(uint16_t end, uint16_t scrollOffset, uint16_t columnMask, uint16_t row);
 	__noinline void LoadBackgroundTilesWidth4(uint16_t end, uint16_t scrollOffset, uint16_t columnMask, uint16_t row);
-	
+
 	__forceinline void LoadBatEntry(uint16_t scrollOffset, uint16_t columnMask, uint16_t row);
 	__forceinline void LoadTileDataCg0(uint16_t row);
 	__forceinline void LoadTileDataCg1(uint16_t row);
 
 	__forceinline uint16_t ReadVram(uint16_t addr);
 
-	template<bool hasSprites, bool hasSprite0, bool skipRender> __forceinline void InternalDrawScanline();
+	template <bool hasSprites, bool hasSprite0, bool skipRender>
+	__forceinline void InternalDrawScanline();
 
 	bool CheckUpdateLatchTiming(uint16_t clock);
 

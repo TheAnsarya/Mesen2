@@ -19,8 +19,7 @@
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 
-GsuDebugger::GsuDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator())
-{
+GsuDebugger::GsuDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()) {
 	SnesConsole* console = (SnesConsole*)debugger->GetConsole();
 
 	_debugger = debugger;
@@ -30,20 +29,18 @@ GsuDebugger::GsuDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_gsu = console->GetCartridge()->GetGsu();
 	_memoryManager = console->GetMemoryManager();
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_traceLogger.reset(new GsuTraceLogger(debugger, this, console->GetPpu(), _memoryManager));
 
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Gsu, debugger->GetEventManager(CpuType::Snes)));
 	_step.reset(new StepRequest());
 }
 
-void GsuDebugger::Reset()
-{
+void GsuDebugger::Reset() {
 	_prevOpCode = 0xFF;
 }
 
-void GsuDebugger::ProcessInstruction()
-{
+void GsuDebugger::ProcessInstruction() {
 	GsuState& state = _gsu->GetState();
 	uint32_t addr = _gsu->DebugGetProgramCounter();
 	AddressInfo addressInfo = _gsu->GetMemoryMappings()->GetAbsoluteAddress(addr);
@@ -51,11 +48,11 @@ void GsuDebugger::ProcessInstruction()
 	InstructionProgress.LastMemOperation = operation;
 	InstructionProgress.StartCycle = state.CycleCount;
 
-	if(addressInfo.Type == MemoryType::SnesPrgRom) {
+	if (addressInfo.Type == MemoryType::SnesPrgRom) {
 		_codeDataLogger->SetCode<SnesCdlFlags::Gsu>(addressInfo.Address);
 	}
 
-	if(_settings->CheckDebuggerFlag(DebuggerFlags::GsuDebuggerEnabled)) {
+	if (_settings->CheckDebuggerFlag(DebuggerFlags::GsuDebuggerEnabled)) {
 		_disassembler->BuildCache(addressInfo, state.SFR.GetFlagsHigh() & 0x13, CpuType::Gsu);
 	}
 
@@ -67,30 +64,29 @@ void GsuDebugger::ProcessInstruction()
 	_memoryAccessCounter->ProcessMemoryExec(addressInfo, _memoryManager->GetMasterClock());
 	_debugger->ProcessBreakConditions(CpuType::Gsu, *_step.get(), _breakpointManager.get(), operation, addressInfo);
 
-	if(_traceLogger->IsEnabled()) {
+	if (_traceLogger->IsEnabled()) {
 		DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, 0, CpuType::Gsu);
 		_traceLogger->Log(_gsu->GetState(), disInfo, operation, addressInfo);
 	}
 }
 
-void GsuDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType type)
-{
+void GsuDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType type) {
 	AddressInfo addressInfo = _gsu->GetMemoryMappings()->GetAbsoluteAddress(addr);
 	MemoryOperationInfo operation(addr, value, type, MemoryType::GsuMemory);
 	InstructionProgress.LastMemOperation = operation;
 
-	if(type == MemoryOperationType::ExecOpCode) {
+	if (type == MemoryOperationType::ExecOpCode) {
 		_memoryAccessCounter->ProcessMemoryExec(addressInfo, _memoryManager->GetMasterClock());
-	} else if(type == MemoryOperationType::ExecOperand) {
-		if(addressInfo.Type == MemoryType::SnesPrgRom) {
+	} else if (type == MemoryOperationType::ExecOperand) {
+		if (addressInfo.Type == MemoryType::SnesPrgRom) {
 			_codeDataLogger->SetData<SnesCdlFlags::Gsu>(addressInfo.Address);
 		}
 		_memoryAccessCounter->ProcessMemoryExec(addressInfo, _memoryManager->GetMasterClock());
 	} else {
-		if(addressInfo.Type == MemoryType::SnesPrgRom) {
+		if (addressInfo.Type == MemoryType::SnesPrgRom) {
 			_codeDataLogger->SetData<SnesCdlFlags::Gsu>(addressInfo.Address);
 		}
-		if(_traceLogger->IsEnabled()) {
+		if (_traceLogger->IsEnabled()) {
 			_traceLogger->LogNonExec(operation, addressInfo);
 		}
 		_memoryAccessCounter->ProcessMemoryRead(addressInfo, _memoryManager->GetMasterClock());
@@ -98,15 +94,14 @@ void GsuDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType 
 	}
 }
 
-void GsuDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType type)
-{
+void GsuDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType type) {
 	AddressInfo addressInfo = _gsu->GetMemoryMappings()->GetAbsoluteAddress(addr);
 	MemoryOperationInfo operation(addr, value, type, MemoryType::GsuMemory);
 	InstructionProgress.LastMemOperation = operation;
 
 	_debugger->ProcessBreakConditions(CpuType::Gsu, *_step.get(), _breakpointManager.get(), operation, addressInfo);
 
-	if(_traceLogger->IsEnabled()) {
+	if (_traceLogger->IsEnabled()) {
 		_traceLogger->LogNonExec(operation, addressInfo);
 	}
 
@@ -114,20 +109,20 @@ void GsuDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType
 	_memoryAccessCounter->ProcessMemoryWrite(addressInfo, _memoryManager->GetMasterClock());
 }
 
-void GsuDebugger::Run()
-{
+void GsuDebugger::Run() {
 	_step.reset(new StepRequest());
 }
 
-void GsuDebugger::Step(int32_t stepCount, StepType type)
-{
+void GsuDebugger::Step(int32_t stepCount, StepType type) {
 	StepRequest step;
 
-	switch(type) {
+	switch (type) {
 		case StepType::StepOut:
 		case StepType::StepOver:
-		case StepType::Step: step.StepCount = stepCount; break;
-		
+		case StepType::Step:
+			step.StepCount = stepCount;
+			break;
+
 		case StepType::SpecificScanline:
 		case StepType::PpuStep:
 			break;
@@ -136,9 +131,8 @@ void GsuDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
-void GsuDebugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly)
-{
-	if(!updateDebuggerOnly) {
+void GsuDebugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly) {
+	if (!updateDebuggerOnly) {
 		_gsu->DebugSetProgramCounter(addr);
 	}
 
@@ -147,50 +141,41 @@ void GsuDebugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly)
 	_prevProgramCounter = addr;
 }
 
-uint32_t GsuDebugger::GetProgramCounter(bool getInstPc)
-{
+uint32_t GsuDebugger::GetProgramCounter(bool getInstPc) {
 	GsuState& state = _gsu->GetState();
 	return getInstPc ? _prevProgramCounter : ((state.ProgramBank << 16) | state.R[15]);
 }
 
-uint64_t GsuDebugger::GetCpuCycleCount(bool forProfiler)
-{
+uint64_t GsuDebugger::GetCpuCycleCount(bool forProfiler) {
 	return _gsu->GetState().CycleCount;
 }
 
-DebuggerFeatures GsuDebugger::GetSupportedFeatures()
-{
+DebuggerFeatures GsuDebugger::GetSupportedFeatures() {
 	DebuggerFeatures features = {};
 	features.ChangeProgramCounter = AllowChangeProgramCounter;
 	return features;
 }
 
-BreakpointManager* GsuDebugger::GetBreakpointManager()
-{
+BreakpointManager* GsuDebugger::GetBreakpointManager() {
 	return _breakpointManager.get();
 }
 
-CallstackManager* GsuDebugger::GetCallstackManager()
-{
+CallstackManager* GsuDebugger::GetCallstackManager() {
 	return nullptr;
 }
 
-IAssembler* GsuDebugger::GetAssembler()
-{
+IAssembler* GsuDebugger::GetAssembler() {
 	throw std::runtime_error("Assembler not supported for GSU");
 }
 
-BaseEventManager* GsuDebugger::GetEventManager()
-{
+BaseEventManager* GsuDebugger::GetEventManager() {
 	return nullptr;
 }
 
-BaseState& GsuDebugger::GetState()
-{
+BaseState& GsuDebugger::GetState() {
 	return _gsu->GetState();
 }
 
-ITraceLogger* GsuDebugger::GetTraceLogger()
-{
+ITraceLogger* GsuDebugger::GetTraceLogger() {
 	return _traceLogger.get();
 }

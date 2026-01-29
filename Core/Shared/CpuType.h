@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-enum class CpuType : uint8_t
-{
+enum class CpuType : uint8_t {
 	Snes,
 	Spc,
 	NecDsp,
@@ -18,11 +17,9 @@ enum class CpuType : uint8_t
 	Ws
 };
 
-class CpuTypeUtilities
-{
+class CpuTypeUtilities {
 public:
-	static constexpr int GetCpuTypeCount()
-	{
+	static constexpr int GetCpuTypeCount() {
 		return (int)CpuType::Ws + 1;
 	}
 };

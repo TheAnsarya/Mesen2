@@ -2,11 +2,9 @@
 #include "pch.h"
 #include "miniz.h"
 
-class CompressionHelper
-{
+class CompressionHelper {
 public:
-	static void Compress(string data, int compressionLevel, vector<uint8_t>& output)
-	{
+	static void Compress(string data, int compressionLevel, vector<uint8_t>& output) {
 		unsigned long compressedSize = compressBound((unsigned long)data.size());
 		uint8_t* compressedData = new uint8_t[compressedSize];
 		compress2(compressedData, &compressedSize, (unsigned char*)data.c_str(), (unsigned long)data.size(), compressionLevel);
@@ -19,23 +17,22 @@ public:
 		delete[] compressedData;
 	}
 
-	static bool Decompress(vector<uint8_t>& input, vector<uint8_t>& output)
-	{
+	static bool Decompress(vector<uint8_t>& input, vector<uint8_t>& output) {
 		uint32_t decompressedSize;
 		uint32_t compressedSize;
 
 		memcpy(&decompressedSize, input.data(), sizeof(uint32_t));
 		memcpy(&compressedSize, input.data() + sizeof(uint32_t), sizeof(uint32_t));
 
-		if(decompressedSize >= 1024 * 1024 * 10 || compressedSize >= 1024 * 1024 * 10) {
-			//Limit to 10mb the data's size
+		if (decompressedSize >= 1024 * 1024 * 10 || compressedSize >= 1024 * 1024 * 10) {
+			// Limit to 10mb the data's size
 			return false;
 		}
 
 		output.resize(decompressedSize, 0);
 
 		unsigned long decompSize = decompressedSize;
-		if(uncompress(output.data(), &decompSize, input.data() + sizeof(uint32_t)*2, (unsigned long)input.size() - sizeof(uint32_t) * 2) != MZ_OK) {
+		if (uncompress(output.data(), &decompSize, input.data() + sizeof(uint32_t) * 2, (unsigned long)input.size() - sizeof(uint32_t) * 2) != MZ_OK) {
 			return false;
 		}
 

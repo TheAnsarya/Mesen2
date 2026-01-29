@@ -7,15 +7,14 @@
 
 class Emulator;
 
-class PceControlManager final : public BaseControlManager
-{
+class PceControlManager final : public BaseControlManager {
 private:
 	PceControlManagerState _state = {};
 	PcEngineConfig _prevConfig = {};
 
 public:
 	PceControlManager(Emulator* emu);
-	
+
 	PceControlManagerState& GetState();
 
 	shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override;

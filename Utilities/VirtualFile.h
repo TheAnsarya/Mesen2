@@ -2,8 +2,7 @@
 #include "pch.h"
 #include <sstream>
 
-class VirtualFile
-{
+class VirtualFile {
 private:
 	constexpr static int ChunkSize = 256 * 1024;
 
@@ -16,7 +15,7 @@ private:
 	vector<vector<uint8_t>> _chunks;
 	bool _useChunks = false;
 
-	void FromStream(std::istream &input, vector<uint8_t> &output);
+	void FromStream(std::istream& input, vector<uint8_t>& output);
 
 	void LoadFile();
 
@@ -24,13 +23,13 @@ public:
 	static const std::initializer_list<string> RomExtensions;
 
 	VirtualFile();
-	VirtualFile(const string &archivePath, const string innerFile);
-	VirtualFile(const string &file);
-	VirtualFile(const void *buffer, size_t bufferSize, string fileName = "noname");
-	VirtualFile(std::istream &input, string filePath);
+	VirtualFile(const string& archivePath, const string innerFile);
+	VirtualFile(const string& file);
+	VirtualFile(const void* buffer, size_t bufferSize, string fileName = "noname");
+	VirtualFile(std::istream& input, string filePath);
 
 	operator std::string() const;
-	
+
 	bool IsValid();
 	bool IsArchive();
 	string GetFilePath();
@@ -46,24 +45,23 @@ public:
 
 	vector<uint8_t>& GetData();
 
-	bool ReadFile(vector<uint8_t> &out);
-	bool ReadFile(std::stringstream &out);
+	bool ReadFile(vector<uint8_t>& out);
+	bool ReadFile(std::stringstream& out);
 	bool ReadFile(uint8_t* out, uint32_t expectedSize);
 
 	uint8_t ReadByte(uint32_t offset);
 
-	bool ApplyPatch(VirtualFile &patch);
+	bool ApplyPatch(VirtualFile& patch);
 
-	template<typename T>
-	bool ReadChunk(T& container, int start, int length)
-	{
+	template <typename T>
+	bool ReadChunk(T& container, int start, int length) {
 		InitChunks();
-		if(start < 0 || start + length > GetSize()) {
-			//Out of bounds
+		if (start < 0 || start + length > GetSize()) {
+			// Out of bounds
 			return false;
 		}
 
-		for(int i = start, end = start + length; i < end; i++) {
+		for (int i = start, end = start + length; i < end; i++) {
 			container.push_back(ReadByte(i));
 		}
 

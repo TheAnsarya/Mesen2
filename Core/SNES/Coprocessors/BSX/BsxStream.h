@@ -5,8 +5,7 @@
 class SnesConsole;
 class SnesMemoryManager;
 
-class BsxStream : public ISerializable
-{
+class BsxStream : public ISerializable {
 private:
 	SnesConsole* _console;
 	SnesMemoryManager* _memoryManager;

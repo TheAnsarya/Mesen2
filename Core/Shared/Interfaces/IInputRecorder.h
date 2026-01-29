@@ -3,8 +3,7 @@
 
 class BaseControlDevice;
 
-class IInputRecorder
-{
+class IInputRecorder {
 public:
 	virtual void RecordInput(vector<shared_ptr<BaseControlDevice>> devices) = 0;
 };

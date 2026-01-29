@@ -5,30 +5,26 @@
 class Emulator;
 class IDebugger;
 
-struct StepBackCacheEntry
-{
+struct StepBackCacheEntry {
 	stringstream SaveState;
 	uint64_t Clock;
 };
 
-struct StepBackConfig
-{
+struct StepBackConfig {
 	uint64_t CurrentCycle;
 	uint32_t CyclesPerScanline;
 	uint32_t CyclesPerFrame;
 };
 
-enum class StepBackType
-{
+enum class StepBackType {
 	Instruction,
 	Scanline,
 	Frame
 };
 
-class StepBackManager
-{
+class StepBackManager {
 private:
-	static constexpr uint64_t DefaultClockLimit = 600; //Default to 600 clocks to avoid retry when NES sprite DMA occurs (~512 cycles)
+	static constexpr uint64_t DefaultClockLimit = 600; // Default to 600 clocks to avoid retry when NES sprite DMA occurs (~512 cycles)
 
 	Emulator* _emu = nullptr;
 	RewindManager* _rewindManager = nullptr;

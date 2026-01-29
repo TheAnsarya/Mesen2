@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include "pch.h"
 
 #include "Shared/SettingTypes.h"
@@ -29,8 +29,7 @@ enum class ConsoleRegion;
 enum class GameInputType;
 enum class GameSystem;
 
-class NesConsole final : public IConsole
-{
+class NesConsole final : public IConsole {
 private:
 	Emulator* _emu = nullptr;
 
@@ -52,10 +51,10 @@ private:
 	ConsoleRegion _region = ConsoleRegion::Auto;
 
 	bool _nextFrameOverclockDisabled = false;
-	
+
 	void UpdateRegion(bool forceUpdate = false);
 	void LoadHdPack(VirtualFile& romFile);
-	
+
 	void InitializeInputDevices(GameInputType inputType, GameSystem system);
 
 	void StartRecordingHdPack(HdPackBuilderOptions options);
@@ -65,8 +64,8 @@ public:
 	NesConsole(Emulator* emulator);
 	~NesConsole();
 
-	static vector<string> GetSupportedExtensions() { return { ".nes", ".fds", ".unif", ".unf", ".nsf", ".nsfe", ".studybox", ".qd" }; }
-	static vector<string> GetSupportedSignatures() { return { "NES\x1a", "FDS\x1a", "\x1*NINTENDO-HVC*", "NESM\x1a", "NSFE", "UNIF", "STBX" }; }
+	static vector<string> GetSupportedExtensions() { return {".nes", ".fds", ".unif", ".unf", ".nsf", ".nsfe", ".studybox", ".qd"}; }
+	static vector<string> GetSupportedSignatures() { return {"NES\x1a", "FDS\x1a", "\x1*NINTENDO-HVC*", "NESM\x1a", "NSFE", "UNIF", "STBX"}; }
 
 	NesCpu* GetCpu() { return _cpu.get(); }
 	BaseNesPpu* GetPpu() { return _ppu.get(); }
@@ -108,7 +107,7 @@ public:
 	uint32_t GetMasterClockRate() override;
 
 	void SaveBattery() override;
-	
+
 	ShortcutState IsShortcutAllowed(EmulatorShortcut shortcut, uint32_t shortcutParam) override;
 
 	BaseVideoFilter* GetVideoFilter(bool getDefaultFilter) override;

@@ -1,7 +1,6 @@
 #pragma once
 
-enum class MemoryOperationType
-{
+enum class MemoryOperationType {
 	Read = 0,
 	Write = 1,
 	ExecOpCode = 2,
@@ -14,8 +13,7 @@ enum class MemoryOperationType
 	Idle = 9
 };
 
-enum class MemoryAccessFlags
-{
+enum class MemoryAccessFlags {
 	None = 0,
 	DspAccess = 1,
 };

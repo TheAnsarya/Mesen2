@@ -9,15 +9,13 @@
 class Emulator;
 class InputHud;
 
-struct DeviceButtonName
-{
+struct DeviceButtonName {
 	string Name;
 	int ButtonId = 0;
 	bool IsNumeric = false;
 };
 
-class BaseControlDevice : public ISerializable
-{
+class BaseControlDevice : public ISerializable {
 protected:
 	ControlDeviceState _state = {};
 
@@ -29,7 +27,7 @@ protected:
 	bool _connected = true;
 	SimpleLock _stateLock;
 
-	virtual void RefreshStateBuffer() { }
+	virtual void RefreshStateBuffer() {}
 
 	void EnsureCapacity(int32_t minBitCount);
 	uint32_t GetByteIndex(uint8_t bit);
@@ -63,7 +61,7 @@ public:
 
 	BaseControlDevice(Emulator* emu, ControllerType type, uint8_t port, KeyMappingSet keyMappingSet = KeyMappingSet());
 	virtual ~BaseControlDevice();
-	
+
 	virtual void Init() {}
 
 	uint8_t GetPort();
@@ -83,13 +81,13 @@ public:
 	void ClearBit(uint8_t bit);
 	void InvertBit(uint8_t bit);
 	void SetBitValue(uint8_t bit, bool set);
-	
+
 	virtual void SetTextState(string state);
 	virtual string GetTextState();
 
 	void SetStateFromInput();
-	virtual void OnAfterSetState() { }
-	
+	virtual void OnAfterSetState() {}
+
 	virtual void SetRawState(ControlDeviceState state);
 	virtual ControlDeviceState GetRawState();
 
@@ -99,12 +97,12 @@ public:
 	virtual uint8_t ReadRam(uint16_t addr) = 0;
 	virtual void WriteRam(uint16_t addr, uint8_t value) = 0;
 
-	//Used by Lua API
+	// Used by Lua API
 	virtual vector<DeviceButtonName> GetKeyNameAssociations() { return {}; }
 
 	virtual bool HasControllerType(ControllerType type);
-	
+
 	void static SwapButtons(shared_ptr<BaseControlDevice> state1, uint8_t button1, shared_ptr<BaseControlDevice> state2, uint8_t button2);
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 };

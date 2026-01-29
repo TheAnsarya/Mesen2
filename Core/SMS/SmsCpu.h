@@ -16,21 +16,18 @@ class SmsConsole;
 class SmsMemoryManager;
 class SmsCpuParityTable;
 
-class SmsCpu final : public ISerializable
-{
+class SmsCpu final : public ISerializable {
 private:
 	static SmsCpuParityTable _parity;
 
-	class Register16
-	{
+	class Register16 {
 		uint8_t* _high;
 		uint8_t* _low;
 
 	public:
 		Register16(uint8_t* high, uint8_t* low) : _high(high), _low(low) {}
 
-		void Write(uint16_t value)
-		{
+		void Write(uint16_t value) {
 			*_high = (uint8_t)(value >> 8);
 			*_low = (uint8_t)value;
 		}
@@ -55,7 +52,7 @@ private:
 	Register16 _regIX = Register16(&_state.IXH, &_state.IXL);
 	Register16 _regIY = Register16(&_state.IYH, &_state.IYL);
 
-	template<uint8_t prefix>
+	template <uint8_t prefix>
 	void ExecOpCode(uint8_t opCode);
 
 	__forceinline void ExecCycles(uint8_t cycles);
@@ -71,7 +68,7 @@ private:
 	__forceinline uint8_t ReadPort(uint8_t port);
 	__forceinline void WritePort(uint8_t port, uint8_t value);
 
-	template<uint8_t mask>
+	template <uint8_t mask>
 	void SetStandardFlags(uint8_t value);
 
 	bool CheckFlag(uint8_t flag);
@@ -118,7 +115,7 @@ private:
 	void XOR(uint8_t value);
 
 	void UpdateLogicalOpFlags(uint8_t value);
-	
+
 	void CP(uint8_t value);
 
 	void NOP();
@@ -147,25 +144,25 @@ private:
 	void SLL(uint8_t& dst);
 	void SLL_Indirect(uint16_t dst);
 
-	template<MemoryOperationType type>
+	template <MemoryOperationType type>
 	uint8_t ReadMemory(uint16_t addr);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void BIT(uint8_t src);
-	
-	template<uint8_t bit>
+
+	template <uint8_t bit>
 	void BIT_Indirect(Register16& src);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void RES(uint8_t& dst);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void RES_Indirect(uint16_t addr);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void SET(uint8_t& dst);
 
-	template<uint8_t bit>
+	template <uint8_t bit>
 	void SET_Indirect(uint16_t addr);
 
 	void DAA();
@@ -181,7 +178,7 @@ private:
 	void RET(bool condition);
 	void RETI();
 	void RST(uint8_t value);
-	
+
 	void POP(Register16& reg);
 	void PUSH(Register16& reg);
 	void POP_AF();
@@ -192,8 +189,8 @@ private:
 	void IM(uint8_t mode);
 	void EI();
 	void DI();
-	
-	template<uint8_t prefix>
+
+	template <uint8_t prefix>
 	void PREFIX_CB();
 
 	uint8_t GetCbValue(uint8_t dst);
@@ -217,25 +214,25 @@ private:
 	void RRD();
 	void RLD();
 
-	template<bool forInc = false>
+	template <bool forInc = false>
 	void LDD();
 	void LDDR();
 	void LDI();
 	void LDIR();
 
-	template<bool forInc = false>
+	template <bool forInc = false>
 	void CPD();
 	void CPDR();
 	void CPI();
 	void CPIR();
 
-	template<bool forInc = false>
+	template <bool forInc = false>
 	void OUTD();
 	void OTDR();
 	void OUTI();
 	void OTIR();
 
-	template<bool forInc = false>
+	template <bool forInc = false>
 	void IND();
 	void INDR();
 	void INI();
@@ -244,7 +241,7 @@ private:
 	void UpdateInOutRepeatFlags();
 
 	void IncrementR();
-	
+
 	void InitPostBiosState();
 
 public:

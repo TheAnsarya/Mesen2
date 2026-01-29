@@ -5,8 +5,7 @@
 
 struct stb_vorbis;
 
-class OggReader
-{
+class OggReader {
 private:
 	stb_vorbis* _vorbis = nullptr;
 	int16_t* _outputBuffer = nullptr;
@@ -16,7 +15,7 @@ private:
 
 	bool _loop = false;
 	bool _done = false;
-	
+
 	uint32_t _loopPosition = 0;
 
 	int _sampleRate = 0;

@@ -4,14 +4,12 @@
 
 using std::wstring;
 
-enum class IPProtocol
-{
+enum class IPProtocol {
 	TCP = 0,
 	UDP = 1
 };
 
-class UPnPPortMapper
-{
+class UPnPPortMapper {
 private:
 	static vector<wstring> GetLocalIPs();
 

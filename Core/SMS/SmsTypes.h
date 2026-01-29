@@ -3,16 +3,14 @@
 #include "Shared/BaseState.h"
 #include "Shared/MemoryType.h"
 
-enum class SmsModel
-{
+enum class SmsModel {
 	Sms,
 	GameGear,
 	Sg,
 	ColecoVision
 };
 
-struct SmsCpuState : public BaseState
-{
+struct SmsCpuState : public BaseState {
 	uint64_t CycleCount;
 	uint16_t PC;
 	uint16_t SP;
@@ -56,28 +54,25 @@ struct SmsCpuState : public BaseState
 
 	uint8_t IM;
 
-	//Internal flags needed to properly emulate the behavior of the undocumented F3/F5 flags
+	// Internal flags needed to properly emulate the behavior of the undocumented F3/F5 flags
 	uint8_t FlagsChanged;
 	uint16_t WZ;
 };
 
-namespace SmsCpuFlags
-{
-	enum SmsCpuFlags
-	{
-		Carry = 0x01,
-		AddSub = 0x02,
-		Parity = 0x04,
-		F3 = 0x08,
-		HalfCarry = 0x10,
-		F5 = 0x20,
-		Zero = 0x40,
-		Sign = 0x80,
-	};
-}
+namespace SmsCpuFlags {
+enum SmsCpuFlags {
+	Carry = 0x01,
+	AddSub = 0x02,
+	Parity = 0x04,
+	F3 = 0x08,
+	HalfCarry = 0x10,
+	F5 = 0x20,
+	Zero = 0x40,
+	Sign = 0x80,
+};
+} // namespace SmsCpuFlags
 
-struct SmsVdpState : public BaseState
-{
+struct SmsVdpState : public BaseState {
 	uint32_t FrameCount;
 	uint16_t Cycle;
 	uint16_t Scanline;
@@ -115,7 +110,7 @@ struct SmsVdpState : public BaseState
 	uint8_t ScanlineCounter;
 	uint8_t ScanlineCounterLatch;
 
-	//Control register 1
+	// Control register 1
 	bool SyncDisabled;
 	bool M2_AllowHeightChange;
 	bool UseMode4;
@@ -125,7 +120,7 @@ struct SmsVdpState : public BaseState
 	bool HorizontalScrollLock;
 	bool VerticalScrollLock;
 
-	//Control register 2
+	// Control register 2
 	bool Sg16KVramMode;
 	bool RenderingEnabled;
 	bool EnableVerticalBlankIrq;
@@ -133,22 +128,20 @@ struct SmsVdpState : public BaseState
 	bool M3_Use240LineMode;
 	bool UseLargeSprites;
 	bool EnableDoubleSpriteSize;
-	
+
 	uint16_t NametableAddress;
 	uint16_t EffectiveNametableAddress;
 	uint16_t NametableAddressMask;
 };
 
-struct SmsToneChannelState
-{
+struct SmsToneChannelState {
 	uint16_t ReloadValue;
 	uint16_t Timer;
 	uint8_t Output;
 	uint8_t Volume;
 };
 
-struct SmsNoiseChannelState
-{
+struct SmsNoiseChannelState {
 	uint16_t Timer;
 	uint16_t Lfsr;
 	uint8_t LfsrInputBit;
@@ -157,24 +150,21 @@ struct SmsNoiseChannelState
 	uint8_t Volume;
 };
 
-struct SmsPsgState
-{
+struct SmsPsgState {
 	SmsToneChannelState Tone[3] = {};
 	SmsNoiseChannelState Noise = {};
 	uint8_t SelectedReg = 0;
 	uint8_t GameGearPanningReg = 0xFF;
 };
 
-enum class SmsRegisterAccess
-{
+enum class SmsRegisterAccess {
 	None = 0,
 	Read = 1,
 	Write = 2,
 	ReadWrite = 3
 };
 
-struct SmsMemoryManagerState
-{
+struct SmsMemoryManagerState {
 	bool IsReadRegister[0x100];
 	bool IsWriteRegister[0x100];
 
@@ -192,13 +182,11 @@ struct SmsMemoryManagerState
 	bool IoEnabled;
 };
 
-struct SmsControlManagerState
-{
+struct SmsControlManagerState {
 	uint8_t ControlPort;
 };
 
-struct SmsState
-{
+struct SmsState {
 	SmsCpuState Cpu;
 	SmsVdpState Vdp;
 	SmsPsgState Psg;
@@ -206,38 +194,33 @@ struct SmsState
 	SmsControlManagerState ControlManager;
 };
 
-enum class SmsIrqSource
-{
+enum class SmsIrqSource {
 	None = 0,
 	Vdp = 1,
 };
 
-enum class SmsVdpWriteType : uint8_t
-{
+enum class SmsVdpWriteType : uint8_t {
 	None = 0,
 	Vram = 1,
 	Palette = 2
 };
 
-class SmsCpuParityTable
-{
+class SmsCpuParityTable {
 private:
 	uint8_t _parityTable[0x100];
 
 public:
-	SmsCpuParityTable()
-	{
-		for(int i = 0; i < 256; i++) {
+	SmsCpuParityTable() {
+		for (int i = 0; i < 256; i++) {
 			int count = 0;
-			for(int j = 0; j < 8; j++) {
+			for (int j = 0; j < 8; j++) {
 				count += (i & (1 << j)) ? 1 : 0;
 			}
 			_parityTable[i] = count & 0x01 ? 0 : 1;
 		}
 	}
 
-	__forceinline bool CheckParity(uint8_t val)
-	{
+	__forceinline bool CheckParity(uint8_t val) {
 		return _parityTable[val];
 	}
 };

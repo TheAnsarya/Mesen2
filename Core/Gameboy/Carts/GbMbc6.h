@@ -4,8 +4,7 @@
 #include "Gameboy/GbMemoryManager.h"
 #include "Utilities/Serializer.h"
 
-class GbMbc6 : public GbCart
-{
+class GbMbc6 : public GbCart {
 private:
 	bool _ramEnabled = false;
 	bool _flashEnabled = false;
@@ -15,30 +14,28 @@ private:
 	uint8_t _ramBanks[2] = {};
 
 public:
-	void InitCart() override
-	{
+	void InitCart() override {
 		_memoryManager->MapRegisters(0x0000, 0x3FFF, RegisterAccess::Write);
 	}
 
-	void RefreshMappings() override
-	{
+	void RefreshMappings() override {
 		Map(0x0000, 0x3FFF, GbMemoryType::PrgRom, 0, true);
 
-		if(_flashBankEnabled[0]) {
+		if (_flashBankEnabled[0]) {
 			_memoryManager->MapRegisters(0x4000, 0x5FFF, RegisterAccess::ReadWrite);
 		} else {
 			Map(0x4000, 0x5FFF, GbMemoryType::PrgRom, _prgBanks[0] * 0x2000, true);
 			_memoryManager->MapRegisters(0x4000, 0x5FFF, RegisterAccess::None);
 		}
 
-		if(_flashBankEnabled[1]) {
+		if (_flashBankEnabled[1]) {
 			_memoryManager->MapRegisters(0x6000, 0x7FFF, RegisterAccess::ReadWrite);
 		} else {
 			Map(0x6000, 0x7FFF, GbMemoryType::PrgRom, _prgBanks[1] * 0x2000, true);
 			_memoryManager->MapRegisters(0x6000, 0x7FFF, RegisterAccess::None);
 		}
 
-		if(_ramEnabled) {
+		if (_ramEnabled) {
 			Map(0xA000, 0xAFFF, GbMemoryType::CartRam, _ramBanks[0] * 0x1000, false);
 			Map(0xB000, 0xBFFF, GbMemoryType::CartRam, _ramBanks[1] * 0x1000, false);
 		} else {
@@ -46,27 +43,33 @@ public:
 		}
 	}
 
-	uint8_t ReadRegister(uint16_t addr) override
-	{
-		//TODO - Flash reads
+	uint8_t ReadRegister(uint16_t addr) override {
+		// TODO - Flash reads
 		return 0xFF;
 	}
 
-	void WriteRegister(uint16_t addr, uint8_t value) override
-	{
-		if(addr < 0x4000) {
-			switch(addr & 0x3C00) {
-				case 0x0000: _ramEnabled = (value == 0x0A); break;
-				case 0x0400: _ramBanks[0] = value & 0x07; break;
-				case 0x0800: _ramBanks[1] = value & 0x07; break;
+	void WriteRegister(uint16_t addr, uint8_t value) override {
+		if (addr < 0x4000) {
+			switch (addr & 0x3C00) {
+				case 0x0000:
+					_ramEnabled = (value == 0x0A);
+					break;
+				case 0x0400:
+					_ramBanks[0] = value & 0x07;
+					break;
+				case 0x0800:
+					_ramBanks[1] = value & 0x07;
+					break;
 
 				case 0x0C00:
-					if(_flashWriteEnabled) {
+					if (_flashWriteEnabled) {
 						_flashEnabled = (value & 0x01) != 0;
 					}
 					break;
 
-				case 0x1000: _flashWriteEnabled = (value & 0x01) != 0; break;
+				case 0x1000:
+					_flashWriteEnabled = (value & 0x01) != 0;
+					break;
 
 				case 0x2000:
 				case 0x2400:
@@ -90,12 +93,11 @@ public:
 			}
 			RefreshMappings();
 		} else {
-			//TODO - Flash writes
+			// TODO - Flash writes
 		}
 	}
 
-	void Serialize(Serializer& s) override
-	{
+	void Serialize(Serializer& s) override {
 		SV(_ramEnabled);
 		SV(_prgBanks[0]);
 		SV(_prgBanks[1]);

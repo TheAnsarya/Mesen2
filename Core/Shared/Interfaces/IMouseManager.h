@@ -1,15 +1,13 @@
 #pragma once
 #include "pch.h"
 
-enum class CursorImage
-{
+enum class CursorImage {
 	Hidden,
 	Arrow,
 	Cross
 };
 
-struct SystemMouseState
-{
+struct SystemMouseState {
 	int32_t XPosition;
 	int32_t YPosition;
 	bool LeftButton;
@@ -19,8 +17,7 @@ struct SystemMouseState
 	bool Button5;
 };
 
-class IMouseManager
-{
+class IMouseManager {
 public:
 	virtual ~IMouseManager() {}
 

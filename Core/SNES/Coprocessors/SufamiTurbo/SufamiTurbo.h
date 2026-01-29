@@ -8,13 +8,11 @@
 #include "Shared/FirmwareHelper.h"
 #include "Utilities/VirtualFile.h"
 
-struct SufamiTurboFilePromptMessage
-{
+struct SufamiTurboFilePromptMessage {
 	char Filename[5000];
 };
 
-class SufamiTurbo
-{
+class SufamiTurbo {
 private:
 	Emulator* _emu = nullptr;
 	string _nameSlotA;
@@ -36,10 +34,9 @@ private:
 	SufamiTurbo() {}
 
 public:
-	static SufamiTurbo* Init(Emulator* emu, VirtualFile& slotA)
-	{
+	static SufamiTurbo* Init(Emulator* emu, VirtualFile& slotA) {
 		vector<uint8_t> firmware;
-		if(!FirmwareHelper::LoadSufamiTurboFirmware(emu, firmware)) {
+		if (!FirmwareHelper::LoadSufamiTurboFirmware(emu, firmware)) {
 			return nullptr;
 		}
 
@@ -52,7 +49,7 @@ public:
 		memcpy(st->_firmware, firmware.data(), firmware.size());
 		BaseCartridge::EnsureValidPrgRomSize(st->_firmwareSize, st->_firmware);
 		emu->RegisterMemory(MemoryType::SufamiTurboFirmware, st->_firmware, st->_firmwareSize);
-		for(uint32_t i = 0; i < st->_firmwareSize; i += 0x1000) {
+		for (uint32_t i = 0; i < st->_firmwareSize; i += 0x1000) {
 			st->_firmwareHandlers.push_back(unique_ptr<RomHandler>(new RomHandler(st->_firmware, i, st->_firmwareSize, MemoryType::SufamiTurboFirmware)));
 		}
 
@@ -60,14 +57,14 @@ public:
 		emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::SufamiTurboFilePrompt, &msg);
 
 		string slot2File = string(msg.Filename, strlen(msg.Filename));
-		if(slot2File.size()) {
+		if (slot2File.size()) {
 			VirtualFile file = slot2File;
-			if(file.IsValid()) {
+			if (file.IsValid()) {
 				vector<uint8_t> cart;
 				file.ReadFile(cart);
 
 				st->_cartName = FolderUtilities::GetFilename(file.GetFileName(), false);
-				if(st->_nameSlotA == st->_cartName) {
+				if (st->_nameSlotA == st->_cartName) {
 					st->_cartName += "_SlotB";
 				}
 
@@ -78,7 +75,7 @@ public:
 
 				emu->RegisterMemory(MemoryType::SufamiTurboSecondCart, st->_cartRom, st->_cartRomSize);
 
-				for(uint32_t i = 0; i < st->_cartRomSize; i += 0x1000) {
+				for (uint32_t i = 0; i < st->_cartRomSize; i += 0x1000) {
 					st->_cartRomHandlers.push_back(unique_ptr<RomHandler>(new RomHandler(st->_cartRom, i, st->_cartRomSize, MemoryType::SufamiTurboSecondCart)));
 				}
 
@@ -89,7 +86,7 @@ public:
 
 				emu->GetBatteryManager()->LoadBattery(st->_cartName + ".srm", st->_cartRam, st->_cartRamSize);
 
-				for(uint32_t i = 0; i < st->_cartRamSize; i += 0x1000) {
+				for (uint32_t i = 0; i < st->_cartRamSize; i += 0x1000) {
 					st->_cartRamHandlers.push_back(unique_ptr<RamHandler>(new RamHandler(st->_cartRam, i, st->_cartRamSize, MemoryType::SufamiTurboSecondCartRam)));
 				}
 			}
@@ -98,24 +95,22 @@ public:
 		return st;
 	}
 
-	static uint32_t GetSaveRamSize(vector<uint8_t>& cart)
-	{
+	static uint32_t GetSaveRamSize(vector<uint8_t>& cart) {
 		auto checkMarker = [&](string marker) {
-			return std::search((char*)cart.data(), (char*)cart.data()+cart.size(), marker.c_str(), marker.c_str()+marker.size()) != (char*)cart.data() + cart.size();
+			return std::search((char*)cart.data(), (char*)cart.data() + cart.size(), marker.c_str(), marker.c_str() + marker.size()) != (char*)cart.data() + cart.size();
 		};
 
-		if(checkMarker("POIPOI.Ver") || checkMarker("SDBATTLE ")) {
+		if (checkMarker("POIPOI.Ver") || checkMarker("SDBATTLE ")) {
 			return 0x800;
-		} else if(checkMarker("SD \xB6\xDE\xDD\xC0\xDE\xD1 GN")) {
-			//SD ｶﾞﾝﾀﾞﾑ GN
+		} else if (checkMarker("SD \xB6\xDE\xDD\xC0\xDE\xD1 GN")) {
+			// SD ｶﾞﾝﾀﾞﾑ GN
 			return 0x2000;
 		}
 
 		return 0;
 	}
 
-	void InitializeMappings(MemoryMappings& mm, vector<unique_ptr<IMemoryHandler>>& prgRomHandlers, vector<unique_ptr<IMemoryHandler>>& saveRamHandlers)
-	{
+	void InitializeMappings(MemoryMappings& mm, vector<unique_ptr<IMemoryHandler>>& prgRomHandlers, vector<unique_ptr<IMemoryHandler>>& saveRamHandlers) {
 		mm.RegisterHandler(0x20, 0x3F, 0x8000, 0xFFFF, prgRomHandlers);
 		mm.RegisterHandler(0xA0, 0xBF, 0x8000, 0xFFFF, prgRomHandlers);
 
@@ -132,15 +127,13 @@ public:
 		mm.RegisterHandler(0xF0, 0xF3, 0x8000, 0xFFFF, _cartRamHandlers);
 	}
 
-	void SaveBattery()
-	{
-		if(_cartRam) {
+	void SaveBattery() {
+		if (_cartRam) {
 			_emu->GetBatteryManager()->SaveBattery(_cartName + ".srm", _cartRam, _cartRamSize);
 		}
 	}
-	
-	~SufamiTurbo()
-	{
+
+	~SufamiTurbo() {
 		delete[] _firmware;
 		delete[] _cartRom;
 		delete[] _cartRam;

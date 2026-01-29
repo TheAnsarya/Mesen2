@@ -6,8 +6,7 @@
 class WsConsole;
 class Emulator;
 
-class WsDefaultVideoFilter final : public BaseVideoFilter
-{
+class WsDefaultVideoFilter final : public BaseVideoFilter {
 private:
 	Emulator* _emu = nullptr;
 	WsConsole* _console = nullptr;

@@ -1,15 +1,13 @@
 #pragma once
 #include "pch.h"
 
-class IAssembler
-{
+class IAssembler {
 public:
 	virtual ~IAssembler() {}
 	virtual uint32_t AssembleCode(string code, uint32_t startAddress, int16_t* assembledCode) = 0;
 };
 
-enum AssemblerSpecialCodes
-{
+enum AssemblerSpecialCodes {
 	OK = 0,
 	EndOfLine = -1,
 	ParsingError = -2,

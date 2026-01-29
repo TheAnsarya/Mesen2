@@ -3,11 +3,9 @@
 #include "Utilities/ISerializable.h"
 #include "Utilities/Serializer.h"
 
-class Eeprom93Lc56 final : public ISerializable
-{
+class Eeprom93Lc56 final : public ISerializable {
 private:
-	enum class Mode
-	{
+	enum class Mode {
 		Idle,
 		Command,
 		ReadCommand,
@@ -34,21 +32,17 @@ private:
 	uint8_t _writeCounter = 0;
 
 public:
-	void SetRam(uint8_t* saveRam)
-	{
+	void SetRam(uint8_t* saveRam) {
 		_saveRam = saveRam;
 	}
 
-	uint8_t Read()
-	{
-		uint8_t result = (
-			(_chipSelect ? 0x80 : 0) |
-			(_clk ? 0x40 : 0) |
-			(_dataIn ? 0x02 : 0)
-		);
+	uint8_t Read() {
+		uint8_t result = ((_chipSelect ? 0x80 : 0) |
+		                  (_clk ? 0x40 : 0) |
+		                  (_dataIn ? 0x02 : 0));
 
-		if(_mode == Mode::ReadCommand) {
-			if(_readCounter < 0) {
+		if (_mode == Mode::ReadCommand) {
+			if (_readCounter < 0) {
 				return result | 0x01;
 			}
 			return result | ((_saveRam[(_readAddress << 1) + (_readCounter >= 8 ? 0 : 1)] >> (7 - (_readCounter & 0x07))) & 0x01);
@@ -57,29 +51,27 @@ public:
 		}
 	}
 
-	void Write(uint8_t value)
-	{
+	void Write(uint8_t value) {
 		uint8_t prevClk = _clk;
 		bool clk = (value & 0x40);
 		_dataIn = (value & 0x02) >> 1;
 		_chipSelect = value & 0x80;
 		_clk = clk;
 
-		if(!_chipSelect) {
-			//Chip select is disabled, force idle
+		if (!_chipSelect) {
+			// Chip select is disabled, force idle
 			_mode = Mode::Idle;
 			return;
 		}
 
-
-		if(!clk || prevClk) {
-			//Not a rising clock
+		if (!clk || prevClk) {
+			// Not a rising clock
 			return;
 		}
 
-		switch(_mode) {
+		switch (_mode) {
 			case Mode::Idle:
-				if(_dataIn) {
+				if (_dataIn) {
 					_mode = Mode::Command;
 					_commandId = 0;
 					_bitCount = 0;
@@ -95,36 +87,36 @@ public:
 				_commandId |= _dataIn;
 				_bitCount++;
 
-				if(_bitCount >= 10) {
+				if (_bitCount >= 10) {
 					uint8_t id = _commandId >> 6;
-					if((id & 0b1100) == 0b1000) {
+					if ((id & 0b1100) == 0b1000) {
 						_mode = Mode::ReadCommand;
 						_readAddress = _commandId & 0x7F;
-					} else if((id & 0b1100) == 0b0100) {
+					} else if ((id & 0b1100) == 0b0100) {
 						_mode = Mode::WriteCommand;
-					} else if((id & 0b1100) == 0b1100) {
-						if(_writeEnabled) {
+					} else if ((id & 0b1100) == 0b1100) {
+						if (_writeEnabled) {
 							uint8_t addr = _commandId & 0x7F;
 							_saveRam[addr << 1] = 0xFF;
 							_saveRam[(addr << 1) + 1] = 0xFF;
 						}
 						_mode = Mode::Idle;
-					} else if((id & 0b1111) == 0b0000) {
-						//Disable writes (EWDS)
+					} else if ((id & 0b1111) == 0b0000) {
+						// Disable writes (EWDS)
 						_writeEnabled = false;
 						_mode = Mode::Idle;
-					} else if((id & 0b1111) == 0b0011) {
-						//Enable writes (EWEN)
+					} else if ((id & 0b1111) == 0b0011) {
+						// Enable writes (EWEN)
 						_writeEnabled = true;
 						_mode = Mode::Idle;
-					} else if((id & 0b1111) == 0b0010) {
-						//Erase all (ERAL)
-						if(_writeEnabled) {
+					} else if ((id & 0b1111) == 0b0010) {
+						// Erase all (ERAL)
+						if (_writeEnabled) {
 							memset(_saveRam, 0xFF, 256);
 						}
 						_mode = Mode::Idle;
-					} else if((id & 0b1111) == 0b0001) {
-						//Write all (WRAL)
+					} else if ((id & 0b1111) == 0b0001) {
+						// Write all (WRAL)
 						_mode = Mode::WriteAllCommand;
 					}
 				}
@@ -132,7 +124,7 @@ public:
 
 			case Mode::ReadCommand:
 				_readCounter++;
-				if(_readCounter == 16) {
+				if (_readCounter == 16) {
 					_readAddress = (_readAddress + 1) & 0x7F;
 					_readCounter = 0;
 					_mode = Mode::Idle;
@@ -144,10 +136,10 @@ public:
 				_writeData <<= 1;
 				_writeData |= _dataIn;
 				_writeCounter++;
-				if(_writeCounter >= 16) {
-					if(_writeEnabled) {
-						if(_mode == Mode::WriteAllCommand) {
-							for(int i = 0; i < 0x80; i++) {
+				if (_writeCounter >= 16) {
+					if (_writeEnabled) {
+						if (_mode == Mode::WriteAllCommand) {
+							for (int i = 0; i < 0x80; i++) {
 								_saveRam[i << 1] = _writeData;
 								_saveRam[(i << 1) + 1] = _writeData >> 8;
 							}
@@ -164,8 +156,7 @@ public:
 		}
 	}
 
-	void Serialize(Serializer& s)
-	{
+	void Serialize(Serializer& s) {
 		SV(_mode);
 		SV(_chipSelect);
 		SV(_clk);

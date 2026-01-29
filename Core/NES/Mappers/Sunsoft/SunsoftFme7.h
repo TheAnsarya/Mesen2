@@ -4,8 +4,7 @@
 #include "NES/NesCpu.h"
 #include "NES/Mappers/Audio/Sunsoft5bAudio.h"
 
-class SunsoftFme7 : public BaseMapper
-{
+class SunsoftFme7 : public BaseMapper {
 private:
 	unique_ptr<Sunsoft5bAudio> _audio;
 	uint8_t _command = 0;
@@ -23,8 +22,7 @@ protected:
 	uint32_t GetSaveRamPageSize() override { return 0x2000; }
 	bool EnableCpuClockHook() override { return true; }
 
-	void InitMapper() override
-	{
+	void InitMapper() override {
 		_audio.reset(new Sunsoft5bAudio(_console));
 
 		_command = 0;
@@ -38,8 +36,7 @@ protected:
 		UpdateWorkRam();
 	}
 
-	void Serialize(Serializer& s) override
-	{
+	void Serialize(Serializer& s) override {
 		BaseMapper::Serialize(s);
 		SV(_audio);
 		SV(_command);
@@ -47,19 +44,18 @@ protected:
 		SV(_irqEnabled);
 		SV(_irqCounterEnabled);
 		SV(_irqCounter);
-		if(!s.IsSaving()) {
+		if (!s.IsSaving()) {
 			UpdateWorkRam();
 		}
 	}
 
-	void ProcessCpuClock() override
-	{
+	void ProcessCpuClock() override {
 		BaseProcessCpuClock();
 
-		if(_irqCounterEnabled) {
+		if (_irqCounterEnabled) {
 			_irqCounter--;
-			if(_irqCounter == 0xFFFF) {
-				if(_irqEnabled) {
+			if (_irqCounter == 0xFFFF) {
+				if (_irqEnabled) {
 					_console->GetCpu()->SetIrqSource(IRQSource::External);
 				}
 			}
@@ -68,9 +64,8 @@ protected:
 		_audio->Clock();
 	}
 
-	void UpdateWorkRam()
-	{
-		if(_workRamValue & 0x40) {
+	void UpdateWorkRam() {
+		if (_workRamValue & 0x40) {
 			MemoryAccessType accessType = (_workRamValue & 0x80) ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess;
 			SetCpuMemoryMapping(0x6000, 0x7FFF, _workRamValue & 0x3F, HasBattery() ? PrgMemoryType::SaveRam : PrgMemoryType::WorkRam, accessType);
 		} else {
@@ -78,15 +73,21 @@ protected:
 		}
 	}
 
-	void WriteRegister(uint16_t addr, uint8_t value) override
-	{
-		switch(addr & 0xE000) {
+	void WriteRegister(uint16_t addr, uint8_t value) override {
+		switch (addr & 0xE000) {
 			case 0x8000:
 				_command = value & 0x0F;
 				break;
 			case 0xA000:
-				switch(_command) {
-					case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+				switch (_command) {
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
 						SelectChrPage(_command, value);
 						break;
 
@@ -96,16 +97,26 @@ protected:
 						break;
 					}
 
-					case 9: case 0xA: case 0xB:
+					case 9:
+					case 0xA:
+					case 0xB:
 						SelectPrgPage(_command - 9, value & 0x3F);
 						break;
 
 					case 0xC:
-						switch(value & 0x03) {
-							case 0: SetMirroringType(MirroringType::Vertical); break;
-							case 1: SetMirroringType(MirroringType::Horizontal); break;
-							case 2: SetMirroringType(MirroringType::ScreenAOnly); break;
-							case 3: SetMirroringType(MirroringType::ScreenBOnly); break;
+						switch (value & 0x03) {
+							case 0:
+								SetMirroringType(MirroringType::Vertical);
+								break;
+							case 1:
+								SetMirroringType(MirroringType::Horizontal);
+								break;
+							case 2:
+								SetMirroringType(MirroringType::ScreenAOnly);
+								break;
+							case 3:
+								SetMirroringType(MirroringType::ScreenBOnly);
+								break;
 						}
 						break;
 

@@ -1,5 +1,4 @@
 #pragma once
 
-struct BaseState
-{
+struct BaseState {
 };

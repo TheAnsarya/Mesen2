@@ -2,16 +2,13 @@
 
 class Serializer;
 
-enum class DeserializeResult
-{
+enum class DeserializeResult {
 	Success,
 	InvalidFile,
 	SpecificError,
 };
 
-class ISerializable
-{
+class ISerializable {
 public:
-	virtual void Serialize(Serializer &s) = 0;
+	virtual void Serialize(Serializer& s) = 0;
 };
-

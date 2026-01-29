@@ -2,15 +2,13 @@
 #include "pch.h"
 #include "Lua/lua.hpp"
 
-template<typename T>
-struct Nullable
-{
+template <typename T>
+struct Nullable {
 	bool HasValue = false;
 	T Value = {};
 };
 
-class LuaCallHelper
-{
+class LuaCallHelper {
 private:
 	int _stackSize = 0;
 	int _paramCount = 0;

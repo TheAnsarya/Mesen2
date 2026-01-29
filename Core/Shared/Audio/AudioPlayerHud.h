@@ -8,10 +8,9 @@ class Emulator;
 class SoundMixer;
 class DebugHud;
 
-class AudioPlayerHud
-{
+class AudioPlayerHud {
 private:
-	static constexpr int N = 2048*4;
+	static constexpr int N = 2048 * 4;
 
 	Emulator* _emu = nullptr;
 	DebugHud* _hud = nullptr;
@@ -20,7 +19,7 @@ private:
 	kissfft<double> _fft = kissfft<double>(N / 2, false);
 	std::vector<double> _amplitudes;
 	std::deque<int16_t> _samples;
-	
+
 	uint32_t _prevFrameCounter = 0;
 	uint32_t _lastAudioFrame = 0;
 	double _prevFps = 0;

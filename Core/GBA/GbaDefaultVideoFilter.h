@@ -6,8 +6,7 @@
 
 class Emulator;
 
-class GbaDefaultVideoFilter : public BaseVideoFilter
-{
+class GbaDefaultVideoFilter : public BaseVideoFilter {
 private:
 	uint32_t _calculatedPalette[0x8000] = {};
 	VideoConfig _videoConfig = {};

@@ -1,8 +1,7 @@
 #pragma once
 #include "Core/Shared/Interfaces/IAudioDevice.h"
 
-class BaseSoundManager : public IAudioDevice
-{
+class BaseSoundManager : public IAudioDevice {
 public:
 	void ProcessLatency(uint32_t readPosition, uint32_t writePosition);
 	AudioStatistics GetStatistics();

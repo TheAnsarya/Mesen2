@@ -7,8 +7,7 @@
 class SnesConsole;
 class SnesMemoryManager;
 
-class BsxSatellaview : public IMemoryHandler, public ISerializable
-{
+class BsxSatellaview : public IMemoryHandler, public ISerializable {
 private:
 	IMemoryHandler* _bBusHandler;
 	SnesConsole* _console;
@@ -24,7 +23,7 @@ private:
 	void ProcessClocks();
 
 public:
-	BsxSatellaview(SnesConsole* console, IMemoryHandler *bBusHandler);
+	BsxSatellaview(SnesConsole* console, IMemoryHandler* bBusHandler);
 
 	void Reset();
 

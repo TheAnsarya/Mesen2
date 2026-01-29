@@ -5,10 +5,9 @@
 struct RomData;
 struct NesHeader;
 
-class iNesLoader : public BaseLoader
-{
+class iNesLoader : public BaseLoader {
 public:
 	using BaseLoader::BaseLoader;
 
-	void LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *preloadedHeader, bool databaseEnabled);
+	void LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader* preloadedHeader, bool databaseEnabled);
 };

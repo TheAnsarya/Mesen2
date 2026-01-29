@@ -1,8 +1,7 @@
 #pragma once
 #include "pch.h"
 
-struct GbsHeader
-{
+struct GbsHeader {
 	char Header[3];
 	uint8_t Version;
 	uint8_t TrackCount;

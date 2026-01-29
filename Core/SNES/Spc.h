@@ -20,8 +20,7 @@ class SpcFileData;
 class Dsp;
 struct AddressInfo;
 
-class Spc : public ISerializable
-{
+class Spc : public ISerializable {
 public:
 	static constexpr int SpcRamSize = 0x10000;
 	static constexpr int SpcRomSize = 0x40;
@@ -54,18 +53,17 @@ private:
 
 	SpcState _state;
 	uint8_t* _ram;
-	uint8_t _spcBios[64] {
-		0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0,
-		0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
-		0xCC, 0xF4, 0xD0, 0xFB, 0x2F, 0x19, 0xEB, 0xF4,
-		0xD0, 0xFC, 0x7E, 0xF4, 0xD0, 0x0B, 0xE4, 0xF5,
-		0xCB, 0xF4, 0xD7, 0x00, 0xFC, 0xD0, 0xF3, 0xAB,
-		0x01, 0x10, 0xEF, 0x7E, 0xF4, 0x10, 0xEB, 0xBA,
-		0xF6, 0xDA, 0x00, 0xBA, 0xF4, 0xC4, 0xF4, 0xDD,
-		0x5D, 0xD0, 0xDB, 0x1F, 0x00, 0x00, 0xC0, 0xFF
-	};
+	uint8_t _spcBios[64]{
+	    0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0,
+	    0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,
+	    0xCC, 0xF4, 0xD0, 0xFB, 0x2F, 0x19, 0xEB, 0xF4,
+	    0xD0, 0xFC, 0x7E, 0xF4, 0xD0, 0x0B, 0xE4, 0xF5,
+	    0xCB, 0xF4, 0xD7, 0x00, 0xFC, 0xD0, 0xF3, 0xAB,
+	    0x01, 0x10, 0xEF, 0x7E, 0xF4, 0x10, 0xEB, 0xBA,
+	    0xF6, 0xDA, 0x00, 0xBA, 0xF4, 0xC4, 0xF4, 0xDD,
+	    0x5D, 0xD0, 0xDB, 0x1F, 0x00, 0x00, 0xC0, 0xFF};
 
-	//Store operations
+	// Store operations
 	void STA();
 	void STX();
 	void STY();
@@ -74,7 +72,7 @@ private:
 	void STA_AutoIncX();
 	void LDA_AutoIncX();
 
-	//Load operations
+	// Load operations
 	void LDA();
 	void LDA_Imm();
 	void LDX();
@@ -83,8 +81,8 @@ private:
 	void LDY_Imm();
 	void LDW();
 
-	//Transfer
-	void Transfer(uint8_t & dst, uint8_t src);
+	// Transfer
+	void Transfer(uint8_t& dst, uint8_t src);
 	void TXA();
 	void TYA();
 	void TAX();
@@ -97,7 +95,7 @@ private:
 	void MOV();
 	void MOV_Imm();
 
-	//Arithmetic
+	// Arithmetic
 	uint8_t Add(uint8_t a, uint8_t b);
 	uint8_t Sub(uint8_t a, uint8_t b);
 
@@ -120,7 +118,7 @@ private:
 	void CPY_Imm();
 	void CMPW();
 
-	//Increment/decrement
+	// Increment/decrement
 	void INC();
 	void INC_Acc();
 	void INX();
@@ -136,11 +134,11 @@ private:
 	void MUL();
 	void DIV();
 
-	//Decimal
+	// Decimal
 	void DAA();
 	void DAS();
 
-	//Logical
+	// Logical
 	void AND();
 	void AND_Acc();
 	void AND_Imm();
@@ -159,7 +157,7 @@ private:
 	void EOR1();
 	void NOT1();
 
-	//Shift/rotate
+	// Shift/rotate
 	uint8_t ShiftLeft(uint8_t value);
 	uint8_t RollLeft(uint8_t value);
 	uint8_t ShiftRight(uint8_t value);
@@ -175,7 +173,7 @@ private:
 	void ROR_Acc();
 	void XCN();
 
-	//Branch operations
+	// Branch operations
 	void Branch();
 	void BRA();
 	void BEQ();
@@ -193,7 +191,7 @@ private:
 	void DBNZ_Y();
 	void JMP();
 
-	//Flag operations
+	// Flag operations
 	void CLRC();
 	void SETC();
 	void NOTC();
@@ -206,23 +204,28 @@ private:
 	void TSET1();
 	void TCLR1();
 
-	template<uint8_t bit> void SET1();
-	template<uint8_t bit> void CLR1();
-	template<uint8_t bit> void BBS();
-	template<uint8_t bit> void BBC();
+	template <uint8_t bit>
+	void SET1();
+	template <uint8_t bit>
+	void CLR1();
+	template <uint8_t bit>
+	void BBS();
+	template <uint8_t bit>
+	void BBC();
 
-	//Subroutine operations
+	// Subroutine operations
 	void PCALL();
 	void JSR();
 	void RTS();
 	void BRK();
 	void RTI();
 
-	template<uint8_t offset> void TCALL();
+	template <uint8_t offset>
+	void TCALL();
 
-	//Stack operations
+	// Stack operations
 	void PushOperation(uint8_t value);
-	void PullOperation(uint8_t & dst);
+	void PullOperation(uint8_t& dst);
 
 	void PHA();
 	void PHX();
@@ -234,11 +237,11 @@ private:
 	void PLY();
 	void PLP();
 
-	//Other operations
+	// Other operations
 	void NOP();
 	void SLEEP();
 	void STOP();
-	
+
 	void Idle();
 	void DummyRead();
 	void DummyRead(uint16_t addr);
@@ -284,7 +287,7 @@ private:
 	void EndAddr();
 	__forceinline void ProcessCycle();
 	__forceinline void Exec();
-	
+
 	void UpdateClockRatio();
 	void ExitExecLoop();
 
@@ -315,14 +318,14 @@ public:
 
 	bool IsMuted();
 	AddressInfo GetAbsoluteAddress(uint16_t addr);
-	int GetRelativeAddress(AddressInfo & absAddress);
+	int GetRelativeAddress(AddressInfo& absAddress);
 
 	uint8_t* GetSpcRam();
 	uint8_t* GetSpcRom();
 
 	void LoadSpcFile(SpcFileData* spcData);
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 
 #ifdef DUMMYSPC
 private:
@@ -332,11 +335,11 @@ private:
 	void LogMemoryOperation(uint32_t addr, uint8_t value, MemoryOperationType type);
 
 public:
-	DummySpc(uint8_t *spcRam);
+	DummySpc(uint8_t* spcRam);
 
 	void Step();
 
-	void SetDummyState(SpcState &state);
+	void SetDummyState(SpcState& state);
 
 	uint32_t GetOperationCount();
 	MemoryOperationInfo GetOperationInfo(uint32_t index);

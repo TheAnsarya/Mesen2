@@ -10,8 +10,7 @@ class WsTimer;
 class WsConsole;
 class WsMemoryManager;
 
-class WsPpu final : public ISerializable
-{
+class WsPpu final : public ISerializable {
 private:
 	WsPpuState _state = {};
 	Emulator* _emu = nullptr;
@@ -21,11 +20,10 @@ private:
 	uint16_t* _outputBuffers[2] = {};
 	uint16_t* _currentBuffer = nullptr;
 	uint8_t* _vram = nullptr;
-	
+
 	uint8_t _spriteRam[512] = {};
 
-	struct PixelData
-	{
+	struct PixelData {
 		uint8_t Palette;
 		uint8_t Color;
 		uint8_t Priority;
@@ -46,15 +44,18 @@ private:
 
 	void SendFrame();
 
-	template<WsVideoMode mode> void DrawScanline();
-	template<WsVideoMode mode> void DrawSprites();
-	template<WsVideoMode mode, int layerIndex> void DrawBackground();
+	template <WsVideoMode mode>
+	void DrawScanline();
+	template <WsVideoMode mode>
+	void DrawSprites();
+	template <WsVideoMode mode, int layerIndex>
+	void DrawBackground();
 
-	template<WsVideoMode mode> __forceinline uint16_t GetPixelColor(uint16_t tileAddr, uint8_t column);
+	template <WsVideoMode mode>
+	__forceinline uint16_t GetPixelColor(uint16_t tileAddr, uint8_t column);
 
-	__forceinline uint16_t GetBgColor()
-	{
-		if(_state.Mode == WsVideoMode::Monochrome) {
+	__forceinline uint16_t GetBgColor() {
+		if (_state.Mode == WsVideoMode::Monochrome) {
 			uint8_t bgBrightness = _state.BwShades[_state.BgColor & 0x07] ^ 0x0F;
 			return bgBrightness | (bgBrightness << 4) | (bgBrightness << 8);
 		} else {
@@ -62,11 +63,9 @@ private:
 		}
 	}
 
-	__forceinline uint16_t GetPixelRgbColor(WsVideoMode mode, uint8_t color, uint8_t palette)
-	{
-		switch(mode) {
-			case WsVideoMode::Monochrome:
-			{
+	__forceinline uint16_t GetPixelRgbColor(WsVideoMode mode, uint8_t color, uint8_t palette) {
+		switch (mode) {
+			case WsVideoMode::Monochrome: {
 				uint8_t shadeValue = _state.BwPalettes[(palette << 2) | color];
 				uint8_t brightness = _state.BwShades[shadeValue] ^ 0x0F;
 				return brightness | (brightness << 4) | (brightness << 8);
@@ -74,8 +73,7 @@ private:
 
 			case WsVideoMode::Color2bpp:
 			case WsVideoMode::Color4bpp:
-			case WsVideoMode::Color4bppPacked:
-			{
+			case WsVideoMode::Color4bppPacked: {
 				uint16_t paletteAddr = 0xFE00 | (palette << 5) | (color << 1);
 				return _vram[paletteAddr] | ((_vram[paletteAddr + 1] & 0x0F) << 8);
 			}
@@ -83,22 +81,21 @@ private:
 
 		return 0;
 	}
-	
+
 	void ProcessHblank();
 
 public:
 	WsPpu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager, WsTimer* timer, uint8_t* vram);
 	~WsPpu();
 
-	__forceinline void Exec()
-	{
-		if(_state.Scanline == WsConstants::ScreenHeight) {
+	__forceinline void Exec() {
+		if (_state.Scanline == WsConstants::ScreenHeight) {
 			ProcessSpriteCopy();
 		}
 
-		if(_state.Cycle < 224) {
-			if(_state.Scanline < WsConstants::ScreenHeight + 1 && _state.Scanline > 0) {
-				//Palette lookup + output pixel on the first 224 cycles
+		if (_state.Cycle < 224) {
+			if (_state.Scanline < WsConstants::ScreenHeight + 1 && _state.Scanline > 0) {
+				// Palette lookup + output pixel on the first 224 cycles
 				uint8_t rowIndex = (_state.Scanline & 0x01) ^ 1;
 				PixelData& data = _rowData[rowIndex][_state.Cycle];
 				uint16_t screenWidth = _showIcons ? _screenWidth : WsConstants::ScreenWidth;
@@ -106,9 +103,9 @@ public:
 				_currentBuffer[offset] = data.Priority == 0 ? GetBgColor() : GetPixelRgbColor(_state.Mode, data.Color, data.Palette);
 			}
 		} else {
-			if(_state.Cycle == 224) {
+			if (_state.Cycle == 224) {
 				ProcessHblank();
-			} else if(_state.Cycle == 255) {
+			} else if (_state.Cycle == 255) {
 				ProcessEndOfScanline();
 				_state.Cycle = -1;
 			}

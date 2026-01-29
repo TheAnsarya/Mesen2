@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-enum class CpuType : uint8_t; 
+enum class CpuType : uint8_t;
 enum class MemoryType;
 struct AddressInfo;
 enum class BreakpointType;
@@ -9,10 +9,10 @@ enum class BreakpointTypeFlags;
 enum class MemoryOperationType;
 struct MemoryOperationInfo;
 
-class Breakpoint
-{
+class Breakpoint {
 public:
-	template<uint8_t accessWidth = 1> bool Matches(MemoryOperationInfo &opInfo, AddressInfo &info);
+	template <uint8_t accessWidth = 1>
+	bool Matches(MemoryOperationInfo& opInfo, AddressInfo& info);
 	bool HasBreakpointType(BreakpointType type);
 	string GetCondition();
 	bool HasCondition();
