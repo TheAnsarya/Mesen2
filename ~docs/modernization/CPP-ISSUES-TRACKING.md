@@ -27,12 +27,15 @@ This document tracks the GitHub issues and epics for the C++ core modernization 
 | [#76](https://github.com/TheAnsarya/Mesen2/issues/76) | Expand constexpr Usage | 🔄 In Progress | 14 functions (ColorUtilities, Dsp, etc.) |
 | [#77](https://github.com/TheAnsarya/Mesen2/issues/77) | Add [[nodiscard]] Attributes | 🔄 In Progress | ~85 attributes across utilities/core |
 | [#78](https://github.com/TheAnsarya/Mesen2/issues/78) | Adopt std::bit_cast | ✅ Research Done | LOW PRIORITY - minimal candidates |
+| [#82](https://github.com/TheAnsarya/Mesen2/issues/82) | Adopt std::span for buffers | ✅ COMPLETE | BatteryManager API, 26 files |
 
 **Commits:**
 - `2e9c5aaf`, `2b2e90a9` - [[unlikely]] implementation
 - `e5232022` - [[nodiscard]] utility functions
 - `9220b5d3` - constexpr expansion
 - `8db3eeef`, `1672f627` - [[nodiscard]] Core/Shared getters
+- `e3d73e45` - style: newlines at end of header files
+- `6af709d1` - feat: std::span for BatteryManager API (#82)
 
 ---
 
@@ -397,6 +400,7 @@ Modernize memory management in SNES emulation core.
 ---
 
 #### Issue 10.6: Adopt std::span for Buffer Parameters
+**GitHub:** [#82](https://github.com/TheAnsarya/Mesen2/issues/82) ✅ CLOSED
 **Priority:** MEDIUM
 **Labels:** `modernization`, `cpp`
 
@@ -404,13 +408,18 @@ Modernize memory management in SNES emulation core.
 Replace raw pointer + size pairs with std::span.
 
 **Tasks:**
-- [ ] Identify functions with ptr+size patterns
-- [ ] Replace with std::span<T> or std::span<const T>
-- [ ] Update call sites
+- [x] Identify functions with ptr+size patterns
+- [x] Replace with std::span<T> or std::span<const T>
+- [x] Update call sites
+
+**Implementation (January 29, 2026):**
+- BatteryManager::SaveBattery: `std::span<const uint8_t>`
+- BatteryManager::LoadBattery: `std::span<uint8_t>`
+- Updated 26 files across all platforms (NES, SNES, GB, GBA, SMS, PCE, WS)
 
 **Acceptance Criteria:**
-- Consistent use of std::span
-- No buffer overflows possible
+- Consistent use of std::span ✅
+- No buffer overflows possible ✅
 
 ---
 
