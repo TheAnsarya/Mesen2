@@ -1,4 +1,5 @@
 #include <vector>
+#include <cctype>
 #include <string>
 #include <algorithm>
 #include <ranges>
@@ -53,7 +54,7 @@ vector<string> GetFilesInFolder(string rootFolder, std::unordered_set<string> ex
 	for(string folder : folders) {
 		for(fs::directory_iterator i(PathUtil::FromUtf8(folder)), end; i != end; i++) {
 			string extension = PathUtil::ToUtf8(i->path().extension());
-			std::ranges::transform(extension, extension.begin(), ::tolower);
+			std::ranges::transform(extension, extension.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 			if(extensions.find(extension) != extensions.end()) {
 				files.push_back(PathUtil::ToUtf8(i->path()));
 			}

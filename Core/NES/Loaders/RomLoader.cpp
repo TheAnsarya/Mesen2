@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <cctype>
 #include <ranges>
 #include <unordered_set>
 #include "Utilities/FolderUtilities.h"
@@ -79,7 +80,7 @@ bool RomLoader::LoadFile(VirtualFile& romFile, RomData& romData, bool databaseEn
 	if (romData.Info.System == GameSystem::Unknown) {
 		// Use filename to detect PAL/VS system games
 		string name = romData.Info.Filename;
-		std::ranges::transform(name, name.begin(), ::tolower);
+		std::ranges::transform(name, name.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 		if (name.contains("(e)") || name.contains("(australia)") || name.contains("(europe)") ||
 		    name.contains("(germany)") || name.contains("(spain)")) {

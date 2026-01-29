@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <cctype>
 #include "Serializer.h"
 #include "ISerializable.h"
 #include "miniz.h"
@@ -241,7 +242,7 @@ string Serializer::NormalizeName(const char* name, int index) {
 	for (size_t i = 0, len = valName.size(); i < len; i++) {
 		char c = valName[i];
 		if (c >= 'A' && c <= 'Z') {
-			valName[i] = ::tolower(c);
+			valName[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 		} else {
 			size_t pos = valName.find_first_of('.', i);
 			if (pos == string::npos) {

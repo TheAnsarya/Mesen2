@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <cctype>
 #include "LuaApi.h"
 #include "Lua/lua.hpp"
 #include "Debugger/LuaCallHelper.h"
@@ -207,7 +208,7 @@ int LuaApi::GetLibrary(lua_State* lua) {
 	lua_newtable(lua);
 	for (auto& entry : magic_enum::enum_entries<MemoryType>()) {
 		string name = string(entry.second);
-		name[0] = ::tolower(name[0]);
+		name[0] = static_cast<char>(std::tolower(static_cast<unsigned char>(name[0])));
 		if (DebugUtilities::IsRelativeMemory(entry.first)) {
 			string debugName = name.substr(0, name.size() - 6) + "Debug";
 			LuaPushIntValue(lua, debugName, (int)entry.first | 0x100);
@@ -234,7 +235,7 @@ void LuaApi::GenerateEnumDefinition(lua_State* lua, string enumName, unordered_s
 	for (auto& entry : magic_enum::enum_entries<T>()) {
 		if (excludedValues.find(entry.first) == excludedValues.end()) {
 			string name = string(entry.second);
-			name[0] = ::tolower(name[0]);
+			name[0] = static_cast<char>(std::tolower(static_cast<unsigned char>(name[0])));
 			LuaPushIntValue(lua, name, (int)entry.first);
 		}
 	}

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <cctype>
 #include <climits>
 #include <algorithm>
 #include "Debugger/DebugTypes.h"
@@ -102,7 +103,7 @@ bool ExpressionEvaluator::CheckSpecialTokens(string expression, size_t& pos, str
 	size_t initialPos = pos;
 	size_t len = expression.size();
 	do {
-		char c = std::tolower(expression[pos]);
+		char c = static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos])));
 		if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == '@' || c == '\'') {
 			// Only letters, numbers and underscore are allowed in code labels
 			token += c;
@@ -180,8 +181,8 @@ string ExpressionEvaluator::GetNextToken(string expression, size_t& pos, Express
 		return "";
 	}
 
-	char c = std::tolower(expression[pos]);
-	char nextChar = (pos + 1 < expression.size()) ? std::tolower(expression[pos + 1]) : '\0';
+	char c = static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos])));
+	char nextChar = (pos + 1 < expression.size()) ? static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos + 1]))) : '\0';
 	if (c == '$' || (c == '0' && nextChar == 'x')) {
 		// Hex numbers
 		pos++;
@@ -191,7 +192,7 @@ string ExpressionEvaluator::GetNextToken(string expression, size_t& pos, Express
 		}
 
 		for (size_t len = expression.size(); pos < len; pos++) {
-			c = std::tolower(expression[pos]);
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos])));
 			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
 				output += c;
 			} else {
@@ -207,7 +208,7 @@ string ExpressionEvaluator::GetNextToken(string expression, size_t& pos, Express
 		// Binary numbers
 		pos++;
 		for (size_t len = expression.size(); pos < len; pos++) {
-			c = std::tolower(expression[pos]);
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos])));
 			if (c == '0' || c == '1') {
 				output += c;
 			} else {
@@ -228,7 +229,7 @@ string ExpressionEvaluator::GetNextToken(string expression, size_t& pos, Express
 	} else if (c >= '0' && c <= '9') {
 		// Regular numbers
 		for (size_t len = expression.size(); pos < len; pos++) {
-			c = std::tolower(expression[pos]);
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos])));
 			if (c >= '0' && c <= '9') {
 				output += c;
 			} else {
@@ -239,7 +240,7 @@ string ExpressionEvaluator::GetNextToken(string expression, size_t& pos, Express
 		// Operators
 		string operatorToken;
 		for (size_t len = expression.size(); pos < len; pos++) {
-			c = std::tolower(expression[pos]);
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos])));
 			operatorToken += c;
 			if (output.empty() || _operators.find(operatorToken) != _operators.end()) {
 				// If appending the next char results in a valid operator, append it (or if this is the first character)

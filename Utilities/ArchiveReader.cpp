@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ArchiveReader.h"
+#include <cctype>
 #include <string.h>
 #include <sstream>
 #include <algorithm>
@@ -33,7 +34,7 @@ vector<string> ArchiveReader::GetFileList(std::initializer_list<string> extensio
 	vector<string> filenames;
 	for (string filename : InternalGetFileList()) {
 		string lcFilename = filename;
-		std::ranges::transform(lcFilename, lcFilename.begin(), ::tolower);
+		std::ranges::transform(lcFilename, lcFilename.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 		string ext = FolderUtilities::GetExtension(lcFilename);
 		if (extMap.find(ext) != extMap.end()) {

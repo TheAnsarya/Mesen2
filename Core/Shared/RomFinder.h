@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <cctype>
 #include "Shared/Emulator.h"
 #include "Shared/MessageManager.h"
 #include "Utilities/VirtualFile.h"
@@ -15,7 +16,7 @@ private:
 		}
 
 		string lcRomname = romName;
-		std::transform(lcRomname.begin(), lcRomname.end(), lcRomname.begin(), ::tolower);
+		std::transform(lcRomname.begin(), lcRomname.end(), lcRomname.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 		vector<string> romFiles;
 		vector<string> folders = FolderUtilities::GetKnownGameFolders();
@@ -33,7 +34,7 @@ private:
 
 			for (string romFilename : FolderUtilities::GetFilesInFolder(folder, VirtualFile::RomExtensions, true)) {
 				string lcRomFile = romFilename;
-				std::transform(lcRomFile.begin(), lcRomFile.end(), lcRomFile.begin(), ::tolower);
+				std::transform(lcRomFile.begin(), lcRomFile.end(), lcRomFile.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 				if (FolderUtilities::GetFilename(lcRomname, false) == FolderUtilities::GetFilename(lcRomFile, false) && VirtualFile(romFilename).GetCrc32() == crc32) {
 					return romFilename;

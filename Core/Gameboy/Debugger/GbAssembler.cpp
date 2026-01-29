@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <cctype>
 #include <ranges>
 #include <regex>
 #include "Debugger/LabelManager.h"
@@ -36,7 +37,7 @@ void GbAssembler::InitAssembler() {
 
 		entry.OpCode = i < 256 ? i : ((i << 8) | 0xCB);
 
-		std::ranges::transform(opName, opName.begin(), ::tolower);
+		std::ranges::transform(opName, opName.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 		if (_opCodes.find(opName) == _opCodes.end()) {
 			_opCodes[opName] = vector<OpCodeEntry>();
 		}
@@ -72,7 +73,7 @@ void GbAssembler::InitParamEntry(ParamEntry& entry, string param) {
 	} else if (param == "SP+d") {
 		entry.Type = ParamType::StackOffset;
 	} else {
-		std::ranges::transform(param, param.begin(), ::tolower);
+		std::ranges::transform(param, param.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 		entry.Type = ParamType::Literal;
 		entry.Param = param;
 	}
@@ -80,7 +81,7 @@ void GbAssembler::InitParamEntry(ParamEntry& entry, string param) {
 }
 
 bool GbAssembler::IsRegisterName(string op) {
-	std::ranges::transform(op, op.begin(), ::tolower);
+	std::ranges::transform(op, op.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 	return op == "hl" || op == "af" || op == "bc" || op == "de" || op == "a" || op == "b" || op == "c" || op == "d" || op == "e" || op == "f" || op == "l" || op == "h";
 }
 
@@ -153,8 +154,8 @@ bool GbAssembler::IsMatch(ParamEntry& entry, string operand, uint32_t address, u
 
 		case ParamType::Literal: {
 			string param = entry.Param;
-			std::ranges::transform(param, param.begin(), ::tolower);
-			std::ranges::transform(operand, operand.begin(), ::tolower);
+			std::ranges::transform(param, param.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+			std::ranges::transform(operand, operand.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 			return operand == param;
 		}
 
@@ -177,7 +178,7 @@ bool GbAssembler::IsMatch(ParamEntry& entry, string operand, uint32_t address, u
 			return false;
 
 		case ParamType::StackOffset:
-			std::ranges::transform(operand, operand.begin(), ::tolower);
+			std::ranges::transform(operand, operand.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 			if (operand.starts_with("sp+")) {
 				return ReadValue(operand.substr(3), 0, 0xFF, localLabels, firstPass) >= 0;
 			}
@@ -247,7 +248,7 @@ void GbAssembler::ProcessOperand(ParamEntry& entry, string operand, vector<int16
 			break;
 
 		case ParamType::StackOffset:
-			std::ranges::transform(operand, operand.begin(), ::tolower);
+			std::ranges::transform(operand, operand.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 			if (operand.starts_with("sp+")) {
 				PushByte((uint8_t)ReadValue(operand.substr(3), 0, 0xFF, localLabels, firstPass), output, address);
 			}
@@ -329,7 +330,7 @@ void GbAssembler::RunPass(vector<int16_t>& output, string code, uint32_t address
 			continue;
 		}
 
-		std::ranges::transform(opName, opName.begin(), ::tolower);
+		std::ranges::transform(opName, opName.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 		if (_opCodes.find(opName) == _opCodes.end()) {
 			// No matching opcode found, mark it as invalid

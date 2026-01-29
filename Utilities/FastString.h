@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <cctype>
 
 class FastString {
 private:
@@ -28,7 +29,7 @@ public:
 
 	void Write(char c) {
 		if (_lowerCase) {
-			_buffer[_pos++] = ::tolower(c);
+			_buffer[_pos++] = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 		} else {
 			_buffer[_pos++] = c;
 		}
@@ -37,7 +38,7 @@ public:
 	void Write(const char* str, int size) {
 		if (_lowerCase) {
 			for (int i = 0; i < size; i++) {
-				_buffer[_pos + i] = ::tolower(str[i]);
+				_buffer[_pos + i] = static_cast<char>(std::tolower(static_cast<unsigned char>(str[i])));
 			}
 		} else {
 			memcpy(_buffer + _pos, str, size);
@@ -58,7 +59,7 @@ public:
 	void Write(string& str, bool preserveCase = false) {
 		if (_lowerCase && !preserveCase) {
 			for (size_t i = 0; i < str.size(); i++) {
-				_buffer[_pos + i] = ::tolower(str[i]);
+				_buffer[_pos + i] = static_cast<char>(std::tolower(static_cast<unsigned char>(str[i])));
 			}
 		} else {
 			memcpy(_buffer + _pos, str.c_str(), str.size());

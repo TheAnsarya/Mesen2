@@ -1,5 +1,8 @@
 #pragma once
 #include "pch.h"
+#include <algorithm>
+#include <cctype>
+#include <ranges>
 
 class StringUtilities {
 public:
@@ -41,12 +44,12 @@ public:
 	}
 
 	static string ToUpper(string str) {
-		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+		std::ranges::transform(str, str.begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
 		return str;
 	}
 
 	static string ToLower(string str) {
-		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+		std::ranges::transform(str, str.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 		return str;
 	}
 
@@ -55,38 +58,15 @@ public:
 	}
 
 	static bool StartsWith(string& str, const char* content) {
-		size_t length = strlen(content);
-		if (str.size() < length) {
-			return false;
-		}
-
-		for (size_t i = 0; i < length; i++) {
-			if (str[i] != content[i]) {
-				return false;
-			}
-		}
-		return true;
+		return str.starts_with(content);
 	}
 
 	static bool EndsWith(string& str, const char* content) {
-		size_t length = strlen(content);
-		if (str.size() < length) {
-			return false;
-		}
-
-		size_t startPos = str.size() - length;
-		for (size_t i = startPos; i < str.size(); i++) {
-			if (str[i] != content[i - startPos]) {
-				return false;
-			}
-		}
-
-		return true;
+		return str.ends_with(content);
 	}
 
 	static bool Contains(string& str, const char* content) {
-		size_t length = strlen(content);
-		return std::search(str.begin(), str.end(), content, content + length) != str.end();
+		return str.contains(content);
 	}
 
 	static string GetString(char* src, uint32_t maxLen) {

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <cctype>
 #include <ranges>
 #include <unordered_map>
 #include "NES/HdPacks/HdPackLoader.h"
@@ -305,7 +306,7 @@ void HdPackLoader::ProcessPatchTag(vector<string>& tokens) {
 		checkConstraint(false, string("Patch file not found: " + tokens[1]));
 	}
 
-	std::transform(tokens[1].begin(), tokens[1].end(), tokens[1].begin(), ::toupper);
+	std::transform(tokens[1].begin(), tokens[1].end(), tokens[1].begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
 	if (_loadFromZip) {
 		_data->PatchesByHash[tokens[1]] = VirtualFile(_hdPackFolder, tokens[0]);
 	} else {

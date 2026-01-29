@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <cctype>
 #include <regex>
 #include "Shared/CheatManager.h"
 #include "Shared/MessageManager.h"
@@ -136,7 +137,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromNesGameGenie(string code) {
 	int valueBits[8] = {3, 6, 5, 4, 23, 2, 1, 0};
 	int rawCode = 0;
 	for (int i = 0, len = (int)code.size(); i < len; i++) {
-		rawCode |= ggLetters.find(std::toupper(code[i])) << (i * 4);
+		rawCode |= ggLetters.find(static_cast<char>(std::toupper(static_cast<unsigned char>(code[i])))) << (i * 4);
 	}
 
 	int compareValue = -1;
@@ -329,7 +330,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromSnesGameGenie(string code) 
 	for (int i = 0; i < (int)code.size(); i++) {
 		if (code[i] != '-') {
 			rawValue <<= 4;
-			rawValue |= (uint32_t)_convertTable.find_first_of(std::toupper(code[i]));
+			rawValue |= (uint32_t)_convertTable.find_first_of(static_cast<char>(std::toupper(static_cast<unsigned char>(code[i]))));
 		}
 	}
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <cctype>
 #include <ranges>
 #include <regex>
 #include "Debugger/LabelManager.h"
@@ -67,7 +68,7 @@ void SmsAssembler::InitAssembler() {
 				entry.OpCode = (i << 16) | opType.Prefix;
 			}
 
-			std::ranges::transform(opName, opName.begin(), ::tolower);
+			std::ranges::transform(opName, opName.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 			if (_opCodes.find(opName) == _opCodes.end()) {
 				_opCodes[opName] = vector<OpCodeEntry>();
 			}
@@ -182,14 +183,14 @@ void SmsAssembler::InitParamEntry(ParamEntry& entry, string param, HlRegType hlR
 				break;
 		}
 	} else {
-		std::ranges::transform(param, param.begin(), ::tolower);
+		std::ranges::transform(param, param.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 		entry.Type = ParamType::Literal;
 		entry.Param = param;
 	}
 }
 
 bool SmsAssembler::IsRegisterName(string op) {
-	std::ranges::transform(op, op.begin(), ::tolower);
+	std::ranges::transform(op, op.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 	if (op.size() > 2 && op[0] == '(' && op[op.size() - 1] == ')') {
 		op = op.substr(1, op.size() - 2);
 		return op == "hl" || op == "af" || op == "bc" || op == "de" || op == "a" || op == "b" || op == "c" || op == "d" || op == "e" || op == "f" || op == "l" || op == "h" || op == "ix" || op == "iy" || op == "ixl" || op == "ixh" || op == "iyl" || op == "iyh";
@@ -275,8 +276,8 @@ bool SmsAssembler::IsMatch(ParamEntry& entry, string operand, uint32_t address, 
 
 		case ParamType::Literal: {
 			string param = entry.Param;
-			std::ranges::transform(param, param.begin(), ::tolower);
-			std::ranges::transform(operand, operand.begin(), ::tolower);
+			std::ranges::transform(param, param.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+			std::ranges::transform(operand, operand.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 			return operand == param;
 		}
 
@@ -472,7 +473,7 @@ void SmsAssembler::RunPass(vector<int16_t>& output, string code, uint32_t addres
 			continue;
 		}
 
-		std::ranges::transform(opName, opName.begin(), ::tolower);
+		std::ranges::transform(opName, opName.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 		if (_opCodes.find(opName) == _opCodes.end()) {
 			// No matching opcode found, mark it as invalid
