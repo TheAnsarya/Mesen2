@@ -1,0 +1,10 @@
+{
+	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+	"name": "mesen2",
+	"version": "2.0.0",
+	"description": "Mesen2 multi-system emulator",
+	"dependencies": [
+		"gtest",
+		"benchmark"
+	]
+}
