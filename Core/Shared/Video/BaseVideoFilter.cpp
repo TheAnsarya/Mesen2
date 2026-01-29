@@ -18,7 +18,6 @@ BaseVideoFilter::BaseVideoFilter(Emulator* emu) {
 
 BaseVideoFilter::~BaseVideoFilter() {
 	auto lock = _frameLock.AcquireSafe();
-	delete[] _outputBuffer;
 }
 
 void BaseVideoFilter::SetBaseFrameInfo(FrameInfo frameInfo) {
@@ -37,9 +36,8 @@ void BaseVideoFilter::UpdateBufferSize() {
 	uint32_t newBufferSize = _frameInfo.Width * _frameInfo.Height;
 	if (_bufferSize != newBufferSize) {
 		_frameLock.Acquire();
-		delete[] _outputBuffer;
 		_bufferSize = newBufferSize;
-		_outputBuffer = new uint32_t[newBufferSize];
+		_outputBuffer = std::make_unique<uint32_t[]>(newBufferSize);
 		_frameLock.Release();
 	}
 }
@@ -94,7 +92,7 @@ FrameInfo BaseVideoFilter::SendFrame(uint16_t* ppuOutputBuffer, uint32_t frameNu
 }
 
 uint32_t* BaseVideoFilter::GetOutputBuffer() {
-	return _outputBuffer;
+	return _outputBuffer.get();
 }
 
 void BaseVideoFilter::InitConversionMatrix(double hueShift, double saturationShift) {
@@ -148,19 +146,19 @@ void BaseVideoFilter::YiqToRgb(double y, double i, double q, double& r, double& 
 void BaseVideoFilter::TakeScreenshot(VideoFilterType filterType, string filename, std::stringstream* stream) {
 	uint32_t* pngBuffer;
 	FrameInfo frameInfo;
-	uint32_t* frameBuffer = nullptr;
+	std::unique_ptr<uint32_t[]> frameBuffer;
 	{
 		auto lock = _frameLock.AcquireSafe();
 		if (_bufferSize == 0 || !GetOutputBuffer()) {
 			return;
 		}
 
-		frameBuffer = new uint32_t[_bufferSize];
-		memcpy(frameBuffer, GetOutputBuffer(), _bufferSize * sizeof(frameBuffer[0]));
+		frameBuffer = std::make_unique<uint32_t[]>(_bufferSize);
+		memcpy(frameBuffer.get(), GetOutputBuffer(), _bufferSize * sizeof(frameBuffer[0]));
 		frameInfo = _frameInfo;
 	}
 
-	pngBuffer = frameBuffer;
+	pngBuffer = frameBuffer.get();
 
 	uint8_t scale = 1;
 
@@ -187,8 +185,6 @@ void BaseVideoFilter::TakeScreenshot(VideoFilterType filterType, string filename
 	} else {
 		PNGHelper::WritePNG(*stream, pngBuffer, frameInfo.Width, frameInfo.Height);
 	}
-
-	delete[] frameBuffer;
 }
 
 void BaseVideoFilter::TakeScreenshot(string romName, VideoFilterType filterType) {

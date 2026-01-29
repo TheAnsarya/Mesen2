@@ -11,21 +11,16 @@ SoftwareRenderer::SoftwareRenderer(Emulator* emu) {
 	_emu->GetVideoRenderer()->RegisterRenderingDevice(this);
 }
 
-SoftwareRenderer::~SoftwareRenderer() {
-	delete[] _textureBuffer[0];
-	delete[] _textureBuffer[1];
-}
+SoftwareRenderer::~SoftwareRenderer() = default;
 
 void SoftwareRenderer::SetScreenSize(uint32_t width, uint32_t height) {
 	_frameWidth = width;
 	_frameHeight = height;
 
-	delete[] _textureBuffer[0];
-	delete[] _textureBuffer[1];
-	_textureBuffer[0] = new uint32_t[width * height];
-	_textureBuffer[1] = new uint32_t[width * height];
-	memset(_textureBuffer[0], 0, width * height * sizeof(uint32_t));
-	memset(_textureBuffer[1], 0, width * height * sizeof(uint32_t));
+	_textureBuffer[0] = std::make_unique<uint32_t[]>(width * height);
+	_textureBuffer[1] = std::make_unique<uint32_t[]>(width * height);
+	memset(_textureBuffer[0].get(), 0, width * height * sizeof(uint32_t));
+	memset(_textureBuffer[1].get(), 0, width * height * sizeof(uint32_t));
 }
 
 void SoftwareRenderer::UpdateFrame(RenderedFrame& frame) {
@@ -37,14 +32,14 @@ void SoftwareRenderer::UpdateFrame(RenderedFrame& frame) {
 	}
 
 	auto lock = _textureLock.AcquireSafe();
-	memcpy(_textureBuffer[0], frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
+	memcpy(_textureBuffer[0].get(), frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
 	_needSwap = true;
 }
 
 void SoftwareRenderer::ClearFrame() {
 	// Clear current output and display black frame
 	auto lock = _textureLock.AcquireSafe();
-	memset(_textureBuffer[0], 0, _frameWidth * _frameHeight * sizeof(uint32_t));
+	memset(_textureBuffer[0].get(), 0, _frameWidth * _frameHeight * sizeof(uint32_t));
 	_needSwap = true;
 }
 
@@ -71,7 +66,7 @@ void SoftwareRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scri
 	}
 
 	SoftwareRendererFrame frame = {
-	    {_textureBuffer[1], _frameWidth,         _frameHeight,         true               },
+	    {_textureBuffer[1].get(), _frameWidth,         _frameHeight,         true               },
 	    {emuHud.Buffer.get(),     emuHud.Width,    emuHud.Height,    emuHud.IsDirty   },
 	    {scriptHud.Buffer.get(),  scriptHud.Width, scriptHud.Height, scriptHud.IsDirty}
     };

@@ -8,7 +8,7 @@ private:
 	static constexpr int PcmSampleRate = 44100;
 	static constexpr int SamplesToRead = 100;
 
-	int16_t* _outputBuffer = nullptr;
+	std::unique_ptr<int16_t[]> _outputBuffer;
 
 	ifstream _file;
 	uint32_t _fileOffset = 0;

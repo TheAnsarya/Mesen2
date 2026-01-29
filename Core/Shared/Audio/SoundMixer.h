@@ -54,10 +54,10 @@ private:
 	unique_ptr<Equalizer> _equalizer;
 	unique_ptr<SoundResampler> _resampler;
 	safe_ptr<WaveRecorder> _waveRecorder;
-	int16_t* _sampleBuffer = nullptr;
+	std::unique_ptr<int16_t[]> _sampleBuffer;
 
 	HermiteResampler _pitchAdjust;
-	int16_t* _pitchAdjustBuffer = nullptr;
+	std::unique_ptr<int16_t[]> _pitchAdjustBuffer;
 
 	int16_t _leftSample = 0;
 	int16_t _rightSample = 0;

@@ -7,7 +7,7 @@ class Emulator;
 
 class BaseVideoFilter {
 private:
-	uint32_t* _outputBuffer = nullptr;
+	std::unique_ptr<uint32_t[]> _outputBuffer;
 	double _yiqToRgbMatrix[6] = {};
 	uint32_t _bufferSize = 0;
 	SimpleLock _frameLock;

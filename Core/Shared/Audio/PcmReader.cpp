@@ -6,12 +6,10 @@
 PcmReader::PcmReader() {
 	_done = true;
 	_loopOffset = 8;
-	_outputBuffer = new int16_t[20000];
+	_outputBuffer = std::make_unique<int16_t[]>(20000);
 }
 
-PcmReader::~PcmReader() {
-	delete[] _outputBuffer;
-}
+PcmReader::~PcmReader() = default;
 
 bool PcmReader::Init(string filename, bool loop, uint32_t startOffset) {
 	if (_file) {
@@ -119,7 +117,7 @@ void PcmReader::ApplySamples(int16_t* buffer, size_t sampleCount, uint8_t volume
 		LoadSamples(samplesToLoad);
 	}
 
-	uint32_t samplesRead = _resampler.Resample<false>(_pcmBuffer.data(), (uint32_t)_pcmBuffer.size() / 2, _outputBuffer, sampleCount);
+	uint32_t samplesRead = _resampler.Resample<false>(_pcmBuffer.data(), (uint32_t)_pcmBuffer.size() / 2, _outputBuffer.get(), sampleCount);
 	_pcmBuffer.clear();
 
 	uint32_t samplesToProcess = (uint32_t)samplesRead * 2;
