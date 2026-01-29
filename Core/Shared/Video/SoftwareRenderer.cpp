@@ -71,9 +71,9 @@ void SoftwareRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scri
 	}
 
 	SoftwareRendererFrame frame = {
-	    {_textureBuffer[1], _frameWidth,     _frameHeight,     true             },
-	    {emuHud.Buffer,     emuHud.Width,    emuHud.Height,    emuHud.IsDirty   },
-	    {scriptHud.Buffer,  scriptHud.Width, scriptHud.Height, scriptHud.IsDirty}
+	    {_textureBuffer[1], _frameWidth,         _frameHeight,         true               },
+	    {emuHud.Buffer.get(),     emuHud.Width,    emuHud.Height,    emuHud.IsDirty   },
+	    {scriptHud.Buffer.get(),  scriptHud.Width, scriptHud.Height, scriptHud.IsDirty}
     };
 
 	_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::RefreshSoftwareRenderer, &frame);

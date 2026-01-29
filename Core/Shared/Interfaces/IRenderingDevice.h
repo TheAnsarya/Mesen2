@@ -20,7 +20,7 @@ struct RenderedFrame;
 /// Automatic memory management in destructor
 /// </remarks>
 struct RenderSurfaceInfo {
-	uint32_t* Buffer = nullptr;  ///< ARGB pixel data (caller owns memory)
+	std::unique_ptr<uint32_t[]> Buffer;  ///< ARGB pixel data (managed by unique_ptr)
 	uint32_t Width = 0;          ///< Surface width in pixels
 	uint32_t Height = 0;         ///< Surface height in pixels
 	bool IsDirty = true;         ///< True if surface changed since last render
@@ -37,8 +37,7 @@ struct RenderSurfaceInfo {
 	/// </remarks>
 	bool UpdateSize(uint32_t width, uint32_t height) {
 		if (Width != width || Height != height) {
-			delete[] Buffer;
-			Buffer = new uint32_t[height * width];
+			Buffer = std::make_unique<uint32_t[]>(height * width);
 			Width = width;
 			Height = height;
 			Clear();
@@ -51,16 +50,14 @@ struct RenderSurfaceInfo {
 	/// Clear surface to transparent black (0x00000000).
 	/// </summary>
 	void Clear() {
-		memset(Buffer, 0, Width * Height * sizeof(uint32_t));
+		memset(Buffer.get(), 0, Width * Height * sizeof(uint32_t));
 		IsDirty = true;
 	}
 
 	/// <summary>
 	/// Destructor - frees pixel buffer.
 	/// </summary>
-	~RenderSurfaceInfo() {
-		delete[] Buffer;
-	}
+	~RenderSurfaceInfo() = default;
 };
 
 /// <summary>

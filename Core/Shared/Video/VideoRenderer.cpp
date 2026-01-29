@@ -90,7 +90,7 @@ void VideoRenderer::RenderThread() {
 				_systemHud->Draw(_rendererHud.get(), size.Width, size.Height);
 			}
 
-			_emuHudSurface.IsDirty = _rendererHud->Draw(_emuHudSurface.Buffer, size, {}, 0, {}, true);
+			_emuHudSurface.IsDirty = _rendererHud->Draw(_emuHudSurface.Buffer.get(), size, {}, 0, {}, true);
 			_scriptHudSurface.IsDirty = DrawScriptHud(frame);
 
 			if (forceRender || _needRedraw || _emuHudSurface.IsDirty || _scriptHudSurface.IsDirty) {
@@ -130,7 +130,7 @@ bool VideoRenderer::DrawScriptHud(RenderedFrame& frame) {
 
 		if (_emu->GetScriptHud()->HasCommands()) {
 			auto [size, overscan] = GetScriptHudSize();
-			_emu->GetScriptHud()->Draw(_scriptHudSurface.Buffer, size, overscan, frame.FrameNumber, {});
+			_emu->GetScriptHud()->Draw(_scriptHudSurface.Buffer.get(), size, overscan, frame.FrameNumber, {});
 			_needScriptHudClear = true;
 			_lastScriptHudFrameNumber = frame.FrameNumber;
 			needRedraw = true;
@@ -204,7 +204,7 @@ void VideoRenderer::ProcessAviRecording(RenderedFrame& frame) {
 			_aviRecorderSurface.UpdateSize(frame.Width, frame.Height);
 
 			// Copy the game screen
-			memcpy(_aviRecorderSurface.Buffer, frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
+			memcpy(_aviRecorderSurface.Buffer.get(), frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
 
 			// Draw the system/input HUDs
 			DebugHud hud;
@@ -217,10 +217,10 @@ void VideoRenderer::ProcessAviRecording(RenderedFrame& frame) {
 			}
 
 			FrameInfo frameSize = {frame.Width, frame.Height};
-			hud.Draw((uint32_t*)_aviRecorderSurface.Buffer, frameSize, {}, frame.FrameNumber, {scale, scale});
+			hud.Draw((uint32_t*)_aviRecorderSurface.Buffer.get(), frameSize, {}, frame.FrameNumber, {scale, scale});
 
 			// Record the final result
-			if (!recorder->AddFrame(_aviRecorderSurface.Buffer, frame.Width, frame.Height, _emu->GetFps())) {
+			if (!recorder->AddFrame(_aviRecorderSurface.Buffer.get(), frame.Width, frame.Height, _emu->GetFps())) {
 				StopRecording();
 			}
 		} else {

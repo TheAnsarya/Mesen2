@@ -4,7 +4,7 @@
 
 class DrawScreenBufferCommand : public DrawCommand {
 private:
-	uint32_t* _screenBuffer = nullptr;
+	std::unique_ptr<uint32_t[]> _screenBuffer;
 	uint32_t _width = 0;
 	uint32_t _height = 0;
 
@@ -20,7 +20,7 @@ protected:
 			if (y * _frameInfo.Width + width > bufferSize) {
 				break;
 			}
-			memcpy(_argbBuffer + y * _frameInfo.Width, _screenBuffer + srcOffset + y * _width, width * sizeof(uint32_t));
+			memcpy(_argbBuffer + y * _frameInfo.Width, _screenBuffer.get() + srcOffset + y * _width, width * sizeof(uint32_t));
 		}
 	}
 
@@ -28,14 +28,12 @@ public:
 	DrawScreenBufferCommand(uint32_t width, uint32_t height, int startFrame) : DrawCommand(startFrame, 1, false) {
 		_width = width;
 		_height = height;
-		_screenBuffer = new uint32_t[width * height];
+		_screenBuffer = std::make_unique<uint32_t[]>(width * height);
 	}
 
 	void SetPixel(int index, uint32_t color) {
 		_screenBuffer[index] = color;
 	}
 
-	virtual ~DrawScreenBufferCommand() {
-		delete[] _screenBuffer;
-	}
+	virtual ~DrawScreenBufferCommand() = default;
 };
