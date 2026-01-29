@@ -19,6 +19,21 @@ This document tracks the GitHub issues and epics for the C++ core modernization 
 | Epic 12: Performance | [#44](https://github.com/TheAnsarya/Mesen2/issues/44) | 📋 Planned | 2 | LOW |
 | Epic 13: Documentation | [#45](https://github.com/TheAnsarya/Mesen2/issues/45) | 📋 Planned | 2 | LOW |
 
+### 🚀 Recent Progress (January 29, 2026 - Session 6)
+
+| Issue | Title | Status | Details |
+|-------|-------|--------|---------|
+| [#75](https://github.com/TheAnsarya/Mesen2/issues/75) | [[likely]]/[[unlikely]] Branch Hints | ✅ COMPLETE | 41 attributes in error paths |
+| [#76](https://github.com/TheAnsarya/Mesen2/issues/76) | Expand constexpr Usage | 🔄 In Progress | 14 functions (ColorUtilities, Dsp, etc.) |
+| [#77](https://github.com/TheAnsarya/Mesen2/issues/77) | Add [[nodiscard]] Attributes | 🔄 In Progress | ~85 attributes across utilities/core |
+| [#78](https://github.com/TheAnsarya/Mesen2/issues/78) | Adopt std::bit_cast | ✅ Research Done | LOW PRIORITY - minimal candidates |
+
+**Commits:**
+- `2e9c5aaf`, `2b2e90a9` - [[unlikely]] implementation
+- `e5232022` - [[nodiscard]] utility functions
+- `9220b5d3` - constexpr expansion
+- `8db3eeef`, `1672f627` - [[nodiscard]] Core/Shared getters
+
 ---
 
 ## Epic 8: C++ Build System Modernization
