@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <algorithm>
+#include <ranges>
 #include <unordered_set>
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/CRC32.h"
@@ -78,12 +79,12 @@ bool RomLoader::LoadFile(VirtualFile& romFile, RomData& romData, bool databaseEn
 	if (romData.Info.System == GameSystem::Unknown) {
 		// Use filename to detect PAL/VS system games
 		string name = romData.Info.Filename;
-		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+		std::ranges::transform(name, name.begin(), ::tolower);
 
-		if (name.find("(e)") != string::npos || name.find("(australia)") != string::npos || name.find("(europe)") != string::npos ||
-		    name.find("(germany)") != string::npos || name.find("(spain)") != string::npos) {
+		if (name.contains("(e)") || name.contains("(australia)") || name.contains("(europe)") ||
+		    name.contains("(germany)") || name.contains("(spain)")) {
 			romData.Info.System = GameSystem::NesPal;
-		} else if (name.find("(vs)") != string::npos) {
+		} else if (name.contains("(vs)")) {
 			romData.Info.System = GameSystem::VsSystem;
 		} else {
 			romData.Info.System = GameSystem::NesNtsc;

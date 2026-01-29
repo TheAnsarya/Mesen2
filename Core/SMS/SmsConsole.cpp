@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <ranges>
 #include "SMS/SmsConsole.h"
 #include "SMS/SmsCpu.h"
 #include "SMS/SmsControlManager.h"
@@ -181,10 +182,10 @@ void SmsConsole::UpdateRegion(bool forceUpdate) {
 
 	if (region == ConsoleRegion::Auto) {
 		string filename = StringUtilities::ToLower(_filename);
-		if (filename.find("(europe)") != string::npos || filename.find("(e)") != string::npos) {
+		if (filename.contains("(europe)") || filename.contains("(e)")) {
 			region = ConsoleRegion::Pal;
 		} else {
-			if (_model == SmsModel::GameGear && (filename.find("(japan)") != string::npos || filename.find("(j)") != string::npos)) {
+			if (_model == SmsModel::GameGear && (filename.contains("(japan)") || filename.contains("(j)"))) {
 				region = ConsoleRegion::NtscJapan;
 			} else {
 				region = ConsoleRegion::Ntsc;
