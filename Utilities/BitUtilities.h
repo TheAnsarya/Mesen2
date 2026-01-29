@@ -9,7 +9,7 @@ public:
 	}
 
 	template <uint8_t bitNumber, typename T>
-	__forceinline static uint8_t GetBits(T value) {
+	[[nodiscard]] __forceinline static uint8_t GetBits(T value) {
 		return (uint8_t)(value >> bitNumber);
 	}
 };

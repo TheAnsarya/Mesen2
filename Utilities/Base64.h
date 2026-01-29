@@ -3,7 +3,7 @@
 
 class Base64 {
 public:
-	static string Encode(const vector<uint8_t> data) {
+	[[nodiscard]] static string Encode(const vector<uint8_t> data) {
 		std::string out;
 
 		int val = 0, valb = -6;
@@ -22,7 +22,7 @@ public:
 		return out;
 	}
 
-	static vector<uint8_t> Decode(string in) {
+	[[nodiscard]] static vector<uint8_t> Decode(string in) {
 		vector<uint8_t> out;
 
 		vector<int> T(256, -1);

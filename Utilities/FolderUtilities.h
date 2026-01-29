@@ -14,29 +14,29 @@ private:
 
 public:
 	static void SetHomeFolder(string homeFolder);
-	static string GetHomeFolder();
+	[[nodiscard]] static string GetHomeFolder();
 
 	static void SetFolderOverrides(string saveFolder, string saveStateFolder, string screenshotFolder, string firmwareFolder);
 
 	static void AddKnownGameFolder(string gameFolder);
-	static vector<string> GetKnownGameFolders();
+	[[nodiscard]] static vector<string> GetKnownGameFolders();
 
-	static string GetSaveFolder();
-	static string GetFirmwareFolder();
-	static string GetSaveStateFolder();
-	static string GetScreenshotFolder();
-	static string GetHdPackFolder();
-	static string GetDebuggerFolder();
-	static string GetRecentGamesFolder();
+	[[nodiscard]] static string GetSaveFolder();
+	[[nodiscard]] static string GetFirmwareFolder();
+	[[nodiscard]] static string GetSaveStateFolder();
+	[[nodiscard]] static string GetScreenshotFolder();
+	[[nodiscard]] static string GetHdPackFolder();
+	[[nodiscard]] static string GetDebuggerFolder();
+	[[nodiscard]] static string GetRecentGamesFolder();
 
-	static vector<string> GetFolders(string rootFolder);
-	static vector<string> GetFilesInFolder(string rootFolder, std::unordered_set<string> extensions, bool recursive);
+	[[nodiscard]] static vector<string> GetFolders(string rootFolder);
+	[[nodiscard]] static vector<string> GetFilesInFolder(string rootFolder, std::unordered_set<string> extensions, bool recursive);
 
-	static string GetFilename(string filepath, bool includeExtension);
-	static string GetExtension(string filename);
-	static string GetFolderName(string filepath);
+	[[nodiscard]] static string GetFilename(string filepath, bool includeExtension);
+	[[nodiscard]] static string GetExtension(string filename);
+	[[nodiscard]] static string GetFolderName(string filepath);
 
 	static void CreateFolder(string folder);
 
-	static string CombinePath(string folder, string filename);
+	[[nodiscard]] static string CombinePath(string folder, string filename);
 };

@@ -6,7 +6,7 @@
 
 class DebugUtilities {
 public:
-	static constexpr MemoryType GetCpuMemoryType(CpuType type) {
+	[[nodiscard]] static constexpr MemoryType GetCpuMemoryType(CpuType type) {
 		switch (type) {
 			case CpuType::Snes:
 				return MemoryType::SnesMemory;
@@ -39,7 +39,7 @@ public:
 		[[unlikely]] throw std::runtime_error("Invalid CPU type");
 	}
 
-	static constexpr int GetProgramCounterSize(CpuType type) {
+	[[nodiscard]] static constexpr int GetProgramCounterSize(CpuType type) {
 		switch (type) {
 			case CpuType::Snes:
 				return 6;
@@ -72,7 +72,7 @@ public:
 		[[unlikely]] throw std::runtime_error("Invalid CPU type");
 	}
 
-	static constexpr CpuType ToCpuType(MemoryType type) {
+	[[nodiscard]] static constexpr CpuType ToCpuType(MemoryType type) {
 		switch (type) {
 			case MemoryType::SnesMemory:
 			case MemoryType::SnesCgRam:
@@ -195,15 +195,15 @@ public:
 		}
 	}
 
-	static constexpr bool IsRelativeMemory(MemoryType memType) {
+	[[nodiscard]] static constexpr bool IsRelativeMemory(MemoryType memType) {
 		return memType <= GetLastCpuMemoryType();
 	}
 
-	static constexpr MemoryType GetLastCpuMemoryType() {
+	[[nodiscard]] static constexpr MemoryType GetLastCpuMemoryType() {
 		return MemoryType::WsMemory;
 	}
 
-	static constexpr bool IsPpuMemory(MemoryType memType) {
+	[[nodiscard]] static constexpr bool IsPpuMemory(MemoryType memType) {
 		switch (memType) {
 			case MemoryType::SnesVideoRam:
 			case MemoryType::SnesSpriteRam:
@@ -241,7 +241,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsRom(MemoryType memType) {
+	[[nodiscard]] static constexpr bool IsRom(MemoryType memType) {
 		switch (memType) {
 			case MemoryType::SnesPrgRom:
 			case MemoryType::GbPrgRom:
@@ -268,7 +268,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsVolatileRam(MemoryType memType) {
+	[[nodiscard]] static constexpr bool IsVolatileRam(MemoryType memType) {
 		if (IsRom(memType)) {
 			return false;
 		}
@@ -290,11 +290,11 @@ public:
 		}
 	}
 
-	static constexpr CpuType GetLastCpuType() {
+	[[nodiscard]] static constexpr CpuType GetLastCpuType() {
 		return CpuType::Ws;
 	}
 
-	static string AddressToHex(CpuType cpuType, int32_t address) {
+	[[nodiscard]] static string AddressToHex(CpuType cpuType, int32_t address) {
 		int size = GetProgramCounterSize(cpuType);
 		if (size == 4) {
 			return HexUtilities::ToHex((uint16_t)address);
@@ -309,7 +309,7 @@ public:
 		}
 	}
 
-	static constexpr int GetMemoryTypeCount() {
+	[[nodiscard]] static constexpr int GetMemoryTypeCount() {
 		return (int)MemoryType::None + 1;
 	}
 };
