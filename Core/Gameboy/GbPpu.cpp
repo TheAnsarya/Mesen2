@@ -28,17 +28,17 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 	_vram = vram;
 	_oam = oam;
 
-	_outputBuffers[0] = new uint16_t[GbConstants::PixelCount];
-	_outputBuffers[1] = new uint16_t[GbConstants::PixelCount];
-	memset(_outputBuffers[0], 0, GbConstants::PixelCount * sizeof(uint16_t));
-	memset(_outputBuffers[1], 0, GbConstants::PixelCount * sizeof(uint16_t));
-	_currentBuffer = _outputBuffers[0];
+	_outputBuffers[0] = std::make_unique<uint16_t[]>(GbConstants::PixelCount);
+	_outputBuffers[1] = std::make_unique<uint16_t[]>(GbConstants::PixelCount);
+	memset(_outputBuffers[0].get(), 0, GbConstants::PixelCount * sizeof(uint16_t));
+	memset(_outputBuffers[1].get(), 0, GbConstants::PixelCount * sizeof(uint16_t));
+	_currentBuffer = _outputBuffers[0].get();
 
-	_eventViewerBuffers[0] = new uint16_t[456 * 154];
-	_eventViewerBuffers[1] = new uint16_t[456 * 154];
-	memset(_eventViewerBuffers[0], 0, 456 * 154 * sizeof(uint16_t));
-	memset(_eventViewerBuffers[1], 0, 456 * 154 * sizeof(uint16_t));
-	_currentEventViewerBuffer = _eventViewerBuffers[0];
+	_eventViewerBuffers[0] = std::make_unique<uint16_t[]>(456 * 154);
+	_eventViewerBuffers[1] = std::make_unique<uint16_t[]>(456 * 154);
+	memset(_eventViewerBuffers[0].get(), 0, 456 * 154 * sizeof(uint16_t));
+	memset(_eventViewerBuffers[1].get(), 0, 456 * 154 * sizeof(uint16_t));
+	_currentEventViewerBuffer = _eventViewerBuffers[0].get();
 
 	_state = {};
 	_state.Mode = PpuMode::HBlank;
@@ -70,12 +70,7 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 	_rendererIdle = false;
 }
 
-GbPpu::~GbPpu() {
-	delete[] _outputBuffers[0];
-	delete[] _outputBuffers[1];
-	delete[] _eventViewerBuffers[0];
-	delete[] _eventViewerBuffers[1];
-}
+GbPpu::~GbPpu() = default;
 
 GbPpuState GbPpu::GetState() {
 	return _state;
@@ -94,7 +89,7 @@ uint16_t* GbPpu::GetEventViewerBuffer() {
 }
 
 uint16_t* GbPpu::GetPreviousEventViewerBuffer() {
-	return _currentEventViewerBuffer == _eventViewerBuffers[0] ? _eventViewerBuffers[1] : _eventViewerBuffers[0];
+	return _currentEventViewerBuffer == _eventViewerBuffers[0].get() ? _eventViewerBuffers[1].get() : _eventViewerBuffers[0].get();
 }
 
 void GbPpu::SetCpuStopState(bool stopped) {
@@ -255,7 +250,7 @@ void GbPpu::ProcessVblankScanline() {
 
 				if (_emu->IsDebugging()) {
 					_emu->ProcessEvent(EventType::StartFrame, CpuType::Gameboy);
-					_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0] ? _eventViewerBuffers[1] : _eventViewerBuffers[0];
+					_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0].get() ? _eventViewerBuffers[1].get() : _eventViewerBuffers[0].get();
 				}
 			} else {
 				_state.Ly = _state.Scanline;
@@ -775,8 +770,8 @@ void GbPpu::SendFrame() {
 		// Send blank frame on the first frame after enabling LCD
 		// On CGB some games flicker if this is done when the LCD is only off for a short time (e.g Men in Black - The Series)
 		// So for CGB, the screen is only cleared if the LCD has been turned off for a while
-		std::fill(_outputBuffers[0], _outputBuffers[0] + GbConstants::PixelCount, 0x7FFF);
-		std::fill(_outputBuffers[1], _outputBuffers[1] + GbConstants::PixelCount, 0x7FFF);
+		std::fill(_outputBuffers[0].get(), _outputBuffers[0].get() + GbConstants::PixelCount, 0x7FFF);
+		std::fill(_outputBuffers[1].get(), _outputBuffers[1].get() + GbConstants::PixelCount, 0x7FFF);
 	}
 	_forceBlankFrame = false;
 	_isFirstFrame = false;
@@ -788,7 +783,7 @@ void GbPpu::SendFrame() {
 	_emu->ProcessEndOfFrame();
 	_gameboy->ProcessEndOfFrame();
 
-	_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+	_currentBuffer = _currentBuffer == _outputBuffers[0].get() ? _outputBuffers[1].get() : _outputBuffers[0].get();
 }
 
 void GbPpu::DebugSendFrame() {
@@ -913,7 +908,7 @@ void GbPpu::Write(uint16_t addr, uint8_t value) {
 					if (_emu->IsDebugging()) {
 						_emu->ProcessEvent(EventType::StartFrame, CpuType::Gameboy);
 
-						_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0] ? _eventViewerBuffers[1] : _eventViewerBuffers[0];
+						_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0].get() ? _eventViewerBuffers[1].get() : _eventViewerBuffers[0].get();
 						for (int i = 0; i < 456 * 154; i++) {
 							_currentEventViewerBuffer[i] = 0x18C6;
 						}

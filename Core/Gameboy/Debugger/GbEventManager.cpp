@@ -14,13 +14,11 @@ GbEventManager::GbEventManager(Debugger* debugger, GbCpu* cpu, GbPpu* ppu) {
 	_cpu = cpu;
 	_ppu = ppu;
 
-	_ppuBuffer = new uint16_t[456 * GbEventManager::ScreenHeight];
-	memset(_ppuBuffer, 0, 456 * GbEventManager::ScreenHeight * sizeof(uint16_t));
+	_ppuBuffer = std::make_unique<uint16_t[]>(456 * GbEventManager::ScreenHeight);
+	memset(_ppuBuffer.get(), 0, 456 * GbEventManager::ScreenHeight * sizeof(uint16_t));
 }
 
-GbEventManager::~GbEventManager() {
-	delete[] _ppuBuffer;
-}
+GbEventManager::~GbEventManager() = default;
 
 void GbEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
 	DebugEventInfo evt = {};
@@ -130,12 +128,12 @@ uint32_t GbEventManager::TakeEventSnapshot(bool forAutoRefresh) {
 	uint16_t scanline = _ppu->GetState().Scanline;
 
 	if (scanline >= GbEventManager::VBlankScanline || scanline == 0) {
-		memcpy(_ppuBuffer, _ppu->GetEventViewerBuffer(), 456 * GbEventManager::ScreenHeight * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get(), _ppu->GetEventViewerBuffer(), 456 * GbEventManager::ScreenHeight * sizeof(uint16_t));
 	} else {
 		uint32_t size = 456 * GbEventManager::ScreenHeight;
 		uint32_t offset = 456 * scanline;
-		memcpy(_ppuBuffer, _ppu->GetEventViewerBuffer(), offset * sizeof(uint16_t));
-		memcpy(_ppuBuffer + offset, _ppu->GetPreviousEventViewerBuffer() + offset, (size - offset) * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get(), _ppu->GetEventViewerBuffer(), offset * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get() + offset, _ppu->GetPreviousEventViewerBuffer() + offset, (size - offset) * sizeof(uint16_t));
 	}
 
 	_snapshotCurrentFrame = _debugEvents;
@@ -155,7 +153,7 @@ FrameInfo GbEventManager::GetDisplayBufferSize() {
 }
 
 void GbEventManager::DrawScreen(uint32_t* buffer) {
-	uint16_t* src = _ppuBuffer;
+	uint16_t* src = _ppuBuffer.get();
 	for (uint32_t y = 0, len = GbEventManager::ScreenHeight * 2; y < len; y++) {
 		for (uint32_t x = 0; x < GbEventManager::ScanlineWidth; x++) {
 			int srcOffset = (y >> 1) * 456 + (x >> 1);

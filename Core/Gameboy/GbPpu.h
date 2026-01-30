@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include <memory>
+#include <array>
 #include "Gameboy/GbTypes.h"
 #include "Utilities/ISerializable.h"
 
@@ -15,10 +17,10 @@ private:
 	GbPpuState _state = {};
 	GbMemoryManager* _memoryManager = nullptr;
 	GbDmaController* _dmaController = nullptr;
-	uint16_t* _outputBuffers[2] = {};
+	std::array<std::unique_ptr<uint16_t[]>, 2> _outputBuffers;
 	uint16_t* _currentBuffer = nullptr;
 
-	uint16_t* _eventViewerBuffers[2] = {};
+	std::array<std::unique_ptr<uint16_t[]>, 2> _eventViewerBuffers;
 	uint16_t* _currentEventViewerBuffer = nullptr;
 	EvtColor _evtColor = EvtColor::HBlank;
 	int16_t _prevDrawnPixels = 0;
