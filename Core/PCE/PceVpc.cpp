@@ -21,18 +21,15 @@ PceVpc::PceVpc(Emulator* emu, PceConsole* console, PceVce* vce) {
 
 	// Add an extra line to the buffer - this is used to store clock divider values for each row
 	uint32_t bufferSize = PceConstants::MaxScreenWidth * (PceConstants::ScreenHeight + 1);
-	_outBuffer[0] = new uint16_t[bufferSize];
-	_outBuffer[1] = new uint16_t[bufferSize];
-	_currentOutBuffer = _outBuffer[0];
+	_outBuffer[0] = std::make_unique<uint16_t[]>(bufferSize);
+	_outBuffer[1] = std::make_unique<uint16_t[]>(bufferSize);
+	_currentOutBuffer = _outBuffer[0].get();
 
-	memset(_outBuffer[0], 0, bufferSize * sizeof(uint16_t));
-	memset(_outBuffer[1], 0, bufferSize * sizeof(uint16_t));
+	memset(_outBuffer[0].get(), 0, bufferSize * sizeof(uint16_t));
+	memset(_outBuffer[1].get(), 0, bufferSize * sizeof(uint16_t));
 }
 
-PceVpc::~PceVpc() {
-	delete[] _outBuffer[0];
-	delete[] _outBuffer[1];
-}
+PceVpc::~PceVpc() = default;
 
 void PceVpc::ConnectVdc(PceVdc* vdc1, PceVdc* vdc2) {
 	_vdc1 = vdc1;
@@ -210,7 +207,7 @@ void PceVpc::ProcessScanlineStart(PceVdc* vdc, uint16_t scanline) {
 	if (scanline >= 14 && scanline < 256) {
 		uint16_t row = scanline - 14;
 		if (row == 0) {
-			_currentOutBuffer = _currentOutBuffer == _outBuffer[0] ? _outBuffer[1] : _outBuffer[0];
+			_currentOutBuffer = _currentOutBuffer == _outBuffer[0].get() ? _outBuffer[1].get() : _outBuffer[0].get();
 		}
 
 		// Store clock dividers for each row at the end of the buffer

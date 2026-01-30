@@ -10,13 +10,11 @@ WsDefaultVideoFilter::WsDefaultVideoFilter(Emulator* emu, WsConsole* console, bo
 	_emu = emu;
 	_console = console;
 	_applyNtscFilter = applyNtscFilter;
-	_prevFrame = new uint16_t[WsConstants::MaxPixelCount];
+	_prevFrame = std::make_unique<uint16_t[]>(WsConstants::MaxPixelCount);
 	InitLookupTable();
 }
 
-WsDefaultVideoFilter::~WsDefaultVideoFilter() {
-	delete[] _prevFrame;
-}
+WsDefaultVideoFilter::~WsDefaultVideoFilter() = default;
 
 uint32_t WsDefaultVideoFilter::BlendPixels(uint32_t a, uint32_t b) {
 	return ((((a) ^ (b)) & 0xfffefefeL) >> 1) + ((a) & (b));
@@ -89,7 +87,7 @@ void WsDefaultVideoFilter::OnBeforeApplyFilter() {
 	bool blendFrames = wsConfig.BlendFrames && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused();
 	if (_blendFrames != blendFrames) {
 		_blendFrames = blendFrames;
-		memset(_prevFrame, 0, WsConstants::MaxPixelCount * sizeof(uint16_t));
+		memset(_prevFrame.get(), 0, WsConstants::MaxPixelCount * sizeof(uint16_t));
 	}
 	_videoConfig = config;
 }
@@ -109,7 +107,7 @@ void WsDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 	}
 
 	if (_blendFrames) {
-		std::copy(ppuOutputBuffer, ppuOutputBuffer + WsConstants::MaxPixelCount, _prevFrame);
+		std::copy(ppuOutputBuffer, ppuOutputBuffer + WsConstants::MaxPixelCount, _prevFrame.get());
 		_prevFrameSize = size;
 	}
 

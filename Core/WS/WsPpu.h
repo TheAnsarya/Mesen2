@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include <memory>
+#include <array>
 #include "WS/WsTypes.h"
 #include "Shared/Emulator.h"
 #include "Shared/SettingTypes.h"
@@ -17,7 +19,7 @@ private:
 	WsConsole* _console = nullptr;
 	WsMemoryManager* _memoryManager = nullptr;
 	WsTimer* _timer = nullptr;
-	uint16_t* _outputBuffers[2] = {};
+	std::array<std::unique_ptr<uint16_t[]>, 2> _outputBuffers;
 	uint16_t* _currentBuffer = nullptr;
 	uint8_t* _vram = nullptr;
 

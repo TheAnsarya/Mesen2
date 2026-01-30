@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "Shared/Video/BaseVideoFilter.h"
 #include "Shared/Video/GenericNtscFilter.h"
 
@@ -14,7 +15,7 @@ private:
 	VideoConfig _videoConfig = {};
 
 	FrameInfo _prevFrameSize = {};
-	uint16_t* _prevFrame = nullptr;
+	std::unique_ptr<uint16_t[]> _prevFrame;
 	bool _blendFrames = false;
 	bool _adjustColors = false;
 

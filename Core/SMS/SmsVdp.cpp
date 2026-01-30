@@ -23,11 +23,11 @@ void SmsVdp::Init(Emulator* emu, SmsConsole* console, SmsCpu* cpu, SmsControlMan
 	_controlManager = controlManager;
 	_memoryManager = memoryManager;
 
-	_outputBuffers[0] = new uint16_t[256 * 240];
-	_outputBuffers[1] = new uint16_t[256 * 240];
-	_currentOutputBuffer = _outputBuffers[0];
-	memset(_outputBuffers[0], 0, 256 * 240 * sizeof(uint16_t));
-	memset(_outputBuffers[1], 0, 256 * 240 * sizeof(uint16_t));
+	_outputBuffers[0] = std::make_unique<uint16_t[]>(256 * 240);
+	_outputBuffers[1] = std::make_unique<uint16_t[]>(256 * 240);
+	_currentOutputBuffer = _outputBuffers[0].get();
+	memset(_outputBuffers[0].get(), 0, 256 * 240 * sizeof(uint16_t));
+	memset(_outputBuffers[1].get(), 0, 256 * 240 * sizeof(uint16_t));
 
 	// TODOSMS - this allows Impossible Mission to have a random stage on power on
 	// Without this, the bios runs in the exact same amount of time each time, causing
@@ -39,9 +39,9 @@ void SmsVdp::Init(Emulator* emu, SmsConsole* console, SmsCpu* cpu, SmsControlMan
 	// Offset VDP from CPU clock - passes VDPTest "HCounter correct"
 	_state.Cycle = 1;
 
-	_videoRam = new uint8_t[0x4000];
-	console->InitializeRam(_videoRam, 0x4000);
-	_emu->RegisterMemory(MemoryType::SmsVideoRam, _videoRam, 0x4000);
+	_videoRam = std::make_unique<uint8_t[]>(0x4000);
+	console->InitializeRam(_videoRam.get(), 0x4000);
+	_emu->RegisterMemory(MemoryType::SmsVideoRam, _videoRam.get(), 0x4000);
 
 	console->InitializeRam(_paletteRam, 0x40);
 
@@ -71,11 +71,7 @@ void SmsVdp::Init(Emulator* emu, SmsConsole* console, SmsCpu* cpu, SmsControlMan
 	UpdateDisplayMode();
 }
 
-SmsVdp::~SmsVdp() {
-	delete[] _videoRam;
-	delete[] _outputBuffers[0];
-	delete[] _outputBuffers[1];
-}
+SmsVdp::~SmsVdp() = default;
 
 void SmsVdp::Run(uint64_t runTo) {
 	do {
@@ -633,7 +629,7 @@ void SmsVdp::ProcessEndOfScanline() {
 		_state.Scanline = 0;
 		_state.VerticalScrollLatch = _state.VerticalScroll;
 		_emu->ProcessEvent(EventType::StartFrame, CpuType::Sms);
-		_currentOutputBuffer = _currentOutputBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+		_currentOutputBuffer = _currentOutputBuffer == _outputBuffers[0].get() ? _outputBuffers[1].get() : _outputBuffers[0].get();
 	}
 
 	_bgShifters[0] = 0;
@@ -1457,7 +1453,7 @@ void SmsVdp::InitSmsPostBiosState() {
 	    0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 	memcpy(_paletteRam, biosPalRam, 0x20);
-	memset(_videoRam, 0, 0x4000);
+	memset(_videoRam.get(), 0, 0x4000);
 }
 
 void SmsVdp::InitGgPowerOnState() {
@@ -1469,7 +1465,7 @@ void SmsVdp::InitGgPowerOnState() {
 }
 
 void SmsVdp::Serialize(Serializer& s) {
-	SVArray(_videoRam, 0x4000);
+	SVArray(_videoRam.get(), 0x4000);
 	SVArray(_paletteRam, 0x40);
 	SVArray(_internalPaletteRam, 0x20);
 

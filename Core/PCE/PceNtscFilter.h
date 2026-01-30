@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "Shared/Video/BaseVideoFilter.h"
 #include "PCE/PceDefaultVideoFilter.h"
 #include "PCE/PceConstants.h"
@@ -11,8 +12,8 @@ class PceNtscFilter : public PceDefaultVideoFilter {
 private:
 	snes_ntsc_setup_t _ntscSetup = {};
 	snes_ntsc_t _ntscData = {};
-	uint32_t* _ntscBuffer = nullptr;
-	uint16_t* _rgb555Buffer = nullptr;
+	std::unique_ptr<uint32_t[]> _ntscBuffer;
+	std::unique_ptr<uint16_t[]> _rgb555Buffer;
 
 protected:
 	void OnBeforeApplyFilter() override;

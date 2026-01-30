@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include <memory>
+#include <array>
 #include "PCE/PceTypes.h"
 #include "PCE/PceConstants.h"
 #include "PCE/PceVdc.h"
@@ -21,7 +23,7 @@ private:
 	Emulator* _emu = nullptr;
 	PceConsole* _console = nullptr;
 
-	uint16_t* _outBuffer[2] = {};
+	std::array<std::unique_ptr<uint16_t[]>, 2> _outBuffer;
 	uint16_t* _currentOutBuffer = nullptr;
 	uint16_t _xStart = 0;
 
@@ -67,7 +69,7 @@ public:
 	[[nodiscard]] PceVpcState GetState() { return _state; }
 
 	uint16_t* GetScreenBuffer() { return _currentOutBuffer; }
-	uint16_t* GetPreviousScreenBuffer() { return _currentOutBuffer == _outBuffer[0] ? _outBuffer[1] : _outBuffer[0]; }
+	uint16_t* GetPreviousScreenBuffer() { return _currentOutBuffer == _outBuffer[0].get() ? _outBuffer[1].get() : _outBuffer[0].get(); }
 
 	void Serialize(Serializer& s) override;
 };

@@ -10,14 +10,11 @@ PceNtscFilter::PceNtscFilter(Emulator* emu) : PceDefaultVideoFilter(emu) {
 	memset(&_ntscData, 0, sizeof(_ntscData));
 	_ntscSetup = {};
 	snes_ntsc_init(&_ntscData, &_ntscSetup);
-	_ntscBuffer = new uint32_t[SNES_NTSC_OUT_WIDTH(PceConstants::InternalOutputWidth / 2) * PceConstants::ScreenHeight];
-	_rgb555Buffer = new uint16_t[PceConstants::InternalOutputWidth * PceConstants::ScreenHeight];
+	_ntscBuffer = std::make_unique<uint32_t[]>(SNES_NTSC_OUT_WIDTH(PceConstants::InternalOutputWidth / 2) * PceConstants::ScreenHeight);
+	_rgb555Buffer = std::make_unique<uint16_t[]>(PceConstants::InternalOutputWidth * PceConstants::ScreenHeight);
 }
 
-PceNtscFilter::~PceNtscFilter() {
-	delete[] _ntscBuffer;
-	delete[] _rgb555Buffer;
-}
+PceNtscFilter::~PceNtscFilter() = default;
 
 FrameInfo PceNtscFilter::GetFrameInfo() {
 	FrameInfo frameInfo = PceDefaultVideoFilter::GetFrameInfo();
@@ -91,12 +88,12 @@ void PceNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 	}
 
 	if (_frameDivider) {
-		snes_ntsc_blit(&_ntscData, _rgb555Buffer, frameWidth, IsOddFrame() ? 0 : 1, frameWidth, rowCount, GetOutputBuffer(), frameInfo.Width * sizeof(uint32_t));
+		snes_ntsc_blit(&_ntscData, _rgb555Buffer.get(), frameWidth, IsOddFrame() ? 0 : 1, frameWidth, rowCount, GetOutputBuffer(), frameInfo.Width * sizeof(uint32_t));
 	} else {
-		snes_ntsc_blit_hires(&_ntscData, _rgb555Buffer, frameWidth, IsOddFrame() ? 0 : 1, frameWidth, rowCount, _ntscBuffer, frameInfo.Width * sizeof(uint32_t));
+		snes_ntsc_blit_hires(&_ntscData, _rgb555Buffer.get(), frameWidth, IsOddFrame() ? 0 : 1, frameWidth, rowCount, _ntscBuffer.get(), frameInfo.Width * sizeof(uint32_t));
 
 		for (uint32_t i = 0; i < rowCount; i++) {
-			uint32_t* src = _ntscBuffer + i * frameInfo.Width;
+			uint32_t* src = _ntscBuffer.get() + i * frameInfo.Width;
 			for (uint32_t j = 0; j < verticalScale; j++) {
 				uint32_t* dst = GetOutputBuffer() + (i * verticalScale + j) * frameInfo.Width;
 				memcpy(dst, src, frameInfo.Width * sizeof(uint32_t));

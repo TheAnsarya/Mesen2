@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include <memory>
+#include <array>
 #include "SMS/SmsTypes.h"
 #include "Shared/SettingTypes.h"
 #include "Shared/ColorUtilities.h"
@@ -32,7 +34,7 @@ private:
 	SmsControlManager* _controlManager = nullptr;
 	SmsMemoryManager* _memoryManager = nullptr;
 
-	uint8_t* _videoRam = nullptr;
+	std::unique_ptr<uint8_t[]> _videoRam;
 	uint16_t _internalPaletteRam[0x20] = {};
 
 	uint16_t _smsSgPalette[0x10] = {
@@ -65,7 +67,7 @@ private:
 	SmsModel _model = {};
 	SmsRevision _revision = {};
 
-	uint16_t* _outputBuffers[2] = {};
+	std::array<std::unique_ptr<uint16_t[]>, 2> _outputBuffers;
 	uint16_t* _currentOutputBuffer = nullptr;
 
 	SmsVdpState _state = {};
@@ -199,7 +201,7 @@ public:
 	void DebugWritePalette(uint8_t addr, uint8_t value);
 
 	uint16_t* GetScreenBuffer(bool previousBuffer) {
-		return previousBuffer ? ((_currentOutputBuffer == _outputBuffers[0]) ? _outputBuffers[1] : _outputBuffers[0]) : _currentOutputBuffer;
+		return previousBuffer ? ((_currentOutputBuffer == _outputBuffers[0].get()) ? _outputBuffers[1].get() : _outputBuffers[0].get()) : _currentOutputBuffer;
 	}
 
 	void Serialize(Serializer& s) override;

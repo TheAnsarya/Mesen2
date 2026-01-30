@@ -35,19 +35,16 @@ WsPpu::WsPpu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager, 
 		_screenWidth += 13;
 	}
 
-	_outputBuffers[0] = new uint16_t[WsConstants::MaxPixelCount];
-	_outputBuffers[1] = new uint16_t[WsConstants::MaxPixelCount];
-	memset(_outputBuffers[0], 0, WsConstants::MaxPixelCount * sizeof(uint16_t));
-	memset(_outputBuffers[1], 0, WsConstants::MaxPixelCount * sizeof(uint16_t));
-	_currentBuffer = _outputBuffers[0];
+	_outputBuffers[0] = std::make_unique<uint16_t[]>(WsConstants::MaxPixelCount);
+	_outputBuffers[1] = std::make_unique<uint16_t[]>(WsConstants::MaxPixelCount);
+	memset(_outputBuffers[0].get(), 0, WsConstants::MaxPixelCount * sizeof(uint16_t));
+	memset(_outputBuffers[1].get(), 0, WsConstants::MaxPixelCount * sizeof(uint16_t));
+	_currentBuffer = _outputBuffers[0].get();
 
 	_showIcons = _emu->GetSettings()->GetWsConfig().LcdShowIcons;
 }
 
-WsPpu::~WsPpu() {
-	delete[] _outputBuffers[0];
-	delete[] _outputBuffers[1];
-}
+WsPpu::~WsPpu() = default;
 
 void WsPpu::SetVideoMode(WsVideoMode mode) {
 	_state.NextMode = mode;
@@ -92,7 +89,7 @@ void WsPpu::ProcessEndOfScanline() {
 		_state.Mode = _state.NextMode;
 		_state.Scanline = 0;
 		_emu->ProcessEvent(EventType::StartFrame, CpuType::Ws);
-		_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+		_currentBuffer = _currentBuffer == _outputBuffers[0].get() ? _outputBuffers[1].get() : _outputBuffers[0].get();
 		_showIcons = _emu->GetSettings()->GetWsConfig().LcdShowIcons;
 	} else if (_state.Scanline == 145) {
 		SendFrame();
@@ -417,7 +414,7 @@ uint16_t WsPpu::GetVisibleScanlineCount() {
 }
 
 uint16_t* WsPpu::GetScreenBuffer(bool prevFrame) {
-	return prevFrame ? ((_currentBuffer == _outputBuffers[0]) ? _outputBuffers[1] : _outputBuffers[0]) : _currentBuffer;
+	return prevFrame ? ((_currentBuffer == _outputBuffers[0].get()) ? _outputBuffers[1].get() : _outputBuffers[0].get()) : _currentBuffer;
 }
 
 void WsPpu::DebugSendFrame() {
