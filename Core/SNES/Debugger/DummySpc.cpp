@@ -9,7 +9,9 @@
 #undef DUMMYSPC
 
 DummySpc::DummySpc(uint8_t* spcRam) {
-	_ram = spcRam;
+	// Note: DummySpc borrows memory from real Spc - use reset() to set the pointer,
+	// then release() in destructor to prevent deletion of borrowed memory
+	_ram.reset(spcRam);
 
 	_opCode = 0;
 	_opStep = SpcOpStep::ReadOpCode;
@@ -22,7 +24,8 @@ DummySpc::DummySpc(uint8_t* spcRam) {
 }
 
 DummySpc::~DummySpc() {
-	_ram = nullptr;
+	// Release borrowed memory without deleting it (owned by real Spc)
+	_ram.release();
 }
 
 void DummySpc::SetDummyState(SpcState& state) {

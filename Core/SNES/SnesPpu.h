@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include <array>
+#include <memory>
 #include "SNES/SnesPpuTypes.h"
 #include "Utilities/ISerializable.h"
 #include "Utilities/Timer.h"
@@ -67,11 +69,11 @@ private:
 	uint16_t _drawStartX = 0;
 	uint16_t _drawEndX = 0;
 
-	uint16_t* _vram = nullptr;
+	std::unique_ptr<uint16_t[]> _vram;
 	uint16_t _cgram[SnesPpu::CgRamSize >> 1] = {};
 	uint8_t _oamRam[SnesPpu::SpriteRamSize] = {};
 
-	uint16_t* _outputBuffers[2] = {};
+	std::array<std::unique_ptr<uint16_t[]>, 2> _outputBuffers;
 	uint16_t* _currentBuffer = nullptr;
 	bool _useHighResOutput = false;
 	bool _interlacedFrame = false;

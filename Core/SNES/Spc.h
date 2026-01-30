@@ -6,6 +6,7 @@
 #endif
 
 #include "pch.h"
+#include <memory>
 #include "SNES/SpcTypes.h"
 #include "SNES/DSP/DspTypes.h"
 #include "SNES/SnesCpuTypes.h"
@@ -52,7 +53,7 @@ private:
 	uint32_t _spcSampleRate = Spc::SpcSampleRate;
 
 	SpcState _state;
-	uint8_t* _ram;
+	std::unique_ptr<uint8_t[]> _ram;
 	uint8_t _spcBios[64]{
 	    0xCD, 0xEF, 0xBD, 0xE8, 0x00, 0xC6, 0x1D, 0xD0,
 	    0xFC, 0x8F, 0xAA, 0xF4, 0x8F, 0xBB, 0xF5, 0x78,

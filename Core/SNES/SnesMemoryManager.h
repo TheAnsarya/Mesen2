@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "SNES/MemoryMappings.h"
 #include "Debugger/DebugTypes.h"
 #include "Utilities/ISerializable.h"
@@ -41,7 +42,7 @@ private:
 	SnesCpu* _cpu = nullptr;
 	BaseCartridge* _cart = nullptr;
 	CheatManager* _cheatManager = nullptr;
-	uint8_t* _workRam = nullptr;
+	std::unique_ptr<uint8_t[]> _workRam;
 
 	uint64_t _masterClock = 0;
 	uint16_t _hClock = 0;

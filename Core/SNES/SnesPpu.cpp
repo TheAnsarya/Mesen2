@@ -25,23 +25,19 @@ SnesPpu::SnesPpu(Emulator* emu, SnesConsole* console) {
 	_emu = emu;
 	_console = console;
 
-	_vram = new uint16_t[SnesPpu::VideoRamSize >> 1];
-	_emu->RegisterMemory(MemoryType::SnesVideoRam, _vram, SnesPpu::VideoRamSize);
+	_vram = std::make_unique<uint16_t[]>(SnesPpu::VideoRamSize >> 1);
+	_emu->RegisterMemory(MemoryType::SnesVideoRam, _vram.get(), SnesPpu::VideoRamSize);
 
 	_emu->RegisterMemory(MemoryType::SnesSpriteRam, _oamRam, SnesPpu::SpriteRamSize);
 	_emu->RegisterMemory(MemoryType::SnesCgRam, _cgram, SnesPpu::CgRamSize);
 
-	_outputBuffers[0] = new uint16_t[512 * 478];
-	_outputBuffers[1] = new uint16_t[512 * 478];
-	memset(_outputBuffers[0], 0, 512 * 478 * sizeof(uint16_t));
-	memset(_outputBuffers[1], 0, 512 * 478 * sizeof(uint16_t));
+	_outputBuffers[0] = std::make_unique<uint16_t[]>(512 * 478);
+	_outputBuffers[1] = std::make_unique<uint16_t[]>(512 * 478);
+	memset(_outputBuffers[0].get(), 0, 512 * 478 * sizeof(uint16_t));
+	memset(_outputBuffers[1].get(), 0, 512 * 478 * sizeof(uint16_t));
 }
 
-SnesPpu::~SnesPpu() {
-	delete[] _vram;
-	delete[] _outputBuffers[0];
-	delete[] _outputBuffers[1];
-}
+SnesPpu::~SnesPpu() = default;
 
 void SnesPpu::PowerOn() {
 	_skipRender = false;
@@ -50,7 +46,7 @@ void SnesPpu::PowerOn() {
 	_spc = _console->GetSpc();
 	_memoryManager = _console->GetMemoryManager();
 
-	_currentBuffer = _outputBuffers[0];
+	_currentBuffer = _outputBuffers[0].get();
 
 	_state = {};
 	_state.ForcedBlank = true;
@@ -59,7 +55,7 @@ void SnesPpu::PowerOn() {
 		RandomizeState();
 	}
 
-	_console->InitializeRam(_vram, SnesPpu::VideoRamSize);
+	_console->InitializeRam(_vram.get(), SnesPpu::VideoRamSize);
 	_console->InitializeRam(_cgram, SnesPpu::CgRamSize);
 	for (int i = 0; i < SnesPpu::CgRamSize / 2; i++) {
 		_cgram[i] &= 0x7FFF;
@@ -500,7 +496,7 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock) {
 				UpdateNmiScanline();
 
 				if (!_skipRender) {
-					_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+					_currentBuffer = _currentBuffer == _outputBuffers[0].get() ? _outputBuffers[1].get() : _outputBuffers[0].get();
 					if (_interlacedFrame) {
 						memcpy(_currentBuffer, GetPreviousScreenBuffer(), 512 * 478 * sizeof(uint16_t));
 					}
@@ -1659,11 +1655,11 @@ uint16_t* SnesPpu::GetScreenBuffer() {
 }
 
 uint16_t* SnesPpu::GetPreviousScreenBuffer() {
-	return _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+	return _currentBuffer == _outputBuffers[0].get() ? _outputBuffers[1].get() : _outputBuffers[0].get();
 }
 
 uint8_t* SnesPpu::GetVideoRam() {
-	return (uint8_t*)_vram;
+	return (uint8_t*)_vram.get();
 }
 
 uint8_t* SnesPpu::GetCgRam() {
@@ -2422,7 +2418,7 @@ void SnesPpu::Serialize(Serializer& s) {
 		SVI(_state.Window[i].Right);
 	}
 
-	SVArray(_vram, SnesPpu::VideoRamSize >> 1);
+	SVArray(_vram.get(), SnesPpu::VideoRamSize >> 1);
 	SVArray(_oamRam, SnesPpu::SpriteRamSize);
 	SVArray(_cgram, SnesPpu::CgRamSize >> 1);
 

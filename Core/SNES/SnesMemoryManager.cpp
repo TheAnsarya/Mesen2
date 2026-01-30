@@ -32,9 +32,9 @@ void SnesMemoryManager::Initialize(SnesConsole* console) {
 	_cart = console->GetCartridge();
 	_cheatManager = _emu->GetCheatManager();
 
-	_workRam = new uint8_t[SnesMemoryManager::WorkRamSize];
-	_emu->RegisterMemory(MemoryType::SnesWorkRam, _workRam, SnesMemoryManager::WorkRamSize);
-	_console->InitializeRam(_workRam, SnesMemoryManager::WorkRamSize);
+	_workRam = std::make_unique<uint8_t[]>(SnesMemoryManager::WorkRamSize);
+	_emu->RegisterMemory(MemoryType::SnesWorkRam, _workRam.get(), SnesMemoryManager::WorkRamSize);
+	_console->InitializeRam(_workRam.get(), SnesMemoryManager::WorkRamSize);
 
 	_registerHandlerA.reset(new RegisterHandlerA(
 	    console->GetDmaController(),
@@ -45,10 +45,10 @@ void SnesMemoryManager::Initialize(SnesConsole* console) {
 	    _console,
 	    _ppu,
 	    console->GetSpc(),
-	    _workRam));
+	    _workRam.get()));
 
 	for (uint32_t i = 0; i < 128 * 1024; i += 0x1000) {
-		_workRamHandlers.push_back(unique_ptr<RamHandler>(new RamHandler(_workRam, i, SnesMemoryManager::WorkRamSize, MemoryType::SnesWorkRam)));
+		_workRamHandlers.push_back(unique_ptr<RamHandler>(new RamHandler(_workRam.get(), i, SnesMemoryManager::WorkRamSize, MemoryType::SnesWorkRam)));
 	}
 
 	_mappings.RegisterHandler(0x7E, 0x7F, 0x0000, 0xFFFF, _workRamHandlers);
@@ -70,9 +70,7 @@ void SnesMemoryManager::Initialize(SnesConsole* console) {
 	Reset();
 }
 
-SnesMemoryManager::~SnesMemoryManager() {
-	delete[] _workRam;
-}
+SnesMemoryManager::~SnesMemoryManager() = default;
 
 void SnesMemoryManager::Reset() {
 	_masterClock = 0;
@@ -404,7 +402,7 @@ uint16_t SnesMemoryManager::GetHClock() {
 }
 
 uint8_t* SnesMemoryManager::DebugGetWorkRam() {
-	return _workRam;
+	return _workRam.get();
 }
 
 MemoryMappings* SnesMemoryManager::GetMemoryMappings() {
@@ -472,7 +470,7 @@ void SnesMemoryManager::Serialize(Serializer& s) {
 	SV(_memTypeBusA);
 	SV(_nextEvent);
 	SV(_nextEventClock);
-	SVArray(_workRam, SnesMemoryManager::WorkRamSize);
+	SVArray(_workRam.get(), SnesMemoryManager::WorkRamSize);
 	SV(_registerHandlerB);
 
 	if (!s.IsSaving()) {

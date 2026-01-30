@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "Debugger/DebugTypes.h"
 #include "Debugger/BaseEventManager.h"
 #include "Utilities/SimpleLock.h"
@@ -54,7 +55,7 @@ private:
 	bool _overscanMode = false;
 	bool _useHighResOutput = false;
 	uint32_t _scanlineCount = 262;
-	uint16_t* _ppuBuffer = nullptr;
+	std::unique_ptr<uint16_t[]> _ppuBuffer;
 
 protected:
 	void ConvertScanlineCycleToRowColumn(int32_t& x, int32_t& y) override;

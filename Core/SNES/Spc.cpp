@@ -23,9 +23,9 @@ Spc::Spc(SnesConsole* console) {
 	_console = console;
 	_memoryManager = console->GetMemoryManager();
 
-	_ram = new uint8_t[Spc::SpcRamSize];
-	_emu->RegisterMemory(MemoryType::SpcRam, _ram, Spc::SpcRamSize);
-	_console->InitializeRam(_ram, Spc::SpcRamSize);
+	_ram = std::make_unique<uint8_t[]>(Spc::SpcRamSize);
+	_emu->RegisterMemory(MemoryType::SpcRam, _ram.get(), Spc::SpcRamSize);
+	_console->InitializeRam(_ram.get(), Spc::SpcRamSize);
 
 	_emu->RegisterMemory(MemoryType::SpcRom, _spcBios, Spc::SpcRomSize);
 
@@ -56,9 +56,7 @@ Spc::Spc(SnesConsole* console) {
 }
 
 #ifndef DUMMYSPC
-Spc::~Spc() {
-	delete[] _ram;
-}
+Spc::~Spc() = default;
 #endif
 
 void Spc::Reset() {
@@ -487,7 +485,7 @@ int Spc::GetRelativeAddress(AddressInfo& absAddress) {
 }
 
 uint8_t* Spc::GetSpcRam() {
-	return _ram;
+	return _ram.get();
 }
 
 uint8_t* Spc::GetSpcRom() {
@@ -538,7 +536,7 @@ void Spc::Serialize(Serializer& s) {
 	_state.Timer2.Serialize(s);
 	s.PopNamePrefix();
 
-	SVArray(_ram, Spc::SpcRamSize);
+	SVArray(_ram.get(), Spc::SpcRamSize);
 
 	SV(_dsp);
 
@@ -629,7 +627,7 @@ uint16_t Spc::GetDirectAddress(uint8_t offset) {
 }
 
 void Spc::LoadSpcFile(SpcFileData* data) {
-	memcpy(_ram, data->SpcRam, Spc::SpcRamSize);
+	memcpy(_ram.get(), data->SpcRam, Spc::SpcRamSize);
 
 	if (data->HasExtraRam) {
 		bool extraRamContainsIpl = memcmp(data->SpcExtraRam, _spcBios, 0x40) == 0;
@@ -648,7 +646,7 @@ void Spc::LoadSpcFile(SpcFileData* data) {
 
 			if (ramContainsIpl || (isSpcRamEmpty && !isExtraRamEmpty)) {
 				// Use extra ram section only if the main spc FFC0-FFFF section is empty or contains the IPL code
-				memcpy(_ram + 0xFFC0, data->SpcExtraRam, 0x40);
+				memcpy(_ram.get() + 0xFFC0, data->SpcExtraRam, 0x40);
 			}
 		}
 	}

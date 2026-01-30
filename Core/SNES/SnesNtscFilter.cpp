@@ -9,7 +9,7 @@ SnesNtscFilter::SnesNtscFilter(Emulator* emu) : BaseVideoFilter(emu) {
 	memset(&_ntscData, 0, sizeof(_ntscData));
 	_ntscSetup = {};
 	snes_ntsc_init(&_ntscData, &_ntscSetup);
-	_ntscBuffer = new uint32_t[SNES_NTSC_OUT_WIDTH(256) * 480];
+	_ntscBuffer = std::make_unique<uint32_t[]>(SNES_NTSC_OUT_WIDTH(256) * 480);
 }
 
 FrameInfo SnesNtscFilter::GetFrameInfo() {
@@ -53,21 +53,19 @@ void SnesNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 	uint32_t yOffset = overscan.Top / 2 * baseWidth;
 
 	if (useHighResOutput) {
-		snes_ntsc_blit_hires(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, IsOddFrame() ? 0 : 1, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, baseWidth * 4);
+		snes_ntsc_blit_hires(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, IsOddFrame() ? 0 : 1, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer.get(), baseWidth * 4);
 
 		for (uint32_t i = 0; i < frameInfo.Height; i++) {
-			memcpy(GetOutputBuffer() + i * frameInfo.Width, _ntscBuffer + yOffset * 2 + xOffset + i * baseWidth, frameInfo.Width * sizeof(uint32_t));
+			memcpy(GetOutputBuffer() + i * frameInfo.Width, _ntscBuffer.get() + yOffset * 2 + xOffset + i * baseWidth, frameInfo.Width * sizeof(uint32_t));
 		}
 	} else {
-		snes_ntsc_blit(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, IsOddFrame() ? 0 : 1, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, baseWidth * 4);
+		snes_ntsc_blit(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, IsOddFrame() ? 0 : 1, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer.get(), baseWidth * 4);
 
 		for (uint32_t i = 0; i < frameInfo.Height; i += 2) {
-			memcpy(GetOutputBuffer() + i * frameInfo.Width, _ntscBuffer + yOffset + xOffset + i / 2 * baseWidth, frameInfo.Width * sizeof(uint32_t));
-			memcpy(GetOutputBuffer() + (i + 1) * frameInfo.Width, _ntscBuffer + yOffset + xOffset + i / 2 * baseWidth, frameInfo.Width * sizeof(uint32_t));
+			memcpy(GetOutputBuffer() + i * frameInfo.Width, _ntscBuffer.get() + yOffset + xOffset + i / 2 * baseWidth, frameInfo.Width * sizeof(uint32_t));
+			memcpy(GetOutputBuffer() + (i + 1) * frameInfo.Width, _ntscBuffer.get() + yOffset + xOffset + i / 2 * baseWidth, frameInfo.Width * sizeof(uint32_t));
 		}
 	}
 }
 
-SnesNtscFilter::~SnesNtscFilter() {
-	delete[] _ntscBuffer;
-}
+SnesNtscFilter::~SnesNtscFilter() = default;

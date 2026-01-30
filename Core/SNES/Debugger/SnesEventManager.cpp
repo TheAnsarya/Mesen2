@@ -17,13 +17,11 @@ SnesEventManager::SnesEventManager(Debugger* debugger, SnesCpu* cpu, SnesPpu* pp
 	_memoryManager = memoryManager;
 	_dmaController = dmaController;
 
-	_ppuBuffer = new uint16_t[512 * 478];
-	memset(_ppuBuffer, 0, 512 * 478 * sizeof(uint16_t));
+	_ppuBuffer = std::make_unique<uint16_t[]>(512 * 478);
+	memset(_ppuBuffer.get(), 0, 512 * 478 * sizeof(uint16_t));
 }
 
-SnesEventManager::~SnesEventManager() {
-	delete[] _ppuBuffer;
-}
+SnesEventManager::~SnesEventManager() = default;
 
 void SnesEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
 	DebugEventInfo evt = {};
@@ -162,13 +160,13 @@ uint32_t SnesEventManager::TakeEventSnapshot(bool forAutoRefresh) {
 	_useHighResOutput = _ppu->IsHighResOutput();
 
 	if (scanline >= _ppu->GetNmiScanline() || scanline == 0) {
-		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), (_useHighResOutput ? (512 * 478) : (256 * 239)) * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get(), _ppu->GetScreenBuffer(), (_useHighResOutput ? (512 * 478) : (256 * 239)) * sizeof(uint16_t));
 	} else {
 		uint16_t adjustedScanline = scanline + (_overscanMode ? 0 : 7);
 		uint32_t size = _useHighResOutput ? (512 * 478) : (256 * 239);
 		uint32_t offset = _useHighResOutput ? (512 * adjustedScanline * 2) : (256 * adjustedScanline);
-		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), offset * sizeof(uint16_t));
-		memcpy(_ppuBuffer + offset, _ppu->GetPreviousScreenBuffer() + offset, (size - offset) * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get(), _ppu->GetScreenBuffer(), offset * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get() + offset, _ppu->GetPreviousScreenBuffer() + offset, (size - offset) * sizeof(uint16_t));
 	}
 
 	_snapshotCurrentFrame = _debugEvents;
@@ -189,7 +187,7 @@ FrameInfo SnesEventManager::GetDisplayBufferSize() {
 
 void SnesEventManager::DrawScreen(uint32_t* buffer) {
 	// Skip the first 7 blank lines in the buffer when overscan mode is off
-	uint16_t* src = _ppuBuffer + (_overscanMode ? 0 : (_useHighResOutput ? (512 * 14) : (256 * 7)));
+	uint16_t* src = _ppuBuffer.get() + (_overscanMode ? 0 : (_useHighResOutput ? (512 * 14) : (256 * 7)));
 
 	for (uint32_t y = 0, len = _overscanMode ? 239 * 2 : 224 * 2; y < len; y++) {
 		for (uint32_t x = 0; x < 512; x++) {
