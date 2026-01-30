@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include <memory>
+#include <array>
 #include "GBA/GbaTypes.h"
 #include "Shared/Emulator.h"
 #include "Utilities/Timer.h"
@@ -112,7 +114,7 @@ private:
 	uint32_t* _oam = nullptr;
 	uint16_t* _paletteRam = nullptr;
 
-	uint16_t* _outputBuffers[2] = {};
+	std::array<std::unique_ptr<uint16_t[]>, 2> _outputBuffers;
 	uint16_t* _currentBuffer = nullptr;
 
 	GbaPixelData* _oamWriteOutput = nullptr;
@@ -273,7 +275,7 @@ public:
 	uint8_t ReadRegister(uint32_t addr);
 
 	uint16_t* GetScreenBuffer() { return _currentBuffer; }
-	uint16_t* GetPreviousScreenBuffer() { return _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0]; }
+	uint16_t* GetPreviousScreenBuffer() { return _currentBuffer == _outputBuffers[0].get() ? _outputBuffers[1].get() : _outputBuffers[0].get(); }
 
 	GbaPpuState& GetState() { return _state; }
 	[[nodiscard]] uint32_t GetFrameCount() { return _state.FrameCount; }

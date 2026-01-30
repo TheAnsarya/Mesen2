@@ -1,19 +1,18 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "GBA/GbaTypes.h"
 
 class GbaWaitStates {
 private:
-	uint8_t* _waitStatesLut = nullptr;
+	std::unique_ptr<uint8_t[]> _waitStatesLut;
 
 public:
 	GbaWaitStates() {
-		_waitStatesLut = new uint8_t[0x400];
+		_waitStatesLut = std::make_unique<uint8_t[]>(0x400);
 	}
 
-	~GbaWaitStates() {
-		delete[] _waitStatesLut;
-	}
+	~GbaWaitStates() = default;
 
 	void GenerateWaitStateLut(GbaMemoryManagerState& state) {
 		for (GbaAccessModeVal mode = 0; mode < 4; mode++) {

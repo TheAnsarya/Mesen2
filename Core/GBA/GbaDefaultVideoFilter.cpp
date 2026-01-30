@@ -11,13 +11,11 @@
 GbaDefaultVideoFilter::GbaDefaultVideoFilter(Emulator* emu, bool applyNtscFilter) : BaseVideoFilter(emu), _ntscFilter(emu) {
 	InitLookupTable();
 	_applyNtscFilter = applyNtscFilter;
-	_prevFrame = new uint16_t[GbaConstants::PixelCount];
-	memset(_prevFrame, 0, GbaConstants::PixelCount * sizeof(uint16_t));
+	_prevFrame = std::make_unique<uint16_t[]>(GbaConstants::PixelCount);
+	memset(_prevFrame.get(), 0, GbaConstants::PixelCount * sizeof(uint16_t));
 }
 
-GbaDefaultVideoFilter::~GbaDefaultVideoFilter() {
-	delete[] _prevFrame;
-}
+GbaDefaultVideoFilter::~GbaDefaultVideoFilter() = default;
 
 FrameInfo GbaDefaultVideoFilter::GetFrameInfo() {
 	if (_applyNtscFilter) {
@@ -78,7 +76,7 @@ void GbaDefaultVideoFilter::OnBeforeApplyFilter() {
 	bool blendFrames = gbaConfig.BlendFrames && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused();
 	if (_blendFrames != blendFrames) {
 		_blendFrames = blendFrames;
-		memset(_prevFrame, 0, GbaConstants::PixelCount * sizeof(uint16_t));
+		memset(_prevFrame.get(), 0, GbaConstants::PixelCount * sizeof(uint16_t));
 	}
 
 	_videoConfig = config;
@@ -94,7 +92,7 @@ void GbaDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 	}
 
 	if (_blendFrames) {
-		std::copy(ppuOutputBuffer, ppuOutputBuffer + GbaConstants::PixelCount, _prevFrame);
+		std::copy(ppuOutputBuffer, ppuOutputBuffer + GbaConstants::PixelCount, _prevFrame.get());
 	}
 
 	if (_applyNtscFilter) {

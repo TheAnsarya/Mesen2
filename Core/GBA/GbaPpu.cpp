@@ -35,11 +35,11 @@ void GbaPpu::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryMa
 	_vram16 = (uint16_t*)_emu->GetMemory(MemoryType::GbaVideoRam).Memory;
 	_oam = (uint32_t*)_emu->GetMemory(MemoryType::GbaSpriteRam).Memory;
 
-	_outputBuffers[0] = new uint16_t[GbaConstants::PixelCount];
-	_outputBuffers[1] = new uint16_t[GbaConstants::PixelCount];
-	memset(_outputBuffers[0], 0, GbaConstants::PixelCount * sizeof(uint16_t));
-	memset(_outputBuffers[1], 0, GbaConstants::PixelCount * sizeof(uint16_t));
-	_currentBuffer = _outputBuffers[0];
+	_outputBuffers[0] = std::make_unique<uint16_t[]>(GbaConstants::PixelCount);
+	_outputBuffers[1] = std::make_unique<uint16_t[]>(GbaConstants::PixelCount);
+	memset(_outputBuffers[0].get(), 0, GbaConstants::PixelCount * sizeof(uint16_t));
+	memset(_outputBuffers[1].get(), 0, GbaConstants::PixelCount * sizeof(uint16_t));
+	_currentBuffer = _outputBuffers[0].get();
 
 	_oamReadOutput = _oamOutputBuffers[0];
 	_oamWriteOutput = _oamOutputBuffers[1];
@@ -64,10 +64,7 @@ void GbaPpu::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryMa
 	});
 }
 
-GbaPpu::~GbaPpu() {
-	delete[] _outputBuffers[0];
-	delete[] _outputBuffers[1];
-}
+GbaPpu::~GbaPpu() = default;
 
 void GbaPpu::ProcessHBlank() {
 	if (_state.Scanline < 160) {
@@ -160,7 +157,7 @@ void GbaPpu::ProcessEndOfScanline() {
 		               (settings->GetEmulationSpeed() == 0 || settings->GetEmulationSpeed() > 150) &&
 		               _frameSkipTimer.GetElapsedMS() < 15);
 		if (!_skipRender) {
-			_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+			_currentBuffer = _currentBuffer == _outputBuffers[0].get() ? _outputBuffers[1].get() : _outputBuffers[0].get();
 		}
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "GBA/GbaTypes.h"
 #include "Debugger/DebugTypes.h"
 #include "Debugger/BaseEventManager.h"
@@ -65,7 +66,7 @@ private:
 	Debugger* _debugger = nullptr;
 
 	uint32_t _scanlineCount = GbaConstants::ScanlineCount;
-	uint16_t* _ppuBuffer = nullptr;
+	std::unique_ptr<uint16_t[]> _ppuBuffer;
 
 protected:
 	bool ShowPreviousFrameEvents() override;

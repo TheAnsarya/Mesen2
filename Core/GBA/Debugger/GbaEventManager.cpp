@@ -18,13 +18,11 @@ GbaEventManager::GbaEventManager(Debugger* debugger, GbaCpu* cpu, GbaPpu* ppu, G
 	_memoryManager = memoryManager;
 	_dmaController = dmaController;
 
-	_ppuBuffer = new uint16_t[GbaConstants::PixelCount];
-	memset(_ppuBuffer, 0, GbaConstants::PixelCount * sizeof(uint16_t));
+	_ppuBuffer = std::make_unique<uint16_t[]>(GbaConstants::PixelCount);
+	memset(_ppuBuffer.get(), 0, GbaConstants::PixelCount * sizeof(uint16_t));
 }
 
-GbaEventManager::~GbaEventManager() {
-	delete[] _ppuBuffer;
-}
+GbaEventManager::~GbaEventManager() = default;
 
 void GbaEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
 	DebugEventInfo evt = {};
@@ -155,11 +153,11 @@ uint32_t GbaEventManager::TakeEventSnapshot(bool forAutoRefresh) {
 	uint16_t scanline = _ppu->GetScanline();
 
 	if (scanline >= 160 || scanline == 0) {
-		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), GbaConstants::PixelCount * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get(), _ppu->GetScreenBuffer(), GbaConstants::PixelCount * sizeof(uint16_t));
 	} else {
 		uint32_t offset = GbaConstants::ScreenWidth * scanline;
-		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), offset * sizeof(uint16_t));
-		memcpy(_ppuBuffer + offset, _ppu->GetPreviousScreenBuffer() + offset, (GbaConstants::PixelCount - offset) * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get(), _ppu->GetScreenBuffer(), offset * sizeof(uint16_t));
+		memcpy(_ppuBuffer.get() + offset, _ppu->GetPreviousScreenBuffer() + offset, (GbaConstants::PixelCount - offset) * sizeof(uint16_t));
 	}
 
 	_snapshotCurrentFrame = _debugEvents;
@@ -179,7 +177,7 @@ FrameInfo GbaEventManager::GetDisplayBufferSize() {
 }
 
 void GbaEventManager::DrawScreen(uint32_t* buffer) {
-	uint16_t* src = _ppuBuffer;
+	uint16_t* src = _ppuBuffer.get();
 	for (uint32_t y = 0, len = GbaConstants::ScreenHeight * 4; y < len; y++) {
 		for (uint32_t x = 0; x < 240 * 4; x += 4) {
 			int srcOffset = (y >> 2) * 240 + (x >> 2);
