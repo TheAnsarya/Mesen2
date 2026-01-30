@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "SNES/Coprocessors/BaseCoprocessor.h"
 
 class SnesConsole;
@@ -14,7 +15,7 @@ private:
 	BsxMemoryPack* _memPack;
 	unique_ptr<BsxSatellaview> _satellaview;
 
-	uint8_t* _psRam = nullptr;
+	std::unique_ptr<uint8_t[]> _psRam;
 	uint32_t _psRamSize = 0;
 	vector<unique_ptr<IMemoryHandler>> _psRamHandlers;
 

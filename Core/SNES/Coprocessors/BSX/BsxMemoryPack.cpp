@@ -10,10 +10,10 @@ BsxMemoryPack::BsxMemoryPack(SnesConsole* console, vector<uint8_t>& data, bool p
 	_console = console;
 	_orgData = data;
 	_dataSize = (uint32_t)data.size();
-	_data = new uint8_t[_dataSize];
-	console->GetEmulator()->RegisterMemory(MemoryType::BsxMemoryPack, _data, _dataSize);
+	_data = std::make_unique<uint8_t[]>(_dataSize);
+	console->GetEmulator()->RegisterMemory(MemoryType::BsxMemoryPack, _data.get(), _dataSize);
 	_persistFlash = persistFlash;
-	memcpy(_data, data.data(), _dataSize);
+	memcpy(_data.get(), data.data(), _dataSize);
 
 	_calculatedSize = std::min<uint8_t>(0x0C, (uint8_t)log2(_dataSize >> 10));
 
@@ -22,13 +22,11 @@ BsxMemoryPack::BsxMemoryPack(SnesConsole* console, vector<uint8_t>& data, bool p
 	}
 }
 
-BsxMemoryPack::~BsxMemoryPack() {
-	delete[] _data;
-}
+BsxMemoryPack::~BsxMemoryPack() = default;
 
 void BsxMemoryPack::SaveBattery() {
 	if (_persistFlash) {
-		_console->GetEmulator()->GetBatteryManager()->SaveBattery(".bs", std::span<const uint8_t>(_data, _dataSize));
+		_console->GetEmulator()->GetBatteryManager()->SaveBattery(".bs", std::span<const uint8_t>(_data.get(), _dataSize));
 	}
 }
 
@@ -41,7 +39,7 @@ void BsxMemoryPack::Serialize(Serializer& s) {
 
 	if (s.IsSaving()) {
 		// Save content of memory pack as an IPS patch
-		vector<uint8_t> newData(_data, _data + _dataSize);
+		vector<uint8_t> newData(_data.get(), _data.get() + _dataSize);
 		vector<uint8_t> ipsData = IpsPatcher::CreatePatch(_orgData, newData);
 		SVVector(ipsData);
 	} else {
@@ -52,7 +50,7 @@ void BsxMemoryPack::Serialize(Serializer& s) {
 		if (ipsData.size() > 8) {
 			vector<uint8_t> output;
 			IpsPatcher::PatchBuffer(ipsData, _orgData, output);
-			memcpy(_data, output.data(), _dataSize);
+			memcpy(_data.get(), output.data(), _dataSize);
 		}
 	}
 }
@@ -86,10 +84,10 @@ void BsxMemoryPack::ProcessCommand(uint8_t value, uint32_t page) {
 
 	switch (_command) {
 		case 0x20D0:
-			memset(_data + page * 0x10000, 0xFF, 0x10000);
+			memset(_data.get() + page * 0x10000, 0xFF, 0x10000);
 			break; // Page erase
 		case 0xA7D0:
-			memset(_data, 0xFF, _dataSize);
+			memset(_data.get(), 0xFF, _dataSize);
 			break; // Chip erase
 	}
 }
@@ -107,14 +105,14 @@ vector<unique_ptr<IMemoryHandler>>& BsxMemoryPack::GetMemoryHandlers() {
 }
 
 uint8_t* BsxMemoryPack::DebugGetMemoryPack() {
-	return _data;
+	return _data.get();
 }
 
 uint32_t BsxMemoryPack::DebugGetMemoryPackSize() {
 	return _dataSize;
 }
 
-BsxMemoryPack::BsxMemoryPackHandler::BsxMemoryPackHandler(BsxMemoryPack* memPack, uint32_t offset) : RamHandler(memPack->_data, offset, memPack->_dataSize, MemoryType::BsxMemoryPack) {
+BsxMemoryPack::BsxMemoryPackHandler::BsxMemoryPackHandler(BsxMemoryPack* memPack, uint32_t offset) : RamHandler(memPack->_data.get(), offset, memPack->_dataSize, MemoryType::BsxMemoryPack) {
 	_memPack = memPack;
 	_page = offset / 0x10000;
 }

@@ -30,12 +30,12 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize) {
 	_console->InitializeRam(_cache, 512);
 
 	_gsuRamSize = gsuRamSize;
-	_gsuRam = new uint8_t[_gsuRamSize];
-	_emu->RegisterMemory(MemoryType::GsuWorkRam, _gsuRam, _gsuRamSize);
-	_console->InitializeRam(_gsuRam, _gsuRamSize);
+	_gsuRam = std::make_unique<uint8_t[]>(_gsuRamSize);
+	_emu->RegisterMemory(MemoryType::GsuWorkRam, _gsuRam.get(), _gsuRamSize);
+	_console->InitializeRam(_gsuRam.get(), _gsuRamSize);
 
 	for (uint32_t i = 0; i < _gsuRamSize / 0x1000; i++) {
-		_gsuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_gsuRam, i * 0x1000, _gsuRamSize, MemoryType::GsuWorkRam)));
+		_gsuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_gsuRam.get(), i * 0x1000, _gsuRamSize, MemoryType::GsuWorkRam)));
 		_gsuCpuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRamHandler(_state, _gsuRamHandlers.back().get())));
 	}
 
@@ -71,9 +71,7 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize) {
 	_mappings.RegisterHandler(0x70, 0x71, 0x0000, 0xFFFF, _gsuRamHandlers);
 }
 
-Gsu::~Gsu() {
-	delete[] _gsuRam;
-}
+Gsu::~Gsu() = default;
 
 void Gsu::ProcessEndOfFrame() {
 	uint8_t clockMultiplier = std::max(1u, _settings->GetSnesConfig().GsuClockSpeed / 100);
@@ -979,15 +977,15 @@ void Gsu::Serialize(Serializer& s) {
 	SV(_stopped);
 	SVArray(_cacheValid, 32);
 	SVArray(_cache, 512);
-	SVArray(_gsuRam, _gsuRamSize);
+	SVArray(_gsuRam.get(), _gsuRamSize);
 }
 
 void Gsu::LoadBattery() {
-	_emu->GetBatteryManager()->LoadBattery(".srm", std::span<uint8_t>(reinterpret_cast<uint8_t*>(_gsuRam), _gsuRamSize));
+	_emu->GetBatteryManager()->LoadBattery(".srm", std::span<uint8_t>(_gsuRam.get(), _gsuRamSize));
 }
 
 void Gsu::SaveBattery() {
-	_emu->GetBatteryManager()->SaveBattery(".srm", std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(_gsuRam), _gsuRamSize));
+	_emu->GetBatteryManager()->SaveBattery(".srm", std::span<const uint8_t>(_gsuRam.get(), _gsuRamSize));
 }
 
 GsuState& Gsu::GetState() {

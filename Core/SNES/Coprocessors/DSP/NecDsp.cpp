@@ -55,27 +55,27 @@ NecDsp::NecDsp(CoprocessorType type, SnesConsole* console, vector<uint8_t>& prog
 	}
 
 	_progSize = (uint32_t)programRom.size();
-	_progRom = new uint8_t[_progSize];
-	_emu->RegisterMemory(MemoryType::DspProgramRom, _progRom, _progSize);
+	_progRom = std::make_unique<uint8_t[]>(_progSize);
+	_emu->RegisterMemory(MemoryType::DspProgramRom, _progRom.get(), _progSize);
 
-	_prgCache = new uint32_t[_progSize / 3];
+	_prgCache = std::make_unique<uint32_t[]>(_progSize / 3);
 	_progMask = (_progSize / 3) - 1;
 
 	_dataSize = (uint32_t)dataRom.size() / 2;
-	_dataRom = new uint16_t[_dataSize];
-	_emu->RegisterMemory(MemoryType::DspDataRom, _dataRom, _dataSize * sizeof(uint16_t));
+	_dataRom = std::make_unique<uint16_t[]>(_dataSize);
+	_emu->RegisterMemory(MemoryType::DspDataRom, _dataRom.get(), _dataSize * sizeof(uint16_t));
 	_dataMask = _dataSize - 1;
 
-	_ram = new uint16_t[_ramSize];
-	_emu->RegisterMemory(MemoryType::DspDataRam, _ram, _ramSize * sizeof(uint16_t));
+	_ram = std::make_unique<uint16_t[]>(_ramSize);
+	_emu->RegisterMemory(MemoryType::DspDataRam, _ram.get(), _ramSize * sizeof(uint16_t));
 	_ramMask = _ramSize - 1;
 
 	_stackMask = _stackSize - 1;
 
-	_console->InitializeRam(_ram, _ramSize * sizeof(uint16_t));
+	_console->InitializeRam(_ram.get(), _ramSize * sizeof(uint16_t));
 	_console->InitializeRam(_stack, _stackSize * sizeof(uint16_t));
 
-	memcpy(_progRom, programRom.data(), _progSize);
+	memcpy(_progRom.get(), programRom.data(), _progSize);
 	BuildProgramCache();
 
 	for (uint32_t i = 0; i < _dataSize; i++) {
@@ -83,12 +83,7 @@ NecDsp::NecDsp(CoprocessorType type, SnesConsole* console, vector<uint8_t>& prog
 	}
 }
 
-NecDsp::~NecDsp() {
-	delete[] _progRom;
-	delete[] _prgCache;
-	delete[] _dataRom;
-	delete[] _ram;
-}
+NecDsp::~NecDsp() = default;
 
 NecDsp* NecDsp::InitCoprocessor(CoprocessorType type, SnesConsole* console, vector<uint8_t>& embeddedFirware) {
 	Emulator* emu = console->GetEmulator();
@@ -134,13 +129,13 @@ void NecDsp::Reset() {
 
 void NecDsp::LoadBattery() {
 	if (_type == CoprocessorType::ST010 || _type == CoprocessorType::ST011) {
-		_emu->GetBatteryManager()->LoadBattery(".srm", std::span<uint8_t>(reinterpret_cast<uint8_t*>(_ram), _ramSize * sizeof(uint16_t)));
+		_emu->GetBatteryManager()->LoadBattery(".srm", std::span<uint8_t>(reinterpret_cast<uint8_t*>(_ram.get()), _ramSize * sizeof(uint16_t)));
 	}
 }
 
 void NecDsp::SaveBattery() {
 	if (_type == CoprocessorType::ST010 || _type == CoprocessorType::ST011) {
-		_emu->GetBatteryManager()->SaveBattery(".srm", std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(_ram), _ramSize * sizeof(uint16_t)));
+		_emu->GetBatteryManager()->SaveBattery(".srm", std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(_ram.get()), _ramSize * sizeof(uint16_t)));
 	}
 }
 
@@ -745,15 +740,15 @@ uint16_t NecDsp::GetSourceValue(uint8_t source) {
 }
 
 uint8_t* NecDsp::DebugGetProgramRom() {
-	return _progRom;
+	return _progRom.get();
 }
 
 uint8_t* NecDsp::DebugGetDataRom() {
-	return (uint8_t*)_dataRom;
+	return (uint8_t*)_dataRom.get();
 }
 
 uint8_t* NecDsp::DebugGetDataRam() {
-	return (uint8_t*)_ram;
+	return (uint8_t*)_ram.get();
 }
 
 uint32_t NecDsp::DebugGetProgramRomSize() {
@@ -805,6 +800,6 @@ void NecDsp::Serialize(Serializer& s) {
 
 	SV(_opCode);
 	SV(_inRqmLoop);
-	SVArray(_ram, _ramSize);
+	SVArray(_ram.get(), _ramSize);
 	SVArray(_stack, _stackSize);
 }

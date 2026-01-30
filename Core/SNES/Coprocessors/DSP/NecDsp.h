@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "SNES/Coprocessors/DSP/NecDspTypes.h"
 #include "SNES/Coprocessors/BaseCoprocessor.h"
 
@@ -23,10 +24,10 @@ private:
 
 	double _frequency = 7600000;
 	uint32_t _opCode = 0;
-	uint8_t* _progRom = nullptr;
-	uint32_t* _prgCache = nullptr;
-	uint16_t* _dataRom = nullptr;
-	uint16_t* _ram = nullptr;
+	std::unique_ptr<uint8_t[]> _progRom;
+	std::unique_ptr<uint32_t[]> _prgCache;
+	std::unique_ptr<uint16_t[]> _dataRom;
+	std::unique_ptr<uint16_t[]> _ram;
 	uint16_t _stack[16];
 
 	uint32_t _progSize = 0;

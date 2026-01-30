@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "SNES/Coprocessors/BaseCoprocessor.h"
 #include "SNES/Coprocessors/GSU/GsuTypes.h"
 #include "SNES/MemoryMappings.h"
@@ -33,7 +34,7 @@ private:
 	uint32_t _lastOpAddr = 0;
 
 	uint32_t _gsuRamSize = 0;
-	uint8_t* _gsuRam = nullptr;
+	std::unique_ptr<uint8_t[]> _gsuRam;
 
 	MemoryMappings _mappings;
 	vector<unique_ptr<IMemoryHandler>> _gsuRamHandlers;

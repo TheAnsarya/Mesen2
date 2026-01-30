@@ -21,33 +21,29 @@ St018::St018(SnesConsole* console) {
 	DummyArmV3Cpu::StaticInit();
 	GbaCpu::StaticInit(); // todo remove
 
-	_prgRom = new uint8_t[St018::PrgRomSize];
-	_dataRom = new uint8_t[St018::DataRomSize];
+	_prgRom = std::make_unique<uint8_t[]>(St018::PrgRomSize);
+	_dataRom = std::make_unique<uint8_t[]>(St018::DataRomSize);
 
-	_workRam = new uint8_t[St018::WorkRamSize];
-	_console->InitializeRam(_workRam, St018::WorkRamSize);
+	_workRam = std::make_unique<uint8_t[]>(St018::WorkRamSize);
+	_console->InitializeRam(_workRam.get(), St018::WorkRamSize);
 
 	vector<uint8_t> firmwareData;
 	FirmwareHelper::LoadSt018Firmware(_emu, firmwareData);
 	if (firmwareData.size() == 0x28000) {
-		memcpy(_prgRom, firmwareData.data(), St018::PrgRomSize);
-		memcpy(_dataRom, firmwareData.data() + St018::PrgRomSize, St018::DataRomSize);
+		memcpy(_prgRom.get(), firmwareData.data(), St018::PrgRomSize);
+		memcpy(_dataRom.get(), firmwareData.data() + St018::PrgRomSize, St018::DataRomSize);
 	}
 
-	_emu->RegisterMemory(MemoryType::St018PrgRom, _prgRom, St018::PrgRomSize);
-	_emu->RegisterMemory(MemoryType::St018DataRom, _dataRom, St018::DataRomSize);
-	_emu->RegisterMemory(MemoryType::St018WorkRam, _workRam, St018::WorkRamSize);
+	_emu->RegisterMemory(MemoryType::St018PrgRom, _prgRom.get(), St018::PrgRomSize);
+	_emu->RegisterMemory(MemoryType::St018DataRom, _dataRom.get(), St018::DataRomSize);
+	_emu->RegisterMemory(MemoryType::St018WorkRam, _workRam.get(), St018::WorkRamSize);
 
 	_cpu.reset(new ArmV3Cpu());
 	_cpu->Init(_emu, this);
 	_cpu->PowerOn(false);
 }
 
-St018::~St018() {
-	delete[] _prgRom;
-	delete[] _dataRom;
-	delete[] _workRam;
-}
+St018::~St018() = default;
 
 void St018::Reset() {
 }

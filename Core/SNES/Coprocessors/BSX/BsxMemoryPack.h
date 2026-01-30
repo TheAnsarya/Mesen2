@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "SNES/RamHandler.h"
 #include "SNES/IMemoryHandler.h"
 #include "Utilities/ISerializable.h"
@@ -11,7 +12,7 @@ class BsxMemoryPack : public ISerializable {
 private:
 	SnesConsole* _console = nullptr;
 	vector<uint8_t> _orgData;
-	uint8_t* _data = nullptr;
+	std::unique_ptr<uint8_t[]> _data;
 	uint32_t _dataSize = 0;
 	vector<unique_ptr<IMemoryHandler>> _handlers;
 

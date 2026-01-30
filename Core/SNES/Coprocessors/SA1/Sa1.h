@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "SNES/Coprocessors/BaseCoprocessor.h"
 #include "SNES/MemoryMappings.h"
 #include "SNES/Coprocessors/SA1/Sa1Types.h"
@@ -28,7 +29,7 @@ private:
 	SnesCpu* _snesCpu;
 
 	Sa1State _state = {};
-	uint8_t* _iRam;
+	std::unique_ptr<uint8_t[]> _iRam;
 
 	MemoryType _lastAccessMemType;
 	uint8_t _openBus;

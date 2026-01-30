@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <memory>
 #include "SNES/Coprocessors/ST018/St018Types.h"
 #include "SNES/Coprocessors/ST018/ArmV3Types.h"
 #include "SNES/Coprocessors/ST018/ArmV3Cpu.h"
@@ -22,9 +23,9 @@ private:
 	St018State _state = {};
 	unique_ptr<ArmV3Cpu> _cpu;
 
-	uint8_t* _prgRom = nullptr;
-	uint8_t* _dataRom = nullptr;
-	uint8_t* _workRam = nullptr;
+	std::unique_ptr<uint8_t[]> _prgRom;
+	std::unique_ptr<uint8_t[]> _dataRom;
+	std::unique_ptr<uint8_t[]> _workRam;
 
 	__forceinline uint8_t ReadCpuByte(uint32_t addr);
 	__forceinline void WriteCpuByte(uint32_t addr, uint8_t value);

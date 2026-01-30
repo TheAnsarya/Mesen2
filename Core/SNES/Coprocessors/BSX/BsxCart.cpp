@@ -26,20 +26,18 @@ BsxCart::BsxCart(SnesConsole* console, BsxMemoryPack* memPack) {
 	mm->RegisterHandler(0x80, 0xBF, 0x2000, 0x2FFF, _satellaview.get());
 
 	_psRamSize = 512 * 1024;
-	_psRam = new uint8_t[_psRamSize];
-	_console->GetEmulator()->RegisterMemory(MemoryType::BsxPsRam, _psRam, _psRamSize);
-	_console->InitializeRam(_psRam, _psRamSize);
+	_psRam = std::make_unique<uint8_t[]>(_psRamSize);
+	_console->GetEmulator()->RegisterMemory(MemoryType::BsxPsRam, _psRam.get(), _psRamSize);
+	_console->InitializeRam(_psRam.get(), _psRamSize);
 
 	for (uint32_t i = 0; i < _psRamSize / 0x1000; i++) {
-		_psRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_psRam, i * 0x1000, _psRamSize, MemoryType::BsxPsRam)));
+		_psRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_psRam.get(), i * 0x1000, _psRamSize, MemoryType::BsxPsRam)));
 	}
 
 	Reset();
 }
 
-BsxCart::~BsxCart() {
-	delete[] _psRam;
-}
+BsxCart::~BsxCart() = default;
 
 uint8_t BsxCart::Read(uint32_t addr) {
 	uint8_t openBus = _memoryManager->GetOpenBus();
@@ -180,7 +178,7 @@ void BsxCart::Reset() {
 }
 
 void BsxCart::Serialize(Serializer& s) {
-	SVArray(_psRam, _psRamSize);
+	SVArray(_psRam.get(), _psRamSize);
 	SVArray(_regs, 0x10);
 	SVArray(_dirtyRegs, 0x10);
 	SV(_dirty);
@@ -204,7 +202,7 @@ AddressInfo BsxCart::GetAbsoluteAddress(uint32_t address) {
 }
 
 uint8_t* BsxCart::DebugGetPsRam() {
-	return _psRam;
+	return _psRam.get();
 }
 
 uint32_t BsxCart::DebugGetPsRamSize() {

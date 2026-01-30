@@ -28,11 +28,11 @@ Sa1::Sa1(SnesConsole* console) {
 	_cart = _console->GetCartridge();
 	_snesCpu = _console->GetCpu();
 
-	_iRam = new uint8_t[Sa1::InternalRamSize];
-	_emu->RegisterMemory(MemoryType::Sa1InternalRam, _iRam, Sa1::InternalRamSize);
-	_iRamHandlerSa1.reset(new Sa1IRamHandler(&_state.Sa1IRamWriteProtect, _iRam));
-	_iRamHandlerCpu.reset(new Sa1IRamHandler(&_state.CpuIRamWriteProtect, _iRam));
-	_console->InitializeRam(_iRam, 0x800);
+	_iRam = std::make_unique<uint8_t[]>(Sa1::InternalRamSize);
+	_emu->RegisterMemory(MemoryType::Sa1InternalRam, _iRam.get(), Sa1::InternalRamSize);
+	_iRamHandlerSa1.reset(new Sa1IRamHandler(&_state.Sa1IRamWriteProtect, _iRam.get()));
+	_iRamHandlerCpu.reset(new Sa1IRamHandler(&_state.CpuIRamWriteProtect, _iRam.get()));
+	_console->InitializeRam(_iRam.get(), 0x800);
 
 	// Register the SA1 in the CPU's memory space ($22xx-$23xx registers)
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
@@ -72,9 +72,7 @@ Sa1::Sa1(SnesConsole* console) {
 	Reset();
 }
 
-Sa1::~Sa1() {
-	delete[] _iRam;
-}
+Sa1::~Sa1() = default;
 
 void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value) {
 	switch (addr) {
@@ -895,7 +893,7 @@ MemoryType Sa1::GetSnesCpuMemoryType() {
 }
 
 uint8_t* Sa1::DebugGetInternalRam() {
-	return _iRam;
+	return _iRam.get();
 }
 
 uint32_t Sa1::DebugGetInternalRamSize() {
@@ -934,13 +932,13 @@ void Sa1::LoadBattery() {
 	if (_cpuBwRamHandlers.empty()) {
 		// When there is no actual save RAM and the battery flag is set, IRAM is backed up instead
 		// Used by Pachi-Slot Monogatari - PAL Kougyou Special
-		_emu->GetBatteryManager()->LoadBattery(".srm", std::span<uint8_t>(_iRam, Sa1::InternalRamSize));
+		_emu->GetBatteryManager()->LoadBattery(".srm", std::span<uint8_t>(_iRam.get(), Sa1::InternalRamSize));
 	}
 }
 
 void Sa1::SaveBattery() {
 	if (_cpuBwRamHandlers.empty()) {
-		_emu->GetBatteryManager()->SaveBattery(".srm", std::span<const uint8_t>(_iRam, Sa1::InternalRamSize));
+		_emu->GetBatteryManager()->SaveBattery(".srm", std::span<const uint8_t>(_iRam.get(), Sa1::InternalRamSize));
 	}
 }
 
@@ -1032,7 +1030,7 @@ void Sa1::Serialize(Serializer& s) {
 
 	SV(_lastAccessMemType);
 	SV(_openBus);
-	SVArray(_iRam, Sa1::InternalRamSize);
+	SVArray(_iRam.get(), Sa1::InternalRamSize);
 
 	if (!s.IsSaving()) {
 		UpdatePrgRomMappings();
