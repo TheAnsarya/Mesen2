@@ -77,7 +77,7 @@ void FdsInputButtons::InsertDisk(uint8_t diskNumber) {
 		_insertDiskNumber = diskNumber;
 		_insertDiskDelay = 1;
 	}
-	MessageManager::DisplayMessage("FDS", "FdsDiskInserted", std::to_string(diskNumber / 2 + 1), diskNumber & 0x01 ? "B" : "A");
+	MessageManager::DisplayMessage("FDS", "FdsDiskInserted", std::format("{}", diskNumber / 2 + 1), diskNumber & 0x01 ? "B" : "A");
 }
 
 void FdsInputButtons::SwitchDiskSide() {

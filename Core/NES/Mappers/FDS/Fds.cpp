@@ -186,7 +186,7 @@ uint8_t Fds::ReadRam(uint16_t addr) {
 			// Found a single match, insert it
 			_diskNumber = matchIndex;
 			if (_diskNumber != _previousDiskNumber) {
-				MessageManager::Log("[FDS] Disk automatically inserted: Disk " + std::to_string((_diskNumber / 2) + 1) + ((_diskNumber & 0x01) ? " Side B" : " Side A"));
+				MessageManager::Log(std::format("[FDS] Disk automatically inserted: Disk {} Side {}", (_diskNumber / 2) + 1, (_diskNumber & 0x01) ? "B" : "A"));
 				_previousDiskNumber = _diskNumber;
 			}
 

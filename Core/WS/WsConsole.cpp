@@ -92,9 +92,9 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile) {
 	uint8_t mapperType = _prgRom[_prgRomSize - 3];
 
 	MessageManager::Log(string("Color supported: ") + (hasColorSupport ? "Yes" : "No"));
-	MessageManager::Log("Save RAM size: " + std::to_string(_saveRamSize / 1024) + " KB");
-	MessageManager::Log("Cart EEPROM size: " + std::to_string(_cartEepromSize) + " bytes");
-	MessageManager::Log(string("Mapper: ") + (mapperType == 0 ? "Bandai 2001 / KARNAK" : (mapperType == 1 ? "Bandai 2003" : ("Unknown: " + std::to_string(mapperType)))));
+	MessageManager::Log(std::format("Save RAM size: {} KB", _saveRamSize / 1024));
+	MessageManager::Log(std::format("Cart EEPROM size: {} bytes", _cartEepromSize));
+	MessageManager::Log(std::format("Mapper: {}", mapperType == 0 ? "Bandai 2001 / KARNAK" : (mapperType == 1 ? "Bandai 2003" : std::format("Unknown: {}", mapperType))));
 
 	MessageManager::Log("------------------------------");
 

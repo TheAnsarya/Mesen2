@@ -106,7 +106,7 @@ void GameServer::Exec() {
 	_listener->Listen(10);
 	_stop = false;
 	_initialized = true;
-	MessageManager::DisplayMessage("NetPlay", "ServerStarted", std::to_string(_port));
+	MessageManager::DisplayMessage("NetPlay", "ServerStarted", std::format("{}", _port));
 
 	while (!_stop) {
 		AcceptConnections();

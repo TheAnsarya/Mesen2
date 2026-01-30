@@ -184,7 +184,7 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc) {
 					trk.StartPosition = DiscPosition::FromLba(idx.Position.ToLba() + totalPregapLbaLength + startSector);
 					startPos = idx.Position;
 				} else {
-					MessageManager::Log("[CUE] Unsupported index number: " + std::to_string(idx.Number));
+					MessageManager::Log(std::format("[CUE] Unsupported index number: {}", idx.Number));
 					return false;
 				}
 			}
@@ -242,13 +242,13 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc) {
 	MessageManager::Log("---- DISC TRACKS ----");
 	int i = 1;
 	for (TrackInfo& trk : disc.Tracks) {
-		MessageManager::Log("Track " + std::to_string(i) + " (" + string(magic_enum::enum_name(trk.Format)) + ")");
+		MessageManager::Log(std::format("Track {} ({})", i, magic_enum::enum_name(trk.Format)));
 		if (trk.HasLeadIn) {
 			MessageManager::Log("  Lead-in: " + trk.LeadInPosition.ToString());
 		}
 		MessageManager::Log("  Time: " + trk.StartPosition.ToString() + " - " + trk.EndPosition.ToString());
-		MessageManager::Log("  Sectors: " + std::to_string(trk.FirstSector) + " - " + std::to_string(trk.LastSector));
-		MessageManager::Log("  File offset: " + std::to_string(trk.FileOffset) + " - " + std::to_string(trk.FileOffset + trk.Size - 1));
+		MessageManager::Log(std::format("  Sectors: {} - {}", trk.FirstSector, trk.LastSector));
+		MessageManager::Log(std::format("  File offset: {} - {}", trk.FileOffset, trk.FileOffset + trk.Size - 1));
 		i++;
 	}
 	MessageManager::Log("---- END TRACKS ----");

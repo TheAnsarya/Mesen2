@@ -87,7 +87,7 @@ public:
 		if (port < 4) {
 			auto lock = _emu->AcquireLock();
 			_needInsertCoin[port] = VsInputButtons::InsertCoinFrameCount;
-			MessageManager::DisplayMessage("VS System", "CoinInsertedSlot", std::to_string(port + 1));
+			MessageManager::DisplayMessage("VS System", "CoinInsertedSlot", std::format("{}", port + 1));
 		}
 	}
 

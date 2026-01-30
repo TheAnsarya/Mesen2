@@ -860,13 +860,13 @@ void BaseCartridge::DisplayCartInfo(bool showCorruptedHeaderWarning) {
 	MessageManager::Log("Map Mode: $" + HexUtilities::ToHex(_cartInfo.MapMode));
 	MessageManager::Log("Rom Type: $" + HexUtilities::ToHex(_cartInfo.RomType));
 
-	MessageManager::Log("File size: " + std::to_string(_prgRomSize / 1024) + " KB");
-	MessageManager::Log("ROM size: " + std::to_string((0x400 << _cartInfo.RomSize) / 1024) + " KB");
+	MessageManager::Log(std::format("File size: {} KB", _prgRomSize / 1024));
+	MessageManager::Log(std::format("ROM size: {} KB", (0x400 << _cartInfo.RomSize) / 1024));
 	if (_saveRamSize > 0) {
-		MessageManager::Log("SRAM size: " + std::to_string(_saveRamSize / 1024) + " KB" + (_hasBattery ? " (with battery)" : ""));
+		MessageManager::Log(std::format("SRAM size: {} KB{}", _saveRamSize / 1024, _hasBattery ? " (with battery)" : ""));
 	}
 	if (_coprocessorRamSize > 0) {
-		MessageManager::Log("Coprocessor RAM size: " + std::to_string(_coprocessorRamSize / 1024) + " KB");
+		MessageManager::Log(std::format("Coprocessor RAM size: {} KB", _coprocessorRamSize / 1024));
 	}
 	if (_hasBattery) {
 		MessageManager::Log("Battery: yes");

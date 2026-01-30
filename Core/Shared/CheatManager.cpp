@@ -77,7 +77,7 @@ void CheatManager::SetCheats(vector<CheatCode>& codes) {
 	}
 
 	if (codes.size() > 1) {
-		MessageManager::DisplayMessage("Cheats", "CheatsApplied", std::to_string(codes.size()));
+		MessageManager::DisplayMessage("Cheats", "CheatsApplied", std::format("{}", codes.size()));
 	} else if (codes.size() == 1) {
 		MessageManager::DisplayMessage("Cheats", "CheatApplied");
 	} else if (hasCheats) {
