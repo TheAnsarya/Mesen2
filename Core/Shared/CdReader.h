@@ -41,11 +41,7 @@ struct DiscPosition {
 private:
 	/// <summary>Format value with leading zero (e.g., "05" instead of "5")</summary>
 	string GetValueString(uint32_t val) {
-		if (val < 10) {
-			return "0" + std::to_string(val);
-		} else {
-			return std::to_string(val);
-		}
+		return std::format("{:02}", val);
 	}
 };
 

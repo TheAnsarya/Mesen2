@@ -163,7 +163,7 @@ uint32_t EmuSettings::GetVersion() {
 
 string EmuSettings::GetVersionString() {
 	uint32_t version = GetVersion();
-	return std::to_string(version >> 16) + "." + std::to_string((version >> 8) & 0xFF) + "." + std::to_string(version & 0xFF);
+	return std::format("{}.{}.{}", version >> 16, (version >> 8) & 0xFF, version & 0xFF);
 }
 
 void EmuSettings::ProcessString(string& str, const char** strPointer) {

@@ -248,7 +248,7 @@ void PceScsiBus::CmdRead() {
 		SetStatusMessage(ScsiStatus::Good, 0);
 		return;
 	} else if (sector >= _disc->DiscSectorCount) {
-		LogCommand("Read - invalid sector, command ignored: " + std::to_string(sector));
+		LogCommand(std::format("Read - invalid sector, command ignored: {}", sector));
 		SetStatusMessage(ScsiStatus::Good, 0);
 		return;
 	}

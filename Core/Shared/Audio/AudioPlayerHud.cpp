@@ -19,11 +19,7 @@ AudioPlayerHud::AudioPlayerHud(Emulator* emu) {
 }
 
 string AudioPlayerHud::FormatSeconds(uint32_t s) {
-	string seconds = std::to_string(s % 60);
-	if (seconds.size() == 1) {
-		seconds = "0" + seconds;
-	}
-	return std::to_string(s / 60) + ":" + seconds;
+	return std::format("{}:{:02}", s / 60, s % 60);
 }
 
 void AudioPlayerHud::Draw(uint32_t frameCounter, double fps) {
@@ -49,7 +45,7 @@ void AudioPlayerHud::Draw(uint32_t frameCounter, double fps) {
 
 	string position = FormatSeconds((uint32_t)trackInfo.Position);
 
-	string track = "Track: " + std::to_string(trackInfo.TrackNumber) + " / " + std::to_string(trackInfo.TrackCount);
+	string track = std::format("Track: {} / {}", trackInfo.TrackNumber, trackInfo.TrackCount);
 	TextSize size = DrawStringCommand::MeasureString(track);
 	uint32_t trackPosX = 256 - size.X - 14;
 	_hud->DrawString(trackPosX, 218, track, 0xFFFFFF, 0, 1);
