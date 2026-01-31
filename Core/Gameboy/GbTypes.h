@@ -3,14 +3,18 @@
 #include "Shared/MemoryType.h"
 #include "Shared/BaseState.h"
 
-struct GbCpuState : BaseState {
-	uint64_t CycleCount;
-	uint16_t PC;
-	uint16_t SP;
-	uint16_t HaltCounter;
 
-	uint8_t A;
-	uint8_t Flags;
+/// <summary>
+/// Complete Game Boy CPU state (Sharp LR35902, Z80-like).
+/// </summary>
+struct GbCpuState : BaseState {
+	uint64_t CycleCount;   ///< Total CPU cycles executed
+	uint16_t PC;           ///< Program counter
+	uint16_t SP;           ///< Stack pointer
+	uint16_t HaltCounter;  ///< Cycles remaining in HALT
+
+	uint8_t A;             ///< Accumulator
+	uint8_t Flags;         ///< Flags register (Z, N, H, C)
 
 	uint8_t B;
 	uint8_t C;
@@ -20,31 +24,43 @@ struct GbCpuState : BaseState {
 	uint8_t H;
 	uint8_t L;
 
-	bool EiPending;
-	bool IME;
-	bool HaltBug;
-	bool Stopped;
+	bool EiPending;        ///< EI instruction pending
+	bool IME;              ///< Interrupt master enable
+	bool HaltBug;          ///< HALT bug active
+	bool Stopped;          ///< STOP instruction active
 };
 
+
+/// <summary>
+/// Game Boy CPU flag bits (F register).
+/// </summary>
 namespace GbCpuFlags {
 enum GbCpuFlags {
-	Zero = 0x80,
-	AddSub = 0x40,
-	HalfCarry = 0x20,
-	Carry = 0x10
+	Zero = 0x80,      ///< Zero flag (Z)
+	AddSub = 0x40,    ///< Add/Subtract flag (N)
+	HalfCarry = 0x20, ///< Half-carry flag (H)
+	Carry = 0x10      ///< Carry flag (C)
 };
 } // namespace GbCpuFlags
 
+
+/// <summary>
+/// Game Boy interrupt sources (IF/IE bits).
+/// </summary>
 namespace GbIrqSource {
 enum GbIrqSource {
-	VerticalBlank = 0x01,
-	LcdStat = 0x02,
-	Timer = 0x04,
-	Serial = 0x08,
-	Joypad = 0x10
+	VerticalBlank = 0x01, ///< V-Blank interrupt
+	LcdStat = 0x02,       ///< LCD STAT interrupt
+	Timer = 0x04,         ///< Timer overflow
+	Serial = 0x08,        ///< Serial transfer
+	Joypad = 0x10         ///< Joypad input
 };
 } // namespace GbIrqSource
 
+
+/// <summary>
+/// Helper for 16-bit register access from two 8-bit halves.
+/// </summary>
 class Register16 {
 	uint8_t* _low;
 	uint8_t* _high;
@@ -75,29 +91,45 @@ public:
 	operator uint16_t() { return Read(); }
 };
 
+
+/// <summary>
+/// Game Boy PPU mode (STAT register bits 0-1).
+/// </summary>
 enum class PpuMode {
-	HBlank,
-	VBlank,
-	OamEvaluation,
-	Drawing,
-	NoIrq,
+	HBlank,         ///< Mode 0: HBlank
+	VBlank,         ///< Mode 1: VBlank
+	OamEvaluation,  ///< Mode 2: OAM scan
+	Drawing,        ///< Mode 3: Pixel transfer
+	NoIrq,          ///< Not generating IRQ
 };
 
+
+/// <summary>
+/// Types of OAM corruption (hardware bugs).
+/// </summary>
 enum class GbOamCorruptionType {
-	Read,
-	Write,
-	ReadIncDec
+	Read,        ///< Corruption on OAM read
+	Write,       ///< Corruption on OAM write
+	ReadIncDec   ///< Corruption on OAM inc/dec
 };
 
+
+/// <summary>
+/// LCD STAT interrupt sources (STAT register bits 3-6).
+/// </summary>
 namespace GbPpuStatusFlags {
 enum GbPpuStatusFlags {
-	CoincidenceIrq = 0x40,
-	OamIrq = 0x20,
-	VBlankIrq = 0x10,
-	HBlankIrq = 0x08
+	CoincidenceIrq = 0x40, ///< LYC=LY coincidence
+	OamIrq = 0x20,         ///< OAM interrupt
+	VBlankIrq = 0x10,      ///< VBlank interrupt
+	HBlankIrq = 0x08       ///< HBlank interrupt
 };
 } // namespace GbPpuStatusFlags
 
+
+/// <summary>
+/// Debug event color codes for PPU visualization.
+/// </summary>
 enum class EvtColor {
 	HBlank = 0,
 	VBlank = 1,
@@ -107,15 +139,23 @@ enum class EvtColor {
 	RenderingOamLoad = 5,
 };
 
+
+/// <summary>
+/// Pixel type for PPU output (BG or OBJ).
+/// </summary>
 enum class GbPixelType : uint8_t {
-	Background,
-	Object
+	Background, ///< Background pixel
+	Object      ///< Sprite/object pixel
 };
 
+
+/// <summary>
+/// FIFO entry for pixel pipeline (color, attributes, index).
+/// </summary>
 struct GbFifoEntry {
-	uint8_t Color;
-	uint8_t Attributes;
-	uint8_t Index;
+	uint8_t Color;      ///< Palette color index
+	uint8_t Attributes; ///< Attribute bits (priority, palette)
+	uint8_t Index;      ///< Pixel index in tile
 };
 
 struct GbPpuFifo {

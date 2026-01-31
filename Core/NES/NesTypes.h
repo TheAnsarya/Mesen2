@@ -2,114 +2,157 @@
 #include "pch.h"
 #include "Shared/BaseState.h"
 
+
+/// <summary>
+/// 6502 processor status flag bits (P register).
+/// </summary>
 namespace PSFlags {
 enum PSFlags : uint8_t {
-	Carry = 0x01,
-	Zero = 0x02,
-	Interrupt = 0x04,
-	Decimal = 0x08,
-	Break = 0x10,
-	Reserved = 0x20,
-	Overflow = 0x40,
-	Negative = 0x80
+	Carry = 0x01,      ///< Carry flag (C)
+	Zero = 0x02,       ///< Zero flag (Z)
+	Interrupt = 0x04,  ///< Interrupt disable (I)
+	Decimal = 0x08,    ///< Decimal mode (D, unused on NES)
+	Break = 0x10,      ///< Break command (B)
+	Reserved = 0x20,   ///< Always set (unused)
+	Overflow = 0x40,   ///< Overflow flag (V)
+	Negative = 0x80    ///< Negative flag (N)
 };
 } // namespace PSFlags
 
+
+/// <summary>
+/// 6502 addressing modes for instruction decoding.
+/// </summary>
 enum class NesAddrMode {
-	None,
-	Acc,
-	Imp,
-	Imm,
-	Rel,
-	Zero,
-	Abs,
-	ZeroX,
-	ZeroY,
-	Ind,
-	IndX,
-	IndY,
-	IndYW,
-	AbsX,
-	AbsXW,
-	AbsY,
-	AbsYW,
-	Other
+	None,    ///< Not used
+	Acc,     ///< Accumulator
+	Imp,     ///< Implied
+	Imm,     ///< Immediate
+	Rel,     ///< Relative (branch)
+	Zero,    ///< Zero page
+	Abs,     ///< Absolute
+	ZeroX,   ///< Zero page,X
+	ZeroY,   ///< Zero page,Y
+	Ind,     ///< Indirect (JMP)
+	IndX,    ///< (Indirect,X)
+	IndY,    ///< (Indirect),Y
+	IndYW,   ///< (Indirect),Y with wrap
+	AbsX,    ///< Absolute,X
+	AbsXW,   ///< Absolute,X with wrap
+	AbsY,    ///< Absolute,Y
+	AbsYW,   ///< Absolute,Y with wrap
+	Other    ///< Special/illegal
 };
 
+
+/// <summary>
+/// Sources of IRQ (interrupt requests) on the NES.
+/// </summary>
 enum class IRQSource {
-	External = 1,
-	FrameCounter = 2,
-	DMC = 4,
-	FdsDisk = 8,
-	Epsm = 16
+	External = 1,      ///< External IRQ (mapper, controller, etc.)
+	FrameCounter = 2,  ///< APU frame counter
+	DMC = 4,           ///< DMC sample playback
+	FdsDisk = 8,       ///< FDS disk system
+	Epsm = 16          ///< EPSM expansion audio
 };
 
+
+/// <summary>
+/// Memory operation type for tracing and debugging.
+/// </summary>
 enum class MemoryOperation {
-	Read = 1,
-	Write = 2,
-	Any = 3
+	Read = 1,   ///< Read operation
+	Write = 2,  ///< Write operation
+	Any = 3     ///< Any access
 };
 
+
+/// <summary>
+/// Complete 6502 CPU state for NES emulation.
+/// </summary>
 struct NesCpuState : BaseState {
-	uint64_t CycleCount = 0;
-	uint16_t PC = 0;
-	uint8_t SP = 0;
-	uint8_t A = 0;
-	uint8_t X = 0;
-	uint8_t Y = 0;
-	uint8_t PS = 0;
-	uint8_t IrqFlag = 0;
-	bool NmiFlag = false;
+	uint64_t CycleCount = 0; ///< Total CPU cycles executed
+	uint16_t PC = 0;         ///< Program counter
+	uint8_t SP = 0;          ///< Stack pointer
+	uint8_t A = 0;           ///< Accumulator
+	uint8_t X = 0;           ///< X index register
+	uint8_t Y = 0;           ///< Y index register
+	uint8_t PS = 0;          ///< Processor status (flags)
+	uint8_t IrqFlag = 0;     ///< IRQ pending flag
+	bool NmiFlag = false;    ///< NMI pending flag
 };
 
+
+/// <summary>
+/// Types of PRG (program) memory in NES address space.
+/// </summary>
 enum class PrgMemoryType {
-	PrgRom,
-	SaveRam,
-	WorkRam,
-	MapperRam,
+	PrgRom,     ///< Cartridge ROM
+	SaveRam,    ///< Battery-backed RAM
+	WorkRam,    ///< Internal work RAM
+	MapperRam,  ///< Mapper-controlled RAM
 };
 
+
+/// <summary>
+/// Types of CHR (character/graphics) memory in NES PPU address space.
+/// </summary>
 enum class ChrMemoryType {
-	Default,
-	ChrRom,
-	ChrRam,
-	NametableRam,
-	MapperRam,
+	Default,      ///< Default (mapper-specific)
+	ChrRom,       ///< CHR ROM (cartridge)
+	ChrRam,       ///< CHR RAM (cartridge)
+	NametableRam, ///< Nametable RAM (CIRAM)
+	MapperRam,    ///< Mapper-controlled RAM
 };
 
+
+/// <summary>
+/// Memory access permissions for address decoding.
+/// </summary>
 enum MemoryAccessType {
-	Unspecified = -1,
-	NoAccess = 0x00,
-	Read = 0x01,
-	Write = 0x02,
-	ReadWrite = 0x03
+	Unspecified = -1, ///< Not specified
+	NoAccess = 0x00,  ///< No access
+	Read = 0x01,      ///< Read allowed
+	Write = 0x02,     ///< Write allowed
+	ReadWrite = 0x03  ///< Read and write allowed
 };
 
+
+/// <summary>
+/// Nametable mirroring types for PPU address mapping.
+/// </summary>
 enum class MirroringType {
-	Horizontal,
-	Vertical,
-	ScreenAOnly,
-	ScreenBOnly,
-	FourScreens
+	Horizontal,   ///< Horizontal mirroring (vertical split)
+	Vertical,     ///< Vertical mirroring (horizontal split)
+	ScreenAOnly,  ///< Single screen A
+	ScreenBOnly,  ///< Single screen B
+	FourScreens   ///< Four-screen VRAM
 };
 
+
+/// <summary>
+/// Value types for storing mapper state variables.
+/// </summary>
 enum class MapperStateValueType {
-	None,
-	String,
-	Bool,
-	Number8,
-	Number16,
-	Number32
+	None,      ///< No value
+	String,    ///< String value
+	Bool,      ///< Boolean value
+	Number8,   ///< 8-bit integer
+	Number16,  ///< 16-bit integer
+	Number32   ///< 32-bit integer
 };
 
+/// <summary>
+/// Entry for saving/restoring mapper state (address, name, value).
+/// </summary>
 struct MapperStateEntry {
 	static constexpr int MaxLength = 40;
 
-	int64_t RawValue = INT64_MIN;
-	MapperStateValueType Type = MapperStateValueType::Number8;
-	uint8_t Address[MapperStateEntry::MaxLength] = {};
-	uint8_t Name[MapperStateEntry::MaxLength] = {};
-	uint8_t Value[MapperStateEntry::MaxLength] = {};
+	int64_t RawValue = INT64_MIN; ///< Raw value (if numeric)
+	MapperStateValueType Type = MapperStateValueType::Number8; ///< Value type
+	uint8_t Address[MapperStateEntry::MaxLength] = {}; ///< Address string
+	uint8_t Name[MapperStateEntry::MaxLength] = {};    ///< Name string
+	uint8_t Value[MapperStateEntry::MaxLength] = {};   ///< Value string
 
 	MapperStateEntry() {}
 

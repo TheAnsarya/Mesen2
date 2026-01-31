@@ -13,33 +13,39 @@ public:
 	static constexpr uint32_t MaxPixelCount = WsConstants::ScreenWidth * (WsConstants::ScreenHeight + 13);
 };
 
-struct WsCpuFlags {
-	bool Carry;     // 0x01
-	bool Parity;    // 0x04
-	bool AuxCarry;  // 0x10
-	bool Zero;      // 0x40
-	bool Sign;      // 0x80
-	bool Trap;      // 0x100
-	bool Irq;       // 0x200
-	bool Direction; // 0x400
-	bool Overflow;  // 0x800
-	bool Mode;      // 0x8000
 
+/// <summary>
+/// WonderSwan CPU flags (V30MZ, x86-like). Each field represents a bit in the FLAGS register.
+/// </summary>
+struct WsCpuFlags {
+	bool Carry;     ///< Carry flag (0x01)
+	bool Parity;    ///< Parity flag (0x04)
+	bool AuxCarry;  ///< Auxiliary carry (0x10)
+	bool Zero;      ///< Zero flag (0x40)
+	bool Sign;      ///< Sign flag (0x80)
+	bool Trap;      ///< Trap flag (0x100)
+	bool Irq;       ///< Interrupt enable (0x200)
+	bool Direction; ///< Direction flag (0x400)
+	bool Overflow;  ///< Overflow flag (0x800)
+	bool Mode;      ///< Mode flag (0x8000)
+
+	/// <summary>Pack all flags into a 16-bit value.</summary>
 	uint16_t Get() {
 		return (
-		    (uint8_t)Carry |
-		    ((uint8_t)Parity << 2) |
-		    ((uint8_t)AuxCarry << 4) |
-		    ((uint8_t)Zero << 6) |
-		    ((uint8_t)Sign << 7) |
-		    ((uint8_t)Trap << 8) |
-		    ((uint8_t)Irq << 9) |
-		    ((uint8_t)Direction << 10) |
-		    ((uint8_t)Overflow << 11) |
-		    ((uint8_t)Mode << 15) |
-		    0x7002);
+			(uint8_t)Carry |
+			((uint8_t)Parity << 2) |
+			((uint8_t)AuxCarry << 4) |
+			((uint8_t)Zero << 6) |
+			((uint8_t)Sign << 7) |
+			((uint8_t)Trap << 8) |
+			((uint8_t)Irq << 9) |
+			((uint8_t)Direction << 10) |
+			((uint8_t)Overflow << 11) |
+			((uint8_t)Mode << 15) |
+			0x7002);
 	}
 
+	/// <summary>Unpack a 16-bit value into all flags.</summary>
 	void Set(uint16_t f) {
 		Carry = f & 0x01;
 		Parity = f & 0x04;
@@ -54,30 +60,34 @@ struct WsCpuFlags {
 	}
 };
 
+
+/// <summary>
+/// Complete WonderSwan CPU state (NEC V30MZ, 16-bit x86-like).
+/// </summary>
 struct WsCpuState : BaseState {
-	uint64_t CycleCount;
+	uint64_t CycleCount;   ///< Total CPU cycles executed
 
-	uint16_t CS;
-	uint16_t IP;
+	uint16_t CS;           ///< Code segment
+	uint16_t IP;           ///< Instruction pointer
 
-	uint16_t SS;
-	uint16_t SP;
-	uint16_t BP;
+	uint16_t SS;           ///< Stack segment
+	uint16_t SP;           ///< Stack pointer
+	uint16_t BP;           ///< Base pointer
 
-	uint16_t DS;
-	uint16_t ES;
+	uint16_t DS;           ///< Data segment
+	uint16_t ES;           ///< Extra segment
 
-	uint16_t SI;
-	uint16_t DI;
+	uint16_t SI;           ///< Source index
+	uint16_t DI;           ///< Destination index
 
-	uint16_t AX;
-	uint16_t BX;
-	uint16_t CX;
-	uint16_t DX;
+	uint16_t AX;           ///< Accumulator
+	uint16_t BX;           ///< Base register
+	uint16_t CX;           ///< Count register
+	uint16_t DX;           ///< Data register
 
-	WsCpuFlags Flags;
-	bool Halted;
-	bool PowerOff;
+	WsCpuFlags Flags;      ///< CPU flags
+	bool Halted;           ///< CPU halted
+	bool PowerOff;         ///< Power off state
 };
 
 struct WsBgLayer {
@@ -136,11 +146,15 @@ struct WsLcdIcons {
 	uint8_t Value;
 };
 
+
+/// <summary>
+/// WonderSwan video mode (color/bit depth).
+/// </summary>
 enum class WsVideoMode : uint8_t {
-	Monochrome,
-	Color2bpp,
-	Color4bpp,
-	Color4bppPacked
+	Monochrome,        ///< 4 shades, mono
+	Color2bpp,         ///< 2bpp color
+	Color4bpp,         ///< 4bpp color
+	Color4bppPacked    ///< 4bpp packed color
 };
 
 struct WsPpuState : BaseState {
@@ -196,15 +210,19 @@ enum class WsSegment : uint8_t {
 	DS
 };
 
+
+/// <summary>
+/// WonderSwan interrupt sources (IF/IE bits).
+/// </summary>
 enum class WsIrqSource : uint8_t {
-	UartSendReady = 0x01,
-	KeyPressed = 0x02,
-	Cart = 0x04,
-	UartRecvReady = 0x08,
-	Scanline = 0x10,
-	VerticalBlankTimer = 0x20,
-	VerticalBlank = 0x40,
-	HorizontalBlankTimer = 0x80
+	UartSendReady = 0x01,        ///< UART send ready
+	KeyPressed = 0x02,           ///< Key pressed
+	Cart = 0x04,                 ///< Cartridge IRQ
+	UartRecvReady = 0x08,        ///< UART receive ready
+	Scanline = 0x10,             ///< Scanline IRQ
+	VerticalBlankTimer = 0x20,   ///< VBlank timer
+	VerticalBlank = 0x40,        ///< VBlank IRQ
+	HorizontalBlankTimer = 0x80  ///< HBlank timer
 };
 
 struct WsMemoryManagerState {
