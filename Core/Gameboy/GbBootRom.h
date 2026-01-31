@@ -1,9 +1,37 @@
 #pragma once
 #include "pch.h"
 
-// Embedded copies of LIJI32's open source boot roms
-// The original source for these is here: https://github.com/LIJI32/SameBoy/tree/master/BootROMs
+/// @file GbBootRom.h
+/// @brief Embedded open-source Game Boy boot ROMs.
+///
+/// These are LIJI32's open-source boot ROM replacements from the SameBoy project.
+/// Original source: https://github.com/LIJI32/SameBoy/tree/master/BootROMs
+///
+/// **Boot ROM Functions:**
+/// - Initialize hardware registers to documented values
+/// - Display Nintendo logo animation (scrolling logo)
+/// - Verify cartridge header checksum
+/// - Play startup sound (DMG: ding!, CGB: chime)
+/// - Transfer control to cartridge at $0100
+///
+/// **Boot ROM Sizes:**
+/// - DMG (original): 256 bytes ($0000-$00FF)
+/// - SGB/SGB2: 256 bytes (includes SGB packet protocol)
+/// - CGB: 2304 bytes ($0000-$08FF, includes palette selection)
+/// - AGB (GBA GB mode): 2304 bytes (CGB-based)
+///
+/// **Memory Mapping:**
+/// - Boot ROM overlays $0000-$00FF (or $08FF for CGB)
+/// - Writing $01 to $FF50 unmaps boot ROM permanently
+/// - After unmap, cartridge ROM becomes visible at $0000
 
+/// <summary>
+/// DMG (original Game Boy) boot ROM - 256 bytes.
+/// </summary>
+/// <remarks>
+/// Displays scrolling Nintendo logo, verifies header,
+/// plays "ding!" sound, then jumps to $0100.
+/// </remarks>
 uint8_t dmgBootRom[256] = {
     0x31, 0xFE, 0xFF, 0x21, 0x00, 0x80, 0x22, 0xCB, 0x6C, 0x28, 0xFB, 0x3E,
     0x80, 0xE0, 0x26, 0xE0, 0x11, 0x3E, 0xF3, 0xE0, 0x12, 0xE0, 0x25, 0x3E,
@@ -28,22 +56,28 @@ uint8_t dmgBootRom[256] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0xE0, 0x50};
 
-/*
-Note: SGB roms were tweaked to add a delay loop at the end, starting at $F2:
+/// @note SGB boot ROM timing fix:
+/// Added a delay loop at the end (starting at $F2) to match original SGB timing:
+/// @code
+///   LD D, $E1    ;16 E1
+///   LD E, $AA    ;1E AA
+///   DEC DE       ;1B
+///   INC D        ;14
+///   DEC D        ;15
+///   JR NZ, $00F6 ;20 FB
+///   LD E, D      ;5A
+///   XOR $00      ;EE 00
+/// @endcode
+/// This allows the ROM to finish at nearly the exact same timing as the original.
+/// Fixes missing SGB borders in Tetris DX caused by the game starting too early.
 
-  LD D, $E1    ;16 E1
-  LD E, $AA    ;1E AA
-  DEC DE       ;1B
-  INC D        ;14
-  DEC D        ;15
-  JR NZ, $00F6 ;20 FB
-  LD E, D      ;5A
-  XOR $00      ;EE 00
-
-This allows the rom to finish at nearly the exact same timing as the original boot rom.
-Fixes missing SGB borders in Tetris DX caused by the game starting too early.
-*/
-
+/// <summary>
+/// SGB (Super Game Boy) boot ROM - 256 bytes.
+/// </summary>
+/// <remarks>
+/// Similar to DMG but initializes SGB packet protocol
+/// for SNES communication. Includes timing fix for compatibility.
+/// </remarks>
 uint8_t sgbBootRom[256] = {
     0x31, 0xFE, 0xFF, 0x21, 0x00, 0x80, 0x22, 0xCB, 0x6C, 0x28, 0xFB, 0x3E,
     0x80, 0xE0, 0x26, 0xE0, 0x11, 0x3E, 0xF3, 0xE0, 0x12, 0xE0, 0x25, 0x3E,
@@ -68,6 +102,14 @@ uint8_t sgbBootRom[256] = {
     0x42, 0x3C, 0x16, 0xE1, 0x1E, 0xAA, 0x1B, 0x14, 0x15, 0x20, 0xFB, 0x5A,
     0xEE, 0x00, 0xE0, 0x50};
 
+/// <summary>
+/// SGB2 (Super Game Boy 2) boot ROM - 256 bytes.
+/// </summary>
+/// <remarks>
+/// Nearly identical to SGB, but signals SGB2 hardware
+/// via different register initialization ($FF = SGB2 vs $01 = SGB).
+/// SGB2 runs at correct GB speed (4.194304 MHz).
+/// </remarks>
 uint8_t sgb2BootRom[256] = {
     0x31, 0xFE, 0xFF, 0x21, 0x00, 0x80, 0x22, 0xCB, 0x6C, 0x28, 0xFB, 0x3E,
     0x80, 0xE0, 0x26, 0xE0, 0x11, 0x3E, 0xF3, 0xE0, 0x12, 0xE0, 0x25, 0x3E,
@@ -92,6 +134,17 @@ uint8_t sgb2BootRom[256] = {
     0x42, 0x3C, 0x16, 0xE1, 0x1E, 0xAA, 0x1B, 0x14, 0x15, 0x20, 0xFB, 0x5A,
     0xEE, 0x00, 0xE0, 0x50};
 
+/// <summary>
+/// CGB (Game Boy Color) boot ROM - 2304 bytes.
+/// </summary>
+/// <remarks>
+/// Extended boot ROM with additional functionality:
+/// - Selects color palettes for DMG games (based on hash)
+/// - Displays colorful Nintendo logo animation
+/// - Plays multi-note startup chime
+/// - Initializes CGB-specific hardware (palette RAM, VRAM banks)
+/// - Maps to $0000-$08FF (bank 0 of boot ROM area)
+/// </remarks>
 uint8_t cgbBootRom[2304] = {
     0x31, 0xFE, 0xFF, 0xCD, 0xC8, 0x05, 0x26, 0xFE, 0x0E, 0xA0, 0x22, 0x0D,
     0x20, 0xFC, 0x0E, 0x10, 0x21, 0x30, 0xFF, 0x22, 0x2F, 0x0D, 0x20, 0xFB,
