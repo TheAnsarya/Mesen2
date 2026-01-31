@@ -88,6 +88,18 @@
 		<ClCompile Include="PPU\PpuRenderBench.cpp">
 			<PrecompiledHeader>Use</PrecompiledHeader>
 		</ClCompile>
+		<ClCompile Include="GBA\GbaCpuBench.cpp">
+			<PrecompiledHeader>Use</PrecompiledHeader>
+		</ClCompile>
+		<ClCompile Include="GBA\GbaArmCpuBench.cpp">
+			<PrecompiledHeader>Use</PrecompiledHeader>
+		</ClCompile>
+		<ClCompile Include="Serialization\SerializerBench.cpp">
+			<PrecompiledHeader>Use</PrecompiledHeader>
+		</ClCompile>
+		<ClCompile Include="Audio\AudioDspBench.cpp">
+			<PrecompiledHeader>Use</PrecompiledHeader>
+		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Core\Core.vcxproj">
