@@ -10,6 +10,7 @@ This folder contains development documentation for Mesen2 contributions and cust
 | [Code Documentation Style](CODE-DOCUMENTATION-STYLE.md) | Documentation standards |
 | [C++ Development Guide](CPP-DEVELOPMENT-GUIDE.md) | C++23 coding practices |
 | [Profiling Guide](PROFILING-GUIDE.md) | Performance profiling |
+| [ASan Guide](ASAN-GUIDE.md) | AddressSanitizer memory debugging |
 
 ## 🎮 Emulation Core Documentation
 
