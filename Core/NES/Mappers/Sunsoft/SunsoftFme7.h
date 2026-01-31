@@ -4,23 +4,38 @@
 #include "NES/NesCpu.h"
 #include "NES/Mappers/Audio/Sunsoft5bAudio.h"
 
+/// <summary>
+/// Sunsoft FME-7/5A/5B mapper (iNES mapper 69).
+/// Used by games like Batman: Return of the Joker, Gimmick!, Hebereke.
+/// </summary>
+/// <remarks>
+/// Features:
+/// - 8KB PRG banking (4 switchable banks)
+/// - 1KB CHR banking (8 switchable banks)
+/// - PRG-RAM at $6000-$7FFF (optional battery backup)
+/// - Scanline counter IRQ
+/// - Sunsoft 5B expansion audio (YM2149-compatible, 3 square wave channels)
+///
+/// Banking is command-based: write command to $8000, then data to $A000.
+/// Commands 0-7: CHR banks, 8: PRG-RAM/ROM at $6000, 9-B: PRG banks, C: mirroring.
+/// </remarks>
 class SunsoftFme7 : public BaseMapper {
 private:
-	unique_ptr<Sunsoft5bAudio> _audio;
-	uint8_t _command = 0;
-	uint8_t _workRamValue = 0;
-	bool _irqEnabled = false;
-	bool _irqCounterEnabled = false;
-	uint16_t _irqCounter = 0;
+	unique_ptr<Sunsoft5bAudio> _audio;  ///< Expansion audio (YM2149-style)
+	uint8_t _command = 0;               ///< Current command register (0-15)
+	uint8_t _workRamValue = 0;          ///< $6000-$7FFF configuration
+	bool _irqEnabled = false;           ///< IRQ counter enabled
+	bool _irqCounterEnabled = false;    ///< Counter decrement enabled
+	uint16_t _irqCounter = 0;           ///< 16-bit IRQ counter
 
 protected:
-	uint16_t GetPrgPageSize() override { return 0x2000; }
-	uint16_t GetChrPageSize() override { return 0x400; }
+	uint16_t GetPrgPageSize() override { return 0x2000; }  ///< 8KB PRG pages
+	uint16_t GetChrPageSize() override { return 0x400; }   ///< 1KB CHR pages
 	uint32_t GetWorkRamSize() override { return 0x8000; }
 	uint32_t GetWorkRamPageSize() override { return 0x2000; }
 	uint32_t GetSaveRamSize() override { return 0x8000; }
 	uint32_t GetSaveRamPageSize() override { return 0x2000; }
-	bool EnableCpuClockHook() override { return true; }
+	bool EnableCpuClockHook() override { return true; }  ///< Need clock for IRQ counter
 
 	void InitMapper() override {
 		_audio.reset(new Sunsoft5bAudio(_console));

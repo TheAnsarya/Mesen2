@@ -16,36 +16,81 @@ class GbaMemoryManager;
 class GbaRomPrefetch;
 class Emulator;
 
+/// <summary>
+/// Game Boy Advance CPU emulator - ARM7TDMI implementation.
+/// 32-bit RISC processor with ARM and Thumb instruction sets.
+/// </summary>
+/// <remarks>
+/// The ARM7TDMI is a 32-bit RISC CPU featuring:
+/// - 32-bit data bus and address space (though GBA uses 24-bit addressing)
+/// - 16 general-purpose 32-bit registers (R0-R15)
+/// - Special registers: R13 (SP), R14 (LR), R15 (PC)
+/// - Current Program Status Register (CPSR) with condition flags
+/// - Saved PSR (SPSR) for exception handling
+///
+/// **Instruction Sets:**
+/// - **ARM**: 32-bit instructions, full feature set
+/// - **Thumb**: 16-bit compressed instructions, subset of ARM
+/// - Mode switching via BX instruction (bit 0 of target address)
+///
+/// **Processor Modes:**
+/// - User (USR): Normal execution
+/// - FIQ: Fast interrupt (banked R8-R14)
+/// - IRQ: Normal interrupt (banked R13-R14)
+/// - Supervisor (SVC): Software interrupt
+/// - Abort (ABT): Memory access violation
+/// - Undefined (UND): Undefined instruction
+/// - System (SYS): Privileged user mode
+///
+/// **Condition Codes (CPSR N/Z/C/V):**
+/// - All ARM instructions can be conditionally executed
+/// - 16 condition codes: EQ, NE, CS, CC, MI, PL, VS, VC, HI, LS, GE, LT, GT, LE, AL, NV
+///
+/// **GBA-Specific Features:**
+/// - 16.78 MHz clock (4x original GB)
+/// - ROM prefetch buffer for sequential access
+/// - Wait states for different memory regions
+/// - LDM glitch: Register banking edge case
+///
+/// **Memory Timing:**
+/// - Internal work RAM: 1 cycle
+/// - External work RAM: 2-3 cycles
+/// - ROM: 3-8 cycles (depending on wait states)
+/// - ROM prefetch reduces sequential access penalty
+/// </remarks>
 class GbaCpu : public ISerializable {
 private:
-	uint32_t _opCode = 0;
-	GbaCpuState _state = {};
-	uint8_t _ldmGlitch = 0;
-	bool _hasPendingIrq = false;
+	uint32_t _opCode = 0;          ///< Current instruction being executed
+	GbaCpuState _state = {};       ///< CPU registers, flags, and mode
+	uint8_t _ldmGlitch = 0;        ///< LDM register banking glitch state
+	bool _hasPendingIrq = false;   ///< Interrupt request pending
 
-	GbaMemoryManager* _memoryManager = nullptr;
-	GbaRomPrefetch* _prefetch = nullptr;
-	Emulator* _emu = nullptr;
+	GbaMemoryManager* _memoryManager = nullptr;  ///< Memory bus interface
+	GbaRomPrefetch* _prefetch = nullptr;         ///< ROM prefetch buffer
+	Emulator* _emu = nullptr;                    ///< Emulator for debugger hooks
 
 	typedef void (GbaCpu::*Func)();
-	static Func _armTable[0x1000];
-	static Func _thumbTable[0x100];
-	static ArmOpCategory _armCategory[0x1000];
-	static GbaThumbOpCategory _thumbCategory[0x100];
+	static Func _armTable[0x1000];      ///< ARM instruction decoder table (12-bit index)
+	static Func _thumbTable[0x100];     ///< Thumb instruction decoder table (8-bit index)
+	static ArmOpCategory _armCategory[0x1000];        ///< ARM instruction categories for debugger
+	static GbaThumbOpCategory _thumbCategory[0x100];  ///< Thumb instruction categories
 
+	// ALU operations with flag handling
 	uint32_t Add(uint32_t op1, uint32_t op2, bool carry, bool updateFlags);
 	uint32_t Sub(uint32_t op1, uint32_t op2, bool carry, bool updateFlags);
 	uint32_t LogicalOp(uint32_t result, bool carry, bool updateFlags);
 
+	// Barrel shifter operations
 	uint32_t RotateRight(uint32_t value, uint32_t shift);
 	uint32_t RotateRight(uint32_t value, uint32_t shift, bool& carry);
 
-	uint32_t ShiftLsl(uint32_t value, uint8_t shift, bool& carry);
-	uint32_t ShiftLsr(uint32_t value, uint8_t shift, bool& carry);
-	uint32_t ShiftAsr(uint32_t value, uint8_t shift, bool& carry);
-	uint32_t ShiftRor(uint32_t value, uint8_t shift, bool& carry);
-	uint32_t ShiftRrx(uint32_t value, bool& carry);
+	uint32_t ShiftLsl(uint32_t value, uint8_t shift, bool& carry);  ///< Logical shift left
+	uint32_t ShiftLsr(uint32_t value, uint8_t shift, bool& carry);  ///< Logical shift right
+	uint32_t ShiftAsr(uint32_t value, uint8_t shift, bool& carry);  ///< Arithmetic shift right
+	uint32_t ShiftRor(uint32_t value, uint8_t shift, bool& carry);  ///< Rotate right
+	uint32_t ShiftRrx(uint32_t value, bool& carry);                 ///< Rotate right extended (through carry)
 
+	/// Read register (ARM mode) - handles LDM glitch for user mode register access
 	__forceinline uint32_t R(uint8_t reg) {
 		// Used for ARM mode, which can trigger the LDM^ glitch
 		if (_ldmGlitch == 0 || reg == 15 || reg < 8) {
@@ -55,11 +100,13 @@ private:
 		return _state.R[reg] | _state.UserRegs[reg - 8];
 	}
 
+	/// Read register (Thumb mode) - LDM glitch not possible
 	__forceinline uint32_t RT(uint8_t reg) {
 		// Thumb mode can't trigger the LDM glitch
 		return _state.R[reg];
 	}
 
+	/// Write register - handles PC writes triggering pipeline reload
 	void SetR(uint8_t reg, uint32_t value) {
 		_state.R[reg] = value;
 		if (reg == 15) {
@@ -67,9 +114,10 @@ private:
 		}
 	}
 
-	GbaCpuFlags& GetSpsr();
+	GbaCpuFlags& GetSpsr();  ///< Get current mode's saved PSR
 	void SetStatusFlags(bool writeToSpsr, uint8_t mask, uint32_t value);
 
+	// ARM instruction implementations
 	static void InitArmOpTable();
 	void ArmBranchExchangeRegister();
 	void ArmBranch();

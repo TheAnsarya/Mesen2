@@ -44,43 +44,93 @@ enum class EventType;
 enum class MemoryOperationType;
 enum class EvalResultType : int32_t;
 
+/// <summary>Per-CPU debugger context with expression evaluator</summary>
 struct CpuInfo {
-	unique_ptr<IDebugger> Debugger;
-	unique_ptr<ExpressionEvaluator> Evaluator;
+	unique_ptr<IDebugger> Debugger;        ///< CPU-specific debugger (breakpoints, stepping)
+	unique_ptr<ExpressionEvaluator> Evaluator; ///< Watch/conditional expression evaluator
 };
 
+/// <summary>
+/// Central debugger coordinator for all emulated systems.
+/// Manages breakpoints, watches, disassembly, memory inspection, and scripting.
+/// </summary>
+/// <remarks>
+/// The Debugger provides comprehensive debugging capabilities:
+///
+/// **Per-CPU Debugging (IDebugger):**
+/// - Breakpoints (execution, read, write, IRQ/NMI)
+/// - Step in/out/over with proper call stack tracking
+/// - Register inspection and modification
+/// - Disassembly with labels and comments
+///
+/// **Memory Tools:**
+/// - MemoryDumper: Read/write any memory region
+/// - MemoryAccessCounter: Track read/write/execute access patterns
+/// - FrozenAddressManager: Freeze memory values
+/// - CodeDataLogger: Mark code vs data regions
+///
+/// **Analysis Tools:**
+/// - Disassembler: Multi-CPU disassembly with auto-detection
+/// - LabelManager: Symbol/label database
+/// - CallstackManager: Track function calls and returns
+/// - CdlManager: Import/export CDL files for other tools
+///
+/// **Scripting:**
+/// - ScriptManager: Lua script execution
+/// - Event callbacks for memory access, frame, etc.
+/// - Input automation for TAS
+///
+/// **Trace Logging:**
+/// - Per-instruction logging with configurable format
+/// - File output with TraceLogFileSaver
+/// - Memory access logging
+///
+/// **Threading Model:**
+/// - Debugger hooks called from emulation thread
+/// - _executionStopped: Pauses emulation for inspection
+/// - _breakRequestCount: Pending break requests from UI
+/// - _suspendRequestCount: Temporary suspension (stepping)
+///
+/// **Template Methods:**
+/// ProcessMemoryRead/Write: Called on every memory access
+/// - Template on CpuType for zero-overhead when not debugging
+/// - Checks breakpoints, updates access counters, logs traces
+/// </remarks>
 class Debugger {
 private:
-	Emulator* _emu = nullptr;
-	IConsole* _console = nullptr;
+	Emulator* _emu = nullptr;      ///< Parent emulator
+	IConsole* _console = nullptr;  ///< Current console instance
 
 	EmuSettings* _settings = nullptr;
 
+	/// Per-CPU debugger instances (indexed by CpuType)
 	CpuInfo _debuggers[(int)DebugUtilities::GetLastCpuType() + 1];
 
-	CpuType _mainCpuType = CpuType::Snes;
-	unordered_set<CpuType> _cpuTypes;
+	CpuType _mainCpuType = CpuType::Snes;     ///< Primary CPU for this console
+	unordered_set<CpuType> _cpuTypes;          ///< All CPUs in current console
 	ConsoleType _consoleType = ConsoleType::Snes;
 
-	unique_ptr<ScriptManager> _scriptManager;
-	unique_ptr<MemoryDumper> _memoryDumper;
-	unique_ptr<MemoryAccessCounter> _memoryAccessCounter;
-	unique_ptr<CodeDataLogger> _codeDataLogger;
-	unique_ptr<Disassembler> _disassembler;
-	unique_ptr<DisassemblySearch> _disassemblySearch;
-	unique_ptr<LabelManager> _labelManager;
-	unique_ptr<CdlManager> _cdlManager;
+	// Debugging subsystems
+	unique_ptr<ScriptManager> _scriptManager;           ///< Lua script execution
+	unique_ptr<MemoryDumper> _memoryDumper;             ///< Memory read/write access
+	unique_ptr<MemoryAccessCounter> _memoryAccessCounter; ///< Access pattern tracking
+	unique_ptr<CodeDataLogger> _codeDataLogger;         ///< Code/data classification
+	unique_ptr<Disassembler> _disassembler;             ///< Multi-CPU disassembly
+	unique_ptr<DisassemblySearch> _disassemblySearch;   ///< Search disassembly
+	unique_ptr<LabelManager> _labelManager;             ///< Symbol/label database
+	unique_ptr<CdlManager> _cdlManager;                 ///< CDL file management
 
-	unique_ptr<TraceLogFileSaver> _traceLogSaver;
+	unique_ptr<TraceLogFileSaver> _traceLogSaver;       ///< Trace log file output
 
 	SimpleLock _logLock;
-	std::list<string> _debuggerLog;
+	std::list<string> _debuggerLog;  ///< Debug message log
 
-	atomic<bool> _executionStopped;
-	atomic<uint32_t> _breakRequestCount;
-	atomic<uint32_t> _suspendRequestCount;
+	// Execution control
+	atomic<bool> _executionStopped;       ///< Emulation paused for debugging
+	atomic<uint32_t> _breakRequestCount;  ///< Pending break requests
+	atomic<uint32_t> _suspendRequestCount; ///< Temporary suspensions
 
-	DebugControllerState _inputOverrides[8] = {};
+	DebugControllerState _inputOverrides[8] = {};  ///< Controller input overrides
 
 	bool _waitForBreakResume = false;
 
@@ -88,6 +138,7 @@ private:
 
 	__noinline bool ProcessStepBack(IDebugger* debugger);
 
+	// Template helpers for CPU-specific operations
 	template <CpuType type, typename DebuggerType>
 	DebuggerType* GetDebugger();
 	template <CpuType type>

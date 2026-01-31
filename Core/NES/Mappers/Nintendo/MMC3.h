@@ -7,31 +7,60 @@
 #include "NES/NesCpu.h"
 #include "NES/BaseNesPpu.h"
 
+/// <summary>
+/// Nintendo MMC3 mapper (iNES mapper 4) - Most common NES mapper.
+/// Used by hundreds of games including SMB3, Mega Man 3-6, Double Dragon II/III.
+/// </summary>
+/// <remarks>
+/// Features:
+/// - 8KB switchable PRG-ROM (2 banks), 8KB fixed to second-to-last
+/// - 1KB/2KB switchable CHR-ROM (6 banks total)
+/// - Scanline counter IRQ (A12 rising edge detection)
+/// - Horizontal/vertical mirroring control
+/// - Optional 8KB PRG-RAM with write protection
+///
+/// **Banking Modes (controlled by $8000 bit 6 and 7):**
+/// - PRG mode 0: $8000-$9FFF swappable, $C000-$DFFF fixed to second-last
+/// - PRG mode 1: $C000-$DFFF swappable, $8000-$9FFF fixed to second-last
+/// - CHR mode 0: 2KB banks at $0000/$0800, 1KB banks at $1000-$1C00
+/// - CHR mode 1: 2KB banks at $1000/$1800, 1KB banks at $0000-$0C00
+///
+/// **IRQ Operation:**
+/// Counter decrements on A12 rising edge (sprite/BG fetch transition).
+/// When counter reaches 0 with IRQs enabled, IRQ is asserted.
+/// Write to $C000 sets reload value, $C001 triggers reload, $E000 disables, $E001 enables.
+///
+/// **Revisions:**
+/// - MMC3A: Counter reload behavior differs (reload on $C001 or when counter=0)
+/// - MMC3B/C: Standard reload behavior
+/// - Sharp MMC3B: Same as MMC3B
+/// - MMC6: Adds PRG-RAM enable bits per 1KB
+/// </remarks>
 class MMC3 : public BaseMapper {
 private:
-	uint8_t _currentRegister = 0;
+	uint8_t _currentRegister = 0;  ///< Bank register to write (0-7)
 
-	bool _wramEnabled = false;
-	bool _wramWriteProtected = false;
+	bool _wramEnabled = false;        ///< PRG-RAM at $6000-$7FFF enabled
+	bool _wramWriteProtected = false; ///< PRG-RAM write-protected
 
-	uint64_t _a12LowClock = 0;
+	uint64_t _a12LowClock = 0;  ///< Last cycle A12 was low (IRQ edge detection)
 
-	bool _forceMmc3RevAIrqs = false;
+	bool _forceMmc3RevAIrqs = false;  ///< Use MMC3A IRQ behavior
 
 	struct Mmc3State {
-		uint8_t Reg8000;
-		uint8_t RegA000;
-		uint8_t RegA001;
+		uint8_t Reg8000;  ///< Control register (bank select, modes)
+		uint8_t RegA000;  ///< Mirroring register
+		uint8_t RegA001;  ///< PRG-RAM protect register
 	} _state = {};
 
 protected:
-	uint8_t _irqReloadValue = 0;
-	uint8_t _irqCounter = 0;
-	bool _irqReload = false;
-	bool _irqEnabled = false;
-	uint8_t _prgMode = 0;
-	uint8_t _chrMode = 0;
-	uint8_t _registers[8] = {};
+	uint8_t _irqReloadValue = 0;  ///< IRQ counter reload value ($C000)
+	uint8_t _irqCounter = 0;      ///< Current IRQ counter
+	bool _irqReload = false;      ///< Reload counter on next clock
+	bool _irqEnabled = false;     ///< IRQ generation enabled
+	uint8_t _prgMode = 0;         ///< PRG banking mode (0 or 1)
+	uint8_t _chrMode = 0;         ///< CHR banking mode (0 or 1)
+	uint8_t _registers[8] = {};   ///< Bank registers R0-R7
 
 	uint8_t GetCurrentRegister() {
 		return _currentRegister;
@@ -45,6 +74,7 @@ protected:
 		return _chrMode;
 	}
 
+	/// Initialize MMC3 state with power-on values
 	void ResetMmc3() {
 		_state.Reg8000 = GetPowerOnByte();
 		_state.RegA000 = GetPowerOnByte();
@@ -75,6 +105,7 @@ protected:
 
 	virtual bool ForceMmc3RevAIrqs() { return _forceMmc3RevAIrqs; }
 
+	/// Update nametable mirroring based on $A000 register
 	virtual void UpdateMirroring() {
 		if (GetMirroringType() != MirroringType::FourScreens) {
 			SetMirroringType(((_state.RegA000 & 0x01) == 0x01) ? MirroringType::Horizontal : MirroringType::Vertical);

@@ -16,51 +16,89 @@ class NesMemoryManager;
 class DummyNesCpu;
 class Emulator;
 
+/// <summary>
+/// NES CPU emulator - Ricoh 2A03/2A07 (6502 variant) implementation.
+/// Cycle-accurate emulation including DMA, IRQ timing, and all undocumented opcodes.
+/// </summary>
+/// <remarks>
+/// The 2A03 (NTSC) / 2A07 (PAL) is a modified MOS 6502:
+/// - 8-bit data bus, 16-bit address space (64KB)
+/// - 6 8-bit registers: A (accumulator), X, Y (index), S (stack), P (status), PC (16-bit)
+/// - 256-byte stack at $0100-$01FF
+/// - Decimal mode disabled (BCD flag ignored)
+/// - Integrated APU (Audio Processing Unit)
+///
+/// **Memory Map:**
+/// - $0000-$07FF: 2KB internal RAM (mirrored 4x to $1FFF)
+/// - $2000-$2007: PPU registers (mirrored every 8 bytes to $3FFF)
+/// - $4000-$4017: APU and I/O registers
+/// - $4018-$FFFF: Cartridge space (PRG ROM/RAM)
+///
+/// **Interrupts:**
+/// - NMI ($FFFA): Non-maskable, triggered by PPU V-blank
+/// - RESET ($FFFC): Power-on/reset vector
+/// - IRQ/BRK ($FFFE): Maskable interrupt / software breakpoint
+///
+/// **DMA:**
+/// - Sprite DMA ($4014): Copies 256 bytes to OAM, halts CPU for 513-514 cycles
+/// - DMC DMA: APU delta modulation fetches, halts CPU for 4 cycles each
+///
+/// **Timing:**
+/// - NTSC: 1.789773 MHz (341 PPU dots per 113.67 CPU cycles)
+/// - PAL: 1.662607 MHz (341 PPU dots per 106.56 CPU cycles)
+/// - Dendy: 1.773448 MHz
+///
+/// **Undocumented Opcodes:**
+/// All unofficial opcodes are emulated for compatibility with unlicensed games.
+/// </remarks>
 class NesCpu : public ISerializable {
 public:
-	static constexpr uint16_t NMIVector = 0xFFFA;
-	static constexpr uint16_t ResetVector = 0xFFFC;
-	static constexpr uint16_t IRQVector = 0xFFFE;
+	static constexpr uint16_t NMIVector = 0xFFFA;    ///< Non-maskable interrupt vector
+	static constexpr uint16_t ResetVector = 0xFFFC; ///< Reset/power-on vector
+	static constexpr uint16_t IRQVector = 0xFFFE;   ///< IRQ/BRK vector
 
 private:
-	typedef void (NesCpu::*Func)();
+	typedef void (NesCpu::*Func)();  ///< Instruction handler function pointer
 
-	uint64_t _masterClock;
-	uint8_t _ppuOffset;
-	uint8_t _startClockCount;
-	uint8_t _endClockCount;
-	uint16_t _operand;
+	uint64_t _masterClock;        ///< Master clock counter
+	uint8_t _ppuOffset;           ///< PPU alignment offset (NTSC/PAL timing)
+	uint8_t _startClockCount;     ///< Cycles at instruction start
+	uint8_t _endClockCount;       ///< Cycles at instruction end
+	uint16_t _operand;            ///< Current instruction operand address
 
-	Func _opTable[256];
-	NesAddrMode _addrMode[256];
-	NesAddrMode _instAddrMode;
+	Func _opTable[256];                ///< Opcode handler table (all 256 opcodes)
+	NesAddrMode _addrMode[256];        ///< Addressing mode per opcode
+	NesAddrMode _instAddrMode;         ///< Current instruction's addressing mode
 
-	bool _needHalt = false;
-	bool _spriteDmaTransfer = false;
-	bool _dmcDmaRunning = false;
-	bool _abortDmcDma = false;
-	bool _needDummyRead = false;
-	uint8_t _spriteDmaOffset;
+	// DMA state
+	bool _needHalt = false;            ///< CPU halt requested (DMA pending)
+	bool _spriteDmaTransfer = false;   ///< Sprite OAM DMA in progress
+	bool _dmcDmaRunning = false;       ///< DMC sample fetch in progress
+	bool _abortDmcDma = false;         ///< Cancel DMC DMA (register write)
+	bool _needDummyRead = false;       ///< DMA alignment dummy read needed
+	uint8_t _spriteDmaOffset;          ///< Current OAM DMA byte offset
 
-	bool _cpuWrite = false;
+	bool _cpuWrite = false;            ///< Currently in write cycle (for DMC DMA timing)
 
-	uint8_t _irqMask;
+	uint8_t _irqMask;                  ///< IRQ source enable mask
 
-	NesCpuState _state;
-	NesConsole* _console;
-	NesMemoryManager* _memoryManager;
-	Emulator* _emu;
+	NesCpuState _state;                ///< CPU registers (A, X, Y, SP, PC, P)
+	NesConsole* _console;              ///< Parent console
+	NesMemoryManager* _memoryManager;  ///< Memory bus interface
+	Emulator* _emu;                    ///< Emulator for debugger hooks
 
-	bool _prevRunIrq = false;
-	bool _runIrq = false;
+	// Interrupt edge detection
+	bool _prevRunIrq = false;          ///< Previous IRQ state
+	bool _runIrq = false;              ///< IRQ pending this cycle
 
-	bool _prevNmiFlag = false;
-	bool _prevNeedNmi = false;
-	bool _needNmi = false;
+	bool _prevNmiFlag = false;         ///< Previous NMI line state
+	bool _prevNeedNmi = false;         ///< Previous NMI pending
+	bool _needNmi = false;             ///< NMI pending
 
-	uint64_t _hideCrashWarning = 0;
-	bool _isDmcDmaRead = false;
+	uint64_t _hideCrashWarning = 0;    ///< Suppress crash warning until this cycle
+	bool _isDmcDmaRead = false;        ///< Current read is DMC DMA
 
+	// Cycle-accurate execution helpers
 	__forceinline void StartCpuCycle(bool forRead);
 	__forceinline void ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType);
 	uint8_t ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool enableInternalRegReads, bool isNesBehavior);
@@ -68,12 +106,14 @@ private:
 	__forceinline void EndCpuCycle(bool forRead);
 	void IRQ();
 
+	/// Fetch opcode at PC and increment PC
 	uint8_t GetOPCode() {
 		uint8_t opCode = MemoryRead(_state.PC, MemoryOperationType::ExecOpCode);
 		_state.PC++;
 		return opCode;
 	}
 
+	/// Perform dummy read at PC (consumed cycle, value discarded)
 	void DummyRead() {
 		MemoryRead(_state.PC, MemoryOperationType::DummyRead);
 	}

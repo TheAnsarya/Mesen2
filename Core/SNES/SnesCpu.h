@@ -16,68 +16,108 @@ class SnesDmaController;
 class SnesConsole;
 class Emulator;
 
+/// <summary>
+/// SNES 65816 CPU emulator - Ricoh 5A22 implementation.
+/// Cycle-accurate emulation of the 16-bit CPU with 24-bit address space.
+/// </summary>
+/// <remarks>
+/// The 65816 is a 16-bit extension of the 6502 with:
+/// - 24-bit address bus (16MB address space)
+/// - 16-bit accumulator and index registers (switchable to 8-bit)
+/// - Direct page relocatable anywhere in bank 0
+/// - Program bank (PBR) and data bank (DBR) registers
+/// - Stack relocatable anywhere in bank 0
+/// - Native and emulation modes (6502 compatibility)
+///
+/// **Key Features:**
+/// - **Memory Modes**: 8/16-bit accumulator (M flag), 8/16-bit index (X flag)
+/// - **Address Modes**: 24 addressing modes including long addressing
+/// - **Block Moves**: MVN/MVP for efficient memory copy
+/// - **Coprocessor Support**: Interface for SA-1, Super FX, DSP chips
+///
+/// **Interrupt Vectors (Native Mode):**
+/// - NMI: $00FFEA (triggered by PPU V-blank)
+/// - IRQ: $00FFEE (hardware/software interrupts)
+/// - BRK: $00FFE6 (software breakpoint)
+/// - COP: $00FFE4 (coprocessor instruction)
+///
+/// **DMA Integration:**
+/// - CPU halts during DMA transfers
+/// - HDMA runs during H-blank
+///
+/// **Performance Notes:**
+/// - Uses DUMMYCPU define for trace/debug builds with additional hooks
+/// - __forceinline on critical paths (ProcessCpuCycle, memory access)
+/// </remarks>
 class SnesCpu : public ISerializable {
 private:
-	static constexpr uint32_t NmiVector = 0x00FFEA;
-	static constexpr uint32_t ResetVector = 0x00FFFC;
-	static constexpr uint32_t IrqVector = 0x00FFEE;
-	static constexpr uint32_t AbortVector = 0x00FFE8;
-	static constexpr uint32_t BreakVector = 0x00FFE6;
-	static constexpr uint32_t CoprocessorVector = 0x00FFE4;
+	// Interrupt vectors (native mode - 24-bit addresses)
+	static constexpr uint32_t NmiVector = 0x00FFEA;       ///< Non-maskable interrupt (V-blank)
+	static constexpr uint32_t ResetVector = 0x00FFFC;     ///< Reset vector (startup)
+	static constexpr uint32_t IrqVector = 0x00FFEE;       ///< Interrupt request
+	static constexpr uint32_t AbortVector = 0x00FFE8;     ///< Abort (not used on SNES)
+	static constexpr uint32_t BreakVector = 0x00FFE6;     ///< BRK instruction
+	static constexpr uint32_t CoprocessorVector = 0x00FFE4; ///< COP instruction
 
+	// Legacy vectors (emulation mode - 16-bit addresses in bank 0)
 	static constexpr uint16_t LegacyNmiVector = 0xFFFA;
 	static constexpr uint32_t LegacyIrqVector = 0xFFFE;
 	static constexpr uint32_t LegacyCoprocessorVector = 0x00FFF4;
 
-	typedef void (SnesCpu::*Func)();
+	typedef void (SnesCpu::*Func)();  ///< Instruction handler function pointer
 
-	SnesMemoryManager* _memoryManager = nullptr;
-	SnesDmaController* _dmaController = nullptr;
-	Emulator* _emu = nullptr;
-	SnesConsole* _console = nullptr;
+	SnesMemoryManager* _memoryManager = nullptr;  ///< Memory mapping and bus access
+	SnesDmaController* _dmaController = nullptr;  ///< DMA/HDMA controller
+	Emulator* _emu = nullptr;                     ///< Emulator for debugger hooks
+	SnesConsole* _console = nullptr;              ///< Parent console
 
-	bool _immediateMode = false;
-	uint32_t _readWriteMask = 0xFFFFFF;
+	bool _immediateMode = false;      ///< Current instruction uses immediate operand
+	uint32_t _readWriteMask = 0xFFFFFF; ///< Address mask (24-bit)
 
-	SnesCpuState _state = {};
-	uint32_t _operand = 0;
-	bool _waiOver = true;
+	SnesCpuState _state = {};  ///< CPU registers and flags
+	uint32_t _operand = 0;     ///< Current instruction operand
+	bool _waiOver = true;      ///< WAI instruction complete (interrupt received)
 
+	/// Get full 24-bit address for program access (PBR:addr)
 	uint32_t GetProgramAddress(uint16_t addr);
+	/// Get full 24-bit address for data access (DBR:addr)
 	uint32_t GetDataAddress(uint16_t addr);
 
+	/// Calculate direct page address with optional emulation mode wrap
 	uint16_t GetDirectAddress(uint16_t offset, bool allowEmulationMode = true);
 
+	/// Indirect addressing helpers
 	uint16_t GetDirectAddressIndirectWord(uint16_t offset);
 	uint16_t GetDirectAddressIndirectWordWithPageWrap(uint16_t offset);
 	uint32_t GetDirectAddressIndirectLong(uint16_t offset);
 
-	uint8_t GetOpCode();
+	uint8_t GetOpCode();       ///< Fetch opcode at PC
+	uint16_t GetResetVector(); ///< Get reset vector based on mode
 
-	uint16_t GetResetVector();
+	void ProcessCpuCycle();  ///< Called each master clock cycle
 
-	void ProcessCpuCycle();
+	// Cycle timing helpers
+	void Idle();                                    ///< Consume a cycle doing nothing
+	void IdleOrDummyWrite(uint32_t addr, uint8_t value); ///< Idle or dummy write (RMW)
+	void IdleOrRead();                              ///< Idle or dummy read
+	void IdleEndJump();                             ///< Extra cycle at end of jump
+	void IdleTakeBranch();                          ///< Extra cycle when branch taken
 
-	void Idle();
-	void IdleOrDummyWrite(uint32_t addr, uint8_t value);
-	void IdleOrRead();
-	void IdleEndJump();
-	void IdleTakeBranch();
+	// Operand fetch
+	uint8_t ReadOperandByte();   ///< Read 8-bit immediate operand
+	uint16_t ReadOperandWord();  ///< Read 16-bit immediate operand
+	uint32_t ReadOperandLong();  ///< Read 24-bit immediate operand
 
-	uint8_t ReadOperandByte();
-	uint16_t ReadOperandWord();
-	uint32_t ReadOperandLong();
+	uint16_t ReadVector(uint16_t vector);  ///< Read interrupt vector
 
-	uint16_t ReadVector(uint16_t vector);
+	uint8_t Read(uint32_t addr, MemoryOperationType type);  ///< Memory read with type
 
-	uint8_t Read(uint32_t addr, MemoryOperationType type);
+	void SetSP(uint16_t sp, bool allowEmulationMode = true);  ///< Set stack pointer
+	__forceinline void RestrictStackPointerValue();           ///< Enforce SP constraints
+	void SetPS(uint8_t ps);  ///< Set processor status register
 
-	void SetSP(uint16_t sp, bool allowEmulationMode = true);
-	__forceinline void RestrictStackPointerValue();
-	void SetPS(uint8_t ps);
-
-	void SetRegister(uint8_t& reg, uint8_t value);
-	void SetRegister(uint16_t& reg, uint16_t value, bool eightBitMode);
+	void SetRegister(uint8_t& reg, uint8_t value);                    ///< Set 8-bit register
+	void SetRegister(uint16_t& reg, uint16_t value, bool eightBitMode); ///< Set 16-bit register
 
 	void SetZeroNegativeFlags(uint16_t value);
 	void SetZeroNegativeFlags(uint8_t value);
