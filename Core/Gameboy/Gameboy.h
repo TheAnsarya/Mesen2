@@ -20,9 +20,55 @@ class SuperGameboy;
 class VirtualFile;
 class BaseControlManager;
 
+/// <summary>
+/// Game Boy / Game Boy Color console emulator.
+/// Implements the complete GB/GBC hardware including Super Game Boy support.
+/// </summary>
+/// <remarks>
+/// **System Variants:**
+/// - **Game Boy (DMG)**: Original monochrome handheld
+/// - **Game Boy Pocket (MGB)**: Lighter, improved screen
+/// - **Super Game Boy (SGB/SGB2)**: SNES adapter with borders and palettes
+/// - **Game Boy Color (CGB)**: Color display, faster CPU mode
+///
+/// **Hardware Specifications:**
+/// - **CPU**: Sharp LR35902 (Z80/8080 hybrid)
+///   - Normal: 4.194304 MHz
+///   - CGB Double Speed: 8.388608 MHz
+/// - **Display**: 160×144 pixels
+///   - DMG: 4 shades of green
+///   - CGB: 32768 colors (56 on screen)
+/// - **Memory**: 8KB WRAM (DMG) / 32KB WRAM (CGB)
+/// - **VRAM**: 8KB (DMG) / 16KB banked (CGB)
+///
+/// **Video Features:**
+/// - 1 background layer (256×256 tilemap)
+/// - 1 window layer (overlay)
+/// - 40 sprites (10 per scanline limit)
+/// - CGB: Tile attributes, VRAM banking
+///
+/// **Audio:**
+/// - 4 sound channels
+///   - 2 square wave (channel 1 has sweep)
+///   - 1 programmable wave
+///   - 1 noise (LFSR)
+/// - Stereo output with panning
+///
+/// **Mappers (MBC):**
+/// - MBC1, MBC2, MBC3 (RTC), MBC5, MBC6, MBC7 (accelerometer)
+/// - HuC1, HuC3, TAMA5, Pocket Camera, and more
+///
+/// **Super Game Boy Features:**
+/// - Custom color palettes
+/// - Border graphics
+/// - SNES controller multiplayer
+/// </remarks>
 class Gameboy final : public IConsole {
 private:
+	/// <summary>OAM/Sprite RAM size (160 bytes = 40 sprites × 4 bytes).</summary>
 	static constexpr int SpriteRamSize = 0xA0;
+
+	/// <summary>High RAM (HRAM) size at $FF80-$FFFE (127 bytes).</summary>
 	static constexpr int HighRamSize = 0x7F;
 
 	Emulator* _emu = nullptr;

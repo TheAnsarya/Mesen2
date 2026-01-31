@@ -29,6 +29,28 @@ enum class ConsoleRegion;
 enum class GameInputType;
 enum class GameSystem;
 
+/// <summary>
+/// NES (Nintendo Entertainment System) console emulator.
+/// Implements the complete NES hardware: CPU, PPU, APU, and memory system.
+/// </summary>
+/// <remarks>
+/// Supports multiple NES variants:
+/// - **Famicom/NES**: Standard console with cartridge-based games
+/// - **Famicom Disk System**: Disk-based add-on for Famicom
+/// - **VS System**: Arcade hardware with dual-screen support
+/// - **NSF Player**: Nintendo Sound Format music playback
+///
+/// **Hardware Components:**
+/// - **CPU**: Ricoh 2A03 (NTSC) / 2A07 (PAL) - 6502 variant @ 1.79/1.66 MHz
+/// - **PPU**: Picture Processing Unit - 256×240 @ 60/50 Hz
+/// - **APU**: Audio Processing Unit - 5 channels (2 pulse, triangle, noise, DMC)
+/// - **Mappers**: Over 300 cartridge mapper implementations
+///
+/// **Extended Features:**
+/// - HD packs for enhanced graphics and audio
+/// - Overclocking for reduced slowdown
+/// - Sprite limit removal
+/// </remarks>
 class NesConsole final : public IConsole {
 private:
 	Emulator* _emu = nullptr;

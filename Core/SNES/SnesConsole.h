@@ -42,6 +42,35 @@ enum class EventType;
 enum class ConsoleRegion;
 enum class ConsoleType;
 
+/// <summary>
+/// SNES (Super Nintendo Entertainment System) console emulator.
+/// Implements the complete SNES hardware including all coprocessors.
+/// </summary>
+/// <remarks>
+/// Supports multiple SNES variants:
+/// - **SNES/Super Famicom**: Standard 16-bit console
+/// - **SPC Player**: SNES audio file playback
+/// - **Game Boy Player**: Super Game Boy emulation
+///
+/// **Hardware Components:**
+/// - **CPU**: Ricoh 5A22 (65816) @ 3.58 MHz (max), 1.79/2.68/3.58 MHz regions
+/// - **PPU**: S-PPU1/S-PPU2 - Up to 512×478 (hi-res interlaced)
+/// - **SPC700**: Sony audio processor @ 1.024 MHz with DSP
+/// - **DMA/HDMA**: 8-channel DMA controller with H-blank DMA
+///
+/// **Coprocessor Support:**
+/// - SA-1: 10.74 MHz 65816 accelerator
+/// - Super FX (GSU): 3D polygon processor
+/// - DSP-1/2/3/4: Math coprocessors
+/// - Cx4: Capcom's custom chip (wireframe 3D)
+/// - SPC7110: Decompression chip
+/// - ST010/ST011: AI chips (racing games)
+///
+/// **Extended Features:**
+/// - MSU-1: CD-quality audio streaming
+/// - Satellaview BS-X support
+/// - Sufami Turbo support
+/// </remarks>
 class SnesConsole final : public IConsole {
 private:
 	unique_ptr<SnesCpu> _cpu;

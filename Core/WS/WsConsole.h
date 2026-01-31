@@ -16,6 +16,40 @@ class WsDmaController;
 class WsEeprom;
 enum class WsModel : uint8_t;
 
+/// <summary>
+/// WonderSwan / WonderSwan Color console emulator.
+/// Implements Bandai's handheld console with portrait/landscape display rotation.
+/// </summary>
+/// <remarks>
+/// **System Variants:**
+/// - **WonderSwan**: Original monochrome (8 shades)
+/// - **WonderSwan Color**: 241 colors on screen from 4096 palette
+/// - **SwanCrystal**: Improved WonderSwan Color with TFT display
+///
+/// **Hardware Specifications:**
+/// - **CPU**: NEC V30MZ (80186 compatible) @ 3.072 MHz
+/// - **Display**: 224×144 pixels (rotatable)
+/// - **Memory**: 16KB internal RAM (64KB on Color)
+/// - **Storage**: EEPROM for saves (internal + cartridge)
+///
+/// **Video Features:**
+/// - 4 background layers with scrolling
+/// - 128 sprites
+/// - Wavetable-based sound with 4 channels
+/// - Portrait/landscape screen rotation
+///
+/// **Audio:**
+/// - 4 wavetable channels (32 samples each)
+/// - Channel 2: Optional PCM voice mode
+/// - Channel 3: Optional frequency sweep
+/// - Channel 4: Optional noise mode
+/// - HyperVoice: DMA-driven 8-bit PCM (Color only)
+///
+/// **Unique Features:**
+/// - Orientation sensor for automatic screen rotation
+/// - Low power consumption design
+/// - Cartridge EEPROM for saves
+/// </remarks>
 class WsConsole final : public IConsole {
 private:
 	Emulator* _emu = nullptr;
