@@ -21,14 +21,15 @@
 #include "Utilities/Serializer.h"
 #include "Utilities/StaticFor.h"
 
+// Initialize GBA PPU state and memory references
 void GbaPpu::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryManager) {
 	_emu = emu;
 	_console = console;
 	_memoryManager = memoryManager;
 
 	_state = {};
-	_state.Scanline = 225;
-	_state.Cycle = 0;
+	_state.Scanline = 225;  // Initial scanline (VBlank)
+	_state.Cycle = 0;       // Cycle within scanline
 
 	_paletteRam = (uint16_t*)_emu->GetMemory(MemoryType::GbaPaletteRam).Memory;
 	_vram = (uint8_t*)_emu->GetMemory(MemoryType::GbaVideoRam).Memory;

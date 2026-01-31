@@ -13,6 +13,7 @@
 #include "Shared/Emulator.h"
 #include "Utilities/Serializer.h"
 
+// Initialize NES APU (Audio Processing Unit) with all sound channels
 NesApu::NesApu(NesConsole* console) {
 	_region = ConsoleRegion::Auto;
 	_apuEnabled = true;
@@ -22,13 +23,15 @@ NesApu::NesApu(NesConsole* console) {
 	_mixer = _console->GetSoundMixer();
 	_settings = _console->GetEmulator()->GetSettings();
 
-	_square1.reset(new SquareChannel(AudioChannel::Square1, _console, true));
-	_square2.reset(new SquareChannel(AudioChannel::Square2, _console, false));
-	_triangle.reset(new TriangleChannel(_console));
-	_noise.reset(new NoiseChannel(_console));
-	_dmc.reset(new DeltaModulationChannel(_console));
-	_frameCounter.reset(new ApuFrameCounter(_console));
+	// Create all APU channels
+	_square1.reset(new SquareChannel(AudioChannel::Square1, _console, true));   // Pulse 1 (with sweep negate quirk)
+	_square2.reset(new SquareChannel(AudioChannel::Square2, _console, false));  // Pulse 2
+	_triangle.reset(new TriangleChannel(_console));                              // Triangle
+	_noise.reset(new NoiseChannel(_console));                                    // Noise
+	_dmc.reset(new DeltaModulationChannel(_console));                            // DMC (sample playback)
+	_frameCounter.reset(new ApuFrameCounter(_console));                          // Frame counter (240Hz sequencer)
 
+	// Register all channels as I/O devices for memory-mapped access
 	_console->GetMemoryManager()->RegisterIODevice(_square1.get());
 	_console->GetMemoryManager()->RegisterIODevice(_square2.get());
 	_console->GetMemoryManager()->RegisterIODevice(_frameCounter.get());
@@ -48,20 +51,22 @@ void NesApu::SetRegion(ConsoleRegion region, bool forceInit) {
 	_frameCounter->SetRegion(region);
 }
 
+// Frame counter tick callback - clocks envelope/length/sweep units
 void NesApu::FrameCounterTick(FrameType type) {
 	// Quarter & half frame clock envelope & linear counter
 	_square1->TickEnvelope();
 	_square2->TickEnvelope();
-	_triangle->TickLinearCounter();
+	_triangle->TickLinearCounter();  // Triangle uses linear counter instead of envelope
 	_noise->TickEnvelope();
 
 	if (type == FrameType::HalfFrame) {
-		// Half frames clock length counter & sweep
+		// Half frames clock length counter & sweep (120Hz on NTSC)
 		_square1->TickLengthCounter();
 		_square2->TickLengthCounter();
 		_triangle->TickLengthCounter();
 		_noise->TickLengthCounter();
 
+		// Only pulse channels have sweep units
 		_square1->TickSweep();
 		_square2->TickSweep();
 	}

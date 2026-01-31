@@ -7,6 +7,10 @@
 #include "Shared/Utilities/Emu2413Serializer.h"
 #include "Utilities/Serializer.h"
 
+/// <summary>
+/// Konami VRC7 expansion audio (FM synthesis, OPLL-based).
+/// Emulates the VRC7 sound hardware used in Lagrange Point and others.
+/// </summary>
 class Vrc7Audio : public BaseExpansionAudio {
 private:
 	static constexpr int OpllSampleRate = 49716;

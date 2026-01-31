@@ -10,6 +10,7 @@
 
 SmsCpuParityTable SmsCpu::_parity = {};
 
+// Initialize SMS/Z80 CPU state and references
 void SmsCpu::Init(Emulator* emu, SmsConsole* console, SmsMemoryManager* memoryManager) {
 	_emu = emu;
 	_console = console;
@@ -17,7 +18,7 @@ void SmsCpu::Init(Emulator* emu, SmsConsole* console, SmsMemoryManager* memoryMa
 
 	_state = {};
 
-	_state.PC = 0;
+	_state.PC = 0; // Program counter starts at $0000
 
 	if (!_console->HasBios()) {
 		InitPostBiosState();
@@ -28,20 +29,23 @@ SmsCpuState& SmsCpu::GetState() {
 	return _state;
 }
 
+// Execute a single SMS/Z80 CPU instruction (fetch, decode, execute, handle IRQ/NMI)
 void SmsCpu::Exec() {
 	uint8_t opCode = 0;
 	_state.FlagsChanged <<= 1;
 	if (_state.Halted) {
+		// CPU is halted, process halted state
 		_emu->ProcessHaltedCpu<CpuType::Sms>();
 		ExecCycles(4);
 	} else {
 #ifndef DUMMYCPU
-		_emu->ProcessInstruction<CpuType::Sms>();
+		_emu->ProcessInstruction<CpuType::Sms>(); // Emulator hook
 #endif
-		opCode = ReadOpCode();
-		ExecOpCode<0>(opCode);
+		opCode = ReadOpCode();       // Fetch opcode
+		ExecOpCode<0>(opCode);       // Decode and execute
 	}
 
+	// Handle pending NMI (highest priority)
 	if (_state.NmiPending) {
 		_state.Halted = false;
 		_state.NmiPending = false;
@@ -49,7 +53,7 @@ void SmsCpu::Exec() {
 		ExecCycles(4);
 		IncrementR();
 		uint16_t originalPc = _state.PC;
-		RST(0x66);
+		RST(0x66); // NMI vector
 		_emu->ProcessInterrupt<CpuType::Sms>(originalPc, _state.PC, true);
 	} else if (_state.IFF1 && _state.ActiveIrqs && opCode != 0xFB) {
 		// Process IRQs if enabled, but not if the previous op was EI (0xFB)
@@ -60,6 +64,7 @@ void SmsCpu::Exec() {
 		IncrementR();
 		uint16_t originalPc = _state.PC;
 		if (_state.IM == 2) {
+			// Interrupt mode 2: vectored interrupt
 			ExecCycles(1);
 			uint16_t addr = (_state.I << 8) | _memoryManager->GetOpenBus();
 			uint8_t lsb = Read(addr);
@@ -69,7 +74,7 @@ void SmsCpu::Exec() {
 			_state.WZ = _state.PC;
 		} else {
 			// TODOSMS interrupt mode 0 is not implemented
-			RST(0x38);
+			RST(0x38); // IRQ vector (mode 1)
 		}
 		_console->RefreshRamCheats();
 		_emu->ProcessInterrupt<CpuType::Sms>(originalPc, _state.PC, false);

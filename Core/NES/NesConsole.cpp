@@ -38,6 +38,7 @@
 #include "Utilities/Serializer.h"
 #include "Utilities/sha1.h"
 
+// Initialize NES console emulator with reference to main emulator
 NesConsole::NesConsole(Emulator* emu) {
 	_emu = emu;
 }
@@ -112,12 +113,13 @@ void NesConsole::Serialize(Serializer& s) {
 	}
 }
 
+// Reset NES console state (soft reset)
 void NesConsole::Reset() {
-	_memoryManager->Reset(true);
+	_memoryManager->Reset(true);  // Reset memory manager (soft)
 
-	_ppu->Reset(true);
-	_apu->Reset(true);
-	_cpu->Reset(true, _region);
+	_ppu->Reset(true);            // Reset PPU (soft)
+	_apu->Reset(true);            // Reset APU (soft)
+	_cpu->Reset(true, _region);   // Reset CPU (soft, region-specific)
 	_controlManager->Reset(true);
 	_mixer->Reset();
 	if (_vsSubConsole) {

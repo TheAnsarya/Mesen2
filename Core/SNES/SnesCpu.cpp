@@ -24,32 +24,36 @@ SnesCpu::SnesCpu(SnesConsole* console) {
 SnesCpu::~SnesCpu() {
 }
 
+// Execute a single SNES CPU instruction (fetch, decode, execute, handle IRQ/NMI)
 void SnesCpu::Exec() {
 	_immediateMode = false;
 	_readWriteMask = 0xFFFFFF;
 
 	if (_state.StopState == SnesCpuStopState::Running) {
 #ifndef DUMMYCPU
-		_emu->ProcessInstruction<CpuType::Snes>();
+		_emu->ProcessInstruction<CpuType::Snes>(); // Emulator hook for instruction
 #endif
 
-		RunOp();
-		CheckForInterrupts();
+		RunOp();                // Execute instruction
+		CheckForInterrupts();   // Handle pending IRQ/NMI
 	} else {
-		ProcessHaltedState();
+		ProcessHaltedState();   // Handle STOP/WAI
 	}
 }
 
+// Check and process pending IRQ/NMI interrupts for SNES CPU
 void SnesCpu::CheckForInterrupts() {
 #ifndef DUMMYCPU
 	// Use the state of the IRQ/NMI flags on the previous cycle to determine if an IRQ is processed or not
 	if (_state.NeedNmi) {
+		// NMI: clear flag, process interrupt, notify emulator
 		_state.NeedNmi = false;
 		uint32_t originalPc = GetProgramAddress(_state.PC);
 		_emu->GetCheatManager()->RefreshRamCheats(CpuType::Snes);
 		ProcessInterrupt(_state.EmulationMode ? SnesCpu::LegacyNmiVector : SnesCpu::NmiVector, true);
 		_emu->ProcessInterrupt<CpuType::Snes>(originalPc, GetProgramAddress(_state.PC), true);
 	} else if (_state.PrevIrqSource) {
+		// IRQ: process interrupt, notify emulator
 		uint32_t originalPc = GetProgramAddress(_state.PC);
 		ProcessInterrupt(_state.EmulationMode ? SnesCpu::LegacyIrqVector : SnesCpu::IrqVector, true);
 		_emu->ProcessInterrupt<CpuType::Snes>(originalPc, GetProgramAddress(_state.PC), false);
@@ -57,9 +61,10 @@ void SnesCpu::CheckForInterrupts() {
 #endif
 }
 
+// Handle SNES CPU halted state (STOP/WAI)
 void SnesCpu::ProcessHaltedState() {
 #ifndef DUMMYCPU
-	_emu->ProcessHaltedCpu<CpuType::Snes>();
+	_emu->ProcessHaltedCpu<CpuType::Snes>(); // Emulator hook for halted CPU
 #endif
 
 	if (_state.StopState == SnesCpuStopState::Stopped) {

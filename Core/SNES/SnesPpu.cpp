@@ -21,16 +21,20 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Serializer.h"
 
+// Initialize SNES PPU state and allocate video memory
 SnesPpu::SnesPpu(Emulator* emu, SnesConsole* console) {
 	_emu = emu;
 	_console = console;
 
+	// Allocate 64KB VRAM (32K words)
 	_vram = std::make_unique<uint16_t[]>(SnesPpu::VideoRamSize >> 1);
 	_emu->RegisterMemory(MemoryType::SnesVideoRam, _vram.get(), SnesPpu::VideoRamSize);
 
+	// Register OAM and CGRAM with emulator for debugging
 	_emu->RegisterMemory(MemoryType::SnesSpriteRam, _oamRam, SnesPpu::SpriteRamSize);
 	_emu->RegisterMemory(MemoryType::SnesCgRam, _cgram, SnesPpu::CgRamSize);
 
+	// Allocate double-buffered output (512x478 max for hi-res interlaced)
 	_outputBuffers[0] = std::make_unique<uint16_t[]>(512 * 478);
 	_outputBuffers[1] = std::make_unique<uint16_t[]>(512 * 478);
 	memset(_outputBuffers[0].get(), 0, 512 * 478 * sizeof(uint16_t));
@@ -39,6 +43,7 @@ SnesPpu::SnesPpu(Emulator* emu, SnesConsole* console) {
 
 SnesPpu::~SnesPpu() = default;
 
+// Power-on initialization for SNES PPU
 void SnesPpu::PowerOn() {
 	_skipRender = false;
 	_regs = _console->GetInternalRegisters();
@@ -49,20 +54,22 @@ void SnesPpu::PowerOn() {
 	_currentBuffer = _outputBuffers[0].get();
 
 	_state = {};
-	_state.ForcedBlank = true;
-	_state.VramIncrementValue = 1;
+	_state.ForcedBlank = true;      // Screen is blanked on power-on
+	_state.VramIncrementValue = 1;  // Default VRAM increment
 	if (_settings->GetSnesConfig().EnableRandomPowerOnState) {
 		RandomizeState();
 	}
 
+	// Initialize video memory based on power-on state configuration
 	_console->InitializeRam(_vram.get(), SnesPpu::VideoRamSize);
 	_console->InitializeRam(_cgram, SnesPpu::CgRamSize);
 	for (int i = 0; i < SnesPpu::CgRamSize / 2; i++) {
-		_cgram[i] &= 0x7FFF;
+		_cgram[i] &= 0x7FFF; // CGRAM entries are 15-bit BGR
 	}
 
 	_console->InitializeRam(_oamRam, SnesPpu::SpriteRamSize);
 
+	// Clear sprite index table (used during sprite evaluation)
 	memset(_spriteIndexes, 0xFF, sizeof(_spriteIndexes));
 
 	UpdateNmiScanline();

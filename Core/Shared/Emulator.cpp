@@ -49,29 +49,30 @@
 #include "Shared/MemoryOperationType.h"
 #include "Shared/EventType.h"
 
+// Initialize emulator with all core subsystems
 Emulator::Emulator() : _settings(new EmuSettings(this)),
-                       _debugHud(new DebugHud()),
-                       _scriptHud(new DebugHud()),
-                       _notificationManager(new NotificationManager()),
-                       _batteryManager(new BatteryManager()),
-                       _soundMixer(new SoundMixer(this)),
-                       _videoRenderer(new VideoRenderer(this)),
-                       _videoDecoder(new VideoDecoder(this)),
-                       _saveStateManager(new SaveStateManager(this)),
-                       _cheatManager(new CheatManager(this)),
-                       _movieManager(new MovieManager(this)),
-                       _historyViewer(new HistoryViewer(this)),
-                       _gameServer(new GameServer(this)),
-                       _gameClient(new GameClient(this)),
-                       _rewindManager(new RewindManager(this)) {
+                       _debugHud(new DebugHud()),           // Debug overlay rendering
+                       _scriptHud(new DebugHud()),          // Script-driven overlay rendering
+                       _notificationManager(new NotificationManager()),  // Event notification system
+                       _batteryManager(new BatteryManager()),            // Battery-backed RAM management
+                       _soundMixer(new SoundMixer(this)),                // Audio mixing and output
+                       _videoRenderer(new VideoRenderer(this)),          // Video output rendering
+                       _videoDecoder(new VideoDecoder(this)),            // Video frame decoding/filtering
+                       _saveStateManager(new SaveStateManager(this)),    // Save state management
+                       _cheatManager(new CheatManager(this)),            // Cheat code handling
+                       _movieManager(new MovieManager(this)),            // Movie recording/playback
+                       _historyViewer(new HistoryViewer(this)),          // Rewind history viewer
+                       _gameServer(new GameServer(this)),                // Netplay server
+                       _gameClient(new GameClient(this)),                // Netplay client
+                       _rewindManager(new RewindManager(this)) {         // Rewind state management
 	_paused = false;
 	_pauseOnNextFrame = false;
 	_stopFlag = false;
-	_isRunAheadFrame = false;
-	_lockCounter = 0;
+	_isRunAheadFrame = false;   // Set during run-ahead prediction frames
+	_lockCounter = 0;            // Emulator lock reference count
 	_threadPaused = false;
 
-	_debugRequestCount = 0;
+	_debugRequestCount = 0;      // Pending debugger requests
 	_blockDebuggerRequestCount = 0;
 
 	_videoDecoder->Init();

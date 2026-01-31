@@ -18,29 +18,35 @@
 #include "Utilities/Serializer.h"
 #include "Shared/MemoryOperationType.h"
 
+// Initialize SNES SPC700 (Sony SPC700) sound processor
 Spc::Spc(SnesConsole* console) {
 	_emu = console->GetEmulator();
 	_console = console;
 	_memoryManager = console->GetMemoryManager();
 
+	// Allocate 64KB SPC RAM
 	_ram = std::make_unique<uint8_t[]>(Spc::SpcRamSize);
 	_emu->RegisterMemory(MemoryType::SpcRam, _ram.get(), Spc::SpcRamSize);
 	_console->InitializeRam(_ram.get(), Spc::SpcRamSize);
 
+	// Register IPL ROM (boot ROM at $FFC0-$FFFF)
 	_emu->RegisterMemory(MemoryType::SpcRom, _spcBios, Spc::SpcRomSize);
 
 #ifndef DUMMYSPC
+	// Create DSP (Digital Signal Processor) for audio synthesis
 	_dsp.reset(new Dsp(_emu, console, this));
 #endif
 
+	// Initialize SPC700 CPU state
 	_state = {};
-	_state.WriteEnabled = true;
-	_state.TimersEnabled = true;
-	_state.RomEnabled = true;
-	_state.SP = 0xFF;
-	_state.PC = ReadWord(Spc::ResetVector);
+	_state.WriteEnabled = true;   // RAM writes enabled
+	_state.TimersEnabled = true;  // Hardware timers enabled
+	_state.RomEnabled = true;     // IPL ROM enabled (mapped at $FFC0-$FFFF)
+	_state.SP = 0xFF;             // Stack pointer starts at $FF
+	_state.PC = ReadWord(Spc::ResetVector);  // Read reset vector
 	_state.StopState = SnesCpuStopState::Running;
 
+	// Clear instruction state
 	_opCode = 0;
 	_opStep = SpcOpStep::ReadOpCode;
 	_opSubStep = 0;
@@ -59,36 +65,42 @@ Spc::Spc(SnesConsole* console) {
 Spc::~Spc() = default;
 #endif
 
+// Reset SPC700 state (preserves some register values for compatibility)
 void Spc::Reset() {
 	_state.StopState = SnesCpuStopState::Running;
 
+	// Reset all three hardware timers
 	_state.Timer0.Reset();
 	_state.Timer1.Reset();
 	_state.Timer2.Reset();
 
-	// Resetting appears to reset the values the main CPU can read (not doing this causes a freeze in Kaite Tsukette Asoberu Dezaemon)
+	// Reset output ports (values main CPU can read)
+	// Not doing this causes a freeze in Kaite Tsukette Asoberu Dezaemon
 	_state.OutputReg[0] = 0;
 	_state.OutputReg[1] = 0;
 	_state.OutputReg[2] = 0;
 	_state.OutputReg[3] = 0;
 
-	// Reset the values the SPC can read from the port, too (not doing this freezes Ranma Chounai Gekitou Hen on reset)
+	// Reset input ports (values SPC can read from main CPU)
+	// Not doing this freezes Ranma Chounai Gekitou Hen on reset
 	_state.NewCpuRegs[0] = _state.CpuRegs[0] = 0;
 	_state.NewCpuRegs[1] = _state.CpuRegs[1] = 0;
 	_state.NewCpuRegs[2] = _state.CpuRegs[2] = 0;
 	_state.NewCpuRegs[3] = _state.CpuRegs[3] = 0;
 
+	// Re-enable IPL ROM mapping
 	_state.RomEnabled = true;
 	_state.Cycle = 0;
-	_state.PC = ReadWord(Spc::ResetVector);
+	_state.PC = ReadWord(Spc::ResetVector);  // Read reset vector
 	_state.A = 0;
 	_state.X = 0;
 	_state.Y = 0;
 	_state.SP = 0xFF;
 
-	// Clear P (and other flags) - if P is set after reset, the IPL ROM doesn't work properly
+	// Clear PSW flags - if P is set after reset, the IPL ROM doesn't work properly
 	_state.PS = 0;
 
+	// Reset instruction state machine
 	_opCode = 0;
 	_opStep = SpcOpStep::ReadOpCode;
 	_opSubStep = 0;

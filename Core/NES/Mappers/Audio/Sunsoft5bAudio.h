@@ -5,6 +5,10 @@
 #include "NES/APU/BaseExpansionAudio.h"
 #include "Utilities/Serializer.h"
 
+/// <summary>
+/// Sunsoft 5B expansion audio (AY-3-8910 PSG, 3 channels).
+/// Emulates the Sunsoft 5B sound hardware used in Gimmick! and others.
+/// </summary>
 class Sunsoft5bAudio : public BaseExpansionAudio {
 private:
 	uint8_t _volumeLut[0x10] = {};

@@ -37,6 +37,10 @@ public:
 	}
 };
 
+/// <summary>
+/// MMC5 expansion audio (2 pulse channels, unique to MMC5 mapper).
+/// Emulates the extra sound hardware in MMC5 NES games.
+/// </summary>
 class Mmc5Audio : public BaseExpansionAudio {
 private:
 	Mmc5Square _square1;

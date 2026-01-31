@@ -27,14 +27,16 @@
 static bool _needStaticInit = true;
 static SimpleLock _staticInitLock;
 
+// Initialize GBA console emulator with reference to main emulator
 GbaConsole::GbaConsole(Emulator* emu) {
 	_emu = emu;
 
+	// Perform one-time static initialization of CPU tables (thread-safe)
 	if (_needStaticInit) {
 		auto lock = _staticInitLock.AcquireSafe();
 		if (_needStaticInit) {
-			GbaCpu::StaticInit();
-			DummyGbaCpu::StaticInit();
+			GbaCpu::StaticInit();       // Initialize ARM/Thumb instruction tables
+			DummyGbaCpu::StaticInit();  // Initialize dummy CPU tables (for debugging)
 			_needStaticInit = false;
 		}
 	}

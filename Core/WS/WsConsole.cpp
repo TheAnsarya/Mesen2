@@ -17,6 +17,7 @@
 #include "Shared/FirmwareHelper.h"
 #include "Shared/BatteryManager.h"
 
+// Initialize Bandai WonderSwan / WonderSwan Color console emulator
 WsConsole::WsConsole(Emulator* emu) {
 	_emu = emu;
 }

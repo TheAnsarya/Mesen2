@@ -8,33 +8,42 @@
 #include "Utilities/Serializer.h"
 #include "Shared/MemoryOperationType.h"
 
+// Initialize NES memory manager with internal RAM and handler arrays
 NesMemoryManager::NesMemoryManager(NesConsole* console, BaseMapper* mapper) {
 	_console = console;
 	_emu = console->GetEmulator();
 	_cheatManager = _emu->GetCheatManager();
 	_mapper = mapper;
 
+	// Allocate internal RAM (2KB for NES, 8KB for FamicomBox)
 	_internalRamSize = mapper->GetInternalRamSize();
 	_internalRam = std::make_unique<uint8_t[]>(_internalRamSize);
 	_emu->RegisterMemory(MemoryType::NesInternalRam, _internalRam.get(), _internalRamSize);
+
+	// Create appropriate internal RAM handler based on size
 	if (_internalRamSize == NesMemoryManager::NesInternalRamSize) {
+		// Standard NES: 2KB RAM mirrored at $0000-$07FF
 		_internalRamHandler.reset(new InternalRamHandler<0x7FF>());
 		((InternalRamHandler<0x7FF>*)_internalRamHandler.get())->SetInternalRam(_internalRam.get());
 	} else if (_internalRamSize == NesMemoryManager::FamicomBoxInternalRamSize) {
+		// FamicomBox: 8KB RAM at $0000-$1FFF
 		_internalRamHandler.reset(new InternalRamHandler<0x1FFF>());
 		((InternalRamHandler<0x1FFF>*)_internalRamHandler.get())->SetInternalRam(_internalRam.get());
 	} else [[unlikely]] {
 		throw std::runtime_error("unsupported memory size");
 	}
 
+	// Allocate read/write handler arrays (64KB address space)
 	_ramReadHandlers = std::make_unique<INesMemoryHandler*[]>(NesMemoryManager::CpuMemorySize);
 	_ramWriteHandlers = std::make_unique<INesMemoryHandler*[]>(NesMemoryManager::CpuMemorySize);
 
+	// Initialize all handlers to open bus (default unmapped behavior)
 	for (int i = 0; i < NesMemoryManager::CpuMemorySize; i++) {
 		_ramReadHandlers[i] = &_openBusHandler;
 		_ramWriteHandlers[i] = &_openBusHandler;
 	}
 
+	// Register internal RAM handler for $0000-$07FF (mirrored to $1FFF)
 	RegisterIODevice(_internalRamHandler.get());
 }
 

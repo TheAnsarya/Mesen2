@@ -27,6 +27,8 @@
 #include "Utilities/Serializer.h"
 #include "Utilities/CRC32.h"
 
+// Initialize Game Boy emulator with reference to main emulator
+// allowSgb: Whether Super Game Boy mode is allowed
 Gameboy::Gameboy(Emulator* emu, bool allowSgb) {
 	_emu = emu;
 	_allowSgb = allowSgb;
@@ -45,41 +47,50 @@ Gameboy::~Gameboy() {
 	delete[] _bootRom;
 }
 
+// Initialize Game Boy hardware components and memory
 void Gameboy::Init(GbCart* cart, std::vector<uint8_t>& romData, uint32_t cartRamSize, bool hasBattery) {
 	_cart.reset(cart);
 
-	_ppu.reset(new GbPpu());
-	_apu.reset(new GbApu());
-	_cpu.reset(new GbCpu());
-	_memoryManager.reset(new GbMemoryManager());
-	_timer.reset(new GbTimer());
-	_dmaController.reset(new GbDmaController());
-	_controlManager.reset(new GbControlManager(_emu, this));
+	// Create all hardware components
+	_ppu.reset(new GbPpu());                           // Picture Processing Unit
+	_apu.reset(new GbApu());                           // Audio Processing Unit
+	_cpu.reset(new GbCpu());                           // Sharp LR35902 CPU
+	_memoryManager.reset(new GbMemoryManager());       // Memory mapper
+	_timer.reset(new GbTimer());                       // DIV/TIMA hardware timer
+	_dmaController.reset(new GbDmaController());       // OAM DMA controller
+	_controlManager.reset(new GbControlManager(_emu, this));  // Input controller
 
+	// Allocate and copy PRG ROM
 	_prgRomSize = (uint32_t)romData.size();
 	_prgRom = new uint8_t[_prgRomSize];
 	memcpy(_prgRom, romData.data(), romData.size());
 	_emu->RegisterMemory(MemoryType::GbPrgRom, _prgRom, _prgRomSize);
 
+	// Allocate cartridge RAM (battery-backed SRAM)
 	_cartRamSize = cartRamSize;
 	_cartRam = new uint8_t[_cartRamSize];
 	_emu->RegisterMemory(MemoryType::GbCartRam, _cartRam, _cartRamSize);
 
 	_hasBattery = hasBattery;
 
+	// GBC has more work RAM and video RAM
 	bool cgbMode = _model == GameboyModel::GameboyColor;
-	_workRamSize = cgbMode ? 0x8000 : 0x2000;
-	_videoRamSize = cgbMode ? 0x4000 : 0x2000;
+	_workRamSize = cgbMode ? 0x8000 : 0x2000;   // 32KB (GBC) or 8KB (DMG)
+	_videoRamSize = cgbMode ? 0x4000 : 0x2000;  // 16KB (GBC) or 8KB (DMG)
 
+	// Allocate work RAM
 	_workRam = new uint8_t[_workRamSize];
 	_emu->RegisterMemory(MemoryType::GbWorkRam, _workRam, _workRamSize);
 
+	// Allocate video RAM (tile data, tile maps)
 	_videoRam = new uint8_t[_videoRamSize];
 	_emu->RegisterMemory(MemoryType::GbVideoRam, _videoRam, _videoRamSize);
 
+	// Allocate sprite RAM (OAM - 160 bytes, 40 sprites)
 	_spriteRam = new uint8_t[Gameboy::SpriteRamSize];
 	_emu->RegisterMemory(MemoryType::GbSpriteRam, _spriteRam, Gameboy::SpriteRamSize);
 
+	// Allocate high RAM (HRAM - 127 bytes at $FF80-$FFFE)
 	_highRam = new uint8_t[Gameboy::HighRamSize];
 	_emu->RegisterMemory(MemoryType::GbHighRam, _highRam, Gameboy::HighRamSize);
 

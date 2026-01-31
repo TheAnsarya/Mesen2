@@ -22,6 +22,7 @@
 #include "Shared/MemoryType.h"
 #include "Shared/FirmwareHelper.h"
 
+// Initialize PC Engine / TurboGrafx-16 console emulator
 PceConsole::PceConsole(Emulator* emu) {
 	_emu = emu;
 }
@@ -29,6 +30,7 @@ PceConsole::PceConsole(Emulator* emu) {
 PceConsole::~PceConsole() {
 }
 
+// Reset PC Engine console (actually performs power cycle since PCE has no reset button)
 void PceConsole::Reset() {
 	// The PC Engine has no reset button, behave like power cycle
 	_emu->ReloadRom(true);

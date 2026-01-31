@@ -17,11 +17,12 @@
 #include "Utilities/HexUtilities.h"
 #include "Shared/MemoryOperationType.h"
 
+// Initialize SNES memory manager with work RAM and register handlers
 void SnesMemoryManager::Initialize(SnesConsole* console) {
 	_masterClock = 0;
 	_openBus = 0;
 
-	_cpuSpeed = 8;
+	_cpuSpeed = 8;  // Default CPU speed (8 master cycles per operation)
 	UpdateExecCallbacks();
 
 	_console = console;
@@ -32,10 +33,12 @@ void SnesMemoryManager::Initialize(SnesConsole* console) {
 	_cart = console->GetCartridge();
 	_cheatManager = _emu->GetCheatManager();
 
+	// Allocate 128KB work RAM
 	_workRam = std::make_unique<uint8_t[]>(SnesMemoryManager::WorkRamSize);
 	_emu->RegisterMemory(MemoryType::SnesWorkRam, _workRam.get(), SnesMemoryManager::WorkRamSize);
 	_console->InitializeRam(_workRam.get(), SnesMemoryManager::WorkRamSize);
 
+	// Create register handlers for hardware I/O
 	_registerHandlerA.reset(new RegisterHandlerA(
 	    console->GetDmaController(),
 	    console->GetInternalRegisters(),
@@ -47,23 +50,29 @@ void SnesMemoryManager::Initialize(SnesConsole* console) {
 	    console->GetSpc(),
 	    _workRam.get()));
 
+	// Create work RAM handlers (128KB split into 4KB pages)
 	for (uint32_t i = 0; i < 128 * 1024; i += 0x1000) {
 		_workRamHandlers.push_back(unique_ptr<RamHandler>(new RamHandler(_workRam.get(), i, SnesMemoryManager::WorkRamSize, MemoryType::SnesWorkRam)));
 	}
 
+	// Map work RAM at banks $7E-$7F (full 128KB)
 	_mappings.RegisterHandler(0x7E, 0x7F, 0x0000, 0xFFFF, _workRamHandlers);
 
+	// Map PPU/APU registers at $2000-$2FFF in banks $00-$3F and $80-$BF
 	_mappings.RegisterHandler(0x00, 0x3F, 0x2000, 0x2FFF, _registerHandlerB.get());
 	_mappings.RegisterHandler(0x80, 0xBF, 0x2000, 0x2FFF, _registerHandlerB.get());
 
+	// Map CPU/DMA registers at $4000-$4FFF in banks $00-$3F and $80-$BF
 	_mappings.RegisterHandler(0x00, 0x3F, 0x4000, 0x4FFF, _registerHandlerA.get());
 	_mappings.RegisterHandler(0x80, 0xBF, 0x4000, 0x4FFF, _registerHandlerA.get());
 
+	// Map first 8KB of work RAM mirror at $0000-$1FFF in banks $00-$3F and $80-$BF
 	_mappings.RegisterHandler(0x00, 0x3F, 0x0000, 0x0FFF, _workRamHandlers[0].get());
 	_mappings.RegisterHandler(0x80, 0xBF, 0x0000, 0x0FFF, _workRamHandlers[0].get());
 	_mappings.RegisterHandler(0x00, 0x3F, 0x1000, 0x1FFF, _workRamHandlers[1].get());
 	_mappings.RegisterHandler(0x80, 0xBF, 0x1000, 0x1FFF, _workRamHandlers[1].get());
 
+	// Initialize cartridge memory mappings
 	_cart->Init(_mappings);
 
 	GenerateMasterClockTable();

@@ -22,6 +22,7 @@
 #include "Utilities/StringUtilities.h"
 #include "Utilities/CRC32.h"
 
+// Initialize Sega Master System / Game Gear console emulator
 SmsConsole::SmsConsole(Emulator* emu) {
 	_emu = emu;
 }
@@ -29,18 +30,20 @@ SmsConsole::SmsConsole(Emulator* emu) {
 SmsConsole::~SmsConsole() {
 }
 
+// Load ROM file and initialize all SMS/GG/SG/CV hardware components
 LoadRomResult SmsConsole::LoadRom(VirtualFile& romFile) {
 	vector<uint8_t> romData;
 	romFile.ReadFile(romData);
 
 	if (romData.size() >= 0x100) {
 		if ((romData.size() % 0x400) == 0x200) {
-			// ROM has 512-byte copier header, ignore it
+			// ROM has 512-byte copier header, discard it
 			romData.erase(romData.begin(), romData.begin() + 0x200);
 		}
 
 		_filename = romFile.GetFileName();
 
+		// Determine console model based on file extension
 		string ext = romFile.GetFileExtension();
 		bool isGameGear = ext == ".gg";
 		if (isGameGear) {
@@ -57,12 +60,13 @@ LoadRomResult SmsConsole::LoadRom(VirtualFile& romFile) {
 			_model = SmsModel::Sms;
 		}
 
-		_vdp.reset(new SmsVdp());
-		_memoryManager.reset(new SmsMemoryManager());
-		_cpu.reset(new SmsCpu());
-		_psg.reset(new SmsPsg(_emu, this));
-		_fmAudio.reset(new SmsFmAudio(_emu, this));
-		_controlManager.reset(new SmsControlManager(_emu, this, _vdp.get()));
+		// Create all hardware components
+		_vdp.reset(new SmsVdp());                             // Video Display Processor (TMS9918 derivative)
+		_memoryManager.reset(new SmsMemoryManager());         // Memory mapper
+		_cpu.reset(new SmsCpu());                             // Zilog Z80 CPU
+		_psg.reset(new SmsPsg(_emu, this));                   // Programmable Sound Generator (SN76489)
+		_fmAudio.reset(new SmsFmAudio(_emu, this));           // YM2413 FM sound (SMS only)
+		_controlManager.reset(new SmsControlManager(_emu, this, _vdp.get()));  // Input controller
 
 		InitCart(romData);
 

@@ -58,10 +58,12 @@
 #include "Utilities/Patches/IpsPatcher.h"
 #include "Utilities/PlatformUtilities.h"
 
+// Row ID counter for trace log entries (global across all trace loggers)
 uint64_t ITraceLogger::NextRowId = 0;
 
+// Initialize debugger with all debugging subsystems
 Debugger::Debugger(Emulator* emu, IConsole* console) {
-	_executionStopped = true;
+	_executionStopped = true;  // Start paused for debugger attachment
 
 	_emu = emu;
 	_console = console;
@@ -69,18 +71,20 @@ Debugger::Debugger(Emulator* emu, IConsole* console) {
 
 	_consoleType = _emu->GetConsoleType();
 
+	// Get list of CPU types for this console (main CPU + coprocessors)
 	vector<CpuType> cpuTypes = _emu->GetCpuTypes();
 	_cpuTypes = unordered_set<CpuType>(cpuTypes.begin(), cpuTypes.end());
-	_mainCpuType = cpuTypes[0];
+	_mainCpuType = cpuTypes[0];  // First CPU is always the main CPU
 
-	_labelManager.reset(new LabelManager(this));
-	_memoryDumper.reset(new MemoryDumper(this));
-	_disassembler.reset(new Disassembler(console, this));
-	_disassemblySearch.reset(new DisassemblySearch(_disassembler.get(), _labelManager.get()));
-	_memoryAccessCounter.reset(new MemoryAccessCounter(this));
-	_scriptManager.reset(new ScriptManager(this));
-	_traceLogSaver.reset(new TraceLogFileSaver());
-	_cdlManager.reset(new CdlManager(this, _disassembler.get()));
+	// Create shared debugging components
+	_labelManager.reset(new LabelManager(this));          // Symbol/label management
+	_memoryDumper.reset(new MemoryDumper(this));          // Memory viewing/editing
+	_disassembler.reset(new Disassembler(console, this)); // Code disassembly
+	_disassemblySearch.reset(new DisassemblySearch(_disassembler.get(), _labelManager.get()));  // Search in disassembly
+	_memoryAccessCounter.reset(new MemoryAccessCounter(this));  // Memory access tracking
+	_scriptManager.reset(new ScriptManager(this));        // Lua scripting
+	_traceLogSaver.reset(new TraceLogFileSaver());        // Trace log file output
+	_cdlManager.reset(new CdlManager(this, _disassembler.get()));  // Code/Data log manager
 
 	// Use cpuTypes for iteration (ordered), not _cpuTypes (order is important for coprocessors, etc.)
 	for (CpuType type : cpuTypes) {

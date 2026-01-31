@@ -16,6 +16,7 @@
 #include "Utilities/RandomHelper.h"
 #include "Debugger/SmsVdpTools.h"
 
+// Initialize SMS/GG VDP state and memory references
 void SmsVdp::Init(Emulator* emu, SmsConsole* console, SmsCpu* cpu, SmsControlManager* controlManager, SmsMemoryManager* memoryManager) {
 	_emu = emu;
 	_console = console;
@@ -23,6 +24,7 @@ void SmsVdp::Init(Emulator* emu, SmsConsole* console, SmsCpu* cpu, SmsControlMan
 	_controlManager = controlManager;
 	_memoryManager = memoryManager;
 
+	// Allocate output buffers (256x240 max)
 	_outputBuffers[0] = std::make_unique<uint16_t[]>(256 * 240);
 	_outputBuffers[1] = std::make_unique<uint16_t[]>(256 * 240);
 	_currentOutputBuffer = _outputBuffers[0].get();

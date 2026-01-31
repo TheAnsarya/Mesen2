@@ -2,58 +2,74 @@
 #include "pch.h"
 #include "Shared/BaseState.h"
 
+
+/// <summary>
+/// PC Engine interrupt sources (IRQ lines).
+/// </summary>
 enum class PceIrqSource {
-	Irq2 = 1,
-	Irq1 = 2,
-	TimerIrq = 4,
+	Irq2 = 1,      ///< IRQ2 (external)
+	Irq1 = 2,      ///< IRQ1 (external)
+	TimerIrq = 4   ///< Timer IRQ
 };
 
+
+/// <summary>
+/// PC Engine CPU status flags (HuC6280, 6502-like).
+/// </summary>
 namespace PceCpuFlags {
 enum PceCpuFlags : uint8_t {
-	Carry = 0x01,
-	Zero = 0x02,
-	Interrupt = 0x04,
-	Decimal = 0x08,
-	Break = 0x10,
-	Memory = 0x20,
-	Overflow = 0x40,
-	Negative = 0x80
+	Carry = 0x01,      ///< Carry flag (C)
+	Zero = 0x02,       ///< Zero flag (Z)
+	Interrupt = 0x04,  ///< IRQ disable (I)
+	Decimal = 0x08,    ///< Decimal mode (D)
+	Break = 0x10,      ///< Break (B)
+	Memory = 0x20,     ///< Memory/Accumulator width (M, unused)
+	Overflow = 0x40,   ///< Overflow flag (V)
+	Negative = 0x80    ///< Negative flag (N)
 };
 } // namespace PceCpuFlags
 
+
+/// <summary>
+/// Complete PC Engine CPU state (HuC6280, 6502-like).
+/// </summary>
 struct PceCpuState : public BaseState {
-	uint64_t CycleCount = 0;
-	uint16_t PC = 0;
-	uint8_t SP = 0;
-	uint8_t A = 0;
-	uint8_t X = 0;
-	uint8_t Y = 0;
-	uint8_t PS = 0;
+	uint64_t CycleCount = 0; ///< Total CPU cycles executed
+	uint16_t PC = 0;         ///< Program counter
+	uint8_t SP = 0;          ///< Stack pointer
+	uint8_t A = 0;           ///< Accumulator
+	uint8_t X = 0;           ///< X index register
+	uint8_t Y = 0;           ///< Y index register
+	uint8_t PS = 0;          ///< Processor status (flags)
 };
 
+
+/// <summary>
+/// PC Engine CPU addressing modes (HuC6280).
+/// </summary>
 enum class PceAddrMode {
-	None,
-	Acc,
-	Imp,
-	Imm,
-	Rel,
-	Zero,
-	Abs,
-	ZeroX,
-	ZeroY,
-	Ind,
-	IndX,
-	IndY,
-	AbsX,
-	AbsY,
-	ZInd,
-	ZeroRel,
-	Block,
-	ImZero,
-	ImZeroX,
-	ImAbs,
-	ImAbsX,
-	AbsXInd,
+	None,       ///< No addressing mode
+	Acc,        ///< Accumulator
+	Imp,        ///< Implied
+	Imm,        ///< Immediate
+	Rel,        ///< Relative
+	Zero,       ///< Zero page
+	Abs,        ///< Absolute
+	ZeroX,      ///< Zero page,X
+	ZeroY,      ///< Zero page,Y
+	Ind,        ///< Indirect
+	IndX,       ///< (Zero,X)
+	IndY,       ///< (Zero),Y
+	AbsX,       ///< Absolute,X
+	AbsY,       ///< Absolute,Y
+	ZInd,       ///< Zero page indirect
+	ZeroRel,    ///< Zero page relative
+	Block,      ///< Block transfer
+	ImZero,     ///< Immediate/Zero page
+	ImZeroX,    ///< Immediate/Zero page,X
+	ImAbs,      ///< Immediate/Absolute
+	ImAbsX,     ///< Immediate/Absolute,X
+	AbsXInd     ///< Absolute,X indirect
 };
 
 struct PceVdcHvLatches {

@@ -8,6 +8,7 @@
 #include "Shared/Emulator.h"
 #include "Utilities/Serializer.h"
 
+// Initialize Game Boy CPU state and references
 void GbCpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager) {
 	_emu = emu;
 	_gameboy = gameboy;
@@ -17,9 +18,9 @@ void GbCpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 
 	_state = {};
 
-	_state.PC = 0;
-	_state.SP = 0xFFFF;
-	_state.CycleCount = 6; // Makes boot_sclk_align serial test pass
+	_state.PC = 0;             // Program counter starts at $0000
+	_state.SP = 0xFFFF;        // Stack pointer starts at top of RAM
+	_state.CycleCount = 6;     // Initial cycle offset (boot_sclk_align test)
 }
 
 GbCpu::~GbCpu() {
@@ -33,11 +34,13 @@ bool GbCpu::IsHalted() {
 	return _state.HaltCounter > 0;
 }
 
+// Handle STOP instruction state: exit STOP when a button is pressed
 bool GbCpu::HandleStoppedState() {
+	// Check if any button is pressed (low nibble of joypad port != 0x0F)
 	if ((((GbControlManager*)_gameboy->GetControlManager())->ReadInputPort() & 0x0F) != 0x0F) {
-		_state.Stopped = false;
-		_state.HaltCounter = 0;
-		_ppu->SetCpuStopState(false);
+		_state.Stopped = false;      // Exit STOP mode
+		_state.HaltCounter = 0;      // Clear HALT counter
+		_ppu->SetCpuStopState(false); // Notify PPU
 		return true;
 	}
 	return false;

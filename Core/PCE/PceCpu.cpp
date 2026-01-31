@@ -50,6 +50,7 @@ PceAddrMode const PceCpu::_addrMode[] = {
 };
 
 #ifndef DUMMYCPU
+// Initialize PC Engine CPU (HuC6280 - modified 65C02) state and references
 PceCpu::PceCpu(Emulator* emu, PceMemoryManager* memoryManager) {
 	_emu = emu;
 	_memoryManager = memoryManager;
@@ -58,12 +59,13 @@ PceCpu::PceCpu(Emulator* emu, PceMemoryManager* memoryManager) {
 	_state = {};
 	_operand = 0;
 
+	// Read reset vector from $FFFE-$FFFF to initialize PC
 	_state.PC = _memoryManager->Read(PceCpu::ResetVector) | _memoryManager->Read(PceCpu::ResetVector + 1) << 8;
 
-	// I is set on power on
+	// I flag is set on power on (disable IRQs)
 	SetFlags(PceCpuFlags::Interrupt);
 
-	// T & M are always cleared on power on
+	// T (Memory Transfer) & M are always cleared on power on
 	ClearFlags(PceCpuFlags::Decimal | PceCpuFlags::Memory);
 
 	if (_emu->GetSettings()->GetPcEngineConfig().EnableRandomPowerOnState) {
@@ -90,20 +92,22 @@ PceCpu::PceCpu(Emulator* emu, PceMemoryManager* memoryManager) {
 }
 #endif
 
+// Execute a single PCE CPU instruction (fetch, decode, execute, handle IRQ)
 void PceCpu::Exec() {
 #ifndef DUMMYCPU
-	_emu->ProcessInstruction<CpuType::Pce>();
+	_emu->ProcessInstruction<CpuType::Pce>(); // Emulator hook
 #endif
 
-	// T flag is reset at the start of each instruction
+	// T flag is reset at the start of each instruction (PCE-specific)
 	_memoryFlag = CheckFlag(PceCpuFlags::Memory);
 	ClearFlags(PceCpuFlags::Memory);
 
-	uint8_t opCode = GetOPCode();
-	_instAddrMode = _addrMode[opCode];
-	FetchOperand();
-	(this->*_opTable[opCode])();
+	uint8_t opCode = GetOPCode();         // Fetch opcode
+	_instAddrMode = _addrMode[opCode];    // Look up addressing mode
+	FetchOperand();                       // Fetch operand based on addressing mode
+	(this->*_opTable[opCode])();          // Execute instruction
 
+	// Check for pending IRQs (general or timer)
 	if (_pendingIrqs || _memoryManager->HasIrqSource(PceIrqSource::TimerIrq)) {
 		ProcessIrq(false);
 	}

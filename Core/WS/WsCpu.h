@@ -15,6 +15,9 @@ class Emulator;
 class WsConsole;
 class WsMemoryManager;
 
+/// <summary>
+/// WonderSwan CPU core (NEC V30MZ, x86-like). Implements instruction execution, memory, and I/O for the system.
+/// </summary>
 class WsCpu final : public ISerializable {
 private:
 	struct ModRmState {
@@ -25,6 +28,9 @@ private:
 		uint8_t Rm;
 	};
 
+	/// <summary>
+	/// REP prefix mode for string instructions.
+	/// </summary>
 	enum class WsRepMode : uint8_t {
 		None,
 		Zero,
@@ -42,6 +48,9 @@ private:
 		Cmp
 	};
 
+	/// <summary>
+	/// Group 2 operation mode (shifts/rotates).
+	/// </summary>
 	enum class Grp2Mode {
 		One,
 		CL,
@@ -56,6 +65,9 @@ private:
 		bool Preserve;
 	};
 
+	/// <summary>
+	/// State for instruction prefix decoding.
+	/// </summary>
 	static WsCpuParityTable _parity;
 
 	Emulator* _emu = nullptr;
@@ -79,6 +91,7 @@ private:
 	    &_state.AX, &_state.CX, &_state.DX, &_state.BX,
 	    &_state.SP, &_state.BP, &_state.SI, &_state.DI};
 
+	// Lookup tables for register decoding
 	// Used to re-fill prefetch buffer with last opcode when REP prefix is used
 	uint8_t _opCode = 0;
 

@@ -5,6 +5,10 @@
 #include "NES/APU/BaseExpansionAudio.h"
 #include "Utilities/Serializer.h"
 
+/// <summary>
+/// Namco 163 expansion audio (up to 8 wavetable channels).
+/// Emulates the Namco 163 sound hardware used in Famicom games.
+/// </summary>
 class Namco163Audio : public BaseExpansionAudio {
 public:
 	static constexpr uint32_t AudioRamSize = 0x80;

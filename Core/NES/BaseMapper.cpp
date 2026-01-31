@@ -27,7 +27,7 @@ uint8_t BaseMapper::ReadRegister(uint16_t addr) {
 void BaseMapper::InitMapper(RomData& romData) {}
 void BaseMapper::Reset(bool softReset) {}
 
-// Make sure the page size is no bigger than the size of the ROM itself
+// Page size validation: Make sure the page size is no bigger than the size of the ROM itself
 // Otherwise we will end up reading from unallocated memory
 uint16_t BaseMapper::InternalGetPrgPageSize() {
 	return std::min((uint32_t)GetPrgPageSize(), _prgSize);
@@ -45,6 +45,7 @@ uint16_t BaseMapper::InternalGetChrRamPageSize() {
 	return std::min((uint32_t)GetChrRamPageSize(), _chrRamSize);
 }
 
+// Validate that address range is aligned to 256-byte boundaries (NES mapper granularity)
 bool BaseMapper::ValidateAddressRange(uint16_t startAddr, uint16_t endAddr) {
 	if ((startAddr & 0xFF) || (endAddr & 0xFF) != 0xFF) {
 #ifdef _DEBUG
@@ -57,6 +58,7 @@ bool BaseMapper::ValidateAddressRange(uint16_t startAddr, uint16_t endAddr) {
 	return true;
 }
 
+// Map a range of CPU address space to PRG ROM, Save RAM, or Work RAM
 void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, int16_t pageNumber, PrgMemoryType type, int8_t accessType) {
 	if (!ValidateAddressRange(startAddr, endAddr) || startAddr > 0xFF00 || endAddr <= startAddr) {
 		return;
@@ -67,10 +69,12 @@ void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, int16
 	uint8_t defaultAccessType = MemoryAccessType::Read;
 	switch (type) {
 		case PrgMemoryType::PrgRom:
+			// PRG ROM: read-only, uses main PRG page size
 			pageCount = GetPrgPageCount();
 			pageSize = InternalGetPrgPageSize();
 			break;
 		case PrgMemoryType::SaveRam:
+			// Save RAM: battery-backed, read/write
 			pageSize = InternalGetSaveRamPageSize();
 			if (pageSize == 0) {
 #ifdef _DEBUG
@@ -83,6 +87,7 @@ void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, int16
 			defaultAccessType |= MemoryAccessType::Write;
 			break;
 		case PrgMemoryType::WorkRam:
+			// Work RAM: general-purpose, read/write
 			pageSize = InternalGetWorkRamPageSize();
 			if (pageSize == 0) {
 #ifdef _DEBUG

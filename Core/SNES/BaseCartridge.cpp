@@ -40,6 +40,8 @@ BaseCartridge::~BaseCartridge() {
 	delete[] _saveRam;
 }
 
+// Create SNES cartridge from ROM file (factory method)
+// Handles multiple ROM formats: SNES, BS-X, Sufami Turbo, SPC, Game Boy (SGB)
 unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, VirtualFile& romFile) {
 	if (romFile.IsValid()) {
 		unique_ptr<BaseCartridge> cart(new BaseCartridge());
@@ -48,7 +50,7 @@ unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, V
 		romFile.ReadFile(romData);
 
 		if (romData.size() < 0x4000) {
-			return nullptr;
+			return nullptr;  // ROM too small to be valid
 		}
 
 		cart->_console = console;
@@ -57,6 +59,7 @@ unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, V
 
 		string fileExt = FolderUtilities::GetExtension(romFile.GetFileName());
 		if (fileExt == ".bs") {
+			// BS-X Satellaview memory pack
 			cart->_bsxMemPack.reset(new BsxMemoryPack(console, romData, false));
 			if (!FirmwareHelper::LoadBsxFirmware(cart->_emu, &cart->_prgRom, cart->_prgRomSize)) {
 				return nullptr;
@@ -64,20 +67,23 @@ unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, V
 			cart->LoadRom();
 			cart->_emu->RegisterMemory(MemoryType::SnesPrgRom, cart->_prgRom, cart->_prgRomSize);
 		} else if (fileExt == ".st") {
+			// Sufami Turbo mini-cartridge
 			if (cart->LoadSufamiTurbo(romFile)) {
 				return cart;
 			} else {
 				return nullptr;
 			}
 		} else if (fileExt == ".gb" || fileExt == ".gbc" || fileExt == ".gbx") {
+			// Game Boy ROM (Super Game Boy mode)
 			if (cart->LoadGameboy(romFile)) {
 				return cart;
 			} else {
 				return nullptr;
 			}
 		} else {
+			// Standard SNES ROM or SPC file
 			if (romData.size() < 0x8000) {
-				return nullptr;
+				return nullptr;  // SNES ROMs must be at least 32KB
 			}
 
 			cart->_prgRomSize = (uint32_t)romData.size();
@@ -85,13 +91,14 @@ unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, V
 			memcpy(cart->_prgRom, romData.data(), romData.size());
 
 			if (memcmp(cart->_prgRom, "SNES-SPC700 Sound File Data", 27) == 0) {
+				// SPC audio file (requires minimum size for header + data)
 				if (cart->_prgRomSize >= 0x10180) {
-					// SPC files must be 0x10180 bytes long at minimum
 					cart->LoadSpc();
 				} else {
 					return nullptr;
 				}
 			} else {
+				// Standard SNES ROM
 				cart->LoadRom();
 				BaseCartridge::EnsureValidPrgRomSize(cart->_prgRomSize, cart->_prgRom);
 			}

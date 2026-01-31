@@ -6,6 +6,10 @@
 #include "NES/NesConsole.h"
 #include "Utilities/Serializer.h"
 
+/// <summary>
+/// Konami VRC6 expansion audio (2 pulse + 1 sawtooth channels).
+/// Emulates the VRC6 sound hardware used in some Famicom games.
+/// </summary>
 class Vrc6Audio : public BaseExpansionAudio {
 private:
 	Vrc6Pulse _pulse1;

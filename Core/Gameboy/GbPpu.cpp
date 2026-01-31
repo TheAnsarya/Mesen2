@@ -20,13 +20,14 @@
 
 constexpr uint16_t evtColors[6] = {0x18C6, 0x294A, 0x108C, 0x4210, 0x3084, 0x1184};
 
+// Initialize Game Boy PPU state and memory references
 void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager, GbDmaController* dmaController, uint8_t* vram, uint8_t* oam) {
 	_emu = emu;
 	_gameboy = gameboy;
 	_memoryManager = memoryManager;
 	_dmaController = dmaController;
-	_vram = vram;
-	_oam = oam;
+	_vram = vram;   // Video RAM pointer
+	_oam = oam;     // Object Attribute Memory pointer
 
 	_outputBuffers[0] = std::make_unique<uint16_t[]>(GbConstants::PixelCount);
 	_outputBuffers[1] = std::make_unique<uint16_t[]>(GbConstants::PixelCount);

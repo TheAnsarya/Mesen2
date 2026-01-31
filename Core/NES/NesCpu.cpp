@@ -81,10 +81,12 @@ NesCpu::NesCpu(NesConsole* console) {
 	_runIrq = false;
 }
 
+// Reset the NES CPU state and registers.
 void NesCpu::Reset(bool softReset, ConsoleRegion region) {
-	_state.NmiFlag = false;
-	_state.IrqFlag = 0;
+	_state.NmiFlag = false; // Clear NMI flag
+	_state.IrqFlag = 0;     // Clear IRQ flag
 
+	// Reset DMA and DMC state
 	_spriteDmaTransfer = false;
 	_spriteDmaOffset = 0;
 	_needHalt = false;
@@ -94,14 +96,15 @@ void NesCpu::Reset(bool softReset, ConsoleRegion region) {
 	_cpuWrite = false;
 	_hideCrashWarning = false;
 
-	// Use _memoryManager->Read() directly to prevent clocking the PPU/APU when setting PC at reset
+	// Set program counter from reset vector (no PPU/APU clocking)
 	_state.PC = _memoryManager->Read(NesCpu::ResetVector) | _memoryManager->Read(NesCpu::ResetVector + 1) << 8;
 
 	if (softReset) {
+		// Soft reset: set interrupt flag, decrement stack pointer
 		SetFlags(PSFlags::Interrupt);
 		_state.SP -= 0x03;
 	} else {
-		// Used by NSF code to disable Frame Counter & DMC interrupts
+		// Hard reset: clear registers, set interrupt flag, mask IRQs
 		_irqMask = 0xFF;
 
 		_state.A = 0;
@@ -113,6 +116,7 @@ void NesCpu::Reset(bool softReset, ConsoleRegion region) {
 		_runIrq = false;
 	}
 
+	// Set PPU/CPU dividers based on region
 	uint8_t ppuDivider;
 	uint8_t cpuDivider;
 	switch (region) {
@@ -162,36 +166,40 @@ void NesCpu::Reset(bool softReset, ConsoleRegion region) {
 	}
 }
 
+// Execute a single NES CPU instruction (fetch, decode, execute, handle IRQ/NMI)
 void NesCpu::Exec() {
 #ifndef DUMMYCPU
-	_emu->ProcessInstruction<CpuType::Nes>();
+	_emu->ProcessInstruction<CpuType::Nes>(); // Emulator hook for instruction
 #endif
 
-	uint8_t opCode = GetOPCode();
-	_instAddrMode = _addrMode[opCode];
-	_operand = FetchOperand();
-	(this->*_opTable[opCode])();
+	uint8_t opCode = GetOPCode();            // Fetch opcode
+	_instAddrMode = _addrMode[opCode];       // Decode addressing mode
+	_operand = FetchOperand();               // Fetch operand
+	(this->*_opTable[opCode])();             // Execute instruction
 
+	// Handle pending IRQ or NMI after instruction
 	if (_prevRunIrq || _prevNeedNmi) {
 		IRQ();
 	}
 }
 
+// Handle IRQ or NMI interrupt sequence for NES CPU
 void NesCpu::IRQ() {
 #ifndef DUMMYCPU
 	uint16_t originalPc = PC();
 #endif
 
+	// PAL: check for DMA on first read during IRQ/NMI
 	if (_console->GetRegion() == ConsoleRegion::Pal) {
-		// On PAL, IRQ/NMI sequence also checks for DMA on the first read
 		ProcessPendingDma(_state.PC, MemoryOperationType::ExecOpCode);
 	}
 
-	DummyRead(); // fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
-	DummyRead(); // read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)
-	Push((uint16_t)(PC()));
+	DummyRead(); // Fetch opcode (discarded, $00 forced into opcode reg)
+	DummyRead(); // Read next instruction byte (discarded, PC not incremented)
+	Push((uint16_t)(PC())); // Push PC to stack
 
 	if (_needNmi) {
+		// NMI: push flags, set interrupt flag, jump to NMI vector
 		_needNmi = false;
 		Push((uint8_t)(PS() | PSFlags::Reserved));
 		SetFlags(PSFlags::Interrupt);
@@ -202,6 +210,7 @@ void NesCpu::IRQ() {
 		_emu->ProcessInterrupt<CpuType::Nes>(originalPc, _state.PC, true);
 #endif
 	} else {
+		// IRQ: push flags, set interrupt flag, jump to IRQ vector
 		Push((uint8_t)(PS() | PSFlags::Reserved));
 		SetFlags(PSFlags::Interrupt);
 

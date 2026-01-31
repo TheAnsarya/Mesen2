@@ -6,13 +6,14 @@
 #include "Shared/EmuSettings.h"
 #include "Utilities/Serializer.h"
 
+// Initialize GBA CPU state and memory references
 void GbaCpu::Init(Emulator* emu, GbaMemoryManager* memoryManager, GbaRomPrefetch* prefetch) {
 	_emu = emu;
 	_memoryManager = memoryManager;
 	_prefetch = prefetch;
 
 	_state = {};
-	_state.Pipeline.ReloadRequested = true;
+	_state.Pipeline.ReloadRequested = true; // Start with pipeline reload
 
 	if (_emu->GetSettings()->GetGbaConfig().SkipBootScreen) {
 		_state.R[13] = 0x3007F00;

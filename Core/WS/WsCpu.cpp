@@ -9,17 +9,19 @@
 
 WsCpuParityTable WsCpu::_parity = {};
 
+// Initialize WonderSwan CPU (NEC V30MZ) state and references
 WsCpu::WsCpu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager)
 #ifndef DUMMYCPU
-    : _prefetch(this, memoryManager)
+	: _prefetch(this, memoryManager)
 #endif
 {
 	_emu = emu;
 	_console = console;
 	_memoryManager = memoryManager;
 
-	_state.CS = 0xFFFF;
-	_state.IP = 0x0000;
+	// Initial register values (power-on state)
+	_state.CS = 0xFFFF;   // Code segment starts at $FFFF
+	_state.IP = 0x0000;   // Instruction pointer starts at $0000
 
 	_state.BX = 0x1C00;
 	_state.CX = 0x0004;
@@ -39,26 +41,29 @@ uint32_t WsCpu::GetProgramCounter(bool adjustForRepLoop) {
 	return ((_state.CS << 4) + ip) & 0xFFFFF;
 }
 
+// Execute a single WonderSwan CPU instruction (fetch, decode, execute, handle IRQ)
 void WsCpu::Exec() {
 #ifndef DUMMYCPU
 	bool irqPending = _memoryManager->HasPendingIrq();
 	if (_state.Halted && (!irqPending || _state.PowerOff)) {
+		// CPU is halted or powered off
 		Idle();
 		_emu->ProcessHaltedCpu<CpuType::Ws>();
 		return;
 	}
 
 	if (irqPending) {
+		// Exit halt on IRQ, process interrupt if enabled
 		_state.Halted = false;
 		if (_state.Flags.Irq && _suppressIrqClock != _state.CycleCount) {
 			Interrupt(_memoryManager->GetIrqVector(), true);
 		}
 	}
 
-	_emu->ProcessInstruction<CpuType::Ws>();
+	_emu->ProcessInstruction<CpuType::Ws>(); // Emulator hook
 #endif
 
-	ExecOpCode();
+	ExecOpCode(); // Fetch, decode, and execute opcode
 }
 
 template <typename T>

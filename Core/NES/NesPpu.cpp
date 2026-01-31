@@ -27,15 +27,17 @@
 
 #include "Shared/EventType.h"
 
+// Initialize NES PPU (Picture Processing Unit) state and memory
 template <class T>
 NesPpu<T>::NesPpu(NesConsole* console) {
 	_console = console;
 	_emu = console->GetEmulator();
 	_mapper = console->GetMapper();
 	_masterClock = 0;
-	_masterClockDivider = 4;
+	_masterClockDivider = 4; // PPU runs at master/4 (NTSC: 5.37 MHz)
 	_settings = _emu->GetSettings();
 
+	// Allocate double-buffered output (256x240 pixels)
 	_outputBuffers[0] = std::make_unique<uint16_t[]>(256 * 240);
 	_outputBuffers[1] = std::make_unique<uint16_t[]>(256 * 240);
 
@@ -44,9 +46,10 @@ NesPpu<T>::NesPpu(NesConsole* console) {
 	memset(_outputBuffers[1].get(), 0, 256 * 240 * sizeof(uint16_t));
 
 	if (_emu->GetSettings()->GetNesConfig().RamPowerOnState == RamState::Random) {
+		// Randomize palette RAM, masked to valid color indices
 		_console->InitializeRam(_paletteRam, 0x20);
 		for (int i = 0; i < 0x20; i++) {
-			_paletteRam[i] &= 0x3F;
+			_paletteRam[i] &= 0x3F; // Palette entries are 6-bit
 		}
 	} else {
 		// When not using random ram, use a static state at power on (matches blargg's old palette test rom)
@@ -59,21 +62,24 @@ NesPpu<T>::NesPpu(NesConsole* console) {
 	// This should (presumably) persist across resets
 	memset(_corruptOamRow, 0, sizeof(_corruptOamRow));
 
-	//'v' is not cleared on reset, but it set to 0 on power on
+	// 'v' (VRAM address) is not cleared on reset, but it is set to 0 on power on
 	_videoRamAddr = 0;
 
+	// Register memory regions with emulator for debugging
 	_emu->RegisterMemory(MemoryType::NesSpriteRam, _spriteRam, sizeof(_spriteRam));
 	_emu->RegisterMemory(MemoryType::NesSecondarySpriteRam, _secondarySpriteRam, sizeof(_secondarySpriteRam));
 	_emu->RegisterMemory(MemoryType::NesPaletteRam, _paletteRam, sizeof(_paletteRam));
 
-	_console->InitializeRam(_spriteRam, 0x100);
-	_console->InitializeRam(_secondarySpriteRam, 0x20);
+	// Initialize sprite RAMs based on power-on state configuration
+	_console->InitializeRam(_spriteRam, 0x100);          // Primary OAM (256 bytes, 64 sprites)
+	_console->InitializeRam(_secondarySpriteRam, 0x20);  // Secondary OAM (32 bytes, 8 sprites)
 
 	UpdateTimings(ConsoleRegion::Ntsc);
 
 	Reset(false);
 }
 
+// Reset NES PPU state (soft or hard reset)
 template <class T>
 void NesPpu<T>::Reset(bool softReset) {
 	_masterClock = 0;
@@ -83,7 +89,7 @@ void NesPpu<T>::Reset(bool softReset) {
 	_enableOamDecay = _console->GetNesConfig().EnableOamDecay;
 
 	if (softReset && _settings->GetNesConfig().DisablePpuReset) {
-		return;
+		return; // Skip PPU reset if disabled in settings
 	}
 
 	_preventVblFlag = false;
@@ -96,6 +102,7 @@ void NesPpu<T>::Reset(bool softReset) {
 	_openBus = 0;
 	memset(_openBusDecayStamp, 0, sizeof(_openBusDecayStamp));
 
+	// Clear scrolling and address latches
 	_tmpVideoRamAddr = 0;
 	_highBitShift = 0;
 	_lowBitShift = 0;
@@ -103,15 +110,17 @@ void NesPpu<T>::Reset(bool softReset) {
 	_xScroll = 0;
 	_writeToggle = false;
 
+	// Clear control and mask registers
 	_control = {};
 	_mask = {};
 
 	if (!softReset) {
-		//"The VBL flag (PPUSTATUS bit 7) is random at power, and unchanged by reset."
+		// "The VBL flag (PPUSTATUS bit 7) is random at power, and unchanged by reset."
 		_statusFlags = {};
 		_statusFlags.VerticalBlank = _settings->GetNesConfig().RandomizeMapperPowerOnState ? _settings->GetRandomBool() : false;
 	}
 
+	// Clear tile fetch state
 	_tile = {};
 	_currentTilePalette = 0;
 	_previousTilePalette = 0;

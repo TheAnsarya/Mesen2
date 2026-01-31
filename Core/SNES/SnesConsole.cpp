@@ -40,6 +40,7 @@
 #include "SNES/RegisterHandlerB.h"
 #include "Utilities/ArchiveReader.h"
 
+// Initialize SNES console emulator with reference to main emulator and settings
 SnesConsole::SnesConsole(Emulator* emu) {
 	_emu = emu;
 	_settings = emu->GetSettings();
@@ -54,15 +55,18 @@ void SnesConsole::Initialize() {
 void SnesConsole::Release() {
 }
 
+// Execute one full frame of SNES emulation
 void SnesConsole::RunFrame() {
-	UpdateRegion();
+	UpdateRegion();  // Update NTSC/PAL timing if needed
 
 	_frameRunning = true;
 
+	// Execute CPU instructions until frame is complete
 	while (_frameRunning) {
 		_cpu->Exec();
 	}
 
+	// Process any remaining SPC audio at end of frame
 	_spc->ProcessEndFrame();
 }
 
@@ -85,14 +89,15 @@ void SnesConsole::ProcessEndOfFrame() {
 	_frameRunning = false;
 }
 
+// Reset SNES console state
 void SnesConsole::Reset() {
-	_dmaController->Reset();
-	_internalRegisters->Reset();
-	_memoryManager->Reset();
-	_spc->Reset();
-	_ppu->Reset();
-	_cart->Reset();
-	_controlManager->Reset(true);
+	_dmaController->Reset();      // Reset DMA controller
+	_internalRegisters->Reset();  // Reset internal registers ($4200-$421F)
+	_memoryManager->Reset();      // Reset memory manager and clock
+	_spc->Reset();                // Reset SPC700 audio processor
+	_ppu->Reset();                // Reset PPU
+	_cart->Reset();               // Reset cartridge (including coprocessors)
+	_controlManager->Reset(true); // Reset controllers
 
 	// Reset cart before CPU to ensure correct memory mappings when fetching reset vector
 	_cpu->Reset();
