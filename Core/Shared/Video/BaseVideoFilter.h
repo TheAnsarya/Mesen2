@@ -5,6 +5,45 @@
 
 class Emulator;
 
+/// <summary>
+/// Base class for all video filters - handles PPU output to RGB conversion.
+/// Provides NTSC filtering, color adjustments, and screenshot capture.
+/// </summary>
+/// <remarks>
+/// **Video Pipeline:**
+/// 1. Console PPU outputs native format (15-bit RGB, indexed palette, etc.)
+/// 2. VideoFilter converts to 32-bit ARGB for display
+/// 3. Applies color adjustments (brightness, contrast, saturation)
+/// 4. Optionally applies NTSC filter for authentic CRT look
+/// 5. Output sent to VideoRenderer for display
+///
+/// **Filter Types:**
+/// - None: Direct color conversion only
+/// - NTSC: Blargg's NTSC filter (composite/S-Video/RGB simulation)
+/// - Scale2x/3x/4x: Pixel-art scaling algorithms
+/// - HQ2x/3x/4x: High-quality magnification
+/// - xBRZ: Edge-detection based upscaling
+/// - Prescale: Simple integer scaling
+///
+/// **Color Space:**
+/// - Internal: YIQ for NTSC color simulation
+/// - Output: 32-bit ARGB (0xAARRGGBB)
+/// - Supports hue/saturation adjustments
+///
+/// **Overscan:**
+/// - Configurable per-console and per-game
+/// - Crops edges to hide glitches (common in NES games)
+/// - SetOverscan/GetOverscan manage cropping dimensions
+///
+/// **Screenshot:**
+/// - TakeScreenshot() captures filtered output
+/// - Supports PNG output to file or stream
+///
+/// **Threading:**
+/// - _frameLock protects output buffer
+/// - SendFrame() called from emulation thread
+/// - Output buffer read from render thread
+/// </remarks>
 class BaseVideoFilter {
 private:
 	std::unique_ptr<uint32_t[]> _outputBuffer;

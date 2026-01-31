@@ -14,11 +14,44 @@ class BaseCartridge;
 
 enum class MemoryOperationType;
 
-// TODO: Implement write protection flags
-// TODO: Timers
-
+/// <summary>
+/// SA-1 coprocessor - High-speed 65816 CPU with enhanced features.
+/// Provides 10.74 MHz processing, character conversion, and DMA.
+/// </summary>
+/// <remarks>
+/// **Overview:**
+/// The SA-1 is a complete second 65816 CPU running at 10.74 MHz (3x main CPU speed)
+/// with additional features for graphics processing and memory management.
+///
+/// **Key Features:**
+/// - **65816 CPU @ 10.74 MHz**: 3x faster than main CPU
+/// - **2KB Internal RAM**: Fast access for SA-1
+/// - **Character Conversion**: Hardware-accelerated tile format conversion
+/// - **Arithmetic Unit**: Hardware multiply/divide
+/// - **Variable-Length Bit Processing**: For compressed data
+/// - **DMA**: High-speed memory transfers
+///
+/// **Memory Access:**
+/// - Both CPUs can access ROM simultaneously
+/// - Configurable ROM banking (up to 8MB)
+/// - BW-RAM (battery-backed work RAM) access control
+/// - I-RAM visible to both CPUs with arbitration
+///
+/// **Inter-Processor Communication:**
+/// - Message registers for CPU→SA1 and SA1→CPU
+/// - NMI/IRQ triggering between processors
+/// - Shared register space ($2200-$23FF)
+///
+/// **Character Conversion:**
+/// - Type 1: Background tile format conversion
+/// - Type 2: Sprite tile format conversion
+/// - Hardware acceleration for Mode 7 effects
+///
+/// **Games:** Super Mario RPG, Kirby Super Star, Kirby's Dream Land 3
+/// </remarks>
 class Sa1 : public BaseCoprocessor {
 private:
+	/// <summary>SA-1 internal RAM size (2KB).</summary>
 	static constexpr int InternalRamSize = 0x800;
 
 	unique_ptr<Sa1Cpu> _cpu;

@@ -8,6 +8,46 @@ class Emulator;
 class SnesConsole;
 class Spc;
 
+/// <summary>
+/// SNES DSP (Digital Signal Processor) - 8-channel BRR sample playback and effects.
+/// Generates all audio output from the SPC700 audio subsystem.
+/// </summary>
+/// <remarks>
+/// **Architecture:**
+/// The DSP is a dedicated audio processor that works in tandem with the SPC700 CPU.
+/// It provides 8 independent voices for sample playback with hardware mixing and effects.
+///
+/// **BRR (Bit Rate Reduction) Format:**
+/// - 4-bit ADPCM compression (9 bytes = 16 samples)
+/// - Looping support with loop point markers
+/// - Filter modes for improved quality
+///
+/// **Per-Voice Features:**
+/// - Pitch: 14-bit frequency (0-128 kHz)
+/// - ADSR/Gain envelope (attack/decay/sustain/release)
+/// - Volume: Left/right panning
+/// - Pitch modulation from previous voice
+/// - Noise mode (white noise generator)
+///
+/// **Global Effects:**
+/// - Echo: Configurable delay buffer with FIR filter
+/// - Echo feedback with 8-tap FIR coefficients
+/// - Master volume control
+///
+/// **Timing:**
+/// - Runs at 32 kHz sample rate
+/// - 32 cycles per sample (1 cycle per voice + mixing)
+/// - Echo buffer in SPC RAM (max 240ms delay)
+///
+/// **Register Map ($00-$7F via $F2/$F3):**
+/// - $x0-$x9: Voice registers (per-voice)
+/// - $0C/$1C: Master volume L/R
+/// - $2C/$3C: Echo volume L/R
+/// - $4C: Key on
+/// - $5C: Key off
+/// - $6C: Flags (reset, mute, echo, noise clock)
+/// - $7D: Source directory page
+/// </remarks>
 class Dsp final : public ISerializable {
 private:
 	DspState _state = {};
