@@ -649,7 +649,7 @@ void ExpressionEvaluator::GetTokenList(char* tokenList) {
 		}
 	}
 
-	std::sort(entries.begin(), entries.end(), [&](const auto& a, const auto& b) -> bool {
+	std::ranges::sort(entries, [](const auto& a, const auto& b) -> bool {
 		return a.second < b.second;
 	});
 
