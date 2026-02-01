@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Avalonia.Threading;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 using Microsoft.Win32;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	class FileAssociationHelper {
 		static private string CreateMimeType(string mimeType, string extension, string description, List<string> mimeTypes, bool addType) {
 			string baseFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "mime", "packages");
@@ -170,7 +170,7 @@ namespace Mesen.Config {
 					FileAssociationHelper.UpdateLinuxFileAssociations();
 				}
 			} catch (Exception ex) {
-				Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+				Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 			}
 		}
 

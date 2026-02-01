@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class HistoryViewerViewModel : DisposableViewModel {
 		public HistoryViewerConfig Config { get; init; }
 
@@ -165,7 +165,7 @@ namespace Mesen.ViewModels {
 			string? file = await FileDialogHelper.SaveFile(ConfigManager.MovieFolder, initialFile, wnd, FileDialogHelper.MesenMovieExt);
 			if (file != null) {
 				if (!HistoryApi.HistoryViewerSaveMovie(file, segStart, segEnd)) {
-					await MesenMsgBox.Show(wnd, "MovieSaveError", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					await NexenMsgBox.Show(wnd, "MovieSaveError", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 		}
@@ -176,7 +176,7 @@ namespace Mesen.ViewModels {
 			string? file = await FileDialogHelper.SaveFile(ConfigManager.SaveStateFolder, initialFile, wnd, FileDialogHelper.MesenSaveStateExt);
 			if (file != null) {
 				if (!HistoryApi.HistoryViewerCreateSaveState(file, position)) {
-					await MesenMsgBox.Show(wnd, "FileSaveError", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					await NexenMsgBox.Show(wnd, "FileSaveError", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 		}

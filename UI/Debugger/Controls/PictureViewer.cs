@@ -15,10 +15,10 @@ using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using Avalonia.Threading;
-using Mesen.Utilities;
+using Nexen.Utilities;
 using SkiaSharp;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class PictureViewer : Control {
 		public static readonly StyledProperty<IImage> SourceProperty = AvaloniaProperty.Register<PictureViewer, IImage>(nameof(Source));
 		public static readonly StyledProperty<double> ZoomProperty = AvaloniaProperty.Register<PictureViewer, double>(nameof(Zoom), 1, defaultBindingMode: BindingMode.TwoWay);

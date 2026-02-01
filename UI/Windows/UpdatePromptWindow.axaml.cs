@@ -6,11 +6,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public partial class UpdatePromptWindow : MesenWindow {
+namespace Nexen.Windows {
+	public partial class UpdatePromptWindow : NexenWindow {
 		private UpdatePromptViewModel _model;
 
 		[Obsolete("For designer only")]
@@ -39,7 +39,7 @@ namespace Mesen.Windows {
 
 		private void OnUpdateClick(object sender, RoutedEventArgs e) {
 			if (_model.FileInfo == null || UpdateHelper.GetCommitHash() == null) {
-				MesenMsgBox.Show(null, "AutoUpdateNotSupported", MessageBoxButtons.OK, MessageBoxIcon.Info);
+				NexenMsgBox.Show(null, "AutoUpdateNotSupported", MessageBoxButtons.OK, MessageBoxIcon.Info);
 				return;
 			}
 
@@ -54,7 +54,7 @@ namespace Mesen.Windows {
 					result = false;
 					Dispatcher.UIThread.Post(() => {
 						_model.IsUpdating = false;
-						MesenMsgBox.ShowException(ex);
+						NexenMsgBox.ShowException(ex);
 					});
 					return;
 				}

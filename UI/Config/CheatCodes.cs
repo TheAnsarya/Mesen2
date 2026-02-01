@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class CheatCodes {
 		private static string FilePath { get { return Path.Combine(ConfigManager.CheatFolder, EmuApi.GetRomInfo().GetRomName() + ".json"); } }
 

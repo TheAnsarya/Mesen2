@@ -5,14 +5,14 @@ using System.Linq;
 using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class NesConfigViewModel : DisposableViewModel {
 		private NotificationListener? _listener = null;
 

@@ -21,7 +21,7 @@ using Avalonia.Threading;
 using DataBoxControl.Controls;
 using DataBoxControl.Primitives;
 using DynamicData;
-using Mesen.Utilities;
+using Nexen.Utilities;
 using ReactiveUI;
 
 namespace DataBoxControl;

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Disassembly {
+namespace Nexen.Debugger.Disassembly {
 	public class SourceViewStyleProvider : BaseStyleProvider {
 		private SourceViewViewModel _model;
 

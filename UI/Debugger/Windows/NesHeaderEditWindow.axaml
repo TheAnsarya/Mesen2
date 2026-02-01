@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:vm="using:Mesen.Debugger.ViewModels"
 	xmlns:sys="using:System"
 	xmlns:v="using:Mesen.Views"
@@ -60,10 +60,10 @@
 			<c:EnumComboBox SelectedItem="{Binding Header.FileType}" Grid.Row="0" Grid.Column="1" />
 			
 			<TextBlock Text="{l:Translate lblMapper}" Grid.Row="1" />
-			<c:MesenNumericTextBox Value="{Binding Header.MapperId}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" />
+			<c:NexenNumericTextBox Value="{Binding Header.MapperId}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" />
 			
 			<TextBlock Text="{l:Translate lblSubmapper}" Grid.Row="2" />
-			<c:MesenNumericTextBox Value="{Binding Header.SubmapperId}" IsEnabled="{Binding IsNes20}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" />
+			<c:NexenNumericTextBox Value="{Binding Header.SubmapperId}" IsEnabled="{Binding IsNes20}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" />
 			
 			<TextBlock Text="{l:Translate lblMirroringType}" Grid.Row="3" />
 			<c:EnumComboBox SelectedItem="{Binding Header.Mirroring}" Grid.Row="3" Grid.Column="1" />
@@ -85,13 +85,13 @@
 
 			<TextBlock Text="{l:Translate lblPrgRom}" Grid.Row="0" Grid.Column="3" />
 			<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="4">
-				<c:MesenNumericTextBox Value="{Binding Header.PrgRom}"  />
+				<c:NexenNumericTextBox Value="{Binding Header.PrgRom}"  />
 				<TextBlock Text=" KB" />
 			</StackPanel>
 
 			<TextBlock Text="{l:Translate lblChrRom}" Grid.Row="1" Grid.Column="3" />
 			<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="4">
-				<c:MesenNumericTextBox Value="{Binding Header.ChrRom}"  />
+				<c:NexenNumericTextBox Value="{Binding Header.ChrRom}"  />
 				<TextBlock Text=" KB" />
 			</StackPanel>
 

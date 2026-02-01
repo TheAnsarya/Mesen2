@@ -3,12 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class ControllerConfigWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class ControllerConfigWindow : NexenWindow {
 		private ControllerConfigViewModel Model => (ControllerConfigViewModel)DataContext!;
 		private bool _promptToSave = true;
 
@@ -28,7 +28,7 @@ namespace Mesen.Windows {
 		}
 
 		private async void DisplaySaveChangesPrompt() {
-			DialogResult result = await MesenMsgBox.Show(this, "PromptKeepChanges", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+			DialogResult result = await NexenMsgBox.Show(this, "PromptKeepChanges", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 			switch (result) {
 				case DialogResult.Yes: _promptToSave = false; Close(true); break;
 				case DialogResult.No: _promptToSave = false; Close(false); break;

@@ -3,11 +3,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Platform;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
 
-namespace Mesen {
+namespace Nexen {
 	public class NativeRenderer : NativeControlHost {
 		public NativeRenderer() {
 			Focusable = true;

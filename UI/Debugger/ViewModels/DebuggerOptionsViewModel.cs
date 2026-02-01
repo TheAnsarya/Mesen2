@@ -1,8 +1,8 @@
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class DebuggerOptionsViewModel : ViewModelBase {
 		public DebuggerConfig Config { get; }
 

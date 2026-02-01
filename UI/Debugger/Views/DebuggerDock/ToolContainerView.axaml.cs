@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Mesen.Debugger.Views.DebuggerDock {
+namespace Nexen.Debugger.Views.DebuggerDock {
 	public class ToolContainerView : UserControl {
 		public ToolContainerView() {
 			InitializeComponent();

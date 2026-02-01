@@ -5,14 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class ShortcutHandler {
 		private MainWindow _mainWindow;
 
@@ -507,25 +507,25 @@ namespace Mesen.Utilities {
 		}
 
 		public static async void Reset() {
-			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await MesenMsgBox.Show(null, "ConfirmReset", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await NexenMsgBox.Show(null, "ConfirmReset", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
 				LoadRomHelper.Reset();
 			}
 		}
 
 		public static async void PowerCycle() {
-			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await MesenMsgBox.Show(null, "ConfirmPowerCycle", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await NexenMsgBox.Show(null, "ConfirmPowerCycle", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
 				LoadRomHelper.PowerCycle();
 			}
 		}
 
 		public static async void ReloadRom() {
-			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await MesenMsgBox.Show(null, "ConfirmReloadRom", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await NexenMsgBox.Show(null, "ConfirmReloadRom", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
 				LoadRomHelper.ReloadRom();
 			}
 		}
 
 		public static async void PowerOff() {
-			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await MesenMsgBox.Show(null, "ConfirmPowerOff", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await NexenMsgBox.Show(null, "ConfirmPowerOff", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
 				LoadRomHelper.PowerOff();
 			}
 		}

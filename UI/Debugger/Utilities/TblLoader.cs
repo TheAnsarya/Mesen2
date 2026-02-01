@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class TblLoader {
 		public static TblByteCharConverter? Load(string[] fileContents) {
 			try {

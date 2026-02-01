@@ -2,7 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
 /// <summary>
 /// Used to fix an issue with undo in Avalonia's TextBox.

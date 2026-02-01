@@ -5,10 +5,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
 
-namespace Mesen.Debugger.Disassembly {
+namespace Nexen.Debugger.Disassembly {
 	class CodeHighlighting {
 		private static Regex _labelDef = new Regex("^([^\\s]+)\\s*[:=]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 

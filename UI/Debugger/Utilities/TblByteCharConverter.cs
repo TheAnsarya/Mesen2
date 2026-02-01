@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class TblByteCharConverter {
 		private Dictionary<TblKey, string> _tblRules;
 		private Dictionary<string, TblKey> _reverseTblRules;

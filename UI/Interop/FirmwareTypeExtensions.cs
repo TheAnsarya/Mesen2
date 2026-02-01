@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mesen.Interop;
+namespace Nexen.Interop;
 
 public static class FirmwareTypeExtensions {
 	public static FirmwareFiles GetFirmwareInfo(this FirmwareType type) {

@@ -1,12 +1,12 @@
 using System;
 using System.Reactive;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class RefreshTimingViewModel : ViewModelBase {
 		public RefreshTimingConfig Config { get; }
 

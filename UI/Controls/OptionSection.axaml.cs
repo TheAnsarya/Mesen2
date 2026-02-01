@@ -2,9 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
-using Mesen.Utilities;
+using Nexen.Utilities;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class OptionSection : ItemsControl {
 		public static readonly StyledProperty<string> HeaderProperty = AvaloniaProperty.Register<OptionSection, string>(nameof(Header));
 		public static readonly StyledProperty<string> IconProperty = AvaloniaProperty.Register<OptionSection, string>(nameof(Icon), "");

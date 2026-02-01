@@ -1,4 +1,4 @@
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public static class DebugEventInfoExtensions {
 		public static string GetRegisterName(this DebugEventInfo evt) {
 			if (evt.RegisterId < 0) {

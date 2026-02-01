@@ -9,7 +9,7 @@ using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	internal class MenuHelper {
 		private static bool IsPointerInItem(MenuItem item) {
 			if (item.IsSubMenuOpen) {

@@ -8,11 +8,11 @@ using System.Text.Json.Serialization;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
-using Mesen.Localization;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
+using Nexen.Localization;
 
-namespace Mesen.Debugger.Utilities;
+namespace Nexen.Debugger.Utilities;
 
 public static class OpCodeHelper {
 	private static Dictionary<CpuType, CpuDocumentationData> _data = new();

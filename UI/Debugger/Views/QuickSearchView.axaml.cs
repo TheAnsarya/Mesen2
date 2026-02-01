@@ -4,9 +4,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Debugger.ViewModels;
+using Nexen.Debugger.ViewModels;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class QuickSearchView : UserControl {
 		private QuickSearchViewModel? _model;
 		private TextBox _txtSearch;

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Avalonia.Input;
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class DebuggerShortcutsConfig : BaseConfig<DebuggerShortcutsConfig>, IJsonOnDeserialized {
 		private Dictionary<DebuggerShortcut, DebuggerShortcutInfo> _lookup = new();
 

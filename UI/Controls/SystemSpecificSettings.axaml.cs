@@ -7,12 +7,12 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Localization;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Localization;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class SystemSpecificSettings : UserControl {
 		public static readonly StyledProperty<ConfigType> ConfigTypeProperty = AvaloniaProperty.Register<SystemSpecificSettings, ConfigType>(nameof(ConfigType));
 

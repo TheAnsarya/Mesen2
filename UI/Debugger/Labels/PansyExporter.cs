@@ -10,14 +10,14 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Labels {
+namespace Nexen.Debugger.Labels {
 	/// <summary>
 	/// Pansy file header structure for reading existing files.
 	/// </summary>

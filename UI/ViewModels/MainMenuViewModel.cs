@@ -12,20 +12,20 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class MainMenuViewModel : ViewModelBase {
 		public MainWindowViewModel MainWindow { get; set; }
 
@@ -1085,7 +1085,7 @@ namespace Mesen.ViewModels {
 				UpdatePromptViewModel? updateInfo = await UpdatePromptViewModel.GetUpdateInformation(silent);
 				if (updateInfo == null) {
 					if (!silent) {
-						Dispatcher.UIThread.Post(() => MesenMsgBox.Show(null, "UpdateDownloadFailed", MessageBoxButtons.OK, MessageBoxIcon.Info));
+						Dispatcher.UIThread.Post(() => NexenMsgBox.Show(null, "UpdateDownloadFailed", MessageBoxButtons.OK, MessageBoxIcon.Info));
 					}
 
 					return;
@@ -1099,7 +1099,7 @@ namespace Mesen.ViewModels {
 						}
 					});
 				} else if (!silent) {
-					Dispatcher.UIThread.Post(() => MesenMsgBox.Show(null, "MesenUpToDate", MessageBoxButtons.OK, MessageBoxIcon.Info));
+					Dispatcher.UIThread.Post(() => NexenMsgBox.Show(null, "MesenUpToDate", MessageBoxButtons.OK, MessageBoxIcon.Info));
 				}
 			});
 		}
@@ -1144,7 +1144,7 @@ namespace Mesen.ViewModels {
 					}
 
 					if (hiresEntry == null) {
-						await MesenMsgBox.Show(wnd, "InstallHdPackInvalidPack", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						await NexenMsgBox.Show(wnd, "InstallHdPackInvalidPack", MessageBoxButtons.OK, MessageBoxIcon.Error);
 						return;
 					}
 
@@ -1158,7 +1158,7 @@ namespace Mesen.ViewModels {
 					Match match = supportedRomRegex.Match(hiresData);
 					if (match.Success) {
 						if (!match.Groups[1].Value.ToUpper().Contains(EmuApi.GetRomHash(HashType.Sha1).ToUpper())) {
-							await MesenMsgBox.Show(wnd, "InstallHdPackWrongRom", MessageBoxButtons.OK, MessageBoxIcon.Error);
+							await NexenMsgBox.Show(wnd, "InstallHdPackWrongRom", MessageBoxButtons.OK, MessageBoxIcon.Error);
 							return;
 						}
 					}
@@ -1168,7 +1168,7 @@ namespace Mesen.ViewModels {
 						string targetFolder = Path.Combine(ConfigManager.HdPackFolder, romInfo.GetRomName());
 						if (Directory.Exists(targetFolder)) {
 							//Warn if the folder already exists
-							if (await MesenMsgBox.Show(wnd, "InstallHdPackConfirmOverwrite", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, targetFolder) != DialogResult.OK) {
+							if (await NexenMsgBox.Show(wnd, "InstallHdPackConfirmOverwrite", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, targetFolder) != DialogResult.OK) {
 								return;
 							}
 						} else {
@@ -1189,7 +1189,7 @@ namespace Mesen.ViewModels {
 							}
 						}
 					} catch (Exception ex) {
-						await MesenMsgBox.Show(wnd, "InstallHdPackError", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.ToString());
+						await NexenMsgBox.Show(wnd, "InstallHdPackError", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.ToString());
 						return;
 					}
 
@@ -1199,14 +1199,14 @@ namespace Mesen.ViewModels {
 						ConfigManager.Config.Nes.ApplyConfig();
 					}
 
-					if (await MesenMsgBox.Show(wnd, "InstallHdPackConfirmReset", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
+					if (await NexenMsgBox.Show(wnd, "InstallHdPackConfirmReset", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
 						//Power cycle game if the user agrees
 						LoadRomHelper.PowerCycle();
 					}
 				}
 			} catch {
 				//Invalid file (file missing, not a zip file, etc.)
-				await MesenMsgBox.Show(wnd, "InstallHdPackInvalidZipFile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				await NexenMsgBox.Show(wnd, "InstallHdPackInvalidZipFile", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 

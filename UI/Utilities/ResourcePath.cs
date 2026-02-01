@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public struct ResourcePath : IEquatable<ResourcePath> {
 		public string Path { get; set; }
 		public string InnerFile { get; set; }

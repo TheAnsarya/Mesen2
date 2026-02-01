@@ -1,8 +1,8 @@
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Disassembly {
+namespace Nexen.Debugger.Disassembly {
 	public class LocationInfo {
 		public AddressInfo? RelAddress;
 		public AddressInfo? AbsAddress;

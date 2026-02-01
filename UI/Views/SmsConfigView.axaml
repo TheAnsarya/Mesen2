@@ -50,7 +50,7 @@
 					<c:GroupBox Header="{l:Translate grpVolume}" HorizontalAlignment="Left">
 						<StackPanel Orientation="Horizontal" Height="150">
 							<StackPanel.Styles>
-								<Style Selector="c|MesenSlider">
+								<Style Selector="c|NexenSlider">
 									<Setter Property="Minimum" Value="0" />
 									<Setter Property="Maximum" Value="100" />
 									<Setter Property="Orientation" Value="Vertical" />
@@ -58,11 +58,11 @@
 								</Style>
 							</StackPanel.Styles>
 
-							<c:MesenSlider Text="{l:Translate lblChannel1}" Value="{Binding Config.Tone1Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel2}" Value="{Binding Config.Tone2Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel3}" Value="{Binding Config.Tone3Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel4}" Value="{Binding Config.NoiseVol}" />
-							<c:MesenSlider
+							<c:NexenSlider Text="{l:Translate lblChannel1}" Value="{Binding Config.Tone1Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel2}" Value="{Binding Config.Tone2Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel3}" Value="{Binding Config.Tone3Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel4}" Value="{Binding Config.NoiseVol}" />
+							<c:NexenSlider
 								Text="{l:Translate lblChannel5}"
 								IsEnabled="{Binding Config.EnableFmAudio}"
 								Value="{Binding Config.FmAudioVolume}"

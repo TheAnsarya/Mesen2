@@ -9,7 +9,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class ApplicationHelper {
 		public static Window? GetMainWindow() {
 			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is Window wnd) {
@@ -35,7 +35,7 @@ namespace Mesen.Utilities {
 			return null;
 		}
 
-		public static T? GetExistingWindow<T>() where T : MesenWindow {
+		public static T? GetExistingWindow<T>() where T : NexenWindow {
 			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 				return desktop.Windows.Where(w => w is T).FirstOrDefault() as T;
 			}
@@ -43,7 +43,7 @@ namespace Mesen.Utilities {
 			return null;
 		}
 
-		public static T GetOrCreateUniqueWindow<T>(Control? centerParent, Func<T> createWindow) where T : MesenWindow {
+		public static T GetOrCreateUniqueWindow<T>(Control? centerParent, Func<T> createWindow) where T : NexenWindow {
 			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 				if (desktop.Windows.Where(w => w is T).FirstOrDefault() is not T wnd) {
 					wnd = createWindow();

@@ -1,9 +1,9 @@
 using Avalonia.Media;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class GbaEventViewerConfig : ViewModelBase {
 		[Reactive] public EventViewerCategoryCfg PaletteReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x29, 0xC9, 0x29));
 		[Reactive] public EventViewerCategoryCfg PaletteWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));

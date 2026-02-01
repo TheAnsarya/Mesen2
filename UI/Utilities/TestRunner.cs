@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	internal class TestRunner {
 		internal static int Run(string[] args) {
 			ConfigManager.DisableSaveSettings = true;

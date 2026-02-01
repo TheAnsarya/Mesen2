@@ -10,19 +10,19 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class EventViewerViewModel : DisposableViewModel {
 		public const int HdmaChannelFlag = 0x40;
 

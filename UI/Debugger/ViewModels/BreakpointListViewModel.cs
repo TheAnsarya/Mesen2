@@ -9,17 +9,17 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class BreakpointListViewModel : DisposableViewModel {
-		[Reactive] public MesenList<BreakpointViewModel> Breakpoints { get; private set; } = new();
+		[Reactive] public NexenList<BreakpointViewModel> Breakpoints { get; private set; } = new();
 		[Reactive] public SelectionModel<BreakpointViewModel?> Selection { get; set; } = new() { SingleSelect = false };
 		[Reactive] public SortState SortState { get; set; } = new();
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.BreakpointListColumnWidths;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Config.Shortcuts {
+namespace Nexen.Config.Shortcuts {
 	public class KeyCombination {
 		public UInt16 Key1 { get; set; }
 		public UInt16 Key2 { get; set; }

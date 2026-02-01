@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Mesen.Config;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Labels {
+namespace Nexen.Debugger.Labels {
 	public class DefaultLabelHelper {
 		public static void SetDefaultLabels() {
 			if (ConfigManager.Config.Debug.Debugger.DisableDefaultLabels) {

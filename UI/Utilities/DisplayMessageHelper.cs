@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
 public class DisplayMessageHelper {
 	private static int _taskId = 0;

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class SelectStorageFolderViewModel : ViewModelBase {
 		[Reactive] public bool StoreInUserProfile { get; set; }
 		[Reactive] public bool IsCopying { get; set; }
@@ -51,7 +51,7 @@ namespace Mesen.ViewModels {
 						try {
 							File.Copy(sourceFiles[i], targetFiles[i], true);
 						} catch (Exception ex) {
-							Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+							Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 							return false;
 						}
 
@@ -84,7 +84,7 @@ namespace Mesen.ViewModels {
 
 					File.Move(Path.Combine(source, "settings.json"), Path.Combine(source, "settings.backup.json"));
 				} catch (Exception ex) {
-					Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+					Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 				}
 
 				ConfigManager.ResetHomeFolder();

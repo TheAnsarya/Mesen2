@@ -1,12 +1,12 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class ControllerInputViewModel : ViewModelBase {
 		[Reactive] public int ViewHeight { get; set; }
 

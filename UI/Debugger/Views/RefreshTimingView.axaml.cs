@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class RefreshTimingView : UserControl {
 		public RefreshTimingView() {
 			InitializeComponent();

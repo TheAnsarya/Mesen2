@@ -9,17 +9,17 @@ using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class ProfilerWindowViewModel : DisposableViewModel {
 		[Reactive] public List<ProfilerTab> ProfilerTabs { get; set; } = new List<ProfilerTab>();
 		[Reactive] public ProfilerTab? SelectedTab { get; set; } = null;
@@ -124,7 +124,7 @@ namespace Mesen.Debugger.ViewModels {
 	public class ProfilerTab : ReactiveObject {
 		[Reactive] public string TabName { get; set; } = "";
 		[Reactive] public CpuType CpuType { get; set; } = CpuType.Snes;
-		[Reactive] public MesenList<ProfiledFunctionViewModel> GridData { get; private set; } = new();
+		[Reactive] public NexenList<ProfiledFunctionViewModel> GridData { get; private set; } = new();
 		[Reactive] public SelectionModel<ProfiledFunctionViewModel> Selection { get; set; } = new();
 		[Reactive] public SortState SortState { get; set; } = new();
 		public ProfilerConfig Config => ConfigManager.Config.Debug.Profiler;

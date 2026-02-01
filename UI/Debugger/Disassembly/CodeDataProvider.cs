@@ -1,8 +1,8 @@
 using Avalonia.Controls;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Disassembly {
+namespace Nexen.Debugger.Disassembly {
 	public class CodeDataProvider : ICodeDataProvider {
 		private int _lineCount;
 		protected CpuType _type;

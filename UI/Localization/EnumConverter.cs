@@ -1,7 +1,7 @@
 using System;
 using Avalonia.Data.Converters;
 
-namespace Mesen.Localization {
+namespace Nexen.Localization {
 	public class EnumConverter : IValueConverter {
 		public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) {
 			if (value is Enum enumValue && targetType == typeof(string)) {

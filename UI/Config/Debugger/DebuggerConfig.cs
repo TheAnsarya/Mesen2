@@ -4,12 +4,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Media;
-using Mesen.Debugger;
-using Mesen.Interop;
+using Nexen.Debugger;
+using Nexen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class DebuggerConfig : BaseWindowConfig<DebuggerConfig> {
 		public DockEntryDefinition? SavedDockLayout { get; set; } = null;
 

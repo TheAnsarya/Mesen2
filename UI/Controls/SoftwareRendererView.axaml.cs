@@ -11,15 +11,15 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 using Splat.ModeDetection;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class SoftwareRendererView : UserControl {
 		private SimpleImageViewer _frame;
 		private SimpleImageViewer _emuHud;

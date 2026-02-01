@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	internal class SaveRomActionHelper {
 		public static ContextMenuAction GetSaveRomAction(Window wnd) {
 			return new ContextMenuAction() {
@@ -60,7 +60,7 @@ namespace Mesen.Debugger.Utilities {
 		private static async void SaveRom(Window wnd) {
 			string romName = MainWindowViewModel.Instance.RomInfo.RomPath;
 			if (!DebugApi.SaveRomToDisk(romName, false, CdlStripOption.StripNone)) {
-				await MesenMsgBox.Show(wnd, "FileSaveError", Mesen.Windows.MessageBoxButtons.OK, Mesen.Windows.MessageBoxIcon.Error);
+				await NexenMsgBox.Show(wnd, "FileSaveError", Mesen.Windows.MessageBoxButtons.OK, Mesen.Windows.MessageBoxIcon.Error);
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace Mesen.Debugger.Utilities {
 			string? filename = await FileDialogHelper.SaveFile(null, romName, wnd, ext);
 			if (filename != null) {
 				if (!DebugApi.SaveRomToDisk(filename, saveAsIps, cdlOption)) {
-					await MesenMsgBox.Show(wnd, "FileSaveError", Mesen.Windows.MessageBoxButtons.OK, Mesen.Windows.MessageBoxIcon.Error);
+					await NexenMsgBox.Show(wnd, "FileSaveError", Mesen.Windows.MessageBoxButtons.OK, Mesen.Windows.MessageBoxIcon.Error);
 				}
 			}
 		}

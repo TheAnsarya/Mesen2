@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Integration;
+namespace Nexen.Debugger.Integration;
 
 /// <summary>
 /// Converts debug information from various assembler formats to Pansy metadata.
@@ -250,7 +250,7 @@ public static class DbgToPansyConverter {
 		try {
 			var cpuType = romInfo.ConsoleType.GetMainCpuType();
 			int countBefore = LabelManager.GetLabels(cpuType).Count;
-			MesenLabelFile.Import(filePath, showResult: false);
+			NexenLabelFile.Import(filePath, showResult: false);
 			int countAfter = LabelManager.GetLabels(cpuType).Count;
 			result.SymbolsConverted = countAfter - countBefore;
 			return true;

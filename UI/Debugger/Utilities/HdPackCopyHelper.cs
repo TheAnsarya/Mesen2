@@ -5,10 +5,10 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class HdPackCopyHelper {
 		public static bool IsActionAllowed(MemoryType type) {
 			return type switch {

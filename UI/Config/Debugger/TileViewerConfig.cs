@@ -1,7 +1,7 @@
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class TileViewerConfig : BaseWindowConfig<TileViewerConfig> {
 		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 

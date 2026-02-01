@@ -7,11 +7,11 @@ using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
 using Dock.Model.Mvvm.Core;
-using Mesen.Debugger.StatusViews;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.ViewModels.DebuggerDock;
+using Nexen.Debugger.StatusViews;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.ViewModels.DebuggerDock;
 
-namespace Mesen.Debugger {
+namespace Nexen.Debugger {
 	public class DebuggerDockFactory : Factory {
 		public ToolContainerViewModel<DisassemblyViewModel> DisassemblyTool { get; private set; }
 		public ToolContainerViewModel<SourceViewViewModel> SourceViewTool { get; private set; }

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Mesen.Config;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 using static Mesen.Debugger.ViewModels.RegEntry;
 
-namespace Mesen.Debugger.RegisterViewer;
+namespace Nexen.Debugger.RegisterViewer;
 
 public class WsRegisterViewer {
 	public static List<RegisterViewerTab> GetTabs(ref WsState wsState) {

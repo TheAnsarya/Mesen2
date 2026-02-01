@@ -1,9 +1,9 @@
 using System.Reactive;
 using System.Reactive.Linq;
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class NesDebuggerConfig : ViewModelBase {
 		[Reactive] public bool BreakOnBrk { get; set; } = false;
 		[Reactive] public bool BreakOnUnofficialOpCode { get; set; } = false;

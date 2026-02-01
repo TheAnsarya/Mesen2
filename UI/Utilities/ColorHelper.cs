@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class ColorHelper {
 		public static HslColor RgbToHsl(Color rgbColor) {
 			double r = rgbColor.R / 255.0;

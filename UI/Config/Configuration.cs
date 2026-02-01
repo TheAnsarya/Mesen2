@@ -8,13 +8,13 @@ using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config.Shortcuts;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public partial class Configuration : ReactiveObject {
 		private string _fileData = "";
 

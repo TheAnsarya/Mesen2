@@ -6,13 +6,13 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class GameConfig : BaseConfig<GameConfig> {
 		[Reactive] public UInt32 DipSwitches { get; set; } = 0;
 

@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels;
+namespace Nexen.Debugger.ViewModels;
 
 public class NesHeaderEditViewModel : DisposableViewModel {
 	public NesHeader Header { get; }

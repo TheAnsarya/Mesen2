@@ -3,13 +3,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class MovieRecordWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class MovieRecordWindow : NexenWindow {
 		public MovieRecordWindow() {
 			InitializeComponent();
 #if DEBUG

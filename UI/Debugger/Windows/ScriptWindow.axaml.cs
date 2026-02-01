@@ -19,20 +19,20 @@ using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Views;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.Views;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class ScriptWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class ScriptWindow : NexenWindow, INotificationHandler {
 		private static XshdSyntaxDefinition _syntaxDef;
 		private IHighlightingDefinition _highlighting;
-		private MesenTextEditor _textEditor;
-		private MesenTextEditor _txtScriptLog;
+		private NexenTextEditor _textEditor;
+		private NexenTextEditor _txtScriptLog;
 		private DispatcherTimer _timer;
 
 		public ScriptWindowViewModel Model { get; }
@@ -56,7 +56,7 @@ namespace Mesen.Debugger.Windows {
 
 			Model = model;
 			DataContext = model;
-			_textEditor = this.GetControl<MesenTextEditor>("Editor");
+			_textEditor = this.GetControl<NexenTextEditor>("Editor");
 
 			ColorHelper.InvalidateControlOnThemeChange(_textEditor, () => {
 				UpdateSyntaxDef();
@@ -70,7 +70,7 @@ namespace Mesen.Debugger.Windows {
 			_textEditor.TextArea.TextEntering += TextArea_TextEntering;
 			_textEditor.TextArea.TextView.PointerMoved += TextView_PointerMoved;
 
-			_txtScriptLog = this.GetControl<MesenTextEditor>("txtScriptLog");
+			_txtScriptLog = this.GetControl<NexenTextEditor>("txtScriptLog");
 			_timer = new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Normal, (s, e) => UpdateLog());
 
 			if (Design.IsDesignMode) {

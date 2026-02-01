@@ -8,14 +8,14 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 using ReactiveUI;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class StateGrid : UserControl {
 		public static readonly StyledProperty<List<RecentGameInfo>> EntriesProperty = AvaloniaProperty.Register<StateGrid, List<RecentGameInfo>>(nameof(Entries));
 
@@ -159,7 +159,7 @@ namespace Mesen.Controls {
 		/// </summary>
 		private async Task DeleteSelectedEntryWithConfirmation(RecentGamesViewModel model, RecentGameInfo entry) {
 			// Show confirmation dialog
-			DialogResult result = await MesenMsgBox.Show(
+			DialogResult result = await NexenMsgBox.Show(
 				VisualRoot,
 				"ConfirmDeleteSaveState",
 				MessageBoxButtons.YesNo,

@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
-using Mesen.Config.Shortcuts;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config.Shortcuts;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public class EmuApi {
 		public const string DllName = "MesenCore.dll";
 		private const string DllPath = EmuApi.DllName;

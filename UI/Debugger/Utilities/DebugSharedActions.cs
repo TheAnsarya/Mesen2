@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	internal class DebugSharedActions {
 		public static List<ContextMenuAction> GetStepActions(Control wnd, Func<CpuType> getCpuType) {
 			return new List<ContextMenuAction>() {

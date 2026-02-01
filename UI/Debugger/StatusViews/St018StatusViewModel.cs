@@ -1,10 +1,10 @@
 using System;
 using System.Text;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews;
+namespace Nexen.Debugger.StatusViews;
 
 public class St018StatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt32 Reg0 { get; set; }

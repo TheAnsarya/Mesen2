@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	[XmlRoot("cheats")]
 	public class CheatDatabase {
 		[XmlElement("game")]

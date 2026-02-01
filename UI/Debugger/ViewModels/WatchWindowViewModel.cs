@@ -7,16 +7,16 @@ using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class WatchWindowViewModel : ViewModelBase {
 		[Reactive] public List<WatchTab> WatchTabs { get; set; } = new List<WatchTab>();
 		[Reactive] public WatchTab SelectedTab { get; set; } = null!;

@@ -6,12 +6,12 @@ using System.IO.Hashing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Labels {
+namespace Nexen.Debugger.Labels {
 	/// <summary>
 	/// Manages folder-based debug data storage for ROMs.
 	/// Each ROM gets a dedicated folder containing:
@@ -172,7 +172,7 @@ namespace Mesen.Debugger.Labels {
 				if (config.SyncMlbFiles) {
 					string mlbPath = GetMlbPath(romInfo);
 					try {
-						MesenLabelFile.Export(mlbPath);
+						NexenLabelFile.Export(mlbPath);
 					} catch (Exception ex) {
 						System.Diagnostics.Debug.WriteLine($"[DebugFolderManager] MLB export failed: {ex.Message}");
 						success = false;
@@ -344,7 +344,7 @@ namespace Mesen.Debugger.Labels {
 			if (config.AutoLoadMlbFiles && config.SyncMlbFiles) {
 				string mlbPath = GetMlbPath(romInfo);
 				if (File.Exists(mlbPath)) {
-					MesenLabelFile.Import(mlbPath, showResult: false);
+					NexenLabelFile.Import(mlbPath, showResult: false);
 					imported = true;
 				}
 			}

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger {
+namespace Nexen.Debugger {
 	public class CodeLineData {
 		public CpuType CpuType { get; private set; }
 

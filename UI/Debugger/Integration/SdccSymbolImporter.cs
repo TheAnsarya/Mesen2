@@ -4,13 +4,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Integration;
+namespace Nexen.Debugger.Integration;
 
 public abstract class SdccSymbolImporter : ISymbolProvider {
 	private static Regex _globalSymbolRegex = new Regex(@"^L:G\$([^$]+)\$([0-9_]+)\$(\d+):([0-9A-Fa-f]+)$", RegexOptions.Compiled);
@@ -236,9 +236,9 @@ public abstract class SdccSymbolImporter : ISymbolProvider {
 
 		if (showResult) {
 			if (errorCount > 0) {
-				MesenMsgBox.Show(null, "ImportLabelsWithErrors", MessageBoxButtons.OK, MessageBoxIcon.Warning, labels.Count.ToString(), errorCount.ToString());
+				NexenMsgBox.Show(null, "ImportLabelsWithErrors", MessageBoxButtons.OK, MessageBoxIcon.Warning, labels.Count.ToString(), errorCount.ToString());
 			} else {
-				MesenMsgBox.Show(null, "ImportLabels", MessageBoxButtons.OK, MessageBoxIcon.Info, labels.Count.ToString());
+				NexenMsgBox.Show(null, "ImportLabels", MessageBoxButtons.OK, MessageBoxIcon.Info, labels.Count.ToString());
 			}
 		}
 	}

@@ -11,11 +11,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen {
+namespace Nexen {
 	class Program {
 		// Initialization code. Don't use any Avalonia, third-party APIs or any
 		// SynchronizationContext-reliant code before AppMain is called: things aren't initialized

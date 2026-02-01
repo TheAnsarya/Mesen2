@@ -54,7 +54,7 @@
 			<Path Data="{StaticResource NextSmallButton}" />
 		</RepeatButton>
 
-		<c:MesenNumericTextBox
+		<c:NexenNumericTextBox
 			Hex="True"
 			Value="{Binding Value}"
 			Max="{Binding Maximum}"

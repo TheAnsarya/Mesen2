@@ -10,16 +10,16 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.GUI.Utilities;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.GUI.Utilities;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Windows {
-	public partial class SelectRomWindow : MesenWindow {
+namespace Nexen.Windows {
+	public partial class SelectRomWindow : NexenWindow {
 		private ListBox _listBox;
 		private TextBox _searchBox;
 

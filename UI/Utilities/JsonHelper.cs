@@ -6,14 +6,14 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Debugger;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class JsonHelper {
 		public static T Clone<T>(T obj) where T : notnull {
 			using MemoryStream stream = new MemoryStream();

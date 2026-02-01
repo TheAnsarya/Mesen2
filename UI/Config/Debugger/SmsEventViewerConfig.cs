@@ -1,9 +1,9 @@
 using Avalonia.Media;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class SmsEventViewerConfig : ViewModelBase {
 		[Reactive] public EventViewerCategoryCfg VdpPaletteWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
 		[Reactive] public EventViewerCategoryCfg VdpVramWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));

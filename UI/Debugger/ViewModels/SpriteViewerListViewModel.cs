@@ -5,13 +5,13 @@ using System.Linq;
 using System.Windows.Input;
 using Avalonia.Controls.Selection;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class SpriteViewerListViewModel : DisposableViewModel {
 		[Reactive] public bool ShowListView { get; set; }
 		[Reactive] public double MinListViewHeight { get; set; }

@@ -1,9 +1,9 @@
 using System;
 using Avalonia.Controls;
 
-namespace Mesen.Controls;
+namespace Nexen.Controls;
 
-public class MesenNumericUpDown : NumericUpDown {
+public class NexenNumericUpDown : NumericUpDown {
 	protected override Type StyleKeyOverride => typeof(NumericUpDown);
 
 	protected override void OnTextChanged(string? oldValue, string? newValue) {

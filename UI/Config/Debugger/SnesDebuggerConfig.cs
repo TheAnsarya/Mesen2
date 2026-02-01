@@ -1,7 +1,7 @@
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class SnesDebuggerConfig : ViewModelBase {
 		[Reactive] public bool BreakOnBrk { get; set; } = false;
 		[Reactive] public bool BreakOnCop { get; set; } = false;

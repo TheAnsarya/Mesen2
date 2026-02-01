@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Mesen.Interop;
+namespace Nexen.Interop;
 
 public enum SnesCpuStopState : byte {
 	Running = 0,

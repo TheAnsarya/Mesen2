@@ -5,14 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Mesen.Config;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Integration {
+namespace Nexen.Debugger.Integration {
 	public abstract class DbgImporter : ISymbolProvider {
 		private static Regex _segmentRegex = new Regex("^seg\tid=([0-9]+),.*start=0x([0-9a-fA-F]+),.*size=0x([0-9A-Fa-f]+)", RegexOptions.Compiled);
 		private static Regex _segmentPrgRomRegex = new Regex("^seg\tid=([0-9]+),.*start=0x([0-9a-fA-F]+),.*size=0x([0-9A-Fa-f]+),.*ooffs=([0-9]+)", RegexOptions.Compiled);
@@ -982,15 +982,15 @@ namespace Mesen.Debugger.Integration {
 
 					if (_errorCount > 0) {
 						if (_filesNotFound.Count > 0) {
-							MesenMsgBox.Show(null, "ImportLabelsWithErrorsAndMissingFiles", MessageBoxButtons.OK, MessageBoxIcon.Warning, labelsToImport.Count.ToString(), _errorCount.ToString(), missingFiles.ToString());
+							NexenMsgBox.Show(null, "ImportLabelsWithErrorsAndMissingFiles", MessageBoxButtons.OK, MessageBoxIcon.Warning, labelsToImport.Count.ToString(), _errorCount.ToString(), missingFiles.ToString());
 						} else {
-							MesenMsgBox.Show(null, "ImportLabelsWithErrors", MessageBoxButtons.OK, MessageBoxIcon.Warning, labelsToImport.Count.ToString(), _errorCount.ToString());
+							NexenMsgBox.Show(null, "ImportLabelsWithErrors", MessageBoxButtons.OK, MessageBoxIcon.Warning, labelsToImport.Count.ToString(), _errorCount.ToString());
 						}
 					} else {
-						MesenMsgBox.Show(null, "ImportLabelsWithMissingFiles", MessageBoxButtons.OK, MessageBoxIcon.Warning, labelsToImport.Count.ToString(), missingFiles.ToString());
+						NexenMsgBox.Show(null, "ImportLabelsWithMissingFiles", MessageBoxButtons.OK, MessageBoxIcon.Warning, labelsToImport.Count.ToString(), missingFiles.ToString());
 					}
 				} else {
-					MesenMsgBox.Show(null, "ImportLabels", MessageBoxButtons.OK, MessageBoxIcon.Info, labelsToImport.Count.ToString());
+					NexenMsgBox.Show(null, "ImportLabels", MessageBoxButtons.OK, MessageBoxIcon.Info, labelsToImport.Count.ToString());
 				}
 			}
 		}

@@ -8,12 +8,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class ToolRefreshHelper {
 		class ToolInfo {
 			internal int ViewerId { get; set; } = 0;

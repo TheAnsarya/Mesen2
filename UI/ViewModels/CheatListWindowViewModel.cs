@@ -9,17 +9,17 @@ using Avalonia.Controls.Selection;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class CheatListWindowViewModel : DisposableViewModel {
-		[Reactive] public MesenList<CheatCode> Cheats { get; private set; } = new();
+		[Reactive] public NexenList<CheatCode> Cheats { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> ToolbarActions { get; private set; } = new();
 		[Reactive] public bool DisableAllCheats { get; set; } = false;
 
@@ -57,7 +57,7 @@ namespace Mesen.ViewModels {
 
 		public void LoadCheats() {
 			_cheatCodes = CheatCodes.LoadCheatCodes();
-			Cheats = new MesenList<CheatCode>(_cheatCodes.Cheats);
+			Cheats = new NexenList<CheatCode>(_cheatCodes.Cheats);
 		}
 
 		public void SaveCheats() {

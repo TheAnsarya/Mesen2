@@ -1,7 +1,7 @@
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config;
+namespace Nexen.Config;
 
 public class GbaDebuggerConfig : ViewModelBase {
 	[Reactive] public bool BreakOnInvalidOpCode { get; set; } = false;

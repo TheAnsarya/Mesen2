@@ -7,10 +7,10 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Localization;
+using Nexen.Config;
+using Nexen.Localization;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class OverscanInput : UserControl {
 		public static readonly StyledProperty<OverscanConfig> OverscanProperty = AvaloniaProperty.Register<OverscanInput, OverscanConfig>(nameof(Overscan), new OverscanConfig(), defaultBindingMode: BindingMode.TwoWay);
 

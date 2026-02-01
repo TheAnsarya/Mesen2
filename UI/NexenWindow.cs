@@ -4,12 +4,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.VisualTree;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen;
+namespace Nexen;
 
-public class MesenWindow : Window {
-	static MesenWindow() {
+public class NexenWindow : Window {
+	static NexenWindow() {
 		PopupRoot.ClientSizeProperty.Changed.AddClassHandler<PopupRoot>((s, e) => {
 			foreach (var v in s.GetVisualChildren()) {
 				SetTextRenderingMode(v);

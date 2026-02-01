@@ -1,10 +1,10 @@
 using System;
 using System.Text;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews {
+namespace Nexen.Debugger.StatusViews {
 	public class NecDspStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public UInt16 RegTR { get; set; }
 		[Reactive] public UInt16 RegTRB { get; set; }

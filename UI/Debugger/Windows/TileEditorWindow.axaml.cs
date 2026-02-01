@@ -8,15 +8,15 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class TileEditorWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class TileEditorWindow : NexenWindow, INotificationHandler {
 		private TileEditorViewModel _model;
 		private PictureViewer _picViewer;
 		private DynamicTooltip? _tileColorTooltip;

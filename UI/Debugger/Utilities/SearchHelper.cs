@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class SearchHelper {
 		private static List<string> GetSearchTerms(string searchString) {
 			searchString = searchString.Trim();

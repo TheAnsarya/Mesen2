@@ -2,10 +2,10 @@ using System.Collections;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class MainMenuView : UserControl {
 		public Menu MainMenu { get; }
 

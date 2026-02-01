@@ -2,14 +2,14 @@ using System;
 using System.Reactive.Linq;
 using System.Text;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger {
+namespace Nexen.Debugger {
 	public class Breakpoint : ReactiveObject {
 		[Reactive] public bool BreakOnRead { get; set; }
 		[Reactive] public bool BreakOnWrite { get; set; }

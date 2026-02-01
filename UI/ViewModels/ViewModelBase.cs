@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using ReactiveUI;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class ViewModelBase : ReactiveObject {
 	}
 

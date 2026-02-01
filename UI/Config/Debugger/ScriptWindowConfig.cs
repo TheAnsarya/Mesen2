@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class ScriptWindowConfig : BaseWindowConfig<ScriptWindowConfig> {
 		private const int MaxRecentScripts = 10;
 

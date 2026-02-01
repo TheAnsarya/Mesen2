@@ -5,10 +5,10 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Labels;
+namespace Nexen.Debugger.Labels;
 
 /// <summary>
 /// Change type for sync events.
@@ -326,7 +326,7 @@ public class SyncManager : IDisposable {
 				// Wait for file to be released
 				await WaitForFileAccess(change.FilePath, cancellationToken);
 				await Dispatcher.UIThread.InvokeAsync(() => {
-					MesenLabelFile.Import(change.FilePath, showResult: false);
+					NexenLabelFile.Import(change.FilePath, showResult: false);
 					System.Diagnostics.Debug.WriteLine($"[SyncManager] Imported MLB: {change.FilePath}");
 				});
 				break;
@@ -400,7 +400,7 @@ public class SyncManager : IDisposable {
 			// Import MLB if exists
 			string mlbPath = DebugFolderManager.GetMlbPath(_currentRom);
 			if (File.Exists(mlbPath)) {
-				await Dispatcher.UIThread.InvokeAsync(() => MesenLabelFile.Import(mlbPath, showResult: false));
+				await Dispatcher.UIThread.InvokeAsync(() => NexenLabelFile.Import(mlbPath, showResult: false));
 			}
 
 			// Import CDL if exists

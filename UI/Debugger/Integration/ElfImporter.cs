@@ -8,13 +8,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ELFSharp.ELF;
 using ELFSharp.ELF.Sections;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Integration;
+namespace Nexen.Debugger.Integration;
 
 public abstract class ElfImporter {
 	public static void Import(string path, bool showResult, CpuType cpuType) {
@@ -86,11 +86,11 @@ public abstract class ElfImporter {
 			}
 
 			if (showResult) {
-				MesenMsgBox.Show(null, "ImportLabels", MessageBoxButtons.OK, MessageBoxIcon.Info, labels.Count.ToString());
+				NexenMsgBox.Show(null, "ImportLabels", MessageBoxButtons.OK, MessageBoxIcon.Info, labels.Count.ToString());
 			}
 		} catch (Exception ex) {
 			if (showResult) {
-				MesenMsgBox.ShowException(ex);
+				NexenMsgBox.ShowException(ex);
 			}
 		}
 	}

@@ -6,11 +6,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Controls;
-using Mesen.Utilities;
+using Nexen.Controls;
+using Nexen.Utilities;
 
-namespace Mesen.Windows {
-	public class InputBarcodeWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class InputBarcodeWindow : NexenWindow {
 		private static string _lastBarcode { get; set; } = "";
 
 		public static readonly StyledProperty<string> BarcodeProperty = AvaloniaProperty.Register<InputBarcodeWindow, string>(nameof(Barcode), "");

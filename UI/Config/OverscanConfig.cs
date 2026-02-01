@@ -6,13 +6,13 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class OverscanConfig : BaseConfig<OverscanConfig> {
 		[Reactive][MinMax(0, 100)] public UInt32 Left { get; set; } = 0;
 		[Reactive][MinMax(0, 100)] public UInt32 Right { get; set; } = 0;

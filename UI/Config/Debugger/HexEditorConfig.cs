@@ -9,12 +9,12 @@ using System.Xml;
 using System.Xml.Serialization;
 using Avalonia;
 using Avalonia.Media;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class HexEditorConfig : BaseWindowConfig<HexEditorConfig> {
 		[Reactive] public bool ShowOptionPanel { get; set; } = true;
 		[Reactive] public bool AutoRefresh { get; set; } = true;

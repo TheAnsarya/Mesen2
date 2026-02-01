@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Mesen.Interop;
+namespace Nexen.Interop;
 
 public struct PceCpuState : BaseState {
 	public UInt64 CycleCount;

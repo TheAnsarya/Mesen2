@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class NesEventViewerConfigView : UserControl {
 		public NesEventViewerConfigView() {
 			InitializeComponent();

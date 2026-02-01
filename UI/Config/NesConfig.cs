@@ -5,10 +5,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class NesConfig : BaseConfig<NesConfig> {
 		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 

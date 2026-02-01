@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.GUI.Utilities {
+namespace Nexen.GUI.Utilities {
 	public class ArchiveHelper {
 		public unsafe static List<ArchiveRomEntry> GetArchiveRomList(string archivePath) {
 			//Split the array on the [!|!] delimiter

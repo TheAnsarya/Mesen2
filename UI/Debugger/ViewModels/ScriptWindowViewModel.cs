@@ -9,18 +9,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class ScriptWindowViewModel : ViewModelBase {
 		public ScriptWindowConfig Config { get; } = ConfigManager.Config.Debug.ScriptWindow;
 
@@ -312,7 +312,7 @@ namespace Mesen.Debugger.ViewModels {
 
 		public async Task<bool> SavePrompt() {
 			if (_originalText != Code) {
-				DialogResult result = await MesenMsgBox.Show(_wnd, "ScriptSaveConfirmation", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+				DialogResult result = await NexenMsgBox.Show(_wnd, "ScriptSaveConfirmation", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
 				if (result == DialogResult.Yes) {
 					return await SaveScript();
 				} else if (result == DialogResult.Cancel) {

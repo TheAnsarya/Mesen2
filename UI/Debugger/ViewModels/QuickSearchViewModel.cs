@@ -8,12 +8,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels;
+namespace Nexen.Debugger.ViewModels;
 
 public class QuickSearchViewModel : ViewModelBase {
 	[Reactive] public bool IsSearchBoxVisible { get; set; }

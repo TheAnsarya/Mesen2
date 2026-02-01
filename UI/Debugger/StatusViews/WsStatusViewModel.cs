@@ -1,11 +1,11 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews;
+namespace Nexen.Debugger.StatusViews;
 
 public class WsStatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt16 RegAX { get; set; }

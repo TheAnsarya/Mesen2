@@ -6,10 +6,10 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Mesen.Interop;
-using Mesen.Localization;
+using Nexen.Interop;
+using Nexen.Localization;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class CodeCompletionHelper {
 		private static Dictionary<string, DocEntryViewModel> _documentation;
 

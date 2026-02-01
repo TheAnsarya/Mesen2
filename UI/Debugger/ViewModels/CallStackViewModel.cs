@@ -6,21 +6,21 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class CallStackViewModel : DisposableViewModel {
 		public CpuType CpuType { get; }
 		public DebuggerWindowViewModel Debugger { get; }
 
-		[Reactive] public MesenList<StackInfo> CallStackContent { get; private set; } = new();
+		[Reactive] public NexenList<StackInfo> CallStackContent { get; private set; } = new();
 		[Reactive] public SelectionModel<StackInfo?> Selection { get; set; } = new();
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.CallStackColumnWidths;
 

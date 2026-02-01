@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Integration;
+namespace Nexen.Debugger.Integration;
 
 /// <summary>
 /// Imports Pansy metadata files into Mesen's debugger.
@@ -422,7 +422,7 @@ public class PansyImporter {
 		if (result.DataOffsetsImported > 0)
 			stats += $"\nData offsets: {result.DataOffsetsImported}";
 
-		MesenMsgBox.Show(null, "PansyImportComplete", MessageBoxButtons.OK, MessageBoxIcon.Info, stats);
+		NexenMsgBox.Show(null, "PansyImportComplete", MessageBoxButtons.OK, MessageBoxIcon.Info, stats);
 	}
 
 	private class PansyHeader {

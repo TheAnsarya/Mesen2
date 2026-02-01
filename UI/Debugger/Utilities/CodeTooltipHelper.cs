@@ -1,15 +1,15 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Localization;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Localization;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class CodeTooltipHelper {
 		public static LocationInfo? GetLocation(CpuType cpuType, CodeSegmentInfo seg) {
 			int address = -1;

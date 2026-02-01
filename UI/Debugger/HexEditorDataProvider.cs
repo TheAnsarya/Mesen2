@@ -1,14 +1,14 @@
 using System;
 using System.Linq;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
 
-namespace Mesen.Debugger {
+namespace Nexen.Debugger {
 	public class HexEditorDataProvider : IHexEditorDataProvider {
 		public int Length { get; private set; }
 

@@ -1,6 +1,6 @@
 using Avalonia.Media;
 
-namespace Mesen.Config;
+namespace Nexen.Config;
 
 public static class EventViewerColors {
 	public static Color[] Colors { get; } = new Color[] {

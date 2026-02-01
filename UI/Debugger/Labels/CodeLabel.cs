@@ -1,12 +1,12 @@
 using System;
 using System.Globalization;
 using System.Text;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Labels {
+namespace Nexen.Debugger.Labels {
 	public class CodeLabel {
 		public UInt32 Address { get; set; }
 		public MemoryType MemoryType { get; set; }

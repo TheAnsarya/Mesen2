@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Integration {
+namespace Nexen.Debugger.Integration {
 	public interface ISymbolProvider {
 		DateTime SymbolFileStamp { get; }
 		string SymbolPath { get; }

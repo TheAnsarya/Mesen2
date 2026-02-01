@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class Utf8Utilities {
 		public static string GetStringFromArray(byte[] strArray) {
 			for (int i = 0; i < strArray.Length; i++) {

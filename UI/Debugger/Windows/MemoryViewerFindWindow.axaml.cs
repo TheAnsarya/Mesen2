@@ -5,16 +5,16 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class MemoryViewerFindWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class MemoryViewerFindWindow : NexenWindow {
 		private MemoryViewerFindViewModel _model;
 		private MemoryToolsViewModel _viewerModel;
 
@@ -41,7 +41,7 @@ namespace Mesen.Debugger.Windows {
 		}
 
 		protected override void OnClosed(EventArgs e) {
-			//Prevent MesenWindow logic from disposing the model
+			//Prevent NexenWindow logic from disposing the model
 			DataContext = null;
 
 			base.OnClosed(e);

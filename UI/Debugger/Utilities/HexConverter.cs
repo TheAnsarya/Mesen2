@@ -3,7 +3,7 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Data.Converters;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class HexConverter : IValueConverter {
 		public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) {
 			if (targetType == typeof(string)) {

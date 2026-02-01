@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:dvm="using:Mesen.Debugger.ViewModels"
 	xmlns:v="using:Mesen.Views"
 	xmlns:cfg="using:Mesen.Config"
@@ -103,7 +103,7 @@
 					<c:OptionSection Header="{l:Translate lblRestrictions}">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock Text="{l:Translate lblMaxExecutionTime}" />
-							<c:MesenNumericUpDown Margin="3 0" Minimum="1" Maximum="100" Value="{Binding Script.ScriptTimeout}" />
+							<c:NexenNumericUpDown Margin="3 0" Minimum="1" Maximum="100" Value="{Binding Script.ScriptTimeout}" />
 							<TextBlock Text="{l:Translate lblSeconds}" />
 						</StackPanel>
 						<CheckBox IsChecked="{Binding Script.AllowIoOsAccess}" Content="{l:Translate chkAllowIoOsAccess}" />
@@ -358,7 +358,7 @@
 					<c:OptionSection Header="{l:Translate lblSourceView}">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock VerticalAlignment="Center" Text="{l:Translate lblTabSize}" />
-							<c:MesenNumericUpDown Value="{Binding Integration.TabSize}" Minimum="1" Maximum="16" />
+							<c:NexenNumericUpDown Value="{Binding Integration.TabSize}" Minimum="1" Maximum="16" />
 						</StackPanel>
 					</c:OptionSection>
 				</StackPanel>

@@ -1,13 +1,13 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class CodeViewerSelectionHandler : IDisposable {
 		private DisassemblyViewer _viewer;
 		private ISelectableModel _model;

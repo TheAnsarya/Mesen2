@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class HdPackBuilderConfig : BaseConfig<HdPackBuilderConfig> {
 		public ScaleFilterType FilterType { get; set; } = ScaleFilterType.Prescale;
 		public UInt32 Scale { get; set; } = 1;

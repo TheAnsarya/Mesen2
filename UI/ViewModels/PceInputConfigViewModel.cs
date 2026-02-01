@@ -1,11 +1,11 @@
 using System;
 using System.Reactive.Linq;
 using Avalonia.Threading;
-using Mesen.Config;
+using Nexen.Config;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class PceInputConfigViewModel : DisposableViewModel {
 		[Reactive] public PcEngineConfig Config { get; set; }
 		[Reactive] public bool HasTurboTap { get; private set; }

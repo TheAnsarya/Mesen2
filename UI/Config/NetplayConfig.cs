@@ -1,7 +1,7 @@
 using System;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class NetplayConfig : BaseConfig<NetplayConfig> {
 		[Reactive] public string Host { get; set; } = "localhost";
 		[Reactive] public UInt16 Port { get; set; } = 8888;

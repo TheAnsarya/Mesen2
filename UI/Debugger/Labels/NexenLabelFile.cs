@@ -5,13 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Labels {
-	public class MesenLabelFile {
+namespace Nexen.Debugger.Labels {
+	public class NexenLabelFile {
 		public static void Import(string path, bool showResult) {
 			List<CodeLabel> labels = new(1000);
 
@@ -32,7 +32,7 @@ namespace Mesen.Debugger.Labels {
 			LabelManager.SetLabels(labels);
 
 			if (showResult) {
-				MesenMsgBox.Show(null, errorCount == 0 ? "ImportLabels" : "ImportLabelsWithErrors", MessageBoxButtons.OK, MessageBoxIcon.Question, labels.Count.ToString(), errorCount.ToString());
+				NexenMsgBox.Show(null, errorCount == 0 ? "ImportLabels" : "ImportLabelsWithErrors", MessageBoxButtons.OK, MessageBoxIcon.Question, labels.Count.ToString(), errorCount.ToString());
 			}
 		}
 

@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:vm="using:Mesen.ViewModels"
 	xmlns:sys="using:System"
 	xmlns:v="using:Mesen.Views"
@@ -26,11 +26,11 @@
 	
 	<DockPanel>
 		<Panel DockPanel.Dock="Top">
-			<c:MesenMenu DockPanel.Dock="Top" Name="ActionMenu">
+			<c:NexenMenu DockPanel.Dock="Top" Name="ActionMenu">
 				<MenuItem Header="{l:Translate mnuFile}" ItemsSource="{Binding FileMenuActions}" />
 				<MenuItem Header="{l:Translate mnuView}" ItemsSource="{Binding ViewMenuActions}" />
 				<MenuItem Header="{l:Translate mnuTools}" ItemsSource="{Binding ToolsMenuActions}" />
-			</c:MesenMenu>
+			</c:NexenMenu>
 		</Panel>
 
 		<dc:ActionToolbar Items="{Binding ToolbarActions}" DockPanel.Dock="Top" />

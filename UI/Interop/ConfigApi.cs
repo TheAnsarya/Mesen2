@@ -6,11 +6,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Utilities;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public class ConfigApi {
 		private const string DllPath = EmuApi.DllName;
 

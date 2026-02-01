@@ -17,14 +17,14 @@
 	</Design.DataContext>
 
 	<DockPanel Background="{DynamicResource MesenMenuBackground}">
-		<c:MesenMenu Name="ActionMenu" DockPanel.Dock="Left">
+		<c:NexenMenu Name="ActionMenu" DockPanel.Dock="Left">
 			<MenuItem Header="{l:Translate mnuFile}" ItemsSource="{Binding FileMenuItems}" />
 			<MenuItem Header="{l:Translate mnuGame}" ItemsSource="{Binding GameMenuItems}" />
 			<MenuItem Header="{l:Translate mnuOptions}" ItemsSource="{Binding OptionsMenuItems}" />
 			<MenuItem Header="{l:Translate mnuTools}" ItemsSource="{Binding ToolsMenuItems}" SubmenuOpened="mnuTools_Opened" />
 			<MenuItem Header="{l:Translate mnuDebug}" ItemsSource="{Binding DebugMenuItems}" />
 			<MenuItem Header="{l:Translate mnuHelp}" ItemsSource="{Binding HelpMenuItems}" />
-		</c:MesenMenu>
+		</c:NexenMenu>
 		<Panel Name="MenuPanel" />
 	</DockPanel>
 </UserControl>

@@ -2,12 +2,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Media;
-using Mesen.Debugger;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Debugger;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class WsDebuggerConfig : ViewModelBase {
 		[Reactive] public bool BreakOnUndefinedOpCode { get; set; } = false;
 	}

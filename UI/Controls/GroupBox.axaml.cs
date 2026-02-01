@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class GroupBox : ContentControl {
 		public static readonly StyledProperty<object> HeaderProperty = AvaloniaProperty.Register<GroupBox, object>(nameof(Header));
 

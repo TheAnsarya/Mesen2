@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class VideoRecordConfig : BaseConfig<VideoRecordConfig> {
 		[Reactive] public VideoCodec Codec { get; set; } = VideoCodec.CSCD;
 		[Reactive] public UInt32 CompressionLevel { get; set; } = 6;

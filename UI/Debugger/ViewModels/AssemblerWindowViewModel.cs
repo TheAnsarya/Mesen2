@@ -5,18 +5,18 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class AssemblerWindowViewModel : DisposableViewModel {
 		public AssemblerConfig Config { get; }
 
@@ -197,7 +197,7 @@ namespace Mesen.Debugger.ViewModels {
 				warningMessages.Add($"Warning: The code currently mapped to CPU memory addresses ${StartAddress.ToString(addrFormat)} to ${endAddress.ToString(addrFormat)} will be overridden.");
 			}
 
-			if (warningMessages.Count > 0 && await MesenMsgBox.Show(assemblerWindow, "AssemblerConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, string.Join(Environment.NewLine + Environment.NewLine, warningMessages)) != DialogResult.OK) {
+			if (warningMessages.Count > 0 && await NexenMsgBox.Show(assemblerWindow, "AssemblerConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, string.Join(Environment.NewLine + Environment.NewLine, warningMessages)) != DialogResult.OK) {
 				return false;
 			}
 

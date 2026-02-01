@@ -1,9 +1,9 @@
 using System;
-using Mesen.Debugger.Labels;
-using Mesen.ViewModels;
+using Nexen.Debugger.Labels;
+using Nexen.ViewModels;
 using static Mesen.Debugger.ViewModels.LabelEditViewModel;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class CommentEditViewModel : ViewModelBase {
 		public ReactiveCodeLabel Label { get; set; }
 

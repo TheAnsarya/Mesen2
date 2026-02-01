@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:vm="using:Mesen.Debugger.ViewModels"
 	xmlns:sys="using:System"
 	xmlns:v="using:Mesen.Views"
@@ -30,11 +30,11 @@
 	</Window.Resources>
 
 	<DockPanel>
-		<c:MesenMenu DockPanel.Dock="Top" Name="ActionMenu">
+		<c:NexenMenu DockPanel.Dock="Top" Name="ActionMenu">
 			<MenuItem Header="{l:Translate mnuFile}" ItemsSource="{Binding FileMenuActions}" />
 			<MenuItem Header="{l:Translate mnuScript}" ItemsSource="{Binding ScriptMenuActions}" />
 			<MenuItem Header="{l:Translate mnuHelp}" ItemsSource="{Binding HelpMenuActions}" />
-		</c:MesenMenu>
+		</c:NexenMenu>
 
 		<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
 			<dc:ActionToolbar Items="{Binding ToolbarActions}" />
@@ -48,7 +48,7 @@
 			</Grid.RowDefinitions>
 
 			<Border Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Margin="1">
-				<dc:MesenTextEditor
+				<dc:NexenTextEditor
 					Name="Editor"
 					ShowLineNumbers="{Binding Config.ShowLineNumbers}"
 					TextBinding="{Binding Code}"
@@ -60,7 +60,7 @@
 			<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" />
 
 			<Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Margin="1" Background="#20606060">
-				<dc:MesenTextEditor
+				<dc:NexenTextEditor
 					Name="txtScriptLog"
 					Height="NaN"
 					TextBinding="{Binding Log}"

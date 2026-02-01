@@ -1,6 +1,6 @@
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Windows {
+namespace Nexen.Debugger.Windows {
 	public interface INotificationHandler {
 		void ProcessNotification(NotificationEventArgs e);
 	}

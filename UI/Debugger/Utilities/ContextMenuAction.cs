@@ -7,17 +7,17 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Controls;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Controls;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public abstract class BaseMenuAction : ViewModelBase, IDisposable {
 		private static Dictionary<ActionType, string?> _iconCache = new();
 
@@ -142,7 +142,7 @@ namespace Mesen.Debugger.Utilities {
 							try {
 								value();
 							} catch (Exception ex) {
-								Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+								Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 							}
 						}
 					}

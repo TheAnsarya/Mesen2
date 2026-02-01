@@ -9,14 +9,14 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class DynamicTooltip : UserControl {
 		public static readonly StyledProperty<TooltipEntries> ItemsProperty = AvaloniaProperty.Register<DynamicTooltip, TooltipEntries>(nameof(Items));
 		public static readonly StyledProperty<int> FirstColumnWidthProperty = AvaloniaProperty.Register<DynamicTooltip, int>(nameof(FirstColumnWidth));

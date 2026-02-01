@@ -51,7 +51,7 @@
 					<c:GroupBox Header="{l:Translate grpVolume}" HorizontalAlignment="Left" Margin="0 0 0 5">
 						<StackPanel Orientation="Horizontal" Height="150">
 							<StackPanel.Styles>
-								<Style Selector="c|MesenSlider">
+								<Style Selector="c|NexenSlider">
 									<Setter Property="Minimum" Value="0" />
 									<Setter Property="Maximum" Value="100" />
 									<Setter Property="Orientation" Value="Vertical" />
@@ -59,14 +59,14 @@
 								</Style>
 							</StackPanel.Styles>
 
-							<c:MesenSlider Text="{l:Translate lblChannel1}" Value="{Binding Config.Channel1Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel2}" Value="{Binding Config.Channel2Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel3}" Value="{Binding Config.Channel3Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel4}" Value="{Binding Config.Channel4Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel5}" Value="{Binding Config.Channel5Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel6}" Value="{Binding Config.Channel6Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel7}" Value="{Binding Config.Channel7Vol}" />
-							<c:MesenSlider Text="{l:Translate lblChannel8}" Value="{Binding Config.Channel8Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel1}" Value="{Binding Config.Channel1Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel2}" Value="{Binding Config.Channel2Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel3}" Value="{Binding Config.Channel3Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel4}" Value="{Binding Config.Channel4Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel5}" Value="{Binding Config.Channel5Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel6}" Value="{Binding Config.Channel6Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel7}" Value="{Binding Config.Channel7Vol}" />
+							<c:NexenSlider Text="{l:Translate lblChannel8}" Value="{Binding Config.Channel8Vol}" />
 						</StackPanel>
 					</c:GroupBox>
 					<StackPanel Orientation="Horizontal">
@@ -89,7 +89,7 @@
 
 						<TextBlock Grid.Row="1" Text="{l:Translate lblSpcClockSpeedAdjustment}" />
 						<StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-							<c:MesenNumericUpDown
+							<c:NexenNumericUpDown
 								Minimum="-999"
 								Maximum="999"
 								Value="{Binding Config.SpcClockSpeedAdjustment}"
@@ -128,16 +128,16 @@
 					<c:OptionSection Header="{l:Translate grpPpuTiming}">
 						<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" Margin="10 0">
 							<TextBlock Grid.Column="0" Grid.Row="0" Text="{l:Translate lblExtraScanlinesBeforeNmi}" />
-							<c:MesenNumericUpDown Grid.Column="1" Grid.Row="0" Value="{Binding Config.PpuExtraScanlinesBeforeNmi}" Minimum="0" Maximum="1000" />
+							<c:NexenNumericUpDown Grid.Column="1" Grid.Row="0" Value="{Binding Config.PpuExtraScanlinesBeforeNmi}" Minimum="0" Maximum="1000" />
 							<TextBlock Grid.Column="0" Grid.Row="1" Text="{l:Translate lblExtraScanlinesAfterNmi}" />
-							<c:MesenNumericUpDown Grid.Column="1" Grid.Row="1" Value="{Binding Config.PpuExtraScanlinesAfterNmi}" Minimum="0" Maximum="1000" />
+							<c:NexenNumericUpDown Grid.Column="1" Grid.Row="1" Value="{Binding Config.PpuExtraScanlinesAfterNmi}" Minimum="0" Maximum="1000" />
 						</Grid>
 					</c:OptionSection>
 
 					<c:OptionSection Header="{l:Translate lblChipSpecificOc}">
 						<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto" Margin="10 0">
 							<TextBlock Grid.Column="0" Grid.Row="0" Text="{l:Translate lblSuperFxClockSpeed}" />
-							<c:MesenNumericUpDown
+							<c:NexenNumericUpDown
 								Grid.Column="1"
 								Grid.Row="0"
 								Value="{Binding Config.GsuClockSpeed}"

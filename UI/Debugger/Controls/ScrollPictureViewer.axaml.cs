@@ -11,9 +11,9 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Threading;
-using Mesen.Utilities;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class ScrollPictureViewer : UserControl {
 		public static readonly StyledProperty<Vector> ScrollOffsetProperty = AvaloniaProperty.Register<ScrollPictureViewer, Vector>(nameof(ScrollOffset), defaultBindingMode: BindingMode.TwoWay);
 

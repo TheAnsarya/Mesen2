@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:vm="using:Mesen.Debugger.ViewModels"
 	xmlns:sys="using:System"
 	xmlns:v="using:Mesen.Views"
@@ -76,7 +76,7 @@
 								Value="{Binding CompareTo}"
 								CheckedWhen="{x:Static dvm:MemorySearchCompareTo.SpecificValue}"
 							/>
-							<c:MesenNumericTextBox
+							<c:NexenNumericTextBox
 								Grid.Row="2"
 								Grid.Column="2"
 								IsEnabled="{Binding IsSpecificValueEnabled}"
@@ -91,7 +91,7 @@
 								Value="{Binding CompareTo}"
 								CheckedWhen="{x:Static dvm:MemorySearchCompareTo.SpecificAddress}"
 							/>
-							<c:MesenNumericTextBox
+							<c:NexenNumericTextBox
 								Grid.Row="3"
 								Grid.Column="2"
 								IsEnabled="{Binding IsSpecificAddressEnabled}"

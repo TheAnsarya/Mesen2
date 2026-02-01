@@ -5,9 +5,9 @@ using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class SingleInstance : IDisposable {
 		public static SingleInstance Instance { get; private set; } = new SingleInstance();
 

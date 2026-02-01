@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Mesen.Interop;
-using Mesen.Localization;
+using Nexen.Interop;
+using Nexen.Localization;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class ExpressionTooltipHelper {
 		public static StackPanel GetHelpTooltip(CpuType cpuType, bool forWatch) {
 			StackPanel panel = new();

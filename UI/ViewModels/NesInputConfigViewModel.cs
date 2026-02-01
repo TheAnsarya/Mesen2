@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.Views;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.Views;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class NesInputConfigViewModel : DisposableViewModel {
 		[Reactive] public NesConfig Config { get; set; }
 

@@ -8,12 +8,12 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class ConfigWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class ConfigWindow : NexenWindow {
 		private ConfigViewModel _model;
 		private bool _promptToSave = true;
 
@@ -62,7 +62,7 @@ namespace Mesen.Windows {
 		}
 
 		private async void ResetAllSettings(object sender, RoutedEventArgs e) {
-			if (await MesenMsgBox.Show(VisualRoot, "ResetSettingsConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
+			if (await NexenMsgBox.Show(VisualRoot, "ResetSettingsConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
 				ConfigManager.ResetSettings();
 				_promptToSave = false;
 				Close();
@@ -70,7 +70,7 @@ namespace Mesen.Windows {
 		}
 
 		private async void DisplaySaveChangesPrompt() {
-			DialogResult result = await MesenMsgBox.Show(this, "PromptSaveChanges", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+			DialogResult result = await NexenMsgBox.Show(this, "PromptSaveChanges", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 			switch (result) {
 				case DialogResult.Yes: _promptToSave = false; _model.SaveConfig(); Close(); break;
 				case DialogResult.No: _promptToSave = false; _model.RevertConfig(); Close(); break;

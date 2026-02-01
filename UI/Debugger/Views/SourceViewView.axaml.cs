@@ -9,20 +9,20 @@ using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Dock.Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.ViewModels.DebuggerDock;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.ViewModels.DebuggerDock;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Views {
-	public class SourceViewView : MesenUserControl {
+namespace Nexen.Debugger.Views {
+	public class SourceViewView : NexenUserControl {
 		private SourceViewViewModel Model => (SourceViewViewModel)DataContext!;
 		private LocationInfo ActionLocation => _selectionHandler?.ActionLocation ?? new LocationInfo();
 		private bool IsMarginClick => _selectionHandler?.IsMarginClick ?? false;

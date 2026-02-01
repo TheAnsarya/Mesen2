@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using Mesen.Debugger;
+using Nexen.Debugger;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public struct InteropBreakpoint {
 		public Int32 Id;
 		public CpuType CpuType;

@@ -7,11 +7,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
 
-namespace Mesen.Windows {
-	public class LogWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class LogWindow : NexenWindow {
 		private DispatcherTimer _timer;
 
 		public static readonly StyledProperty<string> LogContentProperty = AvaloniaProperty.Register<LogWindow, string>(nameof(LogContent), "", defaultBindingMode: BindingMode.OneWayToSource);
@@ -35,7 +35,7 @@ namespace Mesen.Windows {
 			string newLog = EmuApi.GetLog();
 			if (newLog != LogContent) {
 				LogContent = newLog;
-				Dispatcher.UIThread.Post(() => this.GetControl<MesenTextEditor>("txtLog").ScrollToEnd());
+				Dispatcher.UIThread.Post(() => this.GetControl<NexenTextEditor>("txtLog").ScrollToEnd());
 			}
 		}
 

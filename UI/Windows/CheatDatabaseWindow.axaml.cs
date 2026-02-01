@@ -10,13 +10,13 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mesen.GUI.Utilities;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.GUI.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class CheatDatabaseWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class CheatDatabaseWindow : NexenWindow {
 		private CheatDatabaseViewModel _model;
 		private bool _cancelled = true;
 		private ListBox _listBox;

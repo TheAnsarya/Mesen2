@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using Mesen.Debugger;
-using Mesen.Interop;
+using Nexen.Debugger;
+using Nexen.Interop;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class DebugConfig {
 		public DebuggerShortcutsConfig Shortcuts { get; set; } = new();
 		public TraceLoggerConfig TraceLogger { get; set; } = new();

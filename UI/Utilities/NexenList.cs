@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	//Copy of Avalonia's AvaloniaList with an added Replace function to avoid triggering 2 updates
-	public partial class MesenList<T> {
+	public partial class NexenList<T> {
 		public void Replace(IList<T> items) {
 			_inner.Clear();
 			_inner.Capacity = items.Count;
@@ -47,14 +47,14 @@ namespace Mesen.Utilities {
 	/// </item>
 	/// </list>
 	/// </remarks>
-	public partial class MesenList<T> : IAvaloniaList<T>, IList {
+	public partial class NexenList<T> : IAvaloniaList<T>, IList {
 		private readonly List<T> _inner;
 		private NotifyCollectionChangedEventHandler? _collectionChanged;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/> class.
 		/// </summary>
-		public MesenList() {
+		public NexenList() {
 			_inner = new List<T>();
 		}
 
@@ -62,7 +62,7 @@ namespace Mesen.Utilities {
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/>.
 		/// </summary>
 		/// <param name="capacity">Initial list capacity.</param>
-		public MesenList(int capacity) {
+		public NexenList(int capacity) {
 			_inner = new List<T>(capacity);
 		}
 
@@ -70,7 +70,7 @@ namespace Mesen.Utilities {
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/> class.
 		/// </summary>
 		/// <param name="items">The initial items for the collection.</param>
-		public MesenList(IEnumerable<T> items) {
+		public NexenList(IEnumerable<T> items) {
 			_inner = new List<T>(items);
 		}
 
@@ -78,7 +78,7 @@ namespace Mesen.Utilities {
 		/// Initializes a new instance of the <see cref="AvaloniaList{T}"/> class.
 		/// </summary>
 		/// <param name="items">The initial items for the collection.</param>
-		public MesenList(params T[] items) {
+		public NexenList(params T[] items) {
 			_inner = new List<T>(items);
 		}
 

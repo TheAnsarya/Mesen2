@@ -10,12 +10,12 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class CheatListWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class CheatListWindow : NexenWindow {
 		private CheatListWindowViewModel _model;
 		private NotificationListener _listener;
 

@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using Avalonia.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class LabelEditViewModel : DisposableViewModel {
 		[Reactive] public ReactiveCodeLabel Label { get; set; }
 

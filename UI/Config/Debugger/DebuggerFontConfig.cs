@@ -1,9 +1,9 @@
 using Avalonia;
 using Avalonia.Media;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class DebuggerFontConfig : BaseConfig<DebuggerFontConfig> {
 		[Reactive] public FontConfig DisassemblyFont { get; set; } = new() { FontFamily = "Consolas", FontSize = 14 };
 		[Reactive] public FontConfig MemoryViewerFont { get; set; } = new() { FontFamily = "Consolas", FontSize = 14 };

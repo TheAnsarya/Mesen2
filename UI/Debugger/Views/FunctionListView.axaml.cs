@@ -4,12 +4,12 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using DataBoxControl;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Windows;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.Windows;
 using static Mesen.Debugger.ViewModels.FunctionListViewModel;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class FunctionListView : UserControl {
 		public FunctionListView() {
 			InitializeComponent();

@@ -9,17 +9,17 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using DataBoxControl;
 using DynamicData;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class EventViewerWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class EventViewerWindow : NexenWindow, INotificationHandler {
 		private EventViewerViewModel _model;
 		private PixelPoint? _prevMousePos = null;
 

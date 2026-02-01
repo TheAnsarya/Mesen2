@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows;
+namespace Nexen.Debugger.Windows;
 
 /// <summary>
 /// Progress window for Pansy export operations.
 /// Shows progress, current operation, and statistics on completion.
 /// </summary>
-public partial class PansyExportProgressWindow : MesenWindow {
+public partial class PansyExportProgressWindow : NexenWindow {
 	private CancellationTokenSource? _cts;
 	private readonly Stopwatch _stopwatch = new();
 	private bool _isComplete;

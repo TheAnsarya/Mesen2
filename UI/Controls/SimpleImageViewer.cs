@@ -8,10 +8,10 @@ using Avalonia.Media.TextFormatting;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
-using Mesen.Utilities;
+using Nexen.Utilities;
 using SkiaSharp;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class SimpleImageViewer : Control {
 		public static readonly StyledProperty<DynamicBitmap> SourceProperty = AvaloniaProperty.Register<SimpleImageViewer, DynamicBitmap>(nameof(Source));
 		public static readonly StyledProperty<bool> UseBilinearInterpolationProperty = AvaloniaProperty.Register<SimpleImageViewer, bool>(nameof(UseBilinearInterpolation));

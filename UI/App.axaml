@@ -1,11 +1,11 @@
 <Application
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:dbg="using:Mesen.Debugger"
-	xmlns:l="using:Mesen.Localization"
-	xmlns:u="using:Mesen.Utilities"
-	x:Class="Mesen.App"
-	Name="Mesen"
+	xmlns:dbg="using:Nexen.Debugger"
+	xmlns:l="using:Nexen.Localization"
+	xmlns:u="using:Nexen.Utilities"
+	x:Class="Nexen.App"
+	Name="Nexen"
 >
 	<Application.Resources>
 		<FontFamily x:Key="MesenFont">Microsoft Sans Serif</FontFamily>
@@ -51,7 +51,7 @@
 
 	<Application.Styles>
 		<FluentTheme />
-		<StyleInclude Source="/Styles/MesenStyles.xaml" />
+		<StyleInclude Source="/Styles/NexenStyles.xaml" />
 	</Application.Styles>
 
 	<NativeMenu.Menu>

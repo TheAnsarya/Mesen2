@@ -16,19 +16,19 @@ using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Views;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Views;
 
-namespace Mesen.Windows {
-	public class MainWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class MainWindow : NexenWindow {
 		private DispatcherTimer _timerBackgroundFlag = new DispatcherTimer();
 		private MainWindowViewModel _model = null!;
 
@@ -168,7 +168,7 @@ namespace Mesen.Windows {
 		}
 
 		private async void ValidateExit() {
-			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await MesenMsgBox.Show(null, "ConfirmExit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+			if (!ConfigManager.Config.Preferences.ConfirmExitResetPower || await NexenMsgBox.Show(null, "ConfirmExit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
 				_needCloseValidation = false;
 				Close();
 			}
@@ -394,7 +394,7 @@ namespace Mesen.Windows {
 						SufamiTurboFilePromptMessage msg = Marshal.PtrToStructure<SufamiTurboFilePromptMessage>(e.Parameter);
 						TaskCompletionSource tcs = new TaskCompletionSource();
 						Dispatcher.UIThread.Post(async () => {
-							if (await MesenMsgBox.Show(this, "PromptLoadSufamiTurbo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+							if (await NexenMsgBox.Show(this, "PromptLoadSufamiTurbo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
 								string? selectedFile = await FileDialogHelper.OpenFile(null, this, FileDialogHelper.SufamiTurboExt);
 								if (selectedFile != null) {
 									byte[] file = Encoding.UTF8.GetBytes(selectedFile);

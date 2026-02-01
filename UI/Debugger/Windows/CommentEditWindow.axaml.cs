@@ -4,13 +4,13 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class CommentEditWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class CommentEditWindow : NexenWindow {
 		private CommentEditViewModel _model;
 
 		[Obsolete("For designer only")]

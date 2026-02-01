@@ -8,14 +8,14 @@ using Avalonia.Controls.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen {
+namespace Nexen {
 	public class App : Application {
 		public static bool ShowConfigWindow { get; set; }
 
@@ -25,7 +25,7 @@ namespace Mesen {
 				: ConfigManager.Config.Preferences.Theme == MesenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 
 			Dispatcher.UIThread.UnhandledException += (s, e) => {
-				MesenMsgBox.ShowException(e.Exception);
+				NexenMsgBox.ShowException(e.Exception);
 				e.Handled = true;
 			};
 

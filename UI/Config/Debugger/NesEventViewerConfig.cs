@@ -1,9 +1,9 @@
 using Avalonia.Media;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class NesEventViewerConfig : ViewModelBase {
 		[Reactive] public EventViewerCategoryCfg MapperRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x00, 0x6E, 0x8E));
 		[Reactive] public EventViewerCategoryCfg MapperRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x78, 0xA5, 0xB2));

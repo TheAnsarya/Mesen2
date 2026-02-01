@@ -1,8 +1,8 @@
 using System;
 using Avalonia.Input;
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class CursorImageExtensions {
 		public static StandardCursorType ToStandardCursorType(this CursorImage cursor) {
 			return cursor switch {

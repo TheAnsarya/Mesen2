@@ -4,7 +4,7 @@ using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class DynamicBitmap : WriteableBitmap, IDynamicBitmap {
 		public event EventHandler? Invalidated;
 

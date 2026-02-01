@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class BreakpointBar : Control {
 		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) {
 			BreakpointManager.BreakpointsChanged += BreakpointManager_BreakpointsChanged;

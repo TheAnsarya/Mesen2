@@ -8,12 +8,12 @@ using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Localization;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Localization;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class ActionToolbar : UserControl {
 		public static readonly StyledProperty<List<ContextMenuAction>> ItemsProperty = AvaloniaProperty.Register<ActionToolbar, List<ContextMenuAction>>(nameof(Items));
 		private DispatcherTimer _timer;

@@ -8,13 +8,13 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class GameboyConfigView : UserControl {
 		private GameboyConfigViewModel _model;
 

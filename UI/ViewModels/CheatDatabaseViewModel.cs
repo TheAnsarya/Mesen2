@@ -9,13 +9,13 @@ using System.Text.Json;
 using System.Xml.Serialization;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class CheatDatabaseViewModel : DisposableViewModel {
 		private List<CheatDbGameEntry> _entries;
 

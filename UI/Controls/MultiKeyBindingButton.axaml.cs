@@ -5,11 +5,11 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
-using Mesen.Config.Shortcuts;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config.Shortcuts;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class MultiKeyBindingButton : Button {
 		protected override Type StyleKeyOverride => typeof(Button);
 

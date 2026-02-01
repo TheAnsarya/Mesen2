@@ -3,13 +3,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Controls;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class BreakOnWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class BreakOnWindow : NexenWindow {
 		public static int _lastValue { get; set; } = 0;
 
 		public static readonly StyledProperty<int> ValueProperty = AvaloniaProperty.Register<BreakInWindow, int>(nameof(Value));
@@ -58,7 +58,7 @@ namespace Mesen.Debugger.Windows {
 
 		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
-			this.GetControl<MesenNumericTextBox>("txtValue").FocusAndSelectAll();
+			this.GetControl<NexenNumericTextBox>("txtValue").FocusAndSelectAll();
 		}
 
 		private void Ok_OnClick(object sender, RoutedEventArgs e) {

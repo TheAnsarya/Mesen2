@@ -10,16 +10,16 @@ using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using DataBoxControl;
 using DynamicData;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels;
+namespace Nexen.Debugger.ViewModels;
 
 public class MemorySearchViewModel : DisposableViewModel {
 	public MemorySearchConfig Config { get; }
@@ -33,7 +33,7 @@ public class MemorySearchViewModel : DisposableViewModel {
 	[Reactive] public MemorySearchCompareTo CompareTo { get; set; } = MemorySearchCompareTo.PreviousRefreshValue;
 	[Reactive] public MemorySearchOperator Operator { get; set; } = MemorySearchOperator.Equal;
 
-	[Reactive] public MesenList<MemoryAddressViewModel> ListData { get; private set; } = new();
+	[Reactive] public NexenList<MemoryAddressViewModel> ListData { get; private set; } = new();
 	[Reactive] public SelectionModel<MemoryAddressViewModel> Selection { get; set; } = new();
 	[Reactive] public SortState SortState { get; set; } = new();
 	public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.MemorySearch.ColumnWidths;

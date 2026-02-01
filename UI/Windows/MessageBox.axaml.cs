@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Windows {
-	public partial class MessageBox : MesenWindow {
+namespace Nexen.Windows {
+	public partial class MessageBox : NexenWindow {
 		public MessageBox() {
 			InitializeComponent();
 #if DEBUG

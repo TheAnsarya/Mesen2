@@ -6,16 +6,16 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Windows;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.Windows;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using static Mesen.Debugger.ViewModels.BreakpointListViewModel;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class BreakpointListView : UserControl {
 		public BreakpointListView() {
 			InitializeComponent();

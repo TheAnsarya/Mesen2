@@ -3,15 +3,15 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Controls;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Controls;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class NesHeaderEditWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class NesHeaderEditWindow : NexenWindow {
 		NesHeaderEditViewModel _model;
 
 		public NesHeaderEditWindow() {

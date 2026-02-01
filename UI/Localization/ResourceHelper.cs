@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Localization {
+namespace Nexen.Localization {
 	class ResourceHelper {
 		private static XmlDocument _resources = new XmlDocument();
 

@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
-namespace Mesen.Benchmarks;
+namespace Nexen.Benchmarks;
 
 public class Program {
 	public static void Main(string[] args) {

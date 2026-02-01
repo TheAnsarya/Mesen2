@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger {
+namespace Nexen.Debugger {
 	public class WatchManager {
 		public delegate void WatchChangedEventHandler(bool resetSelection);
 

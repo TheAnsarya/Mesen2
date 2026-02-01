@@ -3,12 +3,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class NetplayStartServerWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class NetplayStartServerWindow : NexenWindow {
 		public NetplayStartServerWindow() {
 			InitializeComponent();
 #if DEBUG

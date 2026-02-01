@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
 
-namespace Mesen.Debugger {
+namespace Nexen.Debugger {
 	public static class BreakpointManager {
 		public static event EventHandler? BreakpointsChanged;
 

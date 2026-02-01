@@ -6,15 +6,15 @@ using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Media;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.RegisterViewer;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.RegisterViewer;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTypeModel {
 		[Reactive] public List<RegisterViewerTab> Tabs { get; set; } = new List<RegisterViewerTab>();
 

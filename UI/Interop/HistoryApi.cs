@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public class HistoryApi {
 		private const string DllPath = EmuApi.DllName;
 

@@ -5,16 +5,16 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
-using Mesen.Controls;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.Views;
+using Nexen.Controls;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.Views;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class GoToWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class GoToWindow : NexenWindow {
 		public static readonly StyledProperty<string> AddressProperty = AvaloniaProperty.Register<GoToWindow, string>(nameof(Address), "");
 
 		public string Address {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Input;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class KeyExtensions {
 		public static bool IsSpecialKey(this Key key) {
 			//Some keys only trigger a KeyUp event without a matching KeyDown event

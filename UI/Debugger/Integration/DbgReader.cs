@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Mesen.Debugger.Integration {
+namespace Nexen.Debugger.Integration {
 	public static class DbgReader {
 		public delegate void ReadEntryCallback(ref ReadOnlySpan<char> name, ref ReadOnlySpan<char> data);
 

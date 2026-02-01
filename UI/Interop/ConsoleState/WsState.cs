@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Interop;
+namespace Nexen.Interop;
 
 public struct WsBgLayer {
 	public UInt16 MapAddress;

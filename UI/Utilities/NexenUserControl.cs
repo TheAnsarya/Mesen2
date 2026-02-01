@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
-public class MesenUserControl : UserControl, IDisposable {
+public class NexenUserControl : UserControl, IDisposable {
 	private HashSet<IDisposable> _disposables = new();
 	public bool Disposed { get; private set; } = false;
 

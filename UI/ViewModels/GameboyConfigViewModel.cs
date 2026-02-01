@@ -3,13 +3,13 @@ using System.Reactive;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class GameboyConfigViewModel : DisposableViewModel {
 		[Reactive] public GameboyConfig Config { get; set; }
 		[Reactive] public GameboyConfig OriginalConfig { get; set; }

@@ -3,12 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class EventViewerCategoryControl : UserControl {
 		public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<EventViewerCategoryControl, string>(nameof(Text), "", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 		public static readonly StyledProperty<EventViewerCategoryCfg> ConfigProperty = AvaloniaProperty.Register<EventViewerCategoryControl, EventViewerCategoryCfg>(nameof(Config), new EventViewerCategoryCfg(), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);

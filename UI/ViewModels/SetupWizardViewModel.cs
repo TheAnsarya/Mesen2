@@ -2,13 +2,13 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class SetupWizardViewModel : ViewModelBase {
 		[Reactive] public bool StoreInUserProfile { get; set; } = true;
 
@@ -58,7 +58,7 @@ namespace Mesen.ViewModels {
 
 				return true;
 			} catch (Exception ex) {
-				MesenMsgBox.Show(parent, "CannotWriteToFolder", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.ToString());
+				NexenMsgBox.Show(parent, "CannotWriteToFolder", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.ToString());
 			}
 
 			return false;

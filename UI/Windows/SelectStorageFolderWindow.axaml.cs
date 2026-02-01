@@ -6,11 +6,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class SelectStorageFolderWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class SelectStorageFolderWindow : NexenWindow {
 		private SelectStorageFolderViewModel _model;
 
 		public SelectStorageFolderWindow() {

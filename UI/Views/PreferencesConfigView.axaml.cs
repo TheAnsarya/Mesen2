@@ -7,13 +7,13 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class PreferencesConfigView : UserControl {
 		public PreferencesConfigView() {
 			InitializeComponent();

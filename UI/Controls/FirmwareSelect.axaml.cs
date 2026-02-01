@@ -7,13 +7,13 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Controls;
+namespace Nexen.Controls;
 
 public class FirmwareSelect : UserControl {
 	public static readonly StyledProperty<FirmwareType> FirmwareTypeProperty = AvaloniaProperty.Register<FirmwareSelect, FirmwareType>(nameof(FirmwareType));
@@ -99,7 +99,7 @@ public class FirmwareSelect : UserControl {
 	public async void DeleteFirmware(object parameter) {
 		string path = Path.Combine(ConfigManager.FirmwareFolder, Filename);
 		if (File.Exists(path)) {
-			DialogResult result = await MesenMsgBox.Show(VisualRoot, "PromptDeleteFirmware", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, path);
+			DialogResult result = await NexenMsgBox.Show(VisualRoot, "PromptDeleteFirmware", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, path);
 			if (result == DialogResult.OK) {
 				File.Delete(path);
 			}

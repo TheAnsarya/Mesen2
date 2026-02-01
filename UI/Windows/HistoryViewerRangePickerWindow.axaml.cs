@@ -6,8 +6,8 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
-namespace Mesen.Windows {
-	public class HistoryViewerRangePickerWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class HistoryViewerRangePickerWindow : NexenWindow {
 		public int MinValue { get; set; }
 		public int MaxValue { get; set; }
 

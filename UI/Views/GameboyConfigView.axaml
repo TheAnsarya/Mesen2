@@ -45,7 +45,7 @@
 					<c:GroupBox Header="{l:Translate grpVolume}" HorizontalAlignment="Left">
 						<StackPanel Orientation="Horizontal" Height="150">
 							<StackPanel.Styles>
-								<Style Selector="c|MesenSlider">
+								<Style Selector="c|NexenSlider">
 									<Setter Property="Minimum" Value="0" />
 									<Setter Property="Maximum" Value="100" />
 									<Setter Property="Orientation" Value="Vertical" />
@@ -53,10 +53,10 @@
 								</Style>
 							</StackPanel.Styles>
 
-							<c:MesenSlider Text="{l:Translate lblSquare1}" Value="{Binding Config.Square1Vol}" />
-							<c:MesenSlider Text="{l:Translate lblSquare2}" Value="{Binding Config.Square2Vol}" />
-							<c:MesenSlider Text="{l:Translate lblWave}" Value="{Binding Config.WaveVol}" />
-							<c:MesenSlider Text="{l:Translate lblNoise}" Value="{Binding Config.NoiseVol}" />
+							<c:NexenSlider Text="{l:Translate lblSquare1}" Value="{Binding Config.Square1Vol}" />
+							<c:NexenSlider Text="{l:Translate lblSquare2}" Value="{Binding Config.Square2Vol}" />
+							<c:NexenSlider Text="{l:Translate lblWave}" Value="{Binding Config.WaveVol}" />
+							<c:NexenSlider Text="{l:Translate lblNoise}" Value="{Binding Config.NoiseVol}" />
 						</StackPanel>
 					</c:GroupBox>
 				</StackPanel>

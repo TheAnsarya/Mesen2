@@ -4,10 +4,10 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Localization;
+using Nexen.Config;
+using Nexen.Localization;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class VideoConfigOverrideView : UserControl {
 		public static readonly StyledProperty<bool> ShowBisqwitFilterProperty = AvaloniaProperty.Register<VideoConfigOverrideView, bool>(nameof(ShowBisqwitFilter), false);
 		public static readonly StyledProperty<string> HeaderProperty = AvaloniaProperty.Register<VideoConfigOverrideView, string>(nameof(Header), ResourceHelper.GetViewLabel(nameof(VideoConfigOverrideView), "lblHeader"));

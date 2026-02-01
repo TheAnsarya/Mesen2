@@ -4,18 +4,18 @@ using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Views;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Views;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class DisassemblyViewModel : DisposableViewModel, ISelectableModel {
 		public ICodeDataProvider DataProvider { get; }
 		public CpuType CpuType { get; }

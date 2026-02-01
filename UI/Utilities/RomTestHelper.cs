@@ -9,12 +9,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class RomTestHelper {
 		public static async void RunTest() {
 			string? filename = await FileDialogHelper.OpenFile(ConfigManager.TestFolder, null, "mtp");

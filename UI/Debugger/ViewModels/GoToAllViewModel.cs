@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Avalonia.Controls.Selection;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Utilities;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Utilities;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels;
+namespace Nexen.Debugger.ViewModels;
 
 public class GoToAllViewModel : DisposableViewModel {
 	[Reactive] public string SearchString { get; set; } = "";

@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:vm="using:Mesen.Debugger.ViewModels"
 	xmlns:sys="using:System"
 	xmlns:du="using:Mesen.Debugger.Utilities"
@@ -136,7 +136,7 @@
 				<CheckBox Content="{l:Translate chkFilterExec}" IsChecked="{Binding FilterExec}" />
 				<StackPanel Orientation="Horizontal">
 					<CheckBox Content="{l:Translate chkFilterTimeSpan}" IsChecked="{Binding FilterTimeSpanEnabled}" />
-					<c:MesenNumericTextBox MinWidth="35" Margin="5 0" Min="1" Max="9999" Value="{Binding FilterTimeSpan}" IsEnabled="{Binding FilterTimeSpanEnabled}" />
+					<c:NexenNumericTextBox MinWidth="35" Margin="5 0" Min="1" Max="9999" Value="{Binding FilterTimeSpan}" IsEnabled="{Binding FilterTimeSpanEnabled}" />
 					<TextBlock Text="{l:Translate lblFrames}" />
 				</StackPanel>
 			</c:OptionSection>

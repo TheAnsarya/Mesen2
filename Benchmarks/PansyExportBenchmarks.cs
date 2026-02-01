@@ -6,7 +6,7 @@ using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 
-namespace Mesen.Benchmarks;
+namespace Nexen.Benchmarks;
 
 /// <summary>
 /// Benchmarks for Pansy export operations.

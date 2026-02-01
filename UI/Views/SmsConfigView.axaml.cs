@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 
-namespace Mesen.Views;
+namespace Nexen.Views;
 
 public class SmsConfigView : UserControl {
 	private SmsConfigViewModel _model = null!;

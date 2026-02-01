@@ -1,8 +1,8 @@
 using System;
-using Mesen.Config;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	internal class MarkSelectionHelper {
 		public static ContextMenuAction GetAction(Func<MemoryType> getMemType, Func<int> getSelStart, Func<int> getSelEnd, Action refreshView, Func<bool>? isVisible = null) {
 			return new ContextMenuAction() {

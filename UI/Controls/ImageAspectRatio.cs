@@ -2,7 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class ImageAspectRatio : Image {
 		protected override Type StyleKeyOverride => typeof(Image);
 

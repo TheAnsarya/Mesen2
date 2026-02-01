@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class CheatWindowConfig : BaseWindowConfig<CheatWindowConfig> {
 		public bool DisableAllCheats { get; set; } = false;
 		public List<int> ColumnWidths { get; set; } = new();

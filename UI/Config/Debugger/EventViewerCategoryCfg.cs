@@ -1,10 +1,10 @@
 using System;
 using Avalonia.Media;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class EventViewerCategoryCfg : ViewModelBase {
 		[Reactive] public bool Visible { get; set; } = true;
 		[Reactive] public UInt32 Color { get; set; }

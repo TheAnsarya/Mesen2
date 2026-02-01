@@ -7,18 +7,18 @@ using System.Windows.Input;
 using Avalonia.Collections;
 using Avalonia.Controls.Selection;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class EventViewerListViewModel : DisposableViewModel {
 		public DebugEventInfo[] RawDebugEvents { get; private set; } = [];
 
-		public MesenList<DebugEventViewModel> DebugEvents { get; }
+		public NexenList<DebugEventViewModel> DebugEvents { get; }
 		public SelectionModel<DebugEventViewModel?> Selection { get; set; } = new();
 		public EventViewerViewModel EventViewer { get; }
 

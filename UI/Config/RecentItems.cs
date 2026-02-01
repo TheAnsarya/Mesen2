@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Utilities;
+using Nexen.Utilities;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class RecentItems {
 		private const int MaxRecentFiles = 10;
 		public List<RecentItem> Items { get; set; } = new List<RecentItem>();

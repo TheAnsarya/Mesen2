@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.ViewModels;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class SnesControllerConfig : ControllerConfig {
 		public new SnesKeyMapping Mapping1 { get => (SnesKeyMapping)_mapping1; set => _mapping1 = value; }
 		public new SnesKeyMapping Mapping2 { get => (SnesKeyMapping)_mapping2; set => _mapping2 = value; }

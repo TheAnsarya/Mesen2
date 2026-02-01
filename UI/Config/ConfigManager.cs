@@ -9,10 +9,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Config;
+namespace Nexen.Config;
 
 public static partial class ConfigManager {
 	private static Configuration? _config;

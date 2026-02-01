@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
+using Nexen.Config;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class ControllerConfigViewModel : ViewModelBase {
 		public ControllerConfig Config { get; }
 		public ControllerConfig OriginalConfig { get; }

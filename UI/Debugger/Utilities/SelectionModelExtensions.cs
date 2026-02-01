@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls.Selection;
 using AvaloniaEdit.Editing;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class SelectionModelExtensions {
 		public static void SelectIndexes<T>(this SelectionModel<T> selection, IEnumerable<int> indexes, int elementCount) {
 			selection.BeginBatchUpdate();

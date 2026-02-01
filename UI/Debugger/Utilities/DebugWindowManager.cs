@@ -4,20 +4,20 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class DebugWindowManager {
 		private static int _debugWindowCounter = 0;
 		private static ConcurrentDictionary<Window, bool> _openedWindows = new();
 		private static ReaderWriterLockSlim _windowNotifLock = new();
 		private static bool _loadingGame = false;
 
-		public static T CreateDebugWindow<T>(Func<T> createWindow) where T : MesenWindow {
+		public static T CreateDebugWindow<T>(Func<T> createWindow) where T : NexenWindow {
 			if (Interlocked.Increment(ref _debugWindowCounter) == 1) {
 				//Opened a debug window and nothing else was opened, load the saved workspace
 				DebugWorkspaceManager.Load();
@@ -41,13 +41,13 @@ namespace Mesen.Debugger.Utilities {
 			}
 		}
 
-		public static T OpenDebugWindow<T>(Func<T> createWindow) where T : MesenWindow {
+		public static T OpenDebugWindow<T>(Func<T> createWindow) where T : NexenWindow {
 			T wnd = CreateDebugWindow<T>(createWindow);
 			wnd.Show();
 			return wnd;
 		}
 
-		public static T GetOrOpenDebugWindow<T>(Func<T> createWindow) where T : MesenWindow {
+		public static T GetOrOpenDebugWindow<T>(Func<T> createWindow) where T : NexenWindow {
 			foreach (Window wnd in _openedWindows.Keys) {
 				if (wnd is T typedWnd) {
 					wnd.BringToFront();
@@ -58,7 +58,7 @@ namespace Mesen.Debugger.Utilities {
 			return OpenDebugWindow<T>(createWindow);
 		}
 
-		public static T? GetDebugWindow<T>(Func<T, bool> isMatch) where T : MesenWindow {
+		public static T? GetDebugWindow<T>(Func<T, bool> isMatch) where T : NexenWindow {
 			foreach (Window wnd in _openedWindows.Keys) {
 				if (wnd is T tWnd && isMatch(tWnd)) {
 					return (T)wnd;

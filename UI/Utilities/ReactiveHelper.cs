@@ -7,7 +7,7 @@ using System.Reflection;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
 public static class ReactiveHelper {
 	[RequiresUnreferencedCode("Uses reflection to access properties dynamically")]

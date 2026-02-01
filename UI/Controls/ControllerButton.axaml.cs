@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class ControllerButton : UserControl {
 		public static readonly StyledProperty<UInt32> KeyBindingProperty = AvaloniaProperty.Register<ControllerButton, UInt32>(nameof(KeyBinding), 0, false, Avalonia.Data.BindingMode.TwoWay);
 		public static readonly StyledProperty<UInt32> TurboKeyBindingProperty = AvaloniaProperty.Register<ControllerButton, UInt32>(nameof(TurboKeyBinding), 0, false, Avalonia.Data.BindingMode.TwoWay);

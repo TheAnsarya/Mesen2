@@ -8,21 +8,21 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Interactivity;
-using Mesen.Config;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class WatchListViewModel : DisposableViewModel, IToolHelpTooltip {
 		private static Regex _watchAddressOrLabel = new Regex(@"^(\[|{)(\s*((\$[0-9A-Fa-f]+)|(\d+)|([@_a-zA-Z0-9]+)))\s*[,]{0,1}\d*\s*(\]|})$", RegexOptions.Compiled);
 
-		[Reactive] public MesenList<WatchValueInfo> WatchEntries { get; private set; } = new();
+		[Reactive] public NexenList<WatchValueInfo> WatchEntries { get; private set; } = new();
 		[Reactive] public SelectionModel<WatchValueInfo> Selection { get; set; } = new() { SingleSelect = false };
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.WatchListColumnWidths;
 

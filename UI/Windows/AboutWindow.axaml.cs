@@ -9,11 +9,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Windows {
-	public class AboutWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class AboutWindow : NexenWindow {
 		public string Version { get; }
 		public string BuildDate { get; }
 		public string RuntimeVersion { get; }

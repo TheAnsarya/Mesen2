@@ -6,12 +6,12 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class KeyBindingButton : Button {
 		protected override Type StyleKeyOverride => typeof(Button);
 

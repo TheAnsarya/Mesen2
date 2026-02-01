@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public class NetplayApi {
 		private const string DllPath = EmuApi.DllName;
 

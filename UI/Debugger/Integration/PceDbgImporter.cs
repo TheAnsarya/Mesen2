@@ -1,6 +1,6 @@
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Integration {
+namespace Nexen.Debugger.Integration {
 	public class PceDbgImporter : DbgImporter {
 		public PceDbgImporter(RomFormat romFormat) : base(CpuType.Pce, romFormat, new() { MemoryType.PcePrgRom, MemoryType.PceWorkRam, MemoryType.PceSaveRam, MemoryType.PceCdromRam, MemoryType.PceCardRam }) {
 		}

@@ -7,14 +7,14 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Rendering;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.ViewModels;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.ViewModels;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Windows {
-	public class DebuggerConfigWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class DebuggerConfigWindow : NexenWindow {
 		private DebuggerConfigWindowViewModel _model;
 		private bool _promptToSave = true;
 
@@ -64,7 +64,7 @@ namespace Mesen.Debugger.Windows {
 		}
 
 		private async void DisplaySaveChangesPrompt() {
-			DialogResult result = await MesenMsgBox.Show(this, "PromptSaveChanges", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+			DialogResult result = await NexenMsgBox.Show(this, "PromptSaveChanges", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 			switch (result) {
 				case DialogResult.Yes: _promptToSave = false; Close(); break;
 				case DialogResult.No: _promptToSave = false; _model.RevertChanges(); Close(); break;

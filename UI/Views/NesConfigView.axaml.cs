@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class NesConfigView : UserControl {
 		public NesConfigView() {
 			InitializeComponent();

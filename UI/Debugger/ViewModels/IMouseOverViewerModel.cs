@@ -1,10 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Mesen.Debugger.Controls;
-using Mesen.Utilities;
+using Nexen.Debugger.Controls;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public interface IMouseOverViewerModel {
 		DynamicTooltip? ViewerTooltip { get; set; }
 		PixelPoint? ViewerMousePos { get; set; }

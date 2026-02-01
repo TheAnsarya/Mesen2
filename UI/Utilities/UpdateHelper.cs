@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Windows;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class UpdateHelper {
 		public static string? GetCommitHash() {
 			return DependencyHelper.GetFileContent("BuildSha.txt");
@@ -33,10 +33,10 @@ namespace Mesen.Utilities {
 					return true;
 				} else {
 					//Download failed, mismatching hashes
-					Dispatcher.UIThread.Post(() => MesenMsgBox.Show(null, "UpdateDownloadFailed", MessageBoxButtons.OK, MessageBoxIcon.Error));
+					Dispatcher.UIThread.Post(() => NexenMsgBox.Show(null, "UpdateDownloadFailed", MessageBoxButtons.OK, MessageBoxIcon.Error));
 				}
 			} catch (Exception ex) {
-				Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+				Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 			}
 
 			return false;

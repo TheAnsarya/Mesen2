@@ -12,15 +12,15 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Views;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.Views;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class DebuggerWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class DebuggerWindow : NexenWindow, INotificationHandler {
 		private DebuggerWindowViewModel _model;
 
 		public CpuType CpuType => _model.CpuType;

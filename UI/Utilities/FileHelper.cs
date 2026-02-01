@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	internal class FileHelper {
 		public static string? ReadAllText(string filepath) {
 			return AttemptOperation(() => File.ReadAllText(filepath));
@@ -47,9 +47,9 @@ namespace Mesen.Utilities {
 					retry--;
 					if (retry == 0) {
 						if (Dispatcher.UIThread.CheckAccess()) {
-							MesenMsgBox.ShowException(ex);
+							NexenMsgBox.ShowException(ex);
 						} else {
-							Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+							Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 						}
 
 						return default;

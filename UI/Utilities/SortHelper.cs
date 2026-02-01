@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class SortHelper {
 		public static void SortArray<T>(T[] array, List<Tuple<string, ListSortDirection>> sortOrder, Dictionary<string, Func<T, T, int>> comparers, string defaultColumnSort) {
 			Array.Sort(array, GetSortComparison(sortOrder, comparers, defaultColumnSort));

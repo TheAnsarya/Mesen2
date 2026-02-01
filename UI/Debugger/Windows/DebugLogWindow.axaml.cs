@@ -7,12 +7,12 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Windows {
-	public class DebugLogWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class DebugLogWindow : NexenWindow {
 		private DispatcherTimer _timer;
 
 		public static readonly StyledProperty<string> LogContentProperty = AvaloniaProperty.Register<DebugLogWindow, string>(nameof(LogContent), "", defaultBindingMode: BindingMode.OneWayToSource);
@@ -38,7 +38,7 @@ namespace Mesen.Debugger.Windows {
 			string newLog = DebugApi.GetLog();
 			if (newLog != LogContent) {
 				LogContent = newLog;
-				Dispatcher.UIThread.Post(() => this.GetControl<MesenTextEditor>("txtLog").ScrollToEnd());
+				Dispatcher.UIThread.Post(() => this.GetControl<NexenTextEditor>("txtLog").ScrollToEnd());
 			}
 		}
 

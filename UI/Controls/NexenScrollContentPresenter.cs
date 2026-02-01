@@ -12,8 +12,8 @@ using Avalonia.Styling;
 using DataBoxControl;
 using DataBoxControl.Primitives;
 
-namespace Mesen.Controls {
-	public class MesenScrollContentPresenter : ScrollContentPresenter {
+namespace Nexen.Controls {
+	public class NexenScrollContentPresenter : ScrollContentPresenter {
 		protected override Type StyleKeyOverride => typeof(ScrollContentPresenter);
 
 		protected override void OnPointerWheelChanged(PointerWheelEventArgs e) {

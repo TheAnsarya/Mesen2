@@ -5,15 +5,15 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class PaletteViewerWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class PaletteViewerWindow : NexenWindow, INotificationHandler {
 		private PaletteViewerViewModel _model;
 		private PaletteSelector _palSelector;
 

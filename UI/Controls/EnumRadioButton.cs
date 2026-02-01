@@ -5,9 +5,9 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
-using Mesen.Localization;
+using Nexen.Localization;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class EnumRadioButton : RadioButton {
 		protected override Type StyleKeyOverride => typeof(RadioButton);
 

@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class MemoryMappingViewModel : ViewModelBase {
 		private CpuType _cpuType;
 

@@ -4,12 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class AudioPlayerViewModel : ViewModelBase {
 		[Reactive] public AudioPlayerConfig Config { get; set; }
 		[Reactive] public bool IsPaused { get; set; }

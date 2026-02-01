@@ -3,12 +3,12 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class VideoConfigViewModel : DisposableViewModel {
 		[ObservableAsProperty] public bool ShowCustomRatio { get; }
 		[ObservableAsProperty] public bool ShowNtscBlarggSettings { get; }

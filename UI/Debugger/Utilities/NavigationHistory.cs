@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class NavigationHistory<T> {
 		private List<T> _historyList = new List<T>();
 		private int _historyPosition = -1;

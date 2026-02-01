@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class EventViewerConfig : BaseWindowConfig<EventViewerConfig> {
 		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 

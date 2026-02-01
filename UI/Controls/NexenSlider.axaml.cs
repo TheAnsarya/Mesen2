@@ -4,15 +4,15 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 
-namespace Mesen.Controls {
-	public class MesenSlider : UserControl {
-		public static readonly StyledProperty<int> MinimumProperty = AvaloniaProperty.Register<MesenSlider, int>(nameof(Minimum));
-		public static readonly StyledProperty<int> MaximumProperty = AvaloniaProperty.Register<MesenSlider, int>(nameof(Maximum));
-		public static readonly StyledProperty<int> ValueProperty = AvaloniaProperty.Register<MesenSlider, int>(nameof(Value), 0, false, Avalonia.Data.BindingMode.TwoWay);
-		public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<MesenSlider, string>(nameof(Text), "");
-		public static readonly StyledProperty<bool> HideValueProperty = AvaloniaProperty.Register<MesenSlider, bool>(nameof(HideValue));
-		public static readonly StyledProperty<int> TickFrequencyProperty = AvaloniaProperty.Register<MesenSlider, int>(nameof(TickFrequency), 10);
-		public static readonly StyledProperty<Orientation> OrientationProperty = AvaloniaProperty.Register<MesenSlider, Orientation>(nameof(Orientation));
+namespace Nexen.Controls {
+	public class NexenSlider : UserControl {
+		public static readonly StyledProperty<int> MinimumProperty = AvaloniaProperty.Register<NexenSlider, int>(nameof(Minimum));
+		public static readonly StyledProperty<int> MaximumProperty = AvaloniaProperty.Register<NexenSlider, int>(nameof(Maximum));
+		public static readonly StyledProperty<int> ValueProperty = AvaloniaProperty.Register<NexenSlider, int>(nameof(Value), 0, false, Avalonia.Data.BindingMode.TwoWay);
+		public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<NexenSlider, string>(nameof(Text), "");
+		public static readonly StyledProperty<bool> HideValueProperty = AvaloniaProperty.Register<NexenSlider, bool>(nameof(HideValue));
+		public static readonly StyledProperty<int> TickFrequencyProperty = AvaloniaProperty.Register<NexenSlider, int>(nameof(TickFrequency), 10);
+		public static readonly StyledProperty<Orientation> OrientationProperty = AvaloniaProperty.Register<NexenSlider, Orientation>(nameof(Orientation));
 
 		public int Minimum {
 			get { return GetValue(MinimumProperty); }
@@ -49,7 +49,7 @@ namespace Mesen.Controls {
 			set { SetValue(OrientationProperty, value); }
 		}
 
-		public MesenSlider() {
+		public NexenSlider() {
 			InitializeComponent();
 		}
 

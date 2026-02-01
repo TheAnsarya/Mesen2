@@ -3,9 +3,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
+using Nexen.Utilities;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class PathSelector : UserControl {
 		public static readonly StyledProperty<string> DisabledPathProperty = AvaloniaProperty.Register<PathSelector, string>(nameof(DisabledPath));
 		public static readonly StyledProperty<string> PathProperty = AvaloniaProperty.Register<PathSelector, string>(nameof(Path), "", false, Avalonia.Data.BindingMode.TwoWay);

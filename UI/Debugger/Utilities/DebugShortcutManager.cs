@@ -8,9 +8,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Rendering;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	internal static class DebugShortcutManager {
 		public static IEnumerable CreateContextMenu(Control ctrl, Control focusCtrl, IEnumerable actions) {
 			if (ctrl is not IInputElement) {

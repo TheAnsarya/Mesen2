@@ -1,7 +1,7 @@
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class PaletteViewerConfig : BaseWindowConfig<PaletteViewerConfig> {
 		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 		[Reactive] public bool ShowPaletteIndexes { get; set; } = false;

@@ -10,14 +10,14 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config.Shortcuts;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class PreferencesConfig : BaseConfig<PreferencesConfig> {
 		[Reactive] public MesenTheme Theme { get; set; } = MesenTheme.Light;
 		[Reactive] public bool AutomaticallyCheckForUpdates { get; set; } = true;

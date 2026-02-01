@@ -1,9 +1,9 @@
 using System;
 using Dock.Model.Mvvm.Controls;
-using Mesen.Debugger.Utilities;
+using Nexen.Debugger.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels.DebuggerDock {
+namespace Nexen.Debugger.ViewModels.DebuggerDock {
 	public class BaseToolContainerViewModel : Tool {
 		public virtual object? HelpContent { get; } = null;
 

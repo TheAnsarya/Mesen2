@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Labels {
+namespace Nexen.Debugger.Labels {
 	/// <summary>
 	/// Manages background CDL recording and periodic Pansy file export.
 	/// This enables CDL collection without requiring the debugger window to be open.

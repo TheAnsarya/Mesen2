@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Disassembly {
+namespace Nexen.Debugger.Disassembly {
 	public class BaseStyleProvider : ILineStyleProvider {
 		public int AddressSize { get; }
 		public int ByteCodeSize { get; }

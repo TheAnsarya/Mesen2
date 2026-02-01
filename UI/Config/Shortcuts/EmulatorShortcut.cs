@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Config.Shortcuts {
+namespace Nexen.Config.Shortcuts {
 	public enum EmulatorShortcut {
 		FastForward,
 		Rewind,

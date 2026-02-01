@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
 public static class EnumExtensions {
 	[RequiresUnreferencedCode("Uses reflection to access enum member attributes")]

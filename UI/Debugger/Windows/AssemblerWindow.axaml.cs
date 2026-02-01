@@ -12,19 +12,19 @@ using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class AssemblerWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class AssemblerWindow : NexenWindow, INotificationHandler {
 		private static XshdSyntaxDefinition _syntaxDef;
 		private IHighlightingDefinition _highlighting;
-		private MesenTextEditor _textEditor;
-		private MesenTextEditor _hexView;
+		private NexenTextEditor _textEditor;
+		private NexenTextEditor _hexView;
 		private AssemblerWindowViewModel _model;
 
 		static AssemblerWindow() {
@@ -46,8 +46,8 @@ namespace Mesen.Debugger.Windows {
 
 			_model = model;
 			DataContext = model;
-			_textEditor = this.GetControl<MesenTextEditor>("Editor");
-			_hexView = this.GetControl<MesenTextEditor>("HexView");
+			_textEditor = this.GetControl<NexenTextEditor>("Editor");
+			_hexView = this.GetControl<NexenTextEditor>("HexView");
 
 			if (Design.IsDesignMode) {
 				return;

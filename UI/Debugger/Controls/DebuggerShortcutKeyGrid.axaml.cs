@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class DebuggerShortcutKeyGrid : UserControl {
 		public static readonly StyledProperty<List<DebuggerShortcutInfo>> ShortcutsProperty = AvaloniaProperty.Register<DebuggerShortcutKeyGrid, List<DebuggerShortcutInfo>>(nameof(Shortcuts));
 

@@ -26,7 +26,7 @@
 					<c:OptionSection Header="{l:Translate tpgGeneral}">
 						<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
 							<TextBlock Grid.Row="0" Text="{l:Translate lblDeadzone}" VerticalAlignment="Top" Margin="0 15 5 0" />
-							<c:MesenSlider
+							<c:NexenSlider
 								Margin="12 2 10 0"
 								HorizontalAlignment="Left"
 								Grid.Row="0"
@@ -45,7 +45,7 @@
 							</Grid>
 
 							<TextBlock Grid.Row="2" Text="{l:Translate lblSensitivity}" VerticalAlignment="Top" Margin="0 15 5 0" />
-							<c:MesenSlider
+							<c:NexenSlider
 								Margin="12 2 10 0"
 								HorizontalAlignment="Left"
 								Grid.Row="2"
@@ -64,7 +64,7 @@
 							</Grid>
 
 							<TextBlock Grid.Row="4" Text="{l:Translate lblForceFeedbackIntensity}" VerticalAlignment="Top" Margin="0 15 5 0" />
-							<c:MesenSlider
+							<c:NexenSlider
 								Margin="12 2 10 0"
 								HorizontalAlignment="Left"
 								Grid.Row="4"

@@ -1,6 +1,6 @@
 using System;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public static class ConsoleTypeExtensions {
 		public static CpuType GetMainCpuType(this ConsoleType type) {
 			return type switch {

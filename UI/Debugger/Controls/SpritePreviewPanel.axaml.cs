@@ -4,13 +4,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Debugger.ViewModels;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.ViewModels;
+using Nexen.Utilities;
 using ReactiveUI;
 
-namespace Mesen.Debugger.Controls {
-	public class SpritePreviewPanel : MesenUserControl {
+namespace Nexen.Debugger.Controls {
+	public class SpritePreviewPanel : NexenUserControl {
 		public static readonly StyledProperty<double> InnerHeightProperty = AvaloniaProperty.Register<SpritePreviewPanel, double>(nameof(InnerHeight), 0);
 		public static readonly StyledProperty<double> InnerWidthProperty = AvaloniaProperty.Register<SpritePreviewPanel, double>(nameof(InnerWidth), 0);
 		public static readonly StyledProperty<bool> FadePreviewProperty = AvaloniaProperty.Register<SpritePreviewPanel, bool>(nameof(FadePreview), false);

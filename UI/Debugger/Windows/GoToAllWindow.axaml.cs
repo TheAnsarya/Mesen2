@@ -8,17 +8,17 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class GoToAllWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class GoToAllWindow : NexenWindow {
 		private GoToAllViewModel _model;
 
 		[Obsolete("For designer only")]

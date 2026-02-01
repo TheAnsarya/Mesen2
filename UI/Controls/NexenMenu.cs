@@ -5,10 +5,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
-using Mesen.Debugger.Utilities;
+using Nexen.Debugger.Utilities;
 
-namespace Mesen.Controls {
-	public class MesenMenu : Menu {
+namespace Nexen.Controls {
+	public class NexenMenu : Menu {
 		protected override Type StyleKeyOverride => typeof(Menu);
 
 		private void SubmenuOpened(object? sender, RoutedEventArgs e) {

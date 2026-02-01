@@ -9,11 +9,11 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class DisassemblyViewer : Control {
 		public static readonly StyledProperty<CodeLineData[]> LinesProperty = AvaloniaProperty.Register<DisassemblyViewer, CodeLineData[]>(nameof(Lines));
 		public static readonly StyledProperty<ILineStyleProvider> StyleProviderProperty = AvaloniaProperty.Register<DisassemblyViewer, ILineStyleProvider>(nameof(StyleProviderProperty));
@@ -216,7 +216,7 @@ namespace Mesen.Debugger.Controls {
 			try {
 				InternalRender(context);
 			} catch (Exception ex) {
-				Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+				Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 			}
 		}
 

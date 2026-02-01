@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Rendering;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Windows;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class FirmwareHelper {
 		public static string GetFileHash(string filename) {
 			using (SHA256 sha256Hash = SHA256.Create()) {
@@ -38,7 +38,7 @@ namespace Mesen.Utilities {
 			string filename = Marshal.PtrToStringUTF8(msg.Filename) ?? "";
 			Window? wnd = ApplicationHelper.GetMainWindow();
 
-			if (await MesenMsgBox.Show(wnd, "FirmwareNotFound", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, ResourceHelper.GetEnumText(msg.Firmware), filename, msg.Size.ToString()) == DialogResult.OK) {
+			if (await NexenMsgBox.Show(wnd, "FirmwareNotFound", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, ResourceHelper.GetEnumText(msg.Firmware), filename, msg.Size.ToString()) == DialogResult.OK) {
 				while (true) {
 					string? selectedFile = await FileDialogHelper.OpenFile(null, wnd, FileDialogHelper.FirmwareExt);
 					if (selectedFile != null) {
@@ -47,7 +47,7 @@ namespace Mesen.Utilities {
 								break;
 							}
 						} catch (Exception ex) {
-							await MesenMsgBox.ShowException(ex);
+							await NexenMsgBox.ShowException(ex);
 						}
 					} else {
 						break;
@@ -69,7 +69,7 @@ namespace Mesen.Utilities {
 			}
 
 			if (!foundSizeMatch) {
-				await MesenMsgBox.Show(wnd, "FirmwareFileWrongSize", MessageBoxButtons.OK, MessageBoxIcon.Error, knownFirmwares[0].Size.ToString());
+				await NexenMsgBox.Show(wnd, "FirmwareFileWrongSize", MessageBoxButtons.OK, MessageBoxIcon.Error, knownFirmwares[0].Size.ToString());
 				return false;
 			}
 
@@ -83,7 +83,7 @@ namespace Mesen.Utilities {
 			}
 
 			if (!hashMatches) {
-				if (await MesenMsgBox.Show(wnd, "FirmwareMismatch", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, ResourceHelper.GetEnumText(type), knownFirmwares[0].Hashes[0], fileHash) != DialogResult.OK) {
+				if (await NexenMsgBox.Show(wnd, "FirmwareMismatch", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, ResourceHelper.GetEnumText(type), knownFirmwares[0].Hashes[0], fileHash) != DialogResult.OK) {
 					//Files don't match and user cancelled the action, retry
 					return false;
 				}
@@ -92,7 +92,7 @@ namespace Mesen.Utilities {
 			string destination = Path.Combine(ConfigManager.FirmwareFolder, knownFirmwares.Names[0]);
 			if (selectedFile != destination) {
 				if (File.Exists(destination)) {
-					if (await MesenMsgBox.Show(wnd, "OverwriteFirmware", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, destination) != DialogResult.OK) {
+					if (await NexenMsgBox.Show(wnd, "OverwriteFirmware", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, destination) != DialogResult.OK) {
 						//Don't overwrite the existing file
 						return true;
 					}

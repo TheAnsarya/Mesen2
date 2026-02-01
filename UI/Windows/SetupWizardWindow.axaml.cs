@@ -6,10 +6,10 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class SetupWizardWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class SetupWizardWindow : NexenWindow {
 		private SetupWizardViewModel _model;
 
 		public SetupWizardWindow() {

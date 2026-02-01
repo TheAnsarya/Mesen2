@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class MinMaxAttribute : Attribute {
 		public object Min { get; set; }
 		public object Max { get; set; }

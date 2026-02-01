@@ -9,18 +9,18 @@ using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Media;
 using DataBoxControl;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class LabelListViewModel : DisposableViewModel {
-		[Reactive] public MesenList<LabelViewModel> Labels { get; private set; } = new();
+		[Reactive] public NexenList<LabelViewModel> Labels { get; private set; } = new();
 		[Reactive] public SelectionModel<LabelViewModel?> Selection { get; set; } = new() { SingleSelect = false };
 		[Reactive] public SortState SortState { get; set; } = new();
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.LabelListColumnWidths;

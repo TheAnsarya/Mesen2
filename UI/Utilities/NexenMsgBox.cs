@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Rendering;
-using Mesen.Localization;
-using Mesen.Windows;
+using Nexen.Localization;
+using Nexen.Windows;
 
-namespace Mesen.Utilities {
-	public class MesenMsgBox {
+namespace Nexen.Utilities {
+	public class NexenMsgBox {
 		public static Task ShowException(Exception ex) {
-			return MesenMsgBox.Show(null, "UnexpectedError", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.Message + Environment.NewLine + ex.StackTrace);
+			return NexenMsgBox.Show(null, "UnexpectedError", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.Message + Environment.NewLine + ex.StackTrace);
 		}
 
 		public static Task<DialogResult> Show(IRenderRoot? parent, string text, MessageBoxButtons buttons, MessageBoxIcon icon, params string[] args) {

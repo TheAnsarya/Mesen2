@@ -11,21 +11,21 @@ using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using DataBoxControl;
 using Dock.Model.Core;
-using Mesen.Config;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels.DebuggerDock;
-using Mesen.Debugger.Views.DebuggerDock;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels.DebuggerDock;
+using Nexen.Debugger.Views.DebuggerDock;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels;
+namespace Nexen.Debugger.ViewModels;
 
 public class FindResultListViewModel : DisposableViewModel {
-	[Reactive] public MesenList<FindResultViewModel> FindResults { get; private set; } = new();
+	[Reactive] public NexenList<FindResultViewModel> FindResults { get; private set; } = new();
 	[Reactive] public SelectionModel<FindResultViewModel?> Selection { get; set; } = new() { SingleSelect = false };
 	[Reactive] public SortState SortState { get; set; } = new();
 	public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.FindResultColumnWidths;

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class IntegrationConfig : BaseConfig<IntegrationConfig> {
 		[Reactive] public bool AutoLoadDbgFiles { get; set; } = true;
 		[Reactive] public bool AutoLoadMlbFiles { get; set; } = true;

@@ -1,6 +1,6 @@
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class TraceLoggerCpuConfig : BaseConfig<TraceLoggerCpuConfig> {
 		[Reactive] public bool Enabled { get; set; } = true;
 

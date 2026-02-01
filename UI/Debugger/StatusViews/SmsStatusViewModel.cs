@@ -1,10 +1,10 @@
 using System;
 using System.Text;
-using Mesen.Interop;
+using Nexen.Interop;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews {
+namespace Nexen.Debugger.StatusViews {
 	public class SmsStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public byte RegA { get; set; }
 		[Reactive] public byte RegB { get; set; }

@@ -1,12 +1,12 @@
 using System;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Localization;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class SnesConfigViewModel : DisposableViewModel {
 		[Reactive] public SnesConfig Config { get; set; }
 		[Reactive] public SnesConfig OriginalConfig { get; set; }

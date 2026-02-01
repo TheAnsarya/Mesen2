@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class HdPackBuilderWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class HdPackBuilderWindow : NexenWindow {
 		private HdPackBuilderViewModel _model;
 
 		public HdPackBuilderWindow() {

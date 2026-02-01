@@ -8,12 +8,12 @@ using System.Xml;
 using System.Xml.Serialization;
 using Avalonia;
 using Avalonia.Media;
-using Mesen.Debugger;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Debugger;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class TraceLoggerConfig : BaseWindowConfig<TraceLoggerConfig> {
 		[Reactive] public bool AutoRefresh { get; set; } = true;
 		[Reactive] public bool RefreshOnBreakPause { get; set; } = true;

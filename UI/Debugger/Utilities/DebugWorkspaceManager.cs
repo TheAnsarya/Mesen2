@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Labels;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Labels;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public static class DebugWorkspaceManager {
 		private static DebugWorkspace? _workspace = null;
 		private static RomInfo _romInfo = new();
@@ -185,7 +185,7 @@ namespace Mesen.Debugger.Utilities {
 		public static void LoadMesenLabelFile(string path, bool showResult) {
 			if (File.Exists(path) && Path.GetExtension(path).ToLower() == "." + FileDialogHelper.MesenLabelExt) {
 				ResetLabels();
-				MesenLabelFile.Import(path, showResult);
+				NexenLabelFile.Import(path, showResult);
 			}
 		}
 

@@ -4,9 +4,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class MemoryToolsDisplayOptionsView : UserControl {
 		public MemoryToolsDisplayOptionsView() {
 			InitializeComponent();

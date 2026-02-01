@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Reactive.Linq;
-using Mesen.Config;
+using Nexen.Config;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class SnesInputConfigViewModel : DisposableViewModel {
 		[Reactive] public SnesConfig Config { get; set; }
 

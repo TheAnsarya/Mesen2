@@ -6,12 +6,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Mesen.Debugger;
-using Mesen.Interop;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Debugger;
+using Nexen.Interop;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Labels {
+namespace Nexen.Debugger.Labels {
 	public class LabelManager {
 		public static Regex LabelRegex { get; } = new Regex("^[@_a-zA-Z]+[@_a-zA-Z0-9]*$", RegexOptions.Compiled);
 		public static Regex InvalidLabelRegex { get; } = new Regex("[^@_a-zA-Z0-9]", RegexOptions.Compiled);

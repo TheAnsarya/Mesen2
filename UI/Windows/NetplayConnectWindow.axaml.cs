@@ -5,12 +5,12 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class NetplayConnectWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class NetplayConnectWindow : NexenWindow {
 		public NetplayConnectWindow() {
 			InitializeComponent();
 #if DEBUG

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 using static Mesen.Debugger.ViewModels.RegEntry;
 
-namespace Mesen.Debugger.RegisterViewer;
+namespace Nexen.Debugger.RegisterViewer;
 
 public class SnesRegisterViewer {
 	public static List<RegisterViewerTab> GetTabs(ref SnesState snesState, HashSet<CpuType> cpuTypes, byte snesReg4210, byte snesReg4211, byte snesReg4212) {

@@ -6,12 +6,12 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class DebuggerKeyBindingButton : Button {
 		protected override Type StyleKeyOverride => typeof(Button);
 

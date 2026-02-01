@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
+using Nexen.Config;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class FolderHelper {
 		private static HashSet<string> _romExtensions = [
 				".sfc", ".smc", ".fig", ".swc", ".bs", ".st",

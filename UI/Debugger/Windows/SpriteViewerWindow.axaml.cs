@@ -5,14 +5,14 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Windows {
-	public class SpriteViewerWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class SpriteViewerWindow : NexenWindow, INotificationHandler {
 		private SpriteViewerViewModel _model;
 
 		[Obsolete("For designer only")]

@@ -1,4 +1,4 @@
-namespace Mesen.Interop;
+namespace Nexen.Interop;
 
 public interface BaseState {
 }

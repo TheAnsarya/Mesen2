@@ -7,15 +7,15 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class HdPackBuilderViewModel : DisposableViewModel {
 		[Reactive] public string SaveFolder { get; set; }
 		[Reactive] public bool IsRecording { get; set; }

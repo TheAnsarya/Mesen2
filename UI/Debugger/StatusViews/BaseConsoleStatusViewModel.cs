@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel;
-using Mesen.ViewModels;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews {
+namespace Nexen.Debugger.StatusViews {
 	public abstract class BaseConsoleStatusViewModel : ViewModelBase {
 		[Reactive] public bool EditAllowed { get; set; }
 		[Reactive] public UInt64 ElapsedCycles { get; set; }

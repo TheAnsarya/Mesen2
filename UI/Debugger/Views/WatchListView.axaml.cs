@@ -10,10 +10,10 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using DataBoxControl;
-using Mesen.Debugger.ViewModels;
-using Mesen.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class WatchListView : UserControl {
 		public WatchListViewModel Model => (WatchListViewModel)DataContext!;
 

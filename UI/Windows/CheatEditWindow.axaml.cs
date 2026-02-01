@@ -5,13 +5,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class CheatEditWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class CheatEditWindow : NexenWindow {
 		private CheatEditWindowViewModel _model;
 
 		[Obsolete("For designer only")]

@@ -6,11 +6,11 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
-using Mesen.Config;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Utilities;
 using SkiaSharp;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public partial class HexEditor {
 		class HexViewDrawOperation : ICustomDrawOperation {
 			private HexEditor _he;

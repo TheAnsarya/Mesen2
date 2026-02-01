@@ -1,9 +1,9 @@
 using Avalonia.Media;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class PceEventViewerConfig : ViewModelBase {
 		[Reactive] public EventViewerCategoryCfg VdcStatusReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x29, 0xC9, 0xC9));
 		[Reactive] public EventViewerCategoryCfg VdcVramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x9F, 0x93, 0xC6));

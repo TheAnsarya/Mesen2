@@ -1,8 +1,8 @@
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config;
+namespace Nexen.Config;
 
 public class WsEventViewerConfig : ViewModelBase {
 	[Reactive] public EventViewerCategoryCfg PpuPaletteRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[0]);

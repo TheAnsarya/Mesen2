@@ -4,13 +4,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Utilities;
+using Nexen.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class BreakpointEditWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class BreakpointEditWindow : NexenWindow {
 		[Obsolete("For designer only")]
 		public BreakpointEditWindow() : this(new BreakpointEditViewModel()) { }
 
@@ -28,7 +28,7 @@ namespace Mesen.Debugger.Windows {
 
 		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
-			this.GetControl<MesenNumericTextBox>("startAddress").FocusAndSelectAll();
+			this.GetControl<NexenNumericTextBox>("startAddress").FocusAndSelectAll();
 		}
 
 		private void Ok_OnClick(object sender, RoutedEventArgs e) {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config.Shortcuts {
+namespace Nexen.Config.Shortcuts {
 	public class ShortcutKeyInfo : ReactiveObject {
 		[Reactive] public EmulatorShortcut Shortcut { get; set; }
 		[Reactive] public KeyCombination KeyCombination { get; set; } = new KeyCombination();

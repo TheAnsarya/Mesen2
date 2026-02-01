@@ -1,9 +1,9 @@
 using System;
 using System.Text.Json;
-using Mesen.Utilities;
+using Nexen.Utilities;
 using ReactiveUI;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class BaseConfig<T> : ReactiveObject where T : class {
 		public T Clone() {
 			if (this is T obj) {

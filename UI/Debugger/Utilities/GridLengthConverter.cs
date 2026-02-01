@@ -2,7 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class GridLengthConverter : IValueConverter {
 		public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) {
 			if (value is double val && targetType == typeof(GridLength)) {

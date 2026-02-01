@@ -10,11 +10,11 @@ using Avalonia.Styling;
 using AvaloniaEdit;
 using AvaloniaEdit.Editing;
 
-namespace Mesen.Debugger.Controls {
-	public class MesenTextEditor : TextEditor {
+namespace Nexen.Debugger.Controls {
+	public class NexenTextEditor : TextEditor {
 		protected override Type StyleKeyOverride => typeof(TextEditor);
 
-		public static readonly StyledProperty<string> TextBindingProperty = AvaloniaProperty.Register<MesenTextEditor, string>(nameof(TextBinding), "", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+		public static readonly StyledProperty<string> TextBindingProperty = AvaloniaProperty.Register<NexenTextEditor, string>(nameof(TextBinding), "", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 		public string TextBinding {
 			get { return GetValue(TextBindingProperty); }
@@ -40,14 +40,14 @@ namespace Mesen.Debugger.Controls {
 		private bool _readyEventSent = false;
 		public event EventHandler<EventArgs>? TextEditorReady;
 
-		static MesenTextEditor() {
-			TextBindingProperty.Changed.AddClassHandler<MesenTextEditor>((x, e) => {
+		static NexenTextEditor() {
+			TextBindingProperty.Changed.AddClassHandler<NexenTextEditor>((x, e) => {
 				if (x.Text != (string?)e.NewValue) {
 					x.Text = (string)e.NewValue!;
 				}
 			});
 
-			BoundsProperty.Changed.AddClassHandler<MesenTextEditor>((x, e) => {
+			BoundsProperty.Changed.AddClassHandler<NexenTextEditor>((x, e) => {
 				if (!x._readyEventSent && e.NewValue is Rect bounds && bounds.Width > 0 && bounds.Height > 0) {
 					x._readyEventSent = true;
 					x.TextEditorReady?.Invoke(x, EventArgs.Empty);
@@ -55,7 +55,7 @@ namespace Mesen.Debugger.Controls {
 			});
 		}
 
-		public MesenTextEditor() {
+		public NexenTextEditor() {
 			Options.AllowScrollBelowDocument = false;
 		}
 

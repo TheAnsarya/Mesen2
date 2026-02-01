@@ -4,14 +4,14 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class ColorIndexPickerWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class ColorIndexPickerWindow : NexenWindow {
 		public UInt32[] Palette { get; set; } = [];
 		public int SelectedPalette { get; set; }
 		public int BlockSize { get; set; } = 24;

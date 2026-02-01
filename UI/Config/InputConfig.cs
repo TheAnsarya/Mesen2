@@ -4,12 +4,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class InputConfig : BaseConfig<InputConfig> {
 		[Reactive][MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
 		[Reactive][MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;

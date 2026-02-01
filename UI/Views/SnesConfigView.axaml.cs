@@ -3,11 +3,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class SnesConfigView : UserControl {
 		public SnesConfigView() {
 			InitializeComponent();

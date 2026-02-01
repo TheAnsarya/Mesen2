@@ -1,4 +1,4 @@
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public static class MemoryOperationTypeExtensions {
 		public static bool IsRead(this MemoryOperationType opType) {
 			switch (opType) {

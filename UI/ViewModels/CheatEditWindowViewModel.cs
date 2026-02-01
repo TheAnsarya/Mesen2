@@ -4,14 +4,14 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class CheatEditWindowViewModel : DisposableViewModel {
 		public CheatCode Cheat { get; }
 

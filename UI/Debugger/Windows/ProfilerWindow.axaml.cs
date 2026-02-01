@@ -7,13 +7,13 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using DataBoxControl;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Windows {
-	public class ProfilerWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class ProfilerWindow : NexenWindow, INotificationHandler {
 		private ProfilerWindowViewModel _model;
 
 		public ProfilerWindow() {

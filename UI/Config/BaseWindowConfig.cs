@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public class BaseWindowConfig<T> : BaseConfig<T> where T : class {
 		public MesenSize WindowSize { get; set; } = new PixelSize(0, 0);
 		public MesenPoint WindowLocation { get; set; } = new PixelPoint(0, 0);

@@ -8,14 +8,14 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows {
-	public class HistoryViewerWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class HistoryViewerWindow : NexenWindow {
 		private HistoryViewerViewModel _model;
 		private DispatcherTimer _timer;
 		private DispatcherTimer _mouseTimer;

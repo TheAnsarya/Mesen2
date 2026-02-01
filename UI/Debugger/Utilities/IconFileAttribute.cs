@@ -1,6 +1,6 @@
 using System;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class IconFileAttribute : Attribute {
 		public string Icon { get; }
 		public IconFileAttribute(string icon) {

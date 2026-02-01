@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Mesen.Config;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Utilities;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public class InputApi {
 		private const string DllPath = EmuApi.DllName;
 

@@ -11,23 +11,23 @@ using Avalonia.Threading;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm.Controls;
-using Mesen.Config;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Integration;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.StatusViews;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels.DebuggerDock;
-using Mesen.Debugger.Windows;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Integration;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.StatusViews;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels.DebuggerDock;
+using Nexen.Debugger.Windows;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class DebuggerWindowViewModel : DisposableViewModel {
 		[Reactive] public string Title { get; private set; } = "Debugger";
 		[Reactive] public WindowIcon? Icon { get; private set; } = null;
@@ -819,7 +819,7 @@ namespace Mesen.Debugger.ViewModels {
 							string initFilename = EmuApi.GetRomInfo().GetRomName() + "." + FileDialogHelper.MesenLabelExt;
 							string? filename = await FileDialogHelper.SaveFile(null, initFilename, wnd, FileDialogHelper.MesenLabelExt);
 							if(filename != null) {
-								MesenLabelFile.Export(filename);
+								NexenLabelFile.Export(filename);
 							}
 						}
 					},
@@ -832,9 +832,9 @@ namespace Mesen.Debugger.ViewModels {
 								var romInfo = EmuApi.GetRomInfo();
 								var memoryType = CpuType.GetPrgRomMemoryType();
 								if(PansyExporter.Export(filename, romInfo, memoryType)) {
-									await MesenMsgBox.Show(wnd, "ExportPansySuccess", MessageBoxButtons.OK, MessageBoxIcon.Info);
+									await NexenMsgBox.Show(wnd, "ExportPansySuccess", MessageBoxButtons.OK, MessageBoxIcon.Info);
 								} else {
-									await MesenMsgBox.Show(wnd, "ExportPansyFailed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+									await NexenMsgBox.Show(wnd, "ExportPansyFailed", MessageBoxButtons.OK, MessageBoxIcon.Error);
 								}
 							}
 						}
@@ -868,7 +868,7 @@ namespace Mesen.Debugger.ViewModels {
 						ActionType = ActionType.ResetWorkspace,
 						Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.ResetWorkspace),
 						OnClick = async () => {
-							if(await MesenMsgBox.Show(wnd, "ResetWorkspaceConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
+							if(await NexenMsgBox.Show(wnd, "ResetWorkspaceConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
 								DebugWorkspaceManager.Workspace.Reset();
 							}
 						}

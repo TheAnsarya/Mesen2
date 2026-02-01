@@ -1,7 +1,7 @@
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Disassembly {
+namespace Nexen.Debugger.Disassembly {
 	public class DisassemblyViewStyleProvider : BaseStyleProvider {
 		private DisassemblyViewModel _model;
 

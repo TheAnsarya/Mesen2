@@ -2,12 +2,12 @@ using System;
 using System.Reactive.Linq;
 using System.Text;
 using Avalonia.Controls;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.StatusViews {
+namespace Nexen.Debugger.StatusViews {
 	public class SnesStatusViewModel : BaseConsoleStatusViewModel {
 		[Reactive] public UInt16 RegA { get; set; }
 		[Reactive] public UInt16 RegX { get; set; }

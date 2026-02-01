@@ -5,10 +5,10 @@ using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Interop;
+using Nexen.Config;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class DebuggerOptionsView : UserControl {
 		public DebuggerOptionsView() {
 			InitializeComponent();

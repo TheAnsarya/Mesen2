@@ -9,7 +9,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Platform.Storage.FileIO;
 using Avalonia.Rendering;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class FileDialogHelper {
 		public const string RomExt = "[[ROMFILES]]";
 		public const string FirmwareExt = "[[FIRMWAREFILES]]";
@@ -92,7 +92,7 @@ namespace Mesen.Utilities {
 					return files[0].Path.LocalPath;
 				}
 			} catch (Exception ex) {
-				await MesenMsgBox.ShowException(ex);
+				await NexenMsgBox.ShowException(ex);
 			}
 
 			return null;
@@ -129,7 +129,7 @@ namespace Mesen.Utilities {
 					return file.Path.LocalPath;
 				}
 			} catch (Exception ex) {
-				await MesenMsgBox.ShowException(ex);
+				await NexenMsgBox.ShowException(ex);
 			}
 
 			return null;
@@ -149,7 +149,7 @@ namespace Mesen.Utilities {
 					return folders[0].Path.LocalPath;
 				}
 			} catch (Exception ex) {
-				await MesenMsgBox.ShowException(ex);
+				await NexenMsgBox.ShowException(ex);
 			}
 
 			return null;

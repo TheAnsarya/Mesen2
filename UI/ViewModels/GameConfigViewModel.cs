@@ -1,13 +1,13 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Utilities;
 using Microsoft.VisualBasic;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class GameConfigViewModel : DisposableViewModel {
 		[Reactive] public GameConfig Config { get; set; }
 		public GameDipSwitches DipSwitches { get; }

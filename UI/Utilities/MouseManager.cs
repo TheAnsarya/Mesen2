@@ -8,14 +8,14 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
-using Mesen.Views;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.ViewModels;
+using Nexen.Views;
+using Nexen.Windows;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class MouseManager : IDisposable {
 		public const int LeftMouseButtonKeyCode = 0x200;
 		public const int RightMouseButtonKeyCode = 0x201;

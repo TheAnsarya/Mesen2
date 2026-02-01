@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class TooltipHelper {
 		public static void ShowTooltip(Control target, object? tooltipContent, int horizontalOffset) {
 			try {

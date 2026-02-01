@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class AudioConfigViewModel : DisposableViewModel {
 		[Reactive] public AudioConfig Config { get; set; }
 		[Reactive] public AudioConfig OriginalConfig { get; set; }

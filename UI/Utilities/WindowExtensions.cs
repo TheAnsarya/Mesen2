@@ -10,7 +10,7 @@ using Avalonia.Platform;
 using Avalonia.Rendering;
 using Avalonia.VisualTree;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	static class WindowExtensions {
 		public static void CenterWindow(Window child, Visual parent) {
 			EventHandler? handler = null;

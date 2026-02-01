@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using System.Reactive.Linq;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class MovieRecordConfigViewModel : ViewModelBase {
 		[Reactive] public string SavePath { get; set; }
 		[Reactive] public MovieRecordConfig Config { get; set; }

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Config;
+namespace Nexen.Config;
 
 public class ConsoleOverrideConfig : BaseConfig<GameConfig> {
 	[Reactive] public bool OverrideVideoFilter { get; set; } = false;

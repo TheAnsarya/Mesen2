@@ -7,13 +7,13 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Controls;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.Controls;
+using Nexen.ViewModels;
 
-namespace Mesen.Windows;
+namespace Nexen.Windows;
 
-public class GameConfigWindow : MesenWindow {
+public class GameConfigWindow : NexenWindow {
 	private GameConfigViewModel _model;
 
 	public GameConfigWindow() {

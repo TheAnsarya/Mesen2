@@ -4,10 +4,10 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using DataBoxControl;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Views {
+namespace Nexen.Debugger.Views {
 	public class CallStackView : UserControl {
 		public CallStackView() {
 			InitializeComponent();

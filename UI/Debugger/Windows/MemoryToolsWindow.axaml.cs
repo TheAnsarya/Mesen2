@@ -9,18 +9,18 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Utilities;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Debugger.Disassembly;
+using Nexen.Debugger.Labels;
+using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Windows {
-	public class MemoryToolsWindow : MesenWindow, INotificationHandler {
+namespace Nexen.Debugger.Windows {
+	public class MemoryToolsWindow : NexenWindow, INotificationHandler {
 		private HexEditor _editor;
 		private MemoryToolsViewModel _model;
 		private MemoryViewerFindWindow? _searchWnd;

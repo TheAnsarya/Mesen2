@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Mesen.Config;
-using Mesen.ViewModels;
+using Nexen.Config;
+using Nexen.ViewModels;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class ControllerConfigViewLocator : IDataTemplate {
 		public Control Build(object? data) {
 			if (data is KeyMappingViewModel mappings) {

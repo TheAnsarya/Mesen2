@@ -3,11 +3,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class ColorPickerField : UserControl {
 		public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<ColorPickerField, string>(nameof(Text), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 		public static readonly StyledProperty<UInt32> ColorProperty = AvaloniaProperty.Register<ColorPickerField, UInt32>(nameof(Color), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);

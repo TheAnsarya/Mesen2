@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Mesen.Interop;
+namespace Nexen.Interop;
 
 public struct NesPpuStatusFlags {
 	[MarshalAs(UnmanagedType.I1)] public bool SpriteOverflow;

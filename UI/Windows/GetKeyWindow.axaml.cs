@@ -10,14 +10,14 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Windows {
-	public class GetKeyWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class GetKeyWindow : NexenWindow {
 		private DispatcherTimer _timer;
 
 		private List<UInt16> _prevScanCodes = new List<UInt16>();

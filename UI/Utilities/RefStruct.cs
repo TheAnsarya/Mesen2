@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class RefStruct<T> where T : struct {
 		private T _value;
 

@@ -9,13 +9,13 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class UpdatePromptViewModel : ViewModelBase {
 		public Version LatestVersion { get; }
 		public Version InstalledVersion { get; }
@@ -50,7 +50,7 @@ namespace Mesen.ViewModels {
 				}
 			} catch (Exception ex) {
 				if (!silent) {
-					Dispatcher.UIThread.Post(() => MesenMsgBox.ShowException(ex));
+					Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 				}
 			}
 
@@ -121,7 +121,7 @@ namespace Mesen.ViewModels {
 					}
 				} else {
 					File.Delete(downloadPath);
-					Dispatcher.UIThread.Post(() => MesenMsgBox.Show(wnd, "AutoUpdateInvalidFile", MessageBoxButtons.OK, MessageBoxIcon.Info, FileInfo.Hash, hash));
+					Dispatcher.UIThread.Post(() => NexenMsgBox.Show(wnd, "AutoUpdateInvalidFile", MessageBoxButtons.OK, MessageBoxIcon.Info, FileInfo.Hash, hash));
 					return false;
 				}
 			}

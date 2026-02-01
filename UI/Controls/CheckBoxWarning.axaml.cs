@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class CheckBoxWarning : UserControl {
 		public static readonly StyledProperty<bool> IsCheckedProperty = AvaloniaProperty.Register<CheckBoxWarning, bool>(nameof(IsChecked), false, false, Avalonia.Data.BindingMode.TwoWay);
 		public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<CheckBoxWarning, string>(nameof(Text));

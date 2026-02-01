@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:vm="using:Mesen.Debugger.ViewModels"
 	xmlns:sys="using:System"
 	xmlns:v="using:Mesen.Views"
@@ -48,7 +48,7 @@
 			<TextBlock Grid.Column="0" Grid.Row="1" Text="{l:Translate lblAddress}" />
 			<StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
 				<TextBlock Margin="0 0 3 0">$</TextBlock>
-				<c:MesenNumericTextBox Value="{Binding Label.Address}" Hex="True" Trim="True" Width="60" />
+				<c:NexenNumericTextBox Value="{Binding Label.Address}" Hex="True" Trim="True" Width="60" />
 				<TextBlock Margin="3 0 0 0" Text="{Binding MaxAddress}" Foreground="Gray" />
 			</StackPanel>
 
@@ -74,7 +74,7 @@
 
 			<TextBlock Grid.Column="0" Grid.Row="4" Text="{l:Translate lblLength}" />
 			<StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="4">
-				<c:MesenNumericUpDown
+				<c:NexenNumericUpDown
 					Value="{Binding Label.Length}"
 					Minimum="1"
 					Maximum="65536"

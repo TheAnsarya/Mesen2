@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Input;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
 static class PointerWheelEventArgsExtensions {
 	public static double GetDeltaY(this PointerWheelEventArgs e) {

@@ -1,8 +1,8 @@
 using System;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Interop;
+using Nexen.Utilities;
 
-namespace Mesen.Config {
+namespace Nexen.Config {
 	public static class KeyPresets {
 		public static void ApplyWasdLayout(KeyMapping m, ControllerType type) {
 			m.ClearKeys(type);

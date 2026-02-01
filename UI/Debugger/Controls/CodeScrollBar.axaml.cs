@@ -7,11 +7,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Interop;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Debugger.Controls {
+namespace Nexen.Debugger.Controls {
 	public class CodeScrollBar : UserControl {
 		public static readonly StyledProperty<int> ValueProperty = AvaloniaProperty.Register<CodeScrollBar, int>(nameof(Value), 0, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 		public static readonly StyledProperty<int> MaximumProperty = AvaloniaProperty.Register<CodeScrollBar, int>(nameof(Maximum), 0);

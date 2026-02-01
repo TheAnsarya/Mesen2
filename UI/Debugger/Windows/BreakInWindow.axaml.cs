@@ -3,13 +3,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Controls;
-using Mesen.Interop;
-using Mesen.Utilities;
+using Nexen.Controls;
+using Nexen.Interop;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class BreakInWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class BreakInWindow : NexenWindow {
 		public static int _lastValue { get; set; } = 0;
 		public static StepType _lastStepType { get; set; } = StepType.Step;
 
@@ -57,7 +57,7 @@ namespace Mesen.Debugger.Windows {
 
 		protected override void OnOpened(EventArgs e) {
 			base.OnOpened(e);
-			this.GetControl<MesenNumericTextBox>("txtValue").FocusAndSelectAll();
+			this.GetControl<NexenNumericTextBox>("txtValue").FocusAndSelectAll();
 		}
 
 		private void Ok_OnClick(object sender, RoutedEventArgs e) {

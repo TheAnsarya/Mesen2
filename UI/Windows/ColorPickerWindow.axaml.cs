@@ -3,8 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
-namespace Mesen.Windows {
-	public class ColorPickerWindow : MesenWindow {
+namespace Nexen.Windows {
+	public class ColorPickerWindow : NexenWindow {
 		public ColorPickerWindow() {
 			InitializeComponent();
 #if DEBUG

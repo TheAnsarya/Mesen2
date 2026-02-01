@@ -2,7 +2,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:m="clr-namespace:Mesen"
+	xmlns:m="clr-namespace:Nexen"
 	xmlns:vm="using:Mesen.ViewModels"
 	xmlns:dc="using:Mesen.Debugger.Controls"
 	xmlns:l="using:Mesen.Localization"
@@ -21,7 +21,7 @@
 		</StackPanel>
 
 		<Border BorderThickness="1" BorderBrush="Gray">
-			<dc:MesenTextEditor
+			<dc:NexenTextEditor
 				Name="txtLog"
 				Height="NaN"
 				IsReadOnly="True"

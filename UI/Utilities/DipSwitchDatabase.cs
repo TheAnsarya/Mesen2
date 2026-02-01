@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class DipSwitchDatabase {
 		private static Dictionary<uint, GameDipSwitches> _gameDipswitches = new();
 

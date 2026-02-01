@@ -6,36 +6,36 @@
 	xmlns:c="using:Mesen.Controls"
 	mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
 	x:Name="root"
-	x:Class="Mesen.Controls.MesenSlider"
+	x:Class="Mesen.Controls.NexenSlider"
   HorizontalAlignment="Stretch"
 >
 	<UserControl.Styles>
-		<Style Selector="c|MesenSlider[Orientation=Vertical] DockPanel TextBox">
+		<Style Selector="c|NexenSlider[Orientation=Vertical] DockPanel TextBox">
 			<Setter Property="DockPanel.Dock" Value="Bottom" />
 		</Style>
-		<Style Selector="c|MesenSlider[Orientation=Vertical] > Panel > Panel">
+		<Style Selector="c|NexenSlider[Orientation=Vertical] > Panel > Panel">
 			<Setter Property="IsVisible" Value="False" />
 		</Style>
 
-		<Style Selector="c|MesenSlider[Orientation=Horizontal] > Panel > DockPanel">
+		<Style Selector="c|NexenSlider[Orientation=Horizontal] > Panel > DockPanel">
 			<Setter Property="Margin" Value="0 11 0 0" />
 		</Style>
 		
-		<Style Selector="c|MesenSlider[Orientation=Vertical] DockPanel > Slider">
+		<Style Selector="c|NexenSlider[Orientation=Vertical] DockPanel > Slider">
 			<Setter Property="Margin" Value="12 0 0 0" />
 			<Setter Property="HorizontalAlignment" Value="Center" />
 		</Style>
 		
-		<Style Selector="c|MesenSlider[Orientation=Horizontal] > Panel">
+		<Style Selector="c|NexenSlider[Orientation=Horizontal] > Panel">
 			<Setter Property="VerticalAlignment" Value="Top" />
 			<Setter Property="HorizontalAlignment" Value="Stretch" />
 		</Style>
-		<Style Selector="c|MesenSlider[Orientation=Vertical] > Panel">
+		<Style Selector="c|NexenSlider[Orientation=Vertical] > Panel">
 			<Setter Property="VerticalAlignment" Value="Stretch" />
 			<Setter Property="HorizontalAlignment" Value="Left" />
 		</Style>
 		
-		<Style Selector="c|MesenSlider[Orientation=Horizontal] DockPanel > TextBox">
+		<Style Selector="c|NexenSlider[Orientation=Horizontal] DockPanel > TextBox">
 			<Setter Property="DockPanel.Dock" Value="Right" />
 			<Setter Property="VerticalAlignment" Value="Top" />
 			<Setter Property="Margin" Value="2 0 2 0" />
@@ -43,19 +43,19 @@
 			<Setter Property="MinHeight" Value="18" />
 			<Setter Property="Height" Value="18" />
 		</Style>
-		<Style Selector="c|MesenSlider TextBlock.HorizontalText, c|MesenSlider TextBlock.VerticalText">
+		<Style Selector="c|NexenSlider TextBlock.HorizontalText, c|NexenSlider TextBlock.VerticalText">
 			<Setter Property="IsVisible" Value="False" />
 		</Style>
-		<Style Selector="c|MesenSlider[Orientation=Horizontal] TextBlock.HorizontalText">
+		<Style Selector="c|NexenSlider[Orientation=Horizontal] TextBlock.HorizontalText">
 			<Setter Property="IsVisible" Value="True" />
 		</Style>
-		<Style Selector="c|MesenSlider[Orientation=Vertical] TextBlock.VerticalText">
+		<Style Selector="c|NexenSlider[Orientation=Vertical] TextBlock.VerticalText">
 			<Setter Property="IsVisible" Value="True" />
 			<Setter Property="TextAlignment" Value="Center" />
 		</Style>
-		<Style Selector="c|MesenSlider[Orientation=Horizontal]">
+		<Style Selector="c|NexenSlider[Orientation=Horizontal]">
 		</Style>
-		<Style Selector="c|MesenSlider[Orientation=Horizontal] Slider">
+		<Style Selector="c|NexenSlider[Orientation=Horizontal] Slider">
 			<Setter Property="Margin" Value="0 0 0 0" />
 		</Style>
 	</UserControl.Styles>
@@ -68,7 +68,7 @@
 				Text="{Binding Text, ElementName=root}"
 			/>
 			
-			<c:MesenNumericTextBox
+			<c:NexenNumericTextBox
 				Min="{Binding Minimum, ElementName=root}"
 				Max="{Binding Maximum, ElementName=root}"
 				Value="{Binding Value, ElementName=root}"

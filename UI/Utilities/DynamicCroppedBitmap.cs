@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class DynamicCroppedBitmap : CroppedBitmap, IDynamicBitmap {
 		public new event EventHandler? Invalidated;
 

@@ -3,12 +3,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Controls;
-using Mesen.Utilities;
+using Nexen.Controls;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.Windows {
-	public class FindAllOccurrencesWindow : MesenWindow {
+namespace Nexen.Debugger.Windows {
+	public class FindAllOccurrencesWindow : NexenWindow {
 		private static string _lastSearch { get; set; } = "";
 		private static bool _lastMatchCase { get; set; } = false;
 		private static bool _lastMatchWholeWord { get; set; } = false;

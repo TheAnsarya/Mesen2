@@ -5,12 +5,12 @@ using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class InputComboBox : UserControl {
 		public static readonly StyledProperty<ControllerType> ControllerTypeProperty = AvaloniaProperty.Register<InputComboBox, ControllerType>(nameof(ControllerType), defaultBindingMode: BindingMode.TwoWay);
 		public static readonly StyledProperty<ControllerConfig> ConfigProperty = AvaloniaProperty.Register<InputComboBox, ControllerConfig>(nameof(Config), defaultBindingMode: BindingMode.TwoWay);

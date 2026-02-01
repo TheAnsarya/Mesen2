@@ -10,15 +10,15 @@ using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Localization;
-using Mesen.Utilities;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Localization;
+using Nexen.Utilities;
+using Nexen.ViewModels;
+using Nexen.Windows;
 using ReactiveUI;
 
-namespace Mesen.Controls {
+namespace Nexen.Controls {
 	public class PaletteConfig : UserControl {
 		public static readonly StyledProperty<UInt32[]> PaletteProperty = AvaloniaProperty.Register<PaletteConfig, UInt32[]>(nameof(Palette), Array.Empty<UInt32>(), defaultBindingMode: BindingMode.TwoWay);
 		public static readonly StyledProperty<List<PalettePreset>> PalettePresetsProperty = AvaloniaProperty.Register<PaletteConfig, List<PalettePreset>>(nameof(PalettePresets), new List<PalettePreset>());
@@ -121,7 +121,7 @@ namespace Mesen.Controls {
 
 				Palette = paletteData;
 			} else {
-				MesenMsgBox.Show(VisualRoot, "InvalidPaletteFile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				NexenMsgBox.Show(VisualRoot, "InvalidPaletteFile", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 
 			paletteFile.Close();

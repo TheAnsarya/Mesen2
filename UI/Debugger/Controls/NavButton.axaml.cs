@@ -3,11 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
-using Mesen.Debugger.ViewModels;
-using Mesen.Localization;
-using Mesen.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Localization;
+using Nexen.Utilities;
 
-namespace Mesen.Debugger.Controls;
+namespace Nexen.Debugger.Controls;
 
 public class NavButton : UserControl {
 	public static readonly StyledProperty<NavType> NavProperty = AvaloniaProperty.Register<NavButton, NavType>(nameof(NavProperty));

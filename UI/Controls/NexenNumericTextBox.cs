@@ -6,19 +6,19 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using Mesen.Debugger.Utilities;
+using Nexen.Debugger.Utilities;
 
-namespace Mesen.Controls {
-	public class MesenNumericTextBox : TextBox {
+namespace Nexen.Controls {
+	public class NexenNumericTextBox : TextBox {
 		protected override Type StyleKeyOverride => typeof(TextBox);
 
 		private static HexConverter _hexConverter = new HexConverter();
 
-		public static readonly StyledProperty<bool> TrimProperty = AvaloniaProperty.Register<MesenNumericTextBox, bool>(nameof(Trim));
-		public static readonly StyledProperty<bool> HexProperty = AvaloniaProperty.Register<MesenNumericTextBox, bool>(nameof(Hex));
-		public static readonly StyledProperty<IComparable> ValueProperty = AvaloniaProperty.Register<MesenNumericTextBox, IComparable>(nameof(Value), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
-		public static readonly StyledProperty<string?> MinProperty = AvaloniaProperty.Register<MesenNumericTextBox, string?>(nameof(Min), null);
-		public static readonly StyledProperty<string?> MaxProperty = AvaloniaProperty.Register<MesenNumericTextBox, string?>(nameof(Max), null);
+		public static readonly StyledProperty<bool> TrimProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Trim));
+		public static readonly StyledProperty<bool> HexProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Hex));
+		public static readonly StyledProperty<IComparable> ValueProperty = AvaloniaProperty.Register<NexenNumericTextBox, IComparable>(nameof(Value), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+		public static readonly StyledProperty<string?> MinProperty = AvaloniaProperty.Register<NexenNumericTextBox, string?>(nameof(Min), null);
+		public static readonly StyledProperty<string?> MaxProperty = AvaloniaProperty.Register<NexenNumericTextBox, string?>(nameof(Max), null);
 
 		private bool _preventTextUpdate;
 
@@ -47,8 +47,8 @@ namespace Mesen.Controls {
 			set { SetValue(MaxProperty, value); }
 		}
 
-		static MesenNumericTextBox() {
-			ValueProperty.Changed.AddClassHandler<MesenNumericTextBox>((x, e) => {
+		static NexenNumericTextBox() {
+			ValueProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
 				if (!x.IsInitialized) {
 					return;
 				}
@@ -64,13 +64,13 @@ namespace Mesen.Controls {
 				});
 			});
 
-			MaxProperty.Changed.AddClassHandler<MesenNumericTextBox>((x, e) => {
+			MaxProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
 				x.MaxLength = x.GetMaxLength();
 				x.UpdateText(true);
 			});
 
 
-			TextProperty.Changed.AddClassHandler<MesenNumericTextBox>((x, e) => {
+			TextProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
 				if (!x.IsInitialized) {
 					return;
 				}
@@ -83,7 +83,7 @@ namespace Mesen.Controls {
 			});
 		}
 
-		public MesenNumericTextBox() {
+		public NexenNumericTextBox() {
 		}
 
 		protected override void OnInitialized() {

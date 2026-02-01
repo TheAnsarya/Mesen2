@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
 class DependencyHelper {
 	public static void ExtractNativeDependencies(string dest) {

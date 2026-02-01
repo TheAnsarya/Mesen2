@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 
-namespace Mesen.Utilities;
+namespace Nexen.Utilities;
 
 public static class TextBoxExtensions {
 	public static void FocusAndSelectAll(this TextBox txt) {

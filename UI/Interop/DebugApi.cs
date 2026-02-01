@@ -9,11 +9,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
-using Mesen.Config;
-using Mesen.Debugger;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Debugger;
+using Nexen.Utilities;
 
-namespace Mesen.Interop {
+namespace Nexen.Interop {
 	public class DebugApi {
 		private const string DllPath = EmuApi.DllName;
 		[DllImport(DllPath)] public static extern void InitializeDebugger();

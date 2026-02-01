@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Debugger.Controls;
-using Mesen.Interop;
+using Nexen.Debugger.Controls;
+using Nexen.Interop;
 
-namespace Mesen.Debugger.Utilities {
+namespace Nexen.Debugger.Utilities {
 	public class PaletteHelper {
 		public static DynamicTooltip GetPreviewPanel(UInt32[] rgbPalette, UInt32[] rawPalette, RawPaletteFormat format, int index, DynamicTooltip? tooltipToUpdate, int colorsPerPalette = 0) {
 			TooltipEntries entries = tooltipToUpdate?.Items ?? new();

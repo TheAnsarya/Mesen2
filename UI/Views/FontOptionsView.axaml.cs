@@ -6,12 +6,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Mesen.Config;
-using Mesen.Debugger.Controls;
-using Mesen.Utilities;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Debugger.Controls;
+using Nexen.Utilities;
+using Nexen.Windows;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class FontOptionsView : UserControl {
 		public static readonly StyledProperty<bool> PreferMonospaceProperty = AvaloniaProperty.Register<FontOptionsView, bool>(nameof(PreferMonospace), false);
 		public static readonly StyledProperty<bool> ShowWarningProperty = AvaloniaProperty.Register<FontOptionsView, bool>(nameof(ShowWarning), false);

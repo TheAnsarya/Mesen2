@@ -7,14 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Interop;
-using Mesen.Localization;
-using Mesen.ViewModels;
-using Mesen.Windows;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Interop;
+using Nexen.Localization;
+using Nexen.ViewModels;
+using Nexen.Windows;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public static class LoadRomHelper {
 		public static async void LoadRom(ResourcePath romPath, ResourcePath? patchPath = null) {
 			if (FolderHelper.IsArchiveFile(romPath)) {
@@ -100,13 +100,13 @@ namespace Mesen.Utilities {
 				Window? wnd = ApplicationHelper.GetMainWindow();
 				if (!EmuApi.IsRunning()) {
 					//Prompt the user for a rom to load
-					if (await MesenMsgBox.Show(wnd, "SelectRomIps", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
+					if (await NexenMsgBox.Show(wnd, "SelectRomIps", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
 						string? filename = await FileDialogHelper.OpenFile(null, wnd, FileDialogHelper.RomExt);
 						if (filename != null) {
 							LoadRom(filename, patchFile);
 						}
 					}
-				} else if (await MesenMsgBox.Show(wnd, "PatchAndReset", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
+				} else if (await NexenMsgBox.Show(wnd, "PatchAndReset", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
 					//Confirm that the user wants to patch the current rom and reset
 					LoadRom(EmuApi.GetRomInfo().RomPath, patchFile);
 				}

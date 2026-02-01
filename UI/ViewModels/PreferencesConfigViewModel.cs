@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Styling;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Config.Shortcuts;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class PreferencesConfigViewModel : DisposableViewModel {
 		[Reactive] public PreferencesConfig Config { get; set; }
 		[Reactive] public PreferencesConfig OriginalConfig { get; set; }

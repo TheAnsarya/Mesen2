@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mesen.Utilities {
+namespace Nexen.Utilities {
 	public class VirtualArray<T> where T : struct {
 		private const int BatchSize = 0x10000;
 

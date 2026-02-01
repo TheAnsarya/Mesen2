@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Mesen.Interop;
+using Nexen.Interop;
 
-namespace Mesen.Views {
+namespace Nexen.Views {
 	public class AudioConfigView : UserControl {
 		public AudioConfigView() {
 			InitializeComponent();

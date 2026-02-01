@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
-using Mesen.Interop;
-using Mesen.ViewModels;
+using Nexen.Interop;
+using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.Debugger.ViewModels {
+namespace Nexen.Debugger.ViewModels {
 	public class ControllerListViewModel : ViewModelBase {
 		[Reactive] public List<ControllerInputViewModel> Controllers { get; set; } = new();
 

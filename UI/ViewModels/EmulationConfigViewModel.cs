@@ -1,9 +1,9 @@
 using Avalonia.Controls;
-using Mesen.Config;
-using Mesen.Utilities;
+using Nexen.Config;
+using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Mesen.ViewModels {
+namespace Nexen.ViewModels {
 	public class EmulationConfigViewModel : DisposableViewModel {
 		[Reactive] public EmulationConfig Config { get; set; }
 		[Reactive] public EmulationConfig OriginalConfig { get; set; }
