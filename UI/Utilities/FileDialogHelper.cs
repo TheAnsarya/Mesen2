@@ -14,7 +14,17 @@ namespace Nexen.Utilities {
 		public const string RomExt = "[[ROMFILES]]";
 		public const string FirmwareExt = "[[FIRMWAREFILES]]";
 		public const string LabelFileExt = "[[LABELFILES]]";
-		public const string NexenMovieExt = "mmo";
+
+		// Nexen native formats (preferred for new files)
+		public const string NexenMovieExt = "nexen-movie";
+		public const string NexenSaveStateExt = "nexen-save";
+		public const string NexenLabelExt = "nexen-labels";
+
+		// Legacy Mesen formats (for backward compatibility)
+		public const string MesenMovieExt = "mmo";
+		public const string MesenSaveStateExt = "mss";
+		public const string MesenLabelExt = "mlb";
+
 		public const string TblExt = "tbl";
 		public const string PaletteExt = "pal";
 		public const string TraceExt = "txt";
@@ -22,7 +32,6 @@ namespace Nexen.Utilities {
 		public const string GifExt = "gif";
 		public const string AviExt = "avi";
 		public const string WaveExt = "wav";
-		public const string NexenSaveStateExt = "mss";
 		public const string WatchFileExt = "txt";
 		public const string LuaExt = "lua";
 		public const string PngExt = "png";
@@ -33,7 +42,6 @@ namespace Nexen.Utilities {
 		public const string ElfFileExt = "elf";
 		public const string SymFileExt = "sym";
 		public const string CdbFileExt = "cdb";
-		public const string NexenLabelExt = "mlb";
 		public const string NesAsmLabelExt = "fns";
 		public const string BinExt = "bin";
 		public const string NesExt = "nes";
@@ -74,7 +82,7 @@ namespace Nexen.Utilities {
 					} else if (ext == FileDialogHelper.FirmwareExt) {
 						filter.Add(new FilePickerFileType("All firmware files") { Patterns = new List<string>() { "*.sfc", "*.pce", "*.nes", "*.bin", "*.rom", "*.col", "*.sms", "*.gg", "*.gba" } });
 					} else if (ext == FileDialogHelper.LabelFileExt) {
-						filter.Add(new FilePickerFileType("All label files") { Patterns = new List<string>() { "*.mlb", "*.sym", "*.dbg", "*.fns", "*.elf", "*.cdb" } });
+						filter.Add(new FilePickerFileType("All label files") { Patterns = new List<string>() { "*.nexen-labels", "*.mlb", "*.sym", "*.dbg", "*.fns", "*.elf", "*.cdb" } });
 					} else {
 						filter.Add(new FilePickerFileType(ext.ToUpper() + " files") { Patterns = new List<string>() { "*." + ext } });
 					}

@@ -71,7 +71,8 @@ public class CommandLineHelper {
 								moviePath = Path.Combine(Program.OriginalFolder, moviePath);
 							}
 
-							if (!moviePath.ToLower().EndsWith("." + FileDialogHelper.NexenMovieExt)) {
+							string lowerPath = moviePath.ToLower();
+							if (!lowerPath.EndsWith("." + FileDialogHelper.NexenMovieExt) && !lowerPath.EndsWith("." + FileDialogHelper.MesenMovieExt)) {
 								moviePath += "." + FileDialogHelper.NexenMovieExt;
 							}
 

@@ -37,7 +37,7 @@ public:
 /// </summary>
 /// <remarks>
 /// Supported formats:
-/// - Nexen (.msm) - Nexen native format
+/// - Nexen (.nexen-movie) - Nexen native format (also supports legacy .mmo)
 /// - FCEUX (.fm2, .fm3) - NES/Famicom movies
 /// - BizHawk (.bk2) - Multi-system TAS format
 /// - Lsnes (.lsmv) - SNES TAS format

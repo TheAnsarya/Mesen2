@@ -131,11 +131,12 @@ namespace Nexen.Utilities {
 
 		public static void LoadFile(string filename) {
 			if (File.Exists(filename)) {
+				string ext = Path.GetExtension(filename).ToLowerInvariant();
 				if (IsPatchFile(filename)) {
 					LoadPatchFile(filename);
-				} else if (Path.GetExtension(filename).ToLowerInvariant() == "." + FileDialogHelper.NexenSaveStateExt) {
+				} else if (ext == "." + FileDialogHelper.NexenSaveStateExt || ext == "." + FileDialogHelper.MesenSaveStateExt) {
 					EmuApi.LoadStateFile(filename);
-				} else if (EmuApi.IsRunning() && Path.GetExtension(filename).ToLowerInvariant() == "." + FileDialogHelper.NexenMovieExt) {
+				} else if (EmuApi.IsRunning() && (ext == "." + FileDialogHelper.NexenMovieExt || ext == "." + FileDialogHelper.MesenMovieExt)) {
 					RecordApi.MoviePlay(filename);
 				} else {
 					LoadRom(filename);

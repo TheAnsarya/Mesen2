@@ -144,7 +144,7 @@ bool MovieRecorder::Stop() {
 		}
 
 		if (_hasSaveState) {
-			_writer->AddFile(_saveStateData, "SaveState.mss");
+			_writer->AddFile(_saveStateData, "SaveState.nexen-save");
 		}
 
 		for (auto kvp : _batteryData) {

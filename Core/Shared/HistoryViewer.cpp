@@ -134,7 +134,7 @@ bool HistoryViewer::SaveMovie(string movieFile, uint32_t startPosition, uint32_t
 	auto lock = _emu->AcquireLock();
 	_emu->Serialize(state, true, false);
 
-	// Convert the rewind data to a .mmo file
+	// Convert the rewind data to a .nexen-movie file
 	unique_ptr<MovieRecorder> recorder(new MovieRecorder(_emu));
 	bool result = recorder->CreateMovie(movieFile, _history, startPosition, endPosition, _mainEmu->GetBatteryManager()->HasBattery());
 

@@ -31,7 +31,8 @@ struct SaveStateInfo {
 /// - Legacy slot mode: 10 numbered slots (0-9) + 1 auto-save slot (index 11)
 /// - Timestamped mode: Unlimited saves with datetime-based naming
 ///   - Files stored in per-ROM subdirectories
-///   - Format: {RomName}/{RomName}_{YYYY-MM-DD}_{HH-mm-ss}.mss
+///   - Format: {RomName}/{RomName}_{YYYY-MM-DD}_{HH-mm-ss}.nexen-save
+///   - Legacy .mss files also supported for backward compatibility
 ///
 /// Save state features:
 /// - Full emulator state (CPU, PPU, APU, memory, etc.)
@@ -68,7 +69,7 @@ private:
 
 	/// <summary>
 	/// Generate a timestamped filepath for a new save state.
-	/// Format: {SaveStateFolder}/{RomName}/{RomName}_{YYYY-MM-DD}_{HH-mm-ss}.mss
+	/// Format: {SaveStateFolder}/{RomName}/{RomName}_{YYYY-MM-DD}_{HH-mm-ss}.nexen-save
 	/// </summary>
 	/// <returns>Full path for new timestamped save state</returns>
 	string GetTimestampedFilepath();

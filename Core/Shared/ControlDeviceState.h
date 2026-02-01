@@ -47,7 +47,7 @@ struct ControlDeviceState {
 /// - Port: Which physical/virtual port this controller is connected to
 ///
 /// Common use cases:
-/// - Movie files (.mmo): Record/replay controller input sequences
+/// - Movie files (.nexen-movie, .mmo): Record/replay controller input sequences
 /// - Network play: Transmit controller state to remote emulator
 /// - Input display: Show pressed buttons on OSD
 /// </remarks>

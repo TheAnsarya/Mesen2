@@ -28,7 +28,7 @@ SaveStateManager::SaveStateManager(Emulator* emu) {
 string SaveStateManager::GetStateFilepath(int stateIndex) {
 	string romFile = _emu->GetRomInfo().RomFile.GetFileName();
 	string folder = FolderUtilities::GetSaveStateFolder();
-	string filename = FolderUtilities::GetFilename(romFile, false) + "_" + std::to_string(stateIndex) + ".mss";
+	string filename = FolderUtilities::GetFilename(romFile, false) + "_" + std::to_string(stateIndex) + ".nexen-save";
 	return FolderUtilities::CombinePath(folder, filename);
 }
 
@@ -60,21 +60,24 @@ string SaveStateManager::GetTimestampedFilepath() {
 		<< std::setw(2) << tm.tm_mday << "_"
 		<< std::setw(2) << tm.tm_hour << "-"
 		<< std::setw(2) << tm.tm_min << "-"
-		<< std::setw(2) << tm.tm_sec << ".mss";
+		<< std::setw(2) << tm.tm_sec << ".nexen-save";
 
 	return FolderUtilities::CombinePath(folder, oss.str());
 }
 
 time_t SaveStateManager::ParseTimestampFromFilename(const string& filename) {
-	// Expected format: {RomName}_{YYYY}-{MM}-{DD}_{HH}-{mm}-{ss}.mss
-	// Find the date/time portion by looking for the pattern _YYYY-MM-DD_HH-mm-ss.mss
+	// Expected format: {RomName}_{YYYY}-{MM}-{DD}_{HH}-{mm}-{ss}.nexen-save or .mss
+	// Find the date/time portion by looking for the pattern _YYYY-MM-DD_HH-mm-ss before the extension
 
-	size_t extPos = filename.rfind(".mss");
+	size_t extPos = filename.rfind(".nexen-save");
+	if (extPos == string::npos) {
+		extPos = filename.rfind(".mss");
+	}
 	if (extPos == string::npos || extPos < 20) {
 		return 0; // Not a valid timestamped filename
 	}
 
-	// Extract the timestamp portion (19 chars before .mss: _YYYY-MM-DD_HH-mm-ss)
+	// Extract the timestamp portion (19 chars before ext: _YYYY-MM-DD_HH-mm-ss)
 	size_t tsStart = extPos - 20;
 	if (filename[tsStart] != '_') {
 		return 0;
@@ -485,10 +488,12 @@ vector<SaveStateInfo> SaveStateManager::GetSaveStateList() {
 
 			string filename = entry.path().filename().string();
 
-			// Check if it's an .mss file
-			if (filename.size() < 4 || filename.substr(filename.size() - 4) != ".mss") {
-				continue;
-			}
+		// Check if it's a save state file (.nexen-save or legacy .mss)
+		bool isNexenSave = filename.size() > 11 && filename.substr(filename.size() - 11) == ".nexen-save";
+		bool isMesenSave = filename.size() > 4 && filename.substr(filename.size() - 4) == ".mss";
+		if (!isNexenSave && !isMesenSave) {
+			continue;
+		}
 
 			// Check if it starts with the ROM name
 			if (filename.find(romName) != 0) {

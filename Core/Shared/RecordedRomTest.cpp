@@ -133,7 +133,7 @@ void RecordedRomTest::Record(string filename, bool reset) {
 
 		// Start recording movie alongside with screenshots
 		RecordMovieOptions options;
-		string movieFilename = FolderUtilities::CombinePath(FolderUtilities::GetFolderName(filename), FolderUtilities::GetFilename(filename, false) + ".mmo");
+		string movieFilename = FolderUtilities::CombinePath(FolderUtilities::GetFolderName(filename), FolderUtilities::GetFilename(filename, false) + ".nexen-movie");
 		memcpy(options.Filename, movieFilename.c_str(), std::min(1000, (int)movieFilename.size()));
 		options.RecordFrom = reset ? RecordMovieFrom::StartWithSaveData : RecordMovieFrom::CurrentState;
 		_emu->GetMovieManager()->Record(options);
@@ -165,7 +165,11 @@ RomTestResult RecordedRomTest::Run(string filename) {
 		return result;
 	}
 
-	VirtualFile testMovie(filename, "TestMovie.mmo");
+	// Try new Nexen format first, then legacy Mesen format for backward compatibility
+	VirtualFile testMovie(filename, "TestMovie.nexen-movie");
+	if (!testMovie.IsValid()) {
+		testMovie = VirtualFile(filename, "TestMovie.mmo");
+	}
 	VirtualFile testRom(filename, romFile);
 
 	stringstream testData;
@@ -286,9 +290,9 @@ void RecordedRomTest::Save() {
 	writer.AddFile(mrtFilename, "TestData.mrt");
 	std::remove(mrtFilename.c_str());
 
-	string mmoFilename = FolderUtilities::CombinePath(FolderUtilities::GetFolderName(_filename), FolderUtilities::GetFilename(_filename, false) + ".mmo");
-	writer.AddFile(mmoFilename, "TestMovie.mmo");
-	std::remove(mmoFilename.c_str());
+	string movieFilename = FolderUtilities::CombinePath(FolderUtilities::GetFolderName(_filename), FolderUtilities::GetFilename(_filename, false) + ".nexen-movie");
+	writer.AddFile(movieFilename, "TestMovie.nexen-movie");
+	std::remove(movieFilename.c_str());
 
 	writer.AddFile(_emu->GetRomInfo().RomFile.GetFilePath(), "TestRom" + _emu->GetRomInfo().RomFile.GetFileExtension());
 

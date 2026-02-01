@@ -162,7 +162,8 @@ bool NexenMovie::Play(VirtualFile& file) {
 	LoadCheats();
 
 	stringstream saveStateData;
-	if (_reader->GetStream("SaveState.mss", saveStateData)) {
+	// Try new Nexen format first, then legacy Mesen format for backward compatibility
+	if (_reader->GetStream("SaveState.nexen-save", saveStateData) || _reader->GetStream("SaveState.mss", saveStateData)) {
 		if (!_emu->GetSaveStateManager()->LoadState(saveStateData)) {
 			return false;
 		}

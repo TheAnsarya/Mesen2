@@ -157,7 +157,7 @@ namespace Nexen.Utilities {
 		}
 
 		private async void LoadStateFromFile() {
-			string? filename = await FileDialogHelper.OpenFile(ConfigManager.SaveStateFolder, _mainWindow, FileDialogHelper.NexenSaveStateExt);
+			string? filename = await FileDialogHelper.OpenFile(ConfigManager.SaveStateFolder, _mainWindow, FileDialogHelper.NexenSaveStateExt, FileDialogHelper.MesenSaveStateExt);
 			if (filename != null) {
 				EmuApi.LoadStateFile(filename);
 			}

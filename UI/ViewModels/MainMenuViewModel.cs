@@ -187,7 +187,10 @@ namespace Nexen.ViewModels {
 			return new MainMenuAction(shortcut) {
 				ActionType = ActionType.Custom,
 				DynamicText = () => {
-					string statePath = Path.Combine(ConfigManager.SaveStateFolder, EmuApi.GetRomInfo().GetRomName() + "_" + slot + "." + FileDialogHelper.NexenSaveStateExt);
+					// Check for Nexen native format first, then legacy Mesen format
+					string statePathNexen = Path.Combine(ConfigManager.SaveStateFolder, EmuApi.GetRomInfo().GetRomName() + "_" + slot + "." + FileDialogHelper.NexenSaveStateExt);
+					string statePathMesen = Path.Combine(ConfigManager.SaveStateFolder, EmuApi.GetRomInfo().GetRomName() + "_" + slot + "." + FileDialogHelper.MesenSaveStateExt);
+					string statePath = File.Exists(statePathNexen) ? statePathNexen : (File.Exists(statePathMesen) ? statePathMesen : statePathNexen);
 					string slotName = isAutoSaveSlot ? "Auto" : slot.ToString();
 
 					string header;
@@ -696,7 +699,7 @@ namespace Nexen.ViewModels {
 						ActionType = ActionType.Play,
 						IsEnabled = () => IsGameRunning && !RecordApi.MovieRecording() && !RecordApi.MoviePlaying(),
 						OnClick = async () => {
-							string? filename = await FileDialogHelper.OpenFile(ConfigManager.MovieFolder, wnd, FileDialogHelper.NexenMovieExt);
+							string? filename = await FileDialogHelper.OpenFile(ConfigManager.MovieFolder, wnd, FileDialogHelper.NexenMovieExt, FileDialogHelper.MesenMovieExt);
 							if(filename != null) {
 								RecordApi.MoviePlay(filename);
 							}
@@ -1059,7 +1062,7 @@ namespace Nexen.ViewModels {
 				new MainMenuAction() {
 					ActionType = ActionType.OnlineHelp,
 					IsVisible = () => false,
-					OnClick = () => ApplicationHelper.OpenBrowser("https://www.Nexen.ca/documentation/")
+					OnClick = () => ApplicationHelper.OpenBrowser("https://www.mesen.ca/documentation/")
 				},
 				new MainMenuAction() {
 					ActionType = ActionType.CommandLineHelp,
@@ -1071,7 +1074,7 @@ namespace Nexen.ViewModels {
 				new MainMenuAction() {
 					ActionType = ActionType.ReportBug,
 					IsVisible = () => false,
-					OnClick = () => ApplicationHelper.OpenBrowser("https://www.Nexen.ca/reportbug/")
+					OnClick = () => ApplicationHelper.OpenBrowser("https://www.mesen.ca/reportbug/")
 				},
 				new ContextMenuSeparator(),
 				new MainMenuAction() {

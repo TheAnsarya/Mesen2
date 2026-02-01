@@ -52,7 +52,7 @@ struct RenderedFrame {
 	/// <remarks>
 	/// Used for:
 	/// - Input display overlay
-	/// - Movie recording (.mmo files)
+	/// - Movie recording (.nexen-movie, .mmo files)
 	/// - Network play synchronization
 	/// Empty vector if input tracking is disabled.
 	/// </remarks>

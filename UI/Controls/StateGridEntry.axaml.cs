@@ -101,11 +101,14 @@ namespace Nexen.Controls {
 				if (game.IsTimestampedSave && !string.IsNullOrEmpty(game.FriendlyTimestamp)) {
 					// Use the friendly timestamp for timestamped saves (e.g., "Today 2:30 PM")
 					SubTitle = game.FriendlyTimestamp;
-				} else if (Path.GetExtension(game.FileName) == "." + FileDialogHelper.NexenSaveStateExt) {
+			} else {
+				string ext = Path.GetExtension(game.FileName);
+				if (ext == "." + FileDialogHelper.NexenSaveStateExt || ext == "." + FileDialogHelper.MesenSaveStateExt) {
 					SubTitle = new FileInfo(game.FileName).LastWriteTime.ToString();
 				} else {
 					DateTime writeTime = new FileInfo(game.FileName).LastWriteTime;
 					SubTitle = writeTime.ToShortDateString() + " " + writeTime.ToShortTimeString();
+				}
 				}
 			} else {
 				SubTitle = ResourceHelper.GetMessage("EmptyState");
@@ -119,7 +122,8 @@ namespace Nexen.Controls {
 					Bitmap? img = null;
 					double aspectRatio = 0;
 					try {
-						if (Path.GetExtension(game.FileName) == "." + FileDialogHelper.NexenSaveStateExt) {
+					string ext = Path.GetExtension(game.FileName);
+					if (ext == "." + FileDialogHelper.NexenSaveStateExt || ext == "." + FileDialogHelper.MesenSaveStateExt) {
 							img = EmuApi.GetSaveStatePreview(game.FileName);
 						} else {
 							using FileStream? fs = FileHelper.OpenRead(game.FileName);
