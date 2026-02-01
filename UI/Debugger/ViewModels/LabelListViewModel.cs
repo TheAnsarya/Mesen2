@@ -19,18 +19,60 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for managing and displaying a list of code labels in the debugger.
+	/// Provides sorting, filtering, and CRUD operations for labels.
+	/// </summary>
+	/// <remarks>
+	/// Labels are symbolic names assigned to memory addresses for easier debugging.
+	/// This ViewModel supports:
+	/// - Sortable columns (Label, RelAddr, AbsAddr, Comment)
+	/// - Multi-select for bulk delete operations
+	/// - Context menu with add, edit, delete, and navigation actions
+	/// - Integration with breakpoints and watch expressions
+	/// </remarks>
 	public class LabelListViewModel : DisposableViewModel {
+		/// <summary>
+		/// Gets or sets the observable collection of label view models.
+		/// </summary>
 		[Reactive] public NexenList<LabelViewModel> Labels { get; private set; } = new();
+
+		/// <summary>
+		/// Gets or sets the selection model for multi-select support.
+		/// </summary>
 		[Reactive] public SelectionModel<LabelViewModel?> Selection { get; set; } = new() { SingleSelect = false };
+
+		/// <summary>
+		/// Gets or sets the current sort state for column ordering.
+		/// </summary>
 		[Reactive] public SortState SortState { get; set; } = new();
+
+		/// <summary>
+		/// Gets the column widths from user configuration.
+		/// </summary>
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.LabelListColumnWidths;
 
+		/// <summary>
+		/// Gets the CPU type this label list is associated with.
+		/// </summary>
 		public CpuType CpuType { get; }
+
+		/// <summary>
+		/// Gets the parent debugger window view model.
+		/// </summary>
 		public DebuggerWindowViewModel Debugger { get; }
 
+		/// <summary>
+		/// Designer-only constructor. Do not use in production code.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public LabelListViewModel() : this(CpuType.Snes, new()) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LabelListViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type to filter labels for.</param>
+		/// <param name="debugger">The parent debugger window view model.</param>
 		public LabelListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger) {
 			CpuType = cpuType;
 			Debugger = debugger;
@@ -38,10 +80,17 @@ namespace Nexen.Debugger.ViewModels {
 			SortState.SetColumnSort("Label", ListSortDirection.Ascending, true);
 		}
 
+		/// <summary>
+		/// Sorts the label list based on the current sort state.
+		/// </summary>
+		/// <param name="param">Sort parameter (unused, for command binding compatibility).</param>
 		public void Sort(object? param) {
 			UpdateLabelList();
 		}
 
+		/// <summary>
+		/// Dictionary of comparison functions for each sortable column.
+		/// </summary>
 		private Dictionary<string, Func<LabelViewModel, LabelViewModel, int>> _comparers = new() {
 			{ "Label", (a, b) => string.Compare(a.Label.Label, b.Label.Label, StringComparison.OrdinalIgnoreCase) },
 			{ "RelAddr", (a, b) => a.RelAddress.CompareTo(b.RelAddress) },
@@ -49,6 +98,10 @@ namespace Nexen.Debugger.ViewModels {
 			{ "Comment", (a, b) => string.Compare(a.Label.Comment, b.Label.Comment, StringComparison.OrdinalIgnoreCase) },
 		};
 
+		/// <summary>
+		/// Updates the label list from the LabelManager and applies current sorting.
+		/// Preserves the current selection after the update.
+		/// </summary>
 		public void UpdateLabelList() {
 			List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 
@@ -61,12 +114,21 @@ namespace Nexen.Debugger.ViewModels {
 			Selection.SelectIndexes(selectedIndexes, Labels.Count);
 		}
 
+		/// <summary>
+		/// Refreshes the display properties of all labels in the list.
+		/// Call when label addresses may have changed due to memory mapping updates.
+		/// </summary>
 		public void RefreshLabelList() {
 			foreach (LabelViewModel label in Labels) {
 				label.Refresh();
 			}
 		}
 
+		/// <summary>
+		/// Initializes the context menu for the label list control.
+		/// Adds actions for add, edit, delete, breakpoints, watches, and navigation.
+		/// </summary>
+		/// <param name="parent">The parent control to attach the context menu to.</param>
 		public void InitContextMenu(Control parent) {
 			AddDisposables(DebugShortcutManager.CreateContextMenu(parent, new object[] {
 				new ContextMenuAction() {
@@ -172,22 +234,69 @@ namespace Nexen.Debugger.ViewModels {
 		}
 	}
 
+	/// <summary>
+	/// ViewModel wrapper for a single code label, providing display-friendly properties.
+	/// Implements <see cref="INotifyPropertyChanged"/> for UI data binding.
+	/// </summary>
 	public class LabelViewModel : INotifyPropertyChanged {
+		/// <summary>
+		/// Indicates whether the label's memory type is an unmapped type (e.g., PRG ROM).
+		/// </summary>
 		private bool _isUnmappedType;
 
+		/// <summary>
+		/// Gets or sets the underlying code label model.
+		/// </summary>
 		public CodeLabel Label { get; set; }
+
+		/// <summary>
+		/// Gets the CPU type for address formatting.
+		/// </summary>
 		public CpuType CpuType { get; }
+
+		/// <summary>
+		/// Gets the formatted absolute address string with memory type.
+		/// </summary>
 		public string AbsAddressDisplay { get; }
 
+		/// <summary>
+		/// Gets the label name text.
+		/// </summary>
 		public string LabelText { get; private set; }
+
+		/// <summary>
+		/// Gets the label comment text.
+		/// </summary>
 		public string LabelComment { get; private set; }
+
+		/// <summary>
+		/// Gets the relative (CPU-visible) address, or -1 if unmapped.
+		/// </summary>
 		public int RelAddress { get; private set; }
+
+		/// <summary>
+		/// Gets the formatted relative address string, or "unavailable" if unmapped.
+		/// </summary>
 		public string RelAddressDisplay => RelAddress >= 0 ? ("$" + RelAddress.ToString(field)) : (_isUnmappedType ? "" : "<unavailable>");
+
+		/// <summary>
+		/// Gets the brush for row highlighting (gray for unavailable addresses).
+		/// </summary>
 		public object RowBrush => RelAddress >= 0 || _isUnmappedType ? AvaloniaProperty.UnsetValue : Brushes.Gray;
+
+		/// <summary>
+		/// Gets the font style (italic for unavailable addresses).
+		/// </summary>
 		public FontStyle RowStyle => RelAddress >= 0 || _isUnmappedType ? FontStyle.Normal : FontStyle.Italic;
 
+		/// <summary>
+		/// Occurs when a property value changes.
+		/// </summary>
 		public event PropertyChangedEventHandler? PropertyChanged;
 
+		/// <summary>
+		/// Refreshes the relative address and updates display properties if changed.
+		/// </summary>
 		public void Refresh() {
 			int addr = Label.GetRelativeAddress(CpuType).Address;
 			if (addr != RelAddress) {
@@ -198,6 +307,11 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LabelViewModel"/> class.
+		/// </summary>
+		/// <param name="label">The code label to wrap.</param>
+		/// <param name="cpuType">The CPU type for address formatting.</param>
 		public LabelViewModel(CodeLabel label, CpuType cpuType) {
 			Label = label;
 			LabelText = label.Label;
