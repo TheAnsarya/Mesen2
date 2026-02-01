@@ -15,22 +15,50 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for the event viewer list panel that shows debug events.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Displays a sortable list of debug events (register reads/writes, DMA, IRQ, etc.)
+	/// captured during emulation. Events are grouped by scanline and cycle position.
+	/// </para>
+	/// <para>
+	/// Works in conjunction with <see cref="EventViewerViewModel"/> which provides the
+	/// graphical event viewer display.
+	/// </para>
+	/// </remarks>
 	public class EventViewerListViewModel : DisposableViewModel {
+		/// <summary>Gets the raw debug event data from the emulator.</summary>
 		public DebugEventInfo[] RawDebugEvents { get; private set; } = [];
 
+		/// <summary>Gets the list of debug event ViewModels for display.</summary>
 		public NexenList<DebugEventViewModel> DebugEvents { get; }
+
+		/// <summary>Gets or sets the selection model for the event list.</summary>
 		public SelectionModel<DebugEventViewModel?> Selection { get; set; } = new();
+
+		/// <summary>Gets the parent event viewer ViewModel.</summary>
 		public EventViewerViewModel EventViewer { get; }
 
+		/// <summary>Gets or sets the current sort state.</summary>
 		[Reactive] public SortState SortState { get; set; } = new();
+
+		/// <summary>Gets the column widths from configuration.</summary>
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.EventViewer.ColumnWidths;
 
+		/// <summary>Gets the command to trigger sorting.</summary>
 		public ICommand SortCommand { get; }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EventViewerListViewModel"/> class.
+		/// </summary>
+		/// <param name="eventViewer">The parent event viewer ViewModel.</param>
 		public EventViewerListViewModel(EventViewerViewModel eventViewer) {
 			EventViewer = eventViewer;
 			DebugEvents = new();
 
+			// Default sort by scanline, then cycle
 			SortState.SetColumnSort("Scanline", ListSortDirection.Ascending, false);
 			SortState.SetColumnSort("Cycle", ListSortDirection.Ascending, false);
 
@@ -54,11 +82,18 @@ namespace Nexen.Debugger.ViewModels {
 			} }
 		};
 
+		/// <summary>
+		/// Refreshes the event list from the emulator and applies sorting.
+		/// </summary>
+		/// <remarks>
+		/// Efficiently updates existing ViewModels when possible to minimize allocations.
+		/// </remarks>
 		public void RefreshList() {
 			RawDebugEvents = DebugApi.GetDebugEvents(EventViewer.CpuType);
 
 			SortHelper.SortArray(RawDebugEvents, SortState.SortOrder, _comparers, "Default");
 
+			// Efficient update: reuse existing ViewModels where possible
 			if (DebugEvents.Count < RawDebugEvents.Length) {
 				for (int i = 0; i < DebugEvents.Count; i++) {
 					DebugEvents[i].Update(RawDebugEvents, i, EventViewer.CpuType);
