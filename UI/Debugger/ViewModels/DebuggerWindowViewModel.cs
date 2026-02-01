@@ -28,52 +28,194 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// View model for the main debugger window that provides CPU debugging capabilities.
+	/// </summary>
+	/// <remarks>
+	/// The debugger window is the primary debugging interface, providing:
+	/// - Disassembly view with code navigation
+	/// - Source view integration for symbol-aware debugging
+	/// - Breakpoint management
+	/// - Watch expressions
+	/// - Call stack inspection
+	/// - CPU register status
+	/// - Label and function lists
+	/// - Memory mappings (for supported CPUs)
+	/// - Find/search functionality
+	/// 
+	/// Supports multiple CPU types including main CPUs and coprocessors.
+	/// Uses a dockable panel layout that can be customized and saved.
+	/// </remarks>
 	public class DebuggerWindowViewModel : DisposableViewModel {
+		/// <summary>
+		/// Gets the window title, customized for coprocessor debuggers.
+		/// </summary>
 		[Reactive] public string Title { get; private set; } = "Debugger";
+
+		/// <summary>
+		/// Gets the window icon, varies by CPU type.
+		/// </summary>
 		[Reactive] public WindowIcon? Icon { get; private set; } = null;
+
+		/// <summary>
+		/// Gets whether this is the main CPU debugger (vs coprocessor).
+		/// </summary>
 		[Reactive] public bool IsMainCpuDebugger { get; private set; } = true;
 
+		/// <summary>
+		/// Gets the debugger configuration settings.
+		/// </summary>
 		[Reactive] public DebuggerConfig Config { get; private set; }
 
+		/// <summary>
+		/// Gets the debugger options view model for the settings panel.
+		/// </summary>
 		[Reactive] public DebuggerOptionsViewModel Options { get; private set; }
 
+		/// <summary>
+		/// Gets the disassembly view model for code display.
+		/// </summary>
 		[Reactive] public DisassemblyViewModel Disassembly { get; private set; }
+
+		/// <summary>
+		/// Gets the breakpoint list view model.
+		/// </summary>
 		[Reactive] public BreakpointListViewModel BreakpointList { get; private set; }
+
+		/// <summary>
+		/// Gets the watch list view model.
+		/// </summary>
 		[Reactive] public WatchListViewModel WatchList { get; private set; }
+
+		/// <summary>
+		/// Gets the console status view model for CPU registers.
+		/// </summary>
 		[Reactive] public BaseConsoleStatusViewModel? ConsoleStatus { get; private set; }
+
+		/// <summary>
+		/// Gets the label list view model.
+		/// </summary>
 		[Reactive] public LabelListViewModel LabelList { get; private set; }
+
+		/// <summary>
+		/// Gets the function list view model (null for CPUs without function support).
+		/// </summary>
 		[Reactive] public FunctionListViewModel? FunctionList { get; private set; }
+
+		/// <summary>
+		/// Gets the call stack view model.
+		/// </summary>
 		[Reactive] public CallStackViewModel CallStack { get; private set; }
+
+		/// <summary>
+		/// Gets the source view model (null when no symbol provider available).
+		/// </summary>
 		[Reactive] public SourceViewViewModel? SourceView { get; private set; }
+
+		/// <summary>
+		/// Gets the memory mappings view model (null for unsupported CPUs).
+		/// </summary>
 		[Reactive] public MemoryMappingViewModel? MemoryMappings { get; private set; }
+
+		/// <summary>
+		/// Gets the find results list view model.
+		/// </summary>
 		[Reactive] public FindResultListViewModel FindResultList { get; private set; }
+
+		/// <summary>
+		/// Gets the controller input list view model.
+		/// </summary>
 		[Reactive] public ControllerListViewModel ControllerList { get; private set; }
 
+		/// <summary>
+		/// Gets the dock panel factory for layout management.
+		/// </summary>
 		[Reactive] public DebuggerDockFactory DockFactory { get; private set; }
+
+		/// <summary>
+		/// Gets the root dock layout for the window.
+		/// </summary>
 		[Reactive] public IRootDock DockLayout { get; private set; }
 
+		/// <summary>
+		/// Gets the reason for the current break (empty if not broken).
+		/// </summary>
 		[Reactive] public string BreakReason { get; private set; } = "";
+
+		/// <summary>
+		/// Gets the elapsed cycles since last break as a formatted string.
+		/// </summary>
 		[Reactive] public string BreakElapsedCycles { get; private set; } = "";
+
+		/// <summary>
+		/// Gets the tooltip for elapsed cycles with full precision.
+		/// </summary>
 		[Reactive] public string BreakElapsedCyclesTooltip { get; private set; } = "";
+
+		/// <summary>
+		/// Gets the CDL (Code/Data Logger) statistics string.
+		/// </summary>
 		[Reactive] public string CdlStats { get; private set; } = "";
 
+		/// <summary>
+		/// Gets the toolbar context menu actions.
+		/// </summary>
 		[Reactive] public List<ContextMenuAction> ToolbarItems { get; private set; } = new();
 
+		/// <summary>
+		/// Gets the File menu items.
+		/// </summary>
 		[Reactive] public List<ContextMenuAction> FileMenuItems { get; private set; } = new();
+
+		/// <summary>
+		/// Gets the Debug menu items.
+		/// </summary>
 		[Reactive] public List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
+
+		/// <summary>
+		/// Gets the Search menu items.
+		/// </summary>
 		[Reactive] public List<ContextMenuAction> SearchMenuItems { get; private set; } = new();
+
+		/// <summary>
+		/// Gets the Options menu items.
+		/// </summary>
 		[Reactive] public List<ContextMenuAction> OptionMenuItems { get; private set; } = new();
 
+		/// <summary>
+		/// Gets the CPU type being debugged.
+		/// </summary>
 		public CpuType CpuType { get; private set; }
+
+		/// <summary>
+		/// Master clock value for tracking elapsed time.
+		/// </summary>
 		private UInt64 _masterClock = 0;
 
+		/// <summary>
+		/// Flag to track whether to auto-switch back to source view.
+		/// </summary>
 		private bool _autoSwitchToSourceView = false;
 
+		/// <summary>
+		/// List of Go To submenu actions including CPU vectors.
+		/// </summary>
 		private List<object> _gotoSubActions = new();
 
+		/// <summary>
+		/// Design-time constructor.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public DebuggerWindowViewModel() : this(null) { }
 
+		/// <summary>
+		/// Creates a new debugger window view model.
+		/// </summary>
+		/// <param name="cpuType">The CPU type to debug, or null for main CPU.</param>
+		/// <remarks>
+		/// Initializes all child view models and sets up the dockable layout.
+		/// Registers for label, breakpoint, and symbol provider change events.
+		/// </remarks>
 		public DebuggerWindowViewModel(CpuType? cpuType) {
 			if (!Design.IsDesignMode) {
 				DebugApi.InitializeDebugger();
@@ -165,6 +307,9 @@ namespace Nexen.Debugger.ViewModels {
 			ConfigApi.SetDebuggerFlag(CpuType.GetDebuggerFlag(), true);
 		}
 
+		/// <summary>
+		/// Initializes the dockable layout and opens the source view if available.
+		/// </summary>
 		private void InitDock() {
 			DockFactory.InitLayout(DockLayout);
 
@@ -179,6 +324,10 @@ namespace Nexen.Debugger.ViewModels {
 			UpdateSourceViewState();
 		}
 
+		/// <summary>
+		/// Scrolls the disassembly and source views to show the specified address.
+		/// </summary>
+		/// <param name="address">The relative address to scroll to.</param>
 		public void ScrollToAddress(int address) {
 			Disassembly.SetSelectedRow(address, true, true);
 			SourceView?.GoToRelativeAddress(address, true);
@@ -187,10 +336,16 @@ namespace Nexen.Debugger.ViewModels {
 			DockFactory.SetFocusedDockable(DockLayout, codeTool);
 		}
 
+		/// <summary>
+		/// Handles symbol provider changes to show/hide source view.
+		/// </summary>
 		private void DebugWorkspaceManager_SymbolProviderChanged(object? sender, EventArgs e) {
 			UpdateSourceViewState();
 		}
 
+		/// <summary>
+		/// Initializes all debugger panels with current data.
+		/// </summary>
 		public void Init() {
 			WatchList.UpdateWatch();
 			CallStack.UpdateCallStack();
@@ -199,6 +354,9 @@ namespace Nexen.Debugger.ViewModels {
 			BreakpointList.UpdateBreakpoints();
 		}
 
+		/// <summary>
+		/// Disposes the view and saves the dock layout.
+		/// </summary>
 		protected override void DisposeView() {
 			Config.SavedDockLayout = DockFactory.ToDockDefinition(DockLayout);
 
@@ -209,11 +367,17 @@ namespace Nexen.Debugger.ViewModels {
 			ConfigApi.SetDebuggerFlag(CpuType.GetDebuggerFlag(), false);
 		}
 
+		/// <summary>
+		/// Handles configuration property changes and reapplies settings.
+		/// </summary>
 		private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			ConfigManager.Config.Debug.ApplyConfig();
 			UpdateDisassembly(false);
 		}
 
+		/// <summary>
+		/// Updates the source view visibility based on symbol provider availability.
+		/// </summary>
 		private void UpdateSourceViewState() {
 			ISymbolProvider? provider = DebugWorkspaceManager.SymbolProvider;
 			if (provider != null) {
@@ -238,14 +402,23 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Updates the console status display with current CPU state.
+		/// </summary>
 		public void UpdateConsoleState() {
 			ConsoleStatus?.UpdateConsoleState();
 		}
 
+		/// <summary>
+		/// Handles watch manager changes to refresh watch list.
+		/// </summary>
 		private void Manager_WatchChanged(object? sender, EventArgs e) {
 			WatchList.UpdateWatch();
 		}
 
+		/// <summary>
+		/// Handles label updates to refresh all affected panels.
+		/// </summary>
 		private void LabelManager_OnLabelUpdated(object? sender, EventArgs e) {
 			LabelList.UpdateLabelList();
 			BreakpointList.RefreshBreakpointList();
@@ -260,6 +433,11 @@ namespace Nexen.Debugger.ViewModels {
 			BreakpointList.UpdateBreakpoints();
 		}
 
+		/// <summary>
+		/// Updates all debugger panels with current state.
+		/// </summary>
+		/// <param name="forBreak">Whether update is due to a break event.</param>
+		/// <param name="evt">The break event details if applicable.</param>
 		public void UpdateDebugger(bool forBreak = false, BreakEvent? evt = null) {
 			ConsoleStatus?.UpdateUiState();
 
@@ -280,6 +458,10 @@ namespace Nexen.Debugger.ViewModels {
 			CallStack.UpdateCallStack();
 		}
 
+		/// <summary>
+		/// Performs a partial refresh for running updates (console state, mappings, CDL).
+		/// </summary>
+		/// <param name="refreshWatch">Whether to also refresh the watch list.</param>
 		public void PartialRefresh(bool refreshWatch) {
 			ConsoleStatus?.UpdateUiState(true);
 			MemoryMappings?.Refresh();
@@ -289,6 +471,10 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Updates the status bar with break event information.
+		/// </summary>
+		/// <param name="evt">The break event details.</param>
 		private void UpdateStatusBar(BreakEvent? evt) {
 			if (ConsoleStatus?.ElapsedCycles > 0) {
 				string elapsedCycles = $"{CodeTooltipHelper.FormatValue(ConsoleStatus.ElapsedCycles, 999999)} cycles elapsed";
@@ -339,6 +525,9 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Updates the CDL statistics display string.
+		/// </summary>
 		private void UpdateCdlStats() {
 			string statsString = "";
 			if (CpuType.ToMemoryType().SupportsCdl()) {
@@ -354,6 +543,14 @@ namespace Nexen.Debugger.ViewModels {
 			CdlStats = statsString;
 		}
 
+		/// <summary>
+		/// Updates the active address highlight in code views.
+		/// </summary>
+		/// <param name="scrollToAddress">Whether to scroll to show the address.</param>
+		/// <remarks>
+		/// Handles automatic switching between source and disassembly views
+		/// based on whether the current address has source mappings.
+		/// </remarks>
 		public void UpdateActiveAddress(bool scrollToAddress) {
 			if (scrollToAddress) {
 				//Scroll to the active address and highlight it
@@ -384,12 +581,20 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Refreshes the disassembly and source views.
+		/// </summary>
+		/// <param name="scrollToActiveAddress">Whether to scroll to the active address.</param>
 		public void UpdateDisassembly(bool scrollToActiveAddress) {
 			UpdateActiveAddress(scrollToActiveAddress);
 			Disassembly.Refresh();
 			SourceView?.Refresh();
 		}
 
+		/// <summary>
+		/// Handles the resume event by clearing active address and disabling status editing.
+		/// </summary>
+		/// <param name="wnd">The window for focus management.</param>
 		public void ProcessResumeEvent(Window wnd) {
 			if (ConsoleStatus != null) {
 				//Disable status fields in 50ms (if the debugger isn't paused by then)
@@ -418,6 +623,11 @@ namespace Nexen.Debugger.ViewModels {
 			SourceView?.InvalidateVisual();
 		}
 
+		/// <summary>
+		/// Recursively searches for a ToolDock within a dock hierarchy.
+		/// </summary>
+		/// <param name="dock">The dock to search within.</param>
+		/// <returns>The first ToolDock found, or null.</returns>
 		private ToolDock? FindToolDock(IDock dock) {
 			if (dock is ToolDock toolDock) {
 				return toolDock;
@@ -439,18 +649,30 @@ namespace Nexen.Debugger.ViewModels {
 			return null;
 		}
 
+		/// <summary>
+		/// Checks if a tool is the active dockable in its parent dock.
+		/// </summary>
 		private bool IsToolActive(Tool tool) {
 			return (tool.Owner as IDock)?.ActiveDockable == tool;
 		}
 
+		/// <summary>
+		/// Checks if a dock is visible in the layout hierarchy.
+		/// </summary>
 		private bool IsDockVisible(IDock? dock) {
 			return dock is RootDock || (dock != null && (dock.Owner as IDock)?.VisibleDockables?.Contains(dock) == true && (dock.Owner == null || dock.Owner is not IDock || IsDockVisible(dock.Owner as IDock)));
 		}
 
+		/// <summary>
+		/// Checks if a tool is visible in the layout.
+		/// </summary>
 		private bool IsToolVisible(Tool tool) {
 			return (tool.Owner as IDock)?.VisibleDockables?.Contains(tool) == true && IsDockVisible(tool.Owner as IDock);
 		}
 
+		/// <summary>
+		/// Toggles a tool's visibility in the layout.
+		/// </summary>
 		private void ToggleTool(Tool tool) {
 			if (IsToolVisible(tool)) {
 				DockFactory.CloseDockable(tool);
@@ -459,6 +681,10 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Opens a tool panel, creating a new dock section if needed.
+		/// </summary>
+		/// <param name="tool">The tool to open.</param>
 		public void OpenTool(Tool tool) {
 			if (!IsToolVisible(tool)) {
 				IDockable? visibleTool = DockFactory.FindDockable(DockLayout, x => x is BaseToolContainerViewModel && x != DockFactory.DisassemblyTool && x.Owner is IDock owner && owner.VisibleDockables?.Contains(x) == true);
@@ -479,6 +705,10 @@ namespace Nexen.Debugger.ViewModels {
 			DockFactory.SetFocusedDockable(DockLayout, tool);
 		}
 
+		/// <summary>
+		/// Initializes all window menus with actions and keyboard shortcuts.
+		/// </summary>
+		/// <param name="wnd">The window to register shortcuts with.</param>
 		public void InitializeMenu(Window wnd) {
 			DebuggerConfig cfg = ConfigManager.Config.Debug.Debugger;
 
@@ -656,6 +886,9 @@ namespace Nexen.Debugger.ViewModels {
 			DebugShortcutManager.RegisterActions(wnd, OptionMenuItems);
 		}
 
+		/// <summary>
+		/// Initializes Go To menu actions for CPU interrupt vectors.
+		/// </summary>
 		private void InitGoToCpuVectorActions() {
 			DebuggerFeatures features = DebugApi.GetDebuggerFeatures(CpuType);
 
@@ -712,6 +945,12 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Creates the Debug menu items.
+		/// </summary>
+		/// <param name="wnd">The parent window control.</param>
+		/// <param name="forToolbar">Whether creating items for toolbar (shorter) or menu.</param>
+		/// <returns>List of debug menu actions.</returns>
 		private List<ContextMenuAction> GetDebugMenu(Control wnd, bool forToolbar) {
 			List<ContextMenuAction> debugMenu = new();
 			debugMenu.AddRange(DebugSharedActions.GetStepActions(wnd, () => CpuType));
@@ -743,6 +982,11 @@ namespace Nexen.Debugger.ViewModels {
 			return debugMenu;
 		}
 
+		/// <summary>
+		/// Creates the Code/Data Logger submenu.
+		/// </summary>
+		/// <param name="wnd">The parent window.</param>
+		/// <returns>The CDL action menu item with subactions.</returns>
 		private ContextMenuAction GetCdlActionMenu(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.CodeDataLogger,
@@ -798,6 +1042,11 @@ namespace Nexen.Debugger.ViewModels {
 			};
 		}
 
+		/// <summary>
+		/// Creates the Workspace submenu for labels and settings.
+		/// </summary>
+		/// <param name="wnd">The parent window.</param>
+		/// <returns>The workspace action menu item with subactions.</returns>
 		private ContextMenuAction GetWorkspaceActionMenu(Window wnd) {
 			return new ContextMenuAction() {
 				ActionType = ActionType.Workspace,
@@ -877,6 +1126,10 @@ namespace Nexen.Debugger.ViewModels {
 			};
 		}
 
+		/// <summary>
+		/// Gets the currently active code view tool (disassembly or source).
+		/// </summary>
+		/// <returns>The active code tool view model.</returns>
 		private BaseToolContainerViewModel GetActiveCodeTool() {
 			if (DockLayout.ActiveDockable == DockFactory.SourceViewTool) {
 				return DockFactory.SourceViewTool;
@@ -891,6 +1144,10 @@ namespace Nexen.Debugger.ViewModels {
 			return DockFactory.DisassemblyTool;
 		}
 
+		/// <summary>
+		/// Gets the quick search view model for the active code view.
+		/// </summary>
+		/// <returns>The quick search view model.</returns>
 		private QuickSearchViewModel GetActiveQuickSearch() {
 			if (DockLayout.ActiveDockable == DockFactory.SourceViewTool) {
 				return SourceView?.QuickSearch ?? Disassembly.QuickSearch;
@@ -905,6 +1162,14 @@ namespace Nexen.Debugger.ViewModels {
 			return Disassembly.QuickSearch;
 		}
 
+		/// <summary>
+		/// Performs a step operation in the debugger.
+		/// </summary>
+		/// <param name="type">The type of step to perform.</param>
+		/// <param name="instructionCount">Number of instructions to step (default 1).</param>
+		/// <remarks>
+		/// PPU step types are always performed on the main CPU.
+		/// </remarks>
 		public void Step(StepType type, int instructionCount = 1) {
 			switch (type) {
 				case StepType.PpuStep:
@@ -919,6 +1184,11 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Searches for all occurrences of a string in the active code view.
+		/// </summary>
+		/// <param name="search">The text to search for.</param>
+		/// <param name="options">Search options (case sensitivity, whole word).</param>
 		public void FindAllOccurrences(string search, DisassemblySearchOptions options) {
 			if (!options.MatchCase) {
 				search = search.ToLower();
@@ -932,6 +1202,13 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Runs execution until the specified location is reached.
+		/// </summary>
+		/// <param name="actionLocation">The location to run to.</param>
+		/// <remarks>
+		/// Creates a temporary breakpoint that is automatically removed when hit.
+		/// </remarks>
 		public void RunToLocation(LocationInfo actionLocation) {
 			AddressInfo? addr = actionLocation.AbsAddress ?? actionLocation.RelAddress;
 			if (addr == null) {
