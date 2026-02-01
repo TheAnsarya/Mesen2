@@ -17,37 +17,90 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for the inline assembler window, providing assembly code editing and compilation.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// This ViewModel provides:
+	/// <list type="bullet">
+	///   <item><description>Real-time assembly compilation with error feedback</description></item>
+	///   <item><description>Byte code preview as the user types</description></item>
+	///   <item><description>Validation of code size against available space</description></item>
+	///   <item><description>NOP padding when new code is smaller than original</description></item>
+	/// </list>
+	/// </para>
+	/// <para>
+	/// Supports editing existing code (with size warnings) or assembling new code at any address.
+	/// </para>
+	/// </remarks>
 	public class AssemblerWindowViewModel : DisposableViewModel {
+		/// <summary>Gets the assembler configuration settings.</summary>
 		public AssemblerConfig Config { get; }
 
+		/// <summary>Gets or sets the assembly source code text.</summary>
 		[Reactive] public string Code { get; set; } = "";
+
+		/// <summary>Gets or sets the compiled byte code preview display.</summary>
 		[Reactive] public string ByteCodeView { get; set; } = "";
+
+		/// <summary>Gets or sets the target starting address for the assembled code.</summary>
 		[Reactive] public int StartAddress { get; set; }
+
+		/// <summary>Gets or sets the number of bytes produced by the current assembly.</summary>
 		[Reactive] public int BytesUsed { get; set; }
 
+		/// <summary>Gets or sets whether there are warnings to display.</summary>
 		[Reactive] public bool HasWarning { get; set; }
+
+		/// <summary>Gets or sets whether the assembled code is identical to the original.</summary>
 		[Reactive] public bool IsIdentical { get; set; }
+
+		/// <summary>Gets or sets whether the new code exceeds the original code size.</summary>
 		[Reactive] public bool OriginalSizeExceeded { get; set; }
+
+		/// <summary>Gets or sets whether the new code exceeds available memory space.</summary>
 		[Reactive] public bool MaxSizeExceeded { get; set; }
 
+		/// <summary>Gets or sets whether the OK/Apply button should be enabled.</summary>
 		[Reactive] public bool OkEnabled { get; set; } = false;
+
+		/// <summary>Gets or sets the list of assembly errors from compilation.</summary>
 		[Reactive] public List<AssemblerError> Errors { get; set; } = new List<AssemblerError>();
 
+		/// <summary>Gets or sets the File menu actions.</summary>
 		[Reactive] public List<ContextMenuAction> FileMenuActions { get; private set; } = new();
+
+		/// <summary>Gets or sets the Options menu actions.</summary>
 		[Reactive] public List<ContextMenuAction> OptionsMenuActions { get; private set; } = new();
 
+		/// <summary>Gets the CPU type being assembled for.</summary>
 		public CpuType CpuType { get; }
+
 		private List<byte> _bytes = new();
 
+		/// <summary>Gets the maximum valid address for this memory type, or null if unavailable.</summary>
 		public int? MaxAddress { get; }
 
 		private int _originalAddress = -1;
 		private byte[] _originalCode = [];
+
+		/// <summary>Gets or sets the original byte count when editing existing code.</summary>
 		[Reactive] public int OriginalByteCount { get; private set; } = 0;
 
+		/// <summary>
+		/// Designer-only constructor. Do not use in code.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public AssemblerWindowViewModel() : this(CpuType.Snes) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AssemblerWindowViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type to assemble code for.</param>
+		/// <remarks>
+		/// Sets up reactive subscriptions to recompile code whenever the source or start address changes.
+		/// </remarks>
 		public AssemblerWindowViewModel(CpuType cpuType) {
 			Config = ConfigManager.Config.Debug.Assembler;
 			CpuType = cpuType;
@@ -58,9 +111,14 @@ namespace Nexen.Debugger.ViewModels {
 
 			MaxAddress = DebugApi.GetMemorySize(CpuType.ToMemoryType()) - 1;
 
+			// Recompile whenever code or start address changes
 			AddDisposable(this.WhenAnyValue(x => x.Code, x => x.StartAddress).Subscribe(_ => UpdateAssembly(Code)));
 		}
 
+		/// <summary>
+		/// Initializes the File and Options menu items.
+		/// </summary>
+		/// <param name="wnd">The parent window for menu actions.</param>
 		public void InitMenu(Window wnd) {
 			FileMenuActions = AddDisposables(new List<ContextMenuAction>() {
 				SaveRomActionHelper.GetSaveRomAction(wnd),
@@ -82,6 +140,15 @@ namespace Nexen.Debugger.ViewModels {
 			});
 		}
 
+		/// <summary>
+		/// Initializes the assembler for editing existing code at a specific address.
+		/// </summary>
+		/// <param name="address">The starting address of the code to edit.</param>
+		/// <param name="code">The disassembled source code text.</param>
+		/// <param name="byteCount">The number of bytes of original code.</param>
+		/// <remarks>
+		/// Saves the original code for comparison and NOP padding when the new code is smaller.
+		/// </remarks>
 		public void InitEditCode(int address, string code, int byteCount) {
 			OriginalByteCount = byteCount;
 			_originalAddress = address;
@@ -95,6 +162,13 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Assembles the source code and updates the byte code preview and validation state.
+		/// </summary>
+		/// <param name="code">The assembly source code to compile.</param>
+		/// <remarks>
+		/// Parses each line, collects byte output and errors, and updates all reactive properties.
+		/// </remarks>
 		private void UpdateAssembly(string code) {
 			string[] codeLines = code.Replace("\r", "").Split('\n').Select(x => x.Trim()).ToArray();
 			short[] byteCode = DebugApi.AssembleCode(CpuType, string.Join('\n', codeLines), (uint)StartAddress);
@@ -113,6 +187,7 @@ namespace Nexen.Debugger.ViewModels {
 						sb.Append(Environment.NewLine);
 					}
 				} else if (s < (int)AssemblerSpecialCodes.EndOfLine) {
+					// Convert error code to human-readable message
 					string message = "unknown error";
 					switch ((AssemblerSpecialCodes)s) {
 						case AssemblerSpecialCodes.ParsingError: message = "Invalid syntax"; break;
@@ -141,6 +216,7 @@ namespace Nexen.Debugger.ViewModels {
 				}
 			}
 
+			// Update validation state
 			BytesUsed = convertedByteCode.Count;
 			IsIdentical = MatchesOriginalCode(convertedByteCode);
 			OriginalSizeExceeded = BytesUsed > OriginalByteCount;
@@ -154,6 +230,11 @@ namespace Nexen.Debugger.ViewModels {
 			_bytes = convertedByteCode;
 		}
 
+		/// <summary>
+		/// Compares the newly assembled code against the original code bytes.
+		/// </summary>
+		/// <param name="convertedByteCode">The newly assembled byte code.</param>
+		/// <returns>True if the code is byte-for-byte identical to the original.</returns>
 		private bool MatchesOriginalCode(List<byte> convertedByteCode) {
 			bool isIdentical = false;
 			if (_originalCode.Length > 0 && convertedByteCode.Count == _originalCode.Length) {
@@ -169,6 +250,18 @@ namespace Nexen.Debugger.ViewModels {
 			return isIdentical;
 		}
 
+		/// <summary>
+		/// Applies the assembled code changes to the emulator's memory.
+		/// </summary>
+		/// <param name="assemblerWindow">The parent window for dialogs.</param>
+		/// <returns>True if changes were applied; false if cancelled or failed.</returns>
+		/// <remarks>
+		/// <para>
+		/// Shows confirmation dialogs for warnings (errors, size exceeded).
+		/// Pads with NOP instructions if new code is smaller than original.
+		/// Updates CDL flags to mark the modified range as code.
+		/// </para>
+		/// </remarks>
 		public async Task<bool> ApplyChanges(Window assemblerWindow) {
 			MemoryType memType = CpuType.ToMemoryType();
 
@@ -222,29 +315,56 @@ namespace Nexen.Debugger.ViewModels {
 			return true;
 		}
 
+		/// <summary>
+		/// Special codes returned by the assembler to indicate errors or line boundaries.
+		/// </summary>
 		private enum AssemblerSpecialCodes {
+			/// <summary>Assembly succeeded for this byte.</summary>
 			OK = 0,
+			/// <summary>End of a source line.</summary>
 			EndOfLine = -1,
+			/// <summary>General parsing error.</summary>
 			ParsingError = -2,
+			/// <summary>Relative branch target is out of range.</summary>
 			OutOfRangeJump = -3,
+			/// <summary>Label was already defined.</summary>
 			LabelRedefinition = -4,
+			/// <summary>Required operand is missing.</summary>
 			MissingOperand = -5,
+			/// <summary>Operand value is out of range for the instruction.</summary>
 			OperandOutOfRange = -6,
+			/// <summary>Invalid hexadecimal number format.</summary>
 			InvalidHex = -7,
+			/// <summary>Operand contains invalid spaces.</summary>
 			InvalidSpaces = -8,
+			/// <summary>Unexpected text after instruction.</summary>
 			TrailingText = -9,
+			/// <summary>Referenced label does not exist.</summary>
 			UnknownLabel = -10,
+			/// <summary>Unrecognized instruction mnemonic.</summary>
 			InvalidInstruction = -11,
+			/// <summary>Invalid binary number format.</summary>
 			InvalidBinaryValue = -12,
+			/// <summary>Invalid operand combination for instruction.</summary>
 			InvalidOperands = -13,
+			/// <summary>Invalid label name format.</summary>
 			InvalidLabel = -14,
 		}
 	}
 
+	/// <summary>
+	/// Represents an assembly error at a specific line.
+	/// </summary>
 	public class AssemblerError {
+		/// <summary>Gets or sets the error message description.</summary>
 		public string Message { get; set; } = "";
+
+		/// <summary>Gets or sets the 1-based line number where the error occurred.</summary>
 		public int LineNumber { get; set; }
 
+		/// <summary>
+		/// Returns a string representation of the error with line number.
+		/// </summary>
 		public override string ToString() {
 			return "Line " + LineNumber.ToString() + ": " + this.Message;
 		}

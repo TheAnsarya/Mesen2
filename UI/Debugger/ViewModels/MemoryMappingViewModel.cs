@@ -8,17 +8,49 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for displaying memory mappings in the debugger.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Provides a visual representation of how the CPU and PPU address spaces
+	/// are mapped to physical memory (ROM, RAM, registers, etc.).
+	/// </para>
+	/// <para>
+	/// Supports multiple console types with their unique memory mapping schemes:
+	/// <list type="bullet">
+	///   <item><description>NES: CPU ($0000-$FFFF) and PPU ($0000-$3FFF) mappings</description></item>
+	///   <item><description>Game Boy: CPU mappings only</description></item>
+	///   <item><description>PC Engine: CPU mappings with bank switching</description></item>
+	///   <item><description>SMS/WonderSwan: CPU mappings</description></item>
+	/// </list>
+	/// </para>
+	/// </remarks>
 	public class MemoryMappingViewModel : ViewModelBase {
 		private CpuType _cpuType;
 
+		/// <summary>Gets or sets the CPU memory mapping blocks.</summary>
 		[Reactive] public List<MemoryMappingBlock> CpuMappings { get; private set; } = new();
+
+		/// <summary>Gets or sets the PPU memory mapping blocks (NES only, null for other consoles).</summary>
 		[Reactive] public List<MemoryMappingBlock>? PpuMappings { get; private set; } = null;
+
+		/// <summary>Gets the CPU memory type for this console.</summary>
 		public MemoryType CpuMemType { get; }
+
+		/// <summary>Gets the PPU/VRAM memory type for this console.</summary>
 		public MemoryType PpuMemType { get; }
 
+		/// <summary>
+		/// Designer-only constructor. Do not use in code.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public MemoryMappingViewModel() : this(CpuType.Nes) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MemoryMappingViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type to display mappings for.</param>
 		public MemoryMappingViewModel(CpuType cpuType) {
 			_cpuType = cpuType;
 			CpuMemType = cpuType.ToMemoryType();
@@ -31,6 +63,9 @@ namespace Nexen.Debugger.ViewModels {
 			Refresh();
 		}
 
+		/// <summary>
+		/// Refreshes the memory mappings from the current emulator state.
+		/// </summary>
 		public void Refresh() {
 			try {
 				if (_cpuType == CpuType.Nes) {
@@ -49,6 +84,9 @@ namespace Nexen.Debugger.ViewModels {
 			} catch { }
 		}
 
+		/// <summary>
+		/// Updates mappings only if they have changed (for performance).
+		/// </summary>
 		private List<MemoryMappingBlock> UpdateMappings(List<MemoryMappingBlock>? oldMappings, List<MemoryMappingBlock> newMappings) {
 			//Only update the mappings if the new mappings are not the same as the old ones (for performance)
 			if (oldMappings?.Count != newMappings.Count) {
@@ -64,6 +102,9 @@ namespace Nexen.Debugger.ViewModels {
 			return oldMappings;
 		}
 
+		/// <summary>
+		/// Generates CPU memory mapping blocks for NES.
+		/// </summary>
 		private List<MemoryMappingBlock> GetNesCpuMappings(NesCartridgeState state) {
 			Dictionary<NesPrgMemoryType, Color> mainColors = new() {
 				{ NesPrgMemoryType.WorkRam, Color.FromRgb(0xCD, 0xDC, 0xFA) },
