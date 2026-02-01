@@ -19,52 +19,156 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for the tilemap viewer window.
+	/// Displays background layer tilemaps from VRAM with support for multiple layers,
+	/// scroll position overlays, and tile editing.
+	/// </summary>
 	public class TilemapViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
+		/// <summary>
+		/// Gets or sets the CPU type for this tilemap viewer instance.
+		/// </summary>
 		[Reactive] public CpuType CpuType { get; set; }
+
+		/// <summary>
+		/// Gets whether the current platform is NES (affects available features).
+		/// </summary>
 		[Reactive] public bool IsNes { get; private set; }
 
+		/// <summary>
+		/// Gets the configuration settings for the tilemap viewer.
+		/// </summary>
 		public TilemapViewerConfig Config { get; }
+
+		/// <summary>
+		/// Gets the view model controlling refresh timing behavior.
+		/// </summary>
 		public RefreshTimingViewModel RefreshTiming { get; }
 
+		/// <summary>
+		/// Gets or sets the selection rectangle for the currently selected tile.
+		/// </summary>
 		[Reactive] public Rect SelectionRect { get; set; }
+
+		/// <summary>
+		/// Gets or sets the horizontal grid size for tile snapping.
+		/// </summary>
 		[Reactive] public int GridSizeX { get; set; } = 8;
+
+		/// <summary>
+		/// Gets or sets the vertical grid size for tile snapping.
+		/// </summary>
 		[Reactive] public int GridSizeY { get; set; } = 8;
 
+		/// <summary>
+		/// Gets or sets custom grid overlay definitions, if any.
+		/// </summary>
 		[Reactive] public List<GridDefinition>? CustomGrids { get; set; } = null;
 
+		/// <summary>
+		/// Gets or sets the bitmap displaying the tilemap.
+		/// </summary>
 		[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
 
+		/// <summary>
+		/// Gets or sets the tooltip panel showing selected tile information.
+		/// </summary>
 		[Reactive] public DynamicTooltip TilemapInfoPanel { get; private set; } = new DynamicTooltip();
+
+		/// <summary>
+		/// Gets whether the tilemap info panel is visible.
+		/// </summary>
 		[Reactive] public bool IsTilemapInfoVisible { get; private set; }
 
+		/// <summary>
+		/// Gets or sets the preview panel for tile details.
+		/// </summary>
 		[Reactive] public DynamicTooltip? PreviewPanel { get; private set; }
+
+		/// <summary>
+		/// Gets or sets the tooltip shown when hovering over the tilemap viewer.
+		/// </summary>
 		[Reactive] public DynamicTooltip? ViewerTooltip { get; set; }
+
+		/// <summary>
+		/// Gets or sets the mouse position over the viewer, or null if not hovering.
+		/// </summary>
 		[Reactive] public PixelPoint? ViewerMousePos { get; set; }
 
+		/// <summary>
+		/// Gets or sets the list of tilemap layer tabs.
+		/// </summary>
 		[Reactive] public List<TilemapViewerTab> Tabs { get; private set; } = new List<TilemapViewerTab>();
+
+		/// <summary>
+		/// Gets whether the layer tabs should be visible (more than one layer available).
+		/// </summary>
 		[Reactive] public bool ShowTabs { get; private set; }
+
+		/// <summary>
+		/// Gets or sets the currently selected tilemap layer tab.
+		/// </summary>
 		[Reactive] public TilemapViewerTab SelectedTab { get; set; }
 
+		/// <summary>
+		/// Gets or sets the rectangle showing the current scroll position on the tilemap.
+		/// </summary>
 		[Reactive] public Rect ScrollOverlayRect { get; private set; }
+
+		/// <summary>
+		/// Gets or sets lines for scroll overlay rendering.
+		/// </summary>
 		[Reactive] public List<PictureViewerLine>? OverlayLines { get; private set; } = null;
 
+		/// <summary>
+		/// Gets or sets the available display modes for the tilemap viewer.
+		/// </summary>
 		[Reactive] public Enum[] AvailableDisplayModes { get; set; } = [];
 
+		/// <summary>
+		/// Gets the menu actions for the File menu.
+		/// </summary>
 		public List<object> FileMenuActions { get; } = new();
+
+		/// <summary>
+		/// Gets the menu actions for the View menu.
+		/// </summary>
 		public List<object> ViewMenuActions { get; } = new();
 
+		/// <summary>Lock object for thread-safe data updates.</summary>
 		private object _updateLock = new();
+
+		/// <summary>Tilemap data for UI display.</summary>
 		private TilemapViewerData _data = new();
+
+		/// <summary>Tilemap data from the emulator core.</summary>
 		private TilemapViewerData _coreData = new();
 
+		/// <summary>Reference to the picture viewer control.</summary>
 		private PictureViewer _picViewer;
+
+		/// <summary>Flag to refresh data when tab changes.</summary>
 		private bool _refreshDataOnTabChange;
+
+		/// <summary>Flag indicating we're in the OnGameLoaded handler.</summary>
 		private bool _inGameLoaded;
+
+		/// <summary>Flag indicating a refresh is pending.</summary>
 		private bool _refreshPending;
 
+		/// <summary>
+		/// Designer-only constructor. Do not use in production code.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public TilemapViewerViewModel() : this(CpuType.Snes, new(), new(), null) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TilemapViewerViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type whose tilemap to view.</param>
+		/// <param name="picViewer">The picture viewer control for tilemap display.</param>
+		/// <param name="scrollViewer">The scroll picture viewer for panning.</param>
+		/// <param name="wnd">The parent window for context menus and dialogs.</param>
 		public TilemapViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Window? wnd) {
 			Config = ConfigManager.Config.Debug.TilemapViewer.Clone();
 			CpuType = cpuType;

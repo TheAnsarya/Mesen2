@@ -20,33 +20,102 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels;
 
+/// <summary>
+/// ViewModel for the tile editor window.
+/// Provides pixel-level editing of individual tiles with palette selection and undo/redo support.
+/// </summary>
 public class TileEditorViewModel : DisposableViewModel {
+	/// <summary>
+	/// Gets or sets the bitmap displaying the tile being edited.
+	/// </summary>
 	[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
 
+	/// <summary>
+	/// Gets or sets the array of RGB palette colors for display.
+	/// </summary>
 	[Reactive] public UInt32[] PaletteColors { get; set; } = [];
+
+	/// <summary>
+	/// Gets or sets the raw palette values for indexed formats.
+	/// </summary>
 	[Reactive] public UInt32[] RawPalette { get; set; } = [];
+
+	/// <summary>
+	/// Gets or sets the raw palette format.
+	/// </summary>
 	[Reactive] public RawPaletteFormat RawFormat { get; set; }
+
+	/// <summary>
+	/// Gets the number of columns in the palette grid.
+	/// </summary>
 	[Reactive] public int PaletteColumnCount { get; private set; } = 16;
+
+	/// <summary>
+	/// Gets or sets the currently selected color index in the palette.
+	/// </summary>
 	[Reactive] public int SelectedColor { get; set; } = 0;
+
+	/// <summary>
+	/// Gets or sets custom grid overlay definitions for the tile view.
+	/// </summary>
 	[Reactive] public List<GridDefinition>? CustomGrids { get; set; } = null;
 
+	/// <summary>
+	/// Gets the tile editor configuration settings.
+	/// </summary>
 	public TileEditorConfig Config { get; }
 
+	/// <summary>
+	/// Gets the menu actions for the File menu.
+	/// </summary>
 	public List<ContextMenuAction> FileMenuActions { get; private set; } = new();
+
+	/// <summary>
+	/// Gets the menu actions for the View menu.
+	/// </summary>
 	public List<ContextMenuAction> ViewMenuActions { get; private set; } = new();
+
+	/// <summary>
+	/// Gets the menu actions for the Tools menu.
+	/// </summary>
 	public List<ContextMenuAction> ToolsMenuActions { get; private set; } = new();
+
+	/// <summary>
+	/// Gets the toolbar button actions.
+	/// </summary>
 	public List<ContextMenuAction> ToolbarActions { get; private set; } = new();
 
+	/// <summary>CPU type for the tile data.</summary>
 	private CpuType _cpuType;
+
+	/// <summary>List of memory addresses containing the tile data.</summary>
 	private List<AddressInfo> _tileAddresses;
+
+	/// <summary>Number of tile columns in the editor.</summary>
 	private int _columnCount = 1;
+
+	/// <summary>Number of tile rows in the editor.</summary>
 	private int _rowCount = 1;
+
+	/// <summary>Tile format (bit depth).</summary>
 	private TileFormat _tileFormat;
+
+	/// <summary>Pixel buffer for the tile being edited.</summary>
 	private UInt32[] _tileBuffer = [];
 
+	/// <summary>
+	/// Designer-only constructor. Do not use in production code.
+	/// </summary>
 	[Obsolete("For designer only")]
 	public TileEditorViewModel() : this(new() { new() }, 1, TileFormat.Bpp4, 0) { }
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="TileEditorViewModel"/> class.
+	/// </summary>
+	/// <param name="tileAddresses">List of memory addresses for the tiles to edit.</param>
+	/// <param name="columnCount">Number of tile columns.</param>
+	/// <param name="format">The tile format (bit depth).</param>
+	/// <param name="initialPalette">The initial palette index to select.</param>
 	public TileEditorViewModel(List<AddressInfo> tileAddresses, int columnCount, TileFormat format, int initialPalette) {
 		Config = ConfigManager.Config.Debug.TileEditor;
 		_tileAddresses = tileAddresses;
@@ -87,6 +156,11 @@ public class TileEditorViewModel : DisposableViewModel {
 		RefreshViewer();
 	}
 
+	/// <summary>
+	/// Initializes the menu and toolbar actions for the tile editor.
+	/// </summary>
+	/// <param name="picViewer">The picture viewer control.</param>
+	/// <param name="wnd">The parent window.</param>
 	public void InitActions(PictureViewer picViewer, Window wnd) {
 		FileMenuActions = AddDisposables(new List<ContextMenuAction>() {
 			new ContextMenuAction() {
@@ -122,6 +196,10 @@ public class TileEditorViewModel : DisposableViewModel {
 		DebugShortcutManager.RegisterActions(wnd, ToolsMenuActions);
 	}
 
+	/// <summary>
+	/// Gets the list of tile transformation tool actions.
+	/// </summary>
+	/// <returns>List of context menu actions for tile transformations.</returns>
 	private List<ContextMenuAction> GetTools() {
 		return new List<ContextMenuAction>() {
 			new ContextMenuAction() {
@@ -175,6 +253,10 @@ public class TileEditorViewModel : DisposableViewModel {
 		};
 	}
 
+	/// <summary>
+	/// Gets all pixel data from the tiles as color indices.
+	/// </summary>
+	/// <returns>List of color indices for each pixel.</returns>
 	private List<int> GetTileData() {
 		PixelSize tileSize = _tileFormat.GetTileSize();
 		int width = tileSize.Width * _columnCount;
@@ -190,6 +272,10 @@ public class TileEditorViewModel : DisposableViewModel {
 		return data;
 	}
 
+	/// <summary>
+	/// Applies a transformation to all tiles (flip, rotate, or translate).
+	/// </summary>
+	/// <param name="type">The type of transformation to apply.</param>
 	private void Transform(TransformType type) {
 		List<int> data = GetTileData();
 
@@ -229,7 +315,18 @@ public class TileEditorViewModel : DisposableViewModel {
 		RefreshViewer();
 	}
 
+	/// <summary>Contains tile and pixel coordinates within a tile.</summary>
+	/// <param name="Column">Tile column index.</param>
+	/// <param name="Row">Tile row index.</param>
+	/// <param name="TileX">X coordinate within the tile.</param>
+	/// <param name="TileY">Y coordinate within the tile.</param>
 	private record TilePixelPositionInfo(int Column, int Row, int TileX, int TileY);
+
+	/// <summary>
+	/// Converts a pixel position to tile and sub-tile coordinates.
+	/// </summary>
+	/// <param name="position">The pixel position.</param>
+	/// <returns>Position info with tile and sub-tile coordinates.</returns>
 	private TilePixelPositionInfo GetPositionInfo(PixelPoint position) {
 		PixelSize tileSize = _tileFormat.GetTileSize();
 
@@ -240,27 +337,49 @@ public class TileEditorViewModel : DisposableViewModel {
 		return new(column, row, tileX, tileY);
 	}
 
+	/// <summary>
+	/// Gets the palette color index at the specified pixel position.
+	/// </summary>
+	/// <param name="position">The pixel position to query.</param>
+	/// <returns>The color index including palette offset.</returns>
 	public int GetColorAtPosition(PixelPoint position) {
 		TilePixelPositionInfo pos = GetPositionInfo(position);
 		int paletteColorIndex = DebugApi.GetTilePixel(_tileAddresses[pos.Column + (pos.Row * _columnCount)], _tileFormat, pos.TileX, pos.TileY);
 		return SelectedColor - (SelectedColor % GetColorsPerPalette(_tileFormat)) + paletteColorIndex;
 	}
 
+	/// <summary>
+	/// Sets the selected color to the color at the specified position.
+	/// </summary>
+	/// <param name="position">The pixel position to sample.</param>
 	public void SelectColor(PixelPoint position) {
 		SelectedColor = GetColorAtPosition(position);
 	}
 
+	/// <summary>
+	/// Sets the color of a pixel in the tile data.
+	/// </summary>
+	/// <param name="position">The pixel position to modify.</param>
+	/// <param name="color">The color index to set.</param>
 	private void SetPixelColor(PixelPoint position, int color) {
 		TilePixelPositionInfo pos = GetPositionInfo(position);
 		DebugApi.SetTilePixel(_tileAddresses[pos.Column + (pos.Row * _columnCount)], _tileFormat, pos.TileX, pos.TileY, color);
 	}
 
+	/// <summary>
+	/// Updates a pixel at the specified position with the selected color or clears it.
+	/// </summary>
+	/// <param name="position">The pixel position to update.</param>
+	/// <param name="clearPixel">If true, sets the pixel to color 0; otherwise uses the selected color.</param>
 	public void UpdatePixel(PixelPoint position, bool clearPixel) {
 		int pixelColor = clearPixel ? 0 : SelectedColor % GetColorsPerPalette(_tileFormat);
 		SetPixelColor(position, pixelColor);
 		RefreshViewer();
 	}
 
+	/// <summary>
+	/// Refreshes the tile viewer display from current tile data and palette.
+	/// </summary>
 	private unsafe void RefreshViewer() {
 		Dispatcher.UIThread.Post((Action)(() => {
 			DebugPaletteInfo palette = DebugApi.GetPaletteInfo(_cpuType, new GetPaletteInfoOptions() { Format = _tileFormat });
@@ -294,10 +413,19 @@ public class TileEditorViewModel : DisposableViewModel {
 		}));
 	}
 
+	/// <summary>
+	/// Gets the number of colors per palette for the current tile format.
+	/// </summary>
+	/// <returns>The number of colors in each palette (2, 4, 16, or 256).</returns>
 	public int GetColorsPerPalette() {
 		return GetColorsPerPalette(_tileFormat);
 	}
 
+	/// <summary>
+	/// Gets the number of colors per palette for a given tile format.
+	/// </summary>
+	/// <param name="format">The tile format to query.</param>
+	/// <returns>The number of colors in each palette (2, 4, 16, or 256).</returns>
 	private int GetColorsPerPalette(TileFormat format) {
 		return format.GetBitsPerPixel() switch {
 			1 => 2, //2-color palettes
@@ -307,6 +435,12 @@ public class TileEditorViewModel : DisposableViewModel {
 		};
 	}
 
+	/// <summary>
+	/// Creates options for rendering a tile view.
+	/// </summary>
+	/// <param name="column">The tile column index.</param>
+	/// <param name="row">The tile row index.</param>
+	/// <returns>Options configured for the specified tile.</returns>
 	private GetTileViewOptions GetOptions(int column, int row) {
 		int tileIndex = (row * _columnCount) + column;
 
@@ -324,14 +458,25 @@ public class TileEditorViewModel : DisposableViewModel {
 		};
 	}
 
+	/// <summary>
+	/// Specifies tile transformation operations available in the tile editor.
+	/// </summary>
 	public enum TransformType {
+		/// <summary>Mirrors the tile horizontally.</summary>
 		FlipHorizontal,
+		/// <summary>Mirrors the tile vertically.</summary>
 		FlipVertical,
+		/// <summary>Rotates the tile 90 degrees counter-clockwise.</summary>
 		RotateLeft,
+		/// <summary>Rotates the tile 90 degrees clockwise.</summary>
 		RotateRight,
+		/// <summary>Shifts all pixels one position to the left with wraparound.</summary>
 		TranslateLeft,
+		/// <summary>Shifts all pixels one position to the right with wraparound.</summary>
 		TranslateRight,
+		/// <summary>Shifts all pixels one position up with wraparound.</summary>
 		TranslateUp,
+		/// <summary>Shifts all pixels one position down with wraparound.</summary>
 		TranslateDown,
 	}
 }
