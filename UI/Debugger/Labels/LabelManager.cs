@@ -33,7 +33,7 @@ namespace Nexen.Debugger.Labels {
 	/// </remarks>
 	public class LabelManager {
 		/// <summary>
-		/// Regex pattern for valid label names: must start with letter/underscore/@, 
+		/// Regex pattern for valid label names: must start with letter/underscore/@,
 		/// followed by letters/digits/underscore/@.
 		/// </summary>
 		public static Regex LabelRegex { get; } = new Regex("^[@_a-zA-Z]+[@_a-zA-Z0-9]*$", RegexOptions.Compiled);
