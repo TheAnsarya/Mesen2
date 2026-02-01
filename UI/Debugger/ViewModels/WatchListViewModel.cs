@@ -19,19 +19,65 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for managing and displaying watch expressions in the debugger.
+	/// Provides evaluation, formatting, and manipulation of watch entries.
+	/// </summary>
+	/// <remarks>
+	/// Watch expressions can be:
+	/// - Memory addresses: [address] or {address} syntax
+	/// - Labels: references to named memory locations
+	/// - Complex expressions: evaluated by the debugger
+	/// 
+	/// Supports multiple display formats (hex, decimal, binary, signed/unsigned)
+	/// with configurable byte lengths (8, 16, 24, 32 bits).
+	/// </remarks>
 	public class WatchListViewModel : DisposableViewModel, IToolHelpTooltip {
+		/// <summary>
+		/// Regex pattern for matching watch expressions that are addresses or labels.
+		/// Matches formats like [$FFFF], {123}, [LabelName], etc.
+		/// </summary>
 		private static Regex _watchAddressOrLabel = new Regex(@"^(\[|{)(\s*((\$[0-9A-Fa-f]+)|(\d+)|([@_a-zA-Z0-9]+)))\s*[,]{0,1}\d*\s*(\]|})$", RegexOptions.Compiled);
 
+		/// <summary>
+		/// Gets or sets the observable collection of watch entries.
+		/// </summary>
 		[Reactive] public NexenList<WatchValueInfo> WatchEntries { get; private set; } = new();
+
+		/// <summary>
+		/// Gets or sets the selection model for multi-select support.
+		/// </summary>
 		[Reactive] public SelectionModel<WatchValueInfo> Selection { get; set; } = new() { SingleSelect = false };
+
+		/// <summary>
+		/// Gets the column widths from user configuration.
+		/// </summary>
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.WatchListColumnWidths;
 
+		/// <summary>
+		/// Gets the watch manager that stores and evaluates watch expressions.
+		/// </summary>
 		public WatchManager Manager { get; }
+
+		/// <summary>
+		/// Gets the CPU type this watch list is associated with.
+		/// </summary>
 		public CpuType CpuType { get; }
+
+		/// <summary>
+		/// Gets the help tooltip content for watch expression syntax.
+		/// </summary>
 		public object HelpTooltip => ExpressionTooltipHelper.GetHelpTooltip(CpuType, true);
 
+		/// <summary>
+		/// Designer-only constructor using SNES as default CPU type.
+		/// </summary>
 		public WatchListViewModel() : this(CpuType.Snes) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WatchListViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type to use for watch evaluation.</param>
 		public WatchListViewModel(CpuType cpuType) {
 			CpuType = cpuType;
 			Manager = WatchManager.GetWatchManager(cpuType);
@@ -39,11 +85,18 @@ namespace Nexen.Debugger.ViewModels {
 			Manager.WatchChanged += Manager_WatchChanged;
 		}
 
+		/// <summary>
+		/// Disposes the view and unsubscribes from watch change events.
+		/// </summary>
 		protected override void DisposeView() {
 			base.DisposeView();
 			Manager.WatchChanged -= Manager_WatchChanged;
 		}
 
+		/// <summary>
+		/// Handles watch change events from the manager.
+		/// </summary>
+		/// <param name="resetSelection">True to clear selection, false to preserve it.</param>
 		private void Manager_WatchChanged(bool resetSelection) {
 			if (resetSelection) {
 				Selection.Clear();
@@ -52,6 +105,10 @@ namespace Nexen.Debugger.ViewModels {
 			UpdateWatch();
 		}
 
+		/// <summary>
+		/// Updates all watch entries with current values from memory.
+		/// Either replaces the entire list or updates values in place depending on count.
+		/// </summary>
 		public void UpdateWatch() {
 			List<WatchValueInfo> newEntries = Manager.GetWatchContent(WatchEntries);
 
@@ -69,6 +126,11 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Edits the watch expression at the specified index.
+		/// </summary>
+		/// <param name="index">The index of the watch entry to edit.</param>
+		/// <param name="expression">The new watch expression.</param>
 		public void EditWatch(int index, string expression) {
 			if (index < 0) {
 				return;
@@ -77,6 +139,10 @@ namespace Nexen.Debugger.ViewModels {
 			Manager.UpdateWatch(index, expression);
 		}
 
+		/// <summary>
+		/// Moves the watch entry at the specified index up one position.
+		/// </summary>
+		/// <param name="index">The index of the watch entry to move up.</param>
 		public void MoveUp(int index) {
 			List<string> entries = Manager.WatchEntries;
 			if (index > 0 && index < entries.Count) {
@@ -87,6 +153,10 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Moves the watch entry at the specified index down one position.
+		/// </summary>
+		/// <param name="index">The index of the watch entry to move down.</param>
 		public void MoveDown(int index) {
 			List<string> entries = Manager.WatchEntries;
 			if (index < entries.Count - 1) {
@@ -97,22 +167,46 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Converts a collection of watch value items to their indices in the watch list.
+		/// </summary>
+		/// <param name="items">The items to get indices for.</param>
+		/// <returns>Array of indices corresponding to the items.</returns>
 		private int[] GetIndexes(IEnumerable<WatchValueInfo?> items) {
 			return items.Cast<WatchValueInfo>().Select(x => WatchEntries.IndexOf(x)).ToArray();
 		}
 
+		/// <summary>
+		/// Deletes the specified watch entries from the list.
+		/// </summary>
+		/// <param name="items">The watch entries to delete.</param>
 		internal void DeleteWatch(List<WatchValueInfo?> items) {
 			Manager.RemoveWatch(GetIndexes(items));
 		}
 
+		/// <summary>
+		/// Sets the display format for the specified watch entries.
+		/// </summary>
+		/// <param name="format">The format style (Hex, Signed, Unsigned, Binary).</param>
+		/// <param name="byteLength">The number of bytes to display (1, 2, 3, or 4).</param>
+		/// <param name="items">The watch entries to format.</param>
 		internal void SetSelectionFormat(WatchFormatStyle format, int byteLength, IEnumerable<WatchValueInfo?> items) {
 			Manager.SetSelectionFormat(format, byteLength, GetIndexes(items));
 		}
 
+		/// <summary>
+		/// Clears the custom format from the specified watch entries, reverting to default display.
+		/// </summary>
+		/// <param name="items">The watch entries to clear formatting from.</param>
 		internal void ClearSelectionFormat(IEnumerable<WatchValueInfo?> items) {
 			Manager.ClearSelectionFormat(GetIndexes(items));
 		}
 
+		/// <summary>
+		/// Gets the memory location information for the currently selected watch entry.
+		/// Parses the expression to extract address or label information.
+		/// </summary>
+		/// <returns>Location information if valid, null otherwise.</returns>
 		private LocationInfo? GetLocation() {
 			if (Selection.SelectedIndex < 0 || Selection.SelectedIndex >= WatchEntries.Count) {
 				return null;
@@ -151,6 +245,11 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Initializes the context menu with watch list actions.
+		/// Includes delete, move, format, and navigation options.
+		/// </summary>
+		/// <param name="ctrl">The control to attach the context menu to.</param>
 		public void InitContextMenu(Control ctrl) {
 			AddDisposables(DebugShortcutManager.CreateContextMenu(ctrl, new object[] {
 				new ContextMenuAction() {
@@ -288,6 +387,11 @@ namespace Nexen.Debugger.ViewModels {
 			}));
 		}
 
+		/// <summary>
+		/// Gets a display hint string for the current location.
+		/// Returns the label name or formatted hex address.
+		/// </summary>
+		/// <returns>Label name, hex address, or empty string if no valid location.</returns>
 		private string GetLocationHint() {
 			LocationInfo? location = GetLocation();
 			if (location?.Label != null) {

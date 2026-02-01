@@ -16,33 +16,86 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for displaying and managing the call stack in the debugger.
+	/// Shows the chain of function calls leading to the current execution point.
+	/// </summary>
+	/// <remarks>
+	/// The call stack displays:
+	/// - Entry point labels or addresses for each stack frame
+	/// - Current PC address (relative to CPU memory map)
+	/// - Absolute address with memory type
+	/// - Visual indication (italic/gray) for unmapped addresses
+	/// 
+	/// Supports navigation to any stack frame location and label editing.
+	/// </remarks>
 	public class CallStackViewModel : DisposableViewModel {
+		/// <summary>
+		/// Gets the CPU type this call stack is associated with.
+		/// </summary>
 		public CpuType CpuType { get; }
+
+		/// <summary>
+		/// Gets the parent debugger window view model.
+		/// </summary>
 		public DebuggerWindowViewModel Debugger { get; }
 
+		/// <summary>
+		/// Gets or sets the observable collection of call stack entries.
+		/// </summary>
 		[Reactive] public NexenList<StackInfo> CallStackContent { get; private set; } = new();
+
+		/// <summary>
+		/// Gets or sets the selection model for the call stack list.
+		/// </summary>
 		[Reactive] public SelectionModel<StackInfo?> Selection { get; set; } = new();
+
+		/// <summary>
+		/// Gets the column widths from user configuration.
+		/// </summary>
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.CallStackColumnWidths;
 
+		/// <summary>
+		/// Cached stack frame information from the emulator.
+		/// </summary>
 		private StackFrameInfo[] _stackFrames = [];
 
+		/// <summary>
+		/// Designer-only constructor. Do not use in production code.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public CallStackViewModel() : this(CpuType.Snes, new()) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CallStackViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type to get call stack for.</param>
+		/// <param name="debugger">The parent debugger window view model.</param>
 		public CallStackViewModel(CpuType cpuType, DebuggerWindowViewModel debugger) {
 			Debugger = debugger;
 			CpuType = cpuType;
 		}
 
+		/// <summary>
+		/// Updates the call stack by fetching current stack frames from the debug API.
+		/// </summary>
 		public void UpdateCallStack() {
 			_stackFrames = DebugApi.GetCallstack(CpuType);
 			RefreshCallStack();
 		}
 
+		/// <summary>
+		/// Refreshes the call stack display using cached stack frame data.
+		/// </summary>
 		public void RefreshCallStack() {
 			CallStackContent.Replace(GetStackInfo());
 		}
 
+		/// <summary>
+		/// Converts stack frame data into displayable StackInfo objects.
+		/// Adds current location at the top and builds the call chain.
+		/// </summary>
+		/// <returns>List of stack info entries, newest first.</returns>
 		private List<StackInfo> GetStackInfo() {
 			StackFrameInfo[] stackFrames = _stackFrames;
 
@@ -70,6 +123,12 @@ namespace Nexen.Debugger.ViewModels {
 			return stack;
 		}
 
+		/// <summary>
+		/// Gets a display string for the entry point of a stack frame.
+		/// Shows label name if available, or address with NMI/IRQ indication.
+		/// </summary>
+		/// <param name="stackFrame">The stack frame, or null for bottom of stack.</param>
+		/// <returns>Formatted entry point string.</returns>
 		private string GetEntryPoint(StackFrameInfo? stackFrame) {
 			if (stackFrame == null) {
 				return "[bottom of stack]";
@@ -90,16 +149,30 @@ namespace Nexen.Debugger.ViewModels {
 			return "$" + entry.Target.ToString(format);
 		}
 
+		/// <summary>
+		/// Checks if a stack entry's address is mapped to a valid relative address.
+		/// </summary>
+		/// <param name="entry">The stack entry to check.</param>
+		/// <returns>True if the address is mapped, false otherwise.</returns>
 		private bool IsMapped(StackInfo entry) {
 			return DebugApi.GetRelativeAddress(entry.Address, CpuType).Address >= 0;
 		}
 
+		/// <summary>
+		/// Navigates the debugger to the location specified by a stack entry.
+		/// </summary>
+		/// <param name="entry">The stack entry to navigate to.</param>
 		public void GoToLocation(StackInfo entry) {
 			if (IsMapped(entry)) {
 				Debugger.ScrollToAddress((int)entry.RelAddress);
 			}
 		}
 
+		/// <summary>
+		/// Initializes the context menu with call stack actions.
+		/// Includes edit label and go to location options.
+		/// </summary>
+		/// <param name="parent">The parent control for the context menu.</param>
 		public void InitContextMenu(Control parent) {
 			AddDisposables(DebugShortcutManager.CreateContextMenu(parent, new object[] {
 				new ContextMenuAction() {
@@ -134,11 +207,24 @@ namespace Nexen.Debugger.ViewModels {
 		}
 	}
 
+	/// <summary>
+	/// Represents a single entry in the call stack display.
+	/// Contains both display-formatted strings and raw address data.
+	/// </summary>
 	public class StackInfo {
+		/// <summary>
+		/// Gets or sets the entry point label or address for this stack frame.
+		/// </summary>
 		public string EntryPoint { get; set; } = "";
 
+		/// <summary>
+		/// Gets the PC address formatted as a hex string.
+		/// </summary>
 		public string PcAddress => $"${RelAddress:X4}";
 
+		/// <summary>
+		/// Gets the absolute address with memory type, or empty string if unmapped.
+		/// </summary>
 		public string AbsAddress {
 			get {
 				if (Address.Address >= 0) {
@@ -149,12 +235,29 @@ namespace Nexen.Debugger.ViewModels {
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the absolute address of the entry point, if available.
+		/// </summary>
 		public AddressInfo? EntryPointAddr { get; set; }
 
+		/// <summary>
+		/// Gets or sets the relative (CPU-visible) address.
+		/// </summary>
 		public UInt32 RelAddress { get; set; }
+
+		/// <summary>
+		/// Gets or sets the absolute address with memory type.
+		/// </summary>
 		public AddressInfo Address { get; set; }
 
+		/// <summary>
+		/// Gets or sets the brush for row highlighting (gray for unmapped).
+		/// </summary>
 		public object RowBrush { get; set; } = AvaloniaProperty.UnsetValue;
+
+		/// <summary>
+		/// Gets or sets the font style (italic for unmapped addresses).
+		/// </summary>
 		public FontStyle RowStyle { get; set; }
 	}
 }

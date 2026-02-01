@@ -18,27 +18,76 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for managing and displaying a list of breakpoints in the debugger UI.
+	/// Provides sorting, selection management, and context menu actions for breakpoint operations.
+	/// </summary>
+	/// <remarks>
+	/// This ViewModel implements the MVVM pattern with ReactiveUI and provides:
+	/// - Observable collection of breakpoints with automatic UI updates
+	/// - Multi-select support for bulk operations
+	/// - Sortable columns (Enabled, Marked, Type, Address, Condition)
+	/// - Context menu with add, edit, delete, enable/disable, and navigation actions
+	/// </remarks>
 	public class BreakpointListViewModel : DisposableViewModel {
+		/// <summary>
+		/// Gets or sets the observable collection of breakpoint view models displayed in the list.
+		/// </summary>
 		[Reactive] public NexenList<BreakpointViewModel> Breakpoints { get; private set; } = new();
+
+		/// <summary>
+		/// Gets or sets the selection model for tracking selected breakpoints.
+		/// Supports multiple selection for bulk operations.
+		/// </summary>
 		[Reactive] public SelectionModel<BreakpointViewModel?> Selection { get; set; } = new() { SingleSelect = false };
+
+		/// <summary>
+		/// Gets or sets the current sort state for column ordering.
+		/// </summary>
 		[Reactive] public SortState SortState { get; set; } = new();
+
+		/// <summary>
+		/// Gets the column widths from user configuration.
+		/// </summary>
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.BreakpointListColumnWidths;
 
+		/// <summary>
+		/// Gets the CPU type this breakpoint list is associated with.
+		/// </summary>
 		public CpuType CpuType { get; }
+
+		/// <summary>
+		/// Gets the parent debugger window view model.
+		/// </summary>
 		public DebuggerWindowViewModel Debugger { get; }
 
+		/// <summary>
+		/// Designer-only constructor. Do not use in production code.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public BreakpointListViewModel() : this(CpuType.Snes, new()) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="BreakpointListViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type to filter breakpoints for.</param>
+		/// <param name="debugger">The parent debugger window view model.</param>
 		public BreakpointListViewModel(CpuType cpuType, DebuggerWindowViewModel debugger) {
 			CpuType = cpuType;
 			Debugger = debugger;
 		}
 
+		/// <summary>
+		/// Sorts the breakpoint list based on the current sort state.
+		/// </summary>
+		/// <param name="param">Sort parameter (unused, for command binding compatibility).</param>
 		public void Sort(object? param) {
 			UpdateBreakpoints();
 		}
 
+		/// <summary>
+		/// Dictionary of comparison functions for each sortable column.
+		/// </summary>
 		private Dictionary<string, Func<BreakpointViewModel, BreakpointViewModel, int>> _comparers = new() {
 			{ "Enabled", (a, b) => a.Breakpoint.Enabled.CompareTo(b.Breakpoint.Enabled) },
 			{ "Marked", (a, b) => a.Breakpoint.MarkEvent.CompareTo(b.Breakpoint.MarkEvent) },
@@ -47,6 +96,10 @@ namespace Nexen.Debugger.ViewModels {
 			{ "Condition", (a, b) => string.Compare(a.Breakpoint.Condition, b.Breakpoint.Condition, StringComparison.OrdinalIgnoreCase) },
 		};
 
+		/// <summary>
+		/// Updates the breakpoint list from the BreakpointManager and applies current sorting.
+		/// Preserves the current selection after the update.
+		/// </summary>
 		public void UpdateBreakpoints() {
 			List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 
@@ -60,12 +113,21 @@ namespace Nexen.Debugger.ViewModels {
 			Selection.SelectIndexes(selectedIndexes, Breakpoints.Count);
 		}
 
+		/// <summary>
+		/// Refreshes the display properties of all breakpoints in the list.
+		/// Call when breakpoint labels or addresses may have changed.
+		/// </summary>
 		public void RefreshBreakpointList() {
 			foreach (BreakpointViewModel bp in Breakpoints) {
 				bp.Refresh();
 			}
 		}
 
+		/// <summary>
+		/// Initializes the context menu for the breakpoint list control.
+		/// Adds actions for add, edit, delete, enable/disable, and navigation.
+		/// </summary>
+		/// <param name="parent">The parent control to attach the context menu to.</param>
 		public void InitContextMenu(Control parent) {
 			AddDisposables(DebugShortcutManager.CreateContextMenu(parent, new object[] {
 				new ContextMenuAction() {
@@ -169,18 +231,44 @@ namespace Nexen.Debugger.ViewModels {
 		}
 	}
 
+	/// <summary>
+	/// ViewModel wrapper for a single breakpoint, providing display-friendly properties.
+	/// Implements <see cref="INotifyPropertyChanged"/> for UI data binding.
+	/// </summary>
 	public class BreakpointViewModel : INotifyPropertyChanged {
+		/// <summary>
+		/// Gets or sets the underlying breakpoint model.
+		/// </summary>
 		public Breakpoint Breakpoint { get; set; }
+
+		/// <summary>
+		/// Gets a human-readable display string for the breakpoint type (e.g., "Read", "Write", "Execute").
+		/// </summary>
 		public string TypeDisplay => Breakpoint.ToReadableType();
+
+		/// <summary>
+		/// Gets a formatted display string for the breakpoint address.
+		/// </summary>
 		public string AddressDisplay => Breakpoint.GetAddressString(true);
 
+		/// <summary>
+		/// Occurs when a property value changes.
+		/// </summary>
 		public event PropertyChangedEventHandler? PropertyChanged;
 
+		/// <summary>
+		/// Raises property changed notifications for display properties.
+		/// Call when the breakpoint's address or type may have changed.
+		/// </summary>
 		public void Refresh() {
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TypeDisplay)));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AddressDisplay)));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="BreakpointViewModel"/> class.
+		/// </summary>
+		/// <param name="bp">The breakpoint to wrap.</param>
 		public BreakpointViewModel(Breakpoint bp) {
 			Breakpoint = bp;
 		}
