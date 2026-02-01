@@ -22,57 +22,165 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels {
+	/// <summary>
+	/// ViewModel for the sprite viewer window.
+	/// Displays all sprites currently in OAM (Object Attribute Memory) with selection,
+	/// preview panels, and support for editing tile graphics.
+	/// </summary>
 	public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
+		/// <summary>
+		/// Gets the configuration settings for the sprite viewer.
+		/// </summary>
 		public SpriteViewerConfig Config { get; }
+
+		/// <summary>
+		/// Gets the view model controlling refresh timing behavior.
+		/// </summary>
 		public RefreshTimingViewModel RefreshTiming { get; }
 
+		/// <summary>
+		/// Gets or sets the CPU type for this sprite viewer instance.
+		/// </summary>
 		public CpuType CpuType { get; set; }
 
+		/// <summary>
+		/// Gets or sets the currently selected sprite preview model.
+		/// </summary>
 		[Reactive] public SpritePreviewModel? SelectedSprite { get; set; }
+
+		/// <summary>
+		/// Gets or sets the tooltip panel showing selected sprite details.
+		/// </summary>
 		[Reactive] public DynamicTooltip? SelectedPreviewPanel { get; set; }
 
+		/// <summary>
+		/// Gets or sets the tooltip for the preview panel area.
+		/// </summary>
 		[Reactive] public DynamicTooltip? PreviewPanelTooltip { get; set; }
+
+		/// <summary>
+		/// Gets or sets the sprite being displayed in the preview panel tooltip.
+		/// </summary>
 		[Reactive] public SpritePreviewModel? PreviewPanelSprite { get; set; }
 
+		/// <summary>
+		/// Gets or sets the tooltip shown when hovering over the sprite viewer.
+		/// </summary>
 		[Reactive] public DynamicTooltip? ViewerTooltip { get; set; }
+
+		/// <summary>
+		/// Gets or sets the mouse position over the viewer, or null if not hovering.
+		/// </summary>
 		[Reactive] public PixelPoint? ViewerMousePos { get; set; }
 
+		/// <summary>
+		/// Gets or sets the bitmap displaying all sprites.
+		/// </summary>
 		[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
+
+		/// <summary>
+		/// Gets or sets the selection rectangle for the currently selected sprite.
+		/// </summary>
 		[Reactive] public Rect SelectionRect { get; set; }
+
+		/// <summary>
+		/// Gets or sets the rectangle highlighting the sprite under the mouse, or null.
+		/// </summary>
 		[Reactive] public Rect? MouseOverRect { get; set; }
 
+		/// <summary>
+		/// Gets or sets the top clipping region size for off-screen sprite filtering.
+		/// </summary>
 		[Reactive] public int TopClipSize { get; set; }
+
+		/// <summary>
+		/// Gets or sets the bottom clipping region size for off-screen sprite filtering.
+		/// </summary>
 		[Reactive] public int BottomClipSize { get; set; }
+
+		/// <summary>
+		/// Gets or sets the left clipping region size for off-screen sprite filtering.
+		/// </summary>
 		[Reactive] public int LeftClipSize { get; set; }
+
+		/// <summary>
+		/// Gets or sets the right clipping region size for off-screen sprite filtering.
+		/// </summary>
 		[Reactive] public int RightClipSize { get; set; }
 
+		/// <summary>
+		/// Gets or sets the list of sprite preview models for all sprites in OAM.
+		/// </summary>
 		[Reactive] public List<SpritePreviewModel> SpritePreviews { get; set; } = new();
 
+		/// <summary>
+		/// Gets the view model for the sprite list panel.
+		/// </summary>
 		public SpriteViewerListViewModel ListView { get; }
 
+		/// <summary>
+		/// Gets or sets the maximum source offset for the sprite viewer.
+		/// </summary>
 		[Reactive] public int MaxSourceOffset { get; set; } = 0;
 
+		/// <summary>
+		/// Gets the menu actions for the File menu.
+		/// </summary>
 		public List<object> FileMenuActions { get; } = new();
+
+		/// <summary>
+		/// Gets the menu actions for the View menu.
+		/// </summary>
 		public List<object> ViewMenuActions { get; } = new();
 
+		/// <summary>Grid control for displaying sprite thumbnails.</summary>
 		private Grid _spriteGrid;
 
+		/// <summary>Lock object for thread-safe data updates.</summary>
 		private object _updateLock = new();
+
+		/// <summary>Sprite viewer data for UI display.</summary>
 		private SpriteViewerData _data = new();
+
+		/// <summary>Sprite viewer data from the emulator core.</summary>
 		private SpriteViewerData _coreData = new();
 
+		/// <summary>Base VRAM data for sprite tiles.</summary>
 		private byte[] _baseVram = [];
+
+		/// <summary>Base sprite RAM (OAM) data.</summary>
 		private byte[] _baseSpriteRam = [];
+
+		/// <summary>Extended VRAM data (for systems with extended VRAM).</summary>
 		private byte[] _extVram = [];
+
+		/// <summary>Extended sprite RAM data.</summary>
 		private byte[] _extSpriteRam = [];
 
+		/// <summary>Array of sprite information from the emulator.</summary>
 		private DebugSpriteInfo[] _spriteList = [];
+
+		/// <summary>Pixel data for sprite preview images.</summary>
 		private UInt32[] _spritePreviews = [];
+
+		/// <summary>Flag indicating a refresh is pending.</summary>
 		private bool _refreshPending;
 
+		/// <summary>
+		/// Designer-only constructor. Do not use in production code.
+		/// </summary>
 		[Obsolete("For designer only")]
 		public SpriteViewerViewModel() : this(CpuType.Snes, new(), new(), new(), new(), null) { }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SpriteViewerViewModel"/> class.
+		/// </summary>
+		/// <param name="cpuType">The CPU type whose sprites to view.</param>
+		/// <param name="picViewer">The picture viewer control for sprite display.</param>
+		/// <param name="scrollViewer">The scroll picture viewer for panning.</param>
+		/// <param name="spriteGrid">The grid control for sprite thumbnails.</param>
+		/// <param name="listView">The list view control.</param>
+		/// <param name="wnd">The parent window for context menus and dialogs.</param>
 		public SpriteViewerViewModel(CpuType cpuType, PictureViewer picViewer, ScrollPictureViewer scrollViewer, Grid spriteGrid, Control listView, Window? wnd) {
 			Config = ConfigManager.Config.Debug.SpriteViewer.Clone();
 

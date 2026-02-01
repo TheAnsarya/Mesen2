@@ -18,37 +18,120 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels;
 
+/// <summary>
+/// ViewModel for the source code viewer panel in the debugger.
+/// Displays assembly source files from symbol providers with syntax highlighting,
+/// breakpoint integration, and navigation support.
+/// </summary>
 public class SourceViewViewModel : DisposableViewModel, ISelectableModel {
+	/// <summary>
+	/// Gets or sets the symbol provider for source file information.
+	/// </summary>
 	public ISymbolProvider SymbolProvider { get; set; }
+
+	/// <summary>
+	/// Gets the debug configuration settings.
+	/// </summary>
 	public DebugConfig Config { get; }
+
+	/// <summary>
+	/// Gets the CPU type for this source view.
+	/// </summary>
 	public CpuType CpuType { get; }
+
+	/// <summary>
+	/// Gets the list of available source files from the symbol provider.
+	/// </summary>
 	public List<SourceFileInfo> SourceFiles { get; }
 
+	/// <summary>
+	/// Gets the style provider for source code line formatting.
+	/// </summary>
 	public BaseStyleProvider StyleProvider { get; }
 
+	/// <summary>
+	/// Gets the view model for the quick search overlay.
+	/// </summary>
 	public QuickSearchViewModel QuickSearch { get; } = new();
 
+	/// <summary>
+	/// Gets or sets the currently selected source file to display.
+	/// </summary>
 	[Reactive] public SourceFileInfo? SelectedFile { get; set; }
+
+	/// <summary>
+	/// Gets the maximum scroll position based on file line count.
+	/// </summary>
 	[Reactive] public int MaxScrollPosition { get; private set; }
+
+	/// <summary>
+	/// Gets or sets the current scroll position (first visible line).
+	/// </summary>
 	[Reactive] public int ScrollPosition { get; set; }
+
+	/// <summary>
+	/// Gets or sets the array of visible code lines for display.
+	/// </summary>
 	[Reactive] public CodeLineData[] Lines { get; private set; } = [];
 
+	/// <summary>
+	/// Gets or sets the active address (current execution point), or null.
+	/// </summary>
 	[Reactive] public int? ActiveAddress { get; set; }
+
+	/// <summary>
+	/// Gets or sets the currently selected row index.
+	/// </summary>
 	[Reactive] public int SelectedRow { get; set; }
+
+	/// <summary>
+	/// Gets or sets the anchor row for range selection.
+	/// </summary>
 	[Reactive] public int SelectionAnchor { get; set; }
+
+	/// <summary>
+	/// Gets or sets the start row of the current selection.
+	/// </summary>
 	[Reactive] public int SelectionStart { get; set; }
+
+	/// <summary>
+	/// Gets or sets the end row of the current selection.
+	/// </summary>
 	[Reactive] public int SelectionEnd { get; set; }
 
+	/// <summary>
+	/// Gets or sets the number of visible rows in the view.
+	/// </summary>
 	[Reactive] public int VisibleRowCount { get; set; } = 100;
+
+	/// <summary>
+	/// Gets the parent debugger window view model.
+	/// </summary>
 	public DebuggerWindowViewModel Debugger { get; }
 
+	/// <summary>
+	/// Gets the navigation history for source code locations.
+	/// </summary>
 	public NavigationHistory<SourceCodeLocation> History { get; } = new();
+
+	/// <summary>Reference to the disassembly viewer control.</summary>
 	private DisassemblyViewer? _viewer = null;
+
+	/// <summary>Action to refresh the scrollbar state.</summary>
 	private Action? _refreshScrollbar = null;
 
+	/// <summary>
+	/// Designer-only constructor. Do not use in production code.
+	/// </summary>
 	[Obsolete("For designer only")]
 	public SourceViewViewModel() : this(new(), new SnesDbgImporter(RomFormat.Sfc), CpuType.Snes) { }
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="SourceViewViewModel"/> class.
+	/// </summary>
+	/// <param name="debugger">The parent debugger window view model.</param>
+	/// <param name="symbolProvider">The symbol provider for source file information.</param>
+	/// <param name="cpuType">The CPU type for this source view.</param>
 	public SourceViewViewModel(DebuggerWindowViewModel debugger, ISymbolProvider symbolProvider, CpuType cpuType) {
 		Debugger = debugger;
 		Config = ConfigManager.Config.Debug;
