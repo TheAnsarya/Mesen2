@@ -31,7 +31,7 @@ namespace Nexen.ViewModels {
 			try {
 				string? dbContent = DependencyHelper.GetFileContent("CheatDb." + consoleType.ToString() + ".json");
 				if (dbContent != null) {
-					cheatDb = (CheatDatabase?)JsonSerializer.Deserialize(dbContent, typeof(CheatDatabase), MesenCamelCaseSerializerContext.Default) ?? new CheatDatabase();
+					cheatDb = (CheatDatabase?)JsonSerializer.Deserialize(dbContent, typeof(CheatDatabase), NexenCamelCaseSerializerContext.Default) ?? new CheatDatabase();
 				}
 			} catch { }
 

@@ -142,7 +142,7 @@ namespace Nexen.Debugger.Controls {
 
 			int start = 0;
 			double x = 0;
-			Typeface typeface = new Typeface(ConfigManager.Config.Preferences.MesenFont.FontFamily);
+			Typeface typeface = new Typeface(ConfigManager.Config.Preferences.NexenFont.FontFamily);
 			Pen borderPen = ColorHelper.GetPen(Color.FromRgb(0x60, 0x60, 0x60));
 			for (int i = 0; i < mappings.Count; i++) {
 				MemoryMappingBlock block = mappings[i];

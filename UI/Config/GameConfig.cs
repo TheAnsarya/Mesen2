@@ -34,7 +34,7 @@ namespace Nexen.Config {
 				string? fileData = FileHelper.ReadAllText(path);
 				if (fileData != null) {
 					try {
-						cfg = (GameConfig?)JsonSerializer.Deserialize(fileData, typeof(GameConfig), MesenSerializerContext.Default);
+						cfg = (GameConfig?)JsonSerializer.Deserialize(fileData, typeof(GameConfig), NexenSerializerContext.Default);
 						if (cfg != null) {
 							return cfg;
 						}
@@ -50,7 +50,7 @@ namespace Nexen.Config {
 		public void Save() {
 			string romName = MainWindowViewModel.Instance.RomInfo.GetRomName();
 			string path = Path.Combine(ConfigManager.GameConfigFolder, romName + ".json");
-			FileHelper.WriteAllText(path, JsonSerializer.Serialize(this, typeof(GameConfig), MesenSerializerContext.Default));
+			FileHelper.WriteAllText(path, JsonSerializer.Serialize(this, typeof(GameConfig), NexenSerializerContext.Default));
 		}
 	}
 

@@ -1099,7 +1099,7 @@ namespace Nexen.ViewModels {
 						}
 					});
 				} else if (!silent) {
-					Dispatcher.UIThread.Post(() => NexenMsgBox.Show(null, "MesenUpToDate", MessageBoxButtons.OK, MessageBoxIcon.Info));
+					Dispatcher.UIThread.Post(() => NexenMsgBox.Show(null, "NexenUpToDate", MessageBoxButtons.OK, MessageBoxIcon.Info));
 				}
 			});
 		}

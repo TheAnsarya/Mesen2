@@ -3,15 +3,15 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:m="clr-namespace:Nexen"
-	xmlns:w="using:Mesen.Windows"
-	xmlns:vm="using:Mesen.ViewModels"
-	xmlns:c="using:Mesen.Debugger.Controls"
-	xmlns:cfg="using:Mesen.Config"
-	xmlns:v="using:Mesen.Views"
-	xmlns:l="using:Mesen.Localization"
+	xmlns:w="using:Nexen.Windows"
+	xmlns:vm="using:Nexen.ViewModels"
+	xmlns:c="using:Nexen.Debugger.Controls"
+	xmlns:cfg="using:Nexen.Config"
+	xmlns:v="using:Nexen.Views"
+	xmlns:l="using:Nexen.Localization"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
-	x:Class="Mesen.Windows.CheatListWindow"
+	x:Class="Nexen.Windows.CheatListWindow"
 	Width="400" Height="400"
 	Icon="/Assets/CheatCode.png"
 	x:DataType="vm:CheatListWindowViewModel"
@@ -35,7 +35,7 @@
 		
 		<c:ActionToolbar DockPanel.Dock="Top" Items="{Binding ToolbarActions}" />
 		
-		<Border BorderThickness="1" BorderBrush="{StaticResource MesenGrayBorderColor}" Margin="2">
+		<Border BorderThickness="1" BorderBrush="{StaticResource NexenGrayBorderColor}" Margin="2">
 			<DataBox
 				Items="{Binding Cheats}"
 				Selection="{Binding Selection}"

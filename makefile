@@ -4,7 +4,7 @@
 #The emulation core also requires SDL2.
 #Run "make" to build, "make run" to run
 
-MESENFLAGS=
+NEXENFLAGS=
 
 ifeq ($(USE_GCC),true)
 	CXX := g++
@@ -24,99 +24,99 @@ SDL2INC := $(shell sdl2-config --cflags)
 LINKCHECKUNRESOLVED := -Wl,-z,defs
 
 LINKOPTIONS :=
-MESENOS :=
+NEXENOS :=
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
-	MESENOS := linux
-	SHAREDLIB := MesenCore.so
+	NEXENOS := linux
+	SHAREDLIB := NexenCore.so
 endif
 
 ifeq ($(UNAME_S),Darwin)
-	MESENOS := osx
-	SHAREDLIB := MesenCore.dylib
+	NEXENOS := osx
+	SHAREDLIB := NexenCore.dylib
 	LTO := false
 	STATICLINK := false
 	LINKCHECKUNRESOLVED :=
 endif
 
-MESENFLAGS += -m64
+NEXENFLAGS += -m64
 
 MACHINE := $(shell uname -m)
 ifeq ($(MACHINE),x86_64)
-	MESENPLATFORM := $(MESENOS)-x64
+	NEXENPLATFORM := $(NEXENOS)-x64
 endif
 ifneq ($(filter %86,$(MACHINE)),)
-	MESENPLATFORM := $(MESENOS)-x64
+	NEXENPLATFORM := $(NEXENOS)-x64
 endif
 # TODO: this returns `aarch64` on one of my machines...
 ifneq ($(filter arm%,$(MACHINE)),)
-	MESENPLATFORM := $(MESENOS)-arm64
+	NEXENPLATFORM := $(NEXENOS)-arm64
 endif
 ifeq ($(MACHINE),aarch64)
-	MESENPLATFORM := $(MESENOS)-arm64
+	NEXENPLATFORM := $(NEXENOS)-arm64
 	ifeq ($(USE_GCC),true)
 		#don't set -m64 on arm64 for gcc (unrecognized option)
-		MESENFLAGS=
+		NEXENFLAGS=
 	endif
 endif
 
 DEBUG ?= 0
 
 ifeq ($(DEBUG),0)
-	MESENFLAGS += -O3
+	NEXENFLAGS += -O3
 	ifneq ($(LTO),false)
-		MESENFLAGS += -DHAVE_LTO
+		NEXENFLAGS += -DHAVE_LTO
 		ifneq ($(USE_GCC),true)
-			MESENFLAGS += -flto=thin
+			NEXENFLAGS += -flto=thin
 		else
-			MESENFLAGS += -flto=auto
+			NEXENFLAGS += -flto=auto
 		endif
 	endif
 else
-	MESENFLAGS += -O0 -g
-	# Note: if compiling with a sanitizer, you will likely need to `LD_PRELOAD` the library `libMesenCore.so` will be linked against.
+	NEXENFLAGS += -O0 -g
+	# Note: if compiling with a sanitizer, you will likely need to `LD_PRELOAD` the library `libNexenCore.so` will be linked against.
 	ifneq ($(SANITIZER),)
 		ifeq ($(SANITIZER),address)
 			# Currently, `-fsanitize=address` is not supported together with `-fsanitize=thread`
-			MESENFLAGS += -fsanitize=address
+			NEXENFLAGS += -fsanitize=address
 		else ifeq ($(SANITIZER),thread)
 			# Currently, `-fsanitize=address` is not supported together with `-fsanitize=thread`
-			MESENFLAGS += -fsanitize=thread
+			NEXENFLAGS += -fsanitize=thread
 		else
 $(warning Unrecognised $$(SANITIZER) value: $(SANITIZER))
 		endif
 		# `-Wl,-z,defs` is incompatible with the sanitizers in a shared lib, unless the sanitizer libs are linked dynamically; hence `-shared-libsan` (not the default for Clang).
 		# It seems impossible to link dynamically against two sanitizers at the same time, but that might be a Clang limitation.
 		ifneq ($(USE_GCC),true)
-			MESENFLAGS += -shared-libsan
+			NEXENFLAGS += -shared-libsan
 		endif
 	endif
 endif
 
 ifeq ($(PGO),profile)
-	MESENFLAGS += ${PROFILE_GEN_FLAG}
+	NEXENFLAGS += ${PROFILE_GEN_FLAG}
 endif
 
 ifeq ($(PGO),optimize)
-	MESENFLAGS += ${PROFILE_USE_FLAG}
+	NEXENFLAGS += ${PROFILE_USE_FLAG}
 endif
 
 ifneq ($(STATICLINK),false)
 	LINKOPTIONS += -static-libgcc -static-libstdc++
 endif
 
-ifeq ($(MESENOS),osx)
+ifeq ($(NEXENOS),osx)
 	LINKOPTIONS += -framework Foundation -framework Cocoa -framework GameController -framework CoreHaptics -Wl,-rpath,/opt/local/lib
 endif
 
-CXXFLAGS = -fPIC -Wall --std=c++23 $(MESENFLAGS) $(SDL2INC) -I $(realpath ./) -I $(realpath ./Core) -I $(realpath ./Utilities) -I $(realpath ./Sdl) -I $(realpath ./Linux) -I $(realpath ./MacOS)
+CXXFLAGS = -fPIC -Wall --std=c++23 $(NEXENFLAGS) $(SDL2INC) -I $(realpath ./) -I $(realpath ./Core) -I $(realpath ./Utilities) -I $(realpath ./Sdl) -I $(realpath ./Linux) -I $(realpath ./MacOS)
 OBJCXXFLAGS = $(CXXFLAGS)
-CFLAGS = -fPIC -Wall $(MESENFLAGS)
+CFLAGS = -fPIC -Wall $(NEXENFLAGS)
 
-OBJFOLDER := obj.$(MESENPLATFORM)
-DEBUGFOLDER := bin/$(MESENPLATFORM)/Debug
-RELEASEFOLDER := bin/$(MESENPLATFORM)/Release
+OBJFOLDER := obj.$(NEXENPLATFORM)
+DEBUGFOLDER := bin/$(NEXENPLATFORM)/Debug
+RELEASEFOLDER := bin/$(NEXENPLATFORM)/Release
 ifeq ($(DEBUG), 0)
 	OUTFOLDER = $(RELEASEFOLDER)
 	BUILD_TYPE := Release
@@ -129,9 +129,9 @@ endif
 
 
 ifeq ($(USE_AOT),true)
-	PUBLISHFLAGS ?=  -r $(MESENPLATFORM) -p:PublishSingleFile=false -p:PublishAot=true -p:SelfContained=true
+	PUBLISHFLAGS ?=  -r $(NEXENPLATFORM) -p:PublishSingleFile=false -p:PublishAot=true -p:SelfContained=true
 else
-	PUBLISHFLAGS ?=  -r $(MESENPLATFORM) --no-self-contained true -p:PublishSingleFile=true
+	PUBLISHFLAGS ?=  -r $(NEXENPLATFORM) --no-self-contained true -p:PublishSingleFile=true
 endif
 
 
@@ -150,14 +150,14 @@ SEVENZIPOBJ := $(SEVENZIPSRC:.c=.o)
 LUASRC := $(shell find Lua -name '*.c')
 LUAOBJ := $(LUASRC:.c=.o)
 
-ifeq ($(MESENOS),linux)
+ifeq ($(NEXENOS),linux)
 	LINUXSRC := $(shell find Linux -name '*.cpp')
 else
 	LINUXSRC :=
 endif
 LINUXOBJ := $(LINUXSRC:.cpp=.o)
 
-ifeq ($(MESENOS),osx)
+ifeq ($(NEXENOS),osx)
 	MACOSSRC := $(shell find MacOS -name '*.mm')
 else
 	MACOSSRC :=
@@ -176,7 +176,7 @@ else
 	LIBEVDEVINC := -I../
 endif
 
-ifeq ($(MESENOS),linux)
+ifeq ($(NEXENOS),linux)
 	X11LIB := -lX11
 else
 	X11LIB :=
@@ -184,15 +184,15 @@ endif
 
 FSLIB := -lstdc++fs
 
-ifeq ($(MESENOS),osx)
+ifeq ($(NEXENOS),osx)
 	LIBEVDEVOBJ :=
 	LIBEVDEVINC :=
 	LIBEVDEVSRC :=
 	FSLIB :=
 	ifeq ($(USE_AOT),true)
-		PUBLISHFLAGS := -t:BundleApp -p:UseAppHost=true -p:RuntimeIdentifier=$(MESENPLATFORM) -p:PublishSingleFile=false -p:PublishAot=true -p:SelfContained=true
+		PUBLISHFLAGS := -t:BundleApp -p:UseAppHost=true -p:RuntimeIdentifier=$(NEXENPLATFORM) -p:PublishSingleFile=false -p:PublishAot=true -p:SelfContained=true
 	else
-		PUBLISHFLAGS := -t:BundleApp -p:UseAppHost=true -p:RuntimeIdentifier=$(MESENPLATFORM) -p:SelfContained=true -p:PublishSingleFile=false -p:PublishReadyToRun=false
+		PUBLISHFLAGS := -t:BundleApp -p:UseAppHost=true -p:RuntimeIdentifier=$(NEXENPLATFORM) -p:SelfContained=true -p:PublishSingleFile=false -p:PublishReadyToRun=false
 	endif
 endif
 
@@ -204,7 +204,7 @@ ui: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
 	cp InteropDLL/$(OBJFOLDER)/$(SHAREDLIB) $(OUTFOLDER)/$(SHAREDLIB)
 	#Called twice because the first call copies native libraries to the bin folder which need to be included in Dependencies.zip
 	#Don't run with AOT flags the first time to reduce build duration
-	cd UI && dotnet publish -c $(BUILD_TYPE) $(OPTIMIZEUI) -r $(MESENPLATFORM)
+	cd UI && dotnet publish -c $(BUILD_TYPE) $(OPTIMIZEUI) -r $(NEXENPLATFORM)
 	cd UI && dotnet publish -c $(BUILD_TYPE) $(OPTIMIZEUI) $(PUBLISHFLAGS)
 
 core: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
@@ -232,7 +232,7 @@ pgo:
 	./buildPGO.sh
 
 run:
-	$(OUTFOLDER)/$(MESENPLATFORM)/publish/Mesen
+	$(OUTFOLDER)/$(NEXENPLATFORM)/publish/Nexen
 
 clean:
 	rm -r -f $(COREOBJ)

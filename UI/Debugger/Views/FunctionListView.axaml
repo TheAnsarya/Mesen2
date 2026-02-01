@@ -3,16 +3,16 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:vm="using:Mesen.Debugger.ViewModels"
-	xmlns:c="using:Mesen.Debugger.Controls"
-	xmlns:du="using:Mesen.Debugger.Utilities"
-	xmlns:l="using:Mesen.Localization"
+	xmlns:vm="using:Nexen.Debugger.ViewModels"
+	xmlns:c="using:Nexen.Debugger.Controls"
+	xmlns:du="using:Nexen.Debugger.Utilities"
+	xmlns:l="using:Nexen.Localization"
 	mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="110"
 	VerticalAlignment="Stretch"
 	HorizontalAlignment="Stretch"
 	Focusable="True"
 	x:DataType="vm:FunctionListViewModel"
-	x:Class="Mesen.Debugger.Views.FunctionListView"
+	x:Class="Nexen.Debugger.Views.FunctionListView"
 >
 	<Design.DataContext>
 		<vm:FunctionListViewModel />
@@ -25,7 +25,7 @@
 		</Style>
 	</UserControl.Styles>
 
-	<Border BorderThickness="0 1 0 0" BorderBrush="{StaticResource MesenGrayBorderColor}">
+	<Border BorderThickness="0 1 0 0" BorderBrush="{StaticResource NexenGrayBorderColor}">
 		<DataBox
 			Items="{Binding Functions}"
 			Selection="{Binding Selection}"

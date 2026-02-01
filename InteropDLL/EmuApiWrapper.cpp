@@ -372,7 +372,7 @@ public:
 };
 
 DllExport void __stdcall PgoRunTest(vector<string> testRoms, bool enableDebugger) {
-	FolderUtilities::SetHomeFolder("../PGOMesenHome");
+	FolderUtilities::SetHomeFolder("../PGONexenHome");
 	PgoKeyManager pgoKeyManager;
 	KeyManager::RegisterKeyManager(&pgoKeyManager);
 

@@ -89,7 +89,7 @@ namespace Nexen.Utilities {
 		}
 
 		public static SolidColorBrush GetBrush(Color color) {
-			if (ConfigManager.ActiveTheme == MesenTheme.Dark) {
+			if (ConfigManager.ActiveTheme == NexenTheme.Dark) {
 				return new SolidColorBrush(InvertBrightness(color));
 			} else {
 				return new SolidColorBrush(color);
@@ -97,7 +97,7 @@ namespace Nexen.Utilities {
 		}
 
 		public static SolidColorBrush GetBrush(SolidColorBrush b) {
-			if (ConfigManager.ActiveTheme == MesenTheme.Dark) {
+			if (ConfigManager.ActiveTheme == NexenTheme.Dark) {
 				return new SolidColorBrush(InvertBrightness(b.Color));
 			} else {
 				return new SolidColorBrush(b.Color);
@@ -109,7 +109,7 @@ namespace Nexen.Utilities {
 		}
 
 		public static Color GetColor(Color color) {
-			if (ConfigManager.ActiveTheme == MesenTheme.Dark) {
+			if (ConfigManager.ActiveTheme == NexenTheme.Dark) {
 				return InvertBrightness(color);
 			} else {
 				return color;
@@ -118,7 +118,7 @@ namespace Nexen.Utilities {
 
 		public static Color GetColor(UInt32 u32Color) {
 			Color color = Color.FromUInt32(u32Color);
-			if (ConfigManager.ActiveTheme == MesenTheme.Dark) {
+			if (ConfigManager.ActiveTheme == NexenTheme.Dark) {
 				return InvertBrightness(color);
 			} else {
 				return color;

@@ -53,7 +53,7 @@ namespace Nexen.Windows {
 			}
 		}
 
-		private void OpenMesenFolder(object sender, RoutedEventArgs e) {
+		private void OpenNexenFolder(object sender, RoutedEventArgs e) {
 			System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
 				FileName = ConfigManager.HomeFolder + Path.DirectorySeparatorChar,
 				UseShellExecute = true,

@@ -23,7 +23,7 @@ namespace Nexen.Config {
 
 			if (File.Exists(path)) {
 				try {
-					cheats = (CheatCodes?)JsonSerializer.Deserialize(File.ReadAllText(path), typeof(CheatCodes), MesenSerializerContext.Default) ?? new CheatCodes();
+					cheats = (CheatCodes?)JsonSerializer.Deserialize(File.ReadAllText(path), typeof(CheatCodes), NexenSerializerContext.Default) ?? new CheatCodes();
 				} catch { }
 			}
 
@@ -33,7 +33,7 @@ namespace Nexen.Config {
 		public void Save() {
 			try {
 				if (Cheats.Count > 0) {
-					FileHelper.WriteAllText(CheatCodes.FilePath, JsonSerializer.Serialize(this, typeof(CheatCodes), MesenSerializerContext.Default));
+					FileHelper.WriteAllText(CheatCodes.FilePath, JsonSerializer.Serialize(this, typeof(CheatCodes), NexenSerializerContext.Default));
 				} else {
 					if (File.Exists(CheatCodes.FilePath)) {
 						File.Delete(CheatCodes.FilePath);

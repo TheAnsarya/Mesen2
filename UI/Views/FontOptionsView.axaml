@@ -3,15 +3,15 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:cfg="using:Mesen.Config"
-	xmlns:c="using:Mesen.Controls"
-	xmlns:l="using:Mesen.Localization"
+	xmlns:cfg="using:Nexen.Config"
+	xmlns:c="using:Nexen.Controls"
+	xmlns:l="using:Nexen.Localization"
 	mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="50"
 	VerticalAlignment="Stretch"
 	HorizontalAlignment="Stretch"
   x:Name="root"
 	x:DataType="cfg:FontConfig"
-	x:Class="Mesen.Views.FontOptionsView"
+	x:Class="Nexen.Views.FontOptionsView"
 >
 	<Design.DataContext>
 		<cfg:FontConfig />

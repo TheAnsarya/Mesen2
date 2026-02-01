@@ -25,7 +25,7 @@ namespace Nexen.ViewModels {
 		[Reactive] public AudioPlayerViewModel? AudioPlayer { get; private set; }
 		[Reactive] public RecentGamesViewModel RecentGames { get; private set; }
 
-		[Reactive] public string WindowTitle { get; private set; } = "Mesen";
+		[Reactive] public string WindowTitle { get; private set; } = "Nexen";
 		[Reactive] public Size RendererSize { get; set; }
 
 		[Reactive] public bool IsMenuVisible { get; set; }

@@ -1,4 +1,4 @@
-name: Build Mesen
+name: Build Nexen
 
 on: [push]
 
@@ -40,18 +40,18 @@ jobs:
       - name: Write commit SHA1 to file
         uses: ./.github/actions/build-sha1-action
 
-      - name: Build Mesen
+      - name: Build Nexen
         run: msbuild -nologo -v:d -clp:ForceConsoleColor -m -p:Configuration=Release -p:Platform=x64 -t:Clean,UI -p:TargetFramework="${{ matrix.platform.targetframework }}"
 
-      - name: Publish Mesen
-        run: dotnet publish --no-restore -c Release -p:PublishAot="${{ matrix.platform.aot }}" -p:SelfContained="${{ matrix.platform.aot }}" -p:PublishSingleFile="${{ matrix.platform.singleFile }}" -p:OptimizeUi="true" -p:Platform="Any CPU" -p:TargetFramework="${{ matrix.platform.targetframework }}" -r win-x64 Mesen.sln /p:PublishProfile=UI\Properties\PublishProfiles\Release.pubxml
+      - name: Publish Nexen
+        run: dotnet publish --no-restore -c Release -p:PublishAot="${{ matrix.platform.aot }}" -p:SelfContained="${{ matrix.platform.aot }}" -p:PublishSingleFile="${{ matrix.platform.singleFile }}" -p:OptimizeUi="true" -p:Platform="Any CPU" -p:TargetFramework="${{ matrix.platform.targetframework }}" -r win-x64 Nexen.sln /p:PublishProfile=UI\Properties\PublishProfiles\Release.pubxml
 
-      - name: Upload Mesen
+      - name: Upload Nexen
         uses: actions/upload-artifact@v4
         with:
-          name: Mesen (Windows - ${{ matrix.platform.targetframework }}${{ matrix.platform.aotString }})
+          name: Nexen (Windows - ${{ matrix.platform.targetframework }}${{ matrix.platform.aotString }})
           path: |
-            build/TmpReleaseBuild/Mesen.exe
+            build/TmpReleaseBuild/Nexen.exe
 
 
   linux:
@@ -100,15 +100,15 @@ jobs:
         
       # stderr is not detected as a TTY, so diagnostics are by default printed without colours;
       # forcing colours makes the log a little nicer to read.
-      - name: Build Mesen
+      - name: Build Nexen
         run: |
           make -j$(nproc) -O ${{ matrix.make_flags }} LTO=true STATICLINK=true SYSTEM_LIBEVDEV=false
 
-      - name: Upload Mesen
+      - name: Upload Nexen
         uses: actions/upload-artifact@v4
         with:
-          name: Mesen (Linux - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
-          path: bin/linux-${{ matrix.platform.path }}/Release/linux-${{ matrix.platform.path }}/publish/Mesen
+          name: Nexen (Linux - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
+          path: bin/linux-${{ matrix.platform.path }}/Release/linux-${{ matrix.platform.path }}/publish/Nexen
 
   appimage:
     strategy:
@@ -142,14 +142,14 @@ jobs:
       - name: Write commit SHA1 to file
         uses: ./.github/actions/build-sha1-action
 
-      - name: Build Mesen (AppImage)
+      - name: Build Nexen (AppImage)
         run: |
           ${{ matrix.platform.script }}
-      - name: Upload Mesen (AppImage)
+      - name: Upload Nexen (AppImage)
         uses: actions/upload-artifact@v4
         with:
-          name: Mesen (Linux ${{ matrix.platform.name }} - AppImage)
-          path: Mesen.AppImage
+          name: Nexen (Linux ${{ matrix.platform.name }} - AppImage)
+          path: Nexen.AppImage
 
 
   macos:
@@ -197,17 +197,17 @@ jobs:
 
       # stderr is not detected as a TTY, so diagnostics are by default printed without colours;
       # forcing colours makes the log a little nicer to read.
-      - name: Build Mesen
+      - name: Build Nexen
         run: |
           ${{ matrix.make_flags }} make -j$(sysctl -n hw.logicalcpu)
 
       - name: Sign binary
         env:
-          APP_NAME: bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Mesen.app
+          APP_NAME: bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Nexen.app
           CERT_DATA: ${{ secrets.MACOS_CERTIFICATE }}
           CERT_PASS: ${{ secrets.MACOS_CERTIFICATE_PWD }}
-          ENTITLEMENTS: UI/Mesen.entitlements
-          SIGNING_IDENTITY: Mesen
+          ENTITLEMENTS: UI/Nexen.entitlements
+          SIGNING_IDENTITY: Nexen
         run: |
           # Export certs
           echo "$CERT_DATA" | base64 --decode > /tmp/certs.p12
@@ -226,12 +226,12 @@ jobs:
           echo "[INFO] Signing app file"
           codesign --force --deep --timestamp --keychain macos-build.keychain --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_NAME"
 
-      - name: Zip Mesen.app
+      - name: Zip Nexen.app
         run: |
-          ditto -c -k --sequesterRsrc --keepParent bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Mesen.app bin/osx-${{ matrix.platform.arch }}/Release/Mesen.app.zip
+          ditto -c -k --sequesterRsrc --keepParent bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Nexen.app bin/osx-${{ matrix.platform.arch }}/Release/Nexen.app.zip
 
-      - name: Upload Mesen
+      - name: Upload Nexen
         uses: actions/upload-artifact@v4
         with:
-          name: Mesen (macOS - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
-          path: bin/osx-${{ matrix.platform.arch }}/Release/Mesen.app.zip
+          name: Nexen (macOS - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
+          path: bin/osx-${{ matrix.platform.arch }}/Release/Nexen.app.zip

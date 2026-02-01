@@ -240,7 +240,7 @@ namespace Nexen.Config {
 
 			try {
 				string fileData = File.ReadAllText(configFile);
-				config = (Configuration?)JsonSerializer.Deserialize(fileData, typeof(Configuration), MesenSerializerContext.Default) ?? Configuration.CreateConfig();
+				config = (Configuration?)JsonSerializer.Deserialize(fileData, typeof(Configuration), NexenSerializerContext.Default) ?? Configuration.CreateConfig();
 				config._fileData = fileData;
 			} catch {
 				try {
@@ -264,7 +264,7 @@ namespace Nexen.Config {
 
 		public void Serialize(string configFile) {
 			try {
-				string cfgData = JsonSerializer.Serialize(this, typeof(Configuration), MesenSerializerContext.Default);
+				string cfgData = JsonSerializer.Serialize(this, typeof(Configuration), NexenSerializerContext.Default);
 				if (_fileData != cfgData && !Design.IsDesignMode) {
 					FileHelper.WriteAllText(configFile, cfgData);
 					_fileData = cfgData;

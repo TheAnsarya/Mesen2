@@ -3,13 +3,13 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:l="using:Mesen.Localization"
-	xmlns:c="using:Mesen.Controls"
+	xmlns:l="using:Nexen.Localization"
+	xmlns:c="using:Nexen.Controls"
 	mc:Ignorable="d"
 	Design.Width="500"
 	Design.Height="100"
 	x:Name="root"
-	x:Class="Mesen.Controls.SystemSpecificSettings"
+	x:Class="Nexen.Controls.SystemSpecificSettings"
 	HorizontalAlignment="Left"
 >
 	<c:OptionSection Header="{l:Translate lblSystemSpecificSettings}" Margin="0">

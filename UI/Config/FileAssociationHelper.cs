@@ -61,42 +61,42 @@ namespace Nexen.Config {
 			}
 
 			List<string> mimeTypes = new List<string>();
-			CreateMimeType("x-mesen-sfc", "sfc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
-			CreateMimeType("x-mesen-smc", "smc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
-			CreateMimeType("x-mesen-swc", "swc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
-			CreateMimeType("x-mesen-fig", "fig", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
-			CreateMimeType("x-mesen-bs", "bs", "BS-X Memory Pack", mimeTypes, cfg.AssociateSnesRomFiles);
-			CreateMimeType("x-mesen-spc", "spc", "SPC Sound File", mimeTypes, cfg.AssociateSnesMusicFiles);
+			CreateMimeType("x-nexen-sfc", "sfc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
+			CreateMimeType("x-nexen-smc", "smc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
+			CreateMimeType("x-nexen-swc", "swc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
+			CreateMimeType("x-nexen-fig", "fig", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
+			CreateMimeType("x-nexen-bs", "bs", "BS-X Memory Pack", mimeTypes, cfg.AssociateSnesRomFiles);
+			CreateMimeType("x-nexen-spc", "spc", "SPC Sound File", mimeTypes, cfg.AssociateSnesMusicFiles);
 
-			CreateMimeType("x-mesen-nes", "nes", "NES ROM", mimeTypes, cfg.AssociateNesRomFiles);
-			CreateMimeType("x-mesen-fds", "fds", "FDS ROM", mimeTypes, cfg.AssociateNesRomFiles);
-			CreateMimeType("x-mesen-qd", "qd", "FDS ROM (QD format)", mimeTypes, cfg.AssociateNesRomFiles);
-			CreateMimeType("x-mesen-studybox", "studybox", "Studybox ROM (Famicom)", mimeTypes, cfg.AssociateNesRomFiles);
-			CreateMimeType("x-mesen-unif", "unf", "NES ROM", mimeTypes, cfg.AssociateNesRomFiles);
+			CreateMimeType("x-nexen-nes", "nes", "NES ROM", mimeTypes, cfg.AssociateNesRomFiles);
+			CreateMimeType("x-nexen-fds", "fds", "FDS ROM", mimeTypes, cfg.AssociateNesRomFiles);
+			CreateMimeType("x-nexen-qd", "qd", "FDS ROM (QD format)", mimeTypes, cfg.AssociateNesRomFiles);
+			CreateMimeType("x-nexen-studybox", "studybox", "Studybox ROM (Famicom)", mimeTypes, cfg.AssociateNesRomFiles);
+			CreateMimeType("x-nexen-unif", "unf", "NES ROM", mimeTypes, cfg.AssociateNesRomFiles);
 
-			CreateMimeType("x-mesen-nsf", "nsf", "Nintendo Sound File", mimeTypes, cfg.AssociateNesMusicFiles);
-			CreateMimeType("x-mesen-nsfe", "nsfe", "Nintendo Sound File (extended)", mimeTypes, cfg.AssociateNesMusicFiles);
+			CreateMimeType("x-nexen-nsf", "nsf", "Nintendo Sound File", mimeTypes, cfg.AssociateNesMusicFiles);
+			CreateMimeType("x-nexen-nsfe", "nsfe", "Nintendo Sound File (extended)", mimeTypes, cfg.AssociateNesMusicFiles);
 
-			CreateMimeType("x-mesen-gb", "gb", "Game Boy ROM", mimeTypes, cfg.AssociateGbRomFiles);
-			CreateMimeType("x-mesen-gbx", "gbx", "Game Boy ROM", mimeTypes, cfg.AssociateGbRomFiles);
-			CreateMimeType("x-mesen-gbc", "gbc", "Game Boy Color ROM", mimeTypes, cfg.AssociateGbRomFiles);
-			CreateMimeType("x-mesen-gbs", "gbs", "Game Boy Sound File", mimeTypes, cfg.AssociateGbMusicFiles);
-			CreateMimeType("x-mesen-gba", "gba", "Game Boy Advance ROM", mimeTypes, cfg.AssociateGbaRomFiles);
+			CreateMimeType("x-nexen-gb", "gb", "Game Boy ROM", mimeTypes, cfg.AssociateGbRomFiles);
+			CreateMimeType("x-nexen-gbx", "gbx", "Game Boy ROM", mimeTypes, cfg.AssociateGbRomFiles);
+			CreateMimeType("x-nexen-gbc", "gbc", "Game Boy Color ROM", mimeTypes, cfg.AssociateGbRomFiles);
+			CreateMimeType("x-nexen-gbs", "gbs", "Game Boy Sound File", mimeTypes, cfg.AssociateGbMusicFiles);
+			CreateMimeType("x-nexen-gba", "gba", "Game Boy Advance ROM", mimeTypes, cfg.AssociateGbaRomFiles);
 
-			CreateMimeType("x-mesen-pce", "pce", "PC Engine ROM", mimeTypes, cfg.AssociatePceRomFiles);
-			CreateMimeType("x-mesen-sgx", "sgx", "PC Engine SuperGrafx ROM", mimeTypes, cfg.AssociatePceRomFiles);
-			CreateMimeType("x-mesen-hes", "hes", "PC Engine Sound File", mimeTypes, cfg.AssociatePceMusicFiles);
+			CreateMimeType("x-nexen-pce", "pce", "PC Engine ROM", mimeTypes, cfg.AssociatePceRomFiles);
+			CreateMimeType("x-nexen-sgx", "sgx", "PC Engine SuperGrafx ROM", mimeTypes, cfg.AssociatePceRomFiles);
+			CreateMimeType("x-nexen-hes", "hes", "PC Engine Sound File", mimeTypes, cfg.AssociatePceMusicFiles);
 
-			CreateMimeType("x-mesen-sms", "sms", "Master System ROM", mimeTypes, cfg.AssociateSmsRomFiles);
-			CreateMimeType("x-mesen-gg", "gg", "Game Gear ROM", mimeTypes, cfg.AssociateGameGearRomFiles);
-			CreateMimeType("x-mesen-sg", "sg", "SG-1000 ROM", mimeTypes, cfg.AssociateSgRomFiles);
-			CreateMimeType("x-mesen-col", "col", "ColecoVision ROM", mimeTypes, cfg.AssociateCvRomFiles);
+			CreateMimeType("x-nexen-sms", "sms", "Master System ROM", mimeTypes, cfg.AssociateSmsRomFiles);
+			CreateMimeType("x-nexen-gg", "gg", "Game Gear ROM", mimeTypes, cfg.AssociateGameGearRomFiles);
+			CreateMimeType("x-nexen-sg", "sg", "SG-1000 ROM", mimeTypes, cfg.AssociateSgRomFiles);
+			CreateMimeType("x-nexen-col", "col", "ColecoVision ROM", mimeTypes, cfg.AssociateCvRomFiles);
 
-			CreateMimeType("x-mesen-ws", "ws", "WonderSwan ROM", mimeTypes, cfg.AssociateWsRomFiles);
-			CreateMimeType("x-mesen-wsc", "wsc", "WonderSwan Color ROM", mimeTypes, cfg.AssociateWsRomFiles);
+			CreateMimeType("x-nexen-ws", "ws", "WonderSwan ROM", mimeTypes, cfg.AssociateWsRomFiles);
+			CreateMimeType("x-nexen-wsc", "wsc", "WonderSwan Color ROM", mimeTypes, cfg.AssociateWsRomFiles);
 
 			//Icon used for shortcuts
-			ImageUtilities.BitmapFromAsset("Assets/MesenIcon.png").Save(Path.Combine(iconFolder, "MesenIcon.png"));
+			ImageUtilities.BitmapFromAsset("Assets/NexenIcon.png").Save(Path.Combine(iconFolder, "NexenIcon.png"));
 
 			string desktopFile = Path.Combine(desktopFolder, "mesen.desktop");
 			if (!File.Exists(desktopFile)) {
@@ -146,7 +146,7 @@ namespace Nexen.Config {
 			string content =
 				"[Desktop Entry]" + Environment.NewLine +
 				"Type=Application" + Environment.NewLine +
-				"Name=Mesen" + Environment.NewLine +
+				"Name=Nexen" + Environment.NewLine +
 				"Comment=Emulator" + Environment.NewLine +
 				"Keywords=game;emulator;emu" + Environment.NewLine +
 				"Categories=GNOME;GTK;Game;Emulator;" + Environment.NewLine +

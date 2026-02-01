@@ -19,7 +19,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config {
 	public class PreferencesConfig : BaseConfig<PreferencesConfig> {
-		[Reactive] public MesenTheme Theme { get; set; } = MesenTheme.Light;
+		[Reactive] public NexenTheme Theme { get; set; } = NexenTheme.Light;
 		[Reactive] public bool AutomaticallyCheckForUpdates { get; set; } = true;
 		[Reactive] public bool SingleInstance { get; set; } = true;
 		[Reactive] public bool AutoLoadPatches { get; set; } = true;
@@ -68,8 +68,8 @@ namespace Nexen.Config {
 		[Reactive] public GameSelectionMode GameSelectionScreenMode { get; set; } = GameSelectionMode.ResumeState;
 
 		[Reactive] public FontAntialiasing FontAntialiasing { get; set; } = FontAntialiasing.SubPixelAntialias;
-		[Reactive] public FontConfig MesenFont { get; set; } = new FontConfig() { FontFamily = "Microsoft Sans Serif", FontSize = 11 };
-		[Reactive] public FontConfig MesenMenuFont { get; set; } = new FontConfig() { FontFamily = "Segoe UI", FontSize = 12 };
+		[Reactive] public FontConfig NexenFont { get; set; } = new FontConfig() { FontFamily = "Microsoft Sans Serif", FontSize = 11 };
+		[Reactive] public FontConfig NexenMenuFont { get; set; } = new FontConfig() { FontFamily = "Segoe UI", FontSize = 12 };
 
 		[Reactive] public List<ShortcutKeyInfo> ShortcutKeys { get; set; } = new List<ShortcutKeyInfo>();
 
@@ -174,36 +174,36 @@ namespace Nexen.Config {
 
 		private void UpdateFonts() {
 			if (Application.Current != null) {
-				string mesenFont = Configuration.GetValidFontFamily(MesenFont.FontFamily, false);
-				string menuFont = Configuration.GetValidFontFamily(MesenMenuFont.FontFamily, false);
+				string NexenFont = Configuration.GetValidFontFamily(NexenFont.FontFamily, false);
+				string menuFont = Configuration.GetValidFontFamily(NexenMenuFont.FontFamily, false);
 
-				if (Application.Current.Resources["MesenFont"] is FontFamily curMesenFont && curMesenFont.Name != mesenFont) {
-					Application.Current.Resources["MesenFont"] = new FontFamily(mesenFont);
+				if (Application.Current.Resources["NexenFont"] is FontFamily curNexenFont && curNexenFont.Name != NexenFont) {
+					Application.Current.Resources["NexenFont"] = new FontFamily(NexenFont);
 				}
 
-				if (Application.Current.Resources["MesenMenuFont"] is FontFamily curMesenMenuFont && curMesenMenuFont.Name != menuFont) {
-					Application.Current.Resources["MesenMenuFont"] = new FontFamily(menuFont);
+				if (Application.Current.Resources["NexenMenuFont"] is FontFamily curNexenMenuFont && curNexenMenuFont.Name != menuFont) {
+					Application.Current.Resources["NexenMenuFont"] = new FontFamily(menuFont);
 				}
 
-				if (Application.Current.Resources["MesenFontSize"] is double curMesenFontSize && curMesenFontSize != MesenFont.FontSize) {
-					Application.Current.Resources["MesenFontSize"] = (double)MesenFont.FontSize;
+				if (Application.Current.Resources["NexenFontSize"] is double curNexenFontSize && curNexenFontSize != NexenFont.FontSize) {
+					Application.Current.Resources["NexenFontSize"] = (double)NexenFont.FontSize;
 				}
 
-				if (Application.Current.Resources["MesenMenuFontSize"] is double curMesenMenuFontSize && curMesenMenuFontSize != MesenMenuFont.FontSize) {
-					Application.Current.Resources["MesenMenuFontSize"] = (double)MesenMenuFont.FontSize;
+				if (Application.Current.Resources["NexenMenuFontSize"] is double curNexenMenuFontSize && curNexenMenuFontSize != NexenMenuFont.FontSize) {
+					Application.Current.Resources["NexenMenuFontSize"] = (double)NexenMenuFont.FontSize;
 				}
 			}
 		}
 
 		public void InitializeFontDefaults() {
-			MesenFont = Configuration.GetDefaultFont();
-			MesenMenuFont = Configuration.GetDefaultMenuFont();
+			NexenFont = Configuration.GetDefaultFont();
+			NexenMenuFont = Configuration.GetDefaultMenuFont();
 			ApplyFontOptions();
 		}
 
 		public static void UpdateTheme() {
 			if (Application.Current != null) {
-				ThemeVariant newTheme = ConfigManager.Config.Preferences.Theme == MesenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
+				ThemeVariant newTheme = ConfigManager.Config.Preferences.Theme == NexenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 				if (Application.Current.RequestedThemeVariant != newTheme) {
 					ConfigManager.ActiveTheme = ConfigManager.Config.Preferences.Theme;
 					Application.Current.RequestedThemeVariant = newTheme;
@@ -249,7 +249,7 @@ namespace Nexen.Config {
 		}
 	}
 
-	public enum MesenTheme {
+	public enum NexenTheme {
 		Light = 0,
 		Dark = 1
 	}

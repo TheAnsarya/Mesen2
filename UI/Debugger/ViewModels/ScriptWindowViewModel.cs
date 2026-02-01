@@ -112,7 +112,7 @@ namespace Nexen.Debugger.ViewModels {
 				new ContextMenuAction() {
 					ActionType = ActionType.HelpApiReference,
 					OnClick = () => {
-						string tmpDoc = Path.Combine(ConfigManager.HomeFolder, "MesenLuaApiDoc.html");
+						string tmpDoc = Path.Combine(ConfigManager.HomeFolder, "NexenLuaApiDoc.html");
 						if(FileHelper.WriteAllText(tmpDoc, CodeCompletionHelper.GenerateHtmlDocumentation())) {
 							ApplicationHelper.OpenBrowser(tmpDoc);
 						}

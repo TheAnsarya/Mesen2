@@ -3,14 +3,14 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:m="clr-namespace:Nexen"
-	xmlns:vm="using:Mesen.ViewModels"
-	xmlns:c="using:Mesen.Controls"
-	xmlns:v="using:Mesen.Views"
-	xmlns:l="using:Mesen.Localization"
+	xmlns:vm="using:Nexen.ViewModels"
+	xmlns:c="using:Nexen.Controls"
+	xmlns:v="using:Nexen.Views"
+	xmlns:l="using:Nexen.Localization"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="500"
 	x:DataType="vm:ConfigViewModel"
-	x:Class="Mesen.Windows.ConfigWindow"
+	x:Class="Nexen.Windows.ConfigWindow"
 	Width="620" Height="500"
 	Topmost="{Binding AlwaysOnTop}"
 	Title="{l:Translate wndTitle}"
@@ -64,7 +64,7 @@
 	<DockPanel>
 		<Panel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Background="#2888">
 			<Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" RowDefinitions="Auto" Margin="5 3">
-				<c:ButtonWithIcon Grid.Column="0" Click="OpenMesenFolder" Icon="Assets/Folder.png" Text="{l:Translate btnOpenMesenFolder}" />
+				<c:ButtonWithIcon Grid.Column="0" Click="OpenNexenFolder" Icon="Assets/Folder.png" Text="{l:Translate btnOpenNexenFolder}" />
 				<c:ButtonWithIcon Grid.Column="1" Click="ResetAllSettings" Icon="Assets/ResetSettings.png" Text="{l:Translate btnResetSettings}" />
 
 				<Button Grid.Column="3" MinWidth="70" HorizontalContentAlignment="Center" Click="Ok_OnClick" Content="{l:Translate btnOK}" />
@@ -108,7 +108,7 @@
 			
 			<TabItem IsEnabled="False" MinHeight="10">
 				<TabItem.Header>
-					<Rectangle Fill="{StaticResource MesenGrayBorderColor}" Height="1" />
+					<Rectangle Fill="{StaticResource NexenGrayBorderColor}" Height="1" />
 				</TabItem.Header>
 			</TabItem>
 			
@@ -186,7 +186,7 @@
 			
 			<TabItem IsEnabled="False" MinHeight="10">
 				<TabItem.Header>
-					<Rectangle Fill="{StaticResource MesenGrayBorderColor}" Height="1" />
+					<Rectangle Fill="{StaticResource NexenGrayBorderColor}" Height="1" />
 				</TabItem.Header>
 			</TabItem>
 			

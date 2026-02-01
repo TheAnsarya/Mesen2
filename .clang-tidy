@@ -1,4 +1,4 @@
-# Mesen2 clang-tidy Configuration
+# Nexen clang-tidy Configuration
 # Run with: clang-tidy --config-file=.clang-tidy <source-files>
 
 ---

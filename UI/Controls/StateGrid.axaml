@@ -3,16 +3,16 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:vm="using:Mesen.ViewModels"
-	xmlns:c="using:Mesen.Controls"
-	xmlns:cfg="using:Mesen.Config"
-	xmlns:l="using:Mesen.Localization"
+	xmlns:vm="using:Nexen.ViewModels"
+	xmlns:c="using:Nexen.Controls"
+	xmlns:cfg="using:Nexen.Config"
+	xmlns:l="using:Nexen.Localization"
 	mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
 	VerticalAlignment="Stretch"
 	HorizontalAlignment="Stretch"
   Background="Transparent"
 	Name="root"
-	x:Class="Mesen.Controls.StateGrid"
+	x:Class="Nexen.Controls.StateGrid"
 >
 	<UserControl.Resources>
 		<Color x:Key="ButtonBackgroundPointerOver">#2A2A2A</Color>

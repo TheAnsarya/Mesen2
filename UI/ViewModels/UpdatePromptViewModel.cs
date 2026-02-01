@@ -38,7 +38,7 @@ namespace Nexen.ViewModels {
 			try {
 				using (var client = new HttpClient()) {
 					string updateData = await client.GetStringAsync("https://www.mesen.ca/Services/v2/latestversion.json");
-					updateInfo = (UpdateInfo?)JsonSerializer.Deserialize(updateData, typeof(UpdateInfo), MesenSerializerContext.Default);
+					updateInfo = (UpdateInfo?)JsonSerializer.Deserialize(updateData, typeof(UpdateInfo), NexenSerializerContext.Default);
 
 					if (
 						updateInfo == null ||
@@ -80,7 +80,7 @@ namespace Nexen.ViewModels {
 			return null;
 		}
 
-		public async Task<bool> UpdateMesen(UpdatePromptWindow wnd) {
+		public async Task<bool> UpdateNexen(UpdatePromptWindow wnd) {
 			if (FileInfo == null) {
 				return false;
 			}

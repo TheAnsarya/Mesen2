@@ -49,7 +49,7 @@ namespace Nexen.Windows {
 			Task.Run(async () => {
 				bool result;
 				try {
-					result = await _model.UpdateMesen(this);
+					result = await _model.UpdateNexen(this);
 				} catch (Exception ex) {
 					result = false;
 					Dispatcher.UIThread.Post(() => {

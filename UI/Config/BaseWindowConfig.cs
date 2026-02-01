@@ -5,8 +5,8 @@ using Avalonia.Platform;
 
 namespace Nexen.Config {
 	public class BaseWindowConfig<T> : BaseConfig<T> where T : class {
-		public MesenSize WindowSize { get; set; } = new PixelSize(0, 0);
-		public MesenPoint WindowLocation { get; set; } = new PixelPoint(0, 0);
+		public NexenSize WindowSize { get; set; } = new PixelSize(0, 0);
+		public NexenPoint WindowLocation { get; set; } = new PixelPoint(0, 0);
 		public bool WindowIsMaximized { get; set; } = false;
 
 		private PixelRect _restoreBounds;
@@ -106,28 +106,28 @@ namespace Nexen.Config {
 		}
 	}
 
-	public struct MesenSize {
+	public struct NexenSize {
 		public int Width { get; set; }
 		public int Height { get; set; }
 
-		public static implicit operator MesenSize(PixelSize size) {
-			return new MesenSize { Width = size.Width, Height = size.Height };
+		public static implicit operator NexenSize(PixelSize size) {
+			return new NexenSize { Width = size.Width, Height = size.Height };
 		}
 
-		public static implicit operator PixelSize(MesenSize size) {
+		public static implicit operator PixelSize(NexenSize size) {
 			return new PixelSize(size.Width, size.Height);
 		}
 	}
 
-	public struct MesenPoint {
+	public struct NexenPoint {
 		public int X { get; set; }
 		public int Y { get; set; }
 
-		public static implicit operator MesenPoint(PixelPoint point) {
-			return new MesenPoint { X = point.X, Y = point.Y };
+		public static implicit operator NexenPoint(PixelPoint point) {
+			return new NexenPoint { X = point.X, Y = point.Y };
 		}
 
-		public static implicit operator PixelPoint(MesenPoint point) {
+		public static implicit operator PixelPoint(NexenPoint point) {
 			return new PixelPoint(point.X, point.Y);
 		}
 	}

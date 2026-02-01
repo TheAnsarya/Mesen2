@@ -3,17 +3,17 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:vm="using:Mesen.ViewModels"
-	xmlns:c="using:Mesen.Controls"
-	xmlns:v="using:Mesen.Views"
-	xmlns:dc="using:Mesen.Debugger.Controls"
-	xmlns:cfg="using:Mesen.Config"
-	xmlns:l="using:Mesen.Localization"
+	xmlns:vm="using:Nexen.ViewModels"
+	xmlns:c="using:Nexen.Controls"
+	xmlns:v="using:Nexen.Views"
+	xmlns:dc="using:Nexen.Debugger.Controls"
+	xmlns:cfg="using:Nexen.Config"
+	xmlns:l="using:Nexen.Localization"
 	mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
 	VerticalAlignment="Stretch"
 	HorizontalAlignment="Stretch"
 	x:DataType="vm:NesConfigViewModel"
-	x:Class="Mesen.Views.NesConfigView"
+	x:Class="Nexen.Views.NesConfigView"
 >
 	<Design.DataContext>
 		<vm:NesConfigViewModel />
@@ -395,7 +395,7 @@
 					</c:OptionSection>
 					
 					<c:OptionSection Header="{l:Translate lblOverscan}" HorizontalAlignment="Left">
-						<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Margin="0 0 0 5">
+						<Border BorderBrush="{StaticResource NexenGrayBorderColor}" BorderThickness="1" Margin="0 0 0 5">
 							<TabControl>
 								<TabItem Header="{l:Translate lblOverscanNtsc}">
 									<c:OverscanInput Overscan="{Binding Config.NtscOverscan}" Margin="5" />

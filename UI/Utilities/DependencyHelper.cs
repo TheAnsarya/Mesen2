@@ -11,7 +11,7 @@ namespace Nexen.Utilities;
 
 class DependencyHelper {
 	public static void ExtractNativeDependencies(string dest) {
-		using (Stream? depStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Mesen.Dependencies.zip")) {
+		using (Stream? depStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Nexen.Dependencies.zip")) {
 			if (depStream == null) {
 				throw new Exception("Missing dependencies.zip");
 			}
@@ -52,7 +52,7 @@ class DependencyHelper {
 	}
 
 	public static string? GetFileContent(string filename) {
-		using Stream? depStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Mesen.Dependencies.zip");
+		using Stream? depStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Nexen.Dependencies.zip");
 		if (depStream != null) {
 			using ZipArchive zip = new(depStream);
 			foreach (ZipArchiveEntry entry in zip.Entries) {

@@ -17,7 +17,7 @@ namespace Nexen.Debugger.Utilities {
 
 		static CodeCompletionHelper() {
 			using StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Mesen.Debugger.Documentation.LuaDocumentation.json")!);
-			DocEntryViewModel[] documentation = (DocEntryViewModel[]?)JsonSerializer.Deserialize(reader.ReadToEnd(), typeof(DocEntryViewModel[]), MesenCamelCaseSerializerContext.Default) ?? [];
+			DocEntryViewModel[] documentation = (DocEntryViewModel[]?)JsonSerializer.Deserialize(reader.ReadToEnd(), typeof(DocEntryViewModel[]), NexenCamelCaseSerializerContext.Default) ?? [];
 
 			_documentation = new Dictionary<string, DocEntryViewModel>();
 			foreach (DocEntryViewModel entry in documentation) {
@@ -229,7 +229,7 @@ namespace Nexen.Debugger.Utilities {
 
 			sb.AppendLine("<div class=\"maincontent\">");
 
-			sb.AppendLine("<h1 class=\"mainheader\">Mesen Lua API reference</h1>");
+			sb.AppendLine("<h1 class=\"mainheader\">Nexen Lua API reference</h1>");
 			sb.AppendLine("<p><strong>Important: </strong>This API is similar but not completely compatible with the old Mesen 0.9.x (or Mesen-S) Lua APIs.</p>");
 			sb.AppendLine("<p>Generated on " + EmuApi.GetMesenBuildDate() + " for Mesen " + EmuApi.GetMesenVersion().ToString() + ".</p>");
 

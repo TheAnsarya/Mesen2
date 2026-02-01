@@ -3,20 +3,20 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:vm="using:Mesen.ViewModels"
-	xmlns:c="using:Mesen.Controls"
-	xmlns:cfg="using:Mesen.Config"
-	xmlns:l="using:Mesen.Localization"
+	xmlns:vm="using:Nexen.ViewModels"
+	xmlns:c="using:Nexen.Controls"
+	xmlns:cfg="using:Nexen.Config"
+	xmlns:l="using:Nexen.Localization"
 	mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="650"
 	VerticalAlignment="Top"
 	x:DataType="vm:MainMenuViewModel"
-	x:Class="Mesen.Views.MainMenuView"
+	x:Class="Nexen.Views.MainMenuView"
 >
 	<Design.DataContext>
 		<vm:MainMenuViewModel />
 	</Design.DataContext>
 
-	<DockPanel Background="{DynamicResource MesenMenuBackground}">
+	<DockPanel Background="{DynamicResource NexenMenuBackground}">
 		<c:NexenMenu Name="ActionMenu" DockPanel.Dock="Left">
 			<MenuItem Header="{l:Translate mnuFile}" ItemsSource="{Binding FileMenuItems}" />
 			<MenuItem Header="{l:Translate mnuGame}" ItemsSource="{Binding GameMenuItems}" />

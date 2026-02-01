@@ -44,9 +44,9 @@ namespace Nexen.Debugger.Controls {
 		}
 
 		private void ComputeColumnWidth() {
-			if (Application.Current?.Resources["MesenFont"] is FontFamily mesenFont && Application.Current?.Resources["MesenFontSize"] is double fontSize) {
+			if (Application.Current?.Resources["NexenFont"] is FontFamily NexenFont && Application.Current?.Resources["NexenFontSize"] is double fontSize) {
 				int maxWidth = 0;
-				Typeface typeface = new Typeface(mesenFont, FontStyle.Normal, FontWeight.Bold);
+				Typeface typeface = new Typeface(NexenFont, FontStyle.Normal, FontWeight.Bold);
 				foreach (var item in Items) {
 					if (item is TooltipSeparator or CustomTooltipEntry) {
 						continue;

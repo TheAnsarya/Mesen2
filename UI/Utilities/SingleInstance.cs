@@ -26,7 +26,7 @@ namespace Nexen.Utilities {
 			if (OperatingSystem.IsLinux() && !RuntimeFeature.IsDynamicCodeSupported) {
 				//Linux NativeAOT doesn't appear to work correctly here, use file lock instead
 				try {
-					_lockFileStream = File.Open(Path.Combine(ConfigManager.HomeFolder, "mesen.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+					_lockFileStream = File.Open(Path.Combine(ConfigManager.HomeFolder, "nexen.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
 					_lockFileStream.Lock(0, 0);
 					_firstInstance = true;
 				} catch {

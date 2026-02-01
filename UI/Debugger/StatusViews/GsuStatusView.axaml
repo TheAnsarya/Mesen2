@@ -3,14 +3,14 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:du="using:Mesen.Debugger.Utilities"
-	xmlns:vm="using:Mesen.Debugger.StatusViews"
-	xmlns:c="using:Mesen.Controls"
+	xmlns:du="using:Nexen.Debugger.Utilities"
+	xmlns:vm="using:Nexen.Debugger.StatusViews"
+	xmlns:c="using:Nexen.Controls"
 	mc:Ignorable="d" d:DesignWidth="350"
 	VerticalAlignment="Stretch"
 	HorizontalAlignment="Stretch"
 	x:DataType="vm:GsuStatusViewModel"
-	x:Class="Mesen.Debugger.StatusViews.GsuStatusView"
+	x:Class="Nexen.Debugger.StatusViews.GsuStatusView"
 >
 	<Design.DataContext>
 		<vm:GsuStatusViewModel />
@@ -102,7 +102,7 @@
 					</StackPanel>
 				</WrapPanel>
 
-				<Rectangle Stroke="{StaticResource MesenGrayBorderColor}" StrokeThickness="1" Margin="5 5 5 2" />
+				<Rectangle Stroke="{StaticResource NexenGrayBorderColor}" StrokeThickness="1" Margin="5 5 5 2" />
 
 				<WrapPanel Margin="0 5">
 					<StackPanel Orientation="Horizontal">
@@ -135,7 +135,7 @@
 						<c:NexenNumericTextBox Value="{Binding RamAddrCache}" Hex="True" Max="0xFFFF" />
 					</StackPanel>
 				</WrapPanel>
-				<Rectangle Stroke="{StaticResource MesenGrayBorderColor}" StrokeThickness="1" Margin="5 5 5 2" />
+				<Rectangle Stroke="{StaticResource NexenGrayBorderColor}" StrokeThickness="1" Margin="5 5 5 2" />
 
 				<WrapPanel Margin="0 2 0 0" DockPanel.Dock="Top">
 					<StackPanel Orientation="Horizontal">
@@ -169,7 +169,7 @@
 						</StackPanel>
 					</WrapPanel>
 				</WrapPanel>
-				<Rectangle Stroke="{StaticResource MesenGrayBorderColor}" StrokeThickness="1" Margin="5 5 5 2" />
+				<Rectangle Stroke="{StaticResource NexenGrayBorderColor}" StrokeThickness="1" Margin="5 5 5 2" />
 				<WrapPanel Margin="0 2 0 0" DockPanel.Dock="Top">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock>COLOR:</TextBlock>

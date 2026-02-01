@@ -260,7 +260,7 @@ namespace Nexen.Debugger.Utilities {
 			if (File.Exists(path)) {
 				try {
 					string fileData = File.ReadAllText(path);
-					dbgWorkspace = (DebugWorkspace?)JsonSerializer.Deserialize(fileData, typeof(DebugWorkspace), MesenSerializerContext.Default) ?? new DebugWorkspace();
+					dbgWorkspace = (DebugWorkspace?)JsonSerializer.Deserialize(fileData, typeof(DebugWorkspace), NexenSerializerContext.Default) ?? new DebugWorkspace();
 				} catch {
 				}
 			}
@@ -292,7 +292,7 @@ namespace Nexen.Debugger.Utilities {
 				WorkspaceByCpu[cpuType] = workspace;
 			}
 
-			FileHelper.WriteAllText(path, JsonSerializer.Serialize(this, typeof(DebugWorkspace), MesenSerializerContext.Default));
+			FileHelper.WriteAllText(path, JsonSerializer.Serialize(this, typeof(DebugWorkspace), NexenSerializerContext.Default));
 		}
 
 		public void Reset() {

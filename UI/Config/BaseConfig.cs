@@ -14,8 +14,8 @@ namespace Nexen.Config {
 		}
 
 		public bool IsIdentical(T other) {
-			string a = JsonSerializer.Serialize(this, this.GetType(), MesenSerializerContext.Default);
-			string b = JsonSerializer.Serialize(other, this.GetType(), MesenSerializerContext.Default);
+			string a = JsonSerializer.Serialize(this, this.GetType(), NexenSerializerContext.Default);
+			string b = JsonSerializer.Serialize(other, this.GetType(), NexenSerializerContext.Default);
 			return a == b;
 		}
 	}

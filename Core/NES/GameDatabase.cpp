@@ -78,7 +78,7 @@ void GameDatabase::InitDatabase() {
 	if (!_initialized) {
 		auto lock = _loadLock.AcquireSafe();
 		if (!_initialized) {
-			string dbPath = FolderUtilities::CombinePath(FolderUtilities::GetHomeFolder(), "MesenNesDB.txt");
+			string dbPath = FolderUtilities::CombinePath(FolderUtilities::GetHomeFolder(), "NexenNesDB.txt");
 			ifstream db(dbPath, ios::in | ios::binary);
 			LoadGameDb(db);
 			_initialized = true;

@@ -17,8 +17,8 @@ namespace Nexen.Utilities {
 	public static class JsonHelper {
 		public static T Clone<T>(T obj) where T : notnull {
 			using MemoryStream stream = new MemoryStream();
-			byte[] jsonData = JsonSerializer.SerializeToUtf8Bytes(obj, obj.GetType(), MesenSerializerContext.Default);
-			T? clone = (T?)JsonSerializer.Deserialize(jsonData.AsSpan<byte>(), obj.GetType(), MesenSerializerContext.Default);
+			byte[] jsonData = JsonSerializer.SerializeToUtf8Bytes(obj, obj.GetType(), NexenSerializerContext.Default);
+			T? clone = (T?)JsonSerializer.Deserialize(jsonData.AsSpan<byte>(), obj.GetType(), NexenSerializerContext.Default);
 			if (clone is null) {
 				throw new Exception("Invalid object");
 			}
@@ -41,7 +41,7 @@ namespace Nexen.Utilities {
 	IgnoreReadOnlyProperties = true,
 	UseStringEnumConverter = true
 )]
-public partial class MesenSerializerContext : JsonSerializerContext { }
+public partial class NexenSerializerContext : JsonSerializerContext { }
 
 [JsonSerializable(typeof(DocEntryViewModel[]))]
 [JsonSerializable(typeof(DocFileFormat))]
@@ -52,4 +52,4 @@ public partial class MesenSerializerContext : JsonSerializerContext { }
 	UseStringEnumConverter = true,
 	PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase
 )]
-public partial class MesenCamelCaseSerializerContext : JsonSerializerContext { }
+public partial class NexenCamelCaseSerializerContext : JsonSerializerContext { }

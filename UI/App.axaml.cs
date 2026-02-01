@@ -22,7 +22,7 @@ namespace Nexen {
 		public override void Initialize() {
 			RequestedThemeVariant = Design.IsDesignMode || ShowConfigWindow
 				? ThemeVariant.Light
-				: ConfigManager.Config.Preferences.Theme == MesenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
+				: ConfigManager.Config.Preferences.Theme == NexenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 
 			Dispatcher.UIThread.UnhandledException += (s, e) => {
 				NexenMsgBox.ShowException(e.Exception);

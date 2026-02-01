@@ -63,7 +63,7 @@ namespace Nexen.Debugger.Utilities {
 			} else if (DynamicIcon != null) {
 				return "Assets/" + DynamicIcon() + ".png";
 			} else if (IsSelected?.Invoke() == true) {
-				return ConfigManager.ActiveTheme == MesenTheme.Light ? "Assets/MenuItemChecked.png" : "Assets/MenuItemCheckedDark.png";
+				return ConfigManager.ActiveTheme == NexenTheme.Light ? "Assets/MenuItemChecked.png" : "Assets/MenuItemCheckedDark.png";
 			}
 
 			return null;

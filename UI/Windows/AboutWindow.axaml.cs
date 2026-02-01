@@ -100,7 +100,7 @@ namespace Nexen.Windows {
 			}
 		}
 
-		private void OnMesenLinkTapped(object? sender, TappedEventArgs e) {
+		private void OnNexenLinkTapped(object? sender, TappedEventArgs e) {
 			ApplicationHelper.OpenBrowser("https://www.mesen.ca");
 		}
 

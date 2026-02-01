@@ -3,21 +3,21 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:l="using:Mesen.Localization"
-	xmlns:c="using:Mesen.Debugger.Controls"
-	xmlns:vm="using:Mesen.Debugger.ViewModels"
+	xmlns:l="using:Nexen.Localization"
+	xmlns:c="using:Nexen.Debugger.Controls"
+	xmlns:vm="using:Nexen.Debugger.ViewModels"
 	mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="110"
 	VerticalAlignment="Stretch"
 	HorizontalAlignment="Stretch"
 	Focusable="True"
 	x:DataType="vm:BreakpointListViewModel"
-	x:Class="Mesen.Debugger.Views.BreakpointListView"
+	x:Class="Nexen.Debugger.Views.BreakpointListView"
 >
 	<Design.DataContext>
 		<vm:BreakpointListViewModel />
 	</Design.DataContext>
 
-	<Border BorderThickness="0 1 0 0" BorderBrush="{StaticResource MesenGrayBorderColor}">
+	<Border BorderThickness="0 1 0 0" BorderBrush="{StaticResource NexenGrayBorderColor}">
 		<DataBox
 			Items="{Binding Breakpoints}"
 			Selection="{Binding Selection}"

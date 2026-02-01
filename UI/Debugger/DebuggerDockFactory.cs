@@ -72,7 +72,7 @@ namespace Nexen.Debugger {
 								Proportion = 0.60,
 								VisibleDockables = CreateList<IDockable>(DisassemblyTool, SourceViewTool)
 							},
-							new MesenProportionalDockSplitter(),
+							new NexenProportionalDockSplitter(),
 							new ProportionalDock {
 								Proportion = 0.40,
 								Orientation = Orientation.Vertical,
@@ -81,7 +81,7 @@ namespace Nexen.Debugger {
 										Proportion = 0.5,
 										VisibleDockables = CreateList<IDockable>(StatusTool)
 									},
-									new MesenProportionalDockSplitter(),
+									new NexenProportionalDockSplitter(),
 									new ToolDock {
 										Proportion = 0.5,
 										VisibleDockables = CreateList<IDockable>(LabelListTool, FunctionListTool, FindResultListTool, ControllerListTool)
@@ -90,7 +90,7 @@ namespace Nexen.Debugger {
 							}
 						)
 					},
-					new MesenProportionalDockSplitter(),
+					new NexenProportionalDockSplitter(),
 					new ProportionalDock {
 						Proportion = 0.25,
 						Orientation = Orientation.Horizontal,
@@ -99,12 +99,12 @@ namespace Nexen.Debugger {
 								Proportion = 0.33,
 								VisibleDockables = CreateList<IDockable>(WatchListTool)
 							},
-							new MesenProportionalDockSplitter(),
+							new NexenProportionalDockSplitter(),
 							new ToolDock {
 								Proportion = 0.33,
 								VisibleDockables = CreateList<IDockable>(BreakpointListTool)
 							},
-							new MesenProportionalDockSplitter(),
+							new NexenProportionalDockSplitter(),
 							new ToolDock {
 								Proportion = 0.33,
 								VisibleDockables = CreateList<IDockable>(CallStackTool)
@@ -122,7 +122,7 @@ namespace Nexen.Debugger {
 		}
 
 		public override IProportionalDockSplitter CreateProportionalDockSplitter() {
-			return new MesenProportionalDockSplitter();
+			return new NexenProportionalDockSplitter();
 		}
 
 		public override void InitLayout(IDockable layout) {
@@ -140,7 +140,7 @@ namespace Nexen.Debugger {
 
 		public DockEntryDefinition ToDockDefinition(IDockable dockable) {
 			DockEntryDefinition entry = new();
-			if (dockable is MesenProportionalDockSplitter) {
+			if (dockable is NexenProportionalDockSplitter) {
 				entry.Type = DockEntryType.Splitter;
 			} else if (dockable is IDock dock) {
 				if (dock is IRootDock) {
@@ -257,7 +257,7 @@ namespace Nexen.Debugger {
 	}
 }
 
-public class MesenProportionalDockSplitter : DockBase, IProportionalDockSplitter {
+public class NexenProportionalDockSplitter : DockBase, IProportionalDockSplitter {
 	//The regular ProportionalDockSplitter in Dock.Model.Mvvm.Controls inherits from DockableBase, which causes an exception when styles are applied
 
 	/// <inheritdoc/>

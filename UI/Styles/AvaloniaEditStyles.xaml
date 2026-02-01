@@ -13,7 +13,7 @@
 	</Style>
 	
 	<Style Selector="search|SearchPanel">
-		<Setter Property="BorderBrush" Value="{StaticResource MesenGrayBorderColor}" />
+		<Setter Property="BorderBrush" Value="{StaticResource NexenGrayBorderColor}" />
 		<Setter Property="Margin" Value="0 0 5 0" />
 		<Setter Property="BorderThickness" Value="1 0 1 1" />
 		<Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />

@@ -2,11 +2,11 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:sys="clr-namespace:System;assembly=netstandard"	
-	xmlns:c="using:Mesen.Controls"
+	xmlns:c="using:Nexen.Controls"
 >
 	<Styles.Resources>
 		<!-- Custom colors -->
-		<Color x:Key="MesenMenuBackground">#F1F1F1</Color>
+		<Color x:Key="NexenMenuBackground">#F1F1F1</Color>
 	</Styles.Resources>
 	
 	<Style Selector="Window">
@@ -98,7 +98,7 @@
 
 	<Style Selector="Menu">
 		<Setter Property="Height" Value="25" />
-		<Setter Property="Background" Value="{DynamicResource MesenMenuBackground}" />
+		<Setter Property="Background" Value="{DynamicResource NexenMenuBackground}" />
 		<Setter Property="Template">
 			<ControlTemplate>
 				<Border Background="{TemplateBinding Background}"

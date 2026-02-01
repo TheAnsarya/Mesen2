@@ -36,7 +36,7 @@ namespace Nexen.Views {
 			if (await wnd.ShowCenteredDialog<bool>(this.GetVisualRoot() as Visual)) {
 				(this.GetVisualRoot() as Window)?.Close();
 				ApplicationHelper.GetMainWindow()?.Close();
-				ConfigManager.RestartMesen();
+				ConfigManager.RestartNexen();
 			}
 		}
 	}

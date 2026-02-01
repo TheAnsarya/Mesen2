@@ -55,7 +55,7 @@ public static partial class ConfigManager {
 		}
 	}
 
-	public static MesenTheme ActiveTheme { get; set; }
+	public static NexenTheme ActiveTheme { get; set; }
 
 	private static bool ApplySetting(object instance, PropertyInfo property, string value) {
 		Type t = property.PropertyType;
@@ -243,7 +243,7 @@ public static partial class ConfigManager {
 		Config.ApplyConfig();
 	}
 
-	public static void RestartMesen() {
+	public static void RestartNexen() {
 		ProcessModule? mainModule = Process.GetCurrentProcess().MainModule;
 		if (mainModule?.FileName == null) {
 			return;

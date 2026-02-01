@@ -4,10 +4,10 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d" d:DesignWidth="100" d:DesignHeight="100"
-	xmlns:c="using:Mesen.Controls"
+	xmlns:c="using:Nexen.Controls"
 	x:Name="root"
 	HorizontalAlignment="Stretch"
-	x:Class="Mesen.Controls.StateGridEntry"
+	x:Class="Nexen.Controls.StateGridEntry"
 >
 	<UserControl.Resources>
 		<Color x:Key="ButtonBorderBrushDisabled">Gray</Color>
