@@ -118,6 +118,16 @@ namespace Mesen.Config.Shortcuts {
 		LoadStateDialog,
 		LoadLastSession,
 
+		/// <summary>
+		/// Quick save to a timestamped save state file (infinite saves)
+		/// </summary>
+		QuickSaveTimestamped,
+
+		/// <summary>
+		/// Open the save state picker to browse all timestamped saves
+		/// </summary>
+		OpenSaveStatePicker,
+
 		OpenFile,
 
 		InputBarcode,
