@@ -17,26 +17,50 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels {
+	/// <summary>
+	/// Primary ViewModel for the main application window.
+	/// Manages the menu, ROM state, rendering, and recent games display.
+	/// </summary>
 	public class MainWindowViewModel : ViewModelBase {
+		/// <summary>Gets the singleton instance of the main window ViewModel.</summary>
 		public static MainWindowViewModel Instance { get; private set; } = null!;
 
+		/// <summary>Gets or sets the main menu ViewModel.</summary>
 		[Reactive] public MainMenuViewModel MainMenu { get; set; }
+
+		/// <summary>Gets or sets the currently loaded ROM information.</summary>
 		[Reactive] public RomInfo RomInfo { get; set; }
+
+		/// <summary>Gets or sets the audio player ViewModel for music formats (NSF, SPC, etc.).</summary>
 		[Reactive] public AudioPlayerViewModel? AudioPlayer { get; private set; }
+
+		/// <summary>Gets or sets the recent games selection screen ViewModel.</summary>
 		[Reactive] public RecentGamesViewModel RecentGames { get; private set; }
 
+		/// <summary>Gets or sets the window title bar text.</summary>
 		[Reactive] public string WindowTitle { get; private set; } = "Nexen";
+
+		/// <summary>Gets or sets the current render surface size.</summary>
 		[Reactive] public Size RendererSize { get; set; }
 
+		/// <summary>Gets or sets whether the main menu is visible.</summary>
 		[Reactive] public bool IsMenuVisible { get; set; }
 
+		/// <summary>Gets or sets whether the native (GPU) renderer is visible.</summary>
 		[Reactive] public bool IsNativeRendererVisible { get; set; }
+
+		/// <summary>Gets or sets whether the software renderer is visible.</summary>
 		[Reactive] public bool IsSoftwareRendererVisible { get; set; }
 
+		/// <summary>Gets the software renderer ViewModel.</summary>
 		public SoftwareRendererViewModel SoftwareRenderer { get; } = new();
 
+		/// <summary>Gets the application configuration.</summary>
 		public Configuration Config { get; }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
+		/// </summary>
 		public MainWindowViewModel() {
 			Instance = this;
 
@@ -48,6 +72,11 @@ namespace Nexen.ViewModels {
 			IsMenuVisible = !Config.Preferences.AutoHideMenu;
 		}
 
+		/// <summary>
+		/// Initializes the ViewModel with the main window reference.
+		/// Sets up reactive subscriptions for UI updates.
+		/// </summary>
+		/// <param name="wnd">The main window instance.</param>
 		public void Init(MainWindow wnd) {
 			MainMenu.Initialize(wnd);
 			RecentGames.Init(GameScreenMode.RecentGames);
@@ -77,6 +106,9 @@ namespace Nexen.ViewModels {
 			UpdateWindowTitle();
 		}
 
+		/// <summary>
+		/// Updates the window title with ROM name and optional size/filter info.
+		/// </summary>
 		private void UpdateWindowTitle() {
 			string title = "Nexen";
 			string romName = RomInfo.GetRomName();

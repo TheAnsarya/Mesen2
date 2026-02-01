@@ -14,11 +14,24 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels {
+	/// <summary>
+	/// ViewModel for the recent games and save state selection screens.
+	/// Handles displaying recent games, loading save states, and save state management.
+	/// </summary>
 	public class RecentGamesViewModel : ViewModelBase {
+		/// <summary>Gets or sets whether the recent games screen is visible.</summary>
 		[Reactive] public bool Visible { get; set; }
+
+		/// <summary>Gets or sets whether emulation should resume when the screen is closed.</summary>
 		[Reactive] public bool NeedResume { get; private set; }
+
+		/// <summary>Gets or sets the screen title text.</summary>
 		[Reactive] public string Title { get; private set; } = "";
+
+		/// <summary>Gets or sets the current display mode.</summary>
 		[Reactive] public GameScreenMode Mode { get; private set; }
+
+		/// <summary>Gets or sets the list of game entries to display.</summary>
 		[Reactive] public List<RecentGameInfo> GameEntries { get; private set; } = new List<RecentGameInfo>();
 
 		/// <summary>
@@ -26,10 +39,17 @@ namespace Nexen.ViewModels {
 		/// </summary>
 		public bool CanDeleteEntries => Mode == GameScreenMode.SaveStatePicker;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RecentGamesViewModel"/> class.
+		/// </summary>
 		public RecentGamesViewModel() {
 			Visible = ConfigManager.Config.Preferences.GameSelectionScreenMode != GameSelectionMode.Disabled;
 		}
 
+		/// <summary>
+		/// Initializes the ViewModel for a specific display mode.
+		/// </summary>
+		/// <param name="mode">The screen mode to display.</param>
 		public void Init(GameScreenMode mode) {
 			if (mode == GameScreenMode.RecentGames && ConfigManager.Config.Preferences.GameSelectionScreenMode == GameSelectionMode.Disabled) {
 				Visible = false;
@@ -129,6 +149,8 @@ namespace Nexen.ViewModels {
 		/// Delete a save state entry and refresh the list.
 		/// Only works in SaveStatePicker mode.
 		/// </summary>
+		/// <param name="entry">The save state entry to delete.</param>
+		/// <returns>True if the entry was deleted successfully.</returns>
 		public bool DeleteEntry(RecentGameInfo entry) {
 			if (Mode != GameScreenMode.SaveStatePicker || !entry.IsTimestampedSave) {
 				return false;
@@ -152,6 +174,10 @@ namespace Nexen.ViewModels {
 			return false;
 		}
 
+		/// <summary>
+		/// Pauses emulation if currently running.
+		/// </summary>
+		/// <returns>True if emulation was paused; false if already paused.</returns>
 		private bool Pause() {
 			if (!EmuApi.IsPaused()) {
 				EmuApi.Pause();
@@ -162,17 +188,34 @@ namespace Nexen.ViewModels {
 		}
 	}
 
+	/// <summary>
+	/// Specifies the display mode for the game selection screen.
+	/// </summary>
 	public enum GameScreenMode {
+		/// <summary>Shows recently played games.</summary>
 		RecentGames,
+		/// <summary>Shows save state slots for loading.</summary>
 		LoadState,
+		/// <summary>Shows save state slots for saving.</summary>
 		SaveState,
-		SaveStatePicker  // New mode for browsing timestamped saves
+		/// <summary>Shows timestamped saves for browsing.</summary>
+		SaveStatePicker
 	}
 
+	/// <summary>
+	/// Represents a single entry in the recent games or save state list.
+	/// </summary>
 	public class RecentGameInfo {
+		/// <summary>Gets or sets the file path to the game or save state.</summary>
 		public string FileName { get; set; } = "";
+
+		/// <summary>Gets or sets the save state slot index (1-based), or -1 if not a slot-based save.</summary>
 		public int StateIndex { get; set; } = -1;
+
+		/// <summary>Gets or sets the display name for the entry.</summary>
 		public string Name { get; set; } = "";
+
+		/// <summary>Gets or sets whether this entry is for saving (true) or loading (false).</summary>
 		public bool SaveMode { get; set; } = false;
 
 		/// <summary>
@@ -190,10 +233,17 @@ namespace Nexen.ViewModels {
 		/// </summary>
 		public string FriendlyTimestamp { get; set; } = "";
 
+		/// <summary>
+		/// Checks if the entry is enabled (file exists for loading, or save mode).
+		/// </summary>
+		/// <returns>True if the entry can be selected.</returns>
 		public bool IsEnabled() {
 			return SaveMode || File.Exists(FileName);
 		}
 
+		/// <summary>
+		/// Loads or saves the game/state based on the entry type.
+		/// </summary>
 		public void Load() {
 			if (IsTimestampedSave) {
 				// Load timestamped save by filepath
