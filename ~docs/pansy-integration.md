@@ -208,7 +208,7 @@ Create test `.pansy` files for validation:
 
 - [Pansy GitHub Repository](https://github.com/TheAnsarya/pansy)
 - [Pansy File Format Specification](https://github.com/TheAnsarya/pansy/blob/main/docs/FILE-FORMAT.md)
-- [Nexen Debugger Documentation](https://www.mesen.ca/docs/debugging/)
+- [Nexen Debugger Documentation](https://nexen.theansarya.com/docs/debugging/)
 
 ## Change Log
 

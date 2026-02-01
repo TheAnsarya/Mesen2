@@ -243,7 +243,7 @@ TEST(NesEmulationTests, NesTest_Passes) {
 ### Local Testing
 ```powershell
 # Build and run tests
-msbuild Mesen.sln /t:Core.Tests /p:Configuration=Release
+msbuild Nexen.sln /t:Core.Tests /p:Configuration=Release
 vstest.console.exe Core.Tests\bin\Release\Core.Tests.dll
 
 # Or via Test Explorer in Visual Studio
@@ -266,7 +266,7 @@ jobs:
 		  git clone https://github.com/microsoft/vcpkg.git
 		  .\vcpkg\bootstrap-vcpkg.bat
 	  - name: Build
-		run: msbuild Mesen.sln /p:Configuration=Release
+		run: msbuild Nexen.sln /p:Configuration=Release
 	  - name: Test
 		run: vstest.console.exe Core.Tests\bin\Release\Core.Tests.dll
 ```

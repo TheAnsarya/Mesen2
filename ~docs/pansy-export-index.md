@@ -121,7 +121,7 @@ Welcome to the Pansy export feature documentation for Nexen. This feature enable
 
 - [Pansy Format Specification](https://github.com/TheAnsarya/pansy/blob/main/docs/format.md)
 - [Pansy Repository](https://github.com/TheAnsarya/pansy)
-- [Nexen Repository](https://github.com/SourMesen/Nexen)
+- [Nexen Repository](https://github.com/TheAnsarya/Nexen)
 
 ## Getting Help
 
@@ -129,7 +129,7 @@ Welcome to the Pansy export feature documentation for Nexen. This feature enable
 
 Found a bug? Have a feature request?
 
-1. Check existing [GitHub Issues](https://github.com/SourMesen/Nexen/issues)
+1. Check existing [GitHub Issues](https://github.com/TheAnsarya/Nexen/issues)
 2. Search this documentation
 3. Create a new issue with:
    - Nexen version

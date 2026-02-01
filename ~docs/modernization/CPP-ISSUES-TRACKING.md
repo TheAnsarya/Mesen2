@@ -202,7 +202,7 @@ Add Google Test (gtest) or Catch2 testing framework to the solution.
 **Tasks:**
 - [ ] Evaluate gtest vs Catch2
 - [ ] Add chosen framework via vcpkg or submodule
-- [ ] Create test project (Mesen.Core.Tests)
+- [ ] Create test project (Nexen.Core.Tests)
 - [ ] Configure test discovery in VS
 
 **Acceptance Criteria:**

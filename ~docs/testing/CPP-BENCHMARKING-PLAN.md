@@ -323,7 +323,7 @@ jobs:
 		  git rev-parse HEAD > baseline_commit.txt
 	  
 	  - name: Build baseline
-		run: msbuild Mesen.sln /p:Configuration=Release /t:Core.Benchmarks
+		run: msbuild Nexen.sln /p:Configuration=Release /t:Core.Benchmarks
 	  
 	  - name: Run baseline benchmarks
 		run: |
@@ -333,7 +333,7 @@ jobs:
 		run: git checkout ${{ github.sha }}
 	  
 	  - name: Build PR
-		run: msbuild Mesen.sln /p:Configuration=Release /t:Core.Benchmarks
+		run: msbuild Nexen.sln /p:Configuration=Release /t:Core.Benchmarks
 	  
 	  - name: Run PR benchmarks
 		run: |

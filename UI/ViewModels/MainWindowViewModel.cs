@@ -78,7 +78,7 @@ namespace Nexen.ViewModels {
 		}
 
 		private void UpdateWindowTitle() {
-			string title = "Mesen";
+			string title = "Nexen";
 			string romName = RomInfo.GetRomName();
 			if (!string.IsNullOrWhiteSpace(romName)) {
 				title += " - " + romName;

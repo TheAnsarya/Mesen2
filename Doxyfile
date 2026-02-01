@@ -1,12 +1,12 @@
 # Doxyfile 1.12.0
-# Mesen2 Multi-System Emulator Documentation Configuration
+# Nexen Multi-System Emulator Documentation Configuration
 
 #---------------------------------------------------------------------------
 # Project Related Configuration Options
 #---------------------------------------------------------------------------
 
 # Project name and description
-PROJECT_NAME           = "Mesen2"
+PROJECT_NAME           = "Nexen"
 PROJECT_NUMBER         = "2.0"
 PROJECT_BRIEF          = "Multi-System Emulator (NES, SNES, GB, GBA, SMS, PCE, WS)"
 PROJECT_LOGO           = 

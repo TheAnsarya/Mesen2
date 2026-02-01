@@ -53,7 +53,7 @@ This modernization effort upgrades Nexen from .NET 8 to .NET 10, updates all dep
 #### Tasks
 - [x] Update `UI.csproj` TargetFramework to net10.0
 - [x] Update `DataBox.csproj` TargetFramework to net10.0
-- [x] Update `Mesen.Tests.csproj` TargetFramework to net10.0
+- [x] Update `Nexen.Tests.csproj` TargetFramework to net10.0
 - [x] Update any RuntimeIdentifier configurations
 - [x] Fix any breaking changes from .NET 10
 - [x] Test on Windows

@@ -85,7 +85,7 @@ namespace Nexen.ViewModels {
 				return false;
 			}
 
-			string downloadPath = Path.Combine(ConfigManager.BackupFolder, "Mesen." + LatestVersion.ToString(3));
+			string downloadPath = Path.Combine(ConfigManager.BackupFolder, "Nexen." + LatestVersion.ToString(3));
 
 			using (var client = new HttpClient()) {
 				HttpResponseMessage response = await client.GetAsync(FileInfo.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);

@@ -1,12 +1,12 @@
 # 🌼 Pansy Export - API Documentation
 
-This document describes the public API for the Pansy export/import functionality in Mesen.
+This document describes the public API for the Pansy export/import functionality in Nexen.
 
 ## Core Classes
 
 ### PansyExporter
 
-**Namespace:** `Mesen.Debugger.Integration`
+**Namespace:** `Nexen.Debugger.Integration`
 
 Exports Nexen debug metadata to the Pansy binary format.
 
@@ -76,7 +76,7 @@ public class ExportProgress
 
 ### PansyImporter
 
-**Namespace:** `Mesen.Debugger.Integration`
+**Namespace:** `Nexen.Debugger.Integration`
 
 Imports Pansy format files into the Nexen debugger.
 
@@ -127,7 +127,7 @@ public class ImportResult
 
 ### DebugFolderManager
 
-**Namespace:** `Mesen.Debugger.Labels`
+**Namespace:** `Nexen.Debugger.Labels`
 
 Manages folder-based debug storage with MLB/CDL/Pansy sync.
 
@@ -197,7 +197,7 @@ public static void ImportFromFolder(
 
 ### SyncManager
 
-**Namespace:** `Mesen.Debugger.Labels`
+**Namespace:** `Nexen.Debugger.Labels`
 
 Monitors debug folder for external changes and triggers reloads.
 
@@ -256,7 +256,7 @@ public enum SyncState
 
 ### DbgToPansyConverter
 
-**Namespace:** `Mesen.Debugger.Integration`
+**Namespace:** `Nexen.Debugger.Integration`
 
 Converts various debug formats to Pansy.
 
@@ -303,7 +303,7 @@ public static List<ConversionResult> BatchConvert(
 public enum DebugFormat
 {
 	Unknown,
-	MesenMlb,	   // Nexen Label file
+	NexenMlb,  	   // Nexen Label file
 	Ca65Dbg,		// cc65/ca65 debug info
 	WlaDxSym,	   // WLA-DX symbol file
 	RgbdsSym,	   // RGBDS symbol file

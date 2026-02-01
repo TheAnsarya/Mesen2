@@ -15,7 +15,7 @@ Visual Studio's built-in profiler integrates seamlessly with the Nexen solution.
 - Works with Release and Profile builds
 
 **How to Use:**
-1. Open `Mesen.sln` in Visual Studio 2026
+1. Open `Nexen.sln` in Visual Studio 2026
 2. Build in **Release** or **PGO** configuration
 3. **Debug → Performance Profiler** (Alt+F2)
 4. Select profiling type:
@@ -40,7 +40,7 @@ Download from [Intel VTune Profiler](https://www.intel.com/content/www/us/en/dev
 **Configuration:**
 1. Build Nexen with debug info: `Release|x64` configuration
 2. Launch VTune and create new project
-3. Set application path to `bin\win-x64\Release\Mesen.exe`
+3. Set application path to `bin\win-x64\Release\Nexen.exe`
 
 **Useful Analysis Types:**
 - **Hotspots** - Find time-consuming functions

@@ -1,6 +1,6 @@
-# Mesen2 API Documentation
+# Nexen API Documentation
 
-This directory contains auto-generated API documentation for Mesen2.
+This directory contains auto-generated API documentation for Nexen.
 
 ## Generating Documentation
 
@@ -38,7 +38,7 @@ docs/
 ├── api/                    # Generated Doxygen output
 │   ├── html/               # HTML documentation
 │   ├── xml/                # XML output (for tools)
-│   └── mesen2.tag          # Tag file for cross-referencing
+│   └── nexen.tag           # Tag file for cross-referencing
 ├── doxygen-warnings.log    # Build warnings log
 └── README.md               # This file
 ```
@@ -47,7 +47,7 @@ docs/
 
 ### Comment Style
 
-Mesen2 uses XML-style documentation comments compatible with both Doxygen and Visual Studio IntelliSense:
+Nexen uses XML-style documentation comments compatible with both Doxygen and Visual Studio IntelliSense:
 
 ```cpp
 /// <summary>

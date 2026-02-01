@@ -83,11 +83,11 @@ gh issue close <number> --repo TheAnsarya/Nexen --comment "Completed in commit a
 ```powershell
 # Build Release x64
 & "C:\Program Files\Microsoft Visual Studio\18\Insiders\MSBuild\Current\Bin\MSBuild.exe" `
-	Mesen.sln /p:Configuration=Release /p:Platform=x64 /t:Build
+	Nexen.sln /p:Configuration=Release /p:Platform=x64 /t:Build
 
 # Clean build
 & "C:\Program Files\Microsoft Visual Studio\18\Insiders\MSBuild\Current\Bin\MSBuild.exe" `
-	Mesen.sln /p:Configuration=Release /p:Platform=x64 /t:Clean
+	Nexen.sln /p:Configuration=Release /p:Platform=x64 /t:Clean
 ```
 
 ## Documentation

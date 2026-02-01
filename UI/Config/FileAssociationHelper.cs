@@ -98,7 +98,7 @@ namespace Nexen.Config {
 			//Icon used for shortcuts
 			ImageUtilities.BitmapFromAsset("Assets/NexenIcon.png").Save(Path.Combine(iconFolder, "NexenIcon.png"));
 
-			string desktopFile = Path.Combine(desktopFolder, "mesen.desktop");
+			string desktopFile = Path.Combine(desktopFolder, "nexen.desktop");
 			if (!File.Exists(desktopFile)) {
 				CreateLinuxShortcutFile(desktopFile, mimeTypes);
 			} else {
@@ -222,12 +222,12 @@ namespace Nexen.Config {
 			if (associate) {
 				ProcessModule? mainModule = Process.GetCurrentProcess().MainModule;
 				if (mainModule != null) {
-					Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\Mesen\shell\open\command", null, mainModule.FileName + " \"%1\"");
-					Registry.SetValue(key, null, "Mesen");
+					Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\Nexen\shell\open\command", null, mainModule.FileName + " \"%1\"");
+					Registry.SetValue(key, null, "Nexen");
 				}
 			} else {
 				object? regKey = Registry.GetValue(key, null, "");
-				if (regKey != null && regKey.Equals("Mesen")) {
+				if (regKey != null && regKey.Equals("Nexen")) {
 					Registry.SetValue(key, null, "");
 				}
 			}

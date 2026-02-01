@@ -46,7 +46,7 @@ Additionally, SDL2 and the [.NET 10 SDK](https://learn.microsoft.com/en-us/dotne
 Once SDL2 and the .NET 10 SDK are installed, run `make` to compile with Clang.
 To compile with GCC instead, use `USE_GCC=true make`.
 
-**Note:** Mesen usually runs faster when built with Clang instead of GCC.
+**Note:** Nexen usually runs faster when built with Clang instead of GCC.
 
 ## macOS
 

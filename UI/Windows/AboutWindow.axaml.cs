@@ -76,7 +76,7 @@ namespace Nexen.Windows {
 				new("NesDev Wiki/Forums Contributors", "", "", "https://www.nesdev.org/"),
 				new("SameBoy (LIJI32)", "LIJI32", "MIT", "https://github.com/LIJI32/SameBoy"),
 				new("BizHawk (PCEHawk)", "", "MIT", "https://github.com/TASEmulators/BizHawk"),
-				new("FrankenGraphics", "", "Mesen icon", "https://www.patreon.com/frankengraphics"),
+				new("FrankenGraphics", "", "Nexen icon", "https://www.patreon.com/frankengraphics"),
 				new("Mighty Mo", "", "Cheat DB", ""),
 			};
 			AcknowledgeList.Sort((a, b) => a.Name.CompareTo(b.Name));

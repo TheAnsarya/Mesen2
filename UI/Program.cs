@@ -24,7 +24,7 @@ namespace Nexen {
 		public static string OriginalFolder { get; private set; }
 		public static string[] CommandLineArgs { get; private set; } = Array.Empty<string>();
 
-		public static string ExePath => Process.GetCurrentProcess().MainModule?.FileName ?? Path.Join(Path.GetDirectoryName(AppContext.BaseDirectory), "Mesen.exe");
+		public static string ExePath => Process.GetCurrentProcess().MainModule?.FileName ?? Path.Join(Path.GetDirectoryName(AppContext.BaseDirectory), "Nexen.exe");
 
 		static Program() {
 			try {
@@ -83,7 +83,7 @@ namespace Nexen {
 		}
 
 		private static IntPtr DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath) {
-			if (libraryName.Contains("Mesen") || libraryName.Contains("SkiaSharp") || libraryName.Contains("HarfBuzz")) {
+			if (libraryName.Contains("Nexen") || libraryName.Contains("SkiaSharp") || libraryName.Contains("HarfBuzz")) {
 				if (libraryName.EndsWith(".dll")) {
 					libraryName = libraryName.Substring(0, libraryName.Length - 4);
 				}

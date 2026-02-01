@@ -268,7 +268,7 @@ PPU Frame Buffer ──► Video Filter ──► Display Output
 ## Build System
 
 **Windows:**
-- Visual Studio solution (Mesen.sln)
+- Visual Studio solution (Nexen.sln)
 - MSBuild for C++ projects
 - .NET SDK for UI
 

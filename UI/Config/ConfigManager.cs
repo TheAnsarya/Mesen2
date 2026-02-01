@@ -22,7 +22,7 @@ public static partial class ConfigManager {
 	public static string DefaultDocumentsFolder {
 		get {
 			Environment.SpecialFolder folder = OperatingSystem.IsWindows() ? Environment.SpecialFolder.MyDocuments : Environment.SpecialFolder.ApplicationData;
-			return Path.Combine(Environment.GetFolderPath(folder, Environment.SpecialFolderOption.Create), "Mesen2");
+			return Path.Combine(Environment.GetFolderPath(folder, Environment.SpecialFolderOption.Create), "Nexen");
 		}
 	}
 
