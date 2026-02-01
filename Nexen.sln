@@ -55,7 +55,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core.Benchmarks", "Core.Ben
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{66320409-64EC-F7C5-3DEF-65E7510DAAD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mesen.Benchmarks", "Benchmarks\Mesen.Benchmarks.csproj", "{CF248F7F-3EB1-4861-B55F-A1DD7990AC11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexen.Benchmarks", "Benchmarks\Nexen.Benchmarks.csproj", "{CF248F7F-3EB1-4861-B55F-A1DD7990AC11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

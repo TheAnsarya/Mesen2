@@ -5,9 +5,9 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Nullable>enable</Nullable>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-    <AssemblyName>Mesen</AssemblyName>
-    <RootNamespace>Mesen</RootNamespace>
-    <StartupObject>Mesen.Program</StartupObject>
+    <AssemblyName>Nexen</AssemblyName>
+    <RootNamespace>Nexen</RootNamespace>
+    <StartupObject>Nexen.Program</StartupObject>
     <Version>2.2.0</Version>
     <FileVersion>2.2.0</FileVersion>
     <Copyright>(C) 2014-2026 Sour/TheAnsarya</Copyright>
@@ -42,15 +42,15 @@
 		<DefineConstants></DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup>
-		<CFBundleName>Mesen</CFBundleName> <!-- Also defines .app file name -->
-		<CFBundleDisplayName>Mesen</CFBundleDisplayName>
-		<CFBundleIdentifier>ca.mesen</CFBundleIdentifier>
+		<CFBundleName>Nexen</CFBundleName> <!-- Also defines .app file name -->
+		<CFBundleDisplayName>Nexen</CFBundleDisplayName>
+		<CFBundleIdentifier>com.nexen</CFBundleIdentifier>
 		<CFBundleVersion>1.0.0</CFBundleVersion>
 		<CFBundleShortVersionString>1.0</CFBundleShortVersionString>
 		<CFBundlePackageType>APPL</CFBundlePackageType>
 		<CFBundleSignature>????</CFBundleSignature>
-		<CFBundleExecutable>Mesen</CFBundleExecutable>
-		<CFBundleIconFile>MesenIcon.icns</CFBundleIconFile> <!-- Will be copied from output directory -->
+		<CFBundleExecutable>Nexen</CFBundleExecutable>
+		<CFBundleIconFile>NexenIcon.icns</CFBundleIconFile> <!-- Will be copied from output directory -->
 		<NSPrincipalClass>NSApplication</NSPrincipalClass>
 		<NSHighResolutionCapable>true</NSHighResolutionCapable>
 	</PropertyGroup>
