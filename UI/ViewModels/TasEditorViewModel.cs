@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Avalonia.Media;
 using Nexen.Config;
 using Nexen.Controls;
@@ -57,6 +58,31 @@ public class TasEditorViewModel : DisposableViewModel {
 	/// <summary>Gets the view menu items.</summary>
 	[Reactive] public List<object> ViewMenuItems { get; private set; } = new();
 
+	/// <summary>Gets the playback menu items.</summary>
+	[Reactive] public List<object> PlaybackMenuItems { get; private set; } = new();
+
+	/// <summary>Gets whether undo is available.</summary>
+	[Reactive] public bool CanUndo { get; private set; }
+
+	/// <summary>Gets whether redo is available.</summary>
+	[Reactive] public bool CanRedo { get; private set; }
+
+	/// <summary>Gets whether clipboard has content.</summary>
+	[Reactive] public bool HasClipboard { get; private set; }
+
+	/// <summary>Gets or sets whether playback is active.</summary>
+	[Reactive] public bool IsPlaying { get; set; }
+
+	/// <summary>Gets or sets the current playback frame.</summary>
+	[Reactive] public int PlaybackFrame { get; set; }
+
+	/// <summary>Gets or sets the playback speed (1.0 = normal).</summary>
+	[Reactive] public double PlaybackSpeed { get; set; } = 1.0;
+
+	private readonly Stack<UndoableAction> _undoStack = new();
+	private readonly Stack<UndoableAction> _redoStack = new();
+	private List<InputFrame>? _clipboard;
+	private int _clipboardStartIndex;
 	private IMovieConverter? _currentConverter;
 	private Windows.TasEditorWindow? _window;
 
@@ -110,6 +136,35 @@ public class TasEditorViewModel : DisposableViewModel {
 
 		EditMenuItems = new List<object>() {
 			new ContextMenuAction() {
+				ActionType = ActionType.Undo,
+				OnClick = Undo,
+				IsEnabled = () => CanUndo
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Redo",
+				OnClick = Redo,
+				IsEnabled = () => CanRedo
+			},
+			new ContextMenuSeparator(),
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Cut",
+				OnClick = Cut,
+				IsEnabled = () => Movie != null && SelectedFrameIndex >= 0
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Copy,
+				OnClick = Copy,
+				IsEnabled = () => Movie != null && SelectedFrameIndex >= 0
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Paste,
+				OnClick = Paste,
+				IsEnabled = () => HasClipboard && Movie != null
+			},
+			new ContextMenuSeparator(),
+			new ContextMenuAction() {
 				ActionType = ActionType.Custom,
 				CustomText = "Insert Frame(s)",
 				OnClick = InsertFrames,
@@ -146,6 +201,60 @@ public class TasEditorViewModel : DisposableViewModel {
 				ActionType = ActionType.Custom,
 				CustomText = "Toggle Greenzone",
 				OnClick = () => IsGreenzoneEnabled = !IsGreenzoneEnabled
+			}
+		};
+
+		PlaybackMenuItems = new List<object>() {
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Play/Pause",
+				OnClick = TogglePlayback,
+				IsEnabled = () => Movie != null
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Stop",
+				OnClick = StopPlayback,
+				IsEnabled = () => IsPlaying
+			},
+			new ContextMenuSeparator(),
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Frame Advance",
+				OnClick = FrameAdvance,
+				IsEnabled = () => Movie != null
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Frame Rewind",
+				OnClick = FrameRewind,
+				IsEnabled = () => Movie != null && PlaybackFrame > 0
+			},
+			new ContextMenuSeparator(),
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Speed: 0.25x",
+				OnClick = () => PlaybackSpeed = 0.25
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Speed: 0.5x",
+				OnClick = () => PlaybackSpeed = 0.5
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Speed: 1.0x",
+				OnClick = () => PlaybackSpeed = 1.0
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Speed: 2.0x",
+				OnClick = () => PlaybackSpeed = 2.0
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Speed: 4.0x",
+				OnClick = () => PlaybackSpeed = 4.0
 			}
 		};
 	}
@@ -428,6 +537,214 @@ public class TasEditorViewModel : DisposableViewModel {
 		}
 	}
 
+	#region Undo/Redo
+
+	/// <summary>
+	/// Undoes the last action.
+	/// </summary>
+	public void Undo() {
+		if (!CanUndo || _undoStack.Count == 0) {
+			return;
+		}
+
+		var action = _undoStack.Pop();
+		action.Undo();
+		_redoStack.Push(action);
+
+		UpdateUndoRedoState();
+		UpdateFrames();
+		HasUnsavedChanges = true;
+		StatusMessage = $"Undid: {action.Description}";
+	}
+
+	/// <summary>
+	/// Redoes the last undone action.
+	/// </summary>
+	public void Redo() {
+		if (!CanRedo || _redoStack.Count == 0) {
+			return;
+		}
+
+		var action = _redoStack.Pop();
+		action.Execute();
+		_undoStack.Push(action);
+
+		UpdateUndoRedoState();
+		UpdateFrames();
+		HasUnsavedChanges = true;
+		StatusMessage = $"Redid: {action.Description}";
+	}
+
+	/// <summary>
+	/// Executes an action and adds it to the undo stack.
+	/// </summary>
+	private void ExecuteAction(UndoableAction action) {
+		action.Execute();
+		_undoStack.Push(action);
+		_redoStack.Clear(); // Clear redo stack on new action
+
+		UpdateUndoRedoState();
+		HasUnsavedChanges = true;
+	}
+
+	private void UpdateUndoRedoState() {
+		CanUndo = _undoStack.Count > 0;
+		CanRedo = _redoStack.Count > 0;
+	}
+
+	#endregion
+
+	#region Copy/Paste
+
+	/// <summary>
+	/// Cuts the selected frame(s) to clipboard.
+	/// </summary>
+	public void Cut() {
+		if (Movie == null || SelectedFrameIndex < 0) {
+			return;
+		}
+
+		Copy();
+		DeleteFrames();
+	}
+
+	/// <summary>
+	/// Copies the selected frame(s) to clipboard.
+	/// </summary>
+	public void Copy() {
+		if (Movie == null || SelectedFrameIndex < 0 || SelectedFrameIndex >= Movie.InputFrames.Count) {
+			return;
+		}
+
+		// Clone the selected frame
+		var frame = Movie.InputFrames[SelectedFrameIndex];
+		_clipboard = new List<InputFrame> { CloneFrame(frame) };
+		_clipboardStartIndex = SelectedFrameIndex;
+		HasClipboard = true;
+
+		StatusMessage = $"Copied frame {SelectedFrameIndex + 1}";
+	}
+
+	/// <summary>
+	/// Pastes clipboard content at the current position.
+	/// </summary>
+	public void Paste() {
+		if (Movie == null || _clipboard == null || _clipboard.Count == 0) {
+			return;
+		}
+
+		int insertAt = Math.Max(0, SelectedFrameIndex >= 0 ? SelectedFrameIndex + 1 : Movie.InputFrames.Count);
+		var clonedFrames = _clipboard.Select(CloneFrame).ToList();
+
+		ExecuteAction(new InsertFramesAction(Movie, insertAt, clonedFrames));
+		UpdateFrames();
+		SelectedFrameIndex = insertAt;
+
+		StatusMessage = $"Pasted {clonedFrames.Count} frame(s) at {insertAt + 1}";
+	}
+
+	private static InputFrame CloneFrame(InputFrame original) {
+		var clone = new InputFrame(original.FrameNumber) {
+			IsLagFrame = original.IsLagFrame,
+			Comment = original.Comment
+		};
+
+		for (int i = 0; i < original.Controllers.Length && i < clone.Controllers.Length; i++) {
+			var src = original.Controllers[i];
+			clone.Controllers[i] = new ControllerInput {
+				A = src.A,
+				B = src.B,
+				X = src.X,
+				Y = src.Y,
+				L = src.L,
+				R = src.R,
+				Up = src.Up,
+				Down = src.Down,
+				Left = src.Left,
+				Right = src.Right,
+				Start = src.Start,
+				Select = src.Select
+			};
+		}
+
+		return clone;
+	}
+
+	#endregion
+
+	#region Playback Controls
+
+	/// <summary>
+	/// Toggles playback on/off.
+	/// </summary>
+	public void TogglePlayback() {
+		if (IsPlaying) {
+			StopPlayback();
+		} else {
+			StartPlayback();
+		}
+	}
+
+	/// <summary>
+	/// Starts playback from the current frame.
+	/// </summary>
+	public void StartPlayback() {
+		if (Movie == null) {
+			return;
+		}
+
+		IsPlaying = true;
+		PlaybackFrame = SelectedFrameIndex >= 0 ? SelectedFrameIndex : 0;
+		StatusMessage = $"Playing at {PlaybackSpeed:F2}x speed";
+
+		// TODO: Connect to emulation core for actual playback
+		// For now, just update the status
+	}
+
+	/// <summary>
+	/// Stops playback.
+	/// </summary>
+	public void StopPlayback() {
+		IsPlaying = false;
+		StatusMessage = "Playback stopped";
+	}
+
+	/// <summary>
+	/// Advances playback by one frame.
+	/// </summary>
+	public void FrameAdvance() {
+		if (Movie == null) {
+			return;
+		}
+
+		if (PlaybackFrame < Movie.InputFrames.Count - 1) {
+			PlaybackFrame++;
+			SelectedFrameIndex = PlaybackFrame;
+			StatusMessage = $"Frame {PlaybackFrame + 1} / {Movie.InputFrames.Count}";
+
+			// TODO: Connect to emulation core for frame advance
+		}
+	}
+
+	/// <summary>
+	/// Rewinds playback by one frame.
+	/// </summary>
+	public void FrameRewind() {
+		if (Movie == null) {
+			return;
+		}
+
+		if (PlaybackFrame > 0) {
+			PlaybackFrame--;
+			SelectedFrameIndex = PlaybackFrame;
+			StatusMessage = $"Frame {PlaybackFrame + 1} / {Movie.InputFrames.Count}";
+
+			// TODO: Connect to emulation core for frame rewind (requires savestates)
+		}
+	}
+
+	#endregion
+
 	private void UpdateWindowTitle() {
 		string title = "TAS Editor";
 
@@ -485,3 +802,121 @@ public class TasFrameViewModel : ViewModelBase {
 		IsGreenzone = isGreenzone;
 	}
 }
+
+#region Undoable Actions
+
+/// <summary>
+/// Base class for undoable actions in the TAS editor.
+/// </summary>
+public abstract class UndoableAction {
+	/// <summary>Gets a description of this action.</summary>
+	public abstract string Description { get; }
+
+	/// <summary>Executes the action.</summary>
+	public abstract void Execute();
+
+	/// <summary>Undoes the action.</summary>
+	public abstract void Undo();
+}
+
+/// <summary>
+/// Action for inserting frames.
+/// </summary>
+public class InsertFramesAction : UndoableAction {
+	private readonly MovieData _movie;
+	private readonly int _index;
+	private readonly List<InputFrame> _frames;
+
+	public override string Description => $"Insert {_frames.Count} frame(s)";
+
+	public InsertFramesAction(MovieData movie, int index, List<InputFrame> frames) {
+		_movie = movie;
+		_index = index;
+		_frames = frames;
+	}
+
+	public override void Execute() {
+		for (int i = 0; i < _frames.Count; i++) {
+			_movie.InputFrames.Insert(_index + i, _frames[i]);
+		}
+	}
+
+	public override void Undo() {
+		for (int i = 0; i < _frames.Count; i++) {
+			_movie.InputFrames.RemoveAt(_index);
+		}
+	}
+}
+
+/// <summary>
+/// Action for deleting frames.
+/// </summary>
+public class DeleteFramesAction : UndoableAction {
+	private readonly MovieData _movie;
+	private readonly int _index;
+	private readonly List<InputFrame> _deletedFrames;
+
+	public override string Description => $"Delete {_deletedFrames.Count} frame(s)";
+
+	public DeleteFramesAction(MovieData movie, int index, int count) {
+		_movie = movie;
+		_index = index;
+		_deletedFrames = _movie.InputFrames.Skip(index).Take(count).ToList();
+	}
+
+	public override void Execute() {
+		for (int i = 0; i < _deletedFrames.Count; i++) {
+			_movie.InputFrames.RemoveAt(_index);
+		}
+	}
+
+	public override void Undo() {
+		for (int i = 0; i < _deletedFrames.Count; i++) {
+			_movie.InputFrames.Insert(_index + i, _deletedFrames[i]);
+		}
+	}
+}
+
+/// <summary>
+/// Action for modifying controller input.
+/// </summary>
+public class ModifyInputAction : UndoableAction {
+	private readonly InputFrame _frame;
+	private readonly int _port;
+	private readonly ControllerInput _oldInput;
+	private readonly ControllerInput _newInput;
+
+	public override string Description => "Modify input";
+
+	public ModifyInputAction(InputFrame frame, int port, ControllerInput newInput) {
+		_frame = frame;
+		_port = port;
+		_oldInput = CloneInput(frame.Controllers[port]);
+		_newInput = newInput;
+	}
+
+	public override void Execute() {
+		_frame.Controllers[_port] = _newInput;
+	}
+
+	public override void Undo() {
+		_frame.Controllers[_port] = _oldInput;
+	}
+
+	private static ControllerInput CloneInput(ControllerInput src) => new() {
+		A = src.A,
+		B = src.B,
+		X = src.X,
+		Y = src.Y,
+		L = src.L,
+		R = src.R,
+		Up = src.Up,
+		Down = src.Down,
+		Left = src.Left,
+		Right = src.Right,
+		Start = src.Start,
+		Select = src.Select
+	};
+}
+
+#endregion

@@ -24,6 +24,7 @@
 			<MenuItem Header="File" ItemsSource="{Binding FileMenuItems}" />
 			<MenuItem Header="Edit" ItemsSource="{Binding EditMenuItems}" />
 			<MenuItem Header="View" ItemsSource="{Binding ViewMenuItems}" />
+			<MenuItem Header="Playback" ItemsSource="{Binding PlaybackMenuItems}" />
 		</c:NexenMenu>
 
 		<!-- Toolbar -->
@@ -32,8 +33,18 @@
 				<Button Content="Open" ToolTip.Tip="Open movie file" />
 				<Button Content="Save" ToolTip.Tip="Save movie file" IsEnabled="{Binding HasUnsavedChanges}" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
-				<Button Content="+" ToolTip.Tip="Insert frame" Width="30" />
-				<Button Content="-" ToolTip.Tip="Delete frame" Width="30" />
+				<Button Content="↶" ToolTip.Tip="Undo (Ctrl+Z)" Width="30" IsEnabled="{Binding CanUndo}" />
+				<Button Content="↷" ToolTip.Tip="Redo (Ctrl+Y)" Width="30" IsEnabled="{Binding CanRedo}" />
+				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
+				<Button Content="+" ToolTip.Tip="Insert frame (Insert)" Width="30" />
+				<Button Content="-" ToolTip.Tip="Delete frame (Delete)" Width="30" />
+				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
+				<Button Content="⏮" ToolTip.Tip="Frame rewind (R)" Width="30" />
+				<Button Content="⏯" ToolTip.Tip="Play/Pause (Space)" Width="30" />
+				<Button Content="⏭" ToolTip.Tip="Frame advance (F)" Width="30" />
+				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
+				<TextBlock Text="Speed:" VerticalAlignment="Center" />
+				<TextBlock Text="{Binding PlaybackSpeed, StringFormat={}{0:F2}x}" VerticalAlignment="Center" Width="40" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
 				<ToggleButton Content="GZ" ToolTip.Tip="Toggle greenzone" IsChecked="{Binding IsGreenzoneEnabled}" />
 			</StackPanel>

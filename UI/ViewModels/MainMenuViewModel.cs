@@ -25,7 +25,7 @@ using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.ViewModels; 
+namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the main application menu.
 /// Manages all menu items for File, Game, Options, Tools, Debug, and Help menus.
