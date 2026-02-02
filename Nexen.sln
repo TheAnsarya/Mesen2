@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nexen.Benchmarks", "Benchma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieConverter", "MovieConverter\MovieConverter.csproj", "{FB82A03B-7D69-49EC-B5BF-94D7089E75BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieConverter.Tests", "MovieConverter.Tests\MovieConverter.Tests.csproj", "{10865568-B97E-4BDE-80BF-106A6E74CBE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -311,6 +313,30 @@ Global
 		{FB82A03B-7D69-49EC-B5BF-94D7089E75BA}.Release|x64.Build.0 = Release|Any CPU
 		{FB82A03B-7D69-49EC-B5BF-94D7089E75BA}.Release|x86.ActiveCfg = Release|Any CPU
 		{FB82A03B-7D69-49EC-B5BF-94D7089E75BA}.Release|x86.Build.0 = Release|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Debug|x64.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Debug|x86.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Optimize|Any CPU.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Optimize|Any CPU.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Optimize|x64.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Optimize|x64.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Optimize|x86.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Optimize|x86.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Profile|Any CPU.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Profile|Any CPU.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Profile|x64.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Profile|x64.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Profile|x86.ActiveCfg = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.PGO Profile|x86.Build.0 = Debug|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Release|x64.ActiveCfg = Release|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Release|x64.Build.0 = Release|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Release|x86.ActiveCfg = Release|Any CPU
+		{10865568-B97E-4BDE-80BF-106A6E74CBE2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
