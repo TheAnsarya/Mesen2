@@ -28,7 +28,7 @@ TAS (Tool-Assisted Speedrun/Superplay) is a technique for creating video game pl
 ### Opening the TAS Editor
 
 1. Launch Nexen
-2. Go to **Tools** → **TAS Editor** (or use the keyboard shortcut)
+2. Go to **Tools** → **TAS Editor** (or press `Ctrl+T`)
 3. The TAS Editor window will open
 
 ### Creating Your First TAS

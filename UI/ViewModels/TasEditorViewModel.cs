@@ -9,6 +9,8 @@ using Nexen.Config;
 using Nexen.Config.Shortcuts;
 using Nexen.Controls;
 using Nexen.Debugger.Utilities;
+using Nexen.Debugger.ViewModels;
+using Nexen.Debugger.Windows;
 using Nexen.Interop;
 using Nexen.Localization;
 using Nexen.MovieConverter;
@@ -116,6 +118,21 @@ public class TasEditorViewModel : DisposableViewModel {
 	/// <summary>Gets the list of saved branches.</summary>
 	public ObservableCollection<BranchData> Branches { get; } = new();
 
+	/// <summary>Gets the script menu items.</summary>
+	[Reactive] public List<object> ScriptMenuItems { get; private set; } = new();
+
+	/// <summary>Gets the Lua API for TAS scripting.</summary>
+	public TasLuaApi LuaApi { get; }
+
+	/// <summary>Gets or sets the current Lua script path.</summary>
+	[Reactive] public string? CurrentScriptPath { get; set; }
+
+	/// <summary>Gets or sets whether a script is running.</summary>
+	[Reactive] public bool IsScriptRunning { get; set; }
+
+	/// <summary>The ID of the currently loaded script (-1 if none).</summary>
+	private int _currentScriptId = -1;
+
 	private readonly Stack<UndoableAction> _undoStack = new();
 	private readonly Stack<UndoableAction> _redoStack = new();
 	private List<InputFrame>? _clipboard;
@@ -130,6 +147,9 @@ public class TasEditorViewModel : DisposableViewModel {
 	public InputRecorder Recorder { get; }
 
 	public TasEditorViewModel() {
+		// Initialize Lua API
+		LuaApi = new TasLuaApi(this);
+
 		// Initialize recorder with greenzone
 		Recorder = new InputRecorder(Greenzone);
 
@@ -414,6 +434,43 @@ public class TasEditorViewModel : DisposableViewModel {
 				CustomText = "Manage Branches...",
 				OnClick = () => _ = ManageBranchesAsync(),
 				IsEnabled = () => Branches.Count > 0
+			}
+		};
+
+		ScriptMenuItems = new List<object>() {
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Run Script...",
+				OnClick = () => _ = RunScriptAsync(),
+				IsEnabled = () => Movie != null
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Stop Script",
+				OnClick = StopScript,
+				IsEnabled = () => IsScriptRunning
+			},
+			new ContextMenuSeparator(),
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Edit Script...",
+				OnClick = () => _ = EditScriptAsync()
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "New Script...",
+				OnClick = () => _ = NewScriptAsync()
+			},
+			new ContextMenuSeparator(),
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Script API Help",
+				OnClick = ShowScriptApiHelp
+			},
+			new ContextMenuAction() {
+				ActionType = ActionType.Custom,
+				CustomText = "Open Script Folder",
+				OnClick = OpenScriptFolder
 			}
 		};
 	}
@@ -1027,6 +1084,407 @@ public class TasEditorViewModel : DisposableViewModel {
 	public void ShowGreenzoneSettings() {
 		// TODO: Implement greenzone settings dialog
 		StatusMessage = $"Greenzone: {SavestateCount} states, {GreenzoneMemoryMB:F1} MB";
+	}
+
+	#endregion
+
+	#region Lua Scripting
+
+	/// <summary>
+	/// Opens a Lua script file and runs it.
+	/// </summary>
+	public async System.Threading.Tasks.Task RunScriptAsync() {
+		string? path = await FileDialogHelper.OpenFile(
+			Path.Combine(ConfigManager.HomeFolder, "TasScripts"),
+			_window,
+			"lua");
+
+		if (!string.IsNullOrEmpty(path)) {
+			await RunScriptAsync(path);
+		}
+	}
+
+	/// <summary>
+	/// Runs a Lua script from the specified path.
+	/// </summary>
+	public async System.Threading.Tasks.Task RunScriptAsync(string path) {
+		try {
+			if (!File.Exists(path)) {
+				StatusMessage = $"Script not found: {path}";
+				return;
+			}
+
+			// Stop any existing script
+			if (_currentScriptId >= 0) {
+				DebugApi.RemoveScript(_currentScriptId);
+			}
+
+			CurrentScriptPath = path;
+			IsScriptRunning = true;
+			StatusMessage = $"Running script: {Path.GetFileName(path)}";
+
+			// Run the script through the debugger's Lua API
+			string scriptContent = await File.ReadAllTextAsync(path);
+			_currentScriptId = DebugApi.LoadScript(Path.GetFileName(path), path, scriptContent, -1);
+
+			StatusMessage = $"Script loaded: {Path.GetFileName(path)}";
+		} catch (Exception ex) {
+			IsScriptRunning = false;
+			_currentScriptId = -1;
+			StatusMessage = $"Script error: {ex.Message}";
+		}
+	}
+
+	/// <summary>
+	/// Stops the currently running script.
+	/// </summary>
+	public void StopScript() {
+		if (!IsScriptRunning || _currentScriptId < 0) return;
+
+		try {
+			// Stop the script through the debugger API
+			DebugApi.RemoveScript(_currentScriptId);
+			_currentScriptId = -1;
+			IsScriptRunning = false;
+			CurrentScriptPath = null;
+			StatusMessage = "Script stopped";
+		} catch (Exception ex) {
+			StatusMessage = $"Error stopping script: {ex.Message}";
+		}
+	}
+
+	/// <summary>
+	/// Opens the script editor for an existing script.
+	/// </summary>
+	public async System.Threading.Tasks.Task EditScriptAsync() {
+		string? path = await FileDialogHelper.OpenFile(
+			Path.Combine(ConfigManager.HomeFolder, "TasScripts"),
+			_window,
+			"lua");
+
+		if (!string.IsNullOrEmpty(path)) {
+			// Open script in the debugger's script window
+			var model = new ScriptWindowViewModel(null);
+			var wnd = new ScriptWindow(model);
+			DebugWindowManager.OpenDebugWindow(() => wnd);
+			model.LoadScript(path);
+		}
+	}
+
+	/// <summary>
+	/// Creates a new TAS script from template.
+	/// </summary>
+	public async System.Threading.Tasks.Task NewScriptAsync() {
+		string scriptFolder = Path.Combine(ConfigManager.HomeFolder, "TasScripts");
+		Directory.CreateDirectory(scriptFolder);
+
+		string? path = await FileDialogHelper.SaveFile(
+			scriptFolder,
+			"TasScript",
+			_window,
+			"lua");
+
+		if (!string.IsNullOrEmpty(path)) {
+			// Create template script
+			string template = GetScriptTemplate();
+			await File.WriteAllTextAsync(path, template);
+			StatusMessage = $"Created script: {Path.GetFileName(path)}";
+
+			// Open script in the debugger's script window
+			var model = new ScriptWindowViewModel(null);
+			var wnd = new ScriptWindow(model);
+			DebugWindowManager.OpenDebugWindow(() => wnd);
+			model.LoadScript(path);
+		}
+	}
+
+	/// <summary>
+	/// Gets the template for a new TAS Lua script.
+	/// </summary>
+	private string GetScriptTemplate() {
+		return @"-- TAS Script for Nexen
+-- This script provides helper functions for TAS creation
+
+-- Global state
+local startFrame = emu.getState().frameCount
+local bestResult = nil
+
+-- Input combinations to try
+local buttons = {""a"", ""b"", ""up"", ""down"", ""left"", ""right""}
+
+-- Helper: Generate all button combinations
+function generateCombinations(buttons)
+	local combos = {}
+	local n = #buttons
+	local total = 2 ^ n
+	for i = 0, total - 1 do
+		local combo = {}
+		for j = 1, n do
+			if bit32.band(i, bit32.lshift(1, j - 1)) ~= 0 then
+				combo[buttons[j]] = true
+			else
+				combo[buttons[j]] = false
+			end
+		end
+		table.insert(combos, combo)
+	end
+	return combos
+end
+
+-- Helper: Read player position from RAM
+-- TODO: Replace with actual game-specific addresses
+function getPlayerX()
+	return emu.read(0x0010, emu.memType.cpuMemory)
+end
+
+function getPlayerY()
+	return emu.read(0x0011, emu.memType.cpuMemory)
+end
+
+-- Main search function
+function searchBestInput()
+	local combos = generateCombinations(buttons)
+	local best = nil
+	local bestX = getPlayerX()
+
+	for i, combo in ipairs(combos) do
+		-- Create savestate before test
+		local state = emu.createSavestate()
+
+		-- Apply input
+		emu.setInput(combo, 0)
+
+		-- Advance frame
+		emu.step(1, emu.stepType.step)
+
+		-- Check result
+		local newX = getPlayerX()
+		if newX > bestX then
+			bestX = newX
+			best = combo
+		end
+
+		-- Restore state
+		emu.loadSavestate(state)
+	end
+
+	if best then
+		emu.log(""Best input found: "" .. tableToString(best))
+		emu.setInput(best, 0)
+	end
+end
+
+-- Helper: Convert table to string
+function tableToString(t)
+	local result = ""{}""
+	for k, v in pairs(t) do
+		if v then
+			result = result .. k .. "", ""
+		end
+	end
+	return result .. ""}""
+end
+
+-- Frame callback
+function onFrame()
+	-- Example: Search every 60 frames
+	local frame = emu.getState().frameCount
+	if (frame - startFrame) % 60 == 0 then
+		-- searchBestInput()
+	end
+end
+
+-- Register callback
+emu.addEventCallback(onFrame, emu.eventType.endFrame)
+
+emu.log(""TAS Script loaded"")
+emu.displayMessage(""TAS"", ""Script active"")
+";
+	}
+
+	/// <summary>
+	/// Shows the script API help documentation.
+	/// </summary>
+	public void ShowScriptApiHelp() {
+		// Open the Lua API documentation in browser
+		string docPath = Path.Combine(ConfigManager.HomeFolder, "TasLuaApiDoc.html");
+
+		// Generate doc if doesn't exist
+		if (!File.Exists(docPath)) {
+			GenerateScriptApiDoc(docPath);
+		}
+
+		// Open in browser
+		try {
+			System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo {
+				FileName = docPath,
+				UseShellExecute = true
+			});
+		} catch {
+			StatusMessage = "Could not open API documentation";
+		}
+	}
+
+	/// <summary>
+	/// Generates the script API documentation.
+	/// </summary>
+	private void GenerateScriptApiDoc(string path) {
+		string html = @"<!DOCTYPE html>
+<html>
+<head>
+	<title>Nexen TAS Lua API Reference</title>
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+		h1 { color: #2c3e50; }
+		h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+		h3 { color: #7f8c8d; }
+		code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+		pre { background: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 5px; overflow-x: auto; }
+		.param { color: #e74c3c; }
+		.return { color: #27ae60; }
+		table { border-collapse: collapse; width: 100%; }
+		th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+		th { background: #3498db; color: white; }
+	</style>
+</head>
+<body>
+	<h1>🎮 Nexen TAS Lua API Reference</h1>
+
+	<h2>Movie Information</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th><th>Returns</th></tr>
+		<tr><td><code>tas.getCurrentFrame()</code></td><td>Get current frame number</td><td>int</td></tr>
+		<tr><td><code>tas.getTotalFrames()</code></td><td>Get total frames in movie</td><td>int</td></tr>
+		<tr><td><code>tas.getRerecordCount()</code></td><td>Get rerecord count</td><td>int</td></tr>
+		<tr><td><code>tas.getMovieInfo()</code></td><td>Get movie metadata table</td><td>table</td></tr>
+	</table>
+
+	<h2>Frame Navigation</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th></tr>
+		<tr><td><code>tas.seekToFrame(frame)</code></td><td>Seek to specific frame using greenzone</td></tr>
+		<tr><td><code>tas.frameAdvance()</code></td><td>Advance one frame</td></tr>
+		<tr><td><code>tas.frameRewind()</code></td><td>Rewind one frame</td></tr>
+		<tr><td><code>tas.pause()</code></td><td>Pause emulation</td></tr>
+		<tr><td><code>tas.resume()</code></td><td>Resume emulation</td></tr>
+	</table>
+
+	<h2>Input Manipulation</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th></tr>
+		<tr><td><code>tas.getFrameInput(frame, [controller])</code></td><td>Get input for a frame</td></tr>
+		<tr><td><code>tas.setFrameInput(frame, input, [controller])</code></td><td>Set input for a frame</td></tr>
+		<tr><td><code>tas.clearFrameInput(frame, [controller])</code></td><td>Clear all input for a frame</td></tr>
+		<tr><td><code>tas.insertFrames(position, count)</code></td><td>Insert empty frames</td></tr>
+		<tr><td><code>tas.deleteFrames(position, count)</code></td><td>Delete frames</td></tr>
+	</table>
+
+	<h2>Input Table Format</h2>
+	<pre>{
+	a = true/false,
+	b = true/false,
+	x = true/false,
+	y = true/false,
+	l = true/false,
+	r = true/false,
+	select = true/false,
+	start = true/false,
+	up = true/false,
+	down = true/false,
+	left = true/false,
+	right = true/false
+}</pre>
+
+	<h2>Greenzone Operations</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th></tr>
+		<tr><td><code>tas.getGreenzoneInfo()</code></td><td>Get greenzone stats</td></tr>
+		<tr><td><code>tas.captureGreenzone()</code></td><td>Capture savestate now</td></tr>
+		<tr><td><code>tas.clearGreenzone()</code></td><td>Clear all savestates</td></tr>
+		<tr><td><code>tas.hasSavestate(frame)</code></td><td>Check if frame has savestate</td></tr>
+	</table>
+
+	<h2>Recording Operations</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th></tr>
+		<tr><td><code>tas.startRecording([mode])</code></td><td>Start recording (""append"", ""insert"", ""overwrite"")</td></tr>
+		<tr><td><code>tas.stopRecording()</code></td><td>Stop recording</td></tr>
+		<tr><td><code>tas.isRecording()</code></td><td>Check if recording active</td></tr>
+		<tr><td><code>tas.rerecordFrom(frame)</code></td><td>Rerecord from frame</td></tr>
+	</table>
+
+	<h2>Branch Operations</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th></tr>
+		<tr><td><code>tas.createBranch([name])</code></td><td>Create a new branch</td></tr>
+		<tr><td><code>tas.getBranches()</code></td><td>Get list of branch names</td></tr>
+		<tr><td><code>tas.loadBranch(name)</code></td><td>Load a branch by name</td></tr>
+	</table>
+
+	<h2>Input Search (Brute Force)</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th></tr>
+		<tr><td><code>tas.beginSearch()</code></td><td>Begin input search session</td></tr>
+		<tr><td><code>tas.testInput(input, [frames])</code></td><td>Test input combination</td></tr>
+		<tr><td><code>tas.setSearchState(key, value)</code></td><td>Store search state</td></tr>
+		<tr><td><code>tas.getSearchState(key)</code></td><td>Get search state value</td></tr>
+		<tr><td><code>tas.markBestResult()</code></td><td>Mark current as best</td></tr>
+		<tr><td><code>tas.finishSearch([loadBest])</code></td><td>End search session</td></tr>
+	</table>
+
+	<h2>Utility Functions</h2>
+	<table>
+		<tr><th>Function</th><th>Description</th></tr>
+		<tr><td><code>tas.generateInputCombinations([buttons])</code></td><td>Generate all button combos</td></tr>
+		<tr><td><code>tas.readMemory(address, [memType])</code></td><td>Read memory byte</td></tr>
+		<tr><td><code>tas.writeMemory(address, value, [memType])</code></td><td>Write memory byte</td></tr>
+		<tr><td><code>tas.readMemory16(address, [memType])</code></td><td>Read 16-bit value</td></tr>
+		<tr><td><code>tas.log(message)</code></td><td>Log to script output</td></tr>
+		<tr><td><code>tas.displayMessage(message)</code></td><td>Show on-screen message</td></tr>
+	</table>
+
+	<h2>Example: Brute Force Search</h2>
+	<pre>-- Find the input that maximizes X position
+tas.beginSearch()
+
+local buttons = {""a"", ""b"", ""right""}
+local combos = tas.generateInputCombinations(buttons)
+local bestX = tas.readMemory(0x0010)
+
+for i, combo in ipairs(combos) do
+	local frame = tas.testInput(combo, 1)
+	local newX = tas.readMemory(0x0010)
+
+	if newX > bestX then
+		bestX = newX
+		tas.setSearchState(""bestInput"", combo)
+		tas.markBestResult()
+	end
+end
+
+tas.finishSearch(true) -- Load best result</pre>
+
+</body>
+</html>";
+
+		File.WriteAllText(path, html);
+	}
+
+	/// <summary>
+	/// Opens the TAS scripts folder.
+	/// </summary>
+	public void OpenScriptFolder() {
+		string scriptFolder = Path.Combine(ConfigManager.HomeFolder, "TasScripts");
+		Directory.CreateDirectory(scriptFolder);
+
+		try {
+			System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo {
+				FileName = scriptFolder,
+				UseShellExecute = true
+			});
+		} catch {
+			StatusMessage = "Could not open script folder";
+		}
 	}
 
 	#endregion

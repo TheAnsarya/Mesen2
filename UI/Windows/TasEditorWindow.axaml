@@ -26,6 +26,7 @@
 			<MenuItem Header="View" ItemsSource="{Binding ViewMenuItems}" />
 			<MenuItem Header="Playback" ItemsSource="{Binding PlaybackMenuItems}" />
 			<MenuItem Header="Recording" ItemsSource="{Binding RecordingMenuItems}" />
+			<MenuItem Header="Script" ItemsSource="{Binding ScriptMenuItems}" />
 		</c:NexenMenu>
 
 		<!-- Toolbar -->
@@ -53,6 +54,9 @@
 				<TextBlock Text="{Binding SavestateCount, StringFormat=({0})}" VerticalAlignment="Center" Margin="5 0 0 0" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
 				<TextBlock Text="{Binding GreenzoneMemoryMB, StringFormat={}{0:F1} MB}" VerticalAlignment="Center" />
+				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
+				<TextBlock Text="📜" ToolTip.Tip="Script running" VerticalAlignment="Center" IsVisible="{Binding IsScriptRunning}" Foreground="Green" />
+				<TextBlock Text="{Binding CurrentScriptPath}" ToolTip.Tip="Current script" VerticalAlignment="Center" Margin="5 0 0 0" IsVisible="{Binding IsScriptRunning}" MaxWidth="150" TextTrimming="CharacterEllipsis" />
 			</StackPanel>
 		</Border>
 
