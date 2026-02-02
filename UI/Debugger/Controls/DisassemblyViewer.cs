@@ -13,7 +13,7 @@ using Nexen.Config;
 using Nexen.Interop;
 using Nexen.Utilities;
 
-namespace Nexen.Debugger.Controls; 
+namespace Nexen.Debugger.Controls;
 public class DisassemblyViewer : Control {
 	public static readonly StyledProperty<CodeLineData[]> LinesProperty = AvaloniaProperty.Register<DisassemblyViewer, CodeLineData[]>(nameof(Lines));
 	public static readonly StyledProperty<ILineStyleProvider> StyleProviderProperty = AvaloniaProperty.Register<DisassemblyViewer, ILineStyleProvider>(nameof(StyleProviderProperty));
@@ -99,11 +99,14 @@ public class DisassemblyViewer : Control {
 	private Typeface Font { get; set; }
 	private Size LetterSize { get; set; }
 	private double RowHeight => this.LetterSize.Height;
-	private List<CodeSegmentInfo> _visibleCodeSegments = new();
-	private Dictionary<CodeLineData, List<TextFragment>> _textFragments = new();
+	private readonly List<CodeSegmentInfo> _visibleCodeSegments = new(256);
+	private readonly Dictionary<CodeLineData, List<TextFragment>> _textFragments = new(64);
+	private readonly List<List<TextFragment>> _textFragmentPool = new(64);
 	private Point _previousPointerPos;
 	private CodeSegmentInfo? _prevPointerOverSegment = null;
 	private CompositeDisposable _disposables = new();
+	// Cached FormattedText for letter measurement - only needs recalc on font change
+	private FormattedText? _letterMeasureText = null;
 
 	static DisassemblyViewer() {
 		AffectsRender<DisassemblyViewer>(
@@ -203,8 +206,9 @@ public class DisassemblyViewer : Control {
 
 	private void InitFontAndLetterSize() {
 		this.Font = new Typeface(FontFamily);
-		var text = FormatText("A");
-		this.LetterSize = new Size(text.Width, text.Height);
+		// Create and cache the measurement text
+		_letterMeasureText = FormatText("A");
+		this.LetterSize = new Size(_letterMeasureText.Width, _letterMeasureText.Height);
 		this.VisibleRowCount = (int)Math.Ceiling(Bounds.Height / RowHeight);
 	}
 
@@ -266,6 +270,11 @@ public class DisassemblyViewer : Control {
 		}
 
 		_visibleCodeSegments.Clear();
+		// Return text fragment lists to the pool before clearing
+		foreach (var kvp in _textFragments) {
+			kvp.Value.Clear();
+			_textFragmentPool.Add(kvp.Value);
+		}
 		_textFragments.Clear();
 
 		bool useLowerCase = ConfigManager.Config.Debug.Debugger.UseLowerCaseDisassembly;
@@ -277,7 +286,15 @@ public class DisassemblyViewer : Control {
 
 		for (int i = 0; i < lineCount; i++) {
 			CodeLineData line = lines[i];
-			_textFragments[line] = new();
+			// Reuse a pooled list or create a new one
+			List<TextFragment> fragmentList;
+			if (_textFragmentPool.Count > 0) {
+				fragmentList = _textFragmentPool[^1];
+				_textFragmentPool.RemoveAt(_textFragmentPool.Count - 1);
+			} else {
+				fragmentList = new List<TextFragment>(16);
+			}
+			_textFragments[line] = fragmentList;
 
 			string addrFormat = baseFormat + line.CpuType.GetAddressSize();
 			LineProperties lineStyle = styleProvider.GetLineStyle(line, i);
