@@ -134,7 +134,7 @@ namespace Nexen.Utilities {
 				string ext = Path.GetExtension(filename).ToLowerInvariant();
 				if (IsPatchFile(filename)) {
 					LoadPatchFile(filename);
-				} else if (ext == "." + FileDialogHelper.NexenSaveStateExt || ext == "." + FileDialogHelper.MesenSaveStateExt) {
+				} else if (ext is ("." + FileDialogHelper.NexenSaveStateExt) or ("." + FileDialogHelper.MesenSaveStateExt)) {
 					EmuApi.LoadStateFile(filename);
 				} else if (EmuApi.IsRunning() && (ext == "." + FileDialogHelper.NexenMovieExt || ext == "." + FileDialogHelper.MesenMovieExt)) {
 					RecordApi.MoviePlay(filename);

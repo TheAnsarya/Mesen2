@@ -279,7 +279,7 @@ namespace Nexen.ViewModels {
 					ActionType = ActionType.GameConfig,
 					IsVisible = () => IsGameRunning && RomInfo.ConsoleType != ConsoleType.Gameboy && RomInfo.Format != RomFormat.GameGear && RomInfo.ConsoleType != ConsoleType.Gba,
 					IsEnabled = () => IsGameRunning,
-					OnClick = () => new GameConfigWindow().ShowCenteredDialog((Control)wnd)			 },
+					OnClick = () => new GameConfigWindow().ShowCenteredDialog((Control)wnd)          },
 
 				new ContextMenuSeparator() { IsVisible = () => IsFdsGame },
 
@@ -760,11 +760,11 @@ namespace Nexen.ViewModels {
 						IsEnabled = () => IsGameRunning && !RecordApi.MovieRecording() && !RecordApi.MoviePlaying(),
 						OnClick = () => new MovieRecordWindow() {
 								DataContext = new MovieRecordConfigViewModel()
-							}.ShowCenteredDialog((Control)wnd)				  },
+							}.ShowCenteredDialog((Control)wnd)                },
 					new MainMenuAction() {
 						ActionType = ActionType.Stop,
 						IsEnabled = () => IsGameRunning && (RecordApi.MovieRecording() || RecordApi.MoviePlaying()),
-						OnClick = () => RecordApi.MovieStop()				   }
+						OnClick = () => RecordApi.MovieStop()                  }
 				}
 			};
 		}
@@ -774,12 +774,12 @@ namespace Nexen.ViewModels {
 				new MainMenuAction() {
 					ActionType = ActionType.Cheats,
 					IsEnabled = () => IsGameRunning && MainWindow.RomInfo.ConsoleType.SupportsCheats(),
-					OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new CheatListWindow())			 },
+					OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new CheatListWindow())          },
 
 				new MainMenuAction() {
 					ActionType = ActionType.HistoryViewer,
 					IsEnabled = () => IsGameRunning && HistoryApi.HistoryViewerEnabled(),
-					OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(null, () => new HistoryViewerWindow())				},
+					OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(null, () => new HistoryViewerWindow())                },
 
 				GetMoviesMenu(wnd),
 				GetNetPlayMenu(wnd),
@@ -803,7 +803,7 @@ namespace Nexen.ViewModels {
 						},
 						new MainMenuAction() {
 							ActionType = ActionType.HdPackBuilder,
-							OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new HdPackBuilderWindow())					 }
+							OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new HdPackBuilderWindow())                  }
 					}
 				},
 
@@ -811,7 +811,7 @@ namespace Nexen.ViewModels {
 
 				new MainMenuAction() {
 					ActionType = ActionType.LogWindow,
-					OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new LogWindow())			   },
+					OnClick = () => ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new LogWindow())              },
 
 				new MainMenuAction(EmulatorShortcut.TakeScreenshot) {
 					ActionType = ActionType.TakeScreenshot,
@@ -828,11 +828,11 @@ namespace Nexen.ViewModels {
 						IsEnabled = () => IsGameRunning && !RecordApi.AviIsRecording(),
 						OnClick = () => new VideoRecordWindow() {
 								DataContext = new VideoRecordConfigViewModel()
-							}.ShowCenteredDialog((Control)wnd)				  },
+							}.ShowCenteredDialog((Control)wnd)                },
 					new MainMenuAction() {
 						ActionType = ActionType.Stop,
 						IsEnabled = () => IsGameRunning && RecordApi.AviIsRecording(),
-						OnClick = () => RecordApi.AviStop()				 }
+						OnClick = () => RecordApi.AviStop()              }
 				}
 			};
 		}
@@ -854,7 +854,7 @@ namespace Nexen.ViewModels {
 					new MainMenuAction() {
 						ActionType = ActionType.Stop,
 						IsEnabled = () => IsGameRunning && RecordApi.WaveIsRecording(),
-						OnClick = () => RecordApi.WaveStop()					}
+						OnClick = () => RecordApi.WaveStop()                    }
 				}
 			};
 		}
@@ -874,12 +874,12 @@ namespace Nexen.ViewModels {
 						IsEnabled = () => !NetplayApi.IsConnected() && !NetplayApi.IsServerRunning(),
 						OnClick = () => new NetplayConnectWindow() {
 								DataContext = ConfigManager.Config.Netplay.Clone()
-							}.ShowCenteredDialog((Control)wnd)				  },
+							}.ShowCenteredDialog((Control)wnd)                },
 
 					new MainMenuAction() {
 						ActionType = ActionType.Disconnect,
 						IsEnabled = () => NetplayApi.IsConnected(),
-						OnClick = () => NetplayApi.Disconnect()				 },
+						OnClick = () => NetplayApi.Disconnect()              },
 
 					new ContextMenuSeparator(),
 
@@ -888,12 +888,12 @@ namespace Nexen.ViewModels {
 						IsEnabled = () => !NetplayApi.IsConnected() && !NetplayApi.IsServerRunning(),
 						OnClick = () => new NetplayStartServerWindow() {
 								DataContext = ConfigManager.Config.Netplay.Clone()
-							}.ShowCenteredDialog((Control)wnd)				  },
+							}.ShowCenteredDialog((Control)wnd)                },
 
 					new MainMenuAction() {
 						ActionType = ActionType.StopServer,
 						IsEnabled = () => NetplayApi.IsServerRunning(),
-						OnClick = () => NetplayApi.StopServer()				 },
+						OnClick = () => NetplayApi.StopServer()              },
 
 					new ContextMenuSeparator(),
 
@@ -1116,7 +1116,7 @@ namespace Nexen.ViewModels {
 				},
 				new MainMenuAction() {
 					ActionType = ActionType.CommandLineHelp,
-					OnClick = () => new CommandLineHelpWindow().ShowCenteredDialog((Control)wnd)				},
+					OnClick = () => new CommandLineHelpWindow().ShowCenteredDialog((Control)wnd)                },
 				new MainMenuAction() {
 					ActionType = ActionType.CheckForUpdates,
 					OnClick = () => CheckForUpdate(wnd, false)
@@ -1129,7 +1129,7 @@ namespace Nexen.ViewModels {
 				new ContextMenuSeparator(),
 				new MainMenuAction() {
 					ActionType = ActionType.About,
-					OnClick = () => new AboutWindow().ShowCenteredDialog((Control)wnd)			  },
+					OnClick = () => new AboutWindow().ShowCenteredDialog((Control)wnd)            },
 			};
 		}
 

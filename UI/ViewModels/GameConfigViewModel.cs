@@ -1,9 +1,9 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Microsoft.VisualBasic;
 using Nexen.Config;
 using Nexen.Utilities;
-using Microsoft.VisualBasic;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 

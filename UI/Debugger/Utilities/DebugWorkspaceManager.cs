@@ -191,9 +191,7 @@ namespace Nexen.Debugger.Utilities {
 			if (SymbolProvider == null && ConfigManager.Config.Debug.Integration.AutoLoadMlbFiles) {
 				// Try Nexen native format first, then legacy Mesen format
 				string? labelsPath = GetMatchingFile(FileDialogHelper.NexenLabelExt);
-				if (labelsPath == null) {
-					labelsPath = GetMatchingFile(FileDialogHelper.MesenLabelExt);
-				}
+				labelsPath ??= GetMatchingFile(FileDialogHelper.MesenLabelExt);
 				if (labelsPath != null) {
 					LoadNexenLabelFile(labelsPath, false);
 				}

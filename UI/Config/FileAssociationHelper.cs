@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Avalonia.Threading;
+using Microsoft.Win32;
 using Nexen.Interop;
 using Nexen.Utilities;
-using Microsoft.Win32;
 
 namespace Nexen.Config {
 	class FileAssociationHelper {

@@ -109,6 +109,7 @@ namespace Nexen.ViewModels {
 					if (NeedResume) {
 						EmuApi.Resume();
 					}
+
 					return;
 				}
 			} else {
@@ -121,16 +122,16 @@ namespace Nexen.ViewModels {
 
 				string romName = EmuApi.GetRomInfo().GetRomName();
 				for (int i = 0; i < (mode == GameScreenMode.LoadState ? 11 : 10); i++) {
-				// Try Nexen native format first, then legacy Mesen format
-				string pathNexen = Path.Combine(ConfigManager.SaveStateFolder, romName + "_" + (i + 1) + "." + FileDialogHelper.NexenSaveStateExt);
-				string pathMesen = Path.Combine(ConfigManager.SaveStateFolder, romName + "_" + (i + 1) + "." + FileDialogHelper.MesenSaveStateExt);
-				string filePath = File.Exists(pathNexen) ? pathNexen : (File.Exists(pathMesen) ? pathMesen : pathNexen);
-				entries.Add(new RecentGameInfo() {
-					FileName = filePath,
-					StateIndex = i + 1,
-					Name = i == 10 ? ResourceHelper.GetMessage("AutoSave") : ResourceHelper.GetMessage("SlotNumber", i + 1),
-					SaveMode = mode == GameScreenMode.SaveState
-				});
+					// Try Nexen native format first, then legacy Mesen format
+					string pathNexen = Path.Combine(ConfigManager.SaveStateFolder, romName + "_" + (i + 1) + "." + FileDialogHelper.NexenSaveStateExt);
+					string pathMesen = Path.Combine(ConfigManager.SaveStateFolder, romName + "_" + (i + 1) + "." + FileDialogHelper.MesenSaveStateExt);
+					string filePath = File.Exists(pathNexen) ? pathNexen : (File.Exists(pathMesen) ? pathMesen : pathNexen);
+					entries.Add(new RecentGameInfo() {
+						FileName = filePath,
+						StateIndex = i + 1,
+						Name = i == 10 ? ResourceHelper.GetMessage("AutoSave") : ResourceHelper.GetMessage("SlotNumber", i + 1),
+						SaveMode = mode == GameScreenMode.SaveState
+					});
 				}
 
 				if (mode == GameScreenMode.LoadState) {

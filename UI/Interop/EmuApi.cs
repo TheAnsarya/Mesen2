@@ -132,6 +132,7 @@ namespace Nexen.Interop {
 			for (int i = 0; i < count; i++) {
 				result[i] = new SaveStateInfo(interopArray[i]);
 			}
+
 			return result;
 		}
 

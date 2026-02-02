@@ -50,9 +50,9 @@ namespace Nexen.Debugger.Utilities {
 						if (e.Parameter.ToInt32() == viewerId) {
 							lock (callback) {
 								if (!done) {
-									Task.Run(() =>									  //DebugApi.RemoveViewerId() must not be called inside the notification callback (which is
-																						//the same thread as the emulation thread). Otherwise, the viewer timing collection the
-																						//debugger is iterating on will be modified, causing a crash.
+									Task.Run(() =>                                    //DebugApi.RemoveViewerId() must not be called inside the notification callback (which is
+																					  //the same thread as the emulation thread). Otherwise, the viewer timing collection the
+																					  //debugger is iterating on will be modified, causing a crash.
 										DebugApi.RemoveViewerId(viewerId, cpuType));
 
 									listener.Dispose();
