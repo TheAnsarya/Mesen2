@@ -5,7 +5,7 @@ This directory contains auto-generated API documentation for Nexen and user guid
 ## User Documentation
 
 | Document | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | [TAS Editor Manual](TAS-Editor-Manual.md) | Complete user guide for TAS movie editing |
 | [TAS Developer Guide](TAS-Developer-Guide.md) | Technical documentation for TAS system |
 | [TAS Architecture](TAS_ARCHITECTURE.md) | High-level architecture overview |
@@ -16,12 +16,12 @@ This directory contains auto-generated API documentation for Nexen and user guid
 ### Prerequisites
 
 1. **Install Doxygen** (version 1.9.0 or later):
-   - **Windows:** Download from https://www.doxygen.nl/download.html
+   - **Windows:** Download from <https://www.doxygen.nl/download.html>
    - **macOS:** `brew install doxygen`
    - **Linux:** `sudo apt install doxygen` or `sudo dnf install doxygen`
 
 2. **Optional - Graphviz** (for diagrams):
-   - **Windows:** Download from https://graphviz.org/download/
+   - **Windows:** Download from <https://graphviz.org/download/>
    - **macOS:** `brew install graphviz`
    - **Linux:** `sudo apt install graphviz`
 
@@ -42,7 +42,7 @@ Open `docs/api/html/index.html` in a web browser.
 
 ## Documentation Structure
 
-```
+```text
 docs/
 ├── api/                    # Generated Doxygen output
 │   ├── html/               # HTML documentation
@@ -112,7 +112,7 @@ enum class MemoryOperationType : uint8_t {
 The Doxyfile defines these custom aliases for common documentation patterns:
 
 | Alias | Usage |
-|-------|-------|
+| ------- | ------- |
 | `@cpu` | CPU type information |
 | `@platform` | Platform-specific notes |
 | `@threadsafe` | Thread safety information |
@@ -121,6 +121,7 @@ The Doxyfile defines these custom aliases for common documentation patterns:
 | `@nodiscard_note` | Note about [[nodiscard]] attribute |
 
 Example:
+
 ```cpp
 /// <summary>Converts RGB555 to ARGB8888.</summary>
 /// @platform SNES, GBA

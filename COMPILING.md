@@ -5,7 +5,7 @@ This fork uses modern C++23 and .NET 10 for improved performance and code qualit
 ## Requirements
 
 | Component | Version | Notes |
-|-----------|---------|-------|
+| ----------- | --------- | ------- |
 | C++ Standard | C++23 | `/std:c++latest` on MSVC |
 | .NET SDK | 10.0+ | [Download](https://dotnet.microsoft.com/download) |
 | Platform Toolset | v145 | Visual Studio 2026 |
@@ -14,6 +14,7 @@ This fork uses modern C++23 and .NET 10 for improved performance and code qualit
 ## Windows
 
 ### Requirements
+
 - **Compiler:** MSVC (Microsoft Visual C++) from Visual Studio 2026
 - **IDE:** Visual Studio 2026 or later with C++ Desktop workload
 - **Platform Toolset:** v145
@@ -57,6 +58,7 @@ Once SDL2 and the .NET 10 SDK are installed, run `make`.
 ## Fork-Specific Features
 
 This fork (TheAnsarya/Nexen) includes:
+
 - C++23 modernization (smart pointers, std::format, ranges)
 - 🌼 Pansy metadata export for disassembly
 - Comprehensive unit tests (Google Test)

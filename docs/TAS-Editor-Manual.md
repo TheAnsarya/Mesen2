@@ -36,9 +36,9 @@ TAS (Tool-Assisted Speedrun/Superplay) is a technique for creating video game pl
 1. Load a ROM in the main Nexen window
 2. Open the TAS Editor
 3. Either:
-   - **Start Recording**: Begin playing and the editor will capture your inputs
-   - **Open Existing**: Load a movie file (`.nmv`, `.bk2`, `.fm2`, etc.)
-   - **Start Fresh**: Begin editing an empty movie frame-by-frame
+	- **Start Recording**: Begin playing and the editor will capture your inputs
+	- **Open Existing**: Load a movie file (`.nmv`, `.bk2`, `.fm2`, etc.)
+	- **Start Fresh**: Begin editing an empty movie frame-by-frame
 
 ---
 
@@ -49,7 +49,7 @@ The TAS Editor window is divided into several sections:
 ### Menu Bar
 
 | Menu | Purpose |
-|------|---------|
+| ------ | --------- |
 | **File** | Open, Save, Import, Export movies |
 | **Edit** | Undo, Redo, Cut, Copy, Paste, Insert/Delete frames |
 | **View** | Go to Frame, Toggle Greenzone, Show Piano Roll |
@@ -59,6 +59,7 @@ The TAS Editor window is divided into several sections:
 ### Toolbar
 
 Quick access buttons for common actions:
+
 - **Open/Save** - File operations
 - **↶/↷** - Undo/Redo
 - **+/-** - Insert/Delete frames
@@ -69,6 +70,7 @@ Quick access buttons for common actions:
 ### Frame List (Left Panel)
 
 Shows all frames in the movie with:
+
 - **Frame #** - Frame number (1-based)
 - **P1 Input** - Player 1's button presses
 - **P2 Input** - Player 2's button presses
@@ -76,6 +78,7 @@ Shows all frames in the movie with:
 - **Comment** - Notes and markers
 
 Color coding:
+
 - 🟢 **Green** - Greenzone (safe to rerecord from)
 - 🔴 **Red** - Lag frame
 - ⬜ **White** - Normal frame
@@ -103,7 +106,7 @@ Shows current status, selected frame, total frames, rerecord count, and recordin
 ### Supported Formats
 
 | Format | Extension | Read | Write | System |
-|--------|-----------|------|-------|--------|
+| -------- | ----------- | ------ | ------- | -------- |
 | Nexen Movie | `.nmv` | ✅ | ✅ | All |
 | BizHawk | `.bk2` | ✅ | ✅ | All |
 | FCEUX | `.fm2` | ✅ | ✅ | NES |
@@ -148,25 +151,30 @@ Shows current status, selected frame, total frames, rerecord count, and recordin
 ### Modifying Input
 
 **Using Button Panel:**
+
 1. Select a frame
 2. Click buttons in the Controller panel
 3. Buttons toggle on/off
 
 **Using Keyboard:**
+
 - Press button keys while frame is selected (configurable)
 
 **Using Piano Roll:**
+
 - Click cells to toggle buttons
 - Drag to paint multiple frames
 
 ### Insert/Delete Frames
 
 **Insert Frame:**
+
 1. Select position
 2. **Edit** → **Insert Frame(s)** or press `Insert`
 3. New empty frame is inserted
 
 **Delete Frame:**
+
 1. Select frame(s)
 2. **Edit** → **Delete Frame(s)** or press `Delete`
 
@@ -209,7 +217,7 @@ Shows current status, selected frame, total frames, rerecord count, and recordin
 ### Recording Modes
 
 | Mode | Description |
-|------|-------------|
+| ------ | ------------- |
 | **Append** | Add frames to end of movie |
 | **Insert** | Insert frames at current position |
 | **Overwrite** | Replace existing frames |
@@ -233,7 +241,7 @@ Recording automatically detects lag frames when input wasn't polled by the game.
 ### Basic Playback
 
 | Action | How |
-|--------|-----|
+| -------- | ----- |
 | Play/Pause | **Playback** → **Play/Pause** or `Space` |
 | Stop | **Playback** → **Stop** |
 | Frame Advance | **Playback** → **Frame Advance** or `F` |
@@ -242,6 +250,7 @@ Recording automatically detects lag frames when input wasn't polled by the game.
 ### Speed Control
 
 Change playback speed via **Playback** menu:
+
 - 0.25x (slow motion)
 - 0.5x
 - 1.0x (normal)
@@ -251,11 +260,13 @@ Change playback speed via **Playback** menu:
 ### Seeking to Frames
 
 **Go to Frame:**
+
 1. **View** → **Go to Frame...**
 2. Enter frame number
 3. Editor jumps to that frame
 
 **Seek with Greenzone:**
+
 1. **Playback** → **Seek to Frame...**
 2. Uses greenzone savestates for instant seeking
 
@@ -266,6 +277,7 @@ Change playback speed via **Playback** menu:
 ### What is Greenzone?
 
 The greenzone is a system of automatic savestates that enables:
+
 - **Instant seeking** to any frame with a savestate
 - **Frame-accurate rewind** without replay
 - **Efficient rerecording** without starting from beginning
@@ -282,7 +294,7 @@ The greenzone is a system of automatic savestates that enables:
 Access via **View** → **Greenzone Settings...**
 
 | Setting | Default | Description |
-|---------|---------|-------------|
+| --------- | --------- | ------------- |
 | Capture Interval | 60 | Frames between auto-captures |
 | Max Savestates | 1000 | Memory limit (oldest are pruned) |
 | Ring Buffer Size | 120 | Recent frames for instant rewind |
@@ -291,6 +303,7 @@ Access via **View** → **Greenzone Settings...**
 ### Memory Usage
 
 The status bar shows greenzone memory usage. If memory is high:
+
 - Reduce Max Savestates
 - Increase Capture Interval
 - Enable Compression
@@ -320,16 +333,20 @@ The piano roll appears at the bottom of the window.
 ### Editing in Piano Roll
 
 **Toggle Single Cell:**
+
 - Click a cell to toggle that button on that frame
 
 **Paint Multiple Cells:**
+
 - Click and drag horizontally to paint a button across frames
 
 **Zoom:**
+
 - `Ctrl+Scroll` to zoom in/out
 - Or `Ctrl++`/`Ctrl+-`
 
 **Scroll:**
+
 - Scroll wheel to scroll horizontally
 - Arrow keys to navigate
 
@@ -344,6 +361,7 @@ Right-click and drag to select a range of frames in the piano roll.
 ### What is a Branch?
 
 A branch is a saved copy of your entire movie that you can return to later. Useful for:
+
 - Trying different strategies
 - Keeping a backup before risky edits
 - Comparing different approaches
@@ -379,7 +397,7 @@ The rerecord count in the status bar tracks how many times you've rerecorded.
 The TAS Editor supports all systems emulated by Nexen:
 
 | System | Controller Layout | Buttons |
-|--------|------------------|---------|
+| -------- | ------------------ | --------- |
 | NES | 8 buttons | A, B, Select, Start, D-Pad |
 | SNES | 12 buttons | A, B, X, Y, L, R, Select, Start, D-Pad |
 | Game Boy | 8 buttons | A, B, Select, Start, D-Pad |
@@ -398,6 +416,7 @@ The TAS Editor supports all systems emulated by Nexen:
 ### Auto-Detection
 
 When opening a movie, the editor auto-detects the correct layout from:
+
 1. Movie's system type (most reliable)
 2. Movie's source format (fallback)
 
@@ -408,7 +427,7 @@ When opening a movie, the editor auto-detects the correct layout from:
 ### Global
 
 | Shortcut | Action |
-|----------|--------|
+| ---------- | -------- |
 | `Ctrl+O` | Open movie |
 | `Ctrl+S` | Save movie |
 | `Ctrl+Shift+S` | Save As |
@@ -423,7 +442,7 @@ When opening a movie, the editor auto-detects the correct layout from:
 ### Playback
 
 | Shortcut | Action |
-|----------|--------|
+| ---------- | -------- |
 | `Space` | Play/Pause |
 | `F` | Frame Advance |
 | `R` | Frame Rewind |
@@ -432,7 +451,7 @@ When opening a movie, the editor auto-detects the correct layout from:
 ### Navigation
 
 | Shortcut | Action |
-|----------|--------|
+| ---------- | -------- |
 | `Home` | Go to first frame |
 | `End` | Go to last frame |
 | `Page Up` | Jump back 100 frames |
@@ -442,7 +461,7 @@ When opening a movie, the editor auto-detects the correct layout from:
 ### Recording
 
 | Shortcut | Action |
-|----------|--------|
+| ---------- | -------- |
 | `Ctrl+R` | Toggle recording |
 | `Ctrl+B` | Create branch |
 
@@ -474,7 +493,7 @@ When opening a movie, the editor auto-detects the correct layout from:
 ### Common Issues
 
 | Issue | Solution |
-|-------|----------|
+| ------- | ---------- |
 | Movie desyncs | Verify same ROM, check header |
 | High memory usage | Increase greenzone interval |
 | Slow seeking | Enable greenzone compression |

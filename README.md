@@ -19,7 +19,7 @@ This fork replaces the default F1/Shift+F1 behavior with an infinite timestamped
 ### Quick Reference
 
 | Shortcut | Action |
-|----------|--------|
+| ---------- | -------- |
 | **Shift+F1** | Quick save (creates new timestamped save) |
 | **F1** | Open save state picker |
 | **DEL** (in picker) | Delete selected save (with confirmation) |
@@ -59,7 +59,7 @@ For this fork's development builds, see [Actions](https://github.com/TheAnsarya/
 ### Requirements
 
 | Component | Version |
-|-----------|---------|
+| ----------- | --------- |
 | C++ | C++23 (`/std:c++latest`) |
 | .NET | 10.0+ |
 | Visual Studio | 2026 (v145 toolset) |
@@ -86,6 +86,7 @@ All modifications, additions, and new code in this fork (TheAnsarya/Nexen) are r
 See [LICENSE-UNLICENSE](LICENSE-UNLICENSE) for details.
 
 This includes:
+
 - C++ modernization changes
 - 🌼 Pansy metadata export feature
 - Unit tests
@@ -100,7 +101,7 @@ This fork includes a powerful **TAS (Tool-Assisted Speedrun) Editor** for creati
 ### Features
 
 | Feature | Description |
-|---------|-------------|
+| --------- | ------------- |
 | **Multi-Format Support** | Import/export BK2, FM2, SMV, LSMV, VBM, GMV, and native NMV |
 | **Piano Roll View** | Visual timeline for editing button presses across frames |
 | **Greenzone System** | Automatic savestates for instant seeking and efficient rerecording |
@@ -121,7 +122,7 @@ This fork includes a powerful **TAS (Tool-Assisted Speedrun) Editor** for creati
 ### Keyboard Shortcuts (TAS Editor)
 
 | Shortcut | Action |
-|----------|--------|
+| ---------- | -------- |
 | `Space` | Play/Pause |
 | `F` | Frame Advance |
 | `R` | Frame Rewind |

@@ -6,12 +6,12 @@ A .NET library for converting TAS (Tool-Assisted Speedrun) movie files between d
 
 - **Read/Write** Nexen native format (`.nexen-movie`)
 - **Import** from popular TAS formats:
-  - BizHawk (`.bk2`) - Multi-system
-  - lsnes (`.lsmv`) - SNES/GB
-  - FCEUX (`.fm2`) - NES
-  - Snes9x (`.smv`) - SNES
-  - VisualBoyAdvance (`.vbm`) - GBA/GB/GBC
-  - Gens (`.gmv`) - Genesis/Mega Drive
+	- BizHawk (`.bk2`) - Multi-system
+	- lsnes (`.lsmv`) - SNES/GB
+	- FCEUX (`.fm2`) - NES
+	- Snes9x (`.smv`) - SNES
+	- VisualBoyAdvance (`.vbm`) - GBA/GB/GBC
+	- Gens (`.gmv`) - Genesis/Mega Drive
 - **Common data model** for format-independent movie manipulation
 - **Async API** for high-performance I/O
 - **FrozenDictionary** for O(1) format lookups
@@ -19,7 +19,7 @@ A .NET library for converting TAS (Tool-Assisted Speedrun) movie files between d
 ## Supported Formats
 
 | Format | Extension | Emulator | Systems | Read | Write |
-|--------|-----------|----------|---------|------|-------|
+| -------- | ----------- | ---------- | --------- | ------ | ------- |
 | Nexen | `.nexen-movie` | Nexen | Multi | ✅ | ✅ |
 | BK2 | `.bk2` | BizHawk | Multi | ✅ | ✅ |
 | LSMV | `.lsmv` | lsnes | SNES, GB | ✅ | ✅ |
@@ -34,7 +34,7 @@ Legend: ✅ Implemented | 🔲 Planned | ❌ Not supported
 
 The Nexen native format is a ZIP archive designed to be human-readable and easy to edit:
 
-```
+```text
 movie.nexen-movie (ZIP archive)
 ├── movie.json     # Metadata (JSON)
 ├── input.txt      # Input log (text, one line per frame)
@@ -73,7 +73,7 @@ movie.nexen-movie (ZIP archive)
 
 ### input.txt Format
 
-```
+```text
 // Nexen Movie Input Log
 // Game: Super Mario World
 // Author: TASer123
@@ -89,6 +89,7 @@ BY..UD.R.X.r|............|LAG
 ```
 
 Button legend (SNES): `B Y s S U D L R A X l r`
+
 - Uppercase = pressed, `.` = not pressed
 - `s` = Select, `S` = Start, `l` = L shoulder, `r` = R shoulder
 

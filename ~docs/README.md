@@ -5,7 +5,7 @@ This folder contains development documentation for Nexen contributions and custo
 ## 📖 Core Documentation
 
 | Document | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | [Architecture Overview](ARCHITECTURE-OVERVIEW.md) | High-level architecture and design |
 | [Code Documentation Style](CODE-DOCUMENTATION-STYLE.md) | Documentation standards |
 | [C++ Development Guide](CPP-DEVELOPMENT-GUIDE.md) | C++23 coding practices |
@@ -15,7 +15,7 @@ This folder contains development documentation for Nexen contributions and custo
 ## 🎮 Emulation Core Documentation
 
 | Document | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | [NES Core](NES-CORE.md) | 6502 CPU, PPU, APU emulation |
 | [SNES Core](SNES-CORE.md) | 65816 CPU, PPU, SPC700, coprocessors |
 | [GB/GBA Cores](GB-GBA-CORE.md) | LR35902, ARM7TDMI emulation |
@@ -26,7 +26,7 @@ This folder contains development documentation for Nexen contributions and custo
 ## 🎛️ Peripheral System Documentation
 
 | Document | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | [Input Subsystem](INPUT-SUBSYSTEM.md) | Controllers, input handling |
 | [Audio Subsystem](AUDIO-SUBSYSTEM.md) | Audio mixing, effects, recording |
 | [Video Rendering](VIDEO-RENDERING.md) | Filters, HUD, recording |
@@ -37,7 +37,7 @@ This folder contains development documentation for Nexen contributions and custo
 The Pansy export feature enables exporting and importing debug metadata in a universal format.
 
 | Document | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | **[📚 Documentation Index](pansy-export-index.md)** | Start here! |
 | [User Guide](pansy-export-user-guide.md) | End-user documentation |
 | [Tutorials](pansy-export-tutorials.md) | Step-by-step workflows |
@@ -47,7 +47,7 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 ### Design Documents
 
 | Document | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | [Integration Design](pansy-integration.md) | Original design |
 | [Roadmap](pansy-roadmap.md) | Future plans |
 | [Phase 7.5 Sync](phase-7.5-pansy-sync.md) | Sync feature design |
@@ -55,7 +55,7 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 ## 📁 Other Documentation
 
 | Folder | Description |
-|--------|-------------|
+| -------- | ------------- |
 | [DiztinGUIsh Integration](DiztinGUIsh_Integration/) | Integration with DiztinGUIsh |
 | [Modernization](modernization/) | C++ modernization notes |
 | [Testing](testing/) | Test documentation |
@@ -66,7 +66,7 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 ## 🔗 GitHub
 
 | Document | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | [GitHub Issues](github-issues.md) | Issue tracking notes |
 
 ## 📊 Project Status
@@ -74,7 +74,7 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 ### Branch: `cpp-modernization`
 
 | Metric | Value |
-|--------|-------|
+| -------- | ------- |
 | Unit Tests | 421 tests |
 | Benchmarks | 224 benchmarks |
 | Documentation Files | 13 core docs |

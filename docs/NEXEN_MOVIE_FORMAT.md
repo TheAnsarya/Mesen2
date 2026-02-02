@@ -17,7 +17,7 @@ The `.nexen-movie` format is a ZIP-based container for TAS (Tool-Assisted Speedr
 
 A `.nexen-movie` file is a standard ZIP archive containing:
 
-```
+```text
 movie.nexen-movie
 ├── movie.json       # Required: Metadata
 ├── input.txt        # Required: Input log
@@ -67,7 +67,7 @@ JSON file containing movie metadata.
 ### Field Descriptions
 
 | Field | Type | Required | Description |
-|-------|------|----------|-------------|
+| ------- | ------ | ---------- | ------------- |
 | `formatVersion` | string | Yes | Format version (currently "1.0") |
 | `emulatorVersion` | string | No | Emulator that created the movie |
 | `createdDate` | ISO 8601 | No | Creation timestamp |
@@ -92,7 +92,7 @@ JSON file containing movie metadata.
 ### System Types
 
 | Value | System |
-|-------|--------|
+| ------- | -------- |
 | `nes` | Nintendo Entertainment System |
 | `snes` | Super Nintendo |
 | `gb` | Game Boy |
@@ -106,7 +106,7 @@ JSON file containing movie metadata.
 ### Controller Types
 
 | Value | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `none` | No controller |
 | `gamepad` | Standard gamepad |
 | `mouse` | Mouse (SNES Mouse, etc.) |
@@ -122,7 +122,7 @@ Plain text file containing input for each frame, one line per frame.
 
 ### Format
 
-```
+```text
 [CMD:command]|P1_INPUT|P2_INPUT|...|[LAG]|[# comment]
 ```
 
@@ -135,12 +135,12 @@ Plain text file containing input for each frame, one line per frame.
 
 #### SNES (12 characters)
 
-```
+```text
 BYsSUDLRAXLR
 ```
 
 | Position | Button | Uppercase = Pressed |
-|----------|--------|---------------------|
+| ---------- | -------- | --------------------- |
 | 0 | B | B |
 | 1 | Y | Y |
 | 2 | Select | s |
@@ -158,12 +158,12 @@ Example: `BY..U...AX.r` = B + Y + Up + A + X + R pressed
 
 #### NES (8 characters)
 
-```
+```text
 RLDUSTBA
 ```
 
 | Position | Button |
-|----------|--------|
+| ---------- | -------- |
 | 0 | Right |
 | 1 | Left |
 | 2 | Down |
@@ -176,7 +176,7 @@ RLDUSTBA
 ### Special Markers
 
 | Marker | Description |
-|--------|-------------|
+| -------- | ------------- |
 | `LAG` | This frame is a lag frame (input not polled) |
 | `# text` | Comment for this frame |
 | `CMD:SOFT_RESET` | Soft reset |
@@ -188,7 +188,7 @@ RLDUSTBA
 
 ### Example
 
-```
+```text
 // Nexen Movie Input Log
 // Game: Super Mario World
 // Author: TASer123

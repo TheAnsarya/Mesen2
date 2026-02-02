@@ -4,7 +4,7 @@ This document describes the technical architecture and implementation details of
 
 ## Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           TAS Editor Architecture                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
@@ -61,7 +61,7 @@ public int CompressionThreshold { get; set; } = 300; // Frames before compressio
 #### Key Methods
 
 | Method | Description |
-|--------|-------------|
+| -------- | ------------- |
 | `CaptureCurrentState()` | Manually capture current frame |
 | `LoadState(frame)` | Load savestate for specific frame |
 | `SeekToFrameAsync(frame)` | Seek using nearest savestate |
@@ -71,7 +71,7 @@ public int CompressionThreshold { get; set; } = 300; // Frames before compressio
 #### Events
 
 | Event | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `SavestateCaptured` | Fired when new state captured |
 | `SavestateLoaded` | Fired when state loaded |
 | `SavestatesPruned` | Fired when states removed for memory |
@@ -90,7 +90,7 @@ Records player input during gameplay into TAS movies.
 #### Recording Modes
 
 | Mode | Behavior |
-|------|----------|
+| ------ | ---------- |
 | `Append` | Add frames to end of movie |
 | `Insert` | Insert frames at current position, shift later frames |
 | `Overwrite` | Replace existing frames starting at current position |
@@ -98,7 +98,7 @@ Records player input during gameplay into TAS movies.
 #### Key Methods
 
 | Method | Description |
-|--------|-------------|
+| -------- | ------------- |
 | `StartRecording(mode)` | Begin recording in specified mode |
 | `StopRecording()` | Stop recording |
 | `RecordFrame(inputs)` | Record single frame (called each frame) |
@@ -109,7 +109,7 @@ Records player input during gameplay into TAS movies.
 #### Events
 
 | Event | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `RecordingStarted` | Recording has begun |
 | `RecordingStopped` | Recording ended |
 | `FrameRecorded` | New frame recorded |
@@ -135,7 +135,7 @@ Custom Avalonia control for visual timeline editing.
 #### Styled Properties
 
 | Property | Type | Description |
-|----------|------|-------------|
+| ---------- | ------ | ------------- |
 | `Frames` | `List<FrameData>` | Frame data to display |
 | `SelectedFrame` | `int` | Currently selected frame |
 | `SelectionStart` | `int` | Selection range start |
@@ -149,7 +149,7 @@ Custom Avalonia control for visual timeline editing.
 #### Events
 
 | Event | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `CellClicked` | User clicked a cell (frame, button) |
 | `CellsPainted` | User painted cells (drag) |
 | `SelectionChanged` | Selection range changed |
@@ -237,6 +237,7 @@ RecordingMenuItems = new List<ContextMenuAction>
 The TAS Editor uses several core APIs:
 
 #### EmuApi
+
 ```csharp
 // Savestate management
 string statePath = EmuApi.SaveStateFile(filename);
@@ -248,6 +249,7 @@ EmuApi.ExecuteShortcut(EmulatorShortcut.Pause);
 ```
 
 #### InputApi
+
 ```csharp
 // Get current input state
 InputState state = InputApi.GetInputState();
@@ -257,6 +259,7 @@ InputApi.SetInputState(inputs);
 ```
 
 #### RecordApi
+
 ```csharp
 // Native movie operations
 RecordApi.StartRecording(new RecordMovieOptions {
@@ -281,6 +284,7 @@ public static void ExportMovie(MovieData movie, string path, string format);
 ### Adding New Movie Format
 
 1. Implement `IMovieFormat` in MovieConverter:
+
 ```csharp
 public class NewFormat : IMovieFormat
 {
@@ -290,7 +294,7 @@ public class NewFormat : IMovieFormat
 }
 ```
 
-2. Register in `MovieFormatRegistry`
+1. Register in `MovieFormatRegistry`
 
 ### Adding New System Layout
 
@@ -339,7 +343,7 @@ Avoid allocations and complex operations in these methods.
 
 Located in `Nexen.Tests/TAS/`:
 
-```
+```text
 GreenzoneManagerTests.cs
 InputRecorderTests.cs
 PianoRollControlTests.cs
@@ -373,7 +377,7 @@ private const bool DebugLogging = true;
 ### Common Issues
 
 | Issue | Likely Cause | Solution |
-|-------|--------------|----------|
+| ------- | -------------- | ---------- |
 | Desync after seek | Greenzone state corrupted | Clear greenzone, re-record |
 | High memory | Too many states | Increase capture interval |
 | Slow seek | No nearby state | Lower capture interval |
