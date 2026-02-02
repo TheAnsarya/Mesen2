@@ -7,8 +7,27 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Nexen.Config;
 
-namespace Nexen.Utilities; 
+namespace Nexen.Utilities;
+
+/// <summary>
+/// Provides color manipulation utilities with caching for performance.
+/// Supports automatic theme-aware color inversion for dark mode.
+/// </summary>
 public class ColorHelper {
+	// Cache for brushes by color (light theme)
+	private static readonly Dictionary<uint, SolidColorBrush> _brushCache = new();
+	// Cache for brushes by color (dark theme - inverted)
+	private static readonly Dictionary<uint, SolidColorBrush> _darkBrushCache = new();
+	// Cache for pens by color (light theme)
+	private static readonly Dictionary<uint, Pen> _penCache = new();
+	// Cache for pens by color (dark theme - inverted)
+	private static readonly Dictionary<uint, Pen> _darkPenCache = new();
+	// Track current theme to invalidate cache on theme change
+	private static NexenTheme _cachedTheme = NexenTheme.Light;
+
+	/// <summary>
+	/// Converts an RGB color to HSL color space.
+	/// </summary>
 	public static HslColor RgbToHsl(Color rgbColor) {
 		double r = rgbColor.R / 255.0;
 		double g = rgbColor.G / 255.0;
@@ -88,24 +107,70 @@ public class ColorHelper {
 		return HslToRgb(hsl);
 	}
 
+	/// <summary>
+	/// Invalidates the brush/pen cache if theme has changed.
+	/// </summary>
+	private static void CheckThemeChanged() {
+		var currentTheme = ConfigManager.ActiveTheme;
+		if (currentTheme != _cachedTheme) {
+			_cachedTheme = currentTheme;
+			// Theme changed, clear caches
+			_brushCache.Clear();
+			_darkBrushCache.Clear();
+			_penCache.Clear();
+			_darkPenCache.Clear();
+		}
+	}
+
+	/// <summary>
+	/// Gets a cached SolidColorBrush for the specified color, with automatic dark mode inversion.
+	/// </summary>
 	public static SolidColorBrush GetBrush(Color color) {
+		CheckThemeChanged();
+		uint key = color.ToUInt32();
+
 		if (ConfigManager.ActiveTheme == NexenTheme.Dark) {
-			return new SolidColorBrush(InvertBrightness(color));
+			if (!_darkBrushCache.TryGetValue(key, out var brush)) {
+				brush = new SolidColorBrush(InvertBrightness(color));
+				_darkBrushCache[key] = brush;
+			}
+			return brush;
 		} else {
-			return new SolidColorBrush(color);
+			if (!_brushCache.TryGetValue(key, out var brush)) {
+				brush = new SolidColorBrush(color);
+				_brushCache[key] = brush;
+			}
+			return brush;
 		}
 	}
 
+	/// <summary>
+	/// Gets a cached SolidColorBrush for the specified brush's color, with automatic dark mode inversion.
+	/// </summary>
 	public static SolidColorBrush GetBrush(SolidColorBrush b) {
-		if (ConfigManager.ActiveTheme == NexenTheme.Dark) {
-			return new SolidColorBrush(InvertBrightness(b.Color));
-		} else {
-			return new SolidColorBrush(b.Color);
-		}
+		return GetBrush(b.Color);
 	}
 
+	/// <summary>
+	/// Gets a cached Pen for the specified color, with automatic dark mode inversion.
+	/// </summary>
 	public static Pen GetPen(Color color) {
-		return new Pen(GetBrush(color));
+		CheckThemeChanged();
+		uint key = color.ToUInt32();
+
+		if (ConfigManager.ActiveTheme == NexenTheme.Dark) {
+			if (!_darkPenCache.TryGetValue(key, out var pen)) {
+				pen = new Pen(GetBrush(color));
+				_darkPenCache[key] = pen;
+			}
+			return pen;
+		} else {
+			if (!_penCache.TryGetValue(key, out var pen)) {
+				pen = new Pen(GetBrush(color));
+				_penCache[key] = pen;
+			}
+			return pen;
+		}
 	}
 
 	public static Color GetColor(Color color) {
@@ -162,8 +227,20 @@ public class ColorHelper {
 		return Colors.White;
 	}
 
+	/// <summary>
+	/// Explicitly clears all brush and pen caches.
+	/// Call this when theme changes or when memory needs to be freed.
+	/// </summary>
+	public static void ClearCache() {
+		_brushCache.Clear();
+		_darkBrushCache.Clear();
+		_penCache.Clear();
+		_darkPenCache.Clear();
+	}
+
 	public static void InvalidateControlOnThemeChange(Control ctrl, Action? callback = null) {
 		ctrl.ActualThemeVariantChanged += (s, e) => {
+			ClearCache();
 			callback?.Invoke();
 			ctrl.InvalidateVisual();
 		};

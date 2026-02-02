@@ -43,6 +43,11 @@ public static class BreakpointManager {
 	private static List<Breakpoint> _breakpoints = new List<Breakpoint>();
 
 	/// <summary>
+	/// Cached read-only view of breakpoints - invalidated when breakpoints change.
+	/// </summary>
+	private static ReadOnlyCollection<Breakpoint>? _cachedBreakpoints = null;
+
+	/// <summary>
 	/// The list of temporary breakpoints (e.g., "Run to cursor").
 	/// </summary>
 	private static List<Breakpoint> _temporaryBreakpoints = new List<Breakpoint>();
@@ -56,17 +61,27 @@ public static class BreakpointManager {
 	private static HashSet<CpuType> _activeCpuTypes = new HashSet<CpuType>();
 
 	/// <summary>
+	/// Invalidates the cached breakpoints collection.
+	/// Call this whenever _breakpoints is modified.
+	/// </summary>
+	private static void InvalidateCache() {
+		_cachedBreakpoints = null;
+	}
+
+	/// <summary>
 	/// Gets a read-only collection of all user-defined breakpoints.
 	/// </summary>
 	/// <value>
-	/// A snapshot of the current breakpoints as a read-only collection.
+	/// A cached snapshot of the current breakpoints as a read-only collection.
 	/// </value>
 	/// <remarks>
-	/// Returns a copy to prevent external modification. For performance-critical
-	/// code, consider using <see cref="GetBreakpoints(CpuType)"/> with a specific CPU type.
+	/// Returns a cached copy that is invalidated when breakpoints change.
+	/// For performance-critical code, consider using <see cref="GetBreakpoints(CpuType)"/> with a specific CPU type.
 	/// </remarks>
 	public static ReadOnlyCollection<Breakpoint> Breakpoints {
-		get { return _breakpoints.ToList().AsReadOnly(); }
+		get {
+			return _cachedBreakpoints ??= _breakpoints.ToList().AsReadOnly();
+		}
 	}
 
 	/// <summary>
@@ -123,6 +138,7 @@ public static class BreakpointManager {
 	/// </summary>
 	/// <param name="bp">The specific breakpoint that changed, or <c>null</c> for bulk operations.</param>
 	public static void RefreshBreakpoints(Breakpoint? bp = null) {
+		InvalidateCache();
 		BreakpointsChanged?.Invoke(bp, EventArgs.Empty);
 		SetBreakpoints();
 	}
@@ -132,6 +148,7 @@ public static class BreakpointManager {
 	/// </summary>
 	public static void ClearBreakpoints() {
 		_breakpoints = new();
+		InvalidateCache();
 		RefreshBreakpoints();
 	}
 
