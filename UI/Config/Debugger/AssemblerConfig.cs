@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Media;
 
-namespace Nexen.Config {
-	public class AssemblerConfig : BaseWindowConfig<AssemblerConfig> {
-	}
+namespace Nexen.Config; 
+public class AssemblerConfig : BaseWindowConfig<AssemblerConfig> {
 }

@@ -9,67 +9,66 @@ using Avalonia.Threading;
 using Nexen.Utilities;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows {
-	public partial class UpdatePromptWindow : NexenWindow {
-		private UpdatePromptViewModel _model;
+namespace Nexen.Windows; 
+public partial class UpdatePromptWindow : NexenWindow {
+	private UpdatePromptViewModel _model;
 
-		[Obsolete("For designer only")]
-		public UpdatePromptWindow() : this(new(new(), new())) { }
+	[Obsolete("For designer only")]
+	public UpdatePromptWindow() : this(new(new(), new())) { }
 
-		public UpdatePromptWindow(UpdatePromptViewModel model) {
-			_model = model;
-			DataContext = model;
+	public UpdatePromptWindow(UpdatePromptViewModel model) {
+		_model = model;
+		DataContext = model;
 
-			InitializeComponent();
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
+	}
+
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
+
+	protected override void OnClosing(WindowClosingEventArgs e) {
+		base.OnClosing(e);
+		if (_model.IsUpdating) {
+			e.Cancel = true;
+		}
+	}
+
+	private void OnUpdateClick(object sender, RoutedEventArgs e) {
+		if (_model.FileInfo == null || UpdateHelper.GetCommitHash() == null) {
+			NexenMsgBox.Show(null, "AutoUpdateNotSupported", MessageBoxButtons.OK, MessageBoxIcon.Info);
+			return;
 		}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+		_model.Progress = 0;
+		_model.IsUpdating = true;
 
-		protected override void OnClosing(WindowClosingEventArgs e) {
-			base.OnClosing(e);
-			if (_model.IsUpdating) {
-				e.Cancel = true;
-			}
-		}
-
-		private void OnUpdateClick(object sender, RoutedEventArgs e) {
-			if (_model.FileInfo == null || UpdateHelper.GetCommitHash() == null) {
-				NexenMsgBox.Show(null, "AutoUpdateNotSupported", MessageBoxButtons.OK, MessageBoxIcon.Info);
+		Task.Run(async () => {
+			bool result;
+			try {
+				result = await _model.UpdateNexen(this);
+			} catch (Exception ex) {
+				result = false;
+				Dispatcher.UIThread.Post(() => {
+					_model.IsUpdating = false;
+					NexenMsgBox.ShowException(ex);
+				});
 				return;
 			}
 
-			_model.Progress = 0;
-			_model.IsUpdating = true;
-
-			Task.Run(async () => {
-				bool result;
-				try {
-					result = await _model.UpdateNexen(this);
-				} catch (Exception ex) {
-					result = false;
-					Dispatcher.UIThread.Post(() => {
-						_model.IsUpdating = false;
-						NexenMsgBox.ShowException(ex);
-					});
-					return;
+			Dispatcher.UIThread.Post(() => {
+				_model.IsUpdating = false;
+				if (result) {
+					Close(true);
 				}
-
-				Dispatcher.UIThread.Post(() => {
-					_model.IsUpdating = false;
-					if (result) {
-						Close(true);
-					}
-				});
 			});
-		}
+		});
+	}
 
-		private void OnCancelClick(object sender, RoutedEventArgs e) {
-			Close(false);
-		}
+	private void OnCancelClick(object sender, RoutedEventArgs e) {
+		Close(false);
 	}
 }

@@ -13,31 +13,30 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using Nexen.Windows;
 
-namespace Nexen.Views {
-	public class PreferencesConfigView : UserControl {
-		public PreferencesConfigView() {
-			InitializeComponent();
-		}
+namespace Nexen.Views; 
+public class PreferencesConfigView : UserControl {
+	public PreferencesConfigView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		private void btnResetLagCounter_OnClick(object sender, RoutedEventArgs e) {
-			InputApi.ResetLagCounter();
-		}
+	private void btnResetLagCounter_OnClick(object sender, RoutedEventArgs e) {
+		InputApi.ResetLagCounter();
+	}
 
-		private void btnChangeStorageFolder_OnClick(object sender, RoutedEventArgs e) {
-			ShowSelectFolderWindow();
-		}
+	private void btnChangeStorageFolder_OnClick(object sender, RoutedEventArgs e) {
+		ShowSelectFolderWindow();
+	}
 
-		private async void ShowSelectFolderWindow() {
-			SelectStorageFolderWindow wnd = new();
-			if (await wnd.ShowCenteredDialog<bool>(this.GetVisualRoot() as Visual)) {
-				(this.GetVisualRoot() as Window)?.Close();
-				ApplicationHelper.GetMainWindow()?.Close();
-				ConfigManager.RestartNexen();
-			}
+	private async void ShowSelectFolderWindow() {
+		SelectStorageFolderWindow wnd = new();
+		if (await wnd.ShowCenteredDialog<bool>(this.GetVisualRoot() as Visual)) {
+			(this.GetVisualRoot() as Window)?.Close();
+			ApplicationHelper.GetMainWindow()?.Close();
+			ConfigManager.RestartNexen();
 		}
 	}
 }

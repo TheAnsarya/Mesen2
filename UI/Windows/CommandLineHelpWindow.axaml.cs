@@ -11,30 +11,29 @@ using Avalonia.Threading;
 using Nexen.Interop;
 using Nexen.Utilities;
 
-namespace Nexen.Windows {
-	public class CommandLineHelpWindow : NexenWindow {
-		public List<CommandLineTabEntry> HelpTabs { get; } = new();
+namespace Nexen.Windows; 
+public class CommandLineHelpWindow : NexenWindow {
+	public List<CommandLineTabEntry> HelpTabs { get; } = new();
 
-		public CommandLineHelpWindow() {
-			Dictionary<string, string> switchesPerCategory = CommandLineHelper.GetAvailableSwitches();
-			foreach (var kvp in switchesPerCategory) {
-				HelpTabs.Add(new() { Name = kvp.Key, Content = kvp.Value });
-			}
-
-			InitializeComponent();
+	public CommandLineHelpWindow() {
+		Dictionary<string, string> switchesPerCategory = CommandLineHelper.GetAvailableSwitches();
+		foreach (var kvp in switchesPerCategory) {
+			HelpTabs.Add(new() { Name = kvp.Key, Content = kvp.Value });
 		}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
-
-		private void btnOk_OnClick(object? sender, RoutedEventArgs e) {
-			Close();
-		}
+		InitializeComponent();
 	}
 
-	public class CommandLineTabEntry {
-		public string Name { get; set; } = "";
-		public string Content { get; set; } = "";
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
+
+	private void btnOk_OnClick(object? sender, RoutedEventArgs e) {
+		Close();
+	}
+}
+
+public class CommandLineTabEntry {
+	public string Name { get; set; } = "";
+	public string Content { get; set; } = "";
 }

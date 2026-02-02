@@ -9,30 +9,29 @@ using Nexen.Config;
 using Nexen.Interop;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows {
-	public class NetplayConnectWindow : NexenWindow {
-		public NetplayConnectWindow() {
-			InitializeComponent();
+namespace Nexen.Windows; 
+public class NetplayConnectWindow : NexenWindow {
+	public NetplayConnectWindow() {
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
-		}
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e) {
-			NetplayConfig cfg = (NetplayConfig)DataContext!;
-			ConfigManager.Config.Netplay = cfg.Clone();
+	private void Ok_OnClick(object sender, RoutedEventArgs e) {
+		NetplayConfig cfg = (NetplayConfig)DataContext!;
+		ConfigManager.Config.Netplay = cfg.Clone();
 
-			Close(true);
+		Close(true);
 
-			Task.Run(() => NetplayApi.Connect(cfg.Host, cfg.Port, cfg.Password, false));
-		}
+		Task.Run(() => NetplayApi.Connect(cfg.Host, cfg.Port, cfg.Password, false));
+	}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
-			Close(false);
-		}
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close(false);
 	}
 }

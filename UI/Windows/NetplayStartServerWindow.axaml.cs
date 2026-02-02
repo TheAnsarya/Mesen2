@@ -7,30 +7,29 @@ using Nexen.Config;
 using Nexen.Interop;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows {
-	public class NetplayStartServerWindow : NexenWindow {
-		public NetplayStartServerWindow() {
-			InitializeComponent();
+namespace Nexen.Windows; 
+public class NetplayStartServerWindow : NexenWindow {
+	public NetplayStartServerWindow() {
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
-		}
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e) {
-			NetplayConfig cfg = (NetplayConfig)DataContext!;
-			ConfigManager.Config.Netplay = cfg.Clone();
+	private void Ok_OnClick(object sender, RoutedEventArgs e) {
+		NetplayConfig cfg = (NetplayConfig)DataContext!;
+		ConfigManager.Config.Netplay = cfg.Clone();
 
-			Close(true);
+		Close(true);
 
-			NetplayApi.StartServer(cfg.ServerPort, cfg.ServerPassword);
-		}
+		NetplayApi.StartServer(cfg.ServerPort, cfg.ServerPassword);
+	}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
-			Close(false);
-		}
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close(false);
 	}
 }

@@ -7,8 +7,7 @@ using Nexen.Interop;
 using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.Config {
-	public class SmsDebuggerConfig : ViewModelBase {
-		[Reactive] public bool BreakOnNopLoad { get; set; } = false;
-	}
+namespace Nexen.Config; 
+public class SmsDebuggerConfig : ViewModelBase {
+	[Reactive] public bool BreakOnNopLoad { get; set; } = false;
 }

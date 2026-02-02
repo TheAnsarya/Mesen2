@@ -8,14 +8,13 @@ using Avalonia.Media;
 using Nexen.Config;
 using Nexen.Interop;
 
-namespace Nexen.Debugger.Views {
-	public class DebuggerOptionsView : UserControl {
-		public DebuggerOptionsView() {
-			InitializeComponent();
-		}
+namespace Nexen.Debugger.Views; 
+public class DebuggerOptionsView : UserControl {
+	public DebuggerOptionsView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

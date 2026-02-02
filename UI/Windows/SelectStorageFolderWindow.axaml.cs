@@ -9,44 +9,43 @@ using Avalonia.Markup.Xaml;
 using Nexen.Config;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows {
-	public class SelectStorageFolderWindow : NexenWindow {
-		private SelectStorageFolderViewModel _model;
+namespace Nexen.Windows; 
+public class SelectStorageFolderWindow : NexenWindow {
+	private SelectStorageFolderViewModel _model;
 
-		public SelectStorageFolderWindow() {
-			_model = new SelectStorageFolderViewModel() { StoreInUserProfile = ConfigManager.HomeFolder == ConfigManager.DefaultDocumentsFolder };
-			DataContext = _model;
+	public SelectStorageFolderWindow() {
+		_model = new SelectStorageFolderViewModel() { StoreInUserProfile = ConfigManager.HomeFolder == ConfigManager.DefaultDocumentsFolder };
+		DataContext = _model;
 
-			InitializeComponent();
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
+	}
+
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
+
+	protected override void OnClosing(WindowClosingEventArgs e) {
+		if (_model.IsCopying) {
+			e.Cancel = true;
 		}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+		base.OnClosing(e);
+	}
 
-		protected override void OnClosing(WindowClosingEventArgs e) {
-			if (_model.IsCopying) {
-				e.Cancel = true;
-			}
-
-			base.OnClosing(e);
+	private async void StartProcess() {
+		if (await _model.MigrateData()) {
+			Close(true);
 		}
+	}
 
-		private async void StartProcess() {
-			if (await _model.MigrateData()) {
-				Close(true);
-			}
-		}
+	private void Ok_OnClick(object sender, RoutedEventArgs e) {
+		StartProcess();
+	}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e) {
-			StartProcess();
-		}
-
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
-			Close(false);
-		}
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close(false);
 	}
 }

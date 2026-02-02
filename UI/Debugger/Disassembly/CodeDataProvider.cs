@@ -2,31 +2,30 @@ using Avalonia.Controls;
 using Nexen.Debugger.Controls;
 using Nexen.Interop;
 
-namespace Nexen.Debugger.Disassembly {
-	public class CodeDataProvider : ICodeDataProvider {
-		private int _lineCount;
-		protected CpuType _type;
+namespace Nexen.Debugger.Disassembly; 
+public class CodeDataProvider : ICodeDataProvider {
+	private int _lineCount;
+	protected CpuType _type;
 
-		public CodeDataProvider(CpuType type) {
-			_type = type;
+	public CodeDataProvider(CpuType type) {
+		_type = type;
 
-			if (Design.IsDesignMode) {
-				return;
-			}
-
-			_lineCount = DebugApi.GetMemorySize(type.ToMemoryType());
+		if (Design.IsDesignMode) {
+			return;
 		}
 
-		public CpuType CpuType => _type;
+		_lineCount = DebugApi.GetMemorySize(type.ToMemoryType());
+	}
 
-		public int GetLineCount() => _lineCount;
+	public CpuType CpuType => _type;
 
-		public CodeLineData[] GetCodeLines(int startPosition, int rowCount) {
-			return DebugApi.GetDisassemblyOutput(_type, (uint)startPosition, (uint)rowCount);
-		}
+	public int GetLineCount() => _lineCount;
 
-		public int GetRowAddress(int address, int rowOffset) {
-			return DebugApi.GetDisassemblyRowAddress(_type, (uint)address, rowOffset);
-		}
+	public CodeLineData[] GetCodeLines(int startPosition, int rowCount) {
+		return DebugApi.GetDisassemblyOutput(_type, (uint)startPosition, (uint)rowCount);
+	}
+
+	public int GetRowAddress(int address, int rowOffset) {
+		return DebugApi.GetDisassemblyRowAddress(_type, (uint)address, rowOffset);
 	}
 }

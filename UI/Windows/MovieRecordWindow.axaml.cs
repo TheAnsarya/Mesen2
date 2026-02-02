@@ -8,39 +8,38 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows {
-	public class MovieRecordWindow : NexenWindow {
-		public MovieRecordWindow() {
-			InitializeComponent();
+namespace Nexen.Windows; 
+public class MovieRecordWindow : NexenWindow {
+	public MovieRecordWindow() {
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
+	}
+
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
+
+	private async void OnBrowseClick(object sender, RoutedEventArgs e) {
+		MovieRecordConfigViewModel model = (MovieRecordConfigViewModel)DataContext!;
+
+		string? filename = await FileDialogHelper.SaveFile(ConfigManager.MovieFolder, EmuApi.GetRomInfo().GetRomName() + "." + FileDialogHelper.NexenMovieExt, VisualRoot, FileDialogHelper.NexenMovieExt);
+		if (filename != null) {
+			model.SavePath = filename;
 		}
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void Ok_OnClick(object sender, RoutedEventArgs e) {
+		MovieRecordConfigViewModel model = (MovieRecordConfigViewModel)DataContext!;
+		model.SaveConfig();
 
-		private async void OnBrowseClick(object sender, RoutedEventArgs e) {
-			MovieRecordConfigViewModel model = (MovieRecordConfigViewModel)DataContext!;
+		RecordApi.MovieRecord(new RecordMovieOptions(model.SavePath, model.Config.Author, model.Config.Description, model.Config.RecordFrom));
 
-			string? filename = await FileDialogHelper.SaveFile(ConfigManager.MovieFolder, EmuApi.GetRomInfo().GetRomName() + "." + FileDialogHelper.NexenMovieExt, VisualRoot, FileDialogHelper.NexenMovieExt);
-			if (filename != null) {
-				model.SavePath = filename;
-			}
-		}
+		Close(true);
+	}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e) {
-			MovieRecordConfigViewModel model = (MovieRecordConfigViewModel)DataContext!;
-			model.SaveConfig();
-
-			RecordApi.MovieRecord(new RecordMovieOptions(model.SavePath, model.Config.Author, model.Config.Description, model.Config.RecordFrom));
-
-			Close(true);
-		}
-
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
-			Close(false);
-		}
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close(false);
 	}
 }

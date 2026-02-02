@@ -7,18 +7,17 @@ using Nexen.Config;
 using Nexen.Interop;
 using Nexen.ViewModels;
 
-namespace Nexen {
-	public class NativeRenderer : NativeControlHost {
-		public NativeRenderer() {
-			Focusable = true;
-		}
+namespace Nexen; 
+public class NativeRenderer : NativeControlHost {
+	public NativeRenderer() {
+		Focusable = true;
+	}
 
-		public IntPtr Handle { get; private set; }
+	public IntPtr Handle { get; private set; }
 
-		protected override IPlatformHandle CreateNativeControlCore(IPlatformHandle parent) {
-			var handle = base.CreateNativeControlCore(parent);
-			Handle = handle.Handle;
-			return handle;
-		}
+	protected override IPlatformHandle CreateNativeControlCore(IPlatformHandle parent) {
+		var handle = base.CreateNativeControlCore(parent);
+		Handle = handle.Handle;
+		return handle;
 	}
 }

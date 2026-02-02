@@ -5,18 +5,17 @@ using Avalonia.Markup.Xaml;
 using Nexen.Config;
 using Nexen.Utilities;
 
-namespace Nexen.Views {
-	public class VideoConfigView : UserControl {
-		public VideoConfigView() {
-			InitializeComponent();
-		}
+namespace Nexen.Views; 
+public class VideoConfigView : UserControl {
+	public VideoConfigView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		private void btnPreset_OnClick(object sender, RoutedEventArgs e) {
-			((Button)sender).ContextMenu?.Open();
-		}
+	private void btnPreset_OnClick(object sender, RoutedEventArgs e) {
+		((Button)sender).ContextMenu?.Open();
 	}
 }

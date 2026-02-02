@@ -7,28 +7,27 @@ using DataBoxControl;
 using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
-namespace Nexen.Debugger.Views {
-	public class CallStackView : UserControl {
-		public CallStackView() {
-			InitializeComponent();
+namespace Nexen.Debugger.Views; 
+public class CallStackView : UserControl {
+	public CallStackView() {
+		InitializeComponent();
+	}
+
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
+
+	protected override void OnDataContextChanged(EventArgs e) {
+		if (DataContext is CallStackViewModel model) {
+			model.InitContextMenu(this);
 		}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+		base.OnDataContextChanged(e);
+	}
 
-		protected override void OnDataContextChanged(EventArgs e) {
-			if (DataContext is CallStackViewModel model) {
-				model.InitContextMenu(this);
-			}
-
-			base.OnDataContextChanged(e);
-		}
-
-		private void OnCellDoubleClick(DataBoxCell cell) {
-			if (cell.DataContext is StackInfo stack && DataContext is CallStackViewModel model) {
-				model.GoToLocation(stack);
-			}
+	private void OnCellDoubleClick(DataBoxCell cell) {
+		if (cell.DataContext is StackInfo stack && DataContext is CallStackViewModel model) {
+			model.GoToLocation(stack);
 		}
 	}
 }

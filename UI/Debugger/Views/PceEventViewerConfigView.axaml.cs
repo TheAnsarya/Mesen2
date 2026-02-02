@@ -2,14 +2,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Nexen.Debugger.Views {
-	public class PceEventViewerConfigView : UserControl {
-		public PceEventViewerConfigView() {
-			InitializeComponent();
-		}
+namespace Nexen.Debugger.Views; 
+public class PceEventViewerConfigView : UserControl {
+	public PceEventViewerConfigView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

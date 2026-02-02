@@ -1,14 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Nexen.Views {
-	public class DefaultControllerView : UserControl {
-		public DefaultControllerView() {
-			InitializeComponent();
-		}
+namespace Nexen.Views; 
+public class DefaultControllerView : UserControl {
+	public DefaultControllerView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

@@ -8,14 +8,13 @@ using Nexen.Utilities;
 using Nexen.ViewModels;
 using Nexen.Windows;
 
-namespace Nexen.Debugger.Views {
-	public class ControllerInputView : UserControl {
-		public ControllerInputView() {
-			InitializeComponent();
-		}
+namespace Nexen.Debugger.Views; 
+public class ControllerInputView : UserControl {
+	public ControllerInputView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

@@ -5,50 +5,49 @@ using Nexen.Config;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.ViewModels {
-	public class SnesInputConfigViewModel : DisposableViewModel {
-		[Reactive] public SnesConfig Config { get; set; }
+namespace Nexen.ViewModels; 
+public class SnesInputConfigViewModel : DisposableViewModel {
+	[Reactive] public SnesConfig Config { get; set; }
 
-		[ObservableAsProperty] public bool HasMultitap1 { get; }
-		[ObservableAsProperty] public bool HasMultitap2 { get; }
+	[ObservableAsProperty] public bool HasMultitap1 { get; }
+	[ObservableAsProperty] public bool HasMultitap2 { get; }
 
-		public Enum[] AvailableControllerTypesP1 => new Enum[] {
-			ControllerType.None,
-			ControllerType.SnesController,
-			ControllerType.SnesMouse,
-			ControllerType.SuperScope,
-			ControllerType.Multitap,
-			ControllerType.SnesRumbleController,
-		};
+	public Enum[] AvailableControllerTypesP1 => new Enum[] {
+		ControllerType.None,
+		ControllerType.SnesController,
+		ControllerType.SnesMouse,
+		ControllerType.SuperScope,
+		ControllerType.Multitap,
+		ControllerType.SnesRumbleController,
+	};
 
-		public Enum[] AvailableControllerTypesP2 => new Enum[] {
-			ControllerType.None,
-			ControllerType.SnesController,
-			ControllerType.SnesMouse,
-			ControllerType.SuperScope,
-			ControllerType.Multitap
-		};
+	public Enum[] AvailableControllerTypesP2 => new Enum[] {
+		ControllerType.None,
+		ControllerType.SnesController,
+		ControllerType.SnesMouse,
+		ControllerType.SuperScope,
+		ControllerType.Multitap
+	};
 
-		public Enum[] AvailableControllerTypesMultitap => new Enum[] {
-			ControllerType.None,
-			ControllerType.SnesController,
-			ControllerType.SnesMouse,
-			ControllerType.SuperScope,
-		};
+	public Enum[] AvailableControllerTypesMultitap => new Enum[] {
+		ControllerType.None,
+		ControllerType.SnesController,
+		ControllerType.SnesMouse,
+		ControllerType.SuperScope,
+	};
 
-		[Obsolete("For designer only")]
-		public SnesInputConfigViewModel() : this(new SnesConfig()) { }
+	[Obsolete("For designer only")]
+	public SnesInputConfigViewModel() : this(new SnesConfig()) { }
 
-		public SnesInputConfigViewModel(SnesConfig config) {
-			Config = config;
+	public SnesInputConfigViewModel(SnesConfig config) {
+		Config = config;
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type)
-				.Select(x => x == ControllerType.Multitap)
-				.ToPropertyEx(this, x => x.HasMultitap1));
+		AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type)
+			.Select(x => x == ControllerType.Multitap)
+			.ToPropertyEx(this, x => x.HasMultitap1));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Port2.Type)
-				.Select(x => x == ControllerType.Multitap)
-				.ToPropertyEx(this, x => x.HasMultitap2));
-		}
+		AddDisposable(this.WhenAnyValue(x => x.Config.Port2.Type)
+			.Select(x => x == ControllerType.Multitap)
+			.ToPropertyEx(this, x => x.HasMultitap2));
 	}
 }

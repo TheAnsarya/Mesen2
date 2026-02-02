@@ -8,47 +8,46 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows {
-	public class VideoRecordWindow : NexenWindow {
-		public VideoRecordWindow() {
-			InitializeComponent();
+namespace Nexen.Windows; 
+public class VideoRecordWindow : NexenWindow {
+	public VideoRecordWindow() {
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
+	}
+
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
+
+	private async void OnBrowseClick(object sender, RoutedEventArgs e) {
+		VideoRecordConfigViewModel model = (VideoRecordConfigViewModel)DataContext!;
+		bool isGif = model.Config.Codec == VideoCodec.GIF;
+
+		string initFilename = EmuApi.GetRomInfo().GetRomName() + (isGif ? ".gif" : ".avi");
+		string? filename = await FileDialogHelper.SaveFile(ConfigManager.AviFolder, initFilename, VisualRoot, isGif ? FileDialogHelper.GifExt : FileDialogHelper.AviExt);
+
+		if (filename != null) {
+			model.SavePath = filename;
 		}
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void Ok_OnClick(object sender, RoutedEventArgs e) {
+		VideoRecordConfigViewModel model = (VideoRecordConfigViewModel)DataContext!;
+		model.SaveConfig();
 
-		private async void OnBrowseClick(object sender, RoutedEventArgs e) {
-			VideoRecordConfigViewModel model = (VideoRecordConfigViewModel)DataContext!;
-			bool isGif = model.Config.Codec == VideoCodec.GIF;
+		RecordApi.AviRecord(model.SavePath, new RecordAviOptions() {
+			Codec = model.Config.Codec,
+			CompressionLevel = model.Config.CompressionLevel,
+			RecordSystemHud = model.Config.RecordSystemHud,
+			RecordInputHud = model.Config.RecordInputHud
+		});
 
-			string initFilename = EmuApi.GetRomInfo().GetRomName() + (isGif ? ".gif" : ".avi");
-			string? filename = await FileDialogHelper.SaveFile(ConfigManager.AviFolder, initFilename, VisualRoot, isGif ? FileDialogHelper.GifExt : FileDialogHelper.AviExt);
+		Close(true);
+	}
 
-			if (filename != null) {
-				model.SavePath = filename;
-			}
-		}
-
-		private void Ok_OnClick(object sender, RoutedEventArgs e) {
-			VideoRecordConfigViewModel model = (VideoRecordConfigViewModel)DataContext!;
-			model.SaveConfig();
-
-			RecordApi.AviRecord(model.SavePath, new RecordAviOptions() {
-				Codec = model.Config.Codec,
-				CompressionLevel = model.Config.CompressionLevel,
-				RecordSystemHud = model.Config.RecordSystemHud,
-				RecordInputHud = model.Config.RecordInputHud
-			});
-
-			Close(true);
-		}
-
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
-			Close(false);
-		}
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close(false);
 	}
 }

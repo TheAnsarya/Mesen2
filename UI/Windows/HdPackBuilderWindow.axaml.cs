@@ -8,28 +8,27 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows {
-	public class HdPackBuilderWindow : NexenWindow {
-		private HdPackBuilderViewModel _model;
+namespace Nexen.Windows; 
+public class HdPackBuilderWindow : NexenWindow {
+	private HdPackBuilderViewModel _model;
 
-		public HdPackBuilderWindow() {
-			_model = new HdPackBuilderViewModel();
-			DataContext = _model;
+	public HdPackBuilderWindow() {
+		_model = new HdPackBuilderViewModel();
+		DataContext = _model;
 
-			InitializeComponent();
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
-		}
+	}
 
-		protected override void OnClosing(WindowClosingEventArgs e) {
-			base.OnClosing(e);
-			_model.StopRecording();
-			_model.Dispose();
-		}
+	protected override void OnClosing(WindowClosingEventArgs e) {
+		base.OnClosing(e);
+		_model.StopRecording();
+		_model.Dispose();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

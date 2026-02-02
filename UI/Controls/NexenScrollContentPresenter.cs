@@ -12,15 +12,14 @@ using Avalonia.Styling;
 using DataBoxControl;
 using DataBoxControl.Primitives;
 
-namespace Nexen.Controls {
-	public class NexenScrollContentPresenter : ScrollContentPresenter {
-		protected override Type StyleKeyOverride => typeof(ScrollContentPresenter);
+namespace Nexen.Controls; 
+public class NexenScrollContentPresenter : ScrollContentPresenter {
+	protected override Type StyleKeyOverride => typeof(ScrollContentPresenter);
 
-		protected override void OnPointerWheelChanged(PointerWheelEventArgs e) {
-			if (!e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
-				//Skip event if control is pressed, because this is used to zoom in/out
-				base.OnPointerWheelChanged(e);
-			}
+	protected override void OnPointerWheelChanged(PointerWheelEventArgs e) {
+		if (!e.KeyModifiers.HasFlag(KeyModifiers.Control)) {
+			//Skip event if control is pressed, because this is used to zoom in/out
+			base.OnPointerWheelChanged(e);
 		}
 	}
 }

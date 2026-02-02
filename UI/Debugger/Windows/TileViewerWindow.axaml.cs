@@ -10,64 +10,63 @@ using Nexen.Debugger.Utilities;
 using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
-namespace Nexen.Debugger.Windows {
-	public class TileViewerWindow : NexenWindow, INotificationHandler {
-		private TileViewerViewModel _model;
+namespace Nexen.Debugger.Windows; 
+public class TileViewerWindow : NexenWindow, INotificationHandler {
+	private TileViewerViewModel _model;
 
-		[Obsolete("For designer only")]
-		public TileViewerWindow() : this(CpuType.Snes) { }
+	[Obsolete("For designer only")]
+	public TileViewerWindow() : this(CpuType.Snes) { }
 
-		public TileViewerWindow(CpuType cpuType) {
-			InitializeComponent();
+	public TileViewerWindow(CpuType cpuType) {
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
 
-			ScrollPictureViewer scrollViewer = this.GetControl<ScrollPictureViewer>("picViewer");
-			PictureViewer picViewer = scrollViewer.InnerViewer;
-			_model = new TileViewerViewModel(cpuType, picViewer, scrollViewer, this);
-			DataContext = _model;
+		ScrollPictureViewer scrollViewer = this.GetControl<ScrollPictureViewer>("picViewer");
+		PictureViewer picViewer = scrollViewer.InnerViewer;
+		_model = new TileViewerViewModel(cpuType, picViewer, scrollViewer, this);
+		DataContext = _model;
 
-			_model.Config.LoadWindowSettings(this);
+		_model.Config.LoadWindowSettings(this);
 
-			if (Design.IsDesignMode) {
-				return;
-			}
-
-			MouseViewerModelEvents.InitEvents(_model, this, picViewer);
+		if (Design.IsDesignMode) {
+			return;
 		}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
+		MouseViewerModelEvents.InitEvents(_model, this, picViewer);
+	}
+
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
+
+	public static void OpenAtTile(CpuType cpuType, MemoryType type, int address, TileFormat format, TileLayout layout, int paletteIndex) {
+		TileViewerWindow wnd = DebugWindowManager.GetOrOpenDebugWindow(() => new TileViewerWindow(cpuType));
+		wnd._model.SelectTile(type, address, format, layout, paletteIndex);
+		wnd.GetControl<ScrollPictureViewer>("picViewer").ScrollToSelection();
+	}
+
+	protected override void OnOpened(EventArgs e) {
+		base.OnOpened(e);
+		if (Design.IsDesignMode) {
+			return;
 		}
 
-		public static void OpenAtTile(CpuType cpuType, MemoryType type, int address, TileFormat format, TileLayout layout, int paletteIndex) {
-			TileViewerWindow wnd = DebugWindowManager.GetOrOpenDebugWindow(() => new TileViewerWindow(cpuType));
-			wnd._model.SelectTile(type, address, format, layout, paletteIndex);
-			wnd.GetControl<ScrollPictureViewer>("picViewer").ScrollToSelection();
-		}
+		_model.RefreshData();
+	}
 
-		protected override void OnOpened(EventArgs e) {
-			base.OnOpened(e);
-			if (Design.IsDesignMode) {
-				return;
-			}
+	protected override void OnClosing(WindowClosingEventArgs e) {
+		base.OnClosing(e);
+		_model.Config.SaveWindowSettings(this);
+		ConfigManager.Config.Debug.TileViewer = _model.Config;
+	}
 
-			_model.RefreshData();
-		}
+	private void OnSettingsClick(object sender, RoutedEventArgs e) {
+		_model.Config.ShowSettingsPanel = !_model.Config.ShowSettingsPanel;
+	}
 
-		protected override void OnClosing(WindowClosingEventArgs e) {
-			base.OnClosing(e);
-			_model.Config.SaveWindowSettings(this);
-			ConfigManager.Config.Debug.TileViewer = _model.Config;
-		}
-
-		private void OnSettingsClick(object sender, RoutedEventArgs e) {
-			_model.Config.ShowSettingsPanel = !_model.Config.ShowSettingsPanel;
-		}
-
-		public void ProcessNotification(NotificationEventArgs e) {
-			ToolRefreshHelper.ProcessNotification(this, e, _model.RefreshTiming, _model, _model.RefreshData);
-		}
+	public void ProcessNotification(NotificationEventArgs e) {
+		ToolRefreshHelper.ProcessNotification(this, e, _model.RefreshTiming, _model, _model.RefreshData);
 	}
 }

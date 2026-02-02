@@ -4,14 +4,13 @@ using Avalonia.Markup.Xaml;
 using Nexen.Config;
 using Nexen.Utilities;
 
-namespace Nexen.Views {
-	public class InputConfigView : UserControl {
-		public InputConfigView() {
-			InitializeComponent();
-		}
+namespace Nexen.Views; 
+public class InputConfigView : UserControl {
+	public InputConfigView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

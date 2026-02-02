@@ -5,55 +5,54 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nexen.Utilities {
-	public struct ResourcePath : IEquatable<ResourcePath> {
-		public string Path { get; set; }
-		public string InnerFile { get; set; }
-		public int InnerFileIndex { get; set; }
+namespace Nexen.Utilities; 
+public struct ResourcePath : IEquatable<ResourcePath> {
+	public string Path { get; set; }
+	public string InnerFile { get; set; }
+	public int InnerFileIndex { get; set; }
 
-		public bool Exists { get { return File.Exists(Path); } }
-		public bool Compressed { get { return !string.IsNullOrWhiteSpace(InnerFile); } }
+	public bool Exists { get { return File.Exists(Path); } }
+	public bool Compressed { get { return !string.IsNullOrWhiteSpace(InnerFile); } }
 
-		public string FileName { get { return Compressed ? InnerFile : System.IO.Path.GetFileName(Path); } }
-		public string Folder { get { return System.IO.Path.GetDirectoryName(Path) ?? ""; } }
+	public string FileName { get { return Compressed ? InnerFile : System.IO.Path.GetFileName(Path); } }
+	public string Folder { get { return System.IO.Path.GetDirectoryName(Path) ?? ""; } }
 
-		public string ReadablePath {
-			get {
-				if (Compressed) {
-					return $"{System.IO.Path.GetFileName(InnerFile)} ({System.IO.Path.GetFileName(Path)})";
-				} else {
-					return System.IO.Path.GetFileName(Path);
-				}
-			}
-		}
-
-		public override string ToString() {
-			string resPath = Path;
+	public string ReadablePath {
+		get {
 			if (Compressed) {
-				resPath += "\x1" + InnerFile;
-				if (InnerFileIndex > 0) {
-					resPath += "\x1" + (InnerFileIndex - 1).ToString();
-				}
+				return $"{System.IO.Path.GetFileName(InnerFile)} ({System.IO.Path.GetFileName(Path)})";
+			} else {
+				return System.IO.Path.GetFileName(Path);
 			}
+		}
+	}
 
-			return resPath;
+	public override string ToString() {
+		string resPath = Path;
+		if (Compressed) {
+			resPath += "\x1" + InnerFile;
+			if (InnerFileIndex > 0) {
+				resPath += "\x1" + (InnerFileIndex - 1).ToString();
+			}
 		}
 
-		static public implicit operator ResourcePath(string path) {
-			string[] tokens = path.Split('\x1');
-			return new ResourcePath() {
-				Path = tokens[0],
-				InnerFile = tokens.Length > 1 ? tokens[1] : "",
-				InnerFileIndex = tokens.Length > 2 ? (int.Parse(tokens[2]) + 1) : 0
-			};
-		}
+		return resPath;
+	}
 
-		static public implicit operator string(ResourcePath resourcePath) {
-			return resourcePath.ToString();
-		}
+	static public implicit operator ResourcePath(string path) {
+		string[] tokens = path.Split('\x1');
+		return new ResourcePath() {
+			Path = tokens[0],
+			InnerFile = tokens.Length > 1 ? tokens[1] : "",
+			InnerFileIndex = tokens.Length > 2 ? (int.Parse(tokens[2]) + 1) : 0
+		};
+	}
 
-		bool IEquatable<ResourcePath>.Equals(ResourcePath other) {
-			return other.ToString() == this.ToString();
-		}
+	static public implicit operator string(ResourcePath resourcePath) {
+		return resourcePath.ToString();
+	}
+
+	bool IEquatable<ResourcePath>.Equals(ResourcePath other) {
+		return other.ToString() == this.ToString();
 	}
 }

@@ -3,14 +3,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Nexen.Views {
-	public class WsConfigView : UserControl {
-		public WsConfigView() {
-			InitializeComponent();
-		}
+namespace Nexen.Views; 
+public class WsConfigView : UserControl {
+	public WsConfigView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

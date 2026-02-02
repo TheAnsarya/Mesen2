@@ -9,42 +9,42 @@ using System.Text.RegularExpressions;
 using Nexen.Interop;
 using Nexen.Localization;
 
-namespace Nexen.Debugger.Utilities {
-	public class CodeCompletionHelper {
-		private static Dictionary<string, DocEntryViewModel> _documentation;
+namespace Nexen.Debugger.Utilities; 
+public class CodeCompletionHelper {
+	private static Dictionary<string, DocEntryViewModel> _documentation;
 
-		private static Regex _linkRegex = new Regex("emu[.](([a-zA-Z0-9]+)(\\([a-zA-Z0-9 ,]*\\)){0,1})", RegexOptions.Compiled);
+	private static Regex _linkRegex = new Regex("emu[.](([a-zA-Z0-9]+)(\\([a-zA-Z0-9 ,]*\\)){0,1})", RegexOptions.Compiled);
 
-		static CodeCompletionHelper() {
-			using StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Nexen.Debugger.Documentation.LuaDocumentation.json")!);
-			DocEntryViewModel[] documentation = (DocEntryViewModel[]?)JsonSerializer.Deserialize(reader.ReadToEnd(), typeof(DocEntryViewModel[]), NexenCamelCaseSerializerContext.Default) ?? [];
+	static CodeCompletionHelper() {
+		using StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Nexen.Debugger.Documentation.LuaDocumentation.json")!);
+		DocEntryViewModel[] documentation = (DocEntryViewModel[]?)JsonSerializer.Deserialize(reader.ReadToEnd(), typeof(DocEntryViewModel[]), NexenCamelCaseSerializerContext.Default) ?? [];
 
-			_documentation = new Dictionary<string, DocEntryViewModel>();
-			foreach (DocEntryViewModel entry in documentation) {
-				_documentation[entry.Name] = entry;
-			}
+		_documentation = new Dictionary<string, DocEntryViewModel>();
+		foreach (DocEntryViewModel entry in documentation) {
+			_documentation[entry.Name] = entry;
+		}
+	}
+
+	public static IEnumerable<string> GetEntries() {
+		return _documentation.Select(x => x.Key).OrderBy(x => x);
+	}
+
+	public static DocEntryViewModel? GetEntry(string keyword) {
+		if (_documentation.TryGetValue(keyword, out DocEntryViewModel? entry)) {
+			return entry;
 		}
 
-		public static IEnumerable<string> GetEntries() {
-			return _documentation.Select(x => x.Key).OrderBy(x => x);
+		return null;
+	}
+
+	public static string GenerateHtmlDocumentation() {
+		string processText(string text) {
+			text = text.Replace("ARGB", "<a href=\"#ColorFormat\">ARGB</a>");
+			return _linkRegex.Replace(text, (match) => "<a href=\"#" + match.Groups[2].Value + "\">emu." + match.Groups[1].Value + "</a>").Replace("\n", "<br/>");
 		}
 
-		public static DocEntryViewModel? GetEntry(string keyword) {
-			if (_documentation.TryGetValue(keyword, out DocEntryViewModel? entry)) {
-				return entry;
-			}
-
-			return null;
-		}
-
-		public static string GenerateHtmlDocumentation() {
-			string processText(string text) {
-				text = text.Replace("ARGB", "<a href=\"#ColorFormat\">ARGB</a>");
-				return _linkRegex.Replace(text, (match) => "<a href=\"#" + match.Groups[2].Value + "\">emu." + match.Groups[1].Value + "</a>").Replace("\n", "<br/>");
-			}
-
-			StringBuilder sb = new();
-			sb.AppendLine(@$"
+		StringBuilder sb = new();
+		sb.AppendLine(@$"
 				<html>
 					<head>
 						<title>Nexen Lua API Reference</title>
@@ -183,64 +183,64 @@ namespace Nexen.Debugger.Utilities {
 ");
 
 
-			DocEntryCategory? category = null;
-			DocEntrySubcategory? subcategory = null;
+		DocEntryCategory? category = null;
+		DocEntrySubcategory? subcategory = null;
 
-			sb.AppendLine("<div class=\"menu\">");
-			foreach (DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
-				if (entry.Category != category) {
-					if (category != null) {
-						sb.AppendLine("</div>");
-					}
-
-					if (subcategory != null) {
-						sb.AppendLine("</div>");
-					}
-
-					subcategory = null;
-					sb.AppendLine($"<a href=\"#{entry.Category}\">{ResourceHelper.GetEnumText(entry.Category)}</a><div class=\"category\">");
-					category = entry.Category;
+		sb.AppendLine("<div class=\"menu\">");
+		foreach (DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
+			if (entry.Category != category) {
+				if (category != null) {
+					sb.AppendLine("</div>");
 				}
 
-				if (entry.Subcategory != subcategory && entry.Subcategory != null) {
-					if (subcategory != null) {
-						sb.AppendLine("</div>");
-					}
-
-					sb.AppendLine($"<a href=\"#{entry.Category}_{entry.Subcategory}\">{ResourceHelper.GetEnumText(entry.Subcategory)}</a><div class=\"subcategory\">");
-					subcategory = entry.Subcategory;
+				if (subcategory != null) {
+					sb.AppendLine("</div>");
 				}
 
-				sb.AppendLine($"<div class=\"apilink\"><a href=\"#{entry.Name}\">{entry.Name}</a></div>");
+				subcategory = null;
+				sb.AppendLine($"<a href=\"#{entry.Category}\">{ResourceHelper.GetEnumText(entry.Category)}</a><div class=\"category\">");
+				category = entry.Category;
 			}
 
-			if (category != null) {
-				sb.AppendLine("</div>");
+			if (entry.Subcategory != subcategory && entry.Subcategory != null) {
+				if (subcategory != null) {
+					sb.AppendLine("</div>");
+				}
+
+				sb.AppendLine($"<a href=\"#{entry.Category}_{entry.Subcategory}\">{ResourceHelper.GetEnumText(entry.Subcategory)}</a><div class=\"subcategory\">");
+				subcategory = entry.Subcategory;
 			}
 
-			if (subcategory != null) {
-				sb.AppendLine("</div>");
-			}
+			sb.AppendLine($"<div class=\"apilink\"><a href=\"#{entry.Name}\">{entry.Name}</a></div>");
+		}
 
+		if (category != null) {
 			sb.AppendLine("</div>");
+		}
 
-			category = null;
-			subcategory = null;
+		if (subcategory != null) {
+			sb.AppendLine("</div>");
+		}
 
-			sb.AppendLine("<div class=\"maincontent\">");
+		sb.AppendLine("</div>");
 
-			sb.AppendLine("<h1 class=\"mainheader\">Nexen Lua API reference</h1>");
-			sb.AppendLine("<p><strong>Important: </strong>This API is similar but not completely compatible with the old Nexen 0.9.x (or Nexen-S) Lua APIs.</p>");
-			sb.AppendLine("<p>Generated on " + EmuApi.GetNexenBuildDate() + " for Nexen " + EmuApi.GetNexenVersion().ToString() + ".</p>");
+		category = null;
+		subcategory = null;
 
-			foreach (DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
-				if (entry.Category != category) {
-					sb.AppendLine($"<h1 id=\"{entry.Category}\">{ResourceHelper.GetEnumText(entry.Category)}</h1>");
-					category = entry.Category;
-					subcategory = null;
+		sb.AppendLine("<div class=\"maincontent\">");
 
-					if (category == DocEntryCategory.Drawing) {
-						sb.AppendLine(@"
+		sb.AppendLine("<h1 class=\"mainheader\">Nexen Lua API reference</h1>");
+		sb.AppendLine("<p><strong>Important: </strong>This API is similar but not completely compatible with the old Nexen 0.9.x (or Nexen-S) Lua APIs.</p>");
+		sb.AppendLine("<p>Generated on " + EmuApi.GetNexenBuildDate() + " for Nexen " + EmuApi.GetNexenVersion().ToString() + ".</p>");
+
+		foreach (DocEntryViewModel entry in _documentation.Values.OrderBy(x => (int)x.Category).ThenBy(x => (int?)x.Subcategory)) {
+			if (entry.Category != category) {
+				sb.AppendLine($"<h1 id=\"{entry.Category}\">{ResourceHelper.GetEnumText(entry.Category)}</h1>");
+				category = entry.Category;
+				subcategory = null;
+
+				if (category == DocEntryCategory.Drawing) {
+					sb.AppendLine(@"
 							<h3 id=""ColorFormat""><strong>Color format for APIs</strong></h3>
 							<p>Colors are integers in ARGB format, but the alpha value is inverted: 0 is opaque, 255 is fully transparent.</p>
 							<ul>
@@ -253,164 +253,163 @@ namespace Nexen.Debugger.Utilities {
 								<li>Blue: 0x0000FF</li>
 							</ul>
 						");
-					}
-				}
-
-				if (entry.Subcategory != subcategory && entry.Subcategory != null) {
-					sb.AppendLine($"<h2 id=\"{entry.Category}_{entry.Subcategory}\">{ResourceHelper.GetEnumText(entry.Subcategory)}</h2>");
-					subcategory = entry.Subcategory;
-				}
-
-				sb.AppendLine($"<h3 id=\"{entry.Name}\">{entry.Name}</h3>");
-				if (entry.EnumValues.Count > 0) {
-					sb.AppendLine($"<p><strong>Syntax</strong></p>");
-					sb.AppendLine($"<div class=\"monofont\">emu.{entry.Name}.[value]</div>");
-
-					sb.AppendLine($"<p><strong>Description</strong></p>");
-					sb.AppendLine($"<div class=\"fieldData\">{processText(entry.Description)}</div>");
-
-					sb.AppendLine($"<p><strong>Values</strong></p>");
-					sb.AppendLine($"<div class=\"monofont\">");
-					foreach (DocEnumValue value in entry.EnumValues) {
-						sb.AppendLine($"<div>{value.Name} - {processText(value.Description)}</div>");
-					}
-
-					sb.AppendLine($"</div>");
-				} else {
-					sb.AppendLine($"<p><strong>Syntax</strong></p>");
-					sb.AppendLine($"<div class=\"monofont\">emu.{entry.Name}({string.Join(", ", entry.Parameters.Select(x => x.Name))})</div>");
-					sb.AppendLine($"<p><strong>Parameters</strong></p>");
-
-					if (entry.Parameters.Count == 0) {
-						sb.AppendLine($"<div class=\"fieldData\"><em>&lt;none&gt;</em></div>");
-					} else {
-						foreach (DocParam param in entry.Parameters) {
-							sb.AppendLine($"<div class=\"fieldData\"><strong>{param.Name}</strong> - <em>");
-							if (param.Type.ToLowerInvariant() == "enum") {
-								sb.AppendLine($"<a href=\"#{param.EnumName}\">{param.CalculatedType}</a>");
-							} else {
-								sb.AppendLine($"{processText(param.CalculatedType)}");
-							}
-
-							sb.AppendLine($"</em>{(param.DefaultValue.Length > 0 ? $" <span class=\"defaultvalue\">(default: {param.DefaultValue})</span>" : "")}");
-							sb.AppendLine($"<div class=\"fieldDesc\">{processText(param.Description)}</div>");
-							sb.AppendLine($"</div>");
-						}
-					}
-
-					sb.AppendLine($"<p><strong>Return value</strong></p>");
-
-					sb.AppendLine($"<div class=\"fieldData\">");
-					if (string.IsNullOrEmpty(entry.ReturnValue.Type)) {
-						sb.AppendLine("<em>&lt;none&gt;</em>");
-					} else {
-						sb.AppendLine($"<em>{entry.ReturnValue.Type}</em> - {processText(entry.ReturnValue.Description)}");
-					}
-
-					sb.AppendLine($"</div>");
-					sb.AppendLine($"<p><strong>Description</strong></p>");
-					sb.AppendLine($"<div class=\"fieldData\">{processText(entry.Description)}</div>");
 				}
 			}
 
-			sb.AppendLine("</div>");
-			sb.AppendLine("</body></html>");
+			if (entry.Subcategory != subcategory && entry.Subcategory != null) {
+				sb.AppendLine($"<h2 id=\"{entry.Category}_{entry.Subcategory}\">{ResourceHelper.GetEnumText(entry.Subcategory)}</h2>");
+				subcategory = entry.Subcategory;
+			}
 
+			sb.AppendLine($"<h3 id=\"{entry.Name}\">{entry.Name}</h3>");
+			if (entry.EnumValues.Count > 0) {
+				sb.AppendLine($"<p><strong>Syntax</strong></p>");
+				sb.AppendLine($"<div class=\"monofont\">emu.{entry.Name}.[value]</div>");
+
+				sb.AppendLine($"<p><strong>Description</strong></p>");
+				sb.AppendLine($"<div class=\"fieldData\">{processText(entry.Description)}</div>");
+
+				sb.AppendLine($"<p><strong>Values</strong></p>");
+				sb.AppendLine($"<div class=\"monofont\">");
+				foreach (DocEnumValue value in entry.EnumValues) {
+					sb.AppendLine($"<div>{value.Name} - {processText(value.Description)}</div>");
+				}
+
+				sb.AppendLine($"</div>");
+			} else {
+				sb.AppendLine($"<p><strong>Syntax</strong></p>");
+				sb.AppendLine($"<div class=\"monofont\">emu.{entry.Name}({string.Join(", ", entry.Parameters.Select(x => x.Name))})</div>");
+				sb.AppendLine($"<p><strong>Parameters</strong></p>");
+
+				if (entry.Parameters.Count == 0) {
+					sb.AppendLine($"<div class=\"fieldData\"><em>&lt;none&gt;</em></div>");
+				} else {
+					foreach (DocParam param in entry.Parameters) {
+						sb.AppendLine($"<div class=\"fieldData\"><strong>{param.Name}</strong> - <em>");
+						if (param.Type.ToLowerInvariant() == "enum") {
+							sb.AppendLine($"<a href=\"#{param.EnumName}\">{param.CalculatedType}</a>");
+						} else {
+							sb.AppendLine($"{processText(param.CalculatedType)}");
+						}
+
+						sb.AppendLine($"</em>{(param.DefaultValue.Length > 0 ? $" <span class=\"defaultvalue\">(default: {param.DefaultValue})</span>" : "")}");
+						sb.AppendLine($"<div class=\"fieldDesc\">{processText(param.Description)}</div>");
+						sb.AppendLine($"</div>");
+					}
+				}
+
+				sb.AppendLine($"<p><strong>Return value</strong></p>");
+
+				sb.AppendLine($"<div class=\"fieldData\">");
+				if (string.IsNullOrEmpty(entry.ReturnValue.Type)) {
+					sb.AppendLine("<em>&lt;none&gt;</em>");
+				} else {
+					sb.AppendLine($"<em>{entry.ReturnValue.Type}</em> - {processText(entry.ReturnValue.Description)}");
+				}
+
+				sb.AppendLine($"</div>");
+				sb.AppendLine($"<p><strong>Description</strong></p>");
+				sb.AppendLine($"<div class=\"fieldData\">{processText(entry.Description)}</div>");
+			}
+		}
+
+		sb.AppendLine("</div>");
+		sb.AppendLine("</body></html>");
+
+		return sb.ToString();
+	}
+}
+
+public enum DocEntryCategory {
+	Callbacks,
+	Drawing,
+	Emulation,
+	Input,
+	Logging,
+	MemoryAccess,
+	Miscellaneous,
+	Enums
+}
+
+public enum DocEntrySubcategory {
+	AccessCounters,
+	Cdl,
+	Cheats,
+	SaveStates,
+	Others
+}
+
+public class DocEntryViewModel {
+	public string Name { get; set; } = "";
+	public string Description { get; set; } = "";
+	public DocEntryCategory Category { get; set; } = DocEntryCategory.Callbacks;
+	public DocEntrySubcategory? Subcategory { get; set; } = null;
+	public List<DocParam> Parameters { get; set; } = new();
+	public DocReturnValue ReturnValue { get; set; } = new();
+
+	public List<DocEnumValue> EnumValues { get; set; } = new();
+
+	public int MaxWidth => SplitView ? 1000 : 550;
+	public bool SplitView => EnumValues.Count >= 30;
+	public List<DocEnumValue> Column1Values => SplitView ? EnumValues.GetRange(0, (EnumValues.Count / 2) + (EnumValues.Count % 2 == 0 ? 0 : 1)) : EnumValues;
+	public List<DocEnumValue> Column2Values => SplitView ? EnumValues.GetRange(Column1Values.Count, EnumValues.Count - Column1Values.Count) : new();
+
+	public string Syntax {
+		get {
+			StringBuilder sb = new();
+			sb.Append($"emu.{Name}(");
+			bool isOptional = false;
+			for (int i = 0; i < Parameters.Count; i++) {
+				if (!string.IsNullOrEmpty(Parameters[i].DefaultValue)) {
+					if (!isOptional) {
+						isOptional = true;
+						sb.Append("[");
+					}
+				} else {
+					System.Diagnostics.Debug.Assert(!isOptional);
+				}
+
+				sb.Append(Parameters[i].Name);
+				if (i < Parameters.Count - 1) {
+					sb.Append(", ");
+				} else {
+					if (isOptional) {
+						sb.Append("]");
+					}
+				}
+			}
+
+			sb.Append(")");
 			return sb.ToString();
 		}
 	}
+}
 
-	public enum DocEntryCategory {
-		Callbacks,
-		Drawing,
-		Emulation,
-		Input,
-		Logging,
-		MemoryAccess,
-		Miscellaneous,
-		Enums
-	}
+public class DocParam {
+	public string Name { get; set; } = "";
+	public string Type { get; set; } = "";
+	public string EnumName { get; set; } = "";
+	public string Description { get; set; } = "";
+	public string DefaultValue { get; set; } = "";
 
-	public enum DocEntrySubcategory {
-		AccessCounters,
-		Cdl,
-		Cheats,
-		SaveStates,
-		Others
-	}
-
-	public class DocEntryViewModel {
-		public string Name { get; set; } = "";
-		public string Description { get; set; } = "";
-		public DocEntryCategory Category { get; set; } = DocEntryCategory.Callbacks;
-		public DocEntrySubcategory? Subcategory { get; set; } = null;
-		public List<DocParam> Parameters { get; set; } = new();
-		public DocReturnValue ReturnValue { get; set; } = new();
-
-		public List<DocEnumValue> EnumValues { get; set; } = new();
-
-		public int MaxWidth => SplitView ? 1000 : 550;
-		public bool SplitView => EnumValues.Count >= 30;
-		public List<DocEnumValue> Column1Values => SplitView ? EnumValues.GetRange(0, (EnumValues.Count / 2) + (EnumValues.Count % 2 == 0 ? 0 : 1)) : EnumValues;
-		public List<DocEnumValue> Column2Values => SplitView ? EnumValues.GetRange(Column1Values.Count, EnumValues.Count - Column1Values.Count) : new();
-
-		public string Syntax {
-			get {
-				StringBuilder sb = new();
-				sb.Append($"emu.{Name}(");
-				bool isOptional = false;
-				for (int i = 0; i < Parameters.Count; i++) {
-					if (!string.IsNullOrEmpty(Parameters[i].DefaultValue)) {
-						if (!isOptional) {
-							isOptional = true;
-							sb.Append("[");
-						}
-					} else {
-						System.Diagnostics.Debug.Assert(!isOptional);
-					}
-
-					sb.Append(Parameters[i].Name);
-					if (i < Parameters.Count - 1) {
-						sb.Append(", ");
-					} else {
-						if (isOptional) {
-							sb.Append("]");
-						}
-					}
-				}
-
-				sb.Append(")");
-				return sb.ToString();
+	public string CalculatedType {
+		get {
+			if (Type.ToLowerInvariant() == "enum") {
+				System.Diagnostics.Debug.Assert(EnumName.Length > 0);
+				return $"Enum ({EnumName})";
 			}
+
+			return Type;
 		}
 	}
+}
 
-	public class DocParam {
-		public string Name { get; set; } = "";
-		public string Type { get; set; } = "";
-		public string EnumName { get; set; } = "";
-		public string Description { get; set; } = "";
-		public string DefaultValue { get; set; } = "";
+public class DocReturnValue {
+	public string Type { get; set; } = "";
+	public string Description { get; set; } = "";
+}
 
-		public string CalculatedType {
-			get {
-				if (Type.ToLowerInvariant() == "enum") {
-					System.Diagnostics.Debug.Assert(EnumName.Length > 0);
-					return $"Enum ({EnumName})";
-				}
-
-				return Type;
-			}
-		}
-	}
-
-	public class DocReturnValue {
-		public string Type { get; set; } = "";
-		public string Description { get; set; } = "";
-	}
-
-	public class DocEnumValue {
-		public string Name { get; set; } = "";
-		public string Description { get; set; } = "";
-	}
+public class DocEnumValue {
+	public string Name { get; set; } = "";
+	public string Description { get; set; } = "";
 }

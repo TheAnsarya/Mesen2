@@ -10,77 +10,76 @@ using Avalonia.Styling;
 using AvaloniaEdit;
 using AvaloniaEdit.Editing;
 
-namespace Nexen.Debugger.Controls {
-	public class NexenTextEditor : TextEditor {
-		protected override Type StyleKeyOverride => typeof(TextEditor);
+namespace Nexen.Debugger.Controls; 
+public class NexenTextEditor : TextEditor {
+	protected override Type StyleKeyOverride => typeof(TextEditor);
 
-		public static readonly StyledProperty<string> TextBindingProperty = AvaloniaProperty.Register<NexenTextEditor, string>(nameof(TextBinding), "", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+	public static readonly StyledProperty<string> TextBindingProperty = AvaloniaProperty.Register<NexenTextEditor, string>(nameof(TextBinding), "", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
-		public string TextBinding {
-			get { return GetValue(TextBindingProperty); }
-			set { SetValue(TextBindingProperty, value); }
-		}
+	public string TextBinding {
+		get { return GetValue(TextBindingProperty); }
+		set { SetValue(TextBindingProperty, value); }
+	}
 
-		public ScrollViewer? ScrollViewer { get; private set; }
+	public ScrollViewer? ScrollViewer { get; private set; }
 
-		public double VerticalScrollBarValue {
-			get => ScrollViewer?.Offset.Y ?? 0;
-			set {
-				if (ScrollViewer != null) {
-					ScrollViewer.Offset = ScrollViewer.Offset.WithY(value);
-				}
+	public double VerticalScrollBarValue {
+		get => ScrollViewer?.Offset.Y ?? 0;
+		set {
+			if (ScrollViewer != null) {
+				ScrollViewer.Offset = ScrollViewer.Offset.WithY(value);
 			}
 		}
+	}
 
-		public event EventHandler<ScrollChangedEventArgs>? ScrollChanged {
-			add => ScrollViewer!.ScrollChanged += value;
-			remove => ScrollViewer!.ScrollChanged -= value;
-		}
+	public event EventHandler<ScrollChangedEventArgs>? ScrollChanged {
+		add => ScrollViewer!.ScrollChanged += value;
+		remove => ScrollViewer!.ScrollChanged -= value;
+	}
 
-		private bool _readyEventSent = false;
-		public event EventHandler<EventArgs>? TextEditorReady;
+	private bool _readyEventSent = false;
+	public event EventHandler<EventArgs>? TextEditorReady;
 
-		static NexenTextEditor() {
-			TextBindingProperty.Changed.AddClassHandler<NexenTextEditor>((x, e) => {
-				if (x.Text != (string?)e.NewValue) {
-					x.Text = (string)e.NewValue!;
-				}
-			});
-
-			BoundsProperty.Changed.AddClassHandler<NexenTextEditor>((x, e) => {
-				if (!x._readyEventSent && e.NewValue is Rect bounds && bounds.Width > 0 && bounds.Height > 0) {
-					x._readyEventSent = true;
-					x.TextEditorReady?.Invoke(x, EventArgs.Empty);
-				}
-			});
-		}
-
-		public NexenTextEditor() {
-			Options.AllowScrollBelowDocument = false;
-		}
-
-		protected override void OnTextChanged(EventArgs e) {
-			if (TextBinding != Text) {
-				TextBinding = Text;
+	static NexenTextEditor() {
+		TextBindingProperty.Changed.AddClassHandler<NexenTextEditor>((x, e) => {
+			if (x.Text != (string?)e.NewValue) {
+				x.Text = (string)e.NewValue!;
 			}
+		});
 
-			base.OnTextChanged(e);
-		}
-
-		protected override void OnApplyTemplate(TemplateAppliedEventArgs e) {
-			base.OnApplyTemplate(e);
-			ScrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer");
-		}
-
-		public void ScrollLineToTop(int line) {
-			VerticalScrollBarValue = line * TextArea.TextView.DefaultLineHeight;
-		}
-
-		public void ScrollLineToMiddle(int lineNumber) {
-			if (Bounds.Height > 0) {
-				lineNumber = Math.Max(0, lineNumber - (int)(Bounds.Height / TextArea.TextView.DefaultLineHeight / 2));
-				VerticalScrollBarValue = lineNumber * TextArea.TextView.DefaultLineHeight;
+		BoundsProperty.Changed.AddClassHandler<NexenTextEditor>((x, e) => {
+			if (!x._readyEventSent && e.NewValue is Rect bounds && bounds.Width > 0 && bounds.Height > 0) {
+				x._readyEventSent = true;
+				x.TextEditorReady?.Invoke(x, EventArgs.Empty);
 			}
+		});
+	}
+
+	public NexenTextEditor() {
+		Options.AllowScrollBelowDocument = false;
+	}
+
+	protected override void OnTextChanged(EventArgs e) {
+		if (TextBinding != Text) {
+			TextBinding = Text;
+		}
+
+		base.OnTextChanged(e);
+	}
+
+	protected override void OnApplyTemplate(TemplateAppliedEventArgs e) {
+		base.OnApplyTemplate(e);
+		ScrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer");
+	}
+
+	public void ScrollLineToTop(int line) {
+		VerticalScrollBarValue = line * TextArea.TextView.DefaultLineHeight;
+	}
+
+	public void ScrollLineToMiddle(int lineNumber) {
+		if (Bounds.Height > 0) {
+			lineNumber = Math.Max(0, lineNumber - (int)(Bounds.Height / TextArea.TextView.DefaultLineHeight / 2));
+			VerticalScrollBarValue = lineNumber * TextArea.TextView.DefaultLineHeight;
 		}
 	}
 }

@@ -8,175 +8,174 @@ using Nexen.Config.Shortcuts;
 using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.ViewModels {
+namespace Nexen.ViewModels; 
+/// <summary>
+/// ViewModel for the preferences configuration tab.
+/// </summary>
+public class PreferencesConfigViewModel : DisposableViewModel {
+	/// <summary>Gets or sets the current preferences configuration.</summary>
+	[Reactive] public PreferencesConfig Config { get; set; }
+
+	/// <summary>Gets or sets the original preferences configuration for revert.</summary>
+	[Reactive] public PreferencesConfig OriginalConfig { get; set; }
+
+	/// <summary>Gets the data storage location path.</summary>
+	public string DataStorageLocation { get; }
+
+	/// <summary>Gets whether the current platform is macOS.</summary>
+	public bool IsOsx { get; }
+
+	/// <summary>Gets or sets the list of shortcut key bindings.</summary>
+	public List<ShortcutKeyInfo> ShortcutKeys { get; set; }
+
 	/// <summary>
-	/// ViewModel for the preferences configuration tab.
+	/// Initializes a new instance of the <see cref="PreferencesConfigViewModel"/> class.
 	/// </summary>
-	public class PreferencesConfigViewModel : DisposableViewModel {
-		/// <summary>Gets or sets the current preferences configuration.</summary>
-		[Reactive] public PreferencesConfig Config { get; set; }
+	public PreferencesConfigViewModel() {
+		Config = ConfigManager.Config.Preferences;
+		OriginalConfig = Config.Clone();
 
-		/// <summary>Gets or sets the original preferences configuration for revert.</summary>
-		[Reactive] public PreferencesConfig OriginalConfig { get; set; }
+		IsOsx = OperatingSystem.IsMacOS();
+		DataStorageLocation = ConfigManager.HomeFolder;
 
-		/// <summary>Gets the data storage location path.</summary>
-		public string DataStorageLocation { get; }
+		EmulatorShortcut[] displayOrder = new EmulatorShortcut[] {
+			EmulatorShortcut.FastForward,
+			EmulatorShortcut.ToggleFastForward,
+			EmulatorShortcut.Rewind,
+			EmulatorShortcut.ToggleRewind,
+			EmulatorShortcut.RewindTenSecs,
+			EmulatorShortcut.RewindOneMin,
 
-		/// <summary>Gets whether the current platform is macOS.</summary>
-		public bool IsOsx { get; }
+			EmulatorShortcut.Pause,
+			EmulatorShortcut.Reset,
+			EmulatorShortcut.PowerCycle,
+			EmulatorShortcut.ReloadRom,
+			EmulatorShortcut.PowerOff,
+			EmulatorShortcut.Exit,
 
-		/// <summary>Gets or sets the list of shortcut key bindings.</summary>
-		public List<ShortcutKeyInfo> ShortcutKeys { get; set; }
+			EmulatorShortcut.ToggleRecordVideo,
+			EmulatorShortcut.ToggleRecordAudio,
+			EmulatorShortcut.ToggleRecordMovie,
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="PreferencesConfigViewModel"/> class.
-		/// </summary>
-		public PreferencesConfigViewModel() {
-			Config = ConfigManager.Config.Preferences;
-			OriginalConfig = Config.Clone();
+			EmulatorShortcut.TakeScreenshot,
+			EmulatorShortcut.RunSingleFrame,
 
-			IsOsx = OperatingSystem.IsMacOS();
-			DataStorageLocation = ConfigManager.HomeFolder;
+			EmulatorShortcut.SetScale1x,
+			EmulatorShortcut.SetScale2x,
+			EmulatorShortcut.SetScale3x,
+			EmulatorShortcut.SetScale4x,
+			EmulatorShortcut.SetScale5x,
+			EmulatorShortcut.SetScale6x,
+			EmulatorShortcut.SetScale7x,
+			EmulatorShortcut.SetScale8x,
+			EmulatorShortcut.SetScale9x,
+			EmulatorShortcut.SetScale10x,
+			EmulatorShortcut.ToggleFullscreen,
 
-			EmulatorShortcut[] displayOrder = new EmulatorShortcut[] {
-				EmulatorShortcut.FastForward,
-				EmulatorShortcut.ToggleFastForward,
-				EmulatorShortcut.Rewind,
-				EmulatorShortcut.ToggleRewind,
-				EmulatorShortcut.RewindTenSecs,
-				EmulatorShortcut.RewindOneMin,
+			EmulatorShortcut.ToggleDebugInfo,
+			EmulatorShortcut.ToggleFps,
+			EmulatorShortcut.ToggleGameTimer,
+			EmulatorShortcut.ToggleFrameCounter,
+			EmulatorShortcut.ToggleAlwaysOnTop,
+			EmulatorShortcut.ToggleCheats,
+			EmulatorShortcut.ToggleOsd,
 
-				EmulatorShortcut.Pause,
-				EmulatorShortcut.Reset,
-				EmulatorShortcut.PowerCycle,
-				EmulatorShortcut.ReloadRom,
-				EmulatorShortcut.PowerOff,
-				EmulatorShortcut.Exit,
+			EmulatorShortcut.ToggleBgLayer1,
+			EmulatorShortcut.ToggleBgLayer2,
+			EmulatorShortcut.ToggleBgLayer3,
+			EmulatorShortcut.ToggleBgLayer4,
+			EmulatorShortcut.ToggleSprites1,
+			EmulatorShortcut.ToggleSprites2,
+			EmulatorShortcut.EnableAllLayers,
 
-				EmulatorShortcut.ToggleRecordVideo,
-				EmulatorShortcut.ToggleRecordAudio,
-				EmulatorShortcut.ToggleRecordMovie,
+			EmulatorShortcut.ToggleLagCounter,
+			EmulatorShortcut.ResetLagCounter,
 
-				EmulatorShortcut.TakeScreenshot,
-				EmulatorShortcut.RunSingleFrame,
+			EmulatorShortcut.ToggleAudio,
+			EmulatorShortcut.IncreaseVolume,
+			EmulatorShortcut.DecreaseVolume,
 
-				EmulatorShortcut.SetScale1x,
-				EmulatorShortcut.SetScale2x,
-				EmulatorShortcut.SetScale3x,
-				EmulatorShortcut.SetScale4x,
-				EmulatorShortcut.SetScale5x,
-				EmulatorShortcut.SetScale6x,
-				EmulatorShortcut.SetScale7x,
-				EmulatorShortcut.SetScale8x,
-				EmulatorShortcut.SetScale9x,
-				EmulatorShortcut.SetScale10x,
-				EmulatorShortcut.ToggleFullscreen,
+			EmulatorShortcut.PreviousTrack,
+			EmulatorShortcut.NextTrack,
 
-				EmulatorShortcut.ToggleDebugInfo,
-				EmulatorShortcut.ToggleFps,
-				EmulatorShortcut.ToggleGameTimer,
-				EmulatorShortcut.ToggleFrameCounter,
-				EmulatorShortcut.ToggleAlwaysOnTop,
-				EmulatorShortcut.ToggleCheats,
-				EmulatorShortcut.ToggleOsd,
+			EmulatorShortcut.MaxSpeed,
+			EmulatorShortcut.IncreaseSpeed,
+			EmulatorShortcut.DecreaseSpeed,
 
-				EmulatorShortcut.ToggleBgLayer1,
-				EmulatorShortcut.ToggleBgLayer2,
-				EmulatorShortcut.ToggleBgLayer3,
-				EmulatorShortcut.ToggleBgLayer4,
-				EmulatorShortcut.ToggleSprites1,
-				EmulatorShortcut.ToggleSprites2,
-				EmulatorShortcut.EnableAllLayers,
+			EmulatorShortcut.OpenFile,
 
-				EmulatorShortcut.ToggleLagCounter,
-				EmulatorShortcut.ResetLagCounter,
+			EmulatorShortcut.InputBarcode,
+			EmulatorShortcut.LoadTape,
+			EmulatorShortcut.RecordTape,
+			EmulatorShortcut.StopRecordTape,
 
-				EmulatorShortcut.ToggleAudio,
-				EmulatorShortcut.IncreaseVolume,
-				EmulatorShortcut.DecreaseVolume,
+			EmulatorShortcut.MoveToPreviousStateSlot,
+			EmulatorShortcut.MoveToNextStateSlot,
+			EmulatorShortcut.SaveState,
+			EmulatorShortcut.LoadState,
 
-				EmulatorShortcut.PreviousTrack,
-				EmulatorShortcut.NextTrack,
+			EmulatorShortcut.SaveStateSlot1,
+			EmulatorShortcut.SaveStateSlot2,
+			EmulatorShortcut.SaveStateSlot3,
+			EmulatorShortcut.SaveStateSlot4,
+			EmulatorShortcut.SaveStateSlot5,
+			EmulatorShortcut.SaveStateSlot6,
+			EmulatorShortcut.SaveStateSlot7,
+			EmulatorShortcut.SaveStateSlot8,
+			EmulatorShortcut.SaveStateSlot9,
+			EmulatorShortcut.SaveStateSlot10,
+			EmulatorShortcut.SaveStateToFile,
+			EmulatorShortcut.SaveStateDialog,
 
-				EmulatorShortcut.MaxSpeed,
-				EmulatorShortcut.IncreaseSpeed,
-				EmulatorShortcut.DecreaseSpeed,
+			EmulatorShortcut.LoadStateSlot1,
+			EmulatorShortcut.LoadStateSlot2,
+			EmulatorShortcut.LoadStateSlot3,
+			EmulatorShortcut.LoadStateSlot4,
+			EmulatorShortcut.LoadStateSlot5,
+			EmulatorShortcut.LoadStateSlot6,
+			EmulatorShortcut.LoadStateSlot7,
+			EmulatorShortcut.LoadStateSlot8,
+			EmulatorShortcut.LoadStateSlot9,
+			EmulatorShortcut.LoadStateSlot10,
+			EmulatorShortcut.LoadStateSlotAuto,
+			EmulatorShortcut.LoadStateFromFile,
+			EmulatorShortcut.LoadStateDialog,
+			EmulatorShortcut.LoadLastSession,
 
-				EmulatorShortcut.OpenFile,
+			EmulatorShortcut.QuickSaveTimestamped,
+			EmulatorShortcut.OpenSaveStatePicker,
 
-				EmulatorShortcut.InputBarcode,
-				EmulatorShortcut.LoadTape,
-				EmulatorShortcut.RecordTape,
-				EmulatorShortcut.StopRecordTape,
+			EmulatorShortcut.SelectSaveSlot1,
+			EmulatorShortcut.SelectSaveSlot2,
+			EmulatorShortcut.SelectSaveSlot3,
+			EmulatorShortcut.SelectSaveSlot4,
+			EmulatorShortcut.SelectSaveSlot5,
+			EmulatorShortcut.SelectSaveSlot6,
+			EmulatorShortcut.SelectSaveSlot7,
+			EmulatorShortcut.SelectSaveSlot8,
+			EmulatorShortcut.SelectSaveSlot9,
+			EmulatorShortcut.SelectSaveSlot10
+		};
 
-				EmulatorShortcut.MoveToPreviousStateSlot,
-				EmulatorShortcut.MoveToNextStateSlot,
-				EmulatorShortcut.SaveState,
-				EmulatorShortcut.LoadState,
-
-				EmulatorShortcut.SaveStateSlot1,
-				EmulatorShortcut.SaveStateSlot2,
-				EmulatorShortcut.SaveStateSlot3,
-				EmulatorShortcut.SaveStateSlot4,
-				EmulatorShortcut.SaveStateSlot5,
-				EmulatorShortcut.SaveStateSlot6,
-				EmulatorShortcut.SaveStateSlot7,
-				EmulatorShortcut.SaveStateSlot8,
-				EmulatorShortcut.SaveStateSlot9,
-				EmulatorShortcut.SaveStateSlot10,
-				EmulatorShortcut.SaveStateToFile,
-				EmulatorShortcut.SaveStateDialog,
-
-				EmulatorShortcut.LoadStateSlot1,
-				EmulatorShortcut.LoadStateSlot2,
-				EmulatorShortcut.LoadStateSlot3,
-				EmulatorShortcut.LoadStateSlot4,
-				EmulatorShortcut.LoadStateSlot5,
-				EmulatorShortcut.LoadStateSlot6,
-				EmulatorShortcut.LoadStateSlot7,
-				EmulatorShortcut.LoadStateSlot8,
-				EmulatorShortcut.LoadStateSlot9,
-				EmulatorShortcut.LoadStateSlot10,
-				EmulatorShortcut.LoadStateSlotAuto,
-				EmulatorShortcut.LoadStateFromFile,
-				EmulatorShortcut.LoadStateDialog,
-				EmulatorShortcut.LoadLastSession,
-
-				EmulatorShortcut.QuickSaveTimestamped,
-				EmulatorShortcut.OpenSaveStatePicker,
-
-				EmulatorShortcut.SelectSaveSlot1,
-				EmulatorShortcut.SelectSaveSlot2,
-				EmulatorShortcut.SelectSaveSlot3,
-				EmulatorShortcut.SelectSaveSlot4,
-				EmulatorShortcut.SelectSaveSlot5,
-				EmulatorShortcut.SelectSaveSlot6,
-				EmulatorShortcut.SelectSaveSlot7,
-				EmulatorShortcut.SelectSaveSlot8,
-				EmulatorShortcut.SelectSaveSlot9,
-				EmulatorShortcut.SelectSaveSlot10
-			};
-
-			Dictionary<EmulatorShortcut, ShortcutKeyInfo> shortcuts = new Dictionary<EmulatorShortcut, ShortcutKeyInfo>();
-			foreach (ShortcutKeyInfo shortcut in Config.ShortcutKeys) {
-				shortcuts[shortcut.Shortcut] = shortcut;
-			}
-
-			ShortcutKeys = new List<ShortcutKeyInfo>();
-			for (int i = 0; i < displayOrder.Length; i++) {
-				if (shortcuts.ContainsKey(displayOrder[i])) {
-					ShortcutKeys.Add(shortcuts[displayOrder[i]]);
-				}
-			}
-
-			if (Design.IsDesignMode) {
-				return;
-			}
-
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
-				Config.ApplyConfig();
-				PreferencesConfig.UpdateTheme();
-			}));
+		Dictionary<EmulatorShortcut, ShortcutKeyInfo> shortcuts = new Dictionary<EmulatorShortcut, ShortcutKeyInfo>();
+		foreach (ShortcutKeyInfo shortcut in Config.ShortcutKeys) {
+			shortcuts[shortcut.Shortcut] = shortcut;
 		}
+
+		ShortcutKeys = new List<ShortcutKeyInfo>();
+		for (int i = 0; i < displayOrder.Length; i++) {
+			if (shortcuts.ContainsKey(displayOrder[i])) {
+				ShortcutKeys.Add(shortcuts[displayOrder[i]]);
+			}
+		}
+
+		if (Design.IsDesignMode) {
+			return;
+		}
+
+		AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
+			Config.ApplyConfig();
+			PreferencesConfig.UpdateTheme();
+		}));
 	}
 }

@@ -6,36 +6,35 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
-namespace Nexen.Windows {
-	public class HistoryViewerRangePickerWindow : NexenWindow {
-		public int MinValue { get; set; }
-		public int MaxValue { get; set; }
+namespace Nexen.Windows; 
+public class HistoryViewerRangePickerWindow : NexenWindow {
+	public int MinValue { get; set; }
+	public int MaxValue { get; set; }
 
-		public int StartTime { get; set; }
-		public int EndTime { get; set; }
+	public int StartTime { get; set; }
+	public int EndTime { get; set; }
 
-		[Obsolete("For designer only")]
-		public HistoryViewerRangePickerWindow() : this(new(), new()) { }
+	[Obsolete("For designer only")]
+	public HistoryViewerRangePickerWindow() : this(new(), new()) { }
 
-		public HistoryViewerRangePickerWindow(TimeSpan start, TimeSpan end) {
-			MinValue = (int)start.TotalSeconds;
-			MaxValue = (int)end.TotalSeconds;
-			StartTime = MinValue;
-			EndTime = MaxValue;
+	public HistoryViewerRangePickerWindow(TimeSpan start, TimeSpan end) {
+		MinValue = (int)start.TotalSeconds;
+		MaxValue = (int)end.TotalSeconds;
+		StartTime = MinValue;
+		EndTime = MaxValue;
 
-			InitializeComponent();
-		}
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		private void Ok_OnClick(object sender, RoutedEventArgs e) {
-			Close(true);
-		}
+	private void Ok_OnClick(object sender, RoutedEventArgs e) {
+		Close(true);
+	}
 
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
-			Close(false);
-		}
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close(false);
 	}
 }

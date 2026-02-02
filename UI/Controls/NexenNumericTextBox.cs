@@ -8,259 +8,258 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Nexen.Debugger.Utilities;
 
-namespace Nexen.Controls {
-	public class NexenNumericTextBox : TextBox {
-		protected override Type StyleKeyOverride => typeof(TextBox);
+namespace Nexen.Controls; 
+public class NexenNumericTextBox : TextBox {
+	protected override Type StyleKeyOverride => typeof(TextBox);
 
-		private static HexConverter _hexConverter = new HexConverter();
+	private static HexConverter _hexConverter = new HexConverter();
 
-		public static readonly StyledProperty<bool> TrimProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Trim));
-		public static readonly StyledProperty<bool> HexProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Hex));
-		public static readonly StyledProperty<IComparable> ValueProperty = AvaloniaProperty.Register<NexenNumericTextBox, IComparable>(nameof(Value), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
-		public static readonly StyledProperty<string?> MinProperty = AvaloniaProperty.Register<NexenNumericTextBox, string?>(nameof(Min), null);
-		public static readonly StyledProperty<string?> MaxProperty = AvaloniaProperty.Register<NexenNumericTextBox, string?>(nameof(Max), null);
+	public static readonly StyledProperty<bool> TrimProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Trim));
+	public static readonly StyledProperty<bool> HexProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Hex));
+	public static readonly StyledProperty<IComparable> ValueProperty = AvaloniaProperty.Register<NexenNumericTextBox, IComparable>(nameof(Value), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+	public static readonly StyledProperty<string?> MinProperty = AvaloniaProperty.Register<NexenNumericTextBox, string?>(nameof(Min), null);
+	public static readonly StyledProperty<string?> MaxProperty = AvaloniaProperty.Register<NexenNumericTextBox, string?>(nameof(Max), null);
 
-		private bool _preventTextUpdate;
+	private bool _preventTextUpdate;
 
-		public bool Hex {
-			get { return GetValue(HexProperty); }
-			set { SetValue(HexProperty, value); }
-		}
+	public bool Hex {
+		get { return GetValue(HexProperty); }
+		set { SetValue(HexProperty, value); }
+	}
 
-		public bool Trim {
-			get { return GetValue(TrimProperty); }
-			set { SetValue(TrimProperty, value); }
-		}
+	public bool Trim {
+		get { return GetValue(TrimProperty); }
+		set { SetValue(TrimProperty, value); }
+	}
 
-		public IComparable Value {
-			get { return GetValue(ValueProperty); }
-			set { SetValue(ValueProperty, value); }
-		}
+	public IComparable Value {
+		get { return GetValue(ValueProperty); }
+		set { SetValue(ValueProperty, value); }
+	}
 
-		public string? Min {
-			get { return GetValue(MinProperty); }
-			set { SetValue(MinProperty, value); }
-		}
+	public string? Min {
+		get { return GetValue(MinProperty); }
+		set { SetValue(MinProperty, value); }
+	}
 
-		public string? Max {
-			get { return GetValue(MaxProperty); }
-			set { SetValue(MaxProperty, value); }
-		}
+	public string? Max {
+		get { return GetValue(MaxProperty); }
+		set { SetValue(MaxProperty, value); }
+	}
 
-		static NexenNumericTextBox() {
-			ValueProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
-				if (!x.IsInitialized) {
-					return;
-				}
+	static NexenNumericTextBox() {
+		ValueProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
+			if (!x.IsInitialized) {
+				return;
+			}
 
-				//This seems to sometimes cause a stack overflow when the code tries to update
-				//value based on the min/max values, which seems to trigger an infinite loop
-				//of value updates (unsure if this is an Avalonia bug?) - updating after the event
-				//prevents the stack overflow/crash.
-				Dispatcher.UIThread.Post(() => {
-					x.SetNewValue(x.Value);
-					x.UpdateText();
-					x.MaxLength = x.GetMaxLength();
-				});
-			});
-
-			MaxProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
+			//This seems to sometimes cause a stack overflow when the code tries to update
+			//value based on the min/max values, which seems to trigger an infinite loop
+			//of value updates (unsure if this is an Avalonia bug?) - updating after the event
+			//prevents the stack overflow/crash.
+			Dispatcher.UIThread.Post(() => {
+				x.SetNewValue(x.Value);
+				x.UpdateText();
 				x.MaxLength = x.GetMaxLength();
-				x.UpdateText(true);
 			});
+		});
+
+		MaxProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
+			x.MaxLength = x.GetMaxLength();
+			x.UpdateText(true);
+		});
 
 
-			TextProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
-				if (!x.IsInitialized) {
+		TextProperty.Changed.AddClassHandler<NexenNumericTextBox>((x, e) => {
+			if (!x.IsInitialized) {
+				return;
+			}
+
+			//Only update internal value while user is actively editing the text
+			//Text will be update to its "standard" representation when focus is lost
+			x._preventTextUpdate = true;
+			x.UpdateValueFromText();
+			x._preventTextUpdate = false;
+		});
+	}
+
+	public NexenNumericTextBox() {
+	}
+
+	protected override void OnInitialized() {
+		base.OnInitialized();
+		MaxLength = GetMaxLength();
+		UpdateText(true);
+	}
+
+	long? GetMin() {
+		return GetConvertedMinMaxValue(Min);
+	}
+
+	long? GetMax() {
+		return GetConvertedMinMaxValue(Max);
+	}
+
+	private long? GetConvertedMinMaxValue(string? valStr) {
+		if (valStr != null) {
+			NumberStyles styles = NumberStyles.Integer;
+			if (valStr.StartsWith("0x")) {
+				valStr = valStr.Substring(2);
+				styles = NumberStyles.HexNumber;
+			}
+
+			if (long.TryParse(valStr, styles, null, out long val)) {
+				return val;
+			}
+		}
+
+		return null;
+	}
+
+	protected override void OnTextInput(TextInputEventArgs e) {
+		if (e.Text == null) {
+			e.Handled = true;
+			return;
+		}
+
+		long? min = GetMin();
+		bool allowNegative = min != null && min.Value < 0;
+
+		if (Hex) {
+			foreach (char c in e.Text.ToLowerInvariant()) {
+				if (c is not ((>= '0' and <= '9') or (>= 'a' and <= 'f'))) {
+					//not hex
+					e.Handled = true;
 					return;
 				}
+			}
+		} else {
+			foreach (char c in e.Text) {
+				if (c is < '0' or > '9') {
+					//not a number
+					if (c == '-' && allowNegative) {
+						//Allow negative sign
+						continue;
+					}
 
-				//Only update internal value while user is actively editing the text
-				//Text will be update to its "standard" representation when focus is lost
-				x._preventTextUpdate = true;
-				x.UpdateValueFromText();
-				x._preventTextUpdate = false;
-			});
-		}
-
-		public NexenNumericTextBox() {
-		}
-
-		protected override void OnInitialized() {
-			base.OnInitialized();
-			MaxLength = GetMaxLength();
-			UpdateText(true);
-		}
-
-		long? GetMin() {
-			return GetConvertedMinMaxValue(Min);
-		}
-
-		long? GetMax() {
-			return GetConvertedMinMaxValue(Max);
-		}
-
-		private long? GetConvertedMinMaxValue(string? valStr) {
-			if (valStr != null) {
-				NumberStyles styles = NumberStyles.Integer;
-				if (valStr.StartsWith("0x")) {
-					valStr = valStr.Substring(2);
-					styles = NumberStyles.HexNumber;
-				}
-
-				if (long.TryParse(valStr, styles, null, out long val)) {
-					return val;
+					e.Handled = true;
+					return;
 				}
 			}
-
-			return null;
 		}
 
-		protected override void OnTextInput(TextInputEventArgs e) {
-			if (e.Text == null) {
-				e.Handled = true;
-				return;
-			}
+		base.OnTextInput(e);
+	}
 
+	private void UpdateValueFromText() {
+		if (string.IsNullOrWhiteSpace(Text)) {
 			long? min = GetMin();
-			bool allowNegative = min != null && min.Value < 0;
-
-			if (Hex) {
-				foreach (char c in e.Text.ToLowerInvariant()) {
-					if (c is not ((>= '0' and <= '9') or (>= 'a' and <= 'f'))) {
-						//not hex
-						e.Handled = true;
-						return;
-					}
-				}
+			if (min != null && min.Value > 0) {
+				SetNewValue((IComparable)Convert.ChangeType(min.Value, Value.GetType()));
 			} else {
-				foreach (char c in e.Text) {
-					if (c is < '0' or > '9') {
-						//not a number
-						if (c == '-' && allowNegative) {
-							//Allow negative sign
-							continue;
-						}
-
-						e.Handled = true;
-						return;
-					}
-				}
+				SetNewValue((IComparable)Convert.ChangeType(0, Value.GetType()));
 			}
-
-			base.OnTextInput(e);
 		}
 
-		private void UpdateValueFromText() {
-			if (string.IsNullOrWhiteSpace(Text)) {
-				long? min = GetMin();
-				if (min != null && min.Value > 0) {
-					SetNewValue((IComparable)Convert.ChangeType(min.Value, Value.GetType()));
+		IComparable? val;
+		if (Hex) {
+			val = (IComparable?)_hexConverter.ConvertBack(Text, Value.GetType(), null, CultureInfo.InvariantCulture);
+		} else {
+			if (!long.TryParse(Text, out long parsedValue)) {
+				val = Value;
+			} else {
+				if (parsedValue == 0 && Text.StartsWith("-")) {
+					//Allow typing minus before a 0, turn value into -1
+					val = -1;
 				} else {
-					SetNewValue((IComparable)Convert.ChangeType(0, Value.GetType()));
+					val = parsedValue;
 				}
 			}
-
-			IComparable? val;
-			if (Hex) {
-				val = (IComparable?)_hexConverter.ConvertBack(Text, Value.GetType(), null, CultureInfo.InvariantCulture);
-			} else {
-				if (!long.TryParse(Text, out long parsedValue)) {
-					val = Value;
-				} else {
-					if (parsedValue == 0 && Text.StartsWith("-")) {
-						//Allow typing minus before a 0, turn value into -1
-						val = -1;
-					} else {
-						val = parsedValue;
-					}
-				}
-			}
-
-			if (val != null) {
-				SetNewValue(val);
-			}
 		}
 
-		private int GetMaxLength() {
-			IFormattable max;
-			long? maxProp = GetMax();
-			max = maxProp != null
-				? maxProp.Value
-				: Value switch {
-					byte _ => byte.MaxValue,
-					sbyte _ => sbyte.MaxValue,
-					short _ => short.MaxValue,
-					ushort _ => ushort.MaxValue,
-					int _ => int.MaxValue,
-					uint _ => uint.MaxValue,
-					long _ => long.MaxValue,
-					ulong _ => ulong.MaxValue,
-					_ => int.MaxValue
-				};
+		if (val != null) {
+			SetNewValue(val);
+		}
+	}
 
-			//Increase max length by 1 if minus signs are allowed
-			long? min = GetMin();
-			bool allowNegative = !Hex && min != null && min.Value < 0;
-			return max.ToString(Hex ? "X" : null, null).Length + (allowNegative ? 1 : 0);
+	private int GetMaxLength() {
+		IFormattable max;
+		long? maxProp = GetMax();
+		max = maxProp != null
+			? maxProp.Value
+			: Value switch {
+				byte _ => byte.MaxValue,
+				sbyte _ => sbyte.MaxValue,
+				short _ => short.MaxValue,
+				ushort _ => ushort.MaxValue,
+				int _ => int.MaxValue,
+				uint _ => uint.MaxValue,
+				long _ => long.MaxValue,
+				ulong _ => ulong.MaxValue,
+				_ => int.MaxValue
+			};
+
+		//Increase max length by 1 if minus signs are allowed
+		long? min = GetMin();
+		bool allowNegative = !Hex && min != null && min.Value < 0;
+		return max.ToString(Hex ? "X" : null, null).Length + (allowNegative ? 1 : 0);
+	}
+
+	private void SetNewValue(IComparable val) {
+		if (val == null) {
+			return;
 		}
 
-		private void SetNewValue(IComparable val) {
-			if (val == null) {
-				return;
-			}
+		long? max = GetMax();
+		long? min = GetMin();
 
-			long? max = GetMax();
-			long? min = GetMin();
-
-			if (max != null && val.CompareTo(Convert.ChangeType(max, val.GetType())) > 0) {
-				val = (IComparable)Convert.ChangeType(max, val.GetType());
-			} else if (min != null && val.CompareTo(Convert.ChangeType(min, val.GetType())) < 0) {
-				val = (IComparable)Convert.ChangeType(min, val.GetType());
-			} else if (min == null && val.CompareTo(Convert.ChangeType(0, val.GetType())) < 0) {
-				val = (IComparable)Convert.ChangeType(0, val.GetType());
-			}
-
-			if (!object.Equals(Value, val)) {
-				Value = val;
-			}
+		if (max != null && val.CompareTo(Convert.ChangeType(max, val.GetType())) > 0) {
+			val = (IComparable)Convert.ChangeType(max, val.GetType());
+		} else if (min != null && val.CompareTo(Convert.ChangeType(min, val.GetType())) < 0) {
+			val = (IComparable)Convert.ChangeType(min, val.GetType());
+		} else if (min == null && val.CompareTo(Convert.ChangeType(0, val.GetType())) < 0) {
+			val = (IComparable)Convert.ChangeType(0, val.GetType());
 		}
 
-		private void UpdateText(bool force = false) {
-			if (Value == null || _preventTextUpdate) {
-				return;
-			}
+		if (!object.Equals(Value, val)) {
+			Value = val;
+		}
+	}
 
-			string? text;
-			if (Hex) {
-				string format = "X" + MaxLength;
-				text = (string?)_hexConverter.Convert(Value, typeof(string), format, CultureInfo.InvariantCulture);
-			} else {
-				text = Value.ToString();
-			}
-
-			if (force || text?.TrimStart('0', ' ').ToLowerInvariant() != Text?.TrimStart('0', ' ').ToLowerInvariant()) {
-				if (Trim) {
-					text = text?.TrimStart('0', ' ');
-				}
-
-				if (text?.Length == 0) {
-					text = "0";
-				}
-
-				Text = text;
-			}
+	private void UpdateText(bool force = false) {
+		if (Value == null || _preventTextUpdate) {
+			return;
 		}
 
-		protected override void OnGotFocus(GotFocusEventArgs e) {
-			base.OnGotFocus(e);
-			this.SelectAll();
+		string? text;
+		if (Hex) {
+			string format = "X" + MaxLength;
+			text = (string?)_hexConverter.Convert(Value, typeof(string), format, CultureInfo.InvariantCulture);
+		} else {
+			text = Value.ToString();
 		}
 
-		protected override void OnLostFocus(RoutedEventArgs e) {
-			base.OnLostFocus(e);
-			UpdateValueFromText();
-			UpdateText(true);
+		if (force || text?.TrimStart('0', ' ').ToLowerInvariant() != Text?.TrimStart('0', ' ').ToLowerInvariant()) {
+			if (Trim) {
+				text = text?.TrimStart('0', ' ');
+			}
+
+			if (text?.Length == 0) {
+				text = "0";
+			}
+
+			Text = text;
 		}
+	}
+
+	protected override void OnGotFocus(GotFocusEventArgs e) {
+		base.OnGotFocus(e);
+		this.SelectAll();
+	}
+
+	protected override void OnLostFocus(RoutedEventArgs e) {
+		base.OnLostFocus(e);
+		UpdateValueFromText();
+		UpdateText(true);
 	}
 }

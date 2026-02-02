@@ -10,33 +10,32 @@ using Nexen.Utilities;
 using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.Debugger.Windows {
-	public class NesHeaderEditWindow : NexenWindow {
-		NesHeaderEditViewModel _model;
+namespace Nexen.Debugger.Windows; 
+public class NesHeaderEditWindow : NexenWindow {
+	NesHeaderEditViewModel _model;
 
-		public NesHeaderEditWindow() {
-			_model = new NesHeaderEditViewModel();
-			DataContext = _model;
+	public NesHeaderEditWindow() {
+		_model = new NesHeaderEditViewModel();
+		DataContext = _model;
 
-			InitializeComponent();
+		InitializeComponent();
 
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
-		}
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		private async void Ok_OnClick(object sender, RoutedEventArgs e) {
-			if (await _model.Save(this)) {
-				Close();
-			}
-		}
-
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+	private async void Ok_OnClick(object sender, RoutedEventArgs e) {
+		if (await _model.Save(this)) {
 			Close();
 		}
+	}
+
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close();
 	}
 }

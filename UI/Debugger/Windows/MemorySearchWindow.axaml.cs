@@ -12,52 +12,51 @@ using Nexen.Debugger.Utilities;
 using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
-namespace Nexen.Debugger.Windows {
-	public class MemorySearchWindow : NexenWindow, INotificationHandler {
-		private MemorySearchViewModel _model;
+namespace Nexen.Debugger.Windows; 
+public class MemorySearchWindow : NexenWindow, INotificationHandler {
+	private MemorySearchViewModel _model;
 
-		public MemorySearchWindow() {
-			_model = new MemorySearchViewModel();
-			DataContext = _model;
+	public MemorySearchWindow() {
+		_model = new MemorySearchViewModel();
+		DataContext = _model;
 
-			InitializeComponent();
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
 
-			if (Design.IsDesignMode) {
-				return;
-			}
-
-			_model.Config.LoadWindowSettings(this);
+		if (Design.IsDesignMode) {
+			return;
 		}
 
-		protected override void OnClosing(WindowClosingEventArgs e) {
-			base.OnClosing(e);
-			_model.Config.SaveWindowSettings(this);
+		_model.Config.LoadWindowSettings(this);
+	}
+
+	protected override void OnClosing(WindowClosingEventArgs e) {
+		base.OnClosing(e);
+		_model.Config.SaveWindowSettings(this);
+	}
+
+	public void ProcessNotification(NotificationEventArgs e) {
+		switch (e.NotificationType) {
+			case ConsoleNotificationType.GameLoaded:
+				Dispatcher.UIThread.Post(() => _model.OnGameLoaded());
+				break;
+
+			case ConsoleNotificationType.PpuFrameDone:
+				if (!ToolRefreshHelper.LimitFps(this, 30)) {
+					_model.RefreshData(false);
+				}
+
+				break;
+
+			case ConsoleNotificationType.CodeBreak:
+				_model.RefreshData(true);
+				break;
 		}
+	}
 
-		public void ProcessNotification(NotificationEventArgs e) {
-			switch (e.NotificationType) {
-				case ConsoleNotificationType.GameLoaded:
-					Dispatcher.UIThread.Post(() => _model.OnGameLoaded());
-					break;
-
-				case ConsoleNotificationType.PpuFrameDone:
-					if (!ToolRefreshHelper.LimitFps(this, 30)) {
-						_model.RefreshData(false);
-					}
-
-					break;
-
-				case ConsoleNotificationType.CodeBreak:
-					_model.RefreshData(true);
-					break;
-			}
-		}
-
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

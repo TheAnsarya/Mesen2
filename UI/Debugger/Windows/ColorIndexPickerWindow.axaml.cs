@@ -10,105 +10,104 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.Debugger.Windows {
-	public class ColorIndexPickerWindow : NexenWindow {
-		public UInt32[] Palette { get; set; } = [];
-		public int SelectedPalette { get; set; }
-		public int BlockSize { get; set; } = 24;
-		public int ColumnCount { get; set; } = 16;
+namespace Nexen.Debugger.Windows; 
+public class ColorIndexPickerWindow : NexenWindow {
+	public UInt32[] Palette { get; set; } = [];
+	public int SelectedPalette { get; set; }
+	public int BlockSize { get; set; } = 24;
+	public int ColumnCount { get; set; } = 16;
 
-		[Obsolete("For designer only")]
-		public ColorIndexPickerWindow() : this(CpuType.Nes, 0) { }
+	[Obsolete("For designer only")]
+	public ColorIndexPickerWindow() : this(CpuType.Nes, 0) { }
 
-		public ColorIndexPickerWindow(CpuType cpuType, int selectedPalette) {
-			SelectedPalette = selectedPalette;
-			switch (cpuType) {
-				case CpuType.Nes:
-					Palette = ConfigManager.Config.Nes.UserPalette;
-					break;
+	public ColorIndexPickerWindow(CpuType cpuType, int selectedPalette) {
+		SelectedPalette = selectedPalette;
+		switch (cpuType) {
+			case CpuType.Nes:
+				Palette = ConfigManager.Config.Nes.UserPalette;
+				break;
 
-				case CpuType.Pce:
-					Palette = ConfigManager.Config.PcEngine.Palette;
-					break;
+			case CpuType.Pce:
+				Palette = ConfigManager.Config.PcEngine.Palette;
+				break;
 
-				case CpuType.Gameboy:
-					Palette = selectedPalette < 4
-						? ConfigManager.Config.Gameboy.BgColors
-						: selectedPalette < 8 ? ConfigManager.Config.Gameboy.Obj0Colors : ConfigManager.Config.Gameboy.Obj1Colors;
+			case CpuType.Gameboy:
+				Palette = selectedPalette < 4
+					? ConfigManager.Config.Gameboy.BgColors
+					: selectedPalette < 8 ? ConfigManager.Config.Gameboy.Obj0Colors : ConfigManager.Config.Gameboy.Obj1Colors;
 
-					ColumnCount = 4;
-					SelectedPalette = selectedPalette % 4;
-					break;
+				ColumnCount = 4;
+				SelectedPalette = selectedPalette % 4;
+				break;
 
-				case CpuType.Sms:
-					Palette = GenerateSmsPalette();
-					ColumnCount = 8;
-					break;
+			case CpuType.Sms:
+				Palette = GenerateSmsPalette();
+				ColumnCount = 8;
+				break;
 
-				case CpuType.Ws:
-					Palette = GenerateWsPalette();
-					ColumnCount = 8;
-					break;
+			case CpuType.Ws:
+				Palette = GenerateWsPalette();
+				ColumnCount = 8;
+				break;
 
-				default:
-					throw new NotImplementedException();
-			}
+			default:
+				throw new NotImplementedException();
+		}
 
-			InitializeComponent();
+		InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+		this.AttachDevTools();
 #endif
+	}
+
+	private static UInt32[] GenerateWsPalette() {
+		UInt32[] pal = new UInt32[8];
+		WsState state = DebugApi.GetConsoleState<WsState>(ConsoleType.Ws);
+		for (int i = 0; i < 8; i++) {
+			int b = state.Ppu.BwShades[i] ^ 0x0F;
+			pal[i] = 0xFF000000 | (UInt32)(b | (b << 4) | (b << 8) | (b << 12) | (b << 16) | (b << 20) | (b << 24));
 		}
 
-		private static UInt32[] GenerateWsPalette() {
-			UInt32[] pal = new UInt32[8];
-			WsState state = DebugApi.GetConsoleState<WsState>(ConsoleType.Ws);
-			for (int i = 0; i < 8; i++) {
-				int b = state.Ppu.BwShades[i] ^ 0x0F;
-				pal[i] = 0xFF000000 | (UInt32)(b | (b << 4) | (b << 8) | (b << 12) | (b << 16) | (b << 20) | (b << 24));
-			}
+		return pal;
+	}
 
-			return pal;
+	private static UInt32[] GenerateSmsPalette() {
+		UInt32[] pal = new UInt32[0x40];
+		for (int i = 0; i < 0x40; i++) {
+			pal[i] = Rgb222ToArgb((byte)i);
 		}
 
-		private static UInt32[] GenerateSmsPalette() {
-			UInt32[] pal = new UInt32[0x40];
-			for (int i = 0; i < 0x40; i++) {
-				pal[i] = Rgb222ToArgb((byte)i);
-			}
+		return pal;
+	}
 
-			return pal;
+	private static byte Rgb222To8Bit(byte color) {
+		return (byte)((byte)(color << 6) | (byte)(color << 4) | (byte)(color << 2) | color);
+	}
+
+	private static UInt32 Rgb222ToArgb(byte rgb222) {
+		byte b = Rgb222To8Bit((byte)(rgb222 >> 4));
+		byte g = Rgb222To8Bit((byte)((rgb222 >> 2) & 0x3));
+		byte r = Rgb222To8Bit((byte)(rgb222 & 0x3));
+
+		return 0xFF000000 | (UInt32)(r << 16) | (UInt32)(g << 8) | b;
+	}
+
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
+	}
+
+	protected override void OnOpened(EventArgs e) {
+		base.OnOpened(e);
+		if (Owner != null) {
+			WindowExtensions.CenterWindow(this, Owner);
 		}
+	}
 
-		private static byte Rgb222To8Bit(byte color) {
-			return (byte)((byte)(color << 6) | (byte)(color << 4) | (byte)(color << 2) | color);
-		}
+	private void Cancel_OnClick(object sender, RoutedEventArgs e) {
+		Close(null!);
+	}
 
-		private static UInt32 Rgb222ToArgb(byte rgb222) {
-			byte b = Rgb222To8Bit((byte)(rgb222 >> 4));
-			byte g = Rgb222To8Bit((byte)((rgb222 >> 2) & 0x3));
-			byte r = Rgb222To8Bit((byte)(rgb222 & 0x3));
-
-			return 0xFF000000 | (UInt32)(r << 16) | (UInt32)(g << 8) | b;
-		}
-
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
-
-		protected override void OnOpened(EventArgs e) {
-			base.OnOpened(e);
-			if (Owner != null) {
-				WindowExtensions.CenterWindow(this, Owner);
-			}
-		}
-
-		private void Cancel_OnClick(object sender, RoutedEventArgs e) {
-			Close(null!);
-		}
-
-		private void PaletteColor_OnClick(object sender, PaletteSelector.ColorClickEventArgs e) {
-			Close(e.ColorIndex);
-		}
+	private void PaletteColor_OnClick(object sender, PaletteSelector.ColorClickEventArgs e) {
+		Close(e.ColorIndex);
 	}
 }

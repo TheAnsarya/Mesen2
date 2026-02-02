@@ -6,14 +6,13 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Nexen.Config;
 
-namespace Nexen.Debugger.Views {
-	public class MemoryToolsDisplayOptionsView : UserControl {
-		public MemoryToolsDisplayOptionsView() {
-			InitializeComponent();
-		}
+namespace Nexen.Debugger.Views; 
+public class MemoryToolsDisplayOptionsView : UserControl {
+	public MemoryToolsDisplayOptionsView() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }

@@ -10,21 +10,20 @@ using Avalonia.Markup.Xaml;
 using Nexen.Config;
 using Nexen.Localization;
 
-namespace Nexen.Controls {
-	public class OverscanInput : UserControl {
-		public static readonly StyledProperty<OverscanConfig> OverscanProperty = AvaloniaProperty.Register<OverscanInput, OverscanConfig>(nameof(Overscan), new OverscanConfig(), defaultBindingMode: BindingMode.TwoWay);
+namespace Nexen.Controls; 
+public class OverscanInput : UserControl {
+	public static readonly StyledProperty<OverscanConfig> OverscanProperty = AvaloniaProperty.Register<OverscanInput, OverscanConfig>(nameof(Overscan), new OverscanConfig(), defaultBindingMode: BindingMode.TwoWay);
 
-		public OverscanConfig Overscan {
-			get { return GetValue(OverscanProperty); }
-			set { SetValue(OverscanProperty, value); }
-		}
+	public OverscanConfig Overscan {
+		get { return GetValue(OverscanProperty); }
+		set { SetValue(OverscanProperty, value); }
+	}
 
-		public OverscanInput() {
-			InitializeComponent();
-		}
+	public OverscanInput() {
+		InitializeComponent();
+	}
 
-		private void InitializeComponent() {
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent() {
+		AvaloniaXamlLoader.Load(this);
 	}
 }
