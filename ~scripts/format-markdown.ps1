@@ -11,7 +11,7 @@
 param(
 	[Parameter(Mandatory = $false)]
 	[string]$Path = ".",
-	
+
 	[Parameter(Mandatory = $false)]
 	[switch]$DryRun
 )
@@ -20,28 +20,28 @@ $ErrorActionPreference = "Stop"
 
 function Format-MarkdownFile {
 	param([string]$FilePath)
-	
+
 	$content = Get-Content -Path $FilePath -Raw -Encoding UTF8
 	$originalContent = $content
 	$modified = $false
-	
+
 	# Split into lines for processing
 	$lines = $content -split "`r?`n"
 	$newLines = @()
 	$inCodeBlock = $false
 	$codeBlockLanguage = ""
-	
+
 	for ($i = 0; $i -lt $lines.Count; $i++) {
 		$line = $lines[$i]
 		$prevLine = if ($i -gt 0) { $lines[$i - 1] } else { "" }
 		$nextLine = if ($i -lt $lines.Count - 1) { $lines[$i + 1] } else { "" }
-		
+
 		# Track code blocks
 		if ($line -match '^```(\w*)') {
 			if (-not $inCodeBlock) {
 				$inCodeBlock = $true
 				$codeBlockLanguage = $matches[1]
-				
+
 				# MD040: Add language to code blocks without one
 				if ([string]::IsNullOrWhiteSpace($codeBlockLanguage)) {
 					# Try to guess language based on content
@@ -69,7 +69,7 @@ function Format-MarkdownFile {
 					$line = "``````$guessedLang"
 					$modified = $true
 				}
-				
+
 				# MD031: Ensure blank line before code block (if not at start or after blank)
 				if ($i -gt 0 -and -not [string]::IsNullOrWhiteSpace($prevLine)) {
 					$newLines += ""
@@ -80,22 +80,22 @@ function Format-MarkdownFile {
 				$codeBlockLanguage = ""
 			}
 		}
-		
+
 		# Don't modify content inside code blocks (except the fence itself)
 		if ($inCodeBlock -and -not ($line -match '^```')) {
 			$newLines += $line
 			continue
 		}
-		
+
 		# MD060: Fix table formatting (add spaces around pipes)
 		if ($line -match '^\s*\|.*\|' -and -not $inCodeBlock) {
 			# This is a table row
 			$originalLine = $line
-			
+
 			# Split by pipe, trim each cell, rejoin with proper spacing
 			$cells = $line -split '\|'
 			$fixedCells = @()
-			
+
 			foreach ($cell in $cells) {
 				$trimmed = $cell.Trim()
 				if ($trimmed -eq "" -and $fixedCells.Count -eq 0) {
@@ -112,7 +112,7 @@ function Format-MarkdownFile {
 					$fixedCells += " $trimmed "
 				}
 			}
-			
+
 			$line = $fixedCells -join '|'
 			# Trim trailing space from last pipe
 			$line = $line -replace '\|\s*$', '|'
@@ -120,12 +120,12 @@ function Format-MarkdownFile {
 			if (-not ($line -match '^\|')) {
 				$line = "|$line"
 			}
-			
+
 			if ($line -ne $originalLine) {
 				$modified = $true
 			}
 		}
-		
+
 		# MD032/MD058: Add blank lines around lists and tables
 		# Check if this line is a list item
 		$isListItem = $line -match '^\s*[-*+]\s+' -or $line -match '^\s*\d+\.\s+'
@@ -135,37 +135,37 @@ function Format-MarkdownFile {
 		$prevIsTableRow = $prevLine -match '^\s*\|.*\|'
 		$prevIsHeading = $prevLine -match '^#+\s'
 		$prevIsCodeFence = $prevLine -match '^```'
-		
+
 		# Add blank line before list if needed
 		if ($isListItem -and -not $prevIsBlank -and -not $prevIsListItem -and -not $prevIsHeading -and $i -gt 0) {
 			$newLines += ""
 			$modified = $true
 		}
-		
+
 		# Add blank line before table if needed
 		if ($isTableRow -and -not $prevIsBlank -and -not $prevIsTableRow -and -not $prevIsHeading -and $i -gt 0) {
 			$newLines += ""
 			$modified = $true
 		}
-		
+
 		$newLines += $line
-		
+
 		# Check if we need to add blank line after list ends
 		$nextIsListItem = $nextLine -match '^\s*[-*+]\s+' -or $nextLine -match '^\s*\d+\.\s+'
 		$nextIsBlank = [string]::IsNullOrWhiteSpace($nextLine)
 		$nextIsTableRow = $nextLine -match '^\s*\|.*\|'
-		
+
 		if ($isListItem -and -not $nextIsListItem -and -not $nextIsBlank -and $i -lt $lines.Count - 1) {
 			$newLines += ""
 			$modified = $true
 		}
-		
+
 		# Add blank line after table ends
 		if ($isTableRow -and -not $nextIsTableRow -and -not $nextIsBlank -and $i -lt $lines.Count - 1) {
 			$newLines += ""
 			$modified = $true
 		}
-		
+
 		# MD031: Add blank line after code block
 		if ($line -match '^```$' -or ($line -match '^```' -and -not $inCodeBlock)) {
 			if (-not $inCodeBlock -and -not $nextIsBlank -and $i -lt $lines.Count - 1) {
@@ -174,21 +174,21 @@ function Format-MarkdownFile {
 			}
 		}
 	}
-	
+
 	# Rejoin lines
 	$newContent = $newLines -join "`r`n"
-	
+
 	# Convert leading spaces to tabs (outside code blocks)
 	# This is tricky - we need to be careful about code blocks
 	$finalLines = $newContent -split "`r?`n"
 	$finalOutput = @()
 	$inCode = $false
-	
+
 	foreach ($line in $finalLines) {
 		if ($line -match '^```') {
 			$inCode = -not $inCode
 		}
-		
+
 		if (-not $inCode) {
 			# Convert leading spaces to tabs (4 spaces = 1 tab)
 			$originalLine = $line
@@ -199,27 +199,27 @@ function Format-MarkdownFile {
 				$modified = $true
 			}
 		}
-		
+
 		$finalOutput += $line
 	}
-	
+
 	$newContent = $finalOutput -join "`r`n"
-	
+
 	# Ensure file ends with newline
 	if (-not $newContent.EndsWith("`n")) {
 		$newContent += "`r`n"
 	}
-	
+
 	# Remove multiple consecutive blank lines
 	$newContent = $newContent -replace "(`r?`n){3,}", "`r`n`r`n"
-	
+
 	if ($modified -or ($newContent -ne $originalContent)) {
 		return @{
 			Modified = $true
 			Content = $newContent
 		}
 	}
-	
+
 	return @{
 		Modified = $false
 		Content = $originalContent
@@ -227,7 +227,7 @@ function Format-MarkdownFile {
 }
 
 # Find all markdown files
-$mdFiles = Get-ChildItem -Path $Path -Filter "*.md" -Recurse -File | 
+$mdFiles = Get-ChildItem -Path $Path -Filter "*.md" -Recurse -File |
 	Where-Object { $_.FullName -notmatch 'vcpkg_installed|node_modules' }
 
 $totalFiles = $mdFiles.Count
@@ -237,7 +237,7 @@ Write-Host "Processing $totalFiles markdown files..." -ForegroundColor Cyan
 
 foreach ($file in $mdFiles) {
 	$result = Format-MarkdownFile -FilePath $file.FullName
-	
+
 	if ($result.Modified) {
 		$modifiedCount++
 		if ($DryRun) {
