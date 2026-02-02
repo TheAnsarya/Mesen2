@@ -26,13 +26,15 @@
 
 | Platform | Architecture | Download |
 |----------|--------------|----------|
-| **Windows** | x64 | [Nexen-Windows-x64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Windows-x64.zip) |
+| **Windows** | x64 | [Nexen-Windows-x64.exe](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Windows-x64.exe) |
+| **Linux** | x64 | [Nexen-Linux-x64](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Linux-x64) |
 | **Linux** | x64 AppImage | [Nexen-Linux-x64.AppImage](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Linux-x64.AppImage) |
+| **Linux** | ARM64 | [Nexen-Linux-ARM64](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Linux-ARM64) |
 | **Linux** | ARM64 AppImage | [Nexen-Linux-ARM64.AppImage](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Linux-ARM64.AppImage) |
 | **macOS** | Intel (x64) | [Nexen-macOS-x64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-macOS-x64.zip) |
 | **macOS** | Apple Silicon | [Nexen-macOS-ARM64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-macOS-ARM64.zip) |
 
-> **Note:** See [Releases](https://github.com/TheAnsarya/Nexen/releases) for all versions and build artifacts.
+> **Development Builds:** Automated builds from the latest code are available via [GitHub Actions](https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml).
 
 ---
 
@@ -96,34 +98,7 @@
 - Per-channel volume control
 - Audio recording (WAV)
 
-## 📥 Download
-
-### Latest Release
-
-Download the latest release for your platform:
-
-| Platform | Download |
-| ---------- | ---------- |
-| **Windows** | [Nexen-win-x64.zip](https://github.com/TheAnsarya/Nexen/releases/latest) |
-| **Linux (AppImage)** | [Nexen-x86_64.AppImage](https://github.com/TheAnsarya/Nexen/releases/latest) |
-| **Linux (ARM64)** | [Nexen-aarch64.AppImage](https://github.com/TheAnsarya/Nexen/releases/latest) |
-| **macOS (Intel)** | [Nexen-macos-x64.zip](https://github.com/TheAnsarya/Nexen/releases/latest) |
-| **macOS (Apple Silicon)** | [Nexen-macos-arm64.zip](https://github.com/TheAnsarya/Nexen/releases/latest) |
-
-### Development Builds
-
-Automated builds from the latest code are available via [GitHub Actions](https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml).
-
-### System Requirements
-
-| Component | Requirement |
-| ----------- | ------------- |
-| OS | Windows 10+, Linux (glibc 2.31+), macOS 13+ |
-| CPU | x64 or ARM64 |
-| RAM | 4 GB minimum |
-| Graphics | OpenGL 3.3+ or Metal |
-
-## 🚀 Quick Start
+##  Quick Start
 
 ### Windows
 
