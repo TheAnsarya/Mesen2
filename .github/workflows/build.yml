@@ -43,7 +43,7 @@ jobs:
         uses: ./.github/actions/build-sha1-action
 
       - name: Build Nexen
-        run: dotnet build -c Release -p:Platform=x64 --no-restore UI/UI.csproj
+        run: dotnet msbuild -nologo -v:m -clp:ForceConsoleColor -m -p:Configuration=Release -p:Platform=x64 -t:Clean,UI Nexen.sln
 
       - name: Publish Nexen
         run: dotnet publish --no-restore -c Release -p:PublishAot="${{ matrix.platform.aot }}" -p:SelfContained="${{ matrix.platform.aot }}" -p:PublishSingleFile="${{ matrix.platform.singleFile }}" -p:OptimizeUi="true" -r win-x64 UI/UI.csproj
@@ -238,9 +238,10 @@ jobs:
           export PATH="$(brew --prefix llvm)/bin:$PATH"
           export CC="$(brew --prefix llvm)/bin/clang"
           export CXX="$(brew --prefix llvm)/bin/clang++"
-          export LDFLAGS="-L$(brew --prefix llvm)/lib/c++ -Wl,-rpath,$(brew --prefix llvm)/lib/c++"
+          export LDFLAGS="-L$(brew --prefix llvm)/lib/c++ -Wl,-rpath,$(brew --prefix llvm)/lib/c++ -stdlib=libc++"
           export CPPFLAGS="-I$(brew --prefix llvm)/include"
-          ${{ matrix.make_flags }} make -j$(sysctl -n hw.logicalcpu)
+          export CXXFLAGS="-stdlib=libc++"
+          make CC="$CC" CXX="$CXX" NEXENFLAGS="-stdlib=libc++" ${{ matrix.make_flags }} -j$(sysctl -n hw.logicalcpu)
 
       - name: Sign binary
         env:
