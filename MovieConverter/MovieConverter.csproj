@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
@@ -12,9 +12,9 @@
 		<Description>TAS movie format conversion library for Nexen emulator</Description>
 		<PackageTags>TAS;movie;emulator;conversion;BK2;LSMV;FM2;SMV</PackageTags>
 
-		<!-- Modern .NET 10 features -->
+		<!-- Modern .NET features -->
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<IsAotCompatible>true</IsAotCompatible>
+		<IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
 		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
 
 		<!-- Performance and analysis -->
