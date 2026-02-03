@@ -14,9 +14,8 @@ jobs:
     strategy:
       matrix:
         platform: [
-          {netversion: 6.x, targetframework: net6.0, aot: false, singleFile: true, aotString: ""},
-          {netversion: 8.x, targetframework: net8.0, aot: false, singleFile: true, aotString: ""},
-          {netversion: 8.x, targetframework: net8.0, aot: true, singleFile: false, aotString: " - AoT"}
+          {netversion: 10.x, targetframework: net10.0, aot: false, singleFile: true, aotString: ""},
+          {netversion: 10.x, targetframework: net10.0, aot: true, singleFile: false, aotString: " - AoT"}
         ]
       fail-fast: false
     runs-on: windows-latest
@@ -88,12 +87,22 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |
           sudo apt-get update -qy
           sudo apt-get install -qy libsdl2-dev ccache # The compilers are already installed on GitHub's runners.
+
+      # Install GCC 13 for C++23 <format> support (default GCC 11 on ubuntu-22.04 doesn't have it)
+      - name: Install GCC 13
+        if: matrix.compiler == 'gcc'
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install -y g++-13 gcc-13
+          echo "CC=gcc-13" >> $GITHUB_ENV
+          echo "CXX=g++-13" >> $GITHUB_ENV
 
       # Install LLVM 18 for C++23 support (default clang on ubuntu-22.04 doesn't support c++23)
       - name: Install LLVM 18
@@ -102,8 +111,6 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 18
-          echo "CC=clang-18" >> $GITHUB_ENV
-          echo "CXX=clang++-18" >> $GITHUB_ENV
 
       - name: Setup CCache
         uses: ./.github/actions/setup-ccache-action
@@ -113,9 +120,14 @@ jobs:
 
       # stderr is not detected as a TTY, so diagnostics are by default printed without colours;
       # forcing colours makes the log a little nicer to read.
+      # Pass CC/CXX explicitly since makefile ignores environment variables
       - name: Build Nexen
         run: |
-          make -j$(nproc) -O ${{ matrix.make_flags }} LTO=true STATICLINK=true SYSTEM_LIBEVDEV=false
+          if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            make -j$(nproc) -O ${{ matrix.make_flags }} LTO=true STATICLINK=true SYSTEM_LIBEVDEV=false CC=gcc-13 CXX=g++-13
+          else
+            make -j$(nproc) -O ${{ matrix.make_flags }} LTO=true STATICLINK=true SYSTEM_LIBEVDEV=false CC=clang-18 CXX=clang++-18
+          fi
 
       - name: Upload Nexen
         uses: actions/upload-artifact@v4
@@ -142,7 +154,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |
@@ -155,8 +167,6 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 18
-          echo "CC=clang-18" >> $GITHUB_ENV
-          echo "CXX=clang++-18" >> $GITHUB_ENV
 
       - name: Setup CCache
         uses: ./.github/actions/setup-ccache-action
@@ -179,7 +189,7 @@ jobs:
       matrix:
         compiler: [clang, clang_aot]
         platform: [
-          {os: macos-13, arch: x64},
+          {os: macos-15-large, arch: x64},
           {os: macos-14, arch: arm64}
         ]
         include:
@@ -199,7 +209,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |

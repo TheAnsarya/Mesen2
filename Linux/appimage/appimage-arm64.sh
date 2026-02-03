@@ -1,7 +1,8 @@
 #!/bin/bash
 
 export PUBLISHFLAGS="-r linux-arm64 --no-self-contained false -p:PublishSingleFile=true -p:PublishReadyToRun=true"
-make -j$(nproc) -O LTO=true STATICLINK=true SYSTEM_LIBEVDEV=false
+# Use clang-18 for C++23 support on ubuntu-22.04
+make -j$(nproc) -O LTO=true STATICLINK=true SYSTEM_LIBEVDEV=false CC=clang-18 CXX=clang++-18
 
 curl -SL https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-aarch64.AppImage -o appimagetool
 
@@ -17,4 +18,4 @@ mkdir -p AppDir/usr/share/icons && cp ./AppDir/Nexen.png ./AppDir/usr/share/icon
 mkdir -p AppDir/usr/share/icons/hicolor/48x48/apps && cp ./AppDir/Nexen.png ./AppDir/usr/share/icons/hicolor/48x48/apps
 
 chmod a+x appimagetool
-./appimagetool AppDir/ Nexen.AppImage
+ARCH=aarch64 ./appimagetool AppDir/ Nexen.AppImage
