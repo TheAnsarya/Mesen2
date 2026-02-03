@@ -95,9 +95,9 @@ jobs:
           sudo apt-get update -qy
           sudo apt-get install -qy libsdl2-dev ccache # The compilers are already installed on GitHub's runners.
 
-      # Install LLVM 18 for C++23 support on ARM64 (default clang doesn't support c++23)
-      - name: Install LLVM (ARM64)
-        if: matrix.platform.path == 'arm64'
+      # Install LLVM 18 for C++23 support (default clang on ubuntu-22.04 doesn't support c++23)
+      - name: Install LLVM 18
+        if: matrix.compiler != 'gcc'
         run: |
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
@@ -149,9 +149,8 @@ jobs:
           sudo apt-get update -qy
           sudo apt-get install -qy libsdl2-dev libfuse2 ccache # The compilers are already installed on GitHub's runners.
 
-      # Install LLVM 18 for C++23 support on ARM64 (default clang doesn't support c++23)
-      - name: Install LLVM (ARM64)
-        if: matrix.platform.name == 'ARM64'
+      # Install LLVM 18 for C++23 support (ubuntu-22.04 default clang doesn't support c++23)
+      - name: Install LLVM 18
         run: |
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
