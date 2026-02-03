@@ -24,6 +24,10 @@
 
 ## 📥 Downloads
 
+### Latest Release
+
+Download pre-built binaries from the [Releases page](https://github.com/TheAnsarya/Nexen/releases/latest).
+
 | Platform | Architecture | Download |
 |----------|--------------|----------|
 | **Windows** | x64 | [Nexen-Windows-x64.exe](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Windows-x64.exe) |
@@ -34,7 +38,11 @@
 | **macOS** | Intel (x64) | [Nexen-macOS-x64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-macOS-x64.zip) |
 | **macOS** | Apple Silicon | [Nexen-macOS-ARM64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-macOS-ARM64.zip) |
 
-> **Development Builds:** Automated builds from the latest code are available via [GitHub Actions](https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml).
+> ⚠️ **Note:** If the release links don't work, the v1.0.0 release may still be building. Check [GitHub Actions](https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml) for CI build artifacts.
+
+### Development Builds
+
+Automated builds from the latest code are available as artifacts from [GitHub Actions](https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml). Click on a successful workflow run and download artifacts from the bottom of the page.
 
 ---
 
