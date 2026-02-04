@@ -3,6 +3,7 @@
 > **Purpose:** Comprehensive testing checklist for all Nexen features implemented since forking from Mesen2.
 > **Date Created:** 2026-02-02
 > **Target Version:** v1.0.0
+> **Tested on:** 2026-02-02
 
 ---
 
@@ -80,17 +81,19 @@ After:  - Note current frame: **1523**
 
 **Instructions:** Gather at least one ROM for each system. Store them in a dedicated test folder (e.g., `C:\NexenTest\ROMs\`).
 
+_NOTE:_ roms are all in the `C:\NexenTest\ROMs\` folder
+
 | System | Recommended Test ROM | Your ROM | ✓ |
 |--------|---------------------|----------|---|
-| NES | Super Mario Bros. or Mega Man 2 | | [ ] |
-| SNES | Super Mario World or Chrono Trigger | | [ ] |
-| Game Boy | Pokemon Red/Blue or Tetris | | [ ] |
+| NES | Super Mario Bros. or Mega Man 2 | `NES/Megaman II (U) [!].nes`, `NES/Super Mario Bros. (W) [!].nes` | [x] |
+| SNES | Super Mario World or Chrono Trigger | `SNES/Chrono Trigger (U) [!].smc`, `SNES/Super Mario World (U) [!].smc` | [x] |
+| Game Boy | Pokemon Red/Blue or Tetris | `GB/Pokemon - Blue Version (UE) [S][!].gb`, `GB/Tetris (W) (V1.0) [!].gb`, `GB/Tetris (W) (V1.1) [!].gb` | [x] |
 | Game Boy Color | Pokemon Crystal or Zelda DX | | [ ] |
-| Game Boy Advance | Metroid Fusion or Pokemon Emerald | | [ ] |
-| Master System | Sonic the Hedgehog | | [ ] |
-| Game Gear | Sonic Triple Trouble | | [ ] |
-| PC Engine | Bonk's Adventure | | [ ] |
-| WonderSwan | Any title | | [ ] |
+| Game Boy Advance | Metroid Fusion or Pokemon Emerald | `GBA/Metroid Fusion (U) [!].gba`, `GBA/Pokemon - Emerald Version (U).gba` | [x] |
+| Master System | Sonic the Hedgehog | `MasterSystem/Sonic The Hedgehog (UEB) [!].sms` | [x] |
+| Game Gear | Sonic Triple Trouble | `GG/Sonic The Hedgehog - Triple Trouble (UE) [!].gg` | [x] |
+| PC Engine | Bonk's Adventure | `PCE/Bonk's Adventure (U).pce` | [x] |
+| WonderSwan | Any title | `WS/Final Fantasy IV (J) [!].wsc` | [x] |
 
 ### 1.2 Clean Installation
 
@@ -103,19 +106,19 @@ After:  - Note current frame: **1523**
    - macOS: `~/Library/Application Support/Nexen/`
 3. **Restart Nexen** - Verify it opens with default settings
 4. **Record your test system:**
-   - OS: ____________________
-   - CPU: ____________________
-   - RAM: ____________________
-   - GPU: ____________________
+   - OS: Windows 10
+   - CPU: 4.29 GHz
+   - RAM: 32 GB
+   - GPU: Onboard bullshit
 
-- [ ] Clean installation verified - Nexen starts with fresh settings
+- [x] Clean installation verified - Nexen starts with fresh settings
 
 ### 1.3 Pre-Test Checklist
 
-- [ ] Screen recording software ready (OBS, ShareX, etc.) for bug reproduction
-- [ ] Test ROM folder accessible
-- [ ] Notepad/text editor open for notes
-- [ ] At least 30 minutes of uninterrupted testing time
+- [x] Screen recording software ready (OBS, ShareX, etc.) for bug reproduction --- Note: Using the win+alt+g shortcut with builtin recording software
+- [x] Test ROM folder accessible
+- [x] Notepad/text editor open for notes
+- [x] At least 30 minutes of uninterrupted testing time
 
 ---
 
