@@ -46,13 +46,13 @@ public class MainMenuViewModel : ViewModelBase {
 	[Reactive] public List<object> OptionsMenuItems { get; set; } = new();
 
 	/// <summary>Gets or sets the Tools menu items.</summary>
-	[Reactive] public List<object> ToolsMenuItems { get; set; } = new();
+	[Reactive] public List<object> ToolsMenuItems { get; set; } = [];
 
 	/// <summary>Gets or sets the Debug menu items.</summary>
-	[Reactive] public List<object> DebugMenuItems { get; set; } = new();
+	[Reactive] public List<object> DebugMenuItems { get; set; } = [];
 
 	/// <summary>Gets or sets the Help menu items.</summary>
-	[Reactive] public List<object> HelpMenuItems { get; set; } = new();
+	[Reactive] public List<object> HelpMenuItems { get; set; } = [];
 
 	/// <summary>NetPlay controller selection items.</summary>
 	[Reactive] private List<object> _netPlayControllers { get; set; } = new();
@@ -1015,203 +1015,203 @@ public class MainMenuViewModel : ViewModelBase {
 		Func<bool> isSuperGameBoy = () => MainWindow.RomInfo.ConsoleType == ConsoleType.Snes && MainWindow.RomInfo.Format == RomFormat.Gb;
 		Func<bool> isNesFormat = () => MainWindow.RomInfo.ConsoleType == ConsoleType.Nes && (MainWindow.RomInfo.Format == RomFormat.iNes || MainWindow.RomInfo.Format == RomFormat.VsSystem || MainWindow.RomInfo.Format == RomFormat.VsDualSystem);
 
-		DebugMenuItems = new List<object>() {
-			new ContextMenuAction() {
+		DebugMenuItems = [
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenDebugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenDebugger),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(MainWindow.RomInfo.ConsoleType.GetMainCpuType())
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenSpcDebugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenSpcDebugger),
 				IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.Spc),
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(CpuType.Spc)
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenCx4Debugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenCx4Debugger),
 				IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.Cx4),
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(CpuType.Cx4)
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenNecDspDebugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenNecDspDebugger),
 				IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.NecDsp),
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(CpuType.NecDsp)
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenGsuDebugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenGsuDebugger),
 				IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.Gsu),
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(CpuType.Gsu)
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenSa1Debugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenSa1Debugger),
 				IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.Sa1),
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(CpuType.Sa1)
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenSt018Debugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenSt018Debugger),
 				IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.St018),
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(CpuType.St018)
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenGameboyDebugger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenGameboyDebugger),
 				IsVisible = () => MainWindow.RomInfo.ConsoleType == ConsoleType.Snes && MainWindow.RomInfo.CpuTypes.Contains(CpuType.Gameboy),
 				OnClick = () => DebuggerWindow.GetOrOpenWindow(CpuType.Gameboy)
 			},
-			new ContextMenuSeparator(),
-			new ContextMenuAction() {
+			new DebugMenuSeparator(),
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenEventViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenEventViewer),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => EventViewerWindow.GetOrOpenWindow(MainWindow.RomInfo.ConsoleType.GetMainCpuType())
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenMemoryTools,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenMemoryTools),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new MemoryToolsWindow())
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenRegisterViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenRegisterViewer),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new RegisterViewerWindow(new RegisterViewerWindowViewModel()))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenTraceLogger,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenTraceLogger),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.GetOrOpenDebugWindow(() => new TraceLoggerWindow(new TraceLoggerViewModel()))
 			},
-			new ContextMenuSeparator(),
-			new ContextMenuAction() {
+			new DebugMenuSeparator(),
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenTilemapViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenTilemapViewer),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new TilemapViewerWindow(MainWindow.RomInfo.ConsoleType.GetMainCpuType()))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenTileViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenTileViewer),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new TileViewerWindow(MainWindow.RomInfo.ConsoleType.GetMainCpuType()))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenSpriteViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenSpriteViewer),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new SpriteViewerWindow(MainWindow.RomInfo.ConsoleType.GetMainCpuType()))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenPaletteViewer,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenPaletteViewer),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new PaletteViewerWindow(MainWindow.RomInfo.ConsoleType.GetMainCpuType()))
 			},
-			new ContextMenuSeparator(),
-			new ContextMenuAction() {
+			new DebugMenuSeparator(),
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenAssembler,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenAssembler),
-				IsEnabled = () => IsGameRunning && MainWindow.RomInfo.ConsoleType.GetMainCpuType().SupportsAssembler(),
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded && MainWindow.RomInfo.ConsoleType.GetMainCpuType().SupportsAssembler(),
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new AssemblerWindow(new AssemblerWindowViewModel(MainWindow.RomInfo.ConsoleType.GetMainCpuType())))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenDebugLog,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenDebugLog),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.GetOrOpenDebugWindow(() => new DebugLogWindow())
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenMemorySearch,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenMemorySearch),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.GetOrOpenDebugWindow(() => new MemorySearchWindow())
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenProfiler,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenProfiler),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.GetOrOpenDebugWindow(() => new ProfilerWindow())
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenScriptWindow,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenScriptWindow),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new ScriptWindow(new ScriptWindowViewModel(null)))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenWatchWindow,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenWatchWindow),
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.GetOrOpenDebugWindow(() => new WatchWindow(new WatchWindowViewModel()))
 			},
-			new ContextMenuSeparator() { IsVisible = isSuperGameBoy },
-			new ContextMenuAction() {
+			new DebugMenuSeparator() { IsVisible = isSuperGameBoy },
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenTilemapViewer,
 				HintText = () => "GB",
 				IsVisible = isSuperGameBoy,
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new TilemapViewerWindow(CpuType.Gameboy))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenTileViewer,
 				HintText = () => "GB",
 				IsVisible = isSuperGameBoy,
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new TileViewerWindow(CpuType.Gameboy))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenSpriteViewer,
 				HintText = () => "GB",
 				IsVisible = isSuperGameBoy,
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new SpriteViewerWindow(CpuType.Gameboy))
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenPaletteViewer,
 				HintText = () => "GB",
 				IsVisible = isSuperGameBoy,
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new PaletteViewerWindow(CpuType.Gameboy))
 			},
 
-			new ContextMenuSeparator() { IsVisible = isSuperGameBoy },
-			new ContextMenuAction() {
+			new DebugMenuSeparator() { IsVisible = isSuperGameBoy },
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenEventViewer,
 				HintText = () => "GB",
 				IsVisible = isSuperGameBoy,
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => EventViewerWindow.GetOrOpenWindow(CpuType.Gameboy)
 			},
-			new ContextMenuAction() {
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenAssembler,
 				HintText = () => "GB",
 				IsVisible = isSuperGameBoy,
-				IsEnabled = () => IsGameRunning,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
 				OnClick = () => DebugWindowManager.OpenDebugWindow(() => new AssemblerWindow(new AssemblerWindowViewModel(CpuType.Gameboy)))
 			},
 
-			new ContextMenuSeparator() { IsVisible = isNesFormat },
-			new ContextMenuAction() {
+			new DebugMenuSeparator() { IsVisible = isNesFormat },
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenNesHeaderEditor,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenNesHeaderEditor),
 				IsVisible = isNesFormat,
 				OnClick = () => new NesHeaderEditWindow().ShowCenteredDialog((Control)wnd)
 			},
 
-			new ContextMenuSeparator(),
-			new ContextMenuAction() {
+			new DebugMenuSeparator(),
+			new DebugMenuAction() {
 				ActionType = ActionType.OpenDebugSettings,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.OpenDebugSettings),
 				OnClick = () => DebuggerConfigWindow.Open(DebugConfigWindowTab.Debugger, wnd)
 			}
-		};
+		];
 
 		DebugShortcutManager.RegisterActions(wnd, DebugMenuItems);
 	}
