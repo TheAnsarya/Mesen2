@@ -1,0 +1,190 @@
+# UI Modernization - Implementation Checklist
+
+## Epic #158: UI Framework and Package Modernization
+
+Use this checklist to track implementation progress.
+
+---
+
+## Phase 1: Package Updates (#159)
+
+### Pre-Flight
+- [ ] Review release notes for each package
+- [ ] Backup current working state (git tag)
+- [ ] Note any known breaking changes
+
+### Package Updates
+- [ ] Update `Avalonia.ReactiveUI` 11.3.9 → 11.3.11
+- [ ] Update `Dock.Avalonia` 11.3.9 → 11.3.11.6
+- [ ] Update `Dock.Avalonia.Themes.Fluent` 11.3.9 → 11.3.11.6
+- [ ] Update `Dock.Model.Mvvm` 11.3.9 → 11.3.11.6
+- [ ] Check `Avalonia.AvaloniaEdit` for updates
+
+### Verification
+- [ ] `dotnet restore` succeeds
+- [ ] `dotnet build -c Release` succeeds
+- [ ] Application starts without errors
+- [ ] Debugger docking works
+- [ ] Theme switching works
+- [ ] Menu shortcuts function
+- [ ] No visual regressions
+
+---
+
+## Phase 2: Disposal Pattern (#160)
+
+### Base Class Updates
+- [ ] Add `using System.Reactive.Disposables;`
+- [ ] Replace `HashSet<IDisposable>` with `CompositeDisposable`
+- [ ] Update `DisposableViewModel.Dispose()`
+- [ ] Update `NexenUserControl` to match
+
+### ViewModels Using Disposal
+- [ ] Audit all ViewModels for disposal patterns
+- [ ] Update any custom disposal implementations
+- [ ] Test memory usage under load
+
+---
+
+## Phase 3: Compiled Bindings (#161)
+
+### Discovery
+- [ ] Generate list of AXAML files without `x:DataType`
+- [ ] Categorize by complexity
+
+### Views (by folder)
+- [ ] `UI/Views/*.axaml`
+- [ ] `UI/Windows/*.axaml`
+- [ ] `UI/Controls/*.axaml`
+- [ ] `UI/Debugger/Views/*.axaml`
+- [ ] `UI/Debugger/Windows/*.axaml`
+- [ ] `UI/Debugger/Controls/*.axaml`
+- [ ] `UI/Debugger/StatusViews/*.axaml`
+
+### Verification
+- [ ] Build with no binding warnings
+- [ ] All views render correctly
+- [ ] Designer works for updated files
+
+---
+
+## Phase 4: Style Modernization (#162)
+
+### Audit
+- [ ] `AvaloniaComboBoxStyles.xaml`
+- [ ] `AvaloniaContextMenuStyles.xaml`
+- [ ] `AvaloniaEditStyles.xaml`
+- [ ] `AvaloniaMenuItemStyles.xaml`
+- [ ] `AvaloniaNumericUpDownStyles.xaml`
+- [ ] `AvaloniaScrollViewerStyles.xaml`
+- [ ] `DataBoxStyles.xaml`
+- [ ] `DebugStatusStyles.xaml`
+- [ ] `DockStyles.xaml`
+- [ ] `NexenStyles.Dark.xaml`
+- [ ] `NexenStyles.Light.xaml`
+- [ ] `NexenStyles.xaml`
+- [ ] `StartupStyles.xaml`
+
+### Updates
+- [ ] Remove deprecated APIs
+- [ ] Consolidate duplicate styles
+- [ ] Update to ControlTheme where appropriate
+- [ ] Test theme switching
+
+---
+
+## Phase 5: Control Modernization (#163)
+
+### Core Controls
+- [ ] `NexenMenu.cs`
+- [ ] `NexenNumericUpDown.cs`
+- [ ] `NexenNumericTextBox.cs`
+- [ ] `NexenSlider.axaml`
+- [ ] `NexenScrollContentPresenter.cs`
+
+### Input Controls
+- [ ] `KeyBindingButton.axaml`
+- [ ] `MultiKeyBindingButton.axaml`
+- [ ] `ControllerButton.axaml`
+- [ ] `InputComboBox.axaml`
+
+### Selection Controls
+- [ ] `EnumComboBox.axaml`
+- [ ] `EnumRadioButton.cs`
+
+### Layout Controls
+- [ ] `GroupBox.axaml`
+- [ ] `OptionSection.axaml`
+- [ ] `SystemSpecificSettings.axaml`
+
+### Specialized
+- [ ] `PaletteConfig.axaml`
+- [ ] `StateGrid.axaml`
+- [ ] `PathSelector.axaml`
+
+### Rendering
+- [ ] `NativeRenderer.cs`
+- [ ] `SoftwareRendererView.axaml`
+- [ ] `SimpleImageViewer.cs`
+- [ ] `PianoRollControl.cs`
+
+### Accessibility
+- [ ] Add AutomationProperties to all controls
+- [ ] Test keyboard navigation
+- [ ] Verify focus order
+
+---
+
+## Phase 6: Performance (#164)
+
+### Virtualization
+- [ ] Disassembly view
+- [ ] Memory viewer
+- [ ] Watch window
+- [ ] Trace logger
+- [ ] Breakpoint list
+
+### Profiling
+- [ ] Baseline measurements captured
+- [ ] Startup time measured
+- [ ] Memory usage profiled
+- [ ] Scroll performance tested
+
+### Optimizations
+- [ ] Lazy loading implemented where needed
+- [ ] Unnecessary bindings removed
+- [ ] Image caching verified
+- [ ] Event handler cleanup verified
+
+---
+
+## Final Verification
+
+### Functional Testing
+- [ ] All emulator cores work
+- [ ] Debugger fully functional
+- [ ] TAS editor works
+- [ ] Settings save/load
+- [ ] Recent games work
+- [ ] NetPlay (if applicable)
+
+### Visual Testing
+- [ ] Light theme correct
+- [ ] Dark theme correct
+- [ ] All dialogs render
+- [ ] Docking layouts work
+- [ ] Menu displays correct
+
+### Platform Testing
+- [ ] Windows x64
+- [ ] (Optional) Linux x64
+- [ ] (Optional) macOS
+
+---
+
+## Documentation
+
+- [ ] Update ARCHITECTURE-OVERVIEW.md
+- [ ] Style guide complete
+- [ ] Control usage documented
+- [ ] Migration notes for future reference
