@@ -161,6 +161,7 @@
 		<Setter Property="KeyboardNavigation.TabNavigation" Value="Continue" />
 	</Style>
 
+	<!-- Style for old menu action classes (BaseMenuAction from Nexen.Debugger.Utilities) -->
 	<Style Selector="Menu#ActionMenu MenuItem MenuItem, ContextMenu#ActionMenu MenuItem">
 		<Setter Property="Header" Value="{Binding ActionName, DataType={x:Type du:BaseMenuAction}}" />
 		<Setter Property="Icon" Value="{Binding ActionIcon, DataType={x:Type du:BaseMenuAction}}" />

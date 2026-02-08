@@ -27,7 +27,7 @@ using Nexen.Utilities;
 using Nexen.ViewModels;
 using Nexen.Views;
 
-namespace Nexen.Windows; 
+namespace Nexen.Windows;
 public class MainWindow : NexenWindow {
 	private DispatcherTimer _timerBackgroundFlag = new DispatcherTimer();
 	private MainWindowViewModel _model = null!;
@@ -291,6 +291,9 @@ public class MainWindow : NexenWindow {
 				CheatCodes.ApplyCheats();
 				RomInfo romInfo = EmuApi.GetRomInfo();
 
+				// Update global emulator state for menu enable/disable
+				Dispatcher.UIThread.Post(() => Services.EmulatorState.Instance.OnRomChanged(romInfo));
+
 				Dispatcher.UIThread.Post(() => {
 					bool wasAudioFile = _model.AudioPlayer != null;
 					bool updateConfig = _model.RomInfo.Format != romInfo.Format;
@@ -349,6 +352,7 @@ public class MainWindow : NexenWindow {
 			case ConsoleNotificationType.DebuggerResumed:
 			case ConsoleNotificationType.GameResumed:
 				Dispatcher.UIThread.Post(() => {
+					Services.EmulatorState.Instance.OnPauseChanged();
 					_model.RecentGames.Visible = false;
 					if (IsKeyboardFocusWithin) {
 						this.GetControl<Panel>("RendererPanel").Focus();
@@ -363,6 +367,9 @@ public class MainWindow : NexenWindow {
 			case ConsoleNotificationType.EmulationStopped:
 				// Save final Pansy file before stopping
 				BackgroundPansyExporter.OnRomUnloaded();
+
+				// Update global emulator state
+				Dispatcher.UIThread.Post(() => Services.EmulatorState.Instance.OnRomChanged(new RomInfo()));
 
 				Dispatcher.UIThread.Post(() => {
 					_model.RomInfo = new RomInfo();

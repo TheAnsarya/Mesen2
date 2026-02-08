@@ -132,6 +132,28 @@ public class MainMenuViewModel : ViewModelBase {
 		InitToolMenu(wnd);
 		InitDebugMenu(wnd);
 		InitHelpMenu(wnd);
+
+		// Initialize all menu items to set correct Enabled state on first render
+		UpdateAllMenuItems(FileMenuItems);
+		UpdateAllMenuItems(GameMenuItems);
+		UpdateAllMenuItems(OptionsMenuItems);
+		UpdateAllMenuItems(ToolsMenuItems);
+		UpdateAllMenuItems(DebugMenuItems);
+		UpdateAllMenuItems(HelpMenuItems);
+	}
+
+	/// <summary>
+	/// Recursively updates all menu items to set their initial Enabled/Visible state.
+	/// </summary>
+	private static void UpdateAllMenuItems(IEnumerable<object> items) {
+		foreach (object item in items) {
+			if (item is BaseMenuAction action) {
+				action.Update();
+				if (action.SubActions != null) {
+					UpdateAllMenuItems(action.SubActions);
+				}
+			}
+		}
 	}
 
 	private void InitFileMenu(MainWindow wnd) {

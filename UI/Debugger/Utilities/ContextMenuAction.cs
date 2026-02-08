@@ -112,8 +112,8 @@ public abstract class BaseMenuAction : ViewModelBase, IDisposable {
 	[Reactive] public string ShortcutText { get; set; } = "";
 	[Reactive] public string ActionName { get; set; } = "";
 	[Reactive] public Image? ActionIcon { get; set; }
-	[Reactive] public bool Enabled { get; set; }
-	[Reactive] public bool Visible { get; set; }
+	[Reactive] public bool Enabled { get; set; } = true;  // Default to enabled
+	[Reactive] public bool Visible { get; set; } = true;
 
 	[Reactive] public string TooltipText { get; set; } = "";
 
@@ -184,6 +184,14 @@ public abstract class BaseMenuAction : ViewModelBase, IDisposable {
 }
 
 public class MainMenuAction : BaseMenuAction {
+	/// <summary>
+	/// Shortcuts that should always be enabled regardless of emulator state.
+	/// </summary>
+	private static readonly HashSet<EmulatorShortcut> AlwaysEnabledShortcuts = new() {
+		EmulatorShortcut.OpenFile,
+		EmulatorShortcut.Exit,
+	};
+
 	public EmulatorShortcut? Shortcut { get; set; }
 	public uint ShortcutParam { get; set; }
 
@@ -196,7 +204,11 @@ public class MainMenuAction : BaseMenuAction {
 		if (shortcut.HasValue) {
 			Shortcut = shortcut.Value;
 
-			IsEnabled = () => EmuApi.IsShortcutAllowed(shortcut.Value, ShortcutParam);
+			// Only set IsEnabled check for shortcuts that require conditions
+			// Always-enabled shortcuts keep IsEnabled = null (defaults to enabled)
+			if (!AlwaysEnabledShortcuts.Contains(shortcut.Value)) {
+				IsEnabled = () => EmuApi.IsShortcutAllowed(shortcut.Value, ShortcutParam);
+			}
 
 			OnClick = () =>                  //Run outside the UI thread to avoid deadlocks, etc.
 				Task.Run(() => EmuApi.ExecuteShortcut(new ExecuteShortcutParams() { Shortcut = shortcut.Value, Param = ShortcutParam }));
