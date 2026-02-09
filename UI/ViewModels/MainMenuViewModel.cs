@@ -166,17 +166,9 @@ public class MainMenuViewModel : ViewModelBase {
 
 	private void InitFileMenu(MainWindow wnd) {
 		FileMenuItems = [
-			// Open - uses modern async file dialog directly
-			new SimpleMenuAction(ActionType.Open) {
-				AsyncOnClick = async () => {
-					string? initialFolder = ConfigManager.Config.Preferences.OverrideGameFolder && Directory.Exists(ConfigManager.Config.Preferences.GameFolder)
-						? ConfigManager.Config.Preferences.GameFolder
-						: ConfigManager.Config.RecentFiles.Items.Count > 0 ? ConfigManager.Config.RecentFiles.Items[0].RomFile.Folder : null;
-					string? filename = await FileDialogHelper.OpenFile(initialFolder, wnd, FileDialogHelper.RomExt);
-					if (filename != null) {
-						LoadRomHelper.LoadFile(filename);
-					}
-				}
+			// Open - uses EmulatorShortcut.OpenFile which routes through ShortcutHandler
+			new ShortcutMenuAction(EmulatorShortcut.OpenFile, EnableCategory.AlwaysEnabled) {
+				ActionType = ActionType.Open
 			},
 
 			new MenuSeparator(),
