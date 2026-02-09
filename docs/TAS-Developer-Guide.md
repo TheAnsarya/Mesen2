@@ -120,11 +120,11 @@ Records player input during gameplay into TAS movies.
 ```csharp
 public class BranchData
 {
-	public string Name { get; set; }
-	public DateTime CreatedAt { get; set; }
-	public int FrameCount { get; set; }
-	public MovieData MovieSnapshot { get; set; }
-	public byte[]? SavestateData { get; set; }
+    public string Name { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public int FrameCount { get; set; }
+    public MovieData MovieSnapshot { get; set; }
+    public byte[]? SavestateData { get; set; }
 }
 ```
 
@@ -162,13 +162,13 @@ The control uses custom rendering via `OnRender()`:
 ```csharp
 public override void Render(DrawingContext context)
 {
-	DrawBackground(context);
-	DrawFrameCells(context);
-	DrawButtonLabels(context);
-	DrawPlaybackCursor(context);
-	DrawSelection(context);
-	DrawGreenzone(context);
-	DrawMarkers(context);
+    DrawBackground(context);
+    DrawFrameCells(context);
+    DrawButtonLabels(context);
+    DrawPlaybackCursor(context);
+    DrawSelection(context);
+    DrawGreenzone(context);
+    DrawMarkers(context);
 }
 ```
 
@@ -179,9 +179,9 @@ Each system has defined button lanes:
 ```csharp
 private static readonly Dictionary<SystemType, string[]> ButtonLayouts = new()
 {
-	[SystemType.Nes] = ["A", "B", "Select", "Start", "Up", "Down", "Left", "Right"],
-	[SystemType.Snes] = ["A", "B", "X", "Y", "L", "R", "Select", "Start", ...],
-	// etc.
+    [SystemType.Nes] = ["A", "B", "Select", "Start", "Up", "Down", "Left", "Right"],
+    [SystemType.Snes] = ["A", "B", "X", "Y", "L", "R", "Select", "Start", ...],
+    // etc.
 };
 ```
 
@@ -222,11 +222,11 @@ Menus are built dynamically as `List<ContextMenuAction>`:
 ```csharp
 RecordingMenuItems = new List<ContextMenuAction>
 {
-	new ContextMenuAction { ActionType = ActionType.TasStartRecording, ... },
-	new ContextMenuAction { ActionType = ActionType.TasStopRecording, ... },
-	new ContextMenuAction { ActionType = ActionType.Separator },
-	new ContextMenuAction { ActionType = ActionType.TasRerecordFrom, ... },
-	...
+    new ContextMenuAction { ActionType = ActionType.TasStartRecording, ... },
+    new ContextMenuAction { ActionType = ActionType.TasStopRecording, ... },
+    new ContextMenuAction { ActionType = ActionType.Separator },
+    new ContextMenuAction { ActionType = ActionType.TasRerecordFrom, ... },
+    ...
 };
 ```
 
@@ -263,8 +263,8 @@ InputApi.SetInputState(inputs);
 ```csharp
 // Native movie operations
 RecordApi.StartRecording(new RecordMovieOptions {
-	Filename = path,
-	Format = "nmv"
+    Filename = path,
+    Format = "nmv"
 });
 RecordApi.StopRecording();
 ```
@@ -288,9 +288,9 @@ public static void ExportMovie(MovieData movie, string path, string format);
 ```csharp
 public class NewFormat : IMovieFormat
 {
-	public string Extension => ".new";
-	public MovieData Import(Stream stream);
-	public void Export(MovieData movie, Stream stream);
+    public string Extension => ".new";
+    public MovieData Import(Stream stream);
+    public void Export(MovieData movie, Stream stream);
 }
 ```
 
@@ -308,8 +308,8 @@ Implement custom capture policy:
 ```csharp
 public interface ICapturPolicy
 {
-	bool ShouldCapture(int frame, GameState state);
-	int GetCaptureInterval(int frame);
+    bool ShouldCapture(int frame, GameState state);
+    int GetCaptureInterval(int frame);
 }
 ```
 
@@ -357,9 +357,9 @@ Test full workflow scenarios:
 [Test]
 public void RecordAndSeek_ShouldMaintainSync()
 {
-	// Record 1000 frames
-	// Seek to frame 500
-	// Verify game state matches expected
+    // Record 1000 frames
+    // Seek to frame 500
+    // Verify game state matches expected
 }
 ```
 
