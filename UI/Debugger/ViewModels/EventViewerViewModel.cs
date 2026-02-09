@@ -328,6 +328,7 @@ public class EventViewerViewModel : DisposableViewModel {
 	[MemberNotNull(nameof(ViewerBitmap))]
 	private void InitBitmap(FrameInfo size) {
 		if (ViewerBitmap == null || ViewerBitmap.Size.Width != size.Width || ViewerBitmap.Size.Height != size.Height) {
+			ViewerBitmap?.Dispose();
 			ViewerBitmap = new DynamicBitmap(new PixelSize((int)size.Width, (int)size.Height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 		}
 	}

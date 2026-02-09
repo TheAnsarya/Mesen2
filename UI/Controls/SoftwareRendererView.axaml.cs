@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -13,11 +9,9 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using Nexen.Config;
 using Nexen.Interop;
-using Nexen.Localization;
 using Nexen.Utilities;
 using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using Splat.ModeDetection;
 
 namespace Nexen.Controls; 
 public class SoftwareRendererView : UserControl {
@@ -48,6 +42,7 @@ public class SoftwareRendererView : UserControl {
 	private unsafe void UpdateSurface(SoftwareRendererSurface frame, DynamicBitmap? surface, Action<DynamicBitmap> updateSurfaceRef) {
 		PixelSize frameSize = new PixelSize((int)frame.Width, (int)frame.Height);
 		if (surface?.PixelSize != frameSize) {
+			surface?.Dispose();
 			surface = new DynamicBitmap(frameSize, new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 			updateSurfaceRef(surface);
 		}
@@ -62,19 +57,29 @@ public class SoftwareRendererView : UserControl {
 
 	public unsafe void UpdateSoftwareRenderer(SoftwareRendererFrame frameInfo) {
 		UpdateSurface(frameInfo.Frame, _model.FrameSurface, s => _model.FrameSurface = s);
-		if (frameInfo.EmuHud.IsDirty) {
+
+		bool emuHudDirty = frameInfo.EmuHud.IsDirty;
+		bool scriptHudDirty = frameInfo.ScriptHud.IsDirty;
+
+		if (emuHudDirty) {
 			UpdateSurface(frameInfo.EmuHud, _model.EmuHudSurface, s => _model.EmuHudSurface = s);
 		}
 
-		if (frameInfo.ScriptHud.IsDirty) {
+		if (scriptHudDirty) {
 			UpdateSurface(frameInfo.ScriptHud, _model.ScriptHudSurface, s => _model.ScriptHudSurface = s);
 		}
 
 		Dispatcher.UIThread.Post(() => {
 			_frame.UseBilinearInterpolation = ConfigManager.Config.Video.UseBilinearInterpolation;
 			_frame.InvalidateVisual();
-			_emuHud.InvalidateVisual();
-			_scriptHud.InvalidateVisual();
+
+			if (emuHudDirty) {
+				_emuHud.InvalidateVisual();
+			}
+
+			if (scriptHudDirty) {
+				_scriptHud.InvalidateVisual();
+			}
 		}, DispatcherPriority.MaxValue);
 	}
 }

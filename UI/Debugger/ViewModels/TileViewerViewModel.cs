@@ -783,6 +783,7 @@ public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOve
 		int width = ColumnCount * 8;
 		int height = RowCount * 8;
 		if (ViewerBitmap == null || ViewerBitmap.PixelSize.Width != width || ViewerBitmap.PixelSize.Height != height) {
+			ViewerBitmap?.Dispose();
 			ViewerBitmap = new DynamicBitmap(new PixelSize(width, height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 		}
 	}

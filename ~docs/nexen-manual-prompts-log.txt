@@ -94,12 +94,13 @@ you deleted the code from the designated slot, recreate it and continue;
 
 [Nexen] git commit everything, update docs and readmes and issues and plans and chat/session logs, etc, issues #149, #150, #151 might be legacy, check if they've been implemented and close them; work hard on Epic #13 (issue #158) and all the sub issues; work until you're exhausted; go!; continue;
 
+[Nexen] for "13.9" I want to approve all of the icons and new graphics before they are applied; Make a document (and open it) with a listing and description of what each does and how we're using it of all the packages that Nexen uses or inherited from Mesen and create plans and issues and docs for how we can replace these little packages with just standard microsoft dotnet libraries and are they big/robust and have to be kept or can we easily relace them; make isssues!; continue; work on current issues!; continue;
 
 
 
 
 
-[Nexen] Make a document (and open it) with a listing and description of what it does and how we're using it, of all the packages that Nexen uses or inherited from Mesen and create plans and issues and docs for how we can replace these little packages with just standard microsoft dotnet libraries and are they big/robust and have to be kept or can we easily relace them; make isssues!; continue; work on current issues!; continue;
+
 
 
 

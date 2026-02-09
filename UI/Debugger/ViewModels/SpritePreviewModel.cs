@@ -185,6 +185,7 @@ public class SpritePreviewModel : ViewModelBase {
 			UInt32* spritePreview = p + (sprite.SpriteIndex * 128 * 128);
 
 			if (SpritePreview == null || SpritePreview.PixelSize.Width != sprite.Width || SpritePreview.PixelSize.Height != sprite.Height) {
+				SpritePreview?.Dispose();
 				SpritePreview = new DynamicBitmap(new PixelSize(Width, Height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 				needUpdate = true;
 			}
