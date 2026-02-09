@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Reactive.Disposables;
 using ReactiveUI;
 
 namespace Nexen.ViewModels;
@@ -14,7 +14,7 @@ public class ViewModelBase : ReactiveObject {
 
 /// <summary>
 /// Base class for ViewModels that need to manage disposable resources.
-/// Provides automatic disposal tracking and cleanup.
+/// Provides automatic disposal tracking and cleanup using <see cref="CompositeDisposable"/>.
 /// </summary>
 /// <remarks>
 /// Use <see cref="AddDisposable{T}"/> to register disposables that should be
@@ -22,8 +22,8 @@ public class ViewModelBase : ReactiveObject {
 /// for custom cleanup logic.
 /// </remarks>
 public class DisposableViewModel : ViewModelBase, IDisposable {
-	/// <summary>Collection of tracked disposables.</summary>
-	private HashSet<IDisposable> _disposables = new();
+	/// <summary>Collection of tracked disposables using System.Reactive pattern.</summary>
+	private readonly CompositeDisposable _disposables = [];
 
 	/// <summary>
 	/// Gets whether this ViewModel has been disposed.
@@ -39,15 +39,9 @@ public class DisposableViewModel : ViewModelBase, IDisposable {
 		}
 
 		Disposed = true;
-
-		foreach (IDisposable obj in _disposables) {
-			obj.Dispose();
-		}
-
-		_disposables.Clear();
-		_disposables = new();
-
+		_disposables.Dispose();
 		DisposeView();
+		GC.SuppressFinalize(this);
 	}
 
 	/// <summary>

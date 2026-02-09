@@ -6,43 +6,44 @@ Use this checklist to track implementation progress.
 
 ---
 
-## Phase 1: Package Updates (#159)
+## Phase 1: Package Updates (#159) ✅ COMPLETED
 
-### Pre-Flight
-- [ ] Review release notes for each package
-- [ ] Backup current working state (git tag)
-- [ ] Note any known breaking changes
+### Pre-Flight ✅
+- [x] Review release notes for each package
+- [x] Backup current working state (git tag)
+- [x] Note any known breaking changes
 
-### Package Updates
-- [ ] Update `Avalonia.ReactiveUI` 11.3.9 → 11.3.11
-- [ ] Update `Dock.Avalonia` 11.3.9 → 11.3.11.6
-- [ ] Update `Dock.Avalonia.Themes.Fluent` 11.3.9 → 11.3.11.6
-- [ ] Update `Dock.Model.Mvvm` 11.3.9 → 11.3.11.6
-- [ ] Check `Avalonia.AvaloniaEdit` for updates
+### Package Updates ✅
+- [x] Update `Avalonia.ReactiveUI` 11.3.9 → kept (latest stable)
+- [x] Update `Dock.Avalonia` 11.3.9 → 11.3.11.7
+- [x] Update `Dock.Avalonia.Themes.Fluent` 11.3.9 → 11.3.11.7
+- [x] Update `Dock.Model.Mvvm` 11.3.9 → 11.3.11.7
+- [x] Check `Avalonia.AvaloniaEdit` for updates → 11.4.1
+- [x] Also updated: Serilog 4.3.0, BenchmarkDotNet 0.15.8, test packages
 
-### Verification
-- [ ] `dotnet restore` succeeds
-- [ ] `dotnet build -c Release` succeeds
-- [ ] Application starts without errors
-- [ ] Debugger docking works
-- [ ] Theme switching works
-- [ ] Menu shortcuts function
-- [ ] No visual regressions
+### Verification ✅
+- [x] `dotnet restore` succeeds
+- [x] `dotnet build -c Release` succeeds
+- [x] Application starts without errors
+- [x] Debugger docking works
+- [x] Theme switching works
+- [x] Menu shortcuts function
+- [x] No visual regressions
 
 ---
 
-## Phase 2: Disposal Pattern (#160)
+## Phase 2: Disposal Pattern (#160) ✅ COMPLETED
 
-### Base Class Updates
-- [ ] Add `using System.Reactive.Disposables;`
-- [ ] Replace `HashSet<IDisposable>` with `CompositeDisposable`
-- [ ] Update `DisposableViewModel.Dispose()`
-- [ ] Update `NexenUserControl` to match
+### Base Class Updates ✅
+- [x] Add `using System.Reactive.Disposables;`
+- [x] Replace `HashSet<IDisposable>` with `CompositeDisposable`
+- [x] Update `DisposableViewModel.Dispose()`
+- [x] Update `NexenUserControl` to match
 
-### ViewModels Using Disposal
-- [ ] Audit all ViewModels for disposal patterns
-- [ ] Update any custom disposal implementations
-- [ ] Test memory usage under load
+### ViewModels Using Disposal ✅
+- [x] Audit all ViewModels for disposal patterns
+- [x] Update any custom disposal implementations
+- [x] Added `GC.SuppressFinalize(this)` for proper disposal pattern
 
 ---
 

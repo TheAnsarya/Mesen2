@@ -336,22 +336,28 @@ Dispatcher.UIThread.RunBatched(() => {
 
 ## 6. Common Migrations
 
-### 6.1 HashSet to CompositeDisposable
+### 6.1 HashSet to CompositeDisposable ✅ IMPLEMENTED
 
 ```csharp
-// Before
+// Before (DEPRECATED)
 private HashSet<IDisposable> _disposables = new();
 public void Dispose() {
     foreach (var d in _disposables) d.Dispose();
     _disposables.Clear();
 }
 
-// After
-private readonly CompositeDisposable _disposables = new();
+// After (CURRENT - using System.Reactive.Disposables)
+private readonly CompositeDisposable _disposables = [];
 public void Dispose() {
+    if (Disposed) return;
+    Disposed = true;
     _disposables.Dispose();
+    DisposeView();
+    GC.SuppressFinalize(this);
 }
 ```
+
+Both `DisposableViewModel` and `NexenUserControl` now use this pattern.
 
 ### 6.2 Missing x:DataType
 
