@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Styling;
 using Nexen.Debugger.Utilities;
 using Nexen.Menus;
 

@@ -1,13 +1,16 @@
 using System;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
-using Avalonia.Styling;
 using Nexen.Localization;
 
-namespace Nexen.Controls; 
+namespace Nexen.Controls;
+
+/// <summary>
+/// A radio button that binds to an enum value, automatically checking itself
+/// when the bound value matches its <see cref="CheckedWhen"/> property.
+/// </summary>
 public class EnumRadioButton : RadioButton {
 	protected override Type StyleKeyOverride => typeof(RadioButton);
 

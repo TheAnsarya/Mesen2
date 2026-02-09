@@ -4,15 +4,19 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Styling;
 using Avalonia.Threading;
 using Nexen.Debugger.Utilities;
 
-namespace Nexen.Controls; 
+namespace Nexen.Controls;
+
+/// <summary>
+/// A text box specialized for numeric input with support for hex display,
+/// min/max clamping, and type-safe value conversion.
+/// </summary>
 public class NexenNumericTextBox : TextBox {
 	protected override Type StyleKeyOverride => typeof(TextBox);
 
-	private static HexConverter _hexConverter = new HexConverter();
+	private static readonly HexConverter _hexConverter = new();
 
 	public static readonly StyledProperty<bool> TrimProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Trim));
 	public static readonly StyledProperty<bool> HexProperty = AvaloniaProperty.Register<NexenNumericTextBox, bool>(nameof(Hex));
@@ -155,9 +159,9 @@ public class NexenNumericTextBox : TextBox {
 		if (string.IsNullOrWhiteSpace(Text)) {
 			long? min = GetMin();
 			if (min != null && min.Value > 0) {
-				SetNewValue((IComparable)Convert.ChangeType(min.Value, Value.GetType()));
+				SetNewValue(ConvertToSameType(min.Value, Value));
 			} else {
-				SetNewValue((IComparable)Convert.ChangeType(0, Value.GetType()));
+				SetNewValue(ConvertToSameType(0, Value));
 			}
 		}
 
@@ -168,7 +172,7 @@ public class NexenNumericTextBox : TextBox {
 			if (!long.TryParse(Text, out long parsedValue)) {
 				val = Value;
 			} else {
-				if (parsedValue == 0 && Text.StartsWith("-")) {
+				if (parsedValue == 0 && Text.StartsWith('-')) {
 					//Allow typing minus before a 0, turn value into -1
 					val = -1;
 				} else {
@@ -188,14 +192,14 @@ public class NexenNumericTextBox : TextBox {
 		max = maxProp != null
 			? maxProp.Value
 			: Value switch {
-				byte _ => byte.MaxValue,
-				sbyte _ => sbyte.MaxValue,
-				short _ => short.MaxValue,
-				ushort _ => ushort.MaxValue,
-				int _ => int.MaxValue,
-				uint _ => uint.MaxValue,
-				long _ => long.MaxValue,
-				ulong _ => ulong.MaxValue,
+				byte => byte.MaxValue,
+				sbyte => sbyte.MaxValue,
+				short => short.MaxValue,
+				ushort => ushort.MaxValue,
+				int => int.MaxValue,
+				uint => uint.MaxValue,
+				long => long.MaxValue,
+				ulong => ulong.MaxValue,
 				_ => int.MaxValue
 			};
 
@@ -213,17 +217,35 @@ public class NexenNumericTextBox : TextBox {
 		long? max = GetMax();
 		long? min = GetMin();
 
-		if (max != null && val.CompareTo(Convert.ChangeType(max, val.GetType())) > 0) {
-			val = (IComparable)Convert.ChangeType(max, val.GetType());
-		} else if (min != null && val.CompareTo(Convert.ChangeType(min, val.GetType())) < 0) {
-			val = (IComparable)Convert.ChangeType(min, val.GetType());
-		} else if (min == null && val.CompareTo(Convert.ChangeType(0, val.GetType())) < 0) {
-			val = (IComparable)Convert.ChangeType(0, val.GetType());
+		if (max != null && val.CompareTo(ConvertToSameType(max.Value, val)) > 0) {
+			val = ConvertToSameType(max.Value, val);
+		} else if (min != null && val.CompareTo(ConvertToSameType(min.Value, val)) < 0) {
+			val = ConvertToSameType(min.Value, val);
+		} else if (min == null && val.CompareTo(ConvertToSameType(0, val)) < 0) {
+			val = ConvertToSameType(0, val);
 		}
 
 		if (!object.Equals(Value, val)) {
 			Value = val;
 		}
+	}
+
+	/// <summary>
+	/// Converts a long value to the same numeric type as the reference value.
+	/// AOT-safe replacement for Convert.ChangeType.
+	/// </summary>
+	private static IComparable ConvertToSameType(long value, IComparable referenceValue) {
+		return referenceValue switch {
+			byte => (byte)value,
+			sbyte => (sbyte)value,
+			short => (short)value,
+			ushort => (ushort)value,
+			int => (int)value,
+			uint => (uint)value,
+			long => value,
+			ulong => (ulong)value,
+			_ => value
+		};
 	}
 
 	private void UpdateText(bool force = false) {

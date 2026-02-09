@@ -1,16 +1,21 @@
 using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 using Avalonia.Threading;
 using Nexen.Localization;
 
-namespace Nexen.Controls; 
+namespace Nexen.Controls;
+
+/// <summary>
+/// A combo box that automatically populates itself with values from an enum type,
+/// with localized display text from resource files.
+/// </summary>
 public class EnumComboBox : UserControl {
 	public static readonly StyledProperty<Enum[]?> AvailableValuesProperty = AvaloniaProperty.Register<EnumComboBox, Enum[]?>(nameof(AvailableValues), null);
 	public static readonly StyledProperty<Enum?> SelectedItemProperty = AvaloniaProperty.Register<EnumComboBox, Enum?>(nameof(SelectedItem), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
@@ -38,6 +43,7 @@ public class EnumComboBox : UserControl {
 		set { SetValue(InternalSelectedItemProperty, value); }
 	}
 
+	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
 	private Type? _enumType = null;
 
 	static EnumComboBox() {
@@ -73,11 +79,15 @@ public class EnumComboBox : UserControl {
 		}
 
 		if (_enumType == null || SelectedItem == null) {
+			// Enum types always have public fields; suppress trim warning since GetType()
+			// doesn't propagate DynamicallyAccessedMembers annotations
+#pragma warning disable IL2074
 			if (AvailableValues?.Length > 0) {
 				_enumType = AvailableValues[0].GetType();
 			} else if (SelectedItem != null) {
 				_enumType = SelectedItem.GetType();
 			} else {
+#pragma warning restore IL2074
 				return;
 			}
 		}

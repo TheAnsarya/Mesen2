@@ -3,6 +3,10 @@ using Avalonia.Controls;
 
 namespace Nexen.Controls;
 
+/// <summary>
+/// A numeric up-down control that prevents invalid cast errors when the user
+/// clears the text content by defaulting to "0".
+/// </summary>
 public class NexenNumericUpDown : NumericUpDown {
 	protected override Type StyleKeyOverride => typeof(NumericUpDown);
 
