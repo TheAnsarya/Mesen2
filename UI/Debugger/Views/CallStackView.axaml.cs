@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
@@ -11,6 +11,9 @@ namespace Nexen.Debugger.Views;
 public class CallStackView : UserControl {
 	public CallStackView() {
 		InitializeComponent();
+
+		// Subscribe to DataGrid CellDoubleClick routed event
+		this.AddHandler(DataGridCellClickBehavior.CellDoubleClickEvent, OnCellDoubleClick);
 	}
 
 	private void InitializeComponent() {
@@ -25,8 +28,8 @@ public class CallStackView : UserControl {
 		base.OnDataContextChanged(e);
 	}
 
-	private void OnCellDoubleClick(DataBoxCell cell) {
-		if (cell.DataContext is StackInfo stack && DataContext is CallStackViewModel model) {
+	private void OnCellDoubleClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (e.RowItem is StackInfo stack && DataContext is CallStackViewModel model) {
 			model.GoToLocation(stack);
 		}
 	}

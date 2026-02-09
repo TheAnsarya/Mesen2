@@ -13,6 +13,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:dvm="using:Nexen.Debugger.ViewModels"
 	xmlns:dc="using:Nexen.Debugger.Controls"
+	xmlns:ext="using:Nexen.Controls.DataGridExtensions"
 	mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
 	x:Class="Nexen.Debugger.Windows.AssemblerWindow"
 	Icon="/Assets/Chip.png"
@@ -60,16 +61,21 @@
 			</Border>
 
 			<Border Grid.Row="1">
-				<DataBox
-					Items="{Binding Errors}"
+				<DataGrid
+					ItemsSource="{Binding Errors}"
 					GridLinesVisibility="All"
-					CellClick="OnCellClick"
+					IsReadOnly="True"
+					CanUserSortColumns="False"
+					CanUserReorderColumns="False"
+					HeadersVisibility="Column"
+					SelectionMode="Single"
+					ext:DataGridCellClickBehavior.IsEnabled="True"
 				>
-					<DataBox.Columns>
-						<DataBoxTextColumn Header="{l:Translate colLine}" Binding="{Binding LineNumber, DataType={x:Type vm:AssemblerError}}" CanUserResize="True" />
-						<DataBoxTextColumn Header="{l:Translate colError}" Binding="{Binding Message, DataType={x:Type vm:AssemblerError}}" CanUserResize="True" InitialWidth="400" />
-					</DataBox.Columns>
-				</DataBox>
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="{l:Translate colLine}" Binding="{Binding LineNumber}" CanUserResize="True" IsReadOnly="True" />
+						<DataGridTextColumn Header="{l:Translate colError}" Binding="{Binding Message}" CanUserResize="True" IsReadOnly="True" Width="400" />
+					</DataGrid.Columns>
+				</DataGrid>
 			</Border>
 
 			<Border Grid.Row="1" Grid.Column="1" Padding="2">

@@ -9,7 +9,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Dock.Model.Core;
 using Nexen.Config;
 using Nexen.Debugger.Disassembly;

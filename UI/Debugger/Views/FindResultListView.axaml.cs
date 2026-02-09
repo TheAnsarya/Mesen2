@@ -4,8 +4,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using DataBoxControl;
 using Nexen.Config;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Debugger;
 using Nexen.Debugger.Utilities;
 using Nexen.Debugger.ViewModels;
@@ -17,6 +17,9 @@ namespace Nexen.Debugger.Views;
 public class FindResultListView : UserControl {
 	public FindResultListView() {
 		InitializeComponent();
+
+		// Subscribe to DataGrid CellDoubleClick routed event
+		this.AddHandler(DataGridCellClickBehavior.CellDoubleClickEvent, OnCellDoubleClick);
 	}
 
 	private void InitializeComponent() {
@@ -31,8 +34,8 @@ public class FindResultListView : UserControl {
 		base.OnDataContextChanged(e);
 	}
 
-	private void OnCellDoubleClick(DataBoxCell cell) {
-		if (DataContext is FindResultListViewModel listModel && cell.DataContext is FindResultViewModel result) {
+	private void OnCellDoubleClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (DataContext is FindResultListViewModel listModel && e.RowItem is FindResultViewModel result) {
 			listModel.GoToResult(result);
 		}
 	}

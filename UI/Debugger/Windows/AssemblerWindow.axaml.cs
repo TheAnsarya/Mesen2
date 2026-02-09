@@ -11,8 +11,8 @@ using Avalonia.Threading;
 using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
-using DataBoxControl;
 using Nexen.Config;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Debugger.Controls;
 using Nexen.Debugger.Utilities;
 using Nexen.Debugger.ViewModels;
@@ -55,6 +55,9 @@ public class AssemblerWindow : NexenWindow, INotificationHandler {
 
 		_textEditor.TemplateApplied += textEditor_TemplateApplied;
 		_hexView.TemplateApplied += hexView_TemplateApplied;
+
+		// Subscribe to DataGrid CellClick routed event
+		this.AddHandler(DataGridCellClickBehavior.CellClickEvent, OnCellClick);
 
 		_textEditor.SyntaxHighlighting = _highlighting;
 
@@ -104,8 +107,8 @@ public class AssemblerWindow : NexenWindow, INotificationHandler {
 		_hexView.VerticalScrollBarValue = _textEditor.VerticalScrollBarValue;
 	}
 
-	private void OnCellClick(DataBoxCell cell) {
-		int lineNumber = (((AssemblerError?)cell.DataContext)?.LineNumber ?? 0) - 1;
+	private void OnCellClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		int lineNumber = (((AssemblerError?)e.RowItem)?.LineNumber ?? 0) - 1;
 		if (lineNumber >= 0) {
 			_textEditor.TextArea.Caret.Line = lineNumber;
 			_textEditor.TextArea.Caret.Column = 0;

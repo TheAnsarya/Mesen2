@@ -9,8 +9,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using DataBoxControl;
 using Nexen.Config;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Interop;
 using Nexen.ViewModels;
 
@@ -28,6 +28,10 @@ public class CheatListWindow : NexenWindow {
 		_model = new CheatListWindowViewModel();
 		_model.InitActions(this);
 		DataContext = _model;
+
+		// Subscribe to DataGrid CellClick/CellDoubleClick routed events
+		this.AddHandler(DataGridCellClickBehavior.CellClickEvent, OnCellClick);
+		this.AddHandler(DataGridCellClickBehavior.CellDoubleClickEvent, OnCellDoubleClick);
 	}
 
 	private void InitializeComponent() {
@@ -55,8 +59,8 @@ public class CheatListWindow : NexenWindow {
 		Close();
 	}
 
-	private void OnCellClick(DataBoxCell cell) {
-		if (cell.DataContext is CheatCode && cell.Column?.ColumnName == "Enabled") {
+	private void OnCellClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (e.RowItem is CheatCode && e.Column?.SortMemberPath == "Enabled") {
 			bool newValue = !_model.Selection.SelectedItems.Any(cheat => cheat?.Enabled == true);
 			foreach (CheatCode? cheat in _model.Selection.SelectedItems) {
 				if (cheat != null) {
@@ -69,8 +73,8 @@ public class CheatListWindow : NexenWindow {
 		}
 	}
 
-	private async void OnCellDoubleClick(DataBoxCell cell) {
-		if (cell.DataContext is CheatCode cheat) {
+	private async void OnCellDoubleClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (e.RowItem is CheatCode cheat) {
 			await CheatEditWindow.EditCheat(cheat, this);
 			_model.Sort();
 			_model.ApplyCheats();
