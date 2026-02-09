@@ -3,10 +3,12 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Nexen.Config;
@@ -53,55 +55,81 @@ public class UpdatePromptViewModel : ViewModelBase {
 	}
 
 	/// <summary>
-	/// Checks for available updates from the server.
+	/// Checks for available updates from GitHub Releases.
 	/// </summary>
 	/// <param name="silent">If true, suppresses error dialogs.</param>
 	/// <returns>Update ViewModel if an update is available; otherwise null.</returns>
 	public static async Task<UpdatePromptViewModel?> GetUpdateInformation(bool silent) {
-		UpdateInfo? updateInfo = null;
 		try {
-			using (var client = new HttpClient()) {
-				string updateData = await client.GetStringAsync("https://www.Nexen.ca/Services/v2/latestversion.json");
-				updateInfo = (UpdateInfo?)JsonSerializer.Deserialize(updateData, typeof(UpdateInfo), NexenSerializerContext.Default);
+			using var client = new HttpClient();
+			// GitHub API requires User-Agent header
+			client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Nexen", EmuApi.GetNexenVersion().ToString()));
 
-				if (
-					updateInfo == null ||
-					updateInfo.Files == null ||
-					updateInfo.Files.Where(f => f.DownloadUrl == null || (!f.DownloadUrl.StartsWith("https://www.Nexen.ca/") && !f.DownloadUrl.StartsWith("https://github.com/SourNexen/"))).Count() > 0
-				) {
-					return null;
-				}
+			string releaseData = await client.GetStringAsync("https://api.github.com/repos/TheAnsarya/Nexen/releases/latest");
+			var release = (GitHubRelease?)JsonSerializer.Deserialize(releaseData, typeof(GitHubRelease), NexenSerializerContext.Default);
+
+			if (release == null || string.IsNullOrEmpty(release.TagName)) {
+				return null;
 			}
+
+			// Parse version from tag (e.g., "v2.0.0" -> "2.0.0")
+			string versionStr = release.TagName.TrimStart('v', 'V');
+			if (!Version.TryParse(versionStr, out Version? latestVersion)) {
+				return null;
+			}
+
+			// Find the appropriate asset for this platform
+			string platform = GetPlatformIdentifier();
+			var asset = release.Assets?.FirstOrDefault(a =>
+				a.Name?.Contains(platform, StringComparison.OrdinalIgnoreCase) == true);
+
+			var updateInfo = new UpdateInfo {
+				LatestVersion = latestVersion,
+				ReleaseNotes = release.Body ?? "",
+				Files = release.Assets?
+					.Where(a => a.BrowserDownloadUrl?.StartsWith("https://github.com/TheAnsarya/Nexen/") == true)
+					.Select(a => new UpdateFileInfo {
+						Platform = [a.Name ?? ""],
+						DownloadUrl = a.BrowserDownloadUrl ?? "",
+						Hash = "" // GitHub doesn't provide SHA256 in API, hash check will be skipped
+					})
+					.ToArray() ?? []
+			};
+
+			UpdateFileInfo? file = asset != null
+				? new UpdateFileInfo {
+					Platform = [asset.Name ?? ""],
+					DownloadUrl = asset.BrowserDownloadUrl ?? "",
+					Hash = ""
+				}
+				: null;
+
+			return new UpdatePromptViewModel(updateInfo, file);
 		} catch (Exception ex) {
 			if (!silent) {
 				Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 			}
+			return null;
+		}
+	}
+
+	/// <summary>
+	/// Gets the platform identifier string for matching release assets.
+	/// </summary>
+	private static string GetPlatformIdentifier() {
+		string platform;
+		if (OperatingSystem.IsWindows()) {
+			platform = "win";
+		} else if (OperatingSystem.IsLinux()) {
+			platform = "linux";
+		} else if (OperatingSystem.IsMacOS()) {
+			platform = "macos";
+		} else {
+			platform = "unknown";
 		}
 
-		if (updateInfo != null) {
-			string platform;
-			if (OperatingSystem.IsWindows()) {
-				platform = OperatingSystem.IsWindowsVersionAtLeast(10) ? "win" : "win7";
-			} else if (OperatingSystem.IsLinux()) {
-				platform = "linux";
-			} else if (OperatingSystem.IsMacOS()) {
-				platform = "macos";
-			} else {
-				return null;
-			}
-
-			platform += "-" + RuntimeInformation.OSArchitecture.ToString().ToLower();
-			platform += RuntimeFeature.IsDynamicCodeSupported ? "-jit" : "-aot";
-
-			if (OperatingSystem.IsLinux() && Program.ExePath.ToLower().EndsWith("appimage")) {
-				platform += "-appimage";
-			}
-
-			UpdateFileInfo? file = updateInfo.Files.Where(f => f.Platform.Contains(platform)).FirstOrDefault();
-			return updateInfo != null ? new UpdatePromptViewModel(updateInfo, file) : null;
-		}
-
-		return null;
+		string arch = RuntimeInformation.OSArchitecture.ToString().ToLower();
+		return $"{platform}-{arch}";
 	}
 
 	public async Task<bool> UpdateNexen(UpdatePromptWindow wnd) {
@@ -136,17 +164,20 @@ public class UpdatePromptViewModel : ViewModelBase {
 			using SHA256 sha256 = SHA256.Create();
 			memoryStream.Position = 0;
 			string hash = BitConverter.ToString(sha256.ComputeHash(memoryStream)).Replace("-", "");
-			if (hash == FileInfo.Hash) {
-				using ZipArchive archive = new ZipArchive(memoryStream);
-				foreach (var entry in archive.Entries) {
-					downloadPath += Path.GetExtension(entry.Name);
-					entry.ExtractToFile(downloadPath, true);
-					break;
-				}
-			} else {
+			// If hash is provided, verify it; otherwise skip hash check (GitHub releases don't include SHA256)
+			if (!string.IsNullOrEmpty(FileInfo.Hash) && hash != FileInfo.Hash) {
 				File.Delete(downloadPath);
 				Dispatcher.UIThread.Post(() => NexenMsgBox.Show(wnd, "AutoUpdateInvalidFile", MessageBoxButtons.OK, MessageBoxIcon.Info, FileInfo.Hash, hash));
 				return false;
+			}
+
+			// Extract the downloaded file
+			memoryStream.Position = 0;
+			using ZipArchive archive = new ZipArchive(memoryStream);
+			foreach (var entry in archive.Entries) {
+				downloadPath += Path.GetExtension(entry.Name);
+				entry.ExtractToFile(downloadPath, true);
+				break;
 			}
 		}
 
@@ -164,4 +195,38 @@ public class UpdateInfo {
 	public Version LatestVersion { get; set; } = new();
 	public string ReleaseNotes { get; set; } = "";
 	public UpdateFileInfo[] Files { get; set; } = Array.Empty<UpdateFileInfo>();
+}
+
+/// <summary>
+/// Represents a GitHub release from the API.
+/// </summary>
+public class GitHubRelease {
+	[JsonPropertyName("tag_name")]
+	public string? TagName { get; set; }
+
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
+
+	[JsonPropertyName("body")]
+	public string? Body { get; set; }
+
+	[JsonPropertyName("prerelease")]
+	public bool Prerelease { get; set; }
+
+	[JsonPropertyName("assets")]
+	public GitHubAsset[]? Assets { get; set; }
+}
+
+/// <summary>
+/// Represents a GitHub release asset (downloadable file).
+/// </summary>
+public class GitHubAsset {
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
+
+	[JsonPropertyName("browser_download_url")]
+	public string? BrowserDownloadUrl { get; set; }
+
+	[JsonPropertyName("size")]
+	public long Size { get; set; }
 }
