@@ -10,7 +10,7 @@
 	<Application.Resources>
 		<FontFamily x:Key="NexenFont">Microsoft Sans Serif</FontFamily>
 		<x:Double x:Key="NexenFontSize">11</x:Double>
-		
+
 		<FontFamily x:Key="NexenMenuFont">Segoe UI</FontFamily>
 		<x:Double x:Key="NexenMenuFontSize">12</x:Double>
 
@@ -32,7 +32,7 @@
 		<l:EnumConverter x:Key="Enum" />
 		<u:FontNameConverter x:Key="FontNameConverter" />
 		<u:NullTextConverter x:Key="NullTextConverter" />
-		
+
 		<VisualBrush x:Key="ViewerBgBrush" TileMode="Tile" Stretch="None" AlignmentX="Left" AlignmentY="Top" SourceRect="0,0,5,5" DestinationRect="0,0,5,5">
 			<VisualBrush.Visual>
 				<Panel Background="#202020">
@@ -42,7 +42,7 @@
 			</VisualBrush.Visual>
 		</VisualBrush>
 	</Application.Resources>
-	
+
 	<Application.DataTemplates>
 		<DataTemplate DataType="x:Enum">
 			<TextBlock Text="{Binding, Converter={StaticResource Enum}}" />

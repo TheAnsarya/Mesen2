@@ -35,14 +35,14 @@
 		</c:NexenMenu>
 
 		<dv:RefreshTimingView DataContext="{Binding RefreshTiming}" DockPanel.Dock="Bottom" />
-		
+
 		<TabControl ItemsSource="{Binding Tabs}" Padding="1">
 			<TabControl.ItemTemplate>
 				<DataTemplate>
 					<TextBlock Text="{Binding TabName}" />
 				</DataTemplate>
 			</TabControl.ItemTemplate>
-		
+
 			<TabControl.ContentTemplate>
 				<DataTemplate DataType="vm:RegisterViewerTab">
 					<dv:RegisterTabView DataContext="{Binding}" />

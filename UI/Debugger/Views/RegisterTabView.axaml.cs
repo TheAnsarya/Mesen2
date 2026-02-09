@@ -14,7 +14,7 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using static Nexen.Debugger.ViewModels.LabelListViewModel;
 
-namespace Nexen.Debugger.Views; 
+namespace Nexen.Debugger.Views;
 public class RegisterTabView : NexenUserControl {
 	public RegisterViewerTab Model => (RegisterViewerTab)DataContext!;
 
