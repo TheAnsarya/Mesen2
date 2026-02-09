@@ -362,6 +362,37 @@ DllExport bool __stdcall DeleteSaveState(char* filepath) {
 	return _emu->GetSaveStateManager()->DeleteSaveState(filepath);
 }
 
+// ========== Recent Play Queue API ==========
+
+DllExport void __stdcall SaveRecentPlayState(char* outFilepath, int32_t maxLength) {
+	string filepath = _emu->GetSaveStateManager()->SaveRecentPlayState();
+	StringUtilities::CopyToBuffer(filepath, outFilepath, maxLength);
+}
+
+DllExport bool __stdcall ShouldSaveRecentPlay() {
+	return _emu->GetSaveStateManager()->ShouldSaveRecentPlay();
+}
+
+DllExport void __stdcall ResetRecentPlayTimer() {
+	_emu->GetSaveStateManager()->ResetRecentPlayTimer();
+}
+
+DllExport uint32_t __stdcall GetRecentPlayStates(InteropSaveStateInfo* outInfoArray, uint32_t maxCount) {
+	vector<SaveStateInfo> states = _emu->GetSaveStateManager()->GetRecentPlayStates();
+	uint32_t count = std::min<uint32_t>(static_cast<uint32_t>(states.size()), maxCount);
+
+	for (uint32_t i = 0; i < count; i++) {
+		memset(&outInfoArray[i], 0, sizeof(InteropSaveStateInfo));
+		StringUtilities::CopyToBuffer(states[i].filepath, outInfoArray[i].filepath, sizeof(outInfoArray[i].filepath));
+		StringUtilities::CopyToBuffer(states[i].romName, outInfoArray[i].romName, sizeof(outInfoArray[i].romName));
+		outInfoArray[i].timestamp = static_cast<int64_t>(states[i].timestamp);
+		outInfoArray[i].fileSize = states[i].fileSize;
+		outInfoArray[i].origin = static_cast<uint8_t>(states[i].origin);
+	}
+
+	return count;
+}
+
 class PgoKeyManager : public IKeyManager {
 public:
 	void RefreshState() {}

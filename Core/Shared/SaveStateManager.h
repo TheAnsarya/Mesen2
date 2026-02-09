@@ -52,12 +52,11 @@ struct SaveStateInfo {
 /// - Compressed emulator state (zlib)
 /// - Settings (optional)
 ///
-/// Storage modes:
-/// - Legacy slot mode: 10 numbered slots (0-9) + 1 auto-save slot (index 11)
-/// - Timestamped mode: Unlimited saves with datetime-based naming
-///   - Files stored in per-ROM subdirectories
-///   - Format: {RomName}/{RomName}_{YYYY-MM-DD}_{HH-mm-ss}.nexen-save
-///   - Legacy .mss files also supported for backward compatibility
+/// Save Categories:
+/// - Designated Save: Single user-selected save for quick load (F4)
+/// - Quick Save: User-initiated timestamped saves (Ctrl+S)
+/// - Recent Play: Automatic 5-min interval rotating queue (12 saves max)
+/// - Auto Save: Periodic background saves (20-30 min intervals)
 ///
 /// Save state features:
 /// - Full emulator state (CPU, PPU, APU, memory, etc.)
@@ -74,10 +73,16 @@ struct SaveStateInfo {
 /// </remarks>
 class SaveStateManager {
 private:
-	static constexpr uint32_t MaxIndex = 10; ///< Maximum slot index (0-9)
+	static constexpr uint32_t MaxIndex = 10; ///< Maximum slot index (0-9) [LEGACY]
 
-	atomic<uint32_t> _lastIndex; ///< Last used save state slot
-	Emulator* _emu;              ///< Emulator instance
+	// Recent Play Queue constants
+	static constexpr uint32_t RecentPlayMaxSlots = 12;      ///< Maximum Recent Play saves
+	static constexpr uint32_t RecentPlayIntervalSec = 300;  ///< 5 minutes between saves
+
+	atomic<uint32_t> _lastIndex;      ///< Last used save state slot [LEGACY]
+	atomic<uint32_t> _recentPlaySlot; ///< Current Recent Play slot (0-11, wraps)
+	time_t _lastRecentPlayTime;       ///< Last Recent Play save timestamp
+	Emulator* _emu;                   ///< Emulator instance
 
 	/// <summary>
 	/// Get filesystem path for save state slot (legacy mode).
@@ -98,6 +103,14 @@ private:
 	/// </summary>
 	/// <returns>Full path for new timestamped save state</returns>
 	string GetTimestampedFilepath();
+
+	/// <summary>
+	/// Generate filepath for a Recent Play slot.
+	/// Format: {SaveStateFolder}/{RomName}/{RomName}_recent_{01-12}.nexen-save
+	/// </summary>
+	/// <param name="slotIndex">Slot index (0-11)</param>
+	/// <returns>Full path for the Recent Play slot</returns>
+	string GetRecentPlayFilepath(uint32_t slotIndex);
 
 	/// <summary>
 	/// Parse timestamp from a timestamped save state filename.
@@ -243,4 +256,31 @@ public:
 	/// </summary>
 	/// <returns>Count of save state files</returns>
 	uint32_t GetSaveStateCount();
+
+	// ========== Recent Play Queue Methods ==========
+
+	/// <summary>
+	/// Save a Recent Play checkpoint.
+	/// Uses rotating slots (1-12) with FIFO replacement.
+	/// Called automatically every 5 minutes during gameplay.
+	/// </summary>
+	/// <returns>Full path to the saved file, or empty string on failure</returns>
+	string SaveRecentPlayState();
+
+	/// <summary>
+	/// Check if enough time has passed for a new Recent Play save.
+	/// </summary>
+	/// <returns>True if 5+ minutes since last Recent Play save</returns>
+	bool ShouldSaveRecentPlay();
+
+	/// <summary>
+	/// Reset the Recent Play timer (e.g., when loading a ROM).
+	/// </summary>
+	void ResetRecentPlayTimer();
+
+	/// <summary>
+	/// Get Recent Play saves only, sorted newest first.
+	/// </summary>
+	/// <returns>Vector of SaveStateInfo with origin=Recent</returns>
+	vector<SaveStateInfo> GetRecentPlayStates();
 };

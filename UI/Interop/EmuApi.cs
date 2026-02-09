@@ -142,6 +142,44 @@ public class EmuApi {
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static extern bool DeleteSaveState([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath);
 
+	// ========== Recent Play Queue API ==========
+
+	[DllImport(DllPath, EntryPoint = "SaveRecentPlayState")]
+	private static extern void SaveRecentPlayStateWrapper(IntPtr outFilepath, Int32 maxLength);
+
+	/// <summary>
+	/// Save a Recent Play checkpoint (rotating slots 1-12).
+	/// </summary>
+	/// <returns>Full path to saved file, or empty string on failure</returns>
+	public static string SaveRecentPlayState() {
+		return Utf8Utilities.CallStringApi(SaveRecentPlayStateWrapper, 2048);
+	}
+
+	[DllImport(DllPath)]
+	[return: MarshalAs(UnmanagedType.I1)]
+	public static extern bool ShouldSaveRecentPlay();
+
+	[DllImport(DllPath)]
+	public static extern void ResetRecentPlayTimer();
+
+	[DllImport(DllPath, EntryPoint = "GetRecentPlayStates")]
+	private static extern UInt32 GetRecentPlayStatesWrapper([Out] InteropSaveStateInfo[] outInfoArray, UInt32 maxCount);
+
+	/// <summary>
+	/// Get Recent Play saves only, sorted newest first.
+	/// </summary>
+	public static SaveStateInfo[] GetRecentPlayStates(int maxCount = 12) {
+		InteropSaveStateInfo[] interopArray = new InteropSaveStateInfo[maxCount];
+		UInt32 count = GetRecentPlayStatesWrapper(interopArray, (UInt32)maxCount);
+
+		SaveStateInfo[] result = new SaveStateInfo[count];
+		for (int i = 0; i < count; i++) {
+			result[i] = new SaveStateInfo(interopArray[i]);
+		}
+
+		return result;
+	}
+
 	[DllImport(DllPath, EntryPoint = "GetSaveStatePreview")] private static extern Int32 GetSaveStatePreviewWrapper([MarshalAs(UnmanagedType.LPUTF8Str)] string saveStatePath, [Out] byte[] imgData);
 	public static Bitmap? GetSaveStatePreview(string saveStatePath) {
 		if (File.Exists(saveStatePath)) {

@@ -23,6 +23,8 @@
 SaveStateManager::SaveStateManager(Emulator* emu) {
 	_emu = emu;
 	_lastIndex = 1;
+	_recentPlaySlot = 0;
+	_lastRecentPlayTime = 0;
 }
 
 string SaveStateManager::GetStateFilepath(int stateIndex) {
@@ -558,4 +560,67 @@ bool SaveStateManager::DeleteSaveState(const string& filepath) {
 
 uint32_t SaveStateManager::GetSaveStateCount() {
 	return static_cast<uint32_t>(GetSaveStateList().size());
+}
+
+// ========== Recent Play Queue Implementation ==========
+
+string SaveStateManager::GetRecentPlayFilepath(uint32_t slotIndex) {
+	string folder = GetRomSaveStateDirectory();
+	string romName = FolderUtilities::GetFilename(_emu->GetRomInfo().RomFile.GetFileName(), false);
+
+	// Format slot as 2-digit (01-12)
+	std::ostringstream oss;
+	oss << romName << "_recent_" << std::setfill('0') << std::setw(2) << (slotIndex + 1) << ".nexen-save";
+
+	return FolderUtilities::CombinePath(folder, oss.str());
+}
+
+string SaveStateManager::SaveRecentPlayState() {
+	if (_emu->GetRomInfo().RomFile.GetFileName().empty()) {
+		return "";
+	}
+
+	// Get current slot filepath
+	string filepath = GetRecentPlayFilepath(_recentPlaySlot);
+
+	// Save state to file
+	if (SaveState(filepath, false)) {
+		// Update timestamp
+		_lastRecentPlayTime = std::time(nullptr);
+
+		// Advance to next slot (wraps 0-11)
+		_recentPlaySlot = (_recentPlaySlot + 1) % RecentPlayMaxSlots;
+
+		return filepath;
+	}
+
+	return "";
+}
+
+bool SaveStateManager::ShouldSaveRecentPlay() {
+	if (_emu->GetRomInfo().RomFile.GetFileName().empty()) {
+		return false;
+	}
+
+	time_t now = std::time(nullptr);
+	return (now - _lastRecentPlayTime) >= static_cast<time_t>(RecentPlayIntervalSec);
+}
+
+void SaveStateManager::ResetRecentPlayTimer() {
+	_lastRecentPlayTime = std::time(nullptr);
+	// Don't reset slot - allows continuing rotation across ROM loads
+}
+
+vector<SaveStateInfo> SaveStateManager::GetRecentPlayStates() {
+	vector<SaveStateInfo> allStates = GetSaveStateList();
+	vector<SaveStateInfo> recentStates;
+
+	// Filter to only Recent origin saves
+	for (const auto& state : allStates) {
+		if (state.origin == SaveStateOrigin::Recent) {
+			recentStates.push_back(state);
+		}
+	}
+
+	return recentStates;
 }
