@@ -330,6 +330,7 @@ struct InteropSaveStateInfo {
 	char romName[256];      ///< ROM name
 	int64_t timestamp;      ///< Unix timestamp
 	uint32_t fileSize;      ///< File size in bytes
+	uint8_t origin;         ///< SaveStateOrigin enum value
 };
 
 DllExport void __stdcall SaveTimestampedState(char* outFilepath, int32_t maxLength) {
@@ -347,6 +348,7 @@ DllExport uint32_t __stdcall GetSaveStateList(InteropSaveStateInfo* outInfoArray
 		StringUtilities::CopyToBuffer(states[i].romName, outInfoArray[i].romName, sizeof(outInfoArray[i].romName));
 		outInfoArray[i].timestamp = static_cast<int64_t>(states[i].timestamp);
 		outInfoArray[i].fileSize = states[i].fileSize;
+		outInfoArray[i].origin = static_cast<uint8_t>(states[i].origin);
 	}
 
 	return count;

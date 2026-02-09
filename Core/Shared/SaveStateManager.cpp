@@ -506,6 +506,21 @@ vector<SaveStateInfo> SaveStateManager::GetSaveStateList() {
 			info.timestamp = ParseTimestampFromFilename(filename);
 			info.fileSize = static_cast<uint32_t>(entry.file_size());
 
+			// Detect origin from filename pattern
+			// {RomName}_auto.nexen-save -> Auto
+			// {RomName}_recent_{NN}.nexen-save -> Recent
+			// {RomName}_lua_{timestamp}.nexen-save -> Lua
+			// {RomName}_{YYYY-MM-DD}_{HH-mm-ss}.nexen-save -> Save
+			if (filename.find("_auto.") != string::npos) {
+				info.origin = SaveStateOrigin::Auto;
+			} else if (filename.find("_recent_") != string::npos) {
+				info.origin = SaveStateOrigin::Recent;
+			} else if (filename.find("_lua_") != string::npos) {
+				info.origin = SaveStateOrigin::Lua;
+			} else {
+				info.origin = SaveStateOrigin::Save;
+			}
+
 			// If timestamp parsing failed, use file modification time
 			if (info.timestamp == 0) {
 				auto ftime = fs::last_write_time(entry);

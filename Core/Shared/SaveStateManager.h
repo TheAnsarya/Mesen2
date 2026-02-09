@@ -6,14 +6,39 @@ class Emulator;
 struct RenderedFrame;
 
 /// <summary>
+/// Origin category for save state files.
+/// Determines the colored badge shown in UI and the save state's purpose.
+/// </summary>
+/// <remarks>
+/// Badge colors:
+/// - Auto (0): Blue - Background periodic saves (every 20-30 min)
+/// - Save (1): Green - User-initiated saves (Quick Save with Ctrl+S)
+/// - Recent (2): Red - Recent play checkpoints (automatic 5-min interval queue)
+/// - Lua (3): Yellow - Script-created saves
+///
+/// File naming:
+/// - Auto: {RomName}_auto.nexen-save
+/// - Save: {RomName}_{YYYY-MM-DD}_{HH-mm-ss}.nexen-save
+/// - Recent: {RomName}_recent_{01-12}.nexen-save
+/// - Lua: {RomName}_lua_{timestamp}.nexen-save
+/// </remarks>
+enum class SaveStateOrigin : uint8_t {
+	Auto = 0,    ///< Auto-save (blue badge) - periodic background saves
+	Save = 1,    ///< User save (green badge) - Quick Save (Ctrl+S)
+	Recent = 2,  ///< Recent play (red badge) - 5-min interval queue
+	Lua = 3      ///< Lua script (yellow badge) - script-created saves
+};
+
+/// <summary>
 /// Metadata for a single save state file.
 /// Used by GetSaveStateList() to return save state information to the UI.
 /// </summary>
 struct SaveStateInfo {
-	string filepath;    ///< Full path to the save state file
-	string romName;     ///< ROM name this save is for
-	time_t timestamp;   ///< Unix timestamp when save was created (from filename)
-	uint32_t fileSize;  ///< File size in bytes
+	string filepath;        ///< Full path to the save state file
+	string romName;         ///< ROM name this save is for
+	time_t timestamp;       ///< Unix timestamp when save was created (from filename)
+	uint32_t fileSize;      ///< File size in bytes
+	SaveStateOrigin origin; ///< Origin category (Auto/Save/Recent/Lua)
 };
 
 /// <summary>

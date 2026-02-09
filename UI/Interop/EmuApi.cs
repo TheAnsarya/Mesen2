@@ -410,6 +410,28 @@ public struct SoftwareRendererFrame {
 // ========== Timestamped Save State Types ==========
 
 /// <summary>
+/// Origin category for save state files.
+/// Determines the colored badge shown in UI and the save state's purpose.
+/// </summary>
+/// <remarks>
+/// Badge colors:
+/// - Auto (0): Blue - Background periodic saves (every 20-30 min)
+/// - Save (1): Green - User-initiated saves (Quick Save with Ctrl+S)
+/// - Recent (2): Red - Recent play checkpoints (automatic 5-min interval queue)
+/// - Lua (3): Yellow - Script-created saves
+/// </remarks>
+public enum SaveStateOrigin : byte {
+	/// <summary>Auto-save (blue badge) - periodic background saves</summary>
+	Auto = 0,
+	/// <summary>User save (green badge) - Quick Save (Ctrl+S)</summary>
+	Save = 1,
+	/// <summary>Recent play (red badge) - 5-min interval queue</summary>
+	Recent = 2,
+	/// <summary>Lua script (yellow badge) - script-created saves</summary>
+	Lua = 3
+}
+
+/// <summary>
 /// Interop struct for marshaling save state info from native code.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
@@ -420,6 +442,7 @@ public struct InteropSaveStateInfo {
 	public byte[] RomName;
 	public Int64 Timestamp;
 	public UInt32 FileSize;
+	public SaveStateOrigin Origin;
 }
 
 /// <summary>
@@ -438,6 +461,9 @@ public class SaveStateInfo {
 	/// <summary>File size in bytes</summary>
 	public uint FileSize { get; set; }
 
+	/// <summary>Origin category (Auto/Save/Recent/Lua)</summary>
+	public SaveStateOrigin Origin { get; set; }
+
 	public SaveStateInfo() { }
 
 	public SaveStateInfo(InteropSaveStateInfo interop) {
@@ -445,6 +471,7 @@ public class SaveStateInfo {
 		RomName = Utf8Utilities.GetStringFromArray(interop.RomName);
 		Timestamp = DateTimeOffset.FromUnixTimeSeconds(interop.Timestamp).LocalDateTime;
 		FileSize = interop.FileSize;
+		Origin = interop.Origin;
 	}
 
 	/// <summary>
@@ -467,4 +494,27 @@ public class SaveStateInfo {
 			return $"{dateStr} {timeStr}";
 		}
 	}
+
+	/// <summary>
+	/// Get the badge color for this save state's origin.
+	/// </summary>
+	/// <returns>Hex color code (without #)</returns>
+	public string GetBadgeColor() => Origin switch {
+		SaveStateOrigin.Auto => "4a90d9",    // Blue
+		SaveStateOrigin.Save => "5cb85c",    // Green
+		SaveStateOrigin.Recent => "d9534f",  // Red
+		SaveStateOrigin.Lua => "f0ad4e",     // Yellow
+		_ => "777777"                         // Gray fallback
+	};
+
+	/// <summary>
+	/// Get the badge label text for this save state's origin.
+	/// </summary>
+	public string GetBadgeLabel() => Origin switch {
+		SaveStateOrigin.Auto => "Auto",
+		SaveStateOrigin.Save => "Save",
+		SaveStateOrigin.Recent => "Recent",
+		SaveStateOrigin.Lua => "Lua",
+		_ => "Unknown"
+	};
 }
