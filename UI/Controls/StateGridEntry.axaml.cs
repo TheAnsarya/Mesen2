@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Nexen.Interop;
@@ -25,6 +26,9 @@ public class StateGridEntry : UserControl {
 	public static readonly StyledProperty<bool> EnabledProperty = AvaloniaProperty.Register<StateGridEntry, bool>(nameof(Enabled));
 	public static readonly StyledProperty<bool> IsActiveEntryProperty = AvaloniaProperty.Register<StateGridEntry, bool>(nameof(IsActiveEntry));
 	public static readonly StyledProperty<double> AspectRatioProperty = AvaloniaProperty.Register<StateGridEntry, double>(nameof(AspectRatio));
+	public static readonly StyledProperty<string> BadgeTextProperty = AvaloniaProperty.Register<StateGridEntry, string>(nameof(BadgeText), "");
+	public static readonly StyledProperty<IBrush> BadgeBackgroundProperty = AvaloniaProperty.Register<StateGridEntry, IBrush>(nameof(BadgeBackground), Brushes.Transparent);
+	public static readonly StyledProperty<bool> ShowBadgeProperty = AvaloniaProperty.Register<StateGridEntry, bool>(nameof(ShowBadge), false);
 
 	public RecentGameInfo Entry {
 		get { return GetValue(EntryProperty); }
@@ -60,6 +64,27 @@ public class StateGridEntry : UserControl {
 		get { return GetValue(SubTitleProperty); }
 		set { SetValue(SubTitleProperty, value); }
 	}
+
+	public string BadgeText {
+		get { return GetValue(BadgeTextProperty); }
+		set { SetValue(BadgeTextProperty, value); }
+	}
+
+	public IBrush BadgeBackground {
+		get { return GetValue(BadgeBackgroundProperty); }
+		set { SetValue(BadgeBackgroundProperty, value); }
+	}
+
+	public bool ShowBadge {
+		get { return GetValue(ShowBadgeProperty); }
+		set { SetValue(ShowBadgeProperty, value); }
+	}
+
+	// Badge colors for different save state origins (Bootstrap-style)
+	private static readonly IBrush BadgeBlue = new SolidColorBrush(Color.Parse("#0d6efd"));    // Auto save
+	private static readonly IBrush BadgeGreen = new SolidColorBrush(Color.Parse("#198754"));   // User save
+	private static readonly IBrush BadgeRed = new SolidColorBrush(Color.Parse("#dc3545"));     // Recent play
+	private static readonly IBrush BadgeYellow = new SolidColorBrush(Color.Parse("#ffc107"));  // Lua save
 
 	static StateGridEntry() {
 		//Make empty image black
@@ -112,6 +137,19 @@ public class StateGridEntry : UserControl {
 			}
 		} else {
 			SubTitle = ResourceHelper.GetMessage("EmptyState");
+		}
+
+		// Set origin badge for timestamped saves
+		if (game.IsTimestampedSave) {
+			ShowBadge = true;
+			(BadgeText, BadgeBackground) = game.Origin switch {
+				SaveStateOrigin.Auto => ("Auto", BadgeBlue),
+				SaveStateOrigin.Recent => ("Recent", BadgeRed),
+				SaveStateOrigin.Lua => ("Lua", BadgeYellow),
+				_ => ("Save", BadgeGreen) // Default to Save
+			};
+		} else {
+			ShowBadge = false;
 		}
 
 		Enabled = fileExists || game.SaveMode;

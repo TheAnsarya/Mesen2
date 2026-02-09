@@ -39,6 +39,23 @@
 			TextWrapping="Wrap"
 			IsEnabled="{Binding Enabled, ElementName=root}"
 		/>
+		<!-- Origin badge (Auto=Blue, Save=Green, Recent=Red, Lua=Yellow) -->
+		<Border
+			DockPanel.Dock="Bottom"
+			IsVisible="{Binding ShowBadge, ElementName=root}"
+			Background="{Binding BadgeBackground, ElementName=root}"
+			CornerRadius="3"
+			Padding="6 1"
+			HorizontalAlignment="Center"
+			Margin="0 2"
+		>
+			<TextBlock
+				Text="{Binding BadgeText, ElementName=root}"
+				FontSize="10"
+				FontWeight="SemiBold"
+				Foreground="White"
+			/>
+		</Border>
 		<TextBlock
 			DockPanel.Dock="Bottom"
 			Text="{Binding Title, ElementName=root}"
