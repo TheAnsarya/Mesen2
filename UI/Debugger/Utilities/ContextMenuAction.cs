@@ -871,4 +871,11 @@ public enum ActionType {
 	ResetProfilerData,
 	[IconFile("Copy")]
 	CopyToClipboard,
+
+	// Auto Save menu items
+	[IconFile("SaveFloppy")]
+	AutoSave,
+	AutoSaveStates,
+	AutoSavePansy,
+	SavePansyOnUnload,
 }

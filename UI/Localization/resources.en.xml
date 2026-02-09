@@ -1915,6 +1915,9 @@ E
 		<Message ID="LabelOrCommentRequired">A label or a comment must be specified.</Message>
 		<Message ID="AddressOutOfRange">The address is out of range.</Message>
 		<Message ID="AddressHasOtherLabel">Another label exists for this address: {0}</Message>
+
+		<Message ID="ExportPansySuccess">Pansy metadata file exported successfully.</Message>
+		<Message ID="ExportPansyFailed">Failed to export Pansy metadata file.</Message>
 	</Messages>
 	<Enums>
 		<Enum ID="EmulatorShortcut">
@@ -3674,6 +3677,7 @@ E
 			<Value ID="ResetWorkspace">Reset workspace</Value>
 			<Value ID="ImportLabels">Import labels...</Value>
 			<Value ID="ExportLabels">Export labels...</Value>
+			<Value ID="ExportPansy">Export Pansy metadata...</Value>
 			<Value ID="ImportWatchEntries">Import watch entries...</Value>
 			<Value ID="ExportWatchEntries">Export watch entries...</Value>
 
@@ -3740,6 +3744,11 @@ E
 
 			<Value ID="CopyToClipboard">Copy to clipboard</Value>
 			<Value ID="ResetProfilerData">Reset profiler data</Value>
+
+			<Value ID="AutoSave">Auto Save</Value>
+			<Value ID="AutoSaveStates">Auto Save States</Value>
+			<Value ID="AutoSavePansy">Auto Save Pansy Data</Value>
+			<Value ID="SavePansyOnUnload">Save Pansy on ROM Unload</Value>
 		</Enum>
 	</Enums>
 </Resources>

@@ -11,7 +11,7 @@ using Nexen.Debugger.Utilities;
 using Nexen.Interop;
 using Nexen.Utilities;
 
-namespace Nexen.Debugger.Labels; 
+namespace Nexen.Debugger.Labels;
 /// <summary>
 /// Manages folder-based debug data storage for ROMs.
 /// Each ROM gets a dedicated folder containing:
@@ -145,11 +145,13 @@ public static class DebugFolderManager {
 		var config = ConfigManager.Config.Debug.Integration;
 		if (!config.UseFolderStorage) {
 			// Fall back to single-file export (legacy behavior)
+			Log.Info("[DebugFolderManager] UseFolderStorage=false, using legacy export");
 			return ExportPansyOnly(romInfo, memoryType);
 		}
 
 		try {
 			string folder = EnsureFolderExists(romInfo);
+			Log.Info($"[DebugFolderManager] Exporting to folder: {folder}");
 
 			// Create version backup if enabled
 			if (config.KeepVersionHistory) {
@@ -160,6 +162,7 @@ public static class DebugFolderManager {
 
 			// 1. Export Pansy file
 			string pansyPath = GetPansyPath(romInfo);
+			Log.Info($"[DebugFolderManager] Exporting Pansy to: {pansyPath}");
 			var options = new PansyExportOptions {
 				IncludeMemoryRegions = config.PansyIncludeMemoryRegions,
 				IncludeCrossReferences = config.PansyIncludeCrossReferences,
@@ -167,14 +170,16 @@ public static class DebugFolderManager {
 				UseCompression = config.PansyUseCompression
 			};
 			success &= PansyExporter.Export(pansyPath, romInfo, memoryType, 0, options);
+			Log.Info($"[DebugFolderManager] Pansy export result: {success}");
 
 			// 2. Export MLB file if enabled
 			if (config.SyncMlbFiles) {
 				string mlbPath = GetMlbPath(romInfo);
 				try {
 					NexenLabelFile.Export(mlbPath);
+					Log.Info($"[DebugFolderManager] MLB exported to: {mlbPath}");
 				} catch (Exception ex) {
-					System.Diagnostics.Debug.WriteLine($"[DebugFolderManager] MLB export failed: {ex.Message}");
+					Log.Error(ex, "[DebugFolderManager] MLB export failed");
 					success = false;
 				}
 			}
@@ -183,15 +188,16 @@ public static class DebugFolderManager {
 			if (config.SyncCdlFiles) {
 				string cdlPath = GetCdlPath(romInfo);
 				success &= ExportCdlFile(cdlPath, memoryType);
+				Log.Info($"[DebugFolderManager] CDL exported to: {cdlPath}");
 			}
 
 			// 4. Update config file with timestamp
 			UpdateConfigFile(romInfo);
 
-			System.Diagnostics.Debug.WriteLine($"[DebugFolderManager] Exported all files to: {folder}");
+			Log.Info($"[DebugFolderManager] All exports complete. Success={success}");
 			return success;
 		} catch (Exception ex) {
-			System.Diagnostics.Debug.WriteLine($"[DebugFolderManager] ExportAllFiles failed: {ex.Message}");
+			Log.Error(ex, "[DebugFolderManager] ExportAllFiles failed");
 			return false;
 		}
 	}

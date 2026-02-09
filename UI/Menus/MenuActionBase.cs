@@ -147,18 +147,28 @@ public abstract class MenuActionBase : ViewModelBase, IMenuAction, IDisposable {
 	/// <summary>Wraps the click handler with safety checks.</summary>
 	private Action CreateSafeClickHandler(Action handler) {
 		return () => {
-			if ((IsVisible == null || AllowedWhenHidden || IsVisible()) &&
-			    (IsEnabled == null || IsEnabled())) {
+			Utilities.Log.Debug($"[MenuActionBase] Click handler invoked for {ActionType}");
+
+			bool visibleOk = IsVisible == null || AllowedWhenHidden || IsVisible();
+			bool enabledOk = IsEnabled == null || IsEnabled();
+
+			Utilities.Log.Debug($"[MenuActionBase] IsVisible check: {visibleOk}, IsEnabled check: {enabledOk}");
+
+			if (visibleOk && enabledOk) {
 				if (ActionType == ActionType.Exit) {
 					// Exit needs to run after the command completes to avoid crash
 					Dispatcher.UIThread.Post(handler);
 				} else {
 					try {
+						Utilities.Log.Debug($"[MenuActionBase] Executing handler for {ActionType}");
 						handler();
 					} catch (Exception ex) {
+						Utilities.Log.Error(ex, $"[MenuActionBase] EXCEPTION in handler for {ActionType}");
 						Dispatcher.UIThread.Post(() => NexenMsgBox.ShowException(ex));
 					}
 				}
+			} else {
+				Utilities.Log.Warn($"[MenuActionBase] Handler NOT executed - visibility or enable check failed for {ActionType}");
 			}
 		};
 	}

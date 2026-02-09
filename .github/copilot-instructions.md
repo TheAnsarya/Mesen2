@@ -43,7 +43,9 @@ gh issue close <number> --repo TheAnsarya/Nexen --comment "Completed in commit a
 
 ### Indentation
 - **TABS for indentation** - enforced by `.editorconfig`
-- Tab width: 4 spaces equivalent
+- **Tab width: 4 spaces** - ALWAYS use 4-space-equivalent tabs
+- NEVER use spaces for indentation - only tabs
+- Inside code blocks in markdown, use spaces for alignment of ASCII art/diagrams
 
 ### Brace Style
 - **K&R style** - Opening braces on same line

@@ -17,7 +17,7 @@ using Nexen.Utilities;
 using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.Config; 
+namespace Nexen.Config;
 public class PreferencesConfig : BaseConfig<PreferencesConfig> {
 	[Reactive] public NexenTheme Theme { get; set; } = NexenTheme.Light;
 	[Reactive] public bool AutomaticallyCheckForUpdates { get; set; } = true;
@@ -48,7 +48,7 @@ public class PreferencesConfig : BaseConfig<PreferencesConfig> {
 	[Reactive] public bool AssociateWsRomFiles { get; set; } = false;
 
 	[Reactive] public bool EnableAutoSaveState { get; set; } = true;
-	[Reactive] public UInt32 AutoSaveStateDelay { get; set; } = 5;
+	[Reactive] public UInt32 AutoSaveStateDelay { get; set; } = 20;
 
 	[Reactive] public bool EnableRewind { get; set; } = true;
 	[Reactive] public UInt32 RewindBufferSize { get; set; } = 300;

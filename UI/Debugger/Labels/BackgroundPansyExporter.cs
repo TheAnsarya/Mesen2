@@ -6,7 +6,7 @@ using Nexen.Debugger.Labels;
 using Nexen.Interop;
 using Nexen.Utilities;
 
-namespace Nexen.Debugger.Labels; 
+namespace Nexen.Debugger.Labels;
 /// <summary>
 /// Manages background CDL recording and periodic Pansy file export.
 /// This enables CDL collection without requiring the debugger window to be open.
@@ -21,11 +21,11 @@ public static class BackgroundPansyExporter {
 	/// Called when a ROM is loaded. Starts background CDL recording if enabled.
 	/// </summary>
 	public static void OnRomLoaded(RomInfo romInfo) {
-		System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] OnRomLoaded: {romInfo.GetRomName()}");
+		Log.Info($"[BackgroundPansy] OnRomLoaded: {romInfo.GetRomName()}");
 		_currentRomInfo = romInfo;
 
 		if (!ConfigManager.Config.Debug.Integration.BackgroundCdlRecording) {
-			System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Background recording disabled");
+			Log.Info("[BackgroundPansy] Background recording disabled in config");
 			return;
 		}
 
@@ -37,7 +37,7 @@ public static class BackgroundPansyExporter {
 	/// Called when a ROM is unloaded. Saves final Pansy file and stops recording.
 	/// </summary>
 	public static void OnRomUnloaded() {
-		System.Diagnostics.Debug.WriteLine("[BackgroundPansy] OnRomUnloaded");
+		Log.Info("[BackgroundPansy] OnRomUnloaded");
 		StopAutoSaveTimer();
 
 		if (_currentRomInfo is not null && ConfigManager.Config.Debug.Integration.SavePansyOnRomUnload) {
@@ -57,7 +57,7 @@ public static class BackgroundPansyExporter {
 		try {
 			// Initialize debugger if not already done
 			if (!_debuggerInitialized) {
-				System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Initializing debugger");
+				Log.Info("[BackgroundPansy] Initializing debugger");
 				DebugApi.InitializeDebugger();
 				_debuggerInitialized = true;
 			}
@@ -65,11 +65,11 @@ public static class BackgroundPansyExporter {
 			// Enable CDL logging for the main CPU type
 			var cpuType = _currentRomInfo.ConsoleType.GetMainCpuType();
 			var debuggerFlag = cpuType.GetDebuggerFlag();
-			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Enabling CDL for {cpuType} (flag: {debuggerFlag})");
+			Log.Info($"[BackgroundPansy] Enabling CDL for {cpuType} (flag: {debuggerFlag})");
 			ConfigApi.SetDebuggerFlag(debuggerFlag, true);
 			_cdlEnabled = true;
 		} catch (Exception ex) {
-			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Failed to start CDL recording: {ex.Message}");
+			Log.Error(ex, "[BackgroundPansy] Failed to start CDL recording");
 		}
 	}
 
@@ -82,11 +82,11 @@ public static class BackgroundPansyExporter {
 		try {
 			var cpuType = _currentRomInfo.ConsoleType.GetMainCpuType();
 			var debuggerFlag = cpuType.GetDebuggerFlag();
-			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Disabling CDL for {cpuType}");
+			Log.Info($"[BackgroundPansy] Disabling CDL for {cpuType}");
 			ConfigApi.SetDebuggerFlag(debuggerFlag, false);
 			_cdlEnabled = false;
 		} catch (Exception ex) {
-			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Failed to stop CDL recording: {ex.Message}");
+			Log.Error(ex, "[BackgroundPansy] Failed to stop CDL recording");
 		}
 	}
 
@@ -96,12 +96,12 @@ public static class BackgroundPansyExporter {
 	private static void StartAutoSaveTimer() {
 		int intervalMinutes = ConfigManager.Config.Debug.Integration.AutoSaveIntervalMinutes;
 		if (intervalMinutes <= 0) {
-			System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Auto-save disabled (interval = 0)");
+			Log.Info("[BackgroundPansy] Auto-save disabled (interval = 0)");
 			return;
 		}
 
 		int intervalMs = intervalMinutes * 60 * 1000;
-		System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Starting auto-save timer: {intervalMinutes} minutes");
+		Log.Info($"[BackgroundPansy] Starting auto-save timer: {intervalMinutes} minutes");
 
 		_autoSaveTimer?.Dispose();
 		_autoSaveTimer = new Timer(OnAutoSaveTick, null, intervalMs, intervalMs);
@@ -112,7 +112,7 @@ public static class BackgroundPansyExporter {
 	/// </summary>
 	private static void StopAutoSaveTimer() {
 		if (_autoSaveTimer is not null) {
-			System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Stopping auto-save timer");
+			Log.Info("[BackgroundPansy] Stopping auto-save timer");
 			_autoSaveTimer.Dispose();
 			_autoSaveTimer = null;
 		}
@@ -122,7 +122,7 @@ public static class BackgroundPansyExporter {
 	/// Timer callback - exports Pansy on UI thread.
 	/// </summary>
 	private static void OnAutoSaveTick(object? state) {
-		System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Auto-save tick");
+		Log.Info("[BackgroundPansy] Auto-save tick");
 		Dispatcher.UIThread.Post(() => ExportPansy());
 	}
 
@@ -131,16 +131,17 @@ public static class BackgroundPansyExporter {
 	/// </summary>
 	private static void ExportPansy() {
 		if (_currentRomInfo is null || string.IsNullOrEmpty(_currentRomInfo.RomPath)) {
-			System.Diagnostics.Debug.WriteLine("[BackgroundPansy] Cannot export - no ROM loaded");
+			Log.Info("[BackgroundPansy] Cannot export - no ROM loaded");
 			return;
 		}
 
 		try {
 			var memoryType = _currentRomInfo.ConsoleType.GetMainCpuType().GetPrgRomMemoryType();
-			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Exporting Pansy for memory type: {memoryType}");
+			Log.Info($"[BackgroundPansy] Exporting Pansy for memory type: {memoryType}");
 			PansyExporter.AutoExport(_currentRomInfo, memoryType);
+			Log.Info("[BackgroundPansy] Export complete");
 		} catch (Exception ex) {
-			System.Diagnostics.Debug.WriteLine($"[BackgroundPansy] Export failed: {ex.Message}");
+			Log.Error(ex, "[BackgroundPansy] Export failed");
 		}
 	}
 

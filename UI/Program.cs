@@ -15,7 +15,7 @@ using Nexen.Config;
 using Nexen.Interop;
 using Nexen.Utilities;
 
-namespace Nexen; 
+namespace Nexen;
 class Program {
 	// Initialization code. Don't use any Avalonia, third-party APIs or any
 	// SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -36,50 +36,82 @@ class Program {
 
 	[STAThread]
 	public static int Main(string[] args) {
-		if (!System.Diagnostics.Debugger.IsAttached) {
-			NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
-			NativeLibrary.SetDllImportResolver(typeof(SkiaSharp.SKGraphics).Assembly, DllImportResolver);
-			NativeLibrary.SetDllImportResolver(typeof(HarfBuzzSharp.Blob).Assembly, DllImportResolver);
-		}
+		// Initialize logging first thing
+		Log.Initialize();
+		Log.Info($"Nexen starting with args: {string.Join(" ", args)}");
 
-		if (args.Length >= 4 && args[0] == "--update") {
-			UpdateHelper.AttemptUpdate(args[1], args[2], args[3], args.Contains("admin"));
-			return 0;
-		}
+		// Set up global exception handlers
+		AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+			Log.Fatal(e.ExceptionObject as Exception, "Unhandled exception in AppDomain");
+			Log.CloseAndFlush();
+		};
 
-		Environment.CurrentDirectory = ConfigManager.HomeFolder;
+		TaskScheduler.UnobservedTaskException += (sender, e) => {
+			Log.Error(e.Exception, "Unobserved task exception");
+			e.SetObserved(); // Prevent crash
+		};
 
-		if (!File.Exists(ConfigManager.GetConfigFile())) {
-			//Could not find configuration file, show wizard
-			DependencyHelper.ExtractNativeDependencies(ConfigManager.HomeFolder);
-			App.ShowConfigWindow = true;
-			BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnMainWindowClose);
-			if (File.Exists(ConfigManager.GetConfigFile())) {
-				//Configuration done, restart process
-				Process.Start(Program.ExePath);
+		try {
+			if (!System.Diagnostics.Debugger.IsAttached) {
+				NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
+				NativeLibrary.SetDllImportResolver(typeof(SkiaSharp.SKGraphics).Assembly, DllImportResolver);
+				NativeLibrary.SetDllImportResolver(typeof(HarfBuzzSharp.Blob).Assembly, DllImportResolver);
 			}
 
+			if (args.Length >= 4 && args[0] == "--update") {
+				UpdateHelper.AttemptUpdate(args[1], args[2], args[3], args.Contains("admin"));
+				return 0;
+			}
+
+			Log.Info($"Home folder: {ConfigManager.HomeFolder}");
+			Environment.CurrentDirectory = ConfigManager.HomeFolder;
+
+			if (!File.Exists(ConfigManager.GetConfigFile())) {
+				Log.Info("No config file found, showing setup wizard");
+				//Could not find configuration file, show wizard
+				DependencyHelper.ExtractNativeDependencies(ConfigManager.HomeFolder);
+				App.ShowConfigWindow = true;
+				BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnMainWindowClose);
+				if (File.Exists(ConfigManager.GetConfigFile())) {
+					//Configuration done, restart process
+					Log.Info("Configuration complete, restarting");
+					Process.Start(Program.ExePath);
+				}
+
+				return 0;
+			}
+
+			Log.Info("Loading configuration...");
+			//Start loading config file in a separate thread
+			Task.Run(() => ConfigManager.LoadConfig());
+
+			Log.Info("Extracting native dependencies...");
+			//Extract core dll & other native dependencies
+			DependencyHelper.ExtractNativeDependencies(ConfigManager.HomeFolder);
+
+			if (CommandLineHelper.IsTestRunner(args)) {
+				Log.Info("Running in test mode");
+				return TestRunner.Run(args);
+			}
+
+			using SingleInstance instance = SingleInstance.Instance;
+			instance.Init(args);
+			if (instance.FirstInstance) {
+				Log.Info("Starting main application...");
+				Program.CommandLineArgs = (string[])args.Clone();
+				BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnMainWindowClose);
+			} else {
+				Log.Info("Another instance is already running");
+			}
+
+			Log.Info("Nexen shutting down normally");
 			return 0;
+		} catch (Exception ex) {
+			Log.Fatal(ex, "Fatal exception in Main");
+			throw;
+		} finally {
+			Log.CloseAndFlush();
 		}
-
-		//Start loading config file in a separate thread
-		Task.Run(() => ConfigManager.LoadConfig());
-
-		//Extract core dll & other native dependencies
-		DependencyHelper.ExtractNativeDependencies(ConfigManager.HomeFolder);
-
-		if (CommandLineHelper.IsTestRunner(args)) {
-			return TestRunner.Run(args);
-		}
-
-		using SingleInstance instance = SingleInstance.Instance;
-		instance.Init(args);
-		if (instance.FirstInstance) {
-			Program.CommandLineArgs = (string[])args.Clone();
-			BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnMainWindowClose);
-		}
-
-		return 0;
 	}
 
 	private static IntPtr DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath) {

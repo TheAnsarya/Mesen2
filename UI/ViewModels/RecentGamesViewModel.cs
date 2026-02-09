@@ -13,7 +13,7 @@ using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.ViewModels; 
+namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the recent games and save state selection screens.
 /// Handles displaying recent games, loading save states, and save state management.
@@ -84,6 +84,7 @@ public class RecentGamesViewModel : ViewModelBase {
 			}
 		} else if (mode == GameScreenMode.SaveStatePicker) {
 			// New timestamped save state picker mode
+			Log.Info("[RecentGames] SaveStatePicker mode - pausing emulation");
 			if (!Visible) {
 				NeedResume = Pause();
 			}
@@ -91,8 +92,11 @@ public class RecentGamesViewModel : ViewModelBase {
 			Title = ResourceHelper.GetMessage("LoadStateDialog");
 
 			// Get all timestamped saves for current ROM from API
+			Log.Info("[RecentGames] Calling EmuApi.GetSaveStateList()");
 			SaveStateInfo[] states = EmuApi.GetSaveStateList();
+			Log.Info($"[RecentGames] Got {states.Length} save states from API");
 			foreach (var state in states) {
+				Log.Info($"[RecentGames]   - {state.RomName} @ {state.Filepath}");
 				entries.Add(new RecentGameInfo() {
 					FileName = state.Filepath,
 					Name = state.RomName,
@@ -105,6 +109,7 @@ public class RecentGamesViewModel : ViewModelBase {
 			// If no timestamped saves exist, show message
 			if (entries.Count == 0) {
 				// Just close the picker - nothing to show
+				Log.Info("[RecentGames] No save states found - closing picker");
 				Visible = false;
 				if (NeedResume) {
 					EmuApi.Resume();

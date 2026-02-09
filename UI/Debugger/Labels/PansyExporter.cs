@@ -17,7 +17,7 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using Nexen.Windows;
 
-namespace Nexen.Debugger.Labels; 
+namespace Nexen.Debugger.Labels;
 /// <summary>
 /// Pansy file header structure for reading existing files.
 /// </summary>
@@ -393,10 +393,10 @@ public static class PansyExporter {
 	/// <param name="romInfo">Current ROM information</param>
 	/// <param name="memoryType">Memory type for CDL</param>
 	public static void AutoExport(RomInfo romInfo, MemoryType memoryType) {
-		System.Diagnostics.Debug.WriteLine($"[Pansy] AutoExport called - AutoExportPansy={ConfigManager.Config.Debug.Integration.AutoExportPansy}");
+		Log.Info($"[Pansy] AutoExport called - AutoExportPansy={ConfigManager.Config.Debug.Integration.AutoExportPansy}");
 
 		if (!ConfigManager.Config.Debug.Integration.AutoExportPansy) {
-			System.Diagnostics.Debug.WriteLine("[Pansy] Auto-export disabled, skipping");
+			Log.Info("[Pansy] Auto-export disabled, skipping");
 			return;
 		}
 
@@ -404,20 +404,20 @@ public static class PansyExporter {
 
 		// Phase 7.5: Use folder-based storage if enabled
 		if (config.UseFolderStorage) {
-			System.Diagnostics.Debug.WriteLine("[Pansy] Using folder-based storage");
+			Log.Info("[Pansy] Using folder-based storage");
 			bool success = DebugFolderManager.ExportAllFiles(romInfo, memoryType);
-			System.Diagnostics.Debug.WriteLine($"[Pansy] Folder export result: {success}");
+			Log.Info($"[Pansy] Folder export result: {success}");
 			return;
 		}
 
 		// Legacy single-file export
 		string romName = romInfo.GetRomName();
 		string pansyPath = GetPansyFilePath(romName);
-		System.Diagnostics.Debug.WriteLine($"[Pansy] Target path: {pansyPath}");
+		Log.Info($"[Pansy] Target path: {pansyPath}");
 
 		// Calculate current ROM CRC32
 		uint currentCrc = CalculateRomCrc32(romInfo);
-		System.Diagnostics.Debug.WriteLine($"[Pansy] Current ROM CRC32: {currentCrc:X8}");
+		Log.Info($"[Pansy] Current ROM CRC32: {currentCrc:X8}");
 
 		// Build export options from configuration
 		var options = new PansyExportOptions {
@@ -430,22 +430,22 @@ public static class PansyExporter {
 		// Check if existing pansy file has matching CRC
 		var existingHeader = ReadHeader(pansyPath);
 		if (existingHeader != null) {
-			System.Diagnostics.Debug.WriteLine($"[Pansy] Existing file CRC32: {existingHeader.RomCrc32:X8}");
+			Log.Info($"[Pansy] Existing file CRC32: {existingHeader.RomCrc32:X8}");
 
 			if (existingHeader.RomCrc32 != 0 && currentCrc != 0 && existingHeader.RomCrc32 != currentCrc) {
 				// CRC mismatch - this is likely a hacked/translated ROM
 				// Create a separate file with CRC suffix instead of overwriting
 				string altPath = GetPansyFilePathWithCrc(romName, currentCrc);
-				System.Diagnostics.Debug.WriteLine($"[Pansy] CRC MISMATCH! Creating separate file: {altPath}");
+				Log.Info($"[Pansy] CRC MISMATCH! Creating separate file: {altPath}");
 				bool success = Export(altPath, romInfo, memoryType, currentCrc, options);
-				System.Diagnostics.Debug.WriteLine($"[Pansy] Export result: {success}");
+				Log.Info($"[Pansy] Export result: {success}");
 				return;
 			}
 		}
 
 		// Export normally (CRC matches or no existing file)
 		bool exported = Export(pansyPath, romInfo, memoryType, currentCrc, options);
-		System.Diagnostics.Debug.WriteLine($"[Pansy] Export result: {exported}");
+		Log.Info($"[Pansy] Export result: {exported}");
 	}
 
 	/// <summary>

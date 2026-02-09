@@ -245,8 +245,7 @@ public class MainWindow : NexenWindow {
 			_listener = new NotificationListener();
 			_listener.OnNotification += OnNotification;
 
-			_model.Init(this);
-
+			// Apply config and add known folders (can be done on background thread)
 			ConfigManager.Config.ApplyConfig();
 
 			if (ConfigManager.Config.Preferences.OverrideGameFolder && Directory.Exists(ConfigManager.Config.Preferences.GameFolder)) {
@@ -260,7 +259,10 @@ public class MainWindow : NexenWindow {
 			ConfigManager.Config.Preferences.UpdateFileAssociations();
 			SingleInstance.Instance.ArgumentsReceived += Instance_ArgumentsReceived;
 
+			// Menu initialization creates UI controls (Image), must be on UI thread
 			Dispatcher.UIThread.Post(() => {
+				_model.Init(this);
+
 				cmdLine.LoadFiles();
 				cmdLine.OnAfterInit(this);
 

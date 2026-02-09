@@ -124,6 +124,36 @@ public class MainMenuViewModel : ViewModelBase {
 	}
 
 	/// <summary>
+	/// Opens a file dialog to select and load a ROM file.
+	/// This bypasses the shortcut system for direct, reliable ROM loading.
+	/// </summary>
+	/// <param name="wnd">The parent window for the dialog.</param>
+	private async System.Threading.Tasks.Task OpenRomFileAsync(MainWindow wnd) {
+		try {
+			Utilities.Log.Info("[MainMenuViewModel] OpenRomFileAsync called");
+
+			string? initialFolder = ConfigManager.Config.Preferences.OverrideGameFolder && Directory.Exists(ConfigManager.Config.Preferences.GameFolder)
+				? ConfigManager.Config.Preferences.GameFolder
+				: ConfigManager.Config.RecentFiles.Items.Count > 0 ? ConfigManager.Config.RecentFiles.Items[0].RomFile.Folder : null;
+
+			Utilities.Log.Info($"[MainMenuViewModel] Initial folder: {initialFolder ?? "null"}");
+			Utilities.Log.Info("[MainMenuViewModel] Opening file dialog...");
+
+			string? filename = await FileDialogHelper.OpenFile(initialFolder, wnd, FileDialogHelper.RomExt);
+
+			Utilities.Log.Info($"[MainMenuViewModel] File dialog returned: {filename ?? "null (cancelled)"}");
+
+			if (filename != null) {
+				Utilities.Log.Info($"[MainMenuViewModel] Calling LoadRomHelper.LoadFile with: {filename}");
+				LoadRomHelper.LoadFile(filename);
+			}
+		} catch (Exception ex) {
+			Utilities.Log.Error(ex, "[MainMenuViewModel] EXCEPTION in OpenRomFileAsync");
+			await NexenMsgBox.ShowException(ex);
+		}
+	}
+
+	/// <summary>
 	/// Initializes all menus with the main window reference.
 	/// </summary>
 	/// <param name="wnd">The main window.</param>
@@ -166,9 +196,13 @@ public class MainMenuViewModel : ViewModelBase {
 
 	private void InitFileMenu(MainWindow wnd) {
 		FileMenuItems = [
-			// Open - uses EmulatorShortcut.OpenFile which routes through ShortcutHandler
-			new ShortcutMenuAction(EmulatorShortcut.OpenFile, EnableCategory.AlwaysEnabled) {
-				ActionType = ActionType.Open
+			// Open - directly opens file dialog and loads ROM
+			// Bypasses shortcut system to ensure it always works
+			new SimpleMenuAction(ActionType.Open) {
+				OnClick = () => {
+					Utilities.Log.Info("[MainMenuViewModel] OnClick triggered for File->Open");
+					_ = OpenRomFileAsync(wnd);
+				}
 			},
 
 			new MenuSeparator(),
@@ -238,9 +272,13 @@ public class MainMenuViewModel : ViewModelBase {
 			},
 
 			// Open Save State Picker - requires ROM and existing saves
-			new ShortcutMenuAction(EmulatorShortcut.OpenSaveStatePicker) {
-				ActionType = ActionType.OpenSaveStatePicker,
-				IsEnabled = () => EmulatorState.Instance.IsRomLoaded && EmuApi.GetSaveStateCount() > 0
+			// Note: Uses direct OnClick instead of shortcut because this is a UI-only action
+			new SimpleMenuAction(ActionType.OpenSaveStatePicker) {
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded && EmuApi.GetSaveStateCount() > 0,
+				OnClick = () => {
+					Log.Info("[MainMenu] OpenSaveStatePicker clicked - opening picker");
+					MainWindow.RecentGames.Init(GameScreenMode.SaveStatePicker);
+				}
 			},
 
 			new MenuSeparator(),
@@ -648,6 +686,36 @@ public class MainMenuViewModel : ViewModelBase {
 			new SimpleMenuAction() {
 				ActionType = ActionType.OtherConsoles,
 				OnClick = () => OpenConfig(wnd, ConfigWindowTab.OtherConsoles)
+			},
+			new MenuSeparator(),
+
+			new MainMenuAction() {
+				ActionType = ActionType.AutoSave,
+				IsEnabled = () => true,
+				SubActions = [
+					new SimpleMenuAction() {
+						ActionType = ActionType.AutoSaveStates,
+						IsSelected = () => ConfigManager.Config.Preferences.EnableAutoSaveState,
+						OnClick = () => {
+							ConfigManager.Config.Preferences.EnableAutoSaveState = !ConfigManager.Config.Preferences.EnableAutoSaveState;
+							ConfigManager.Config.Preferences.ApplyConfig();
+						}
+					},
+					new SimpleMenuAction() {
+						ActionType = ActionType.AutoSavePansy,
+						IsSelected = () => ConfigManager.Config.Debug.Integration.BackgroundCdlRecording,
+						OnClick = () => {
+							ConfigManager.Config.Debug.Integration.BackgroundCdlRecording = !ConfigManager.Config.Debug.Integration.BackgroundCdlRecording;
+						}
+					},
+					new SimpleMenuAction() {
+						ActionType = ActionType.SavePansyOnUnload,
+						IsSelected = () => ConfigManager.Config.Debug.Integration.SavePansyOnRomUnload,
+						OnClick = () => {
+							ConfigManager.Config.Debug.Integration.SavePansyOnRomUnload = !ConfigManager.Config.Debug.Integration.SavePansyOnRomUnload;
+						}
+					}
+				]
 			},
 			new MenuSeparator(),
 

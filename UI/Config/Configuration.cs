@@ -14,7 +14,7 @@ using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.Config; 
+namespace Nexen.Config;
 public partial class Configuration : ReactiveObject {
 	private string _fileData = "";
 
@@ -117,6 +117,11 @@ public partial class Configuration : ReactiveObject {
 
 		if (ConfigUpgrade < (int)ConfigUpgradeHint.WsInput) {
 			Ws.InitializeDefaults(DefaultKeyMappings);
+		}
+
+		// Enable background CDL recording by default for existing users
+		if (ConfigUpgrade < (int)ConfigUpgradeHint.BackgroundCdlRecording) {
+			Debug.Integration.BackgroundCdlRecording = true;
 		}
 
 		ConfigUpgrade = (int)ConfigUpgradeHint.NextValue - 1;
@@ -300,5 +305,6 @@ public enum ConfigUpgradeHint {
 	GbaInput,
 	CvInput,
 	WsInput,
+	BackgroundCdlRecording,
 	NextValue,
 }

@@ -14,16 +14,21 @@ using Nexen.Localization;
 using Nexen.ViewModels;
 using Nexen.Windows;
 
-namespace Nexen.Utilities; 
+namespace Nexen.Utilities;
 public static class LoadRomHelper {
 	public static async void LoadRom(ResourcePath romPath, ResourcePath? patchPath = null) {
+		Log.Info($"[LoadRomHelper] LoadRom called with: {romPath}");
+
 		if (FolderHelper.IsArchiveFile(romPath)) {
+			Log.Info($"[LoadRomHelper] File is archive, showing SelectRomWindow");
 			ResourcePath? selectedRom = await SelectRomWindow.Show(romPath);
 			if (selectedRom == null) {
+				Log.Info($"[LoadRomHelper] No ROM selected from archive, aborting");
 				return;
 			}
 
 			romPath = selectedRom.Value;
+			Log.Info($"[LoadRomHelper] Selected ROM from archive: {romPath}");
 		}
 
 		if (patchPath == null && ConfigManager.Config.Preferences.AutoLoadPatches) {
@@ -32,6 +37,7 @@ public static class LoadRomHelper {
 				string file = Path.Combine(romPath.Folder, Path.GetFileNameWithoutExtension(romPath.FileName)) + ext;
 				if (File.Exists(file)) {
 					patchPath = file;
+					Log.Info($"[LoadRomHelper] Auto-loading patch: {patchPath}");
 					break;
 				}
 			}
@@ -41,14 +47,27 @@ public static class LoadRomHelper {
 	}
 
 	private static void InternalLoadRom(ResourcePath romPath, ResourcePath? patchPath) {
+		Log.Info($"[LoadRomHelper] InternalLoadRom: {romPath}, patch: {patchPath?.ToString() ?? "none"}");
+
 		//Temporarily hide selection screen to allow displaying error messages
 		MainWindowViewModel.Instance.RecentGames.Visible = false;
 
 		Task.Run(() => {
-			//Run in another thread to prevent deadlocks etc. when emulator notifications are processed UI-side
-			if (EmuApi.LoadRom(romPath, patchPath)) {
-				ConfigManager.Config.RecentFiles.AddRecentFile(romPath, patchPath);
-				ConfigManager.Config.Save();
+			try {
+				Log.Info($"[LoadRomHelper] Calling EmuApi.LoadRom...");
+				//Run in another thread to prevent deadlocks etc. when emulator notifications are processed UI-side
+				bool success = EmuApi.LoadRom(romPath, patchPath);
+				Log.Info($"[LoadRomHelper] EmuApi.LoadRom returned: {success}");
+
+				if (success) {
+					ConfigManager.Config.RecentFiles.AddRecentFile(romPath, patchPath);
+					ConfigManager.Config.Save();
+					Log.Info($"[LoadRomHelper] ROM loaded successfully, saved to recent files");
+				} else {
+					Log.Error($"[LoadRomHelper] EmuApi.LoadRom returned false - load failed");
+				}
+			} catch (Exception ex) {
+				Log.Error(ex, $"[LoadRomHelper] EXCEPTION in LoadRom");
 			}
 
 			ShowSelectionOnScreenAfterError();
@@ -130,18 +149,27 @@ public static class LoadRomHelper {
 	}
 
 	public static void LoadFile(string filename) {
+		Log.Info($"[LoadRomHelper] LoadFile called with: {filename}");
+
 		if (File.Exists(filename)) {
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
+			Log.Info($"[LoadRomHelper] File exists, extension: {ext}");
+
 			if (IsPatchFile(filename)) {
+				Log.Info($"[LoadRomHelper] Detected patch file, calling LoadPatchFile");
 				LoadPatchFile(filename);
 			} else if (ext is ("." + FileDialogHelper.NexenSaveStateExt) or ("." + FileDialogHelper.MesenSaveStateExt)) {
+				Log.Info($"[LoadRomHelper] Detected save state, calling LoadStateFile");
 				EmuApi.LoadStateFile(filename);
 			} else if (EmuApi.IsRunning() && (ext == "." + FileDialogHelper.NexenMovieExt || ext == "." + FileDialogHelper.MesenMovieExt)) {
+				Log.Info($"[LoadRomHelper] Detected movie file, calling MoviePlay");
 				RecordApi.MoviePlay(filename);
 			} else {
+				Log.Info($"[LoadRomHelper] Treating as ROM file, calling LoadRom");
 				LoadRom(filename);
 			}
 		} else {
+			Log.Error($"[LoadRomHelper] ERROR: File not found: {filename}");
 			DisplayMessageHelper.DisplayMessage("Error", ResourceHelper.GetMessage("FileNotFound", filename));
 		}
 	}
