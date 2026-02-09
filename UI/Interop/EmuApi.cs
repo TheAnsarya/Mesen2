@@ -180,6 +180,33 @@ public class EmuApi {
 		return result;
 	}
 
+	// ========== Designated Save API ==========
+
+	[DllImport(DllPath)]
+	public static extern void SetDesignatedSave([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath);
+
+	[DllImport(DllPath, EntryPoint = "GetDesignatedSave")]
+	private static extern void GetDesignatedSaveWrapper(IntPtr outFilepath, Int32 maxLength);
+
+	/// <summary>
+	/// Get the current designated save path for quick loading (F4).
+	/// </summary>
+	/// <returns>Path to designated save, or empty if none set</returns>
+	public static string GetDesignatedSave() {
+		return Utf8Utilities.CallStringApi(GetDesignatedSaveWrapper, 2048);
+	}
+
+	[DllImport(DllPath)]
+	[return: MarshalAs(UnmanagedType.I1)]
+	public static extern bool LoadDesignatedState();
+
+	[DllImport(DllPath)]
+	[return: MarshalAs(UnmanagedType.I1)]
+	public static extern bool HasDesignatedSave();
+
+	[DllImport(DllPath)]
+	public static extern void ClearDesignatedSave();
+
 	[DllImport(DllPath, EntryPoint = "GetSaveStatePreview")] private static extern Int32 GetSaveStatePreviewWrapper([MarshalAs(UnmanagedType.LPUTF8Str)] string saveStatePath, [Out] byte[] imgData);
 	public static Bitmap? GetSaveStatePreview(string saveStatePath) {
 		if (File.Exists(saveStatePath)) {

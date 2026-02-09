@@ -393,6 +393,29 @@ DllExport uint32_t __stdcall GetRecentPlayStates(InteropSaveStateInfo* outInfoAr
 	return count;
 }
 
+// ========== Designated Save API ==========
+
+DllExport void __stdcall SetDesignatedSave(char* filepath) {
+	_emu->GetSaveStateManager()->SetDesignatedSave(filepath ? filepath : "");
+}
+
+DllExport void __stdcall GetDesignatedSave(char* outFilepath, int32_t maxLength) {
+	string filepath = _emu->GetSaveStateManager()->GetDesignatedSave();
+	StringUtilities::CopyToBuffer(filepath, outFilepath, maxLength);
+}
+
+DllExport bool __stdcall LoadDesignatedState() {
+	return _emu->GetSaveStateManager()->LoadDesignatedState();
+}
+
+DllExport bool __stdcall HasDesignatedSave() {
+	return _emu->GetSaveStateManager()->HasDesignatedSave();
+}
+
+DllExport void __stdcall ClearDesignatedSave() {
+	_emu->GetSaveStateManager()->ClearDesignatedSave();
+}
+
 class PgoKeyManager : public IKeyManager {
 public:
 	void RefreshState() {}

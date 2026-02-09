@@ -82,6 +82,7 @@ private:
 	atomic<uint32_t> _lastIndex;      ///< Last used save state slot [LEGACY]
 	atomic<uint32_t> _recentPlaySlot; ///< Current Recent Play slot (0-11, wraps)
 	time_t _lastRecentPlayTime;       ///< Last Recent Play save timestamp
+	string _designatedSavePath;       ///< Path to user-designated quick-load save
 	Emulator* _emu;                   ///< Emulator instance
 
 	/// <summary>
@@ -283,4 +284,36 @@ public:
 	/// </summary>
 	/// <returns>Vector of SaveStateInfo with origin=Recent</returns>
 	vector<SaveStateInfo> GetRecentPlayStates();
+
+	// ========== Designated Save Methods ==========
+
+	/// <summary>
+	/// Set the designated save state for quick loading (F4).
+	/// The save state at the given path becomes the "quick load" target.
+	/// </summary>
+	/// <param name="filepath">Path to save state to designate</param>
+	void SetDesignatedSave(const string& filepath);
+
+	/// <summary>
+	/// Get the current designated save path.
+	/// </summary>
+	/// <returns>Path to designated save, or empty if none set</returns>
+	string GetDesignatedSave() const;
+
+	/// <summary>
+	/// Load the designated save state (F4 action).
+	/// </summary>
+	/// <returns>True if load succeeded</returns>
+	bool LoadDesignatedState();
+
+	/// <summary>
+	/// Check if a designated save is set and valid.
+	/// </summary>
+	/// <returns>True if designated save exists and file is valid</returns>
+	bool HasDesignatedSave() const;
+
+	/// <summary>
+	/// Clear the designated save (unset).
+	/// </summary>
+	void ClearDesignatedSave();
 };

@@ -624,3 +624,42 @@ vector<SaveStateInfo> SaveStateManager::GetRecentPlayStates() {
 
 	return recentStates;
 }
+
+// ========== Designated Save Implementation ==========
+
+void SaveStateManager::SetDesignatedSave(const string& filepath) {
+	namespace fs = std::filesystem;
+
+	// Validate the file exists
+	if (!filepath.empty() && fs::exists(filepath) && fs::is_regular_file(filepath)) {
+		_designatedSavePath = filepath;
+		MessageManager::DisplayMessage("SaveStates", "DesignatedSaveSet");
+	} else {
+		MessageManager::DisplayMessage("SaveStates", "DesignatedSaveInvalid");
+	}
+}
+
+string SaveStateManager::GetDesignatedSave() const {
+	return _designatedSavePath;
+}
+
+bool SaveStateManager::LoadDesignatedState() {
+	if (!HasDesignatedSave()) {
+		MessageManager::DisplayMessage("SaveStates", "NoDesignatedSave");
+		return false;
+	}
+
+	return LoadState(_designatedSavePath, true);
+}
+
+bool SaveStateManager::HasDesignatedSave() const {
+	namespace fs = std::filesystem;
+	return !_designatedSavePath.empty() &&
+	       fs::exists(_designatedSavePath) &&
+	       fs::is_regular_file(_designatedSavePath);
+}
+
+void SaveStateManager::ClearDesignatedSave() {
+	_designatedSavePath.clear();
+	MessageManager::DisplayMessage("SaveStates", "DesignatedSaveCleared");
+}
