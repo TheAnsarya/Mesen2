@@ -114,6 +114,35 @@ gh issue close <number> --repo TheAnsarya/Nexen --comment "Completed in commit a
 - Plans: `~docs/plans/`
 - Modernization tracking: `~docs/modernization/`
 
+## Problem-Solving Philosophy
+
+### ⚠️ NEVER GIVE UP on Hard Problems
+
+When a task is complex or seems difficult:
+
+1. **NEVER declare something "too hard" or "not worth it"** and close the issue
+2. **Break it down** - Create multiple smaller sub-issues for research, prototyping, and incremental progress
+3. **Research first** - Create research issues to investigate approaches, alternatives, and prior art
+4. **Document everything** - Create docs, code-plans, and analysis documents in `~docs/plans/`
+5. **Prototype** - Create spike/prototype branches to test approaches before committing
+6. **Incremental progress** - Even partial progress (e.g., replacing 3 of 15 usages) is valuable
+7. **Create issues for future work** - If something can't be done now, create well-documented issues with clear context for later
+
+### Issue Decomposition Pattern
+When facing a large task:
+- `[N.X.1]` Research/Investigation - Analyze scope, dependencies, alternatives
+- `[N.X.2]` Document findings - Create technical analysis docs
+- `[N.X.3]` Create prototype - Spike branch to test feasibility
+- `[N.X.4]` Implement Phase 1 - Lowest-risk subset first
+- `[N.X.5]` Implement Phase 2 - Next batch of changes
+- `[N.X.N]` Final cleanup - Remove old code, update docs
+
+### What "Closing Too Soon" Looks Like
+- ❌ "This is deeply integrated, keeping as-is" → Instead: break it into phases
+- ❌ "Migration cost-prohibitive" → Instead: create research issues and prototype
+- ❌ "High regression risk" → Instead: create test plan and incremental migration
+- ✅ Close only when the work is **actually complete** or **truly impossible** (not just hard)
+
 ## Related Projects
 
 - **Pansy** - Metadata format for disassembly data
