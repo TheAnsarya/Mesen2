@@ -1068,7 +1068,7 @@ public sealed class DebuggerWindowViewModel : DisposableViewModel {
 						string initFilename = EmuApi.GetRomInfo().GetRomName() + "." + FileDialogHelper.NexenLabelExt;
 						string? filename = await FileDialogHelper.SaveFile(null, initFilename, wnd, FileDialogHelper.NexenLabelExt);
 						if(filename is not null) {
-							NexenLabelFile.Export(filename);
+							NexenLabelFile.Export(filename, EmuApi.GetRomInfo());
 						}
 					}
 				},

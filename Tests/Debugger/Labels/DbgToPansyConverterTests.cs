@@ -17,8 +17,9 @@ public class DbgToPansyConverterTests
 	[InlineData("test.sym", DebugFormat.WlaDx)]
 	[InlineData("symbols.sym", DebugFormat.WlaDx)]
 	[InlineData("debug.elf", DebugFormat.Elf)]
-	[InlineData("labels.mlb", DebugFormat.NexenMlb)]
-	[InlineData("game.MLB", DebugFormat.NexenMlb)]
+	[InlineData("labels.mlb", DebugFormat.NexenLabels)]
+	[InlineData("game.MLB", DebugFormat.NexenLabels)]
+	[InlineData("labels.nexen-labels", DebugFormat.NexenLabels)]
 	public void DetectFormat_ByExtension_ReturnsCorrectFormat(string filename, DebugFormat expected)
 	{
 		var detected = DetectFormatByExtension(filename);
@@ -36,8 +37,8 @@ public class DbgToPansyConverterTests
 	[InlineData("version\tmajor 2", DebugFormat.Ca65Dbg)]
 	[InlineData("; File created by wlalink", DebugFormat.WlaDx)]
 	[InlineData("SECTION \"", DebugFormat.Rgbds)]
-	[InlineData("G:0000 _start", DebugFormat.NexenMlb)]
-	[InlineData("P:8000 Reset", DebugFormat.NexenMlb)]
+	[InlineData("G:0000 _start", DebugFormat.NexenLabels)]
+	[InlineData("P:8000 Reset", DebugFormat.NexenLabels)]
 	public void DetectFormat_ByContent_ReturnsCorrectFormat(string content, DebugFormat expected)
 	{
 		var detected = DetectFormatByContent(content);
@@ -188,7 +189,8 @@ public class DbgToPansyConverterTests
 			".dbg" => DebugFormat.Ca65Dbg,
 			".sym" => DebugFormat.WlaDx,
 			".elf" => DebugFormat.Elf,
-			".mlb" => DebugFormat.NexenMlb,
+			".nexen-labels" => DebugFormat.NexenLabels,
+			".mlb" => DebugFormat.NexenLabels,
 			_ => DebugFormat.Unknown
 		};
 	}
@@ -202,7 +204,7 @@ public class DbgToPansyConverterTests
 		if (content.Contains("SECTION \""))
 			return DebugFormat.Rgbds;
 		if (content.Length > 0 && (content[0] == 'G' || content[0] == 'P' || content[0] == 'S' || content[0] == 'R') && content[1] == ':')
-			return DebugFormat.NexenMlb;
+			return DebugFormat.NexenLabels;
 		return DebugFormat.Unknown;
 	}
 
@@ -328,7 +330,7 @@ public class DbgToPansyConverterTests
 
 	private static string[] GetDebugFilesInDirectory(string path)
 	{
-		var extensions = new[] { ".dbg", ".sym", ".mlb", ".elf" };
+		var extensions = new[] { ".dbg", ".sym", ".mlb", ".nexen-labels", ".elf" };
 		return Directory.GetFiles(path)
 			.Where(f => extensions.Contains(Path.GetExtension(f).ToLowerInvariant()))
 			.ToArray();
@@ -372,7 +374,7 @@ public class DbgToPansyConverterTests
 		Rgbds,
 		Sdcc,
 		Elf,
-		NexenMlb
+		NexenLabels
 	}
 
 	public enum PlatformId

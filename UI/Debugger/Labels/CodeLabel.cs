@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using Nexen.Interop;
 using Nexen.Utilities;
@@ -171,6 +172,56 @@ public sealed class CodeLabel {
 		}
 
 		return codeLabel;
+	}
+
+	/// <summary>
+	/// Writes this label in binary format to a <see cref="BinaryWriter"/>.
+	/// </summary>
+	/// <param name="writer">The writer to serialize to.</param>
+	/// <remarks>
+	/// Binary layout per label:
+	/// Address (UInt32) + Length (UInt32) + MemoryType (UInt16) + Flags (UInt16)
+	/// + Label (UInt16 length + UTF-8) + Comment (UInt16 length + UTF-8).
+	/// Unlike the legacy MLB text format, this preserves <see cref="CodeLabelFlags"/>.
+	/// </remarks>
+	public void WriteBinary(BinaryWriter writer) {
+		writer.Write(Address);
+		writer.Write(Length);
+		writer.Write((ushort)MemoryType);
+		writer.Write((ushort)Flags);
+		WritePrefixedString(writer, Label);
+		WritePrefixedString(writer, Comment);
+	}
+
+	/// <summary>
+	/// Reads a label from binary format.
+	/// </summary>
+	/// <param name="reader">The reader to deserialize from.</param>
+	/// <returns>A new <see cref="CodeLabel"/> deserialized from binary data.</returns>
+	public static CodeLabel ReadBinary(BinaryReader reader) {
+		return new CodeLabel {
+			Address = reader.ReadUInt32(),
+			Length = reader.ReadUInt32(),
+			MemoryType = (MemoryType)reader.ReadUInt16(),
+			Flags = (CodeLabelFlags)reader.ReadUInt16(),
+			Label = ReadPrefixedString(reader),
+			Comment = ReadPrefixedString(reader)
+		};
+	}
+
+	/// <summary>Write a UInt16 length-prefixed UTF-8 string.</summary>
+	private static void WritePrefixedString(BinaryWriter writer, string value) {
+		byte[] bytes = Encoding.UTF8.GetBytes(value ?? "");
+		writer.Write((ushort)bytes.Length);
+		writer.Write(bytes);
+	}
+
+	/// <summary>Read a UInt16 length-prefixed UTF-8 string.</summary>
+	private static string ReadPrefixedString(BinaryReader reader) {
+		ushort length = reader.ReadUInt16();
+		if (length == 0) return "";
+		byte[] bytes = reader.ReadBytes(length);
+		return Encoding.UTF8.GetString(bytes);
 	}
 
 	/// <summary>

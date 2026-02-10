@@ -10,7 +10,7 @@ using ReactiveUI.Fody.Helpers;
 namespace Nexen.Config;
 public sealed class IntegrationConfig : BaseConfig<IntegrationConfig> {
 	[Reactive] public bool AutoLoadDbgFiles { get; set; } = true;
-	[Reactive] public bool AutoLoadMlbFiles { get; set; } = true;
+	[Reactive] public bool AutoLoadLabelFiles { get; set; } = true;
 	[Reactive] public bool AutoLoadCdlFiles { get; set; } = false;
 	[Reactive] public bool AutoLoadSymFiles { get; set; } = true;
 	[Reactive] public bool AutoLoadCdbFiles { get; set; } = true;
@@ -34,7 +34,7 @@ public sealed class IntegrationConfig : BaseConfig<IntegrationConfig> {
 
 	// Phase 7.5: Folder-based storage options
 	[Reactive] public bool UseFolderStorage { get; set; } = true;
-	[Reactive] public bool SyncMlbFiles { get; set; } = true;
+	[Reactive] public bool SyncLabelFiles { get; set; } = true;
 	[Reactive] public bool SyncCdlFiles { get; set; } = true;
 	[Reactive] public bool KeepVersionHistory { get; set; } = false;
 	[Reactive] public int MaxHistoryEntries { get; set; } = 10;

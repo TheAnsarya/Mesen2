@@ -24,7 +24,7 @@ public static class DbgToPansyConverter {
 		Rgbds,      // RGBDS symbol file
 		Sdcc,        // SDCC symbol file
 		Elf,          // ELF with symbols
-		NexenMlb      // Nexen label file
+		NexenLabels   // Nexen label file (.nexen-labels or legacy .mlb)
 	}
 
 	/// <summary>
@@ -107,8 +107,11 @@ public static class DbgToPansyConverter {
 				// Need to check content to distinguish WLA-DX vs RGBDS
 				return DetectSymFormat(filePath);
 
+			case ".nexen-labels":
+				return DebugFormat.NexenLabels;
+
 			case ".mlb":
-				return DebugFormat.NexenMlb;
+				return DebugFormat.NexenLabels;
 
 			case ".elf":
 				return DebugFormat.Elf;
@@ -169,8 +172,8 @@ public static class DbgToPansyConverter {
 				case DebugFormat.WlaDx:
 					return ImportWlaDx(filePath, romInfo, result);
 
-				case DebugFormat.NexenMlb:
-					return ImportNexenMlb(filePath, romInfo, result);
+				case DebugFormat.NexenLabels:
+					return ImportNexenLabels(filePath, romInfo, result);
 
 				case DebugFormat.Sdcc:
 					return ImportSdcc(filePath, romInfo, result);
@@ -244,9 +247,9 @@ public static class DbgToPansyConverter {
 	}
 
 	/// <summary>
-	/// Import Nexen MLB format.
+	/// Import Nexen label file (.nexen-labels or legacy .mlb).
 	/// </summary>
-	private static bool ImportNexenMlb(string filePath, RomInfo romInfo, ConversionResult result) {
+	private static bool ImportNexenLabels(string filePath, RomInfo romInfo, ConversionResult result) {
 		try {
 			var cpuType = romInfo.ConsoleType.GetMainCpuType();
 			int countBefore = LabelManager.GetLabels(cpuType).Count;
@@ -255,7 +258,7 @@ public static class DbgToPansyConverter {
 			result.SymbolsConverted = countAfter - countBefore;
 			return true;
 		} catch (Exception ex) {
-			result.Warnings.Add($"MLB import error: {ex.Message}");
+			result.Warnings.Add($"Label import error: {ex.Message}");
 			return false;
 		}
 	}

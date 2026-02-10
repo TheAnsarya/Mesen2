@@ -16,6 +16,7 @@ public class SyncManagerTests
 
 	[Theory]
 	[InlineData("game.pansy", true)]
+	[InlineData("labels.nexen-labels", true)]
 	[InlineData("labels.mlb", true)]
 	[InlineData("coverage.cdl", true)]
 	[InlineData("game.PANSY", true)]
@@ -33,7 +34,7 @@ public class SyncManagerTests
 	[Fact]
 	public void WatchedExtensions_AllRecognized()
 	{
-		string[] watchedExtensions = [".pansy", ".mlb", ".cdl"];
+		string[] watchedExtensions = [".pansy", ".nexen-labels", ".mlb", ".cdl"];
 		foreach (var ext in watchedExtensions) {
 			Assert.True(IsWatchedExtension($"test{ext}"));
 		}
@@ -235,7 +236,7 @@ public class SyncManagerTests
 	[Fact]
 	public void ExportAll_CreatesExpectedFiles()
 	{
-		var expectedFiles = new[] { "symbols.mlb", "coverage.cdl", "metadata.pansy" };
+		var expectedFiles = new[] { "labels.nexen-labels", "coverage.cdl", "metadata.pansy" };
 		var createdFiles = SimulateExportAll();
 
 		Assert.Equal(3, createdFiles.Length);
@@ -332,7 +333,7 @@ public class SyncManagerTests
 	private static bool IsWatchedExtension(string filename)
 	{
 		string ext = Path.GetExtension(filename).ToLowerInvariant();
-		return ext is ".pansy" or ".mlb" or ".cdl";
+		return ext is ".pansy" or ".nexen-labels" or ".mlb" or ".cdl";
 	}
 
 	private static void SimulateChange(ref DateTime lastTrigger, int debounceMs, ref int callbackCount)
@@ -360,9 +361,9 @@ public class SyncManagerTests
 	private static string[] SimulateExportAll(bool isEmpty = false)
 	{
 		if (isEmpty)
-			return ["symbols.mlb", "coverage.cdl", "metadata.pansy"];
+			return ["labels.nexen-labels", "coverage.cdl", "metadata.pansy"];
 
-		return ["symbols.mlb", "coverage.cdl", "metadata.pansy"];
+		return ["labels.nexen-labels", "coverage.cdl", "metadata.pansy"];
 	}
 
 	#endregion

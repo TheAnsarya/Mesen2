@@ -14,7 +14,7 @@ namespace Nexen.Debugger.Labels;
 /// Manages folder-based debug data storage for ROMs.
 /// Each ROM gets a dedicated folder containing:
 /// - metadata.pansy (universal format)
-/// - labels.mlb (native Nexen labels)
+/// - labels.nexen-labels (native Nexen labels)
 /// - coverage.cdl (Code Data Logger)
 /// - config.json (per-ROM configuration)
 /// </summary>
@@ -29,7 +29,8 @@ namespace Nexen.Debugger.Labels;
 public static class DebugFolderManager {
 	private const string LegacyDebugFolderName = "Debug";
 	private const string PansyFilename = "metadata.pansy";
-	private const string MlbFilename = "labels.mlb";
+	private const string LabelsFilename = "labels.nexen-labels";
+	private const string LegacyMlbFilename = "labels.mlb";
 	private const string CdlFilename = "coverage.cdl";
 	private const string ConfigFilename = "config.json";
 	private const string HistoryFolderName = "history";
@@ -158,10 +159,17 @@ public static class DebugFolderManager {
 	}
 
 	/// <summary>
-	/// Get the path to the MLB labels file for a ROM.
+	/// Get the path to the native .nexen-labels file for a ROM.
 	/// </summary>
-	public static string GetMlbPath(RomInfo romInfo) {
-		return Path.Combine(GetRomDebugFolder(romInfo), MlbFilename);
+	public static string GetLabelsPath(RomInfo romInfo) {
+		return Path.Combine(GetRomDebugFolder(romInfo), LabelsFilename);
+	}
+
+	/// <summary>
+	/// Get the path to the legacy .mlb labels file for a ROM (read-only fallback).
+	/// </summary>
+	public static string GetLegacyMlbPath(RomInfo romInfo) {
+		return Path.Combine(GetRomDebugFolder(romInfo), LegacyMlbFilename);
 	}
 
 	/// <summary>
@@ -222,14 +230,14 @@ public static class DebugFolderManager {
 			success &= PansyExporter.Export(pansyPath, romInfo, memoryType, 0, options);
 			Log.Info($"[DebugFolderManager] Pansy export result: {success}");
 
-			// 2. Export MLB file if enabled
-			if (config.SyncMlbFiles) {
-				string mlbPath = GetMlbPath(romInfo);
+			// 2. Export label file if enabled
+			if (config.SyncLabelFiles) {
+				string labelsPath = GetLabelsPath(romInfo);
 				try {
-					NexenLabelFile.Export(mlbPath);
-					Log.Info($"[DebugFolderManager] MLB exported to: {mlbPath}");
+					NexenLabelFile.Export(labelsPath, romInfo);
+					Log.Info($"[DebugFolderManager] Labels exported to: {labelsPath}");
 				} catch (Exception ex) {
-					Log.Error(ex, "[DebugFolderManager] MLB export failed");
+					Log.Error(ex, "[DebugFolderManager] Label export failed");
 					success = false;
 				}
 			}
@@ -401,12 +409,19 @@ public static class DebugFolderManager {
 
 		bool imported = false;
 
-		// 1. Import MLB file if exists and enabled
-		if (config.AutoLoadMlbFiles && config.SyncMlbFiles) {
-			string mlbPath = ResolveDebugFilePath(romInfo, MlbFilename);
-			if (File.Exists(mlbPath)) {
-				NexenLabelFile.Import(mlbPath, showResult: false);
+		// 1. Import label file if exists and enabled
+		if (config.AutoLoadLabelFiles && config.SyncLabelFiles) {
+			// Try nexen-labels first, fall back to legacy MLB
+			string labelsPath = ResolveDebugFilePath(romInfo, LabelsFilename);
+			if (File.Exists(labelsPath)) {
+				NexenLabelFile.Import(labelsPath, showResult: false);
 				imported = true;
+			} else {
+				string mlbPath = ResolveDebugFilePath(romInfo, LegacyMlbFilename);
+				if (File.Exists(mlbPath)) {
+					NexenLabelFile.Import(mlbPath, showResult: false);
+					imported = true;
+				}
 			}
 		}
 

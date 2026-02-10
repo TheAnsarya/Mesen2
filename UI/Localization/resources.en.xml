@@ -1556,7 +1556,7 @@
 			<Control ID="chkAutoLoadSymFiles">.SYM files (PCEAS, RGBDS, WLA DX, bass)</Control>
 			<Control ID="chkAutoLoadCdbFiles">.CDB files (SDCC)</Control>
 			<Control ID="chkAutoLoadElfFiles">.ELF files (devkitARM - GBA)</Control>
-			<Control ID="chkAutoLoadMlbFiles">.MLB files (Nexen label file)</Control>
+			<Control ID="chkAutoLoadLabelFiles">.nexen-labels files (Nexen label file)</Control>
 			<Control ID="chkAutoLoadFnsFiles">.FNS files (NESASM)</Control>
 			<Control ID="chkAutoLoadCdlFiles">.CDL files (Code/data log)</Control>
 
@@ -1573,7 +1573,7 @@
 			<Control ID="chkPansyUseCompression">Use GZip compression</Control>
 			<Control ID="lblPansySyncSettings">Pansy sync settings (Phase 7.5)</Control>
 			<Control ID="chkUseFolderStorage">Use folder-based storage (per-ROM debug folders)</Control>
-			<Control ID="chkSyncMlbFiles">Sync MLB label files</Control>
+			<Control ID="chkSyncLabelFiles">Sync label files</Control>
 			<Control ID="chkSyncCdlFiles">Sync CDL code/data log files</Control>
 			<Control ID="chkKeepVersionHistory">Keep version history</Control>
 			<Control ID="lblMaxHistoryEntries">Max history entries:</Control>

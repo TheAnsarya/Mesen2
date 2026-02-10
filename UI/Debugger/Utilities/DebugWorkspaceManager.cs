@@ -29,7 +29,7 @@ namespace Nexen.Debugger.Utilities;
 ///   <item><description>SYM files (WLA-DX, RGBDS, Bass, PCEAS symbols)</description></item>
 ///   <item><description>CDB files (SDCC debug info)</description></item>
 ///   <item><description>ELF files (ELF/DWARF debug info)</description></item>
-///   <item><description>MLB/nexen-labels files (Nexen native label format)</description></item>
+///   <item><description>nexen-labels files (Nexen native label format)</description></item>
 ///   <item><description>FNS files (NESASM function labels)</description></item>
 ///   <item><description>CDL files (Code/Data Logger data)</description></item>
 /// </list>
@@ -141,7 +141,7 @@ public static class DebugWorkspaceManager {
 	/// </para>
 	/// <para>
 	/// Auto-loading priority (stops at first successful load):
-	/// DBG → SYM → CDB → ELF → MLB/nexen-labels → FNS
+	/// DBG → SYM → CDB → ELF → nexen-labels/MLB → FNS
 	/// </para>
 	/// <para>
 	/// CDL files are loaded independently as they provide code/data mapping, not symbols.
@@ -188,7 +188,7 @@ public static class DebugWorkspaceManager {
 			}
 		}
 
-		if (SymbolProvider is null && ConfigManager.Config.Debug.Integration.AutoLoadMlbFiles) {
+		if (SymbolProvider is null && ConfigManager.Config.Debug.Integration.AutoLoadLabelFiles) {
 			// Try Nexen native format first, then legacy Mesen format
 			string? labelsPath = GetMatchingFile(FileDialogHelper.NexenLabelExt);
 			labelsPath ??= GetMatchingFile(FileDialogHelper.MesenLabelExt);
@@ -341,10 +341,10 @@ public static class DebugWorkspaceManager {
 	/// <summary>
 	/// Loads labels from a Nexen/Mesen native label file.
 	/// </summary>
-	/// <param name="path">Full path to the .nexen-labels or .mlb file.</param>
+	/// <param name="path">Full path to the .nexen-labels or legacy .mlb file.</param>
 	/// <param name="showResult">If <c>true</c>, displays the import result to the user.</param>
 	/// <remarks>
-	/// Supports both Nexen's native format (.nexen-labels) and the legacy Mesen format (.mlb).
+	/// Supports Nexen's native binary format (.nexen-labels) and the legacy Mesen format (.mlb).
 	/// See <see cref="NexenLabelFile"/> for format details.
 	/// </remarks>
 	public static void LoadNexenLabelFile(string path, bool showResult) {
@@ -398,7 +398,7 @@ public static class DebugWorkspaceManager {
 	///   <item><description>.sym → <see cref="LoadSymFile"/></description></item>
 	///   <item><description>.cdb → <see cref="LoadCdbFile"/></description></item>
 	///   <item><description>.elf → <see cref="LoadElfFile"/></description></item>
-	///   <item><description>.nexen-labels, .mlb → <see cref="LoadNexenLabelFile"/></description></item>
+	///   <item><description>.nexen-labels, .mlb (legacy) → <see cref="LoadNexenLabelFile"/></description></item>
 	///   <item><description>.fns → <see cref="LoadNesAsmLabelFile"/></description></item>
 	///   <item><description>.cdl → <see cref="LoadCdlFile"/></description></item>
 	/// </list>

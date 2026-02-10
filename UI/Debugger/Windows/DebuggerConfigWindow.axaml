@@ -222,8 +222,8 @@
 								Content="{l:Translate chkAutoLoadCdbFiles}"
 							/>
 							<CheckBox
-								IsChecked="{Binding Integration.AutoLoadMlbFiles}"
-								Content="{l:Translate chkAutoLoadMlbFiles}"
+								IsChecked="{Binding Integration.AutoLoadLabelFiles}"
+								Content="{l:Translate chkAutoLoadLabelFiles}"
 							/>
 							<CheckBox
 								IsChecked="{Binding Integration.AutoLoadFnsFiles}"
@@ -288,8 +288,8 @@
 								Content="{l:Translate chkUseFolderStorage}"
 							/>
 							<CheckBox
-								IsChecked="{Binding Integration.SyncMlbFiles}"
-								Content="{l:Translate chkSyncMlbFiles}"
+								IsChecked="{Binding Integration.SyncLabelFiles}"
+								Content="{l:Translate chkSyncLabelFiles}"
 								IsEnabled="{Binding Integration.UseFolderStorage}"
 								Margin="20 0 0 0"
 							/>

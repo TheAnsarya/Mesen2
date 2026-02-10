@@ -137,7 +137,7 @@ public sealed class SyncManager : IDisposable {
 				IncludeSubdirectories = false
 			};
 
-			// Watch for Pansy, MLB, and CDL files
+			// Watch for Pansy, label, and CDL files
 			watcher.Filter = "*.*";
 
 			watcher.Changed += OnFileChanged;
@@ -231,7 +231,7 @@ public sealed class SyncManager : IDisposable {
 	/// </summary>
 	private static bool IsRelevantFile(string path) {
 		string ext = Path.GetExtension(path).ToLowerInvariant();
-		return ext is ".pansy" or ".mlb" or ".cdl";
+		return ext is ".pansy" or ".nexen-labels" or ".mlb" or ".cdl";
 	}
 
 	/// <summary>
@@ -322,12 +322,13 @@ public sealed class SyncManager : IDisposable {
 		var config = ConfigManager.Config.Debug.Integration;
 
 		switch (ext) {
-			case ".mlb" when config.AutoLoadMlbFiles:
+			case ".nexen-labels" when config.AutoLoadLabelFiles:
+			case ".mlb" when config.AutoLoadLabelFiles:
 				// Wait for file to be released
 				await WaitForFileAccess(change.FilePath, cancellationToken);
 				await Dispatcher.UIThread.InvokeAsync(() => {
 					NexenLabelFile.Import(change.FilePath, showResult: false);
-					System.Diagnostics.Debug.WriteLine($"[SyncManager] Imported MLB: {change.FilePath}");
+					System.Diagnostics.Debug.WriteLine($"[SyncManager] Imported labels: {change.FilePath}");
 				});
 				break;
 
@@ -397,10 +398,15 @@ public sealed class SyncManager : IDisposable {
 		SyncStatusChanged?.Invoke(this, true);
 
 		try {
-			// Import MLB if exists
-			string mlbPath = DebugFolderManager.GetMlbPath(_currentRom);
-			if (File.Exists(mlbPath)) {
-				await Dispatcher.UIThread.InvokeAsync(() => NexenLabelFile.Import(mlbPath, showResult: false));
+			// Import labels if exists (nexen-labels first, then legacy MLB)
+			string labelsPath = DebugFolderManager.GetLabelsPath(_currentRom);
+			if (File.Exists(labelsPath)) {
+				await Dispatcher.UIThread.InvokeAsync(() => NexenLabelFile.Import(labelsPath, showResult: false));
+			} else {
+				string mlbPath = DebugFolderManager.GetLegacyMlbPath(_currentRom);
+				if (File.Exists(mlbPath)) {
+					await Dispatcher.UIThread.InvokeAsync(() => NexenLabelFile.Import(mlbPath, showResult: false));
+				}
 			}
 
 			// Import CDL if exists
