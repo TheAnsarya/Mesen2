@@ -7,7 +7,7 @@ using Nexen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.Debugger.Labels; 
+namespace Nexen.Debugger.Labels;
 /// <summary>
 /// Represents a label (symbol) attached to a memory address in the debugger.
 /// Labels provide human-readable names for addresses and can include comments.

@@ -219,12 +219,12 @@ public sealed class MainMenuViewModel : ViewModelBase {
 
 			new MenuSeparator(),
 
-			// Quick Save (Timestamped) - F1/Shift+F1/Ctrl+S creates infinite saves
+			// Quick Save (Timestamped) - F1/Ctrl+S creates infinite saves
 			new ShortcutMenuAction(EmulatorShortcut.QuickSaveTimestamped, EnableCategory.RequiresRom) {
 				ActionType = ActionType.QuickSaveTimestamped
 			},
 
-			// Browse Save States - F1 opens the picker to view/load all saves
+			// Browse Save States - Shift+F1 opens the picker to view/load all saves
 			new SimpleMenuAction(ActionType.OpenSaveStatePicker) {
 				IsEnabled = () => EmulatorState.Instance.IsRomLoaded && EmuApi.GetSaveStateCount() > 0,
 				OnClick = () => {

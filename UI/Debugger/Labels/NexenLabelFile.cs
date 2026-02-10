@@ -11,7 +11,7 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using Nexen.Windows;
 
-namespace Nexen.Debugger.Labels; 
+namespace Nexen.Debugger.Labels;
 /// <summary>
 /// Unified entry point for importing and exporting Nexen label files.
 /// </summary>

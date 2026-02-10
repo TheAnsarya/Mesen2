@@ -102,13 +102,17 @@ No i told you to add to the copilot instructions that you should never give up, 
 
 if you're trying to reduce png size, download and use the `pngcrush` utility; continue;
 
+for a unified crypto library, use `www.github.com/TheAnsarya/StreamHash/` and the nuget package; continue;
 
+[Nexen] does `DataGrid + DataGridExtensions` perform as well as `DataBox` for large datasets like the code display component in the debugger? Can get test that or did you research this?
 
+yes, thank you, please continue;
 
+[Nexen] continue working through issues for modernization, and make new ones if you need to; update the StreamHash nuget package and use the new "Basic Hashes" method to get crc32/md5/sha-1/sha-256 value of the roms; continue;
 
+[Nexen] I thought we agreed that we weren't using `mlb` files except as a legacy importable and legacy exportable from a special menu for exporting and converting files from a new format to an old one, like save files for other emulators; instead we are using a file name with `nexen-labels` as its extension, just like `nexen-save` and `nexen-movie`, and these aren't just renamed mlb files, they have a better format and metadata and if there's a better way to deal with labels do it!; create issues and todos and docs and code-plans; continue; 
 
-
-
+[Nexen] save files if they are the most modern versions of those files; save and close all the vscode open files; Switch `F1` and `Shift+F1` so that `F1` creates a Quick Save and `Shift+F1` opens the `Browse Save States` file dialog with the screen shots and tags (tags show which savestate type, with the associated color) and labels; work on issue #207; and then work on other issues; continue;
 
 
 

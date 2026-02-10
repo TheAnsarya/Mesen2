@@ -12,7 +12,7 @@ using Nexen.Debugger.Labels;
 using Nexen.Interop;
 using Nexen.Utilities;
 
-namespace Nexen.Debugger.Utilities; 
+namespace Nexen.Debugger.Utilities;
 /// <summary>
 /// Manages the debug workspace state for the currently loaded ROM.
 /// </summary>
