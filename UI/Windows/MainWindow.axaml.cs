@@ -297,8 +297,15 @@ public class MainWindow : NexenWindow {
 				string saveStatesPath = GameDataManager.GetSaveStatesFolder(romInfo);
 				EmuApi.SetPerRomSaveStateDirectory(saveStatesPath);
 
+				// Set per-ROM battery save directory for C++ core
+				string savesPath = GameDataManager.GetSavesFolder(romInfo);
+				EmuApi.SetPerRomSaveDirectory(savesPath);
+
 				// Migrate any legacy save states to the new per-game folder
 				GameDataManager.MigrateSaveStates(romInfo);
+
+				// Migrate any legacy battery saves to the new per-game folder
+				GameDataManager.MigrateBatterySaves(romInfo);
 
 				// Update global emulator state for menu enable/disable
 				Dispatcher.UIThread.Post(() => Services.EmulatorState.Instance.OnRomChanged(romInfo));

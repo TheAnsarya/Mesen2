@@ -217,6 +217,16 @@ public sealed class EmuApi {
 	[DllImport(DllPath)]
 	public static extern void SetPerRomSaveStateDirectory([MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
+	// ========== Per-ROM Battery Save Directory ==========
+
+	/// <summary>
+	/// Set the per-ROM battery save directory for the C++ core.
+	/// Called on ROM load to redirect battery saves (.sav, .srm, etc.) to per-game folders.
+	/// </summary>
+	/// <param name="path">Full path to per-ROM save directory, or empty to use default.</param>
+	[DllImport(DllPath)]
+	public static extern void SetPerRomSaveDirectory([MarshalAs(UnmanagedType.LPUTF8Str)] string path);
+
 	[DllImport(DllPath, EntryPoint = "GetSaveStatePreview")] private static extern Int32 GetSaveStatePreviewWrapper([MarshalAs(UnmanagedType.LPUTF8Str)] string saveStatePath, [Out] byte[] imgData);
 	public static Bitmap? GetSaveStatePreview(string saveStatePath) {
 		if (File.Exists(saveStatePath)) {

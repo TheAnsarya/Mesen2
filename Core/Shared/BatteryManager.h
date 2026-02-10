@@ -39,6 +39,7 @@ public:
 class BatteryManager {
 private:
 	string _romName;          ///< ROM name for constructing save file paths
+	string _perRomSaveDir;    ///< Per-ROM save directory override (set by C# GameDataManager on ROM load)
 	bool _hasBattery = false; ///< Battery-backed save flag
 
 	std::weak_ptr<IBatteryProvider> _provider; ///< Optional custom battery provider
@@ -123,4 +124,11 @@ public:
 	/// <param name="extension">File extension to check</param>
 	/// <returns>File size in bytes, or 0 if file does not exist</returns>
 	uint32_t GetBatteryFileSize(string extension);
+
+	/// <summary>
+	/// Set per-ROM save directory override for battery files.
+	/// Called from C# GameDataManager on ROM load to redirect saves to per-game folders.
+	/// </summary>
+	/// <param name="path">Full path to per-ROM save directory, or empty string to use default</param>
+	void SetPerRomSaveDirectory(const string& path);
 };

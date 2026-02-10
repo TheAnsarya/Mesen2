@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -271,6 +272,72 @@ public static class GameDataManager {
 			return migrated;
 		} catch (Exception ex) {
 			Log.Warn($"[GameDataManager] Save state migration failed: {ex.Message}");
+			return 0;
+		}
+	}
+
+	/// <summary>
+	/// Migrates legacy battery save files to the new per-game folder structure.
+	/// </summary>
+	/// <param name="romInfo">ROM information for locating the game folder.</param>
+	/// <returns>Number of files migrated.</returns>
+	/// <remarks>
+	/// <para>
+	/// Copies (non-destructive) battery saves from the legacy <c>{HomeFolder}/Saves/</c> folder
+	/// to the new <c>GameData/{System}/{RomName}_{CRC32}/Saves/</c> structure.
+	/// Only copies files that don't already exist at the destination.
+	/// Supports all battery save extensions: .sav, .srm, .rtc, .eeprom, .ieeprom, .bs, .chr.sav
+	/// </para>
+	/// </remarks>
+	public static int MigrateBatterySaves(RomInfo romInfo) {
+		try {
+			string romName = romInfo.GetRomName();
+			string legacyFolder = Path.Combine(ConfigManager.HomeFolder, "Saves");
+
+			if (!Directory.Exists(legacyFolder))
+				return 0;
+
+			string newFolder = GetSavesFolder(romInfo);
+			int migrated = 0;
+
+			// Battery save extensions used across all console cores
+			HashSet<string> batteryExtensions = [".sav", ".srm", ".rtc", ".eeprom", ".ieeprom", ".bs"];
+
+			foreach (string sourceFile in Directory.GetFiles(legacyFolder)) {
+				string fileName = Path.GetFileName(sourceFile);
+
+				// Battery saves are stored as {RomName}{ext} — check if this file belongs to our ROM
+				// Handle compound extensions like .chr.sav
+				bool matchesRom = false;
+				string ext = "";
+
+				if (fileName.StartsWith(romName, StringComparison.OrdinalIgnoreCase)) {
+					ext = fileName[romName.Length..].ToLowerInvariant();
+					matchesRom = batteryExtensions.Contains(ext) || ext == ".chr.sav";
+				}
+
+				if (!matchesRom)
+					continue;
+
+				string destFile = Path.Combine(newFolder, fileName);
+				if (File.Exists(destFile))
+					continue;
+
+				try {
+					File.Copy(sourceFile, destFile, overwrite: false);
+					migrated++;
+				} catch (Exception ex) {
+					Log.Warn($"[GameDataManager] Failed to migrate battery save '{sourceFile}': {ex.Message}");
+				}
+			}
+
+			if (migrated > 0) {
+				Log.Info($"[GameDataManager] Migrated {migrated} battery save(s) for '{romName}' to per-game folder");
+			}
+
+			return migrated;
+		} catch (Exception ex) {
+			Log.Warn($"[GameDataManager] Battery save migration failed: {ex.Message}");
 			return 0;
 		}
 	}

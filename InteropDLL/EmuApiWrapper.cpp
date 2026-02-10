@@ -6,6 +6,7 @@
 #include "Core/Shared/SystemActionManager.h"
 #include "Core/Shared/MessageManager.h"
 #include "Core/Shared/SaveStateManager.h"
+#include "Core/Shared/BatteryManager.h"
 #include "Core/Shared/Interfaces/INotificationListener.h"
 #include "Core/Shared/KeyManager.h"
 #include "Core/Shared/ShortcutKeyHandler.h"
@@ -420,6 +421,12 @@ DllExport void __stdcall ClearDesignatedSave() {
 
 DllExport void __stdcall SetPerRomSaveStateDirectory(char* path) {
 	_emu->GetSaveStateManager()->SetPerRomSaveStateDirectory(path ? path : "");
+}
+
+// ========== Per-ROM Battery Save Directory ==========
+
+DllExport void __stdcall SetPerRomSaveDirectory(char* path) {
+	_emu->GetBatteryManager()->SetPerRomSaveDirectory(path ? path : "");
 }
 
 class PgoKeyManager : public IKeyManager {

@@ -10,10 +10,18 @@ void BatteryManager::Initialize(string romName, bool setBatteryFlag) {
 }
 
 string BatteryManager::GetBasePath(string& extension) {
-	if (StringUtilities::StartsWith(extension, ".")) {
-		return FolderUtilities::CombinePath(FolderUtilities::GetSaveFolder(), _romName + extension);
+	string folder;
+	if (!_perRomSaveDir.empty()) {
+		FolderUtilities::CreateFolder(_perRomSaveDir);
+		folder = _perRomSaveDir;
 	} else {
-		return FolderUtilities::CombinePath(FolderUtilities::GetSaveFolder(), extension);
+		folder = FolderUtilities::GetSaveFolder();
+	}
+
+	if (StringUtilities::StartsWith(extension, ".")) {
+		return FolderUtilities::CombinePath(folder, _romName + extension);
+	} else {
+		return FolderUtilities::CombinePath(folder, extension);
 	}
 }
 
@@ -77,4 +85,11 @@ void BatteryManager::LoadBattery(string extension, std::span<uint8_t> data) {
 
 uint32_t BatteryManager::GetBatteryFileSize(string extension) {
 	return (uint32_t)LoadBattery(extension).size();
+}
+
+void BatteryManager::SetPerRomSaveDirectory(const string& path) {
+	_perRomSaveDir = path;
+	if (!path.empty()) {
+		FolderUtilities::CreateFolder(path);
+	}
 }
