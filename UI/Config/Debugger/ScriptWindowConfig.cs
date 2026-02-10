@@ -12,7 +12,7 @@ namespace Nexen.Config;
 public class ScriptWindowConfig : BaseWindowConfig<ScriptWindowConfig> {
 	private const int MaxRecentScripts = 10;
 
-	[Reactive] public List<string> RecentScripts { get; set; } = new List<string>();
+	[Reactive] public List<string> RecentScripts { get; set; } = [];
 
 	[Reactive] public int Zoom { get; set; } = 100;
 

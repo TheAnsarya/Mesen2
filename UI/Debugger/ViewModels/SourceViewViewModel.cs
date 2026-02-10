@@ -236,7 +236,7 @@ public class SourceViewViewModel : DisposableViewModel, ISelectableModel {
 			AbsoluteAddress = address ?? new AddressInfo() { Address = -1 },
 			Flags = LineFlags.VerifiedCode | (!showLineAddress ? LineFlags.Empty : LineFlags.None),
 			Text = ReplaceTabs(file.Data[lineNumber], ConfigManager.Config.Debug.Integration.TabSize),
-			ByteCode = byteCode ?? Array.Empty<byte>(),
+			ByteCode = byteCode ?? [],
 			OpSize = (byte)opSize
 		};
 	}

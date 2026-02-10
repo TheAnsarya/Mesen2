@@ -16,7 +16,7 @@ public static class SearchHelper {
 	private static List<string> GetSearchTerms(string searchString) {
 		searchString = searchString.Trim();
 
-		HashSet<string> terms = new HashSet<string>();
+		HashSet<string> terms = [];
 		terms.Add(searchString.ToLower());
 
 		//Add each word as a separate search term
@@ -70,7 +70,7 @@ public static class SearchHelper {
 			cdlData = DebugApi.GetCdlData(0, (uint)size, prgMemType.Value);
 		}
 
-		List<SearchResultInfo> results = new List<SearchResultInfo>();
+		List<SearchResultInfo> results = [];
 		bool isEmptySearch = string.IsNullOrWhiteSpace(searchString);
 		if (!isEmptySearch) {
 			if (symbolProvider != null) {

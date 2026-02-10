@@ -105,7 +105,7 @@ public static class LoadRomHelper {
 			return;
 		}
 
-		List<string> romsInFolder = new List<string>();
+		List<string> romsInFolder = [];
 		foreach (string filepath in Directory.EnumerateFiles(patchFolder)) {
 			if (FolderHelper.IsRomFile(filepath)) {
 				romsInFolder.Add(filepath);

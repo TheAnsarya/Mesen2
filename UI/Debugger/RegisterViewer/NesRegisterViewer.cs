@@ -68,7 +68,7 @@ public class NesRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetNesApuTab(ref NesState state) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 		NesApuState apu = state.Apu;
 
 		NesApuSquareState sq1 = apu.Square1;
@@ -208,7 +208,7 @@ public class NesRegisterViewer {
 	private static RegisterViewerTab GetNesCartTab(ref NesState state) {
 		NesCartridgeState cart = state.Cartridge;
 
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 		for (int i = 0; i < cart.CustomEntryCount; i++) {
 			ref MapperStateEntry entry = ref cart.CustomEntries[i];
 			Format format = entry.Type switch {

@@ -69,7 +69,7 @@ public class WatchManager {
 	/// <summary>
 	/// The list of watch expression strings.
 	/// </summary>
-	private List<string> _watchEntries = new List<string>();
+	private List<string> _watchEntries = [];
 
 	/// <summary>
 	/// The CPU type this watch manager is associated with.

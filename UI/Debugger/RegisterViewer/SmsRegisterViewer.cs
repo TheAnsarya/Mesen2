@@ -16,7 +16,7 @@ public class SmsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetSmsVdpTab(ref SmsState sms) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		SmsVdpState vdp = sms.Vdp;
 		entries.AddRange(new List<RegEntry>() {
@@ -71,7 +71,7 @@ public class SmsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetSmsPsgTab(ref SmsState sms, bool isGameGear) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		SmsPsgState psg = sms.Psg;
 
@@ -114,7 +114,7 @@ public class SmsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetSmsMiscTab(ref SmsState sms) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		SmsControlManagerState ctrl = sms.ControlManager;
 		SmsMemoryManagerState mem = sms.MemoryManager;

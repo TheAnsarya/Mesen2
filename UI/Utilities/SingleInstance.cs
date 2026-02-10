@@ -77,7 +77,7 @@ public class SingleInstance : IDisposable {
 				using StreamReader reader = new StreamReader(server);
 				server.WaitForConnection();
 
-				List<string> args = new List<string>();
+				List<string> args = [];
 				while (server.IsConnected) {
 					string? arg = reader.ReadLine();
 					if (!string.IsNullOrWhiteSpace(arg)) {

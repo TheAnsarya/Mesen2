@@ -45,7 +45,7 @@ public class InputApi {
 			InputApi.GetPressedKeysWrapper((IntPtr)ptr);
 		}
 
-		List<UInt16> keys = new List<UInt16>();
+		List<UInt16> keys = [];
 		for (int i = 0; i < 3; i++) {
 			if (keyBuffer[i] != 0) {
 				keys.Add(keyBuffer[i]);

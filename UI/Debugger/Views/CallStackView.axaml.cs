@@ -7,7 +7,7 @@ using Nexen.Controls.DataGridExtensions;
 using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
-namespace Nexen.Debugger.Views; 
+namespace Nexen.Debugger.Views;
 public class CallStackView : UserControl {
 	public CallStackView() {
 		InitializeComponent();

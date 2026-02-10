@@ -38,7 +38,7 @@ public class HistoryViewerViewModel : DisposableViewModel {
 	[Reactive] public bool IsSoftwareRendererVisible { get; set; } = false;
 
 	private bool _blockCoreUpdates = false;
-	private uint[] _segments = Array.Empty<uint>();
+	private uint[] _segments = [];
 	private double _fps = 60.0;
 
 	public HistoryViewerViewModel() {

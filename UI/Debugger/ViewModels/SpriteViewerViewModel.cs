@@ -669,7 +669,7 @@ public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseO
 		InitPreviews(_spriteList, _spritePreviews, previewInfo);
 
 		if (Config.ShowOutline) {
-			List<Rect> spriteRects = new List<Rect>();
+			List<Rect> spriteRects = [];
 			foreach (SpritePreviewModel sprite in SpritePreviews) {
 				(Rect mainRect, Rect alt1, Rect alt2, Rect alt3) = sprite.GetPreviewRect();
 				spriteRects.Add(mainRect);
@@ -768,8 +768,8 @@ public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseO
 public class SpriteViewerData {
 	public BaseState? PpuState;
 	public BaseState? PpuToolsState;
-	public byte[] SpriteRam = Array.Empty<byte>();
-	public byte[] Vram = Array.Empty<byte>();
+	public byte[] SpriteRam = [];
+	public byte[] Vram = [];
 	public DebugPaletteInfo? Palette = null;
 
 	public void CopyTo(SpriteViewerData dst) {

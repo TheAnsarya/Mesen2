@@ -60,7 +60,7 @@ class FileAssociationHelper {
 			Directory.CreateDirectory(desktopFolder);
 		}
 
-		List<string> mimeTypes = new List<string>();
+		List<string> mimeTypes = [];
 		CreateMimeType("x-nexen-sfc", "sfc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
 		CreateMimeType("x-nexen-smc", "smc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);
 		CreateMimeType("x-nexen-swc", "swc", "SNES Rom", mimeTypes, cfg.AssociateSnesRomFiles);

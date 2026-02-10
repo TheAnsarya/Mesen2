@@ -16,7 +16,7 @@ public class ArchiveHelper {
 		}
 
 		List<List<byte>> filenames = new List<List<byte>>();
-		List<byte> filenameBytes = new List<byte>();
+		List<byte> filenameBytes = [];
 		for (int i = 0; i < buffer.Length - 5; i++) {
 			if (buffer[i] == 0) {
 				break;
@@ -27,7 +27,7 @@ public class ArchiveHelper {
 					filenames.Add(filenameBytes);
 				}
 
-				filenameBytes = new List<byte>();
+				filenameBytes = [];
 				i += 4;
 			} else {
 				filenameBytes.Add(buffer[i]);
@@ -38,7 +38,7 @@ public class ArchiveHelper {
 			filenames.Add(filenameBytes);
 		}
 
-		List<ArchiveRomEntry> entries = new List<ArchiveRomEntry>();
+		List<ArchiveRomEntry> entries = [];
 
 		//Check whether or not each string is a valid utf8 filename, if not decode it using the system's default encoding.
 		//This is necessary because zip files do not have any rules when it comes to encoding filenames

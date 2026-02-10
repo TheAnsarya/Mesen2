@@ -20,7 +20,7 @@ using ReactiveUI;
 
 namespace Nexen.Controls; 
 public class PaletteConfig : UserControl {
-	public static readonly StyledProperty<UInt32[]> PaletteProperty = AvaloniaProperty.Register<PaletteConfig, UInt32[]>(nameof(Palette), Array.Empty<UInt32>(), defaultBindingMode: BindingMode.TwoWay);
+	public static readonly StyledProperty<UInt32[]> PaletteProperty = AvaloniaProperty.Register<PaletteConfig, UInt32[]>(nameof(Palette), [], defaultBindingMode: BindingMode.TwoWay);
 	public static readonly StyledProperty<List<PalettePreset>> PalettePresetsProperty = AvaloniaProperty.Register<PaletteConfig, List<PalettePreset>>(nameof(PalettePresets), new List<PalettePreset>());
 	public static readonly StyledProperty<int> ColumnCountProperty = AvaloniaProperty.Register<PaletteConfig, int>(nameof(ColumnCount), 16);
 	public static readonly StyledProperty<int> BlockSizeProperty = AvaloniaProperty.Register<PaletteConfig, int>(nameof(BlockSize), 16);
@@ -128,7 +128,7 @@ public class PaletteConfig : UserControl {
 	}
 
 	public void ExportPalette(string filename) {
-		List<byte> bytePalette = new List<byte>();
+		List<byte> bytePalette = [];
 		foreach (UInt32 value in Palette) {
 			bytePalette.Add((byte)((value >> 16) & 0xFF));
 			bytePalette.Add((byte)((value >> 8) & 0xFF));
@@ -141,5 +141,5 @@ public class PaletteConfig : UserControl {
 
 public class PalettePreset {
 	public string Name { get; set; } = "";
-	public UInt32[] Palette { get; set; } = Array.Empty<UInt32>();
+	public UInt32[] Palette { get; set; } = [];
 }

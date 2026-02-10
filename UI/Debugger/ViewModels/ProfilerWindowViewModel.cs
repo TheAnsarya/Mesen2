@@ -29,7 +29,7 @@ public class ProfilerWindowViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the list of profiler tabs, one per supported CPU type.
 	/// </summary>
-	[Reactive] public List<ProfilerTab> ProfilerTabs { get; set; } = new List<ProfilerTab>();
+	[Reactive] public List<ProfilerTab> ProfilerTabs { get; set; } = [];
 
 	/// <summary>
 	/// Gets or sets the currently selected profiler tab.

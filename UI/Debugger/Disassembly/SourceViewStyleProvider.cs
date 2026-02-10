@@ -70,7 +70,7 @@ public class SourceViewStyleProvider : BaseStyleProvider {
 		string codeString = lineData.Text.TrimEnd();
 		Color defaultColor = Color.FromRgb(60, 60, 60);
 
-		List<CodeColor> colors = new List<CodeColor>();
+		List<CodeColor> colors = [];
 		if (codeString.Length > 0 && highlightCode && !lineData.Flags.HasFlag(LineFlags.Label)) {
 			int pos = 0;
 			while (codeString.Length > 0) {

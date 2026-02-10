@@ -22,7 +22,7 @@ class Program {
 	// yet and stuff might break.
 
 	public static string OriginalFolder { get; private set; }
-	public static string[] CommandLineArgs { get; private set; } = Array.Empty<string>();
+	public static string[] CommandLineArgs { get; private set; } = [];
 
 	public static string ExePath => Process.GetCurrentProcess().MainModule?.FileName ?? Path.Join(Path.GetDirectoryName(AppContext.BaseDirectory), "Nexen.exe");
 

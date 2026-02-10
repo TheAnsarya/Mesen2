@@ -14,7 +14,7 @@ public class TblByteCharConverter {
 			_hasPotentialRule[kvp.Key.Key & 0xFF] = true;
 		}
 
-		this._stringList = new List<string>();
+		this._stringList = [];
 		this._reverseTblRules = new Dictionary<string, TblKey>();
 		foreach (KeyValuePair<TblKey, string> kvp in tblRules) {
 			this._stringList.Add(kvp.Value);
@@ -55,7 +55,7 @@ public class TblByteCharConverter {
 	}
 
 	public byte[] GetBytes(string text) {
-		List<byte> bytes = new List<byte>();
+		List<byte> bytes = [];
 
 		bool match = false;
 		while (text.Length > 0) {

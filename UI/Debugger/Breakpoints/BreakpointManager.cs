@@ -40,7 +40,7 @@ public static class BreakpointManager {
 	/// <summary>
 	/// The list of user-defined breakpoints.
 	/// </summary>
-	private static List<Breakpoint> _breakpoints = new List<Breakpoint>();
+	private static List<Breakpoint> _breakpoints = [];
 
 	/// <summary>
 	/// Cached read-only view of breakpoints - invalidated when breakpoints change.
@@ -50,7 +50,7 @@ public static class BreakpointManager {
 	/// <summary>
 	/// The list of temporary breakpoints (e.g., "Run to cursor").
 	/// </summary>
-	private static List<Breakpoint> _temporaryBreakpoints = new List<Breakpoint>();
+	private static List<Breakpoint> _temporaryBreakpoints = [];
 
 	/// <summary>
 	/// The set of CPU types currently active in the debugger.
@@ -58,7 +58,7 @@ public static class BreakpointManager {
 	/// <remarks>
 	/// Only breakpoints for active CPU types are sent to the emulator core.
 	/// </remarks>
-	private static HashSet<CpuType> _activeCpuTypes = new HashSet<CpuType>();
+	private static HashSet<CpuType> _activeCpuTypes = [];
 
 	/// <summary>
 	/// Invalidates the cached breakpoints collection.
@@ -91,7 +91,7 @@ public static class BreakpointManager {
 	/// Assert breakpoints are created from labels with assertion conditions.
 	/// See <see cref="LabelManager.UpdateAssertBreakpoints"/>.
 	/// </remarks>
-	public static List<Breakpoint> Asserts { internal get; set; } = new List<Breakpoint>();
+	public static List<Breakpoint> Asserts { internal get; set; } = [];
 
 	/// <summary>
 	/// Gets all breakpoints for a specific CPU type.
@@ -99,7 +99,7 @@ public static class BreakpointManager {
 	/// <param name="cpuType">The CPU type to filter by.</param>
 	/// <returns>A list of breakpoints targeting the specified CPU.</returns>
 	public static List<Breakpoint> GetBreakpoints(CpuType cpuType) {
-		List<Breakpoint> breakpoints = new List<Breakpoint>();
+		List<Breakpoint> breakpoints = [];
 		foreach (Breakpoint bp in _breakpoints) {
 			if (bp.CpuType == cpuType) {
 				breakpoints.Add(bp);
@@ -433,7 +433,7 @@ public static class BreakpointManager {
 	/// </para>
 	/// </remarks>
 	public static void SetBreakpoints() {
-		List<InteropBreakpoint> breakpoints = new List<InteropBreakpoint>();
+		List<InteropBreakpoint> breakpoints = [];
 
 		int id = 0;
 		void toInteropBreakpoints(IEnumerable<Breakpoint> bpList) {

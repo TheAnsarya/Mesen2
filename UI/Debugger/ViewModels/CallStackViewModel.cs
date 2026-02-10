@@ -99,7 +99,7 @@ public class CallStackViewModel : DisposableViewModel {
 	private List<StackInfo> GetStackInfo() {
 		StackFrameInfo[] stackFrames = _stackFrames;
 
-		List<StackInfo> stack = new List<StackInfo>();
+		List<StackInfo> stack = [];
 		for (int i = 0; i < stackFrames.Length; i++) {
 			bool isMapped = DebugApi.GetRelativeAddress(stackFrames[i].AbsSource, CpuType).Address >= 0;
 			stack.Insert(0, new StackInfo() {

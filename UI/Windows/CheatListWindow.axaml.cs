@@ -14,7 +14,7 @@ using Nexen.Controls.DataGridExtensions;
 using Nexen.Interop;
 using Nexen.ViewModels;
 
-namespace Nexen.Windows; 
+namespace Nexen.Windows;
 public class CheatListWindow : NexenWindow {
 	private CheatListWindowViewModel _model;
 	private NotificationListener _listener;

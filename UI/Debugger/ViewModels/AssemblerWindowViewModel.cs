@@ -66,7 +66,7 @@ public class AssemblerWindowViewModel : DisposableViewModel {
 	[Reactive] public bool OkEnabled { get; set; } = false;
 
 	/// <summary>Gets or sets the list of assembly errors from compilation.</summary>
-	[Reactive] public List<AssemblerError> Errors { get; set; } = new List<AssemblerError>();
+	[Reactive] public List<AssemblerError> Errors { get; set; } = [];
 
 	/// <summary>Gets or sets the File menu actions.</summary>
 	[Reactive] public List<ContextMenuAction> FileMenuActions { get; private set; } = new();
@@ -172,7 +172,7 @@ public class AssemblerWindowViewModel : DisposableViewModel {
 	private void UpdateAssembly(string code) {
 		string[] codeLines = code.Replace("\r", "").Split('\n').Select(x => x.Trim()).ToArray();
 		short[] byteCode = DebugApi.AssembleCode(CpuType, string.Join('\n', codeLines), (uint)StartAddress);
-		List<AssemblerError> errorList = new List<AssemblerError>();
+		List<AssemblerError> errorList = [];
 		List<byte> convertedByteCode = new List<byte>(byteCode.Length);
 		StringBuilder sb = new StringBuilder();
 		int line = 1;
@@ -277,7 +277,7 @@ public class AssemblerWindowViewModel : DisposableViewModel {
 		string addrFormat = memType.GetFormatString();
 		UInt32 endAddress = (uint)(StartAddress + bytes.Count - 1);
 
-		List<string> warningMessages = new List<string>();
+		List<string> warningMessages = [];
 		if (Errors.Count > 0) {
 			warningMessages.Add("Warning: The code contains errors - lines with errors will be ignored.");
 		}

@@ -98,7 +98,7 @@ public class TilemapViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouse
 	/// <summary>
 	/// Gets or sets the list of tilemap layer tabs.
 	/// </summary>
-	[Reactive] public List<TilemapViewerTab> Tabs { get; private set; } = new List<TilemapViewerTab>();
+	[Reactive] public List<TilemapViewerTab> Tabs { get; private set; } = [];
 
 	/// <summary>
 	/// Gets whether the layer tabs should be visible (more than one layer available).

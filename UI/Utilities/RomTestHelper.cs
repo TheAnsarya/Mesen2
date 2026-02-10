@@ -54,7 +54,7 @@ public static class RomTestHelper {
 			});
 
 			EmuApi.WriteLogEntry("==================");
-			List<string> failedTests = new List<string>();
+			List<string> failedTests = [];
 			List<string> entries = results.Keys.ToList();
 			entries.Sort();
 
@@ -102,7 +102,7 @@ public static class RomTestHelper {
 			});
 
 			EmuApi.WriteLogEntry("==================");
-			List<string> failedTests = new List<string>();
+			List<string> failedTests = [];
 			List<string> entries = results.Keys.ToList();
 			entries.Sort();
 
@@ -156,7 +156,7 @@ public static class RomTestHelper {
 			});
 
 			EmuApi.WriteLogEntry("==================");
-			List<string> failedTests = new List<string>();
+			List<string> failedTests = [];
 			List<string> entries = results.Keys.ToList();
 			entries.Sort();
 

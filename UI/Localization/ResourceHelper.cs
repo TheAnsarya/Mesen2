@@ -72,7 +72,7 @@ class ResourceHelper {
 	}
 
 	public static Enum[] GetEnumValues(Type t) {
-		List<Enum> values = new List<Enum>();
+		List<Enum> values = [];
 		XmlNode? node = _resources.SelectSingleNode("/Resources/Enums/Enum[@ID='" + t.Name + "']");
 		if (node?.Attributes!["ID"]!.Value == t.Name) {
 			foreach (XmlNode enumNode in node.ChildNodes) {

@@ -33,9 +33,9 @@
 			<Button DockPanel.Dock="Right" MinWidth="70" HorizontalContentAlignment="Center" Click="Ok_OnClick" Content="{l:Translate btnOK}" />
 			<CheckBox Content="{l:Translate chkDisableCheats}" IsChecked="{Binding DisableAllCheats}" />
 		</DockPanel >
-		
+
 		<c:ActionToolbar DockPanel.Dock="Top" Items="{Binding ToolbarActions}" />
-		
+
 		<Border BorderThickness="1" BorderBrush="{StaticResource NexenGrayBorderColor}" Margin="2">
 			<DataGrid
 				ItemsSource="{Binding Cheats}"

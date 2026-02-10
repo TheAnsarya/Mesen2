@@ -71,7 +71,7 @@ public class PreferencesConfig : BaseConfig<PreferencesConfig> {
 	[Reactive] public FontConfig NexenFont { get; set; } = new FontConfig() { FontFamily = "Microsoft Sans Serif", FontSize = 11 };
 	[Reactive] public FontConfig NexenMenuFont { get; set; } = new FontConfig() { FontFamily = "Segoe UI", FontSize = 12 };
 
-	[Reactive] public List<ShortcutKeyInfo> ShortcutKeys { get; set; } = new List<ShortcutKeyInfo>();
+	[Reactive] public List<ShortcutKeyInfo> ShortcutKeys { get; set; } = [];
 
 	[Reactive] public bool OverrideGameFolder { get; set; } = false;
 	[Reactive] public bool OverrideAviFolder { get; set; } = false;
@@ -205,7 +205,7 @@ public class PreferencesConfig : BaseConfig<PreferencesConfig> {
 	public void ApplyConfig() {
 		UpdateFonts();
 
-		List<InteropShortcutKeyInfo> shortcutKeys = new List<InteropShortcutKeyInfo>();
+		List<InteropShortcutKeyInfo> shortcutKeys = [];
 		foreach (ShortcutKeyInfo shortcutInfo in ShortcutKeys) {
 			if (!shortcutInfo.KeyCombination.IsEmpty) {
 				shortcutKeys.Add(new InteropShortcutKeyInfo(shortcutInfo.Shortcut, shortcutInfo.KeyCombination.ToInterop()));

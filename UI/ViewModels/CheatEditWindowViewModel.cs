@@ -19,7 +19,7 @@ public class CheatEditWindowViewModel : DisposableViewModel {
 	[Reactive] public bool ShowInvalidCodeHint { get; private set; } = false;
 	[Reactive] public bool OkButtonEnabled { get; private set; } = false;
 
-	[Reactive] public Enum[] AvailableCheatTypes { get; private set; } = Array.Empty<Enum>();
+	[Reactive] public Enum[] AvailableCheatTypes { get; private set; } = [];
 
 	private MainWindowViewModel MainWndModel { get; }
 

@@ -11,7 +11,7 @@ namespace Nexen.Views;
 public class VideoConfigOverrideView : UserControl {
 	public static readonly StyledProperty<bool> ShowBisqwitFilterProperty = AvaloniaProperty.Register<VideoConfigOverrideView, bool>(nameof(ShowBisqwitFilter), false);
 	public static readonly StyledProperty<string> HeaderProperty = AvaloniaProperty.Register<VideoConfigOverrideView, string>(nameof(Header), ResourceHelper.GetViewLabel(nameof(VideoConfigOverrideView), "lblHeader"));
-	public static readonly StyledProperty<Enum[]> AvailableValuesProperty = AvaloniaProperty.Register<VideoConfigOverrideView, Enum[]>(nameof(ShowBisqwitFilter), Array.Empty<Enum>());
+	public static readonly StyledProperty<Enum[]> AvailableValuesProperty = AvaloniaProperty.Register<VideoConfigOverrideView, Enum[]>(nameof(ShowBisqwitFilter), []);
 
 	public bool ShowBisqwitFilter {
 		get { return GetValue(ShowBisqwitFilterProperty); }

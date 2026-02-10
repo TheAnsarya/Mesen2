@@ -291,7 +291,7 @@ public class PceasSymbolImporter : ISymbolProvider {
 									}
 								}
 
-								string[] fileData = this.ProcessSourceFile(filePath, comment, File.Exists(fullPath) ? File.ReadAllLines(fullPath) : Array.Empty<string>());
+								string[] fileData = this.ProcessSourceFile(filePath, comment, File.Exists(fullPath) ? File.ReadAllLines(fullPath) : []);
 								string ext = Path.GetExtension(filePath).ToLower();
 								bool isAsm = ext is not ".c" and not ".h";
 								_sourceFiles[fileId] = new SourceFileInfo(filePath, isAsm, new PceasSourceFile() { Data = fileData });
@@ -366,7 +366,7 @@ public class PceasSymbolImporter : ISymbolProvider {
 	}
 
 	class PceasSourceFile : IFileDataProvider {
-		public string[] Data { get; init; } = Array.Empty<string>();
+		public string[] Data { get; init; } = [];
 	}
 
 	private readonly struct SymbolInfo {

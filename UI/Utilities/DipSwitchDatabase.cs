@@ -42,7 +42,7 @@ public class DipSwitchDatabase {
 					gameDipswitches.DefaultDipSwitches = UInt32.Parse(defaultDip);
 				}
 
-				gameDipswitches.DipSwitches = new List<DipSwitchDefinition>();
+				gameDipswitches.DipSwitches = [];
 
 				int unknownCount = 0;
 				XmlNodeList dipSwitchNodes = gameNode.SelectNodes("DipSwitch") ?? throw new Exception("Invalid entry");

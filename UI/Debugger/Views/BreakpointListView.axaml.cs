@@ -15,7 +15,7 @@ using Nexen.Utilities;
 using Nexen.ViewModels;
 using static Nexen.Debugger.ViewModels.BreakpointListViewModel;
 
-namespace Nexen.Debugger.Views; 
+namespace Nexen.Debugger.Views;
 public class BreakpointListView : UserControl {
 	public BreakpointListView() {
 		InitializeComponent();

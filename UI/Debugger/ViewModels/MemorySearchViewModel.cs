@@ -278,7 +278,7 @@ public class MemorySearchViewModel : DisposableViewModel {
 		byte[] mem = MemoryState;
 		byte[] prevMem = PrevMemoryState;
 
-		AddressCounters[] counters = Array.Empty<AddressCounters>();
+		AddressCounters[] counters = [];
 		foreach ((string column, ListSortDirection order) in SortState.SortOrder) {
 			if (column.Contains("Read") || column.Contains("Write") || column.Contains("Exec")) {
 				//Only get counters if user sorted on a counter column

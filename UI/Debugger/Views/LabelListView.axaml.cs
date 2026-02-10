@@ -9,7 +9,7 @@ using Nexen.Debugger.ViewModels;
 using Nexen.Debugger.Windows;
 using static Nexen.Debugger.ViewModels.LabelListViewModel;
 
-namespace Nexen.Debugger.Views; 
+namespace Nexen.Debugger.Views;
 public class LabelListView : UserControl {
 	public LabelListView() {
 		InitializeComponent();

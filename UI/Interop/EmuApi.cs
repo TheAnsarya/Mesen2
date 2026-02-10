@@ -314,7 +314,7 @@ public class RomInfo {
 	public RomFormat Format = RomFormat.Unknown;
 	public ConsoleType ConsoleType = ConsoleType.Snes;
 	public InteropDipSwitchInfo DipSwitches;
-	public HashSet<CpuType> CpuTypes = new HashSet<CpuType>();
+	public HashSet<CpuType> CpuTypes = [];
 
 	public RomInfo() { }
 

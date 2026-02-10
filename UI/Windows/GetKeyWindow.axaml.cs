@@ -20,7 +20,7 @@ namespace Nexen.Windows;
 public class GetKeyWindow : NexenWindow {
 	private DispatcherTimer _timer;
 
-	private List<UInt16> _prevScanCodes = new List<UInt16>();
+	private List<UInt16> _prevScanCodes = [];
 	private TextBlock lblCurrentKey;
 	private bool _allowKeyboardOnly;
 

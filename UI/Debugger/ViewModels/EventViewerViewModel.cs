@@ -556,7 +556,7 @@ public class EventViewerViewModel : DisposableViewModel {
 	public static string GetEventDetails(CpuType cpuType, DebugEventInfo evt, bool singleLine) {
 		bool isDma = evt.DmaChannel >= 0 && (evt.Operation.Type == MemoryOperationType.DmaWrite || evt.Operation.Type == MemoryOperationType.DmaRead);
 
-		List<string> details = new List<string>();
+		List<string> details = [];
 		if (evt.Flags.HasFlag(EventFlags.PreviousFrame)) {
 			details.Add("Previous frame");
 		}

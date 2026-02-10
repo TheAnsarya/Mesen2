@@ -322,7 +322,7 @@ public abstract class SdccSymbolImporter : ISymbolProvider {
 	}
 
 	class SdccSourceFile : IFileDataProvider {
-		public string[] Data { get; init; } = Array.Empty<string>();
+		public string[] Data { get; init; } = [];
 	}
 
 	private readonly struct SymbolInfo {

@@ -32,7 +32,7 @@ public class NesInputConfigViewModel : DisposableViewModel {
 	[ObservableAsProperty] public bool HasFourPlayerAdapter { get; }
 	[ObservableAsProperty] public bool HasExpansionHub { get; }
 	[ObservableAsProperty] public string ExpConfigLabel { get; } = "";
-	[ObservableAsProperty] public Enum[] AvailableControllerTypesExpansionHub { get; } = Array.Empty<Enum>();
+	[ObservableAsProperty] public Enum[] AvailableControllerTypesExpansionHub { get; } = [];
 
 	public Enum[] AvailableControllerTypesP1 => new Enum[] {
 		ControllerType.None,
@@ -160,7 +160,7 @@ public class NesInputConfigViewModel : DisposableViewModel {
 			shortcuts[shortcut.Shortcut] = shortcut;
 		}
 
-		ShortcutKeys = new List<ShortcutKeyInfo>();
+		ShortcutKeys = [];
 
 		if (Design.IsDesignMode) {
 			return;

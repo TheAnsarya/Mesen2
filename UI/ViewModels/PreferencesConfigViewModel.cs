@@ -124,7 +124,7 @@ public class PreferencesConfigViewModel : DisposableViewModel {
 			shortcuts[shortcut.Shortcut] = shortcut;
 		}
 
-		ShortcutKeys = new List<ShortcutKeyInfo>();
+		ShortcutKeys = [];
 		for (int i = 0; i < displayOrder.Length; i++) {
 			if (shortcuts.ContainsKey(displayOrder[i])) {
 				ShortcutKeys.Add(shortcuts[displayOrder[i]]);

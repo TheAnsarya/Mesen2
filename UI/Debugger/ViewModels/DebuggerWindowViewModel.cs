@@ -903,7 +903,7 @@ public class DebuggerWindowViewModel : DisposableViewModel {
 			} else if (def.Type == VectorType.Direct) {
 				return (int)def.Address;
 			} else {
-				byte[] vector = Array.Empty<byte>();
+				byte[] vector = [];
 				if (def.Type == VectorType.x86) {
 					vector = DebugApi.GetMemoryValues(CpuType.ToMemoryType(), def.Address, def.Address + 3);
 				} else if (def.Type == VectorType.x86WithOffset) {

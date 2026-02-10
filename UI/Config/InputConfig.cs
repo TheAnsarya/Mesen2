@@ -205,7 +205,7 @@ public class ControllerConfig : BaseConfig<ControllerConfig> {
 	}
 
 	public void InitDefaults<T>(DefaultKeyMappingType defaultMappings, ControllerType type) where T : KeyMapping, new() {
-		List<T> mappings = new List<T>();
+		List<T> mappings = [];
 		if (defaultMappings.HasFlag(DefaultKeyMappingType.Xbox)) {
 			T mapping = new T();
 			mapping.SetDefaultKeys(type, KeyPresetType.XboxP1);

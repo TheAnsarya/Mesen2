@@ -10,7 +10,7 @@ using Nexen.Utilities;
 namespace Nexen.Config; 
 public class RecentItems {
 	private const int MaxRecentFiles = 10;
-	public List<RecentItem> Items { get; set; } = new List<RecentItem>();
+	public List<RecentItem> Items { get; set; } = [];
 
 	public void AddRecentFile(ResourcePath romFile, ResourcePath? patchFile) {
 		if (patchFile.HasValue && string.IsNullOrWhiteSpace(patchFile)) {

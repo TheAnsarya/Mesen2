@@ -22,7 +22,7 @@ public class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTypeModel 
 	/// <summary>
 	/// Gets or sets the list of register viewer tabs, one per hardware subsystem.
 	/// </summary>
-	[Reactive] public List<RegisterViewerTab> Tabs { get; set; } = new List<RegisterViewerTab>();
+	[Reactive] public List<RegisterViewerTab> Tabs { get; set; } = [];
 
 	/// <summary>
 	/// Gets the configuration settings for the register viewer.
@@ -161,7 +161,7 @@ public class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTypeModel 
 			return;
 		}
 
-		List<RegisterViewerTab> tabs = new List<RegisterViewerTab>();
+		List<RegisterViewerTab> tabs = [];
 		BaseState lastState = _state;
 
 		if (lastState is SnesState snesState) {

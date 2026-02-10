@@ -162,7 +162,7 @@ public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOve
 	/// <summary>
 	/// Gets or sets the list of available configuration presets.
 	/// </summary>
-	[Reactive] public List<ConfigPreset> ConfigPresets { get; set; } = new List<ConfigPreset>();
+	[Reactive] public List<ConfigPreset> ConfigPresets { get; set; } = [];
 
 	/// <summary>
 	/// Gets the File menu actions.
@@ -730,7 +730,7 @@ public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOve
 	private void DrawNesChrPageDelimiters() {
 		double pageHeight = (double)256 / ColumnCount * 8;
 		double y = pageHeight;
-		List<PictureViewerLine> delimiters = new List<PictureViewerLine>();
+		List<PictureViewerLine> delimiters = [];
 		int yMax = RowCount * 8;
 
 		while (y < yMax) {

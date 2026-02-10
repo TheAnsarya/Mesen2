@@ -414,7 +414,7 @@ public class SnesRegisterViewer {
 
 	private static RegisterViewerTab GetSnesDspTab(ref SnesState state) {
 		DspState dsp = state.Dsp;
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		void AddReg(int i, string name, bool signed = false) {
 			entries.Add(new RegEntry("$" + i.ToString("X2"), name, signed ? (sbyte)dsp.Regs[i] : dsp.Regs[i], Format.X8));
@@ -529,7 +529,7 @@ public class SnesRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetSnesDmaTab(ref SnesState state) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		for (int i = 0; i < 8; i++) {
 			DmaChannelConfig ch = state.Dma.Channels[i];

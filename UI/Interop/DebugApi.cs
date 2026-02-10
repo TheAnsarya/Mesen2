@@ -218,7 +218,7 @@ public class DebugApi {
 		byte[] availableIndexes = new byte[8];
 		GetAvailableInputOverrides(availableIndexes);
 
-		List<int> indexes = new List<int>();
+		List<int> indexes = [];
 		for (int i = 0; i < 8; i++) {
 			if (availableIndexes[i] != 0) {
 				indexes.Add(i);
@@ -436,7 +436,7 @@ public class DebugApi {
 			return UTF8Encoding.UTF8.GetString(tokenListBuffer, 0, index).Split("|", StringSplitOptions.RemoveEmptyEntries);
 		}
 
-		return Array.Empty<string>();
+		return [];
 	}
 
 	[DllImport(DllPath)] public static extern void ResetMemoryAccessCounts();

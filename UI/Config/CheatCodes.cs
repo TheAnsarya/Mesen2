@@ -12,7 +12,7 @@ namespace Nexen.Config;
 public class CheatCodes {
 	private static string FilePath { get { return Path.Combine(ConfigManager.CheatFolder, EmuApi.GetRomInfo().GetRomName() + ".json"); } }
 
-	public List<CheatCode> Cheats { get; set; } = new List<CheatCode>();
+	public List<CheatCode> Cheats { get; set; } = [];
 
 	public static CheatCodes LoadCheatCodes() {
 		return Deserialize(CheatCodes.FilePath);
@@ -52,7 +52,7 @@ public class CheatCodes {
 	}
 
 	public static void ApplyCheats(IEnumerable<CheatCode> cheats) {
-		List<InteropCheatCode> encodedCheats = new List<InteropCheatCode>();
+		List<InteropCheatCode> encodedCheats = [];
 		foreach (CheatCode cheat in cheats) {
 			if (cheat.Enabled) {
 				encodedCheats.AddRange(cheat.ToInteropCheats());
@@ -70,7 +70,7 @@ public class CheatCode : ViewModelBase {
 	[Reactive] public string Codes { get; set; } = "";
 
 	public List<InteropCheatCode> ToInteropCheats() {
-		List<InteropCheatCode> encodedCheats = new List<InteropCheatCode>();
+		List<InteropCheatCode> encodedCheats = [];
 		foreach (string code in Codes.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)) {
 			encodedCheats.Add(new InteropCheatCode(Type, code));
 		}

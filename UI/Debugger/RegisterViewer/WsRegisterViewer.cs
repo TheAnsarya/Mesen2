@@ -23,7 +23,7 @@ public class WsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetPpuTab(ref WsState ws) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 		WsPpuState ppu = ws.Ppu;
 
 		byte volumeLevel = 0;
@@ -125,7 +125,7 @@ public class WsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetApuTab(ref WsState ws) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		WsApuState apu = ws.Apu;
 
@@ -239,7 +239,7 @@ public class WsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetDmaTab(ref WsState ws) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		WsDmaControllerState dma = ws.DmaController;
 
@@ -271,7 +271,7 @@ public class WsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetTimerTab(ref WsState ws) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		WsTimerState timer = ws.Timer;
 		entries.AddRange(new List<RegEntry>() {
@@ -289,7 +289,7 @@ public class WsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetIrqTab(ref WsState ws) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		WsMemoryManagerState mm = ws.MemoryManager;
 		WsSerialState serial = ws.Serial;
@@ -352,7 +352,7 @@ public class WsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetCartTab(ref WsState ws) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		WsCartState cart = ws.Cart;
 
@@ -379,7 +379,7 @@ public class WsRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetMiscTab(ref WsState ws) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		WsMemoryManagerState mm = ws.MemoryManager;
 		WsSerialState serial = ws.Serial;

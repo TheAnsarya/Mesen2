@@ -53,7 +53,7 @@ public class FileDialogHelper {
 		}
 
 		try {
-			List<FilePickerFileType> filter = new List<FilePickerFileType>();
+			List<FilePickerFileType> filter = [];
 			foreach (string ext in extensions) {
 				if (ext == FileDialogHelper.RomExt) {
 					filter.Add(new FilePickerFileType("All supported files") {
@@ -112,7 +112,7 @@ public class FileDialogHelper {
 		}
 
 		try {
-			List<FilePickerFileType> filter = new List<FilePickerFileType>();
+			List<FilePickerFileType> filter = [];
 			foreach (string ext in extensions) {
 				filter.Add(new FilePickerFileType(ext.ToUpper() + " files") { Patterns = new List<string>() { "*." + ext } });
 			}

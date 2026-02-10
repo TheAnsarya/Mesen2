@@ -18,7 +18,7 @@ public class GbaRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetGbaMiscTab(ref GbaState gbaState) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		GbaMemoryManagerState memManager = gbaState.MemoryManager;
 		GbaGpioState gpio = gbaState.Cart.Gpio;
@@ -115,7 +115,7 @@ public class GbaRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetGbaPpuTab(ref GbaState gbaState) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		GbaPpuState ppu = gbaState.Ppu;
 		entries.AddRange(new List<RegEntry>() {
@@ -269,7 +269,7 @@ public class GbaRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetGbaApuTab(ref GbaState gbaState) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		GbaApuState apu = gbaState.Apu.Common;
 		entries.AddRange(new List<RegEntry>() {
@@ -415,7 +415,7 @@ public class GbaRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetGbaTimerTab(ref GbaState gbaState) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		GbaTimersState timers = gbaState.Timer;
 		for (int i = 0; i < 4; i++) {
@@ -444,7 +444,7 @@ public class GbaRegisterViewer {
 	}
 
 	private static RegisterViewerTab GetGbaDmaTab(ref GbaState gbaState) {
-		List<RegEntry> entries = new List<RegEntry>();
+		List<RegEntry> entries = [];
 
 		GbaDmaControllerState state = gbaState.Dma;
 		for (int i = 0; i < 4; i++) {

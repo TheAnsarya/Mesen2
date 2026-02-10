@@ -24,7 +24,7 @@ public class WatchWindowViewModel : ViewModelBase {
 	/// <summary>
 	/// Gets or sets the list of watch tabs, one per available CPU type.
 	/// </summary>
-	[Reactive] public List<WatchTab> WatchTabs { get; set; } = new List<WatchTab>();
+	[Reactive] public List<WatchTab> WatchTabs { get; set; } = [];
 
 	/// <summary>
 	/// Gets or sets the currently selected watch tab.

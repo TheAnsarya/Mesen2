@@ -17,7 +17,7 @@ using Nexen.Utilities;
 using Nexen.Windows;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.ViewModels; 
+namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the update prompt dialog.
 /// Handles checking for updates, downloading, and installing new versions.
@@ -191,7 +191,7 @@ public class UpdatePromptViewModel : ViewModelBase {
 }
 
 public class UpdateFileInfo {
-	public string[] Platform { get; set; } = Array.Empty<string>();
+	public string[] Platform { get; set; } = [];
 	public string DownloadUrl { get; set; } = "";
 	public string Hash { get; set; } = "";
 }
@@ -199,7 +199,7 @@ public class UpdateFileInfo {
 public class UpdateInfo {
 	public Version LatestVersion { get; set; } = new();
 	public string ReleaseNotes { get; set; } = "";
-	public UpdateFileInfo[] Files { get; set; } = Array.Empty<UpdateFileInfo>();
+	public UpdateFileInfo[] Files { get; set; } = [];
 }
 
 /// <summary>

@@ -55,7 +55,7 @@ public partial class NexenList<T> : IAvaloniaList<T>, IList {
 	/// Initializes a new instance of the <see cref="AvaloniaList{T}"/> class.
 	/// </summary>
 	public NexenList() {
-		_inner = new List<T>();
+		_inner = [];
 	}
 
 	/// <summary>

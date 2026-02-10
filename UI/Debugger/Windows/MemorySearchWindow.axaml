@@ -30,7 +30,7 @@
 			<Setter Property="Background" Value="LightCoral" />
 		</Style>
 	</Window.Styles>
-	
+
 	<DockPanel>
 		<DockPanel DockPanel.Dock="Right" Margin="3">
 			<c:ButtonWithIcon
@@ -40,7 +40,7 @@
 				Text="{l:Translate btnResetCounters}"
 				Command="{Binding ResetCounters}"
 		  />
-			
+
 			<StackPanel>
 				<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
 					<TextBlock Text="{l:Translate lblMemType}" />
@@ -106,7 +106,7 @@
 					</c:GroupBox>
 					<c:GroupBox Header="{l:Translate lblOperator}">
 						<StackPanel>
-							<c:EnumRadioButton 
+							<c:EnumRadioButton
 								Value="{Binding Operator}"
 								CheckedWhen="{x:Static dvm:MemorySearchOperator.Equal}"
 							/>
@@ -132,7 +132,7 @@
 							/>
 						</StackPanel>
 					</c:GroupBox>
-				
+
 					<DockPanel>
 						<c:ButtonWithIcon
 							Icon="Assets/Find.png"

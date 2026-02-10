@@ -25,7 +25,7 @@ public class HdPackBuilderViewModel : DisposableViewModel {
 	[Reactive] public FilterInfo? SelectedFilter { get; set; }
 	[Reactive] public BankSizeInfo SelectedBankSize { get; set; }
 
-	[Reactive] public FilterInfo[] Filters { get; private set; } = Array.Empty<FilterInfo>();
+	[Reactive] public FilterInfo[] Filters { get; private set; } = [];
 
 	public BankSizeInfo[] BankSizes { get; } = {
 		new BankSizeInfo() { Name = "1 KB", BankSize = 0x400 },

@@ -204,7 +204,7 @@ public abstract class WlaDxImporter : ISymbolProvider {
 									}
 								}
 
-								string[] fileData = File.Exists(fullPath) ? File.ReadAllLines(fullPath) : Array.Empty<string>();
+								string[] fileData = File.Exists(fullPath) ? File.ReadAllLines(fullPath) : [];
 								_sourceFiles[fileId] = new SourceFileInfo(filePath, true, new WlaDxFile() { Data = fileData });
 							}
 						}
@@ -282,7 +282,7 @@ public abstract class WlaDxImporter : ISymbolProvider {
 	protected abstract AddressInfo GetLabelAddress(int bank, int addr);
 
 	class WlaDxFile : IFileDataProvider {
-		public string[] Data { get; init; } = Array.Empty<string>();
+		public string[] Data { get; init; } = [];
 	}
 
 	private readonly struct SymbolInfo {

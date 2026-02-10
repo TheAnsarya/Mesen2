@@ -10,7 +10,7 @@ using Nexen.Interop;
 using Nexen.Localization;
 using Nexen.Windows;
 
-namespace Nexen.Utilities; 
+namespace Nexen.Utilities;
 public static class FirmwareHelper {
 	public static string GetFileHash(string filename) {
 		var hashes = RomHashService.ComputeFileHashes(filename);

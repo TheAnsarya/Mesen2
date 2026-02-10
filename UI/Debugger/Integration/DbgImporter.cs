@@ -32,26 +32,26 @@ public abstract class DbgImporter : ISymbolProvider {
 	private Dictionary<int, ScopeInfo> _scopes = new Dictionary<int, ScopeInfo>();
 	private Dictionary<int, SymbolInfo> _symbols = new Dictionary<int, SymbolInfo>();
 	private Dictionary<int, CSymbolInfo> _cSymbols = new Dictionary<int, CSymbolInfo>();
-	private HashSet<int> _usedFileIds = new HashSet<int>();
-	private HashSet<string> _usedLabels = new HashSet<string>();
+	private HashSet<int> _usedFileIds = [];
+	private HashSet<string> _usedLabels = [];
 
 	private Dictionary<MemoryType, Dictionary<int, CodeLabel>> _labelsByType = new();
 
-	private HashSet<string> _filesNotFound = new HashSet<string>();
+	private HashSet<string> _filesNotFound = [];
 	private int _errorCount = 0;
 
 	private Dictionary<int, SourceCodeLocation> _linesByPrgAddress = new Dictionary<int, SourceCodeLocation>();
 	private Dictionary<int, LineInfo?[]> _linesByFile = new Dictionary<int, LineInfo?[]>();
 	private Dictionary<string, int> _prgAddressByLine = new Dictionary<string, int>();
 	private Dictionary<string, int> _prgAddressEndByLine = new Dictionary<string, int>();
-	protected HashSet<int> _scopeSpans = new HashSet<int>();
+	protected HashSet<int> _scopeSpans = [];
 
 	private Dictionary<int, ScopeInfo> _scopesBySymbol = new Dictionary<int, ScopeInfo>();
 
 	public DateTime SymbolFileStamp { get; private set; }
 	public string SymbolPath { get; private set; } = "";
 
-	public List<SourceFileInfo> SourceFiles { get; } = new List<SourceFileInfo>();
+	public List<SourceFileInfo> SourceFiles { get; } = [];
 
 	private CpuType _cpuType;
 	private MemoryType _cpuMemType;
@@ -349,7 +349,7 @@ public abstract class DbgImporter : ISymbolProvider {
 		int? fileID = null;
 		int? lineNumber = null;
 		LineType type = LineType.Assembly;
-		int[] spanIds = Array.Empty<int>();
+		int[] spanIds = [];
 
 		DbgReader.ReadEntry(row, (ref ReadOnlySpan<char> name, ref ReadOnlySpan<char> data) => {
 			if (name.IsEqual("id")) {
@@ -434,7 +434,7 @@ public abstract class DbgImporter : ISymbolProvider {
 			string name = match.Groups[2].Value;
 			int? symbolID = match.Groups[4].Success ? (int?)Int32.Parse(match.Groups[4].Value) : null;
 
-			int[] spans = Array.Empty<int>();
+			int[] spans = [];
 			if (match.Groups[6].Success) {
 				spans = match.Groups[6].Value.Split('+').Select(o => Int32.Parse(o)).ToArray();
 				Array.ForEach(spans, id => _scopeSpans.Add(id));
@@ -461,8 +461,8 @@ public abstract class DbgImporter : ISymbolProvider {
 		int? segmentId = null;
 		int? exportSymbolId = null;
 		int? size = null;
-		int[] definitions = Array.Empty<int>();
-		int[] references = Array.Empty<int>();
+		int[] definitions = [];
+		int[] references = [];
 		string? type = null;
 
 		DbgReader.ReadEntry(row, (ref ReadOnlySpan<char> name, ref ReadOnlySpan<char> data) => {
@@ -963,7 +963,7 @@ public abstract class DbgImporter : ISymbolProvider {
 			LoadComments();
 		}
 
-		List<CodeLabel> labelsToImport = new List<CodeLabel>();
+		List<CodeLabel> labelsToImport = [];
 		foreach (MemoryType memType in _memTypesToImport) {
 			if (_labelsByType.TryGetValue(memType, out var labels) && ConfigManager.Config.Debug.Integration.IsMemoryTypeImportEnabled(memType)) {
 				labelsToImport.AddRange(labels.Values);
@@ -1026,7 +1026,7 @@ public abstract class DbgImporter : ISymbolProvider {
 				if (field != null) {
 					return field;
 				} else {
-					field = _sourceFile == null || !File.Exists(_sourceFile) ? Array.Empty<string>() : File.ReadAllLines(_sourceFile);
+					field = _sourceFile == null || !File.Exists(_sourceFile) ? [] : File.ReadAllLines(_sourceFile);
 				}
 
 				return field;

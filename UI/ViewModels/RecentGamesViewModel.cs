@@ -32,7 +32,7 @@ public class RecentGamesViewModel : ViewModelBase {
 	[Reactive] public GameScreenMode Mode { get; private set; }
 
 	/// <summary>Gets or sets the list of game entries to display.</summary>
-	[Reactive] public List<RecentGameInfo> GameEntries { get; private set; } = new List<RecentGameInfo>();
+	[Reactive] public List<RecentGameInfo> GameEntries { get; private set; } = [];
 
 	/// <summary>
 	/// Whether the current mode supports deleting entries (e.g., SaveStatePicker)
@@ -53,7 +53,7 @@ public class RecentGamesViewModel : ViewModelBase {
 	public void Init(GameScreenMode mode) {
 		if (mode == GameScreenMode.RecentGames && ConfigManager.Config.Preferences.GameSelectionScreenMode == GameSelectionMode.Disabled) {
 			Visible = false;
-			GameEntries = new List<RecentGameInfo>();
+			GameEntries = [];
 			return;
 		} else if (mode != GameScreenMode.RecentGames && Mode == mode && Visible) {
 			Visible = false;
