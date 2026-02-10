@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Nexen.Utilities; 
-public class VirtualArray<T> where T : struct {
+public sealed class VirtualArray<T> where T : struct {
 	private const int BatchSize = 0x10000;
 
 	private int _size;

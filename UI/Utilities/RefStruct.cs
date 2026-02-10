@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Nexen.Utilities; 
-public class RefStruct<T> where T : struct {
+public sealed class RefStruct<T> where T : struct {
 	private T _value;
 
 	public RefStruct(T value) {

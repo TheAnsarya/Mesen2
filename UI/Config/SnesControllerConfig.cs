@@ -6,7 +6,7 @@ using Nexen.Localization;
 using Nexen.ViewModels;
 
 namespace Nexen.Config; 
-public class SnesControllerConfig : ControllerConfig {
+public sealed class SnesControllerConfig : ControllerConfig {
 	public new SnesKeyMapping Mapping1 { get => (SnesKeyMapping)_mapping1; set => _mapping1 = value; }
 	public new SnesKeyMapping Mapping2 { get => (SnesKeyMapping)_mapping2; set => _mapping2 = value; }
 	public new SnesKeyMapping Mapping3 { get => (SnesKeyMapping)_mapping3; set => _mapping3 = value; }
@@ -20,7 +20,7 @@ public class SnesControllerConfig : ControllerConfig {
 	}
 }
 
-public class SnesKeyMapping : KeyMapping {
+public sealed class SnesKeyMapping : KeyMapping {
 	public UInt16[]? MouseButtons { get; set; } = null;
 	public UInt16[]? SuperScopeButtons { get; set; } = null;
 

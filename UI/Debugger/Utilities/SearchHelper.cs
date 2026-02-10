@@ -317,7 +317,7 @@ public record SearchResultInfo {
 }
 
 
-public class GoToDestination {
+public sealed class GoToDestination {
 	public CodeLabel? Label;
 	public AddressInfo? AbsoluteAddress;
 	public AddressInfo? RelativeAddress;

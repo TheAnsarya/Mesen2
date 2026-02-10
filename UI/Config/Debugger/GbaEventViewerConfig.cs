@@ -4,7 +4,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class GbaEventViewerConfig : ViewModelBase {
+public sealed class GbaEventViewerConfig : ViewModelBase {
 	[Reactive] public EventViewerCategoryCfg PaletteReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x29, 0xC9, 0x29));
 	[Reactive] public EventViewerCategoryCfg PaletteWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
 	[Reactive] public EventViewerCategoryCfg VramReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xDA, 0xB4, 0x7A));

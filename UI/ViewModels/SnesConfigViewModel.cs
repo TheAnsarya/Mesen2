@@ -7,7 +7,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class SnesConfigViewModel : DisposableViewModel {
+public sealed class SnesConfigViewModel : DisposableViewModel {
 	[Reactive] public SnesConfig Config { get; set; }
 	[Reactive] public SnesConfig OriginalConfig { get; set; }
 	[Reactive] public SnesConfigTab SelectedTab { get; set; } = 0;

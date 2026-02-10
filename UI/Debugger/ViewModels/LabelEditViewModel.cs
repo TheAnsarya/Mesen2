@@ -29,7 +29,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Uses ReactiveUI observables to provide real-time validation feedback as the user types.
 /// </para>
 /// </remarks>
-public class LabelEditViewModel : DisposableViewModel {
+public sealed class LabelEditViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the reactive code label being edited.
 	/// </summary>
@@ -193,7 +193,7 @@ public class LabelEditViewModel : DisposableViewModel {
 	/// Call <see cref="Commit"/> to save changes back to the original label.
 	/// </para>
 	/// </remarks>
-	public class ReactiveCodeLabel : ReactiveObject {
+	public sealed class ReactiveCodeLabel : ReactiveObject {
 		private CodeLabel _originalLabel;
 
 		/// <summary>

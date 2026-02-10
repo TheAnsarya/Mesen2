@@ -23,7 +23,7 @@ public enum SyncChangeType {
 /// <summary>
 /// Information about a file change.
 /// </summary>
-public class SyncChangeInfo {
+public sealed class SyncChangeInfo {
 	public SyncChangeType ChangeType { get; init; }
 	public string FilePath { get; init; } = "";
 	public string? OldPath { get; init; }
@@ -45,7 +45,7 @@ public enum ConflictResolution {
 /// Manages bidirectional file synchronization between Pansy and Nexen native formats.
 /// Uses FileSystemWatcher to detect external changes.
 /// </summary>
-public class SyncManager : IDisposable {
+public sealed class SyncManager : IDisposable {
 	private readonly Dictionary<string, FileSystemWatcher> _watchers = new();
 	private readonly ConcurrentQueue<SyncChangeInfo> _pendingChanges = new();
 	private readonly object _syncLock = new();
@@ -442,7 +442,7 @@ public class SyncManager : IDisposable {
 /// <summary>
 /// Event args for sync conflicts.
 /// </summary>
-public class SyncConflictEventArgs : EventArgs {
+public sealed class SyncConflictEventArgs : EventArgs {
 	public string FilePath { get; init; } = "";
 	public string LocalTimestamp { get; init; } = "";
 	public string ExternalTimestamp { get; init; } = "";

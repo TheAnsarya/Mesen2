@@ -12,7 +12,7 @@ using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Controls; 
-public class BreakpointBar : Control {
+public sealed class BreakpointBar : Control {
 	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) {
 		BreakpointManager.BreakpointsChanged += BreakpointManager_BreakpointsChanged;
 		if (DataContext is DisassemblyViewModel disModel) {

@@ -5,7 +5,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
 namespace Nexen.Utilities; 
-public class DynamicBitmap : WriteableBitmap, IDynamicBitmap {
+public sealed class DynamicBitmap : WriteableBitmap, IDynamicBitmap {
 	public event EventHandler? Invalidated;
 
 	public List<Rect>? HighlightRects { get; set; }
@@ -28,7 +28,7 @@ public interface IDynamicBitmap {
 	void Invalidate();
 }
 
-public class DynamicBitmapLock : IDisposable {
+public sealed class DynamicBitmapLock : IDisposable {
 	public ILockedFramebuffer FrameBuffer { get; private set; }
 	private DynamicBitmap _bitmap;
 	private bool _forReadAccess;

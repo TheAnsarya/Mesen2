@@ -13,7 +13,7 @@ namespace Nexen.Utilities;
 /// Provides color manipulation utilities with caching for performance.
 /// Supports automatic theme-aware color inversion for dark mode.
 /// </summary>
-public class ColorHelper {
+public sealed class ColorHelper {
 	// Cache for brushes by color (light theme)
 	private static readonly Dictionary<uint, SolidColorBrush> _brushCache = new();
 	// Cache for brushes by color (dark theme - inverted)

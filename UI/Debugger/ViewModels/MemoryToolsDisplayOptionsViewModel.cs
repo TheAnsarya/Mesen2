@@ -20,7 +20,7 @@ namespace Nexen.Debugger.ViewModels;
 /// ViewModel for the memory tools display options panel.
 /// Controls display preferences for the hex editor including column widths and platform-specific visualization options.
 /// </summary>
-public class MemoryToolsDisplayOptionsViewModel : DisposableViewModel {
+public sealed class MemoryToolsDisplayOptionsViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets the hex editor configuration containing display settings.
 	/// </summary>

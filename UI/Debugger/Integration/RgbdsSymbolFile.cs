@@ -12,7 +12,7 @@ using Nexen.Windows;
 
 namespace Nexen.Debugger.Integration;
 
-public class RgbdsSymbolFile {
+public sealed class RgbdsSymbolFile {
 	private static bool IsValidRow(string row) {
 		return GetBankAddressLabel(row, out _, out _, out _);
 	}

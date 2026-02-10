@@ -7,7 +7,7 @@ using Nexen.Debugger.Controls;
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Utilities; 
-public class PaletteHelper {
+public sealed class PaletteHelper {
 	public static DynamicTooltip GetPreviewPanel(UInt32[] rgbPalette, UInt32[] rawPalette, RawPaletteFormat format, int index, DynamicTooltip? tooltipToUpdate, int colorsPerPalette = 0) {
 		TooltipEntries entries = tooltipToUpdate?.Items ?? new();
 		entries.StartUpdate();

@@ -4,7 +4,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class SnesEventViewerConfig : ViewModelBase {
+public sealed class SnesEventViewerConfig : ViewModelBase {
 	[Reactive] public EventViewerCategoryCfg PpuRegisterCgramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
 	[Reactive] public EventViewerCategoryCfg PpuRegisterVramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));
 	[Reactive] public EventViewerCategoryCfg PpuRegisterOamWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x53, 0xD7, 0x44));

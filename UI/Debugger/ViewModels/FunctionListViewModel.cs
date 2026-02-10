@@ -31,7 +31,7 @@ namespace Nexen.Debugger.ViewModels;
 /// - Label editing for unnamed functions
 /// - Breakpoint and navigation support
 /// </remarks>
-public class FunctionListViewModel : DisposableViewModel {
+public sealed class FunctionListViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the observable collection of function view models.
 	/// </summary>
@@ -194,7 +194,7 @@ public class FunctionListViewModel : DisposableViewModel {
 /// ViewModel wrapper for a single function entry point.
 /// Implements <see cref="INotifyPropertyChanged"/> for UI data binding.
 /// </summary>
-public class FunctionViewModel : INotifyPropertyChanged {
+public sealed class FunctionViewModel : INotifyPropertyChanged {
 	/// <summary>
 	/// Format string for address display based on CPU address size.
 	/// </summary>

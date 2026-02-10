@@ -12,7 +12,7 @@ using Nexen.Windows;
 
 namespace Nexen.Debugger.Integration;
 
-public class LegacyPceasSymbolFile {
+public sealed class LegacyPceasSymbolFile {
 	public static bool IsValidFile(string content) {
 		return content.Contains("Bank\tAddr\tLabel") || content.Contains("Label\t\t\t\tAddr\tBank");
 	}

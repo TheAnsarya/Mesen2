@@ -9,7 +9,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
 
-public class ConsoleOverrideConfig : BaseConfig<GameConfig> {
+public sealed class ConsoleOverrideConfig : BaseConfig<GameConfig> {
 	[Reactive] public bool OverrideVideoFilter { get; set; } = false;
 	[Reactive] public VideoFilterType VideoFilter { get; set; } = VideoFilterType.None;
 

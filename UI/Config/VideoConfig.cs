@@ -10,7 +10,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class VideoConfig : BaseConfig<VideoConfig> {
+public sealed class VideoConfig : BaseConfig<VideoConfig> {
 	[Reactive][MinMax(0.1, 5.0)] public double CustomAspectRatio { get; set; } = 1.0;
 	[Reactive] public VideoFilterType VideoFilter { get; set; } = VideoFilterType.None;
 	[Reactive] public VideoAspectRatio AspectRatio { get; set; } = VideoAspectRatio.NoStretching;

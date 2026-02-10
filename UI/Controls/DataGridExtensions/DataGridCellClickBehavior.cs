@@ -12,7 +12,7 @@ namespace Nexen.Controls.DataGridExtensions;
 /// <summary>
 /// Event args for DataGrid cell click events, providing the clicked row item and column.
 /// </summary>
-public class DataGridCellClickEventArgs : EventArgs {
+public sealed class DataGridCellClickEventArgs : EventArgs {
 	/// <summary>The data item of the clicked row.</summary>
 	public object? RowItem { get; init; }
 
@@ -169,7 +169,7 @@ public static class DataGridCellClickBehavior {
 /// <summary>
 /// Routed event args for cell click events on DataGrid.
 /// </summary>
-public class DataGridCellClickRoutedEventArgs : RoutedEventArgs {
+public sealed class DataGridCellClickRoutedEventArgs : RoutedEventArgs {
 	public DataGridCellClickRoutedEventArgs(RoutedEvent routedEvent) : base(routedEvent) { }
 
 	/// <summary>The data item of the clicked row.</summary>

@@ -6,7 +6,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.StatusViews; 
-public class GsuStatusViewModel : BaseConsoleStatusViewModel {
+public sealed class GsuStatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt16 Reg0 { get; set; }
 	[Reactive] public UInt16 Reg1 { get; set; }
 	[Reactive] public UInt16 Reg2 { get; set; }

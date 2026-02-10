@@ -11,7 +11,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class SmsConfigViewModel : DisposableViewModel {
+public sealed class SmsConfigViewModel : DisposableViewModel {
 	[Reactive] public SmsConfig Config { get; set; }
 	[Reactive] public SmsConfig OriginalConfig { get; set; }
 	[Reactive] public SmsConfigTab SelectedTab { get; set; } = 0;

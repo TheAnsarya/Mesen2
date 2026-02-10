@@ -13,7 +13,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class NesConfigViewModel : DisposableViewModel {
+public sealed class NesConfigViewModel : DisposableViewModel {
 	private NotificationListener? _listener = null;
 
 	[Reactive] public NesConfig Config { get; set; }

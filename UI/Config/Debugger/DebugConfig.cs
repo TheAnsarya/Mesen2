@@ -11,7 +11,7 @@ using Nexen.Debugger;
 using Nexen.Interop;
 
 namespace Nexen.Config; 
-public class DebugConfig {
+public sealed class DebugConfig {
 	public DebuggerShortcutsConfig Shortcuts { get; set; } = new();
 	public TraceLoggerConfig TraceLogger { get; set; } = new();
 	public HexEditorConfig HexEditor { get; set; } = new();

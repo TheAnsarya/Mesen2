@@ -1,3 +1,3 @@
 namespace Nexen.Config; 
-public class WatchWindowConfig : BaseWindowConfig<WatchWindowConfig> {
+public sealed class WatchWindowConfig : BaseWindowConfig<WatchWindowConfig> {
 }

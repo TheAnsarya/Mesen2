@@ -31,7 +31,7 @@ namespace Nexen.Debugger.ViewModels;
 /// - Context menu with add, edit, delete, and navigation actions
 /// - Integration with breakpoints and watch expressions
 /// </remarks>
-public class LabelListViewModel : DisposableViewModel {
+public sealed class LabelListViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the observable collection of label view models.
 	/// </summary>
@@ -238,7 +238,7 @@ public class LabelListViewModel : DisposableViewModel {
 /// ViewModel wrapper for a single code label, providing display-friendly properties.
 /// Implements <see cref="INotifyPropertyChanged"/> for UI data binding.
 /// </summary>
-public class LabelViewModel : INotifyPropertyChanged {
+public sealed class LabelViewModel : INotifyPropertyChanged {
 	/// <summary>
 	/// Indicates whether the label's memory type is an unmapped type (e.g., PRG ROM).
 	/// </summary>

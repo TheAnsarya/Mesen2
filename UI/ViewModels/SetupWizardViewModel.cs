@@ -13,7 +13,7 @@ namespace Nexen.ViewModels;
 /// ViewModel for the first-run setup wizard.
 /// Handles initial configuration of storage location, controller mappings, and shortcuts.
 /// </summary>
-public class SetupWizardViewModel : ViewModelBase {
+public sealed class SetupWizardViewModel : ViewModelBase {
 	/// <summary>Gets or sets whether to store configuration in the user profile folder.</summary>
 	[Reactive] public bool StoreInUserProfile { get; set; } = true;
 

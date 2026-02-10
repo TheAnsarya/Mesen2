@@ -4,7 +4,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class DebuggerFontConfig : BaseConfig<DebuggerFontConfig> {
+public sealed class DebuggerFontConfig : BaseConfig<DebuggerFontConfig> {
 	[Reactive] public FontConfig DisassemblyFont { get; set; } = new() { FontFamily = "Consolas", FontSize = 14 };
 	[Reactive] public FontConfig MemoryViewerFont { get; set; } = new() { FontFamily = "Consolas", FontSize = 14 };
 	[Reactive] public FontConfig AssemblerFont { get; set; } = new() { FontFamily = "Consolas", FontSize = 14 };

@@ -5,7 +5,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class EventViewerCategoryCfg : ViewModelBase {
+public sealed class EventViewerCategoryCfg : ViewModelBase {
 	[Reactive] public bool Visible { get; set; } = true;
 	[Reactive] public UInt32 Color { get; set; }
 

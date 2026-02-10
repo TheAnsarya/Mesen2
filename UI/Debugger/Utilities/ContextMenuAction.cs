@@ -183,7 +183,7 @@ public abstract class BaseMenuAction : ViewModelBase, IDisposable {
 	}
 }
 
-public class MainMenuAction : BaseMenuAction {
+public sealed class MainMenuAction : BaseMenuAction {
 	/// <summary>
 	/// Shortcuts that should always be enabled regardless of emulator state.
 	/// </summary>
@@ -237,7 +237,7 @@ public class ContextMenuAction : BaseMenuAction {
 	}
 }
 
-public class ContextMenuSeparator : ContextMenuAction {
+public sealed class ContextMenuSeparator : ContextMenuAction {
 	public override string Name => "-";
 
 	public ContextMenuSeparator() {
@@ -245,7 +245,7 @@ public class ContextMenuSeparator : ContextMenuAction {
 	}
 }
 
-public class SimpleCommand : ICommand {
+public sealed class SimpleCommand : ICommand {
 	private Action _commandAction;
 
 #pragma warning disable CS0067 // The event 'SimpleCommand.CanExecuteChanged' is never used

@@ -10,7 +10,7 @@ using Nexen.Debugger.Utilities;
 using Nexen.Interop;
 
 namespace Nexen.Utilities; 
-internal class TestRunner {
+internal sealed class TestRunner {
 	internal static int Run(string[] args) {
 		ConfigManager.DisableSaveSettings = true;
 		CommandLineHelper commandLineHelper = new(args, true);

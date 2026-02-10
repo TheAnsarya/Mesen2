@@ -14,7 +14,7 @@ namespace Nexen.ViewModels;
 /// ViewModel for the storage folder selection dialog.
 /// Handles migrating configuration between portable and user profile storage.
 /// </summary>
-public class SelectStorageFolderViewModel : ViewModelBase {
+public sealed class SelectStorageFolderViewModel : ViewModelBase {
 	/// <summary>Gets or sets whether to store in the user profile folder.</summary>
 	[Reactive] public bool StoreInUserProfile { get; set; }
 

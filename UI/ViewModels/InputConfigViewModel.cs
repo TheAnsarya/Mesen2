@@ -7,7 +7,7 @@ namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the input configuration tab.
 /// </summary>
-public class InputConfigViewModel : DisposableViewModel {
+public sealed class InputConfigViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the current input configuration.</summary>
 	[Reactive] public InputConfig Config { get; set; }
 

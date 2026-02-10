@@ -9,7 +9,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class AudioPlayerConfig : BaseConfig<AudioPlayerConfig> {
+public sealed class AudioPlayerConfig : BaseConfig<AudioPlayerConfig> {
 	[Reactive] public UInt32 Volume { get; set; } = 100;
 	[Reactive] public bool Repeat { get; set; } = false;
 	[Reactive] public bool Shuffle { get; set; } = false;

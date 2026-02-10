@@ -11,7 +11,7 @@ using Nexen.Localization;
 using Nexen.Utilities;
 
 namespace Nexen.Debugger.Utilities; 
-internal class DebugSharedActions {
+internal sealed class DebugSharedActions {
 	public static List<ContextMenuAction> GetStepActions(Control wnd, Func<CpuType> getCpuType) {
 		return new List<ContextMenuAction>() {
 			new ContextMenuAction() {

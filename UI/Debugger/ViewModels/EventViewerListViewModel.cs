@@ -28,7 +28,7 @@ namespace Nexen.Debugger.ViewModels;
 /// graphical event viewer display.
 /// </para>
 /// </remarks>
-public class EventViewerListViewModel : DisposableViewModel {
+public sealed class EventViewerListViewModel : DisposableViewModel {
 	/// <summary>Gets the raw debug event data from the emulator.</summary>
 	public DebugEventInfo[] RawDebugEvents { get; private set; } = [];
 

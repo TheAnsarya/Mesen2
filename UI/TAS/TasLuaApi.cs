@@ -12,7 +12,7 @@ namespace Nexen.TAS;
 /// Provides Lua scripting API for TAS operations.
 /// Exposes movie manipulation, input search, and automation functions to Lua scripts.
 /// </summary>
-public class TasLuaApi {
+public sealed class TasLuaApi {
 	private readonly TasEditorViewModel _viewModel;
 	private readonly GreenzoneManager _greenzone;
 	private readonly InputRecorder _recorder;

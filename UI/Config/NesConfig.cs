@@ -9,7 +9,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class NesConfig : BaseConfig<NesConfig> {
+public sealed class NesConfig : BaseConfig<NesConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 	//Input

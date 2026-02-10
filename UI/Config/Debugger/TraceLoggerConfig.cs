@@ -14,7 +14,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class TraceLoggerConfig : BaseWindowConfig<TraceLoggerConfig> {
+public sealed class TraceLoggerConfig : BaseWindowConfig<TraceLoggerConfig> {
 	[Reactive] public bool AutoRefresh { get; set; } = true;
 	[Reactive] public bool RefreshOnBreakPause { get; set; } = true;
 	[Reactive] public bool ShowToolbar { get; set; } = true;

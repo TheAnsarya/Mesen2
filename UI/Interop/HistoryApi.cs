@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Nexen.Config;
 
 namespace Nexen.Interop; 
-public class HistoryApi {
+public sealed class HistoryApi {
 	private const string DllPath = EmuApi.DllName;
 
 	[DllImport(DllPath)] public static extern void HistoryViewerInitialize(IntPtr windowHandle, IntPtr viewerHandle);

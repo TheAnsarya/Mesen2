@@ -1,7 +1,7 @@
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class TraceLoggerCpuConfig : BaseConfig<TraceLoggerCpuConfig> {
+public sealed class TraceLoggerCpuConfig : BaseConfig<TraceLoggerCpuConfig> {
 	[Reactive] public bool Enabled { get; set; } = true;
 
 	[Reactive] public bool ShowRegisters { get; set; } = true;

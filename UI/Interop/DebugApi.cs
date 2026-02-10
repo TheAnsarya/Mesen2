@@ -14,7 +14,7 @@ using Nexen.Debugger;
 using Nexen.Utilities;
 
 namespace Nexen.Interop; 
-public class DebugApi {
+public sealed class DebugApi {
 	private const string DllPath = EmuApi.DllName;
 	[DllImport(DllPath)] public static extern void InitializeDebugger();
 	[DllImport(DllPath)] public static extern void ReleaseDebugger();
@@ -754,7 +754,7 @@ public struct InteropEventViewerCategoryCfg {
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public class InteropSnesEventViewerConfig {
+public sealed class InteropSnesEventViewerConfig {
 	public InteropEventViewerCategoryCfg Irq;
 	public InteropEventViewerCategoryCfg Nmi;
 	public InteropEventViewerCategoryCfg MarkedBreakpoints;
@@ -783,7 +783,7 @@ public class InteropSnesEventViewerConfig {
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public class InteropNesEventViewerConfig {
+public sealed class InteropNesEventViewerConfig {
 	public InteropEventViewerCategoryCfg Irq;
 	public InteropEventViewerCategoryCfg Nmi;
 	public InteropEventViewerCategoryCfg MarkedBreakpoints;
@@ -816,7 +816,7 @@ public class InteropNesEventViewerConfig {
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public class InteropGbEventViewerConfig {
+public sealed class InteropGbEventViewerConfig {
 	public InteropEventViewerCategoryCfg Irq;
 	public InteropEventViewerCategoryCfg MarkedBreakpoints;
 
@@ -853,7 +853,7 @@ public class InteropGbEventViewerConfig {
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public class InteropGbaEventViewerConfig {
+public sealed class InteropGbaEventViewerConfig {
 	public InteropEventViewerCategoryCfg Irq;
 	public InteropEventViewerCategoryCfg MarkedBreakpoints;
 
@@ -893,7 +893,7 @@ public class InteropGbaEventViewerConfig {
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public class InteropPceEventViewerConfig {
+public sealed class InteropPceEventViewerConfig {
 	public InteropEventViewerCategoryCfg Irq;
 	public InteropEventViewerCategoryCfg MarkedBreakpoints;
 
@@ -932,7 +932,7 @@ public class InteropPceEventViewerConfig {
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public class InteropSmsEventViewerConfig {
+public sealed class InteropSmsEventViewerConfig {
 	public InteropEventViewerCategoryCfg Irq;
 	public InteropEventViewerCategoryCfg Nmi;
 	public InteropEventViewerCategoryCfg MarkedBreakpoints;
@@ -959,7 +959,7 @@ public class InteropSmsEventViewerConfig {
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public class InteropWsEventViewerConfig {
+public sealed class InteropWsEventViewerConfig {
 	public InteropEventViewerCategoryCfg PpuPaletteRead;
 	public InteropEventViewerCategoryCfg PpuPaletteWrite;
 	public InteropEventViewerCategoryCfg PpuVramRead;
@@ -1008,7 +1008,7 @@ public enum TilemapHighlightMode {
 	Writes
 }
 
-public class GetTilemapOptions {
+public sealed class GetTilemapOptions {
 	public byte Layer;
 	public byte[]? CompareVram;
 	public AddressCounters[]? AccessCounters;

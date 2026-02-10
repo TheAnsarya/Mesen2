@@ -82,7 +82,7 @@ public static class FirmwareTypeExtensions {
 	}
 }
 
-public class FirmwareFiles : List<FirmwareFileInfo> {
+public sealed class FirmwareFiles : List<FirmwareFileInfo> {
 	public string[] Names;
 
 	public FirmwareFiles(string filename) : this(new string[] { filename }) {

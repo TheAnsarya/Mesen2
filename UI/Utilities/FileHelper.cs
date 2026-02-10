@@ -21,7 +21,7 @@ namespace Nexen.Utilities;
 /// retries are exhausted.
 /// </para>
 /// </remarks>
-internal class FileHelper {
+internal sealed class FileHelper {
 	/// <summary>
 	/// Reads all text from a file with retry logic.
 	/// </summary>

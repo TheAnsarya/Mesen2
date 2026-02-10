@@ -31,7 +31,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Uses ReactiveUI observables to track property changes and update validation state.
 /// </para>
 /// </remarks>
-public class BreakpointEditViewModel : DisposableViewModel {
+public sealed class BreakpointEditViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the breakpoint being edited.
 	/// </summary>

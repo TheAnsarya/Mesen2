@@ -6,7 +6,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class SnesInputConfigViewModel : DisposableViewModel {
+public sealed class SnesInputConfigViewModel : DisposableViewModel {
 	[Reactive] public SnesConfig Config { get; set; }
 
 	[ObservableAsProperty] public bool HasMultitap1 { get; }

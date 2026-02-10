@@ -32,7 +32,7 @@ namespace Nexen.ViewModels;
 /// ViewModel for the main application menu.
 /// Manages all menu items for File, Game, Options, Tools, Debug, and Help menus.
 /// </summary>
-public class MainMenuViewModel : ViewModelBase {
+public sealed class MainMenuViewModel : ViewModelBase {
 	/// <summary>Gets or sets the parent main window ViewModel.</summary>
 	public MainWindowViewModel MainWindow { get; set; }
 

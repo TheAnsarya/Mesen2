@@ -24,7 +24,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Displays background layer tilemaps from VRAM with support for multiple layers,
 /// scroll position overlays, and tile editing.
 /// </summary>
-public class TilemapViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
+public sealed class TilemapViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
 	/// <summary>
 	/// Gets or sets the CPU type for this tilemap viewer instance.
 	/// </summary>
@@ -891,14 +891,14 @@ public class TilemapViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouse
 	}
 }
 
-public class TilemapViewerTab : ViewModelBase {
+public sealed class TilemapViewerTab : ViewModelBase {
 	[Reactive] public string Title { get; set; } = "";
 	[Reactive] public int Layer { get; set; } = 0;
 	[Reactive] public MemoryType? VramMemoryType { get; set; }
 	[Reactive] public bool Enabled { get; set; } = true;
 }
 
-public class TilemapViewerData {
+public sealed class TilemapViewerData {
 	public DebugTilemapInfo TilemapInfo;
 	public UInt64 MasterClock;
 	public BaseState? PpuState;

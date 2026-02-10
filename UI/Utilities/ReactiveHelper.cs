@@ -76,7 +76,7 @@ public static class ReactiveHelper {
 	}
 }
 
-public class RecursiveObserver : IDisposable {
+public sealed class RecursiveObserver : IDisposable {
 	private readonly ReactiveObject _target;
 	private readonly PropertyChangedEventHandler _handler;
 

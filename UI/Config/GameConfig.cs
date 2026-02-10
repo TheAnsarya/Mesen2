@@ -13,7 +13,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class GameConfig : BaseConfig<GameConfig> {
+public sealed class GameConfig : BaseConfig<GameConfig> {
 	[Reactive] public UInt32 DipSwitches { get; set; } = 0;
 
 	[Reactive] public bool OverrideOverscan { get; set; } = false;

@@ -5,7 +5,7 @@ using static Nexen.Debugger.ViewModels.RegEntry;
 
 namespace Nexen.Debugger.RegisterViewer;
 
-public class GbaRegisterViewer {
+public sealed class GbaRegisterViewer {
 	public static List<RegisterViewerTab> GetTabs(ref GbaState gbaState) {
 		List<RegisterViewerTab> tabs = new List<RegisterViewerTab>() {
 			GetGbaPpuTab(ref gbaState),

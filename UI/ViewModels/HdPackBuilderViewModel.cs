@@ -16,7 +16,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class HdPackBuilderViewModel : DisposableViewModel {
+public sealed class HdPackBuilderViewModel : DisposableViewModel {
 	[Reactive] public string SaveFolder { get; set; }
 	[Reactive] public bool IsRecording { get; set; }
 	[Reactive] public bool IsBankSizeVisible { get; set; }
@@ -131,7 +131,7 @@ public class HdPackBuilderViewModel : DisposableViewModel {
 		}
 	}
 
-	public class FilterInfo {
+	public sealed class FilterInfo {
 		public string Name { get; set; } = "";
 		public ScaleFilterType FilterType { get; set; }
 		public UInt32 Scale { get; set; }
@@ -141,7 +141,7 @@ public class HdPackBuilderViewModel : DisposableViewModel {
 		}
 	}
 
-	public class BankSizeInfo {
+	public sealed class BankSizeInfo {
 		public string Name { get; set; } = "";
 		public UInt32 BankSize { get; set; }
 

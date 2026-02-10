@@ -4,7 +4,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class NesDebuggerConfig : ViewModelBase {
+public sealed class NesDebuggerConfig : ViewModelBase {
 	[Reactive] public bool BreakOnBrk { get; set; } = false;
 	[Reactive] public bool BreakOnUnofficialOpCode { get; set; } = false;
 	[Reactive] public bool BreakOnUnstableOpCode { get; set; } = true;

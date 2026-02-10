@@ -51,7 +51,7 @@ public enum MemoryRegionType : byte {
 /// <summary>
 /// Export options for Pansy file generation.
 /// </summary>
-public class PansyExportOptions {
+public sealed class PansyExportOptions {
 	public bool IncludeMemoryRegions { get; set; } = true;
 	public bool IncludeCrossReferences { get; set; } = true;
 	public bool IncludeDataBlocks { get; set; } = true;

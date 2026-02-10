@@ -13,7 +13,7 @@ using Nexen.Windows;
 
 namespace Nexen.Debugger.Integration;
 
-public class PceasSymbolImporter : ISymbolProvider {
+public sealed class PceasSymbolImporter : ISymbolProvider {
 	private static Regex _definitionRegex = new Regex(@"^([0-9a-fA-F]{8}) ([^\s]*)", RegexOptions.Compiled);
 	private static Regex _symbolRegex = new Regex(@"^([0-9a-fA-F]{2,4})[:]{0,1}([0-9a-fA-F]{4}) ([0-9a-fA-F]{8}) ([0-9a-fA-F]{4}):([0-9a-fA-F]{8}):([0-9a-fA-F]{2}) ([^\s]*)", RegexOptions.Compiled);
 	private static Regex _fileRegex = new Regex(@"^([0-9a-fA-F]{4}) (.*)", RegexOptions.Compiled);

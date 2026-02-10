@@ -26,7 +26,7 @@ namespace Nexen.Debugger.ViewModels;
 /// </list>
 /// </para>
 /// </remarks>
-public class RefreshTimingViewModel : ViewModelBase {
+public sealed class RefreshTimingViewModel : ViewModelBase {
 	/// <summary>Gets the refresh timing configuration being edited.</summary>
 	public RefreshTimingConfig Config { get; }
 

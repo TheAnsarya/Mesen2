@@ -13,7 +13,7 @@ using Nexen.Debugger.ViewModels.DebuggerDock;
 
 namespace Nexen.Debugger;
 
-public class DebuggerDockFactory : Factory {
+public sealed class DebuggerDockFactory : Factory {
 		public ToolContainerViewModel<DisassemblyViewModel> DisassemblyTool { get; private set; }
 		public ToolContainerViewModel<SourceViewViewModel> SourceViewTool { get; private set; }
 		public ToolContainerViewModel<BaseConsoleStatusViewModel> StatusTool { get; private set; }
@@ -247,7 +247,7 @@ public class DebuggerDockFactory : Factory {
 		Tool
 	}
 
-	public class DockEntryDefinition {
+	public sealed class DockEntryDefinition {
 		public DockEntryType Type { get; set; }
 		public double Proportion { get; set; } = 0;
 		public Orientation Orientation { get; set; } = Orientation.Horizontal;

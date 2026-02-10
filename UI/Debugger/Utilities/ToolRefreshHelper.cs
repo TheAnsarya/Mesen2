@@ -22,7 +22,7 @@ public static class ToolRefreshHelper {
 		internal CpuType CpuType { get; set; }
 	}
 
-	public class LastRefreshInfo {
+	public sealed class LastRefreshInfo {
 		public WeakReference<Window> Host;
 		public DateTime Stamp;
 

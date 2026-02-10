@@ -11,7 +11,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class PceConfigViewModel : DisposableViewModel {
+public sealed class PceConfigViewModel : DisposableViewModel {
 	[Reactive] public PcEngineConfig Config { get; set; }
 	[Reactive] public PcEngineConfig OriginalConfig { get; set; }
 	[Reactive] public PceConfigTab SelectedTab { get; set; } = 0;

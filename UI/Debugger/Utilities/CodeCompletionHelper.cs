@@ -10,7 +10,7 @@ using Nexen.Interop;
 using Nexen.Localization;
 
 namespace Nexen.Debugger.Utilities; 
-public class CodeCompletionHelper {
+public sealed class CodeCompletionHelper {
 	private static Dictionary<string, DocEntryViewModel> _documentation;
 
 	private static Regex _linkRegex = new Regex("emu[.](([a-zA-Z0-9]+)(\\([a-zA-Z0-9 ,]*\\)){0,1})", RegexOptions.Compiled);
@@ -339,7 +339,7 @@ public enum DocEntrySubcategory {
 	Others
 }
 
-public class DocEntryViewModel {
+public sealed class DocEntryViewModel {
 	public string Name { get; set; } = "";
 	public string Description { get; set; } = "";
 	public DocEntryCategory Category { get; set; } = DocEntryCategory.Callbacks;
@@ -385,7 +385,7 @@ public class DocEntryViewModel {
 	}
 }
 
-public class DocParam {
+public sealed class DocParam {
 	public string Name { get; set; } = "";
 	public string Type { get; set; } = "";
 	public string EnumName { get; set; } = "";
@@ -404,12 +404,12 @@ public class DocParam {
 	}
 }
 
-public class DocReturnValue {
+public sealed class DocReturnValue {
 	public string Type { get; set; } = "";
 	public string Description { get; set; } = "";
 }
 
-public class DocEnumValue {
+public sealed class DocEnumValue {
 	public string Name { get; set; } = "";
 	public string Description { get; set; } = "";
 }

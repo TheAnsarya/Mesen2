@@ -42,7 +42,7 @@ namespace Nexen.Debugger.ViewModels;
 /// </list>
 /// </para>
 /// </remarks>
-public class EventViewerViewModel : DisposableViewModel {
+public sealed class EventViewerViewModel : DisposableViewModel {
 	/// <summary>
 	/// Flag value OR'd with DMA channel number to indicate HDMA (horizontal DMA) on SNES.
 	/// </summary>
@@ -653,7 +653,7 @@ public class EventViewerViewModel : DisposableViewModel {
 /// triggers <see cref="UpdateFields"/> to format all display strings.
 /// </para>
 /// </remarks>
-public class DebugEventViewModel : INotifyPropertyChanged {
+public sealed class DebugEventViewModel : INotifyPropertyChanged {
 	/// <summary>The array of events this ViewModel draws from.</summary>
 	private DebugEventInfo[] _events = [];
 

@@ -10,7 +10,7 @@ using Nexen.Debugger.Labels;
 using Nexen.Interop;
 
 namespace Nexen.Debugger; 
-public class CodeLineData {
+public sealed class CodeLineData {
 	public CpuType CpuType { get; private set; }
 
 	public string Text = "";

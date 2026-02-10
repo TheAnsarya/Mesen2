@@ -19,7 +19,7 @@ using Nexen.Utilities;
 using SkiaSharp;
 
 namespace Nexen.Debugger.Controls; 
-public class PictureViewer : Control {
+public sealed class PictureViewer : Control {
 	public static readonly StyledProperty<IImage> SourceProperty = AvaloniaProperty.Register<PictureViewer, IImage>(nameof(Source));
 	public static readonly StyledProperty<double> ZoomProperty = AvaloniaProperty.Register<PictureViewer, double>(nameof(Zoom), 1, defaultBindingMode: BindingMode.TwoWay);
 	public static readonly StyledProperty<int> GridSizeXProperty = AvaloniaProperty.Register<PictureViewer, int>(nameof(GridSizeX), 8);
@@ -578,7 +578,7 @@ class PictureViewerDrawOperation : ICustomDrawOperation {
 	}
 }
 
-public class PositionClickedEventArgs : RoutedEventArgs {
+public sealed class PositionClickedEventArgs : RoutedEventArgs {
 	public PixelPoint Position { get; }
 	public PointerPointProperties Properties { get; }
 	public PointerEventArgs OriginalEvent { get; }
@@ -591,7 +591,7 @@ public class PositionClickedEventArgs : RoutedEventArgs {
 	}
 }
 
-public class GridRowColumn {
+public sealed class GridRowColumn {
 	public int X;
 	public int Y;
 	public int Width;

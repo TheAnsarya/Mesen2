@@ -9,7 +9,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class CheatCodes {
+public sealed class CheatCodes {
 	private static string FilePath { get { return Path.Combine(ConfigManager.CheatFolder, EmuApi.GetRomInfo().GetRomName() + ".json"); } }
 
 	public List<CheatCode> Cheats { get; set; } = [];
@@ -63,7 +63,7 @@ public class CheatCodes {
 	}
 }
 
-public class CheatCode : ViewModelBase {
+public sealed class CheatCode : ViewModelBase {
 	[Reactive] public string Description { get; set; } = "";
 	[Reactive] public CheatType Type { get; set; }
 	[Reactive] public bool Enabled { get; set; } = true;

@@ -18,7 +18,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
-public class PreferencesConfig : BaseConfig<PreferencesConfig> {
+public sealed class PreferencesConfig : BaseConfig<PreferencesConfig> {
 	[Reactive] public NexenTheme Theme { get; set; } = NexenTheme.Light;
 	[Reactive] public bool AutomaticallyCheckForUpdates { get; set; } = true;
 	[Reactive] public bool SingleInstance { get; set; } = true;

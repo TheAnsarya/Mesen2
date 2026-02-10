@@ -7,7 +7,7 @@ using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Disassembly; 
-public class SourceViewStyleProvider : BaseStyleProvider {
+public sealed class SourceViewStyleProvider : BaseStyleProvider {
 	private SourceViewViewModel _model;
 
 	public SourceViewStyleProvider(CpuType cpuType, SourceViewViewModel model) : base(cpuType) {

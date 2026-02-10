@@ -5,7 +5,7 @@ using static Nexen.Debugger.ViewModels.RegEntry;
 
 namespace Nexen.Debugger.RegisterViewer;
 
-public class SmsRegisterViewer {
+public sealed class SmsRegisterViewer {
 	public static List<RegisterViewerTab> GetTabs(ref SmsState smsState, RomFormat romFormat) {
 		List<RegisterViewerTab> tabs = new() {
 			GetSmsVdpTab(ref smsState),

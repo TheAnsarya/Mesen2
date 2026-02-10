@@ -18,7 +18,7 @@ namespace Nexen.Debugger.ViewModels;
 /// ViewModel for the register viewer window.
 /// Displays hardware register values for the emulated console, organized into tabs by subsystem.
 /// </summary>
-public class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTypeModel {
+public sealed class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTypeModel {
 	/// <summary>
 	/// Gets or sets the list of register viewer tabs, one per hardware subsystem.
 	/// </summary>
@@ -206,7 +206,7 @@ public class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTypeModel 
 /// <summary>
 /// Represents a tab in the register viewer containing registers for a specific hardware subsystem.
 /// </summary>
-public class RegisterViewerTab : ReactiveObject {
+public sealed class RegisterViewerTab : ReactiveObject {
 	/// <summary>Backing field for <see cref="TabName"/>.</summary>
 	private string _name;
 
@@ -275,7 +275,7 @@ public class RegisterViewerTab : ReactiveObject {
 /// Represents a single register entry in the register viewer.
 /// Contains address, name, value, and hex value with support for headers and various value formats.
 /// </summary>
-public class RegEntry : INotifyPropertyChanged {
+public sealed class RegEntry : INotifyPropertyChanged {
 	/// <summary>Background brush used for header rows.</summary>
 	private static ISolidColorBrush HeaderBgBrush = new SolidColorBrush(0x40B0B0B0);
 

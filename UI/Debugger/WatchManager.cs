@@ -36,7 +36,7 @@ namespace Nexen.Debugger;
 /// </list>
 /// </para>
 /// </remarks>
-public class WatchManager {
+public sealed class WatchManager {
 	/// <summary>
 	/// Delegate for handling watch list changes.
 	/// </summary>
@@ -478,7 +478,7 @@ public class WatchManager {
 /// <remarks>
 /// Used for data binding in the watch list UI. Uses ReactiveUI for property notifications.
 /// </remarks>
-public class WatchValueInfo : ReactiveObject {
+public sealed class WatchValueInfo : ReactiveObject {
 	/// <summary>
 	/// Gets or sets the formatted string representation of the value.
 	/// </summary>

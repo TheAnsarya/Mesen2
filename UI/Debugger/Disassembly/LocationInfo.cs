@@ -3,7 +3,7 @@ using Nexen.Debugger.Labels;
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Disassembly; 
-public class LocationInfo {
+public sealed class LocationInfo {
 	public AddressInfo? RelAddress;
 	public AddressInfo? AbsAddress;
 	public CodeLabel? Label;

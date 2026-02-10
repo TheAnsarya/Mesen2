@@ -6,7 +6,7 @@ using Nexen.Localization;
 using Nexen.ViewModels;
 
 namespace Nexen.Config; 
-public class NesControllerConfig : ControllerConfig {
+public sealed class NesControllerConfig : ControllerConfig {
 	public new NesKeyMapping Mapping1 { get => (NesKeyMapping)_mapping1; set => _mapping1 = value; }
 	public new NesKeyMapping Mapping2 { get => (NesKeyMapping)_mapping2; set => _mapping2 = value; }
 	public new NesKeyMapping Mapping3 { get => (NesKeyMapping)_mapping3; set => _mapping3 = value; }
@@ -20,7 +20,7 @@ public class NesControllerConfig : ControllerConfig {
 	}
 }
 
-public class NesKeyMapping : KeyMapping {
+public sealed class NesKeyMapping : KeyMapping {
 	public UInt16[]? PowerPadButtons { get; set; } = null;
 	public UInt16[]? FamilyBasicKeyboardButtons { get; set; } = null;
 	public UInt16[]? PartyTapButtons { get; set; } = null;

@@ -11,7 +11,7 @@ using Nexen.Windows;
 
 namespace Nexen.Debugger.Integration;
 
-public class BassLabelFile {
+public sealed class BassLabelFile {
 	public static void Import(string path, bool showResult, CpuType cpuType) {
 		List<CodeLabel> labels = new List<CodeLabel>(1000);
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 namespace Nexen.Debugger.Utilities; 
-public class NavigationHistory<T> {
+public sealed class NavigationHistory<T> {
 	private List<T> _historyList = [];
 	private int _historyPosition = -1;
 

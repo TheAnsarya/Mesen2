@@ -29,7 +29,7 @@ namespace Nexen.Debugger.ViewModels;
 /// - Sortable columns (Enabled, Marked, Type, Address, Condition)
 /// - Context menu with add, edit, delete, enable/disable, and navigation actions
 /// </remarks>
-public class BreakpointListViewModel : DisposableViewModel {
+public sealed class BreakpointListViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the observable collection of breakpoint view models displayed in the list.
 	/// </summary>
@@ -235,7 +235,7 @@ public class BreakpointListViewModel : DisposableViewModel {
 /// ViewModel wrapper for a single breakpoint, providing display-friendly properties.
 /// Implements <see cref="INotifyPropertyChanged"/> for UI data binding.
 /// </summary>
-public class BreakpointViewModel : INotifyPropertyChanged {
+public sealed class BreakpointViewModel : INotifyPropertyChanged {
 	/// <summary>
 	/// Gets or sets the underlying breakpoint model.
 	/// </summary>

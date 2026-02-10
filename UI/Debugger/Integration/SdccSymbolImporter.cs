@@ -343,7 +343,7 @@ public abstract class SdccSymbolImporter : ISymbolProvider {
 	}
 }
 
-public class NesSdccSymbolImporter : SdccSymbolImporter {
+public sealed class NesSdccSymbolImporter : SdccSymbolImporter {
 	private int _romSize;
 
 	public NesSdccSymbolImporter() {
@@ -369,7 +369,7 @@ public class NesSdccSymbolImporter : SdccSymbolImporter {
 	}
 }
 
-public class SmsSdccSymbolImporter : SdccSymbolImporter {
+public sealed class SmsSdccSymbolImporter : SdccSymbolImporter {
 	protected override bool TryDecodeAddress(int addr, out AddressInfo absAddr) {
 		int bank = addr >> 16;
 		addr &= 0xFFFF;
@@ -387,7 +387,7 @@ public class SmsSdccSymbolImporter : SdccSymbolImporter {
 	}
 }
 
-public class GbSdccSymbolImporter : SdccSymbolImporter {
+public sealed class GbSdccSymbolImporter : SdccSymbolImporter {
 	protected override bool TryDecodeAddress(int addr, out AddressInfo absAddr) {
 		int bank = addr >> 16;
 		addr &= 0xFFFF;

@@ -5,7 +5,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media;
 
 namespace Nexen.Utilities; 
-public class ArgbColorToBrushConverter : IValueConverter {
+public sealed class ArgbColorToBrushConverter : IValueConverter {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
 		if (value is UInt32 c && targetType == typeof(IBrush)) {
 			return new SolidColorBrush(c);

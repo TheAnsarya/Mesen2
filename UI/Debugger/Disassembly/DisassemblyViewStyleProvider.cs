@@ -2,7 +2,7 @@ using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Disassembly; 
-public class DisassemblyViewStyleProvider : BaseStyleProvider {
+public sealed class DisassemblyViewStyleProvider : BaseStyleProvider {
 	private DisassemblyViewModel _model;
 
 	public DisassemblyViewStyleProvider(CpuType cpuType, DisassemblyViewModel model) : base(cpuType) {

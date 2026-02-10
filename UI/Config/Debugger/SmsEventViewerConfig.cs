@@ -4,7 +4,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class SmsEventViewerConfig : ViewModelBase {
+public sealed class SmsEventViewerConfig : ViewModelBase {
 	[Reactive] public EventViewerCategoryCfg VdpPaletteWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
 	[Reactive] public EventViewerCategoryCfg VdpVramWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));
 	[Reactive] public EventViewerCategoryCfg VdpVCounterRead { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x53, 0xD7, 0x44));

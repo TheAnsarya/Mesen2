@@ -30,7 +30,7 @@ namespace Nexen.Debugger.ViewModels;
 /// for systems with coprocessors (SNES SA-1, GSU, etc.) and can log to files.
 /// Features include searching, selection, copying, and configurable display options.
 /// </remarks>
-public class TraceLoggerViewModel : DisposableViewModel, ISelectableModel {
+public sealed class TraceLoggerViewModel : DisposableViewModel, ISelectableModel {
 	/// <summary>
 	/// Gets the trace logger configuration settings.
 	/// </summary>
@@ -625,7 +625,7 @@ public class TraceLoggerViewModel : DisposableViewModel, ISelectableModel {
 /// Each tab controls the logging options for a specific CPU type,
 /// including format customization, register display, and condition filters.
 /// </remarks>
-public class TraceLoggerOptionTab : DisposableViewModel {
+public sealed class TraceLoggerOptionTab : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the display name for the tab.
 	/// </summary>
@@ -958,7 +958,7 @@ public class TraceLoggerOptionTab : DisposableViewModel {
 /// Main CPU uses default colors, secondary CPUs and coprocessors use
 /// distinct colors for easy identification.
 /// </remarks>
-public class TraceLoggerStyleProvider : ILineStyleProvider {
+public sealed class TraceLoggerStyleProvider : ILineStyleProvider {
 	/// <summary>
 	/// The console type for determining main CPU.
 	/// </summary>

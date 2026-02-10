@@ -1,7 +1,7 @@
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Integration; 
-public class PceDbgImporter : DbgImporter {
+public sealed class PceDbgImporter : DbgImporter {
 	public PceDbgImporter(RomFormat romFormat) : base(CpuType.Pce, romFormat, new() { MemoryType.PcePrgRom, MemoryType.PceWorkRam, MemoryType.PceSaveRam, MemoryType.PceCdromRam, MemoryType.PceCardRam }) {
 	}
 

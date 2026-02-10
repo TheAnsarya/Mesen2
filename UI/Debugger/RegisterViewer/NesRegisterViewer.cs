@@ -6,7 +6,7 @@ using static Nexen.Debugger.ViewModels.RegEntry;
 
 namespace Nexen.Debugger.RegisterViewer;
 
-public class NesRegisterViewer {
+public sealed class NesRegisterViewer {
 	public static List<RegisterViewerTab> GetTabs(ref NesState nesState) {
 		List<RegisterViewerTab> tabs = new() {
 			GetNesPpuTab(ref nesState),

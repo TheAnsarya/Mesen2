@@ -6,7 +6,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class CvInputConfigViewModel : DisposableViewModel {
+public sealed class CvInputConfigViewModel : DisposableViewModel {
 	[Reactive] public CvConfig Config { get; set; }
 
 	public Enum[] AvailableControllerTypesP12 => new Enum[] {

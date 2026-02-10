@@ -24,7 +24,7 @@ namespace Nexen.Debugger.ViewModels;
 /// ViewModel for the tile editor window.
 /// Provides pixel-level editing of individual tiles with palette selection and undo/redo support.
 /// </summary>
-public class TileEditorViewModel : DisposableViewModel {
+public sealed class TileEditorViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the bitmap displaying the tile being edited.
 	/// </summary>

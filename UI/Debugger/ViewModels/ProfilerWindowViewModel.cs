@@ -25,7 +25,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Displays function call profiling data including call counts, execution times, and percentages
 /// for performance analysis of emulated code.
 /// </summary>
-public class ProfilerWindowViewModel : DisposableViewModel {
+public sealed class ProfilerWindowViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the list of profiler tabs, one per supported CPU type.
 	/// </summary>
@@ -161,7 +161,7 @@ public class ProfilerWindowViewModel : DisposableViewModel {
 /// Represents a profiler tab for a specific CPU type.
 /// Contains profiler data grid and sorting functionality for that CPU's profiled functions.
 /// </summary>
-public class ProfilerTab : ReactiveObject {
+public sealed class ProfilerTab : ReactiveObject {
 	/// <summary>
 	/// Gets or sets the display name for this tab (typically the CPU type name).
 	/// </summary>
@@ -351,7 +351,7 @@ public static class ProfiledFunctionExtensions {
 /// ViewModel for a single profiled function row in the profiler data grid.
 /// Provides formatted display properties for function statistics.
 /// </summary>
-public class ProfiledFunctionViewModel : INotifyPropertyChanged {
+public sealed class ProfiledFunctionViewModel : INotifyPropertyChanged {
 	/// <summary>
 	/// Event raised when a property value changes.
 	/// </summary>

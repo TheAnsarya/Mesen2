@@ -16,7 +16,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class CheatDatabaseViewModel : DisposableViewModel {
+public sealed class CheatDatabaseViewModel : DisposableViewModel {
 	private List<CheatDbGameEntry> _entries;
 
 	[Reactive] public IEnumerable<CheatDbGameEntry> FilteredEntries { get; set; }

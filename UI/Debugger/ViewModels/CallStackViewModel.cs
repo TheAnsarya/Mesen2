@@ -29,7 +29,7 @@ namespace Nexen.Debugger.ViewModels;
 ///
 /// Supports navigation to any stack frame location and label editing.
 /// </remarks>
-public class CallStackViewModel : DisposableViewModel {
+public sealed class CallStackViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets the CPU type this call stack is associated with.
 	/// </summary>
@@ -211,7 +211,7 @@ public class CallStackViewModel : DisposableViewModel {
 /// Represents a single entry in the call stack display.
 /// Contains both display-formatted strings and raw address data.
 /// </summary>
-public class StackInfo {
+public sealed class StackInfo {
 	/// <summary>
 	/// Gets or sets the entry point label or address for this stack frame.
 	/// </summary>

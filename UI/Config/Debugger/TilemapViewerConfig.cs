@@ -2,7 +2,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class TilemapViewerConfig : BaseWindowConfig<TilemapViewerConfig> {
+public sealed class TilemapViewerConfig : BaseWindowConfig<TilemapViewerConfig> {
 	[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 
 	[Reactive] public double ImageScale { get; set; } = 1;

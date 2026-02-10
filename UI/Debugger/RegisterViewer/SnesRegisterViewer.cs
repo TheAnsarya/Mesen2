@@ -6,7 +6,7 @@ using static Nexen.Debugger.ViewModels.RegEntry;
 
 namespace Nexen.Debugger.RegisterViewer;
 
-public class SnesRegisterViewer {
+public sealed class SnesRegisterViewer {
 	public static List<RegisterViewerTab> GetTabs(ref SnesState snesState, HashSet<CpuType> cpuTypes, byte snesReg4210, byte snesReg4211, byte snesReg4212) {
 		List<RegisterViewerTab> tabs = new() {
 			GetSnesCpuTab(ref snesState, snesReg4210, snesReg4211, snesReg4212),

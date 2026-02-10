@@ -18,7 +18,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class HistoryViewerViewModel : DisposableViewModel {
+public sealed class HistoryViewerViewModel : DisposableViewModel {
 	public HistoryViewerConfig Config { get; init; }
 
 	[Reactive] public bool IsPaused { get; set; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Nexen.Interop;
 
 namespace Nexen.GUI.Utilities; 
-public class ArchiveHelper {
+public sealed class ArchiveHelper {
 	public unsafe static List<ArchiveRomEntry> GetArchiveRomList(string archivePath) {
 		//Split the array on the [!|!] delimiter
 		byte[] buffer = new byte[100000];
@@ -70,7 +70,7 @@ public class ArchiveHelper {
 	}
 }
 
-public class ArchiveRomEntry {
+public sealed class ArchiveRomEntry {
 	public string Filename = "";
 	public bool IsUtf8;
 

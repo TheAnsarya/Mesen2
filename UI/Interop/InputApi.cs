@@ -5,7 +5,7 @@ using Nexen.Config;
 using Nexen.Utilities;
 
 namespace Nexen.Interop; 
-public class InputApi {
+public sealed class InputApi {
 	private const string DllPath = EmuApi.DllName;
 
 	[DllImport(DllPath)] public static extern void SetKeyState(UInt16 scanCode, [MarshalAs(UnmanagedType.I1)] bool pressed);

@@ -8,7 +8,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class MovieRecordConfigViewModel : ViewModelBase {
+public sealed class MovieRecordConfigViewModel : ViewModelBase {
 	[Reactive] public string SavePath { get; set; }
 	[Reactive] public MovieRecordConfig Config { get; set; }
 

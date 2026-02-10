@@ -6,7 +6,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class SmsInputConfigViewModel : DisposableViewModel {
+public sealed class SmsInputConfigViewModel : DisposableViewModel {
 	[Reactive] public SmsConfig Config { get; set; }
 
 	public Enum[] AvailableControllerTypesP12 => new Enum[] {

@@ -16,7 +16,7 @@ namespace Nexen.Debugger.ViewModels;
 /// ViewModel for the sprite viewer list view panel.
 /// Displays sprites in a sortable data grid with selection synchronization to the main sprite viewer.
 /// </summary>
-public class SpriteViewerListViewModel : DisposableViewModel {
+public sealed class SpriteViewerListViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets whether the list view is visible.
 	/// </summary>

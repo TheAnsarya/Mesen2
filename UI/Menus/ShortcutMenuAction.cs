@@ -26,7 +26,7 @@ public enum EnableCategory {
 /// Menu action linked to an EmulatorShortcut.
 /// Handles shortcut key display and execution.
 /// </summary>
-public class ShortcutMenuAction : MenuActionBase {
+public sealed class ShortcutMenuAction : MenuActionBase {
 	/// <summary>The emulator shortcut this action is linked to.</summary>
 	public EmulatorShortcut? Shortcut { get; init; }
 
@@ -85,7 +85,7 @@ public class ShortcutMenuAction : MenuActionBase {
 /// Simple menu action that is always enabled.
 /// Use for items like Open, Exit, Preferences, Help.
 /// </summary>
-public class SimpleMenuAction : MenuActionBase {
+public sealed class SimpleMenuAction : MenuActionBase {
 	/// <summary>Custom shortcut text function.</summary>
 	public Func<string>? CustomShortcutText { get; init; }
 
@@ -113,7 +113,7 @@ public class SimpleMenuAction : MenuActionBase {
 /// <summary>
 /// Menu separator (horizontal line).
 /// </summary>
-public class MenuSeparator : MenuActionBase {
+public sealed class MenuSeparator : MenuActionBase {
 	/// <summary>
 	/// Creates a new menu separator.
 	/// </summary>

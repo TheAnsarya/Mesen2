@@ -32,7 +32,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Supports multiple display formats (hex, decimal, binary, signed/unsigned)
 /// with configurable byte lengths (8, 16, 24, 32 bits).
 /// </remarks>
-public class WatchListViewModel : DisposableViewModel, IToolHelpTooltip {
+public sealed class WatchListViewModel : DisposableViewModel, IToolHelpTooltip {
 	/// <summary>
 	/// Regex pattern for matching watch expressions that are addresses or labels.
 	/// Matches formats like [$FFFF], {123}, [LabelName], etc.

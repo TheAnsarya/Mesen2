@@ -11,7 +11,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
 
-public class SmsConfig : BaseConfig<SmsConfig> {
+public sealed class SmsConfig : BaseConfig<SmsConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 	[Reactive] public ConsoleOverrideConfig GgConfigOverrides { get; set; } = new();
 

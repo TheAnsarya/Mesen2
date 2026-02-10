@@ -13,7 +13,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class OverscanConfig : BaseConfig<OverscanConfig> {
+public sealed class OverscanConfig : BaseConfig<OverscanConfig> {
 	[Reactive][MinMax(0, 100)] public UInt32 Left { get; set; } = 0;
 	[Reactive][MinMax(0, 100)] public UInt32 Right { get; set; } = 0;
 	[Reactive][MinMax(0, 95)] public UInt32 Top { get; set; } = 0;

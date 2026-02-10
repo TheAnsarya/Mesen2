@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class EventViewerConfig : BaseWindowConfig<EventViewerConfig> {
+public sealed class EventViewerConfig : BaseWindowConfig<EventViewerConfig> {
 	[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 
 	[Reactive] public double ImageScale { get; set; } = 1;

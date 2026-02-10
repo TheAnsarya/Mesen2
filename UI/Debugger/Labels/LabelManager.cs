@@ -31,7 +31,7 @@ namespace Nexen.Debugger.Labels;
 /// <c>assert(condition)</c> which creates breakpoints when the condition is false.
 /// </para>
 /// </remarks>
-public class LabelManager {
+public sealed class LabelManager {
 	/// <summary>
 	/// Regex pattern for valid label names: must start with letter/underscore/@,
 	/// followed by letters/digits/underscore/@.

@@ -14,7 +14,7 @@ namespace Nexen.Controls.DataGridExtensions;
 /// Supports single-click for single-column sort, Shift+click for multi-column,
 /// and Ctrl+click to remove a column from sort.
 /// </summary>
-public class SortState {
+public sealed class SortState {
 	/// <summary>
 	/// Ordered list of (ColumnName, Direction) tuples defining the current multi-column sort.
 	/// </summary>

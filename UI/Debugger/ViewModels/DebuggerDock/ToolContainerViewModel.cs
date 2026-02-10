@@ -33,7 +33,7 @@ public class BaseToolContainerViewModel : Tool {
 /// Used to host tool panels in the debugger dock system.
 /// </summary>
 /// <typeparam name="T">The type of the model contained in this tool.</typeparam>
-public class ToolContainerViewModel<T> : BaseToolContainerViewModel {
+public sealed class ToolContainerViewModel<T> : BaseToolContainerViewModel {
 	/// <summary>
 	/// Gets or sets the model instance contained in this tool.
 	/// </summary>

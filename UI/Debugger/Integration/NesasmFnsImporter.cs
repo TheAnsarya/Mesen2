@@ -13,7 +13,7 @@ using Nexen.Windows;
 
 namespace Nexen.Debugger.Integration;
 
-public class NesasmFnsImporter {
+public sealed class NesasmFnsImporter {
 	public static void Import(string path, bool showResult) {
 		//This only works reliably for NROM games with 32kb PRG
 		int errorCount = 0;

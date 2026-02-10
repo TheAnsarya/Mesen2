@@ -11,7 +11,7 @@ using Nexen.Config.Shortcuts;
 using Nexen.Utilities;
 
 namespace Nexen.Interop; 
-public class ConfigApi {
+public sealed class ConfigApi {
 	private const string DllPath = EmuApi.DllName;
 
 	[DllImport(DllPath)] public static extern void SetVideoConfig(InteropVideoConfig config);

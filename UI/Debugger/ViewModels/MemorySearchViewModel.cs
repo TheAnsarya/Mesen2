@@ -39,7 +39,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Maintains search history for undo functionality and supports sorting by various columns.
 /// </para>
 /// </remarks>
-public class MemorySearchViewModel : DisposableViewModel {
+public sealed class MemorySearchViewModel : DisposableViewModel {
 	/// <summary>Gets the memory search configuration.</summary>
 	public MemorySearchConfig Config { get; }
 
@@ -500,7 +500,7 @@ public class MemorySearchViewModel : DisposableViewModel {
 /// Displays current value, previous value, and memory access statistics for a single address.
 /// Uses property change notification to efficiently update only changed fields.
 /// </remarks>
-public class MemoryAddressViewModel : INotifyPropertyChanged {
+public sealed class MemoryAddressViewModel : INotifyPropertyChanged {
 	/// <summary>
 	/// Event raised when a property value changes.
 	/// </summary>

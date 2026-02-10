@@ -12,7 +12,7 @@ using Nexen.Utilities;
 using Nexen.Windows;
 
 namespace Nexen.Debugger.Controls; 
-public class DebuggerKeyBindingButton : Button {
+public sealed class DebuggerKeyBindingButton : Button {
 	protected override Type StyleKeyOverride => typeof(Button);
 
 	public static readonly StyledProperty<DbgShortKeys> KeyBindingProperty = AvaloniaProperty.Register<DebuggerKeyBindingButton, DbgShortKeys>(nameof(KeyBinding), new DbgShortKeys(), false, Avalonia.Data.BindingMode.TwoWay);

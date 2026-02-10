@@ -8,7 +8,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.StatusViews; 
-public class SnesStatusViewModel : BaseConsoleStatusViewModel {
+public sealed class SnesStatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt16 RegA { get; set; }
 	[Reactive] public UInt16 RegX { get; set; }
 	[Reactive] public UInt16 RegY { get; set; }

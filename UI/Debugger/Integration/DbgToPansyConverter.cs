@@ -30,7 +30,7 @@ public static class DbgToPansyConverter {
 	/// <summary>
 	/// Result of a conversion operation.
 	/// </summary>
-	public class ConversionResult {
+	public sealed class ConversionResult {
 		public bool Success { get; set; }
 		public int SymbolsConverted { get; set; }
 		public int CommentsExtracted { get; set; }
@@ -304,7 +304,7 @@ public static class DbgToPansyConverter {
 	/// <summary>
 	/// Represents a symbol in Pansy format.
 	/// </summary>
-	public class PansySymbol {
+	public sealed class PansySymbol {
 		public string Name { get; set; } = "";
 		public uint Address { get; set; }
 		public byte MemoryType { get; set; }

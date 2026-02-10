@@ -27,7 +27,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Displays all sprites currently in OAM (Object Attribute Memory) with selection,
 /// preview panels, and support for editing tile graphics.
 /// </summary>
-public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
+public sealed class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
 	/// <summary>
 	/// Gets the configuration settings for the sprite viewer.
 	/// </summary>
@@ -765,7 +765,7 @@ public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseO
 	}
 }
 
-public class SpriteViewerData {
+public sealed class SpriteViewerData {
 	public BaseState? PpuState;
 	public BaseState? PpuToolsState;
 	public byte[] SpriteRam = [];

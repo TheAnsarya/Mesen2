@@ -6,7 +6,7 @@ using Nexen.Localization;
 using Nexen.ViewModels;
 
 namespace Nexen.Config; 
-public class CvControllerConfig : ControllerConfig {
+public sealed class CvControllerConfig : ControllerConfig {
 	public new CvKeyMapping Mapping1 { get => (CvKeyMapping)_mapping1; set => _mapping1 = value; }
 	public new CvKeyMapping Mapping2 { get => (CvKeyMapping)_mapping2; set => _mapping2 = value; }
 	public new CvKeyMapping Mapping3 { get => (CvKeyMapping)_mapping3; set => _mapping3 = value; }
@@ -20,7 +20,7 @@ public class CvControllerConfig : ControllerConfig {
 	}
 }
 
-public class CvKeyMapping : KeyMapping {
+public sealed class CvKeyMapping : KeyMapping {
 	public UInt16[]? LightPhaserButtons { get; set; } = null;
 	public UInt16[]? ColecoVisionControllerButtons { get; set; } = null;
 

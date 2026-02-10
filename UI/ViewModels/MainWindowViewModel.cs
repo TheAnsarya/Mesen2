@@ -21,7 +21,7 @@ namespace Nexen.ViewModels;
 /// Primary ViewModel for the main application window.
 /// Manages the menu, ROM state, rendering, and recent games display.
 /// </summary>
-public class MainWindowViewModel : ViewModelBase {
+public sealed class MainWindowViewModel : ViewModelBase {
 	/// <summary>Gets the singleton instance of the main window ViewModel.</summary>
 	public static MainWindowViewModel Instance { get; private set; } = null!;
 

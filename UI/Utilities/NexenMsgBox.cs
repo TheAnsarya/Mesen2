@@ -9,7 +9,7 @@ using Nexen.Localization;
 using Nexen.Windows;
 
 namespace Nexen.Utilities; 
-public class NexenMsgBox {
+public sealed class NexenMsgBox {
 	public static Task ShowException(Exception ex) {
 		return NexenMsgBox.Show(null, "UnexpectedError", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.Message + Environment.NewLine + ex.StackTrace);
 	}

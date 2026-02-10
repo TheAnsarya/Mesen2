@@ -6,7 +6,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class PceInputConfigViewModel : DisposableViewModel {
+public sealed class PceInputConfigViewModel : DisposableViewModel {
 	[Reactive] public PcEngineConfig Config { get; set; }
 	[Reactive] public bool HasTurboTap { get; private set; }
 

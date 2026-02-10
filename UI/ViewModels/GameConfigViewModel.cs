@@ -8,7 +8,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class GameConfigViewModel : DisposableViewModel {
+public sealed class GameConfigViewModel : DisposableViewModel {
 	[Reactive] public GameConfig Config { get; set; }
 	public GameDipSwitches DipSwitches { get; }
 

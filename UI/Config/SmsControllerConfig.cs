@@ -6,7 +6,7 @@ using Nexen.Localization;
 using Nexen.ViewModels;
 
 namespace Nexen.Config; 
-public class SmsControllerConfig : ControllerConfig {
+public sealed class SmsControllerConfig : ControllerConfig {
 	public new SmsKeyMapping Mapping1 { get => (SmsKeyMapping)_mapping1; set => _mapping1 = value; }
 	public new SmsKeyMapping Mapping2 { get => (SmsKeyMapping)_mapping2; set => _mapping2 = value; }
 	public new SmsKeyMapping Mapping3 { get => (SmsKeyMapping)_mapping3; set => _mapping3 = value; }
@@ -20,7 +20,7 @@ public class SmsControllerConfig : ControllerConfig {
 	}
 }
 
-public class SmsKeyMapping : KeyMapping {
+public sealed class SmsKeyMapping : KeyMapping {
 	public UInt16[]? LightPhaserButtons { get; set; } = null;
 
 	protected override UInt16[]? GetCustomButtons(ControllerType type) {

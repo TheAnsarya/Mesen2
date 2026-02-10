@@ -4,7 +4,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class HdPackBuilderConfig : BaseConfig<HdPackBuilderConfig> {
+public sealed class HdPackBuilderConfig : BaseConfig<HdPackBuilderConfig> {
 	public ScaleFilterType FilterType { get; set; } = ScaleFilterType.Prescale;
 	public UInt32 Scale { get; set; } = 1;
 	public UInt32 ChrRamBankSize { get; set; } = 0x1000;

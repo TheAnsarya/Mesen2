@@ -24,7 +24,7 @@ namespace Nexen.Debugger.ViewModels;
 /// NES/GB (no shoulder buttons), SMS (limited buttons), WonderSwan (rotated D-pad).
 /// </para>
 /// </remarks>
-public class ControllerInputViewModel : ViewModelBase {
+public sealed class ControllerInputViewModel : ViewModelBase {
 	/// <summary>Gets or sets the view height in pixels for the controller display.</summary>
 	[Reactive] public int ViewHeight { get; set; }
 

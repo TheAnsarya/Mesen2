@@ -13,7 +13,7 @@ namespace Nexen.Controls;
 /// A text box specialized for numeric input with support for hex display,
 /// min/max clamping, and type-safe value conversion.
 /// </summary>
-public class NexenNumericTextBox : TextBox {
+public sealed class NexenNumericTextBox : TextBox {
 	protected override Type StyleKeyOverride => typeof(TextBox);
 
 	private static readonly HexConverter _hexConverter = new();

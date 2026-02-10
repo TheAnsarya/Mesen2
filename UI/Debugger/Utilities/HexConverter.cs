@@ -4,7 +4,7 @@ using Avalonia;
 using Avalonia.Data.Converters;
 
 namespace Nexen.Debugger.Utilities; 
-public class HexConverter : IValueConverter {
+public sealed class HexConverter : IValueConverter {
 	public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) {
 		if (targetType == typeof(string)) {
 			if (parameter is string format && value is IFormattable f) {

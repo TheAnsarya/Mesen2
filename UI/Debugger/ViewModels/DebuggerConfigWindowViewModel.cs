@@ -13,7 +13,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels; 
-public class DebuggerConfigWindowViewModel : DisposableViewModel {
+public sealed class DebuggerConfigWindowViewModel : DisposableViewModel {
 	public DebuggerFontConfig Fonts { get; set; }
 	public DebuggerConfig Debugger { get; set; }
 	public ScriptWindowConfig Script { get; set; }

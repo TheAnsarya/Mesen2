@@ -20,7 +20,7 @@ namespace Nexen.Debugger.ViewModels;
 /// ViewModel for the watch expression window.
 /// Manages watch tabs for each CPU type to monitor expressions and variables during debugging.
 /// </summary>
-public class WatchWindowViewModel : ViewModelBase {
+public sealed class WatchWindowViewModel : ViewModelBase {
 	/// <summary>
 	/// Gets or sets the list of watch tabs, one per available CPU type.
 	/// </summary>
@@ -86,7 +86,7 @@ public class WatchWindowViewModel : ViewModelBase {
 /// Represents a single watch tab for a specific CPU type.
 /// Contains the watch list for monitoring expressions.
 /// </summary>
-public class WatchTab : DisposableViewModel {
+public sealed class WatchTab : DisposableViewModel {
 	/// <summary>
 	/// Gets the display name of the tab (CPU type name).
 	/// </summary>

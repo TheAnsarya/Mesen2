@@ -16,7 +16,7 @@ using Nexen.Views;
 using Nexen.Windows;
 
 namespace Nexen.Utilities; 
-public class MouseManager : IDisposable {
+public sealed class MouseManager : IDisposable {
 	public const int LeftMouseButtonKeyCode = 0x200;
 	public const int RightMouseButtonKeyCode = 0x201;
 	public const int MiddleMouseButtonKeyCode = 0x202;

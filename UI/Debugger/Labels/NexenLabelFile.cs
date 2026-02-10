@@ -31,7 +31,7 @@ namespace Nexen.Debugger.Labels;
 /// supporting all Nexen memory types and extended features.
 /// </para>
 /// </remarks>
-public class NexenLabelFile {
+public sealed class NexenLabelFile {
 	/// <summary>
 	/// Imports labels from a Nexen label file (.nexen-labels / .mlb).
 	/// </summary>

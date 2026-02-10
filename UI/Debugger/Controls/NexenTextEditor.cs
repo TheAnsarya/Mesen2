@@ -11,7 +11,7 @@ using AvaloniaEdit;
 using AvaloniaEdit.Editing;
 
 namespace Nexen.Debugger.Controls; 
-public class NexenTextEditor : TextEditor {
+public sealed class NexenTextEditor : TextEditor {
 	protected override Type StyleKeyOverride => typeof(TextEditor);
 
 	public static readonly StyledProperty<string> TextBindingProperty = AvaloniaProperty.Register<NexenTextEditor, string>(nameof(TextBinding), "", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);

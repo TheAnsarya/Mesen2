@@ -35,7 +35,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Implements <see cref="ISelectableModel"/> for row selection support.
 /// </para>
 /// </remarks>
-public class DisassemblyViewModel : DisposableViewModel, ISelectableModel {
+public sealed class DisassemblyViewModel : DisposableViewModel, ISelectableModel {
 	/// <summary>Gets the code data provider for fetching disassembly lines.</summary>
 	public ICodeDataProvider DataProvider { get; }
 

@@ -11,7 +11,7 @@ using Nexen.ViewModels;
 
 namespace Nexen.Utilities;
 
-public class DisplayMessageHelper {
+public sealed class DisplayMessageHelper {
 	private static int _taskId = 0;
 
 	public static void DisplayMessage(string title, string message, string? param1 = null) {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Nexen.Interop;
 
 namespace Nexen.Config.Shortcuts; 
-public class KeyCombination {
+public sealed class KeyCombination {
 	public UInt16 Key1 { get; set; }
 	public UInt16 Key2 { get; set; }
 	public UInt16 Key3 { get; set; }

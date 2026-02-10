@@ -8,7 +8,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class GbaConfig : BaseConfig<GbaConfig> {
+public sealed class GbaConfig : BaseConfig<GbaConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 	[Reactive] public ControllerConfig Controller { get; set; } = new();

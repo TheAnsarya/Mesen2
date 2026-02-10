@@ -3,9 +3,9 @@ using Nexen.Debugger.Controls;
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Disassembly; 
-public class CodeDataProvider : ICodeDataProvider {
+public sealed class CodeDataProvider : ICodeDataProvider {
 	private int _lineCount;
-	protected CpuType _type;
+	private CpuType _type;
 
 	public CodeDataProvider(CpuType type) {
 		_type = type;

@@ -1,7 +1,7 @@
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Integration; 
-public class NesDbgImporter : DbgImporter {
+public sealed class NesDbgImporter : DbgImporter {
 	public NesDbgImporter(RomFormat romFormat) : base(CpuType.Nes, romFormat, new() { MemoryType.NesPrgRom, MemoryType.NesWorkRam, MemoryType.NesSaveRam, MemoryType.NesInternalRam }) {
 	}
 

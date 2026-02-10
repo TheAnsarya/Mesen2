@@ -18,7 +18,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.ViewModels; 
-public class MemoryToolsViewModel : DisposableViewModel {
+public sealed class MemoryToolsViewModel : DisposableViewModel {
 	[Reactive] public HexEditorConfig Config { get; set; }
 	[Reactive] public int ScrollPosition { get; set; }
 	[Reactive] public HexEditorDataProvider? DataProvider { get; set; }

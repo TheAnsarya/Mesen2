@@ -491,7 +491,7 @@ public static class DebugWorkspaceManager {
 /// Multi-CPU systems (e.g., SNES with main CPU and SA-1, or Super Game Boy)
 /// have separate workspace data for each processor.
 /// </remarks>
-public class CpuDebugWorkspace {
+public sealed class CpuDebugWorkspace {
 	/// <summary>
 	/// Gets or sets the list of watch expression entries for this CPU.
 	/// </summary>
@@ -529,7 +529,7 @@ public class CpuDebugWorkspace {
 /// Workspaces are stored per-ROM in the debugger folder as "{RomName}.json".
 /// </para>
 /// </remarks>
-public class DebugWorkspace {
+public sealed class DebugWorkspace {
 	/// <summary>
 	/// Gets or sets the per-CPU workspace data, keyed by CPU type.
 	/// </summary>

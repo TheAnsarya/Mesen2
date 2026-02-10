@@ -6,7 +6,7 @@ using static Nexen.Debugger.ViewModels.RegEntry;
 
 namespace Nexen.Debugger.RegisterViewer;
 
-public class PceRegisterViewer {
+public sealed class PceRegisterViewer {
 	public static List<RegisterViewerTab> GetTabs(ref PceState pceState) {
 		List<RegisterViewerTab> tabs = new List<RegisterViewerTab>() {
 			GetPceCpuTab(ref pceState)

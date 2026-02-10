@@ -12,7 +12,7 @@ namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the video configuration tab.
 /// </summary>
-public class VideoConfigViewModel : DisposableViewModel {
+public sealed class VideoConfigViewModel : DisposableViewModel {
 	/// <summary>Gets whether to show custom aspect ratio options.</summary>
 	[ObservableAsProperty] public bool ShowCustomRatio { get; }
 

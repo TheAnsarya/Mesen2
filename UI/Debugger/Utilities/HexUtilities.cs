@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Nexen.Debugger.Utilities; 
-public class HexUtilities {
+public sealed class HexUtilities {
 	private static byte[] _hexLookup = new byte[256];
 
 	static HexUtilities() {

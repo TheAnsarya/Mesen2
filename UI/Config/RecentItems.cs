@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Nexen.Utilities;
 
 namespace Nexen.Config; 
-public class RecentItems {
+public sealed class RecentItems {
 	private const int MaxRecentFiles = 10;
 	public List<RecentItem> Items { get; set; } = [];
 
@@ -31,7 +31,7 @@ public class RecentItems {
 	}
 }
 
-public class RecentItem {
+public sealed class RecentItem {
 	public ResourcePath RomFile { get; set; }
 	public ResourcePath? PatchFile { get; set; }
 

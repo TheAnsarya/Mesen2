@@ -323,7 +323,7 @@ public partial class PaletteSelector : Control {
 		SelectedPalette = paletteIndex;
 	}
 
-	public class ColorClickEventArgs : RoutedEventArgs {
+	public sealed class ColorClickEventArgs : RoutedEventArgs {
 		public int ColorIndex;
 		public Color Color;
 

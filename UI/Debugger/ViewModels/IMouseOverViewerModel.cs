@@ -51,7 +51,7 @@ public interface IMouseOverViewerModel {
 /// Tooltips are shown/hidden using the <see cref="TooltipHelper"/> utility class.
 /// </para>
 /// </remarks>
-public class MouseViewerModelEvents {
+public sealed class MouseViewerModelEvents {
 	private IMouseOverViewerModel _model;
 	private Window _wnd;
 

@@ -23,7 +23,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Displays assembly source files from symbol providers with syntax highlighting,
 /// breakpoint integration, and navigation support.
 /// </summary>
-public class SourceViewViewModel : DisposableViewModel, ISelectableModel {
+public sealed class SourceViewViewModel : DisposableViewModel, ISelectableModel {
 	/// <summary>
 	/// Gets or sets the symbol provider for source file information.
 	/// </summary>

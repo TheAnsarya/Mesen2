@@ -37,7 +37,7 @@ namespace Nexen.Debugger.ViewModels;
 /// for adding watches and toggling breakpoints.
 /// </para>
 /// </remarks>
-public class FindResultListViewModel : DisposableViewModel {
+public sealed class FindResultListViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the list of find results.</summary>
 	[Reactive] public NexenList<FindResultViewModel> FindResults { get; private set; } = new();
 
@@ -177,7 +177,7 @@ public class FindResultListViewModel : DisposableViewModel {
 /// <summary>
 /// Represents a single search result with location and display information.
 /// </summary>
-public class FindResultViewModel {
+public sealed class FindResultViewModel {
 	/// <summary>Gets the location information for navigation.</summary>
 	public LocationInfo Location { get; }
 

@@ -25,7 +25,7 @@ namespace Nexen.Debugger.Labels;
 /// Example: "NesPrgRom:8000-80FF:ResetVector:Entry point after reset"
 /// </para>
 /// </remarks>
-public class CodeLabel {
+public sealed class CodeLabel {
 	/// <summary>
 	/// Gets or sets the absolute address within the memory type.
 	/// </summary>

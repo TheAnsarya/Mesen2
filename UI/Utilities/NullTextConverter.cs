@@ -10,7 +10,7 @@ namespace Nexen.Utilities;
 /// the string to null instead of an empty string, causing crashes
 /// in code that does not expect the string to ever be null.
 /// </summary>
-public class NullTextConverter : IValueConverter {
+public sealed class NullTextConverter : IValueConverter {
 	public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) {
 		if (value is string val) {
 			return val ?? "";

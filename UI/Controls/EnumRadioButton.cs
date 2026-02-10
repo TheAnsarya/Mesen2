@@ -11,7 +11,7 @@ namespace Nexen.Controls;
 /// A radio button that binds to an enum value, automatically checking itself
 /// when the bound value matches its <see cref="CheckedWhen"/> property.
 /// </summary>
-public class EnumRadioButton : RadioButton {
+public sealed class EnumRadioButton : RadioButton {
 	protected override Type StyleKeyOverride => typeof(RadioButton);
 
 	public static readonly StyledProperty<Enum> ValueProperty = AvaloniaProperty.Register<EnumRadioButton, Enum>(nameof(Value), defaultBindingMode: BindingMode.TwoWay);

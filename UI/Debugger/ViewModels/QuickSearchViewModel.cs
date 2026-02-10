@@ -32,7 +32,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Search is performed asynchronously to avoid blocking the UI during large searches.
 /// </para>
 /// </remarks>
-public class QuickSearchViewModel : ViewModelBase {
+public sealed class QuickSearchViewModel : ViewModelBase {
 	/// <summary>Gets or sets whether the search box is visible.</summary>
 	[Reactive] public bool IsSearchBoxVisible { get; set; }
 
@@ -178,7 +178,7 @@ public class QuickSearchViewModel : ViewModelBase {
 /// <summary>
 /// Event arguments for find operations in quick search.
 /// </summary>
-public class OnFindEventArgs : EventArgs {
+public sealed class OnFindEventArgs : EventArgs {
 	/// <summary>Gets the search string to find.</summary>
 	public string SearchString { get; init; } = "";
 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Nexen.Config; 
-public class MinMaxAttribute : Attribute {
+public sealed class MinMaxAttribute : Attribute {
 	public object Min { get; set; }
 	public object Max { get; set; }
 
@@ -15,7 +15,7 @@ public class MinMaxAttribute : Attribute {
 	}
 }
 
-public class ValidValuesAttribute : Attribute {
+public sealed class ValidValuesAttribute : Attribute {
 	public Enum[] ValidValues { get; set; }
 
 	public ValidValuesAttribute(params object[] validValues) {

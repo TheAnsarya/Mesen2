@@ -12,7 +12,7 @@ using Nexen.Localization;
 using Nexen.Utilities;
 
 namespace Nexen.Interop;
-public class EmuApi {
+public sealed class EmuApi {
 	public const string DllName = "NexenCore.dll";
 	private const string DllPath = EmuApi.DllName;
 
@@ -308,7 +308,7 @@ public struct InteropRomInfo {
 	public UInt32 CpuTypeCount;
 }
 
-public class RomInfo {
+public sealed class RomInfo {
 	public string RomPath = "";
 	public string PatchPath = "";
 	public RomFormat Format = RomFormat.Unknown;
@@ -513,7 +513,7 @@ public struct InteropSaveStateInfo {
 /// <summary>
 /// Managed save state information.
 /// </summary>
-public class SaveStateInfo {
+public sealed class SaveStateInfo {
 	/// <summary>Full path to save state file</summary>
 	public string Filepath { get; set; } = "";
 

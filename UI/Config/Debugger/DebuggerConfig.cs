@@ -10,7 +10,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class DebuggerConfig : BaseWindowConfig<DebuggerConfig> {
+public sealed class DebuggerConfig : BaseWindowConfig<DebuggerConfig> {
 	public DockEntryDefinition? SavedDockLayout { get; set; } = null;
 
 	[Reactive] public bool ShowSettingsPanel { get; set; } = true;
@@ -97,7 +97,7 @@ public class DebuggerConfig : BaseWindowConfig<DebuggerConfig> {
 	}
 }
 
-public class CfgColor : ReactiveObject {
+public sealed class CfgColor : ReactiveObject {
 	[Reactive] public UInt32 ColorCode { get; set; }
 }
 

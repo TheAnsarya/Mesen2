@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Nexen.Debugger.Utilities; 
-public class TblLoader {
+public sealed class TblLoader {
 	public static TblByteCharConverter? Load(string[] fileContents) {
 		try {
 			Dictionary<TblKey, string> dict = new Dictionary<TblKey, string>();

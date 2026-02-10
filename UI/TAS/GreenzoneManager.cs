@@ -14,7 +14,7 @@ namespace Nexen.TAS;
 /// Manages greenzone savestates for efficient TAS rerecording.
 /// The greenzone is a set of savestates that allow instant seeking to any frame.
 /// </summary>
-public class GreenzoneManager : IDisposable {
+public sealed class GreenzoneManager : IDisposable {
 	private readonly ConcurrentDictionary<int, SavestateData> _savestates = new();
 	private readonly SemaphoreSlim _compressionSemaphore = new(1, 1);
 	private readonly object _ringBufferLock = new();
@@ -374,7 +374,7 @@ public class GreenzoneManager : IDisposable {
 /// <summary>
 /// Internal class to store savestate data.
 /// </summary>
-internal class SavestateData {
+internal sealed class SavestateData {
 	public int Frame { get; set; }
 	public byte[]? Data { get; set; }
 	public DateTime CaptureTime { get; set; }
@@ -384,7 +384,7 @@ internal class SavestateData {
 /// <summary>
 /// Public information about a savestate.
 /// </summary>
-public class SavestateInfo {
+public sealed class SavestateInfo {
 	/// <summary>Gets or sets the frame number.</summary>
 	public int Frame { get; set; }
 
@@ -401,7 +401,7 @@ public class SavestateInfo {
 /// <summary>
 /// Event arguments for greenzone events.
 /// </summary>
-public class GreenzoneEventArgs : EventArgs {
+public sealed class GreenzoneEventArgs : EventArgs {
 	/// <summary>Gets the frame number.</summary>
 	public int Frame { get; }
 
@@ -417,7 +417,7 @@ public class GreenzoneEventArgs : EventArgs {
 /// <summary>
 /// Event arguments for greenzone pruning.
 /// </summary>
-public class GreenzonePruneEventArgs : EventArgs {
+public sealed class GreenzonePruneEventArgs : EventArgs {
 	/// <summary>Gets the number of states pruned.</summary>
 	public int PrunedCount { get; }
 

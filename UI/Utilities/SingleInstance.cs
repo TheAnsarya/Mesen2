@@ -127,7 +127,7 @@ public class SingleInstance : IDisposable {
 	#endregion
 }
 
-public class ArgumentsReceivedEventArgs : EventArgs {
+public sealed class ArgumentsReceivedEventArgs : EventArgs {
 	public string[] Args { get; }
 
 	public ArgumentsReceivedEventArgs(string[] args) {

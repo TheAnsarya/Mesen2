@@ -9,7 +9,7 @@ namespace Nexen.Controls;
 /// Converts a boolean to a GridLength for showing/hiding grid rows.
 /// True = Auto (visible), False = 0 (hidden).
 /// </summary>
-public class BoolToGridLengthConverter : IValueConverter {
+public sealed class BoolToGridLengthConverter : IValueConverter {
 	/// <summary>Gets the singleton instance of the converter.</summary>
 	public static readonly BoolToGridLengthConverter Instance = new();
 

@@ -20,7 +20,7 @@ using Nexen.Windows;
 
 namespace Nexen.Utilities;
 
-public class CommandLineHelper {
+public sealed class CommandLineHelper {
 	public bool NoVideo { get; private set; }
 	public bool NoAudio { get; private set; }
 	public bool NoInput { get; private set; }

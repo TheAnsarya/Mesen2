@@ -26,7 +26,7 @@ namespace Nexen.Debugger.ViewModels;
 /// </list>
 /// </para>
 /// </remarks>
-public class MemoryMappingViewModel : ViewModelBase {
+public sealed class MemoryMappingViewModel : ViewModelBase {
 	private CpuType _cpuType;
 
 	/// <summary>Gets or sets the CPU memory mapping blocks.</summary>

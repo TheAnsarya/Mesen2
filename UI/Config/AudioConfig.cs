@@ -10,7 +10,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
 
-public class AudioConfig : BaseConfig<AudioConfig> {
+public sealed class AudioConfig : BaseConfig<AudioConfig> {
 	[Reactive] public string AudioDevice { get; set; } = "";
 	[Reactive] public bool EnableAudio { get; set; } = true;
 	[Reactive] public bool DisableDynamicSampleRate { get; set; } = false;

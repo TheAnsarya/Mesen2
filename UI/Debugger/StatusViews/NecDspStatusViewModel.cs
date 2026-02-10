@@ -5,7 +5,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.StatusViews; 
-public class NecDspStatusViewModel : BaseConsoleStatusViewModel {
+public sealed class NecDspStatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt16 RegTR { get; set; }
 	[Reactive] public UInt16 RegTRB { get; set; }
 	[Reactive] public UInt16 RegRP { get; set; }

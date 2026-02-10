@@ -12,7 +12,7 @@ namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the audio configuration tab.
 /// </summary>
-public class AudioConfigViewModel : DisposableViewModel {
+public sealed class AudioConfigViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the current audio configuration.</summary>
 	[Reactive] public AudioConfig Config { get; set; }
 

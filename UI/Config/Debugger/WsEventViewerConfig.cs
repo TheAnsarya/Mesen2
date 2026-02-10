@@ -4,7 +4,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
 
-public class WsEventViewerConfig : ViewModelBase {
+public sealed class WsEventViewerConfig : ViewModelBase {
 	[Reactive] public EventViewerCategoryCfg PpuPaletteRead { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[0]);
 	[Reactive] public EventViewerCategoryCfg PpuPaletteWrite { get; set; } = new EventViewerCategoryCfg(EventViewerColors.Colors[1]);
 

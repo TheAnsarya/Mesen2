@@ -26,7 +26,7 @@ namespace Nexen.ViewModels;
 /// Provides frame-by-frame editing of movie files with greenzone support,
 /// input recording, and piano roll visualization.
 /// </summary>
-public class TasEditorViewModel : DisposableViewModel {
+public sealed class TasEditorViewModel : DisposableViewModel {
 	/// <summary>Gets the currently loaded movie data.</summary>
 	[Reactive] public MovieData? Movie { get; private set; }
 
@@ -1658,7 +1658,7 @@ tas.finishSearch(true) -- Load best result</pre>
 /// <summary>
 /// ViewModel representing a single frame in the TAS editor.
 /// </summary>
-public class TasFrameViewModel : ViewModelBase {
+public sealed class TasFrameViewModel : ViewModelBase {
 	/// <summary>Gets the underlying frame.</summary>
 	public InputFrame Frame { get; }
 
@@ -1717,7 +1717,7 @@ public abstract class UndoableAction {
 /// <summary>
 /// Action for inserting frames.
 /// </summary>
-public class InsertFramesAction : UndoableAction {
+public sealed class InsertFramesAction : UndoableAction {
 	private readonly MovieData _movie;
 	private readonly int _index;
 	private readonly List<InputFrame> _frames;
@@ -1746,7 +1746,7 @@ public class InsertFramesAction : UndoableAction {
 /// <summary>
 /// Action for deleting frames.
 /// </summary>
-public class DeleteFramesAction : UndoableAction {
+public sealed class DeleteFramesAction : UndoableAction {
 	private readonly MovieData _movie;
 	private readonly int _index;
 	private readonly List<InputFrame> _deletedFrames;
@@ -1775,7 +1775,7 @@ public class DeleteFramesAction : UndoableAction {
 /// <summary>
 /// Action for modifying controller input.
 /// </summary>
-public class ModifyInputAction : UndoableAction {
+public sealed class ModifyInputAction : UndoableAction {
 	private readonly InputFrame _frame;
 	private readonly int _port;
 	private readonly ControllerInput _oldInput;
@@ -1850,7 +1850,7 @@ public enum ControllerLayout {
 /// <summary>
 /// Information about a controller button for UI display.
 /// </summary>
-public class ControllerButtonInfo {
+public sealed class ControllerButtonInfo {
 	/// <summary>Gets the button identifier used in ControllerInput.</summary>
 	public string ButtonId { get; }
 

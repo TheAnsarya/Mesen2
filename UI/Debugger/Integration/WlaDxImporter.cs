@@ -297,14 +297,14 @@ public abstract class WlaDxImporter : ISymbolProvider {
 	}
 }
 
-public class SnesWlaDxImporter : WlaDxImporter {
+public sealed class SnesWlaDxImporter : WlaDxImporter {
 	protected override AddressInfo GetLabelAddress(int bank, int addr) {
 		AddressInfo relAddr = new AddressInfo() { Address = (bank << 16) | addr, Type = MemoryType.SnesMemory };
 		return DebugApi.GetAbsoluteAddress(relAddr);
 	}
 }
 
-public class GbWlaDxImporter : WlaDxImporter {
+public sealed class GbWlaDxImporter : WlaDxImporter {
 	protected override AddressInfo GetLabelAddress(int bank, int addr) {
 		if (addr >= 0x8000) {
 			AddressInfo relAddr = new AddressInfo() { Address = addr, Type = MemoryType.GameboyMemory };
@@ -315,7 +315,7 @@ public class GbWlaDxImporter : WlaDxImporter {
 	}
 }
 
-public class PceWlaDxImporter : WlaDxImporter {
+public sealed class PceWlaDxImporter : WlaDxImporter {
 	private RomFormat _format;
 
 	public PceWlaDxImporter() {
@@ -364,7 +364,7 @@ public class PceWlaDxImporter : WlaDxImporter {
 	}
 }
 
-public class SmsWlaDxImporter : WlaDxImporter {
+public sealed class SmsWlaDxImporter : WlaDxImporter {
 	protected override AddressInfo GetLabelAddress(int bank, int addr) {
 		if (addr >= 0xC000) {
 			return new AddressInfo() { Address = addr - 0xC000, Type = MemoryType.SmsWorkRam };

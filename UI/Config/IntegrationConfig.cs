@@ -8,7 +8,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
-public class IntegrationConfig : BaseConfig<IntegrationConfig> {
+public sealed class IntegrationConfig : BaseConfig<IntegrationConfig> {
 	[Reactive] public bool AutoLoadDbgFiles { get; set; } = true;
 	[Reactive] public bool AutoLoadMlbFiles { get; set; } = true;
 	[Reactive] public bool AutoLoadCdlFiles { get; set; } = false;

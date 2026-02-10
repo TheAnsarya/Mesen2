@@ -373,14 +373,14 @@ public enum CpuFlag {
 	F5
 }
 
-public class DocFileFormat {
+public sealed class DocFileFormat {
 	public OpCodeDesc[] Instructions { get; set; } = [];
 	public AddrMode[]? AddressingModes { get; set; } = null;
 	public int[]? MinCycles { get; set; }
 	public int[]? MaxCycles { get; set; }
 }
 
-public class OpCodeDesc {
+public sealed class OpCodeDesc {
 	public string Op { get; set; } = "";
 	public string Name { get; set; } = "";
 	public string Description { get; set; } = "";

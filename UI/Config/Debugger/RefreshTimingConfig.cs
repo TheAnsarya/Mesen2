@@ -2,7 +2,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class RefreshTimingConfig : BaseConfig<RefreshTimingConfig> {
+public sealed class RefreshTimingConfig : BaseConfig<RefreshTimingConfig> {
 	[Reactive] public bool RefreshOnBreakPause { get; set; } = true;
 	[Reactive] public bool AutoRefresh { get; set; } = true;
 

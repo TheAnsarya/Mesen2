@@ -3,7 +3,7 @@ using Nexen.Interop;
 using Nexen.ViewModels;
 
 namespace Nexen.Debugger.ViewModels; 
-public class DebuggerOptionsViewModel : ViewModelBase {
+public sealed class DebuggerOptionsViewModel : ViewModelBase {
 	public DebuggerConfig Config { get; }
 
 	public bool IsSnes { get; }

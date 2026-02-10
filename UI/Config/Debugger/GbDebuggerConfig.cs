@@ -8,7 +8,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class GbDebuggerConfig : ViewModelBase {
+public sealed class GbDebuggerConfig : ViewModelBase {
 	[Reactive] public bool GbBreakOnInvalidOamAccess { get; set; } = false;
 	[Reactive] public bool GbBreakOnInvalidVramAccess { get; set; } = false;
 	[Reactive] public bool GbBreakOnDisableLcdOutsideVblank { get; set; } = false;

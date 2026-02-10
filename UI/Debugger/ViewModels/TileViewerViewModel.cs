@@ -38,7 +38,7 @@ namespace Nexen.Debugger.ViewModels;
 /// - Export to PNG
 /// - CDL-based filtering
 /// </remarks>
-public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
+public sealed class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel {
 	/// <summary>
 	/// Gets or sets the CPU type for this viewer.
 	/// </summary>
@@ -1280,7 +1280,7 @@ public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOve
 	}
 }
 
-public class ConfigPreset : ViewModelBase {
+public sealed class ConfigPreset : ViewModelBase {
 	public string Name { get; }
 	public Func<PresetValues?> GetPresetValues { get; }
 	public ReactiveCommand<Unit, Unit> ClickCommand { get; }
@@ -1296,7 +1296,7 @@ public class ConfigPreset : ViewModelBase {
 	}
 }
 
-public class PresetValues {
+public sealed class PresetValues {
 	public MemoryType? Source { get; set; }
 	public TileFormat? Format { get; set; }
 	public TileLayout? Layout { get; set; }

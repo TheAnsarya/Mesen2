@@ -3,7 +3,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
 
-public class GbaDebuggerConfig : ViewModelBase {
+public sealed class GbaDebuggerConfig : ViewModelBase {
 	[Reactive] public bool BreakOnInvalidOpCode { get; set; } = false;
 	[Reactive] public bool BreakOnNopLoad { get; set; } = false;
 	[Reactive] public bool BreakOnUnalignedMemAccess { get; set; } = false;

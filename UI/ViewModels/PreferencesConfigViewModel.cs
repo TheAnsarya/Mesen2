@@ -12,7 +12,7 @@ namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the preferences configuration tab.
 /// </summary>
-public class PreferencesConfigViewModel : DisposableViewModel {
+public sealed class PreferencesConfigViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the current preferences configuration.</summary>
 	[Reactive] public PreferencesConfig Config { get; set; }
 

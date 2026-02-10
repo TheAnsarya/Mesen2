@@ -10,7 +10,7 @@ namespace Nexen.ViewModels;
 /// ViewModel for the configuration window.
 /// Lazily loads child ViewModels for each configuration tab and manages save/revert operations.
 /// </summary>
-public class ConfigViewModel : DisposableViewModel {
+public sealed class ConfigViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the audio configuration ViewModel.</summary>
 	[Reactive] public AudioConfigViewModel? Audio { get; set; }
 

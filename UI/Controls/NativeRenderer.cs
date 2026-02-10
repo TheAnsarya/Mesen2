@@ -8,7 +8,7 @@ using Nexen.Interop;
 using Nexen.ViewModels;
 
 namespace Nexen; 
-public class NativeRenderer : NativeControlHost {
+public sealed class NativeRenderer : NativeControlHost {
 	public NativeRenderer() {
 		Focusable = true;
 	}

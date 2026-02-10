@@ -8,7 +8,7 @@ using Nexen.Interop;
 using Nexen.Utilities;
 
 namespace Nexen.Debugger.Utilities; 
-public class CodeViewerSelectionHandler : IDisposable {
+public sealed class CodeViewerSelectionHandler : IDisposable {
 	private DisassemblyViewer _viewer;
 	private ISelectableModel _model;
 	private LocationInfo? _mouseOverCodeLocation;

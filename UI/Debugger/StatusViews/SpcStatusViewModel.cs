@@ -5,7 +5,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.StatusViews; 
-public class SpcStatusViewModel : BaseConsoleStatusViewModel {
+public sealed class SpcStatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public byte RegA { get; set; }
 	[Reactive] public byte RegX { get; set; }
 	[Reactive] public byte RegY { get; set; }

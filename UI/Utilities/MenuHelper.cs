@@ -10,7 +10,7 @@ using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 
 namespace Nexen.Utilities; 
-internal class MenuHelper {
+internal sealed class MenuHelper {
 	private static bool IsPointerInItem(MenuItem item) {
 		if (item.IsSubMenuOpen) {
 			bool checkPopup = true;

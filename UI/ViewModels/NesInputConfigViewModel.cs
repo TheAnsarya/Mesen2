@@ -20,7 +20,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class NesInputConfigViewModel : DisposableViewModel {
+public sealed class NesInputConfigViewModel : DisposableViewModel {
 	[Reactive] public NesConfig Config { get; set; }
 
 	public List<ShortcutKeyInfo> ShortcutKeys { get; set; }

@@ -18,7 +18,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Provides search functionality within memory viewer with support for hex, string, and integer searches,
 /// along with various filtering options based on memory access patterns and data types.
 /// </summary>
-public class MemoryViewerFindViewModel : DisposableViewModel {
+public sealed class MemoryViewerFindViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets or sets the type of data being searched for (hex bytes, string, or integer).
 	/// </summary>
@@ -270,7 +270,7 @@ public class MemoryViewerFindViewModel : DisposableViewModel {
 /// Represents the data pattern to search for in memory.
 /// Supports exact byte matching and case-insensitive string matching via alternate patterns.
 /// </summary>
-public class SearchData {
+public sealed class SearchData {
 	/// <summary>
 	/// The primary byte pattern to search for. Values 0-255 are literal bytes, -1 is a wildcard.
 	/// </summary>

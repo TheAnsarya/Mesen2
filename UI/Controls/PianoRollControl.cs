@@ -14,7 +14,7 @@ namespace Nexen.Controls;
 /// Piano roll style control for visualizing and editing TAS input.
 /// Displays a timeline with button lanes, allowing visual input editing.
 /// </summary>
-public class PianoRollControl : Control {
+public sealed class PianoRollControl : Control {
 	#region Dependency Properties
 
 	/// <summary>Identifies the Frames property.</summary>
@@ -593,7 +593,7 @@ public class PianoRollControl : Control {
 /// <summary>
 /// Event arguments for cell click events.
 /// </summary>
-public class PianoRollCellEventArgs : EventArgs {
+public sealed class PianoRollCellEventArgs : EventArgs {
 	/// <summary>Gets the frame number.</summary>
 	public int Frame { get; }
 
@@ -613,7 +613,7 @@ public class PianoRollCellEventArgs : EventArgs {
 /// <summary>
 /// Event arguments for paint (drag) events.
 /// </summary>
-public class PianoRollPaintEventArgs : EventArgs {
+public sealed class PianoRollPaintEventArgs : EventArgs {
 	/// <summary>Gets the frames that were painted.</summary>
 	public IReadOnlyList<int> Frames { get; }
 
@@ -633,7 +633,7 @@ public class PianoRollPaintEventArgs : EventArgs {
 /// <summary>
 /// Event arguments for selection change events.
 /// </summary>
-public class PianoRollSelectionEventArgs : EventArgs {
+public sealed class PianoRollSelectionEventArgs : EventArgs {
 	/// <summary>Gets the selection start frame.</summary>
 	public int SelectionStart { get; }
 
@@ -649,7 +649,7 @@ public class PianoRollSelectionEventArgs : EventArgs {
 /// <summary>
 /// Event arguments for marker click events.
 /// </summary>
-public class PianoRollMarkerEventArgs : EventArgs {
+public sealed class PianoRollMarkerEventArgs : EventArgs {
 	/// <summary>Gets the frame with the marker.</summary>
 	public int Frame { get; }
 

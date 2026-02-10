@@ -10,7 +10,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class WsConfigViewModel : DisposableViewModel {
+public sealed class WsConfigViewModel : DisposableViewModel {
 	[Reactive] public WsConfig Config { get; set; }
 	[Reactive] public WsConfig OriginalConfig { get; set; }
 	[Reactive] public WsConfigTab SelectedTab { get; set; } = 0;

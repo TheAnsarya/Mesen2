@@ -29,7 +29,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Results are filtered and sorted by relevance as the user types.
 /// </para>
 /// </remarks>
-public class GoToAllViewModel : DisposableViewModel {
+public sealed class GoToAllViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the current search string.</summary>
 	[Reactive] public string SearchString { get; set; } = "";
 

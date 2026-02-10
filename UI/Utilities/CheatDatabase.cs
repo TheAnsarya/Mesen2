@@ -7,13 +7,13 @@ using System.Xml.Serialization;
 
 namespace Nexen.Utilities; 
 [XmlRoot("cheats")]
-public class CheatDatabase {
+public sealed class CheatDatabase {
 	[XmlElement("game")]
 	public List<CheatDbGameEntry> Games { get; set; } = null!;
 }
 
 [XmlType("game")]
-public class CheatDbGameEntry {
+public sealed class CheatDbGameEntry {
 	[XmlAttribute("name")]
 	public string Name { get; set; } = null!;
 
@@ -28,7 +28,7 @@ public class CheatDbGameEntry {
 	}
 }
 
-public class CheatDbCheatEntry {
+public sealed class CheatDbCheatEntry {
 	[XmlAttribute("desc")]
 	public string Desc { get; set; } = null!;
 

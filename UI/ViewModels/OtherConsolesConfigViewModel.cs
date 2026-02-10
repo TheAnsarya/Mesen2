@@ -11,7 +11,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class OtherConsolesConfigViewModel : DisposableViewModel {
+public sealed class OtherConsolesConfigViewModel : DisposableViewModel {
 	[Reactive] public CvConfig CvConfig { get; set; }
 	[Reactive] public CvConfig CvOriginalConfig { get; set; }
 	[Reactive] public OtherConsolesConfigTab SelectedTab { get; set; } = 0;

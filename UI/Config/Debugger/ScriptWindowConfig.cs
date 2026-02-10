@@ -9,7 +9,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class ScriptWindowConfig : BaseWindowConfig<ScriptWindowConfig> {
+public sealed class ScriptWindowConfig : BaseWindowConfig<ScriptWindowConfig> {
 	private const int MaxRecentScripts = 10;
 
 	[Reactive] public List<string> RecentScripts { get; set; } = [];

@@ -15,7 +15,7 @@ namespace Nexen.Debugger.Integration;
 /// Imports Pansy metadata files into Nexen's debugger.
 /// Supports loading symbols, comments, memory regions, and cross-references.
 /// </summary>
-public class PansyImporter {
+public sealed class PansyImporter {
 	private const string MAGIC = "PANSY\0\0\0";
 	private const ushort MIN_VERSION = 0x0100;
 	private const ushort MAX_VERSION = 0x0101;
@@ -438,7 +438,7 @@ public class PansyImporter {
 /// <summary>
 /// Result of a Pansy import operation.
 /// </summary>
-public class ImportResult {
+public sealed class ImportResult {
 	public string SourceFile { get; set; } = "";
 	public bool Success { get; set; }
 	public string? Error { get; set; }

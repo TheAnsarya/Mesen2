@@ -11,7 +11,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Styling;
 
 namespace Nexen.Controls; 
-public class NexenScrollContentPresenter : ScrollContentPresenter {
+public sealed class NexenScrollContentPresenter : ScrollContentPresenter {
 	protected override Type StyleKeyOverride => typeof(ScrollContentPresenter);
 
 	protected override void OnPointerWheelChanged(PointerWheelEventArgs e) {

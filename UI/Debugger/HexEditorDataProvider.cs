@@ -9,7 +9,7 @@ using Nexen.Debugger.Utilities;
 using Nexen.Interop;
 
 namespace Nexen.Debugger; 
-public class HexEditorDataProvider : IHexEditorDataProvider {
+public sealed class HexEditorDataProvider : IHexEditorDataProvider {
 	public int Length { get; private set; }
 
 	private MemoryType _memoryType;

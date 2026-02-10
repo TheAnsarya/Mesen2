@@ -6,7 +6,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media;
 
 namespace Nexen.Utilities; 
-public class EnumMatchConverter : IValueConverter {
+public sealed class EnumMatchConverter : IValueConverter {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
 		if (value is Enum val && parameter is Enum compare && targetType == typeof(bool)) {
 			return object.Equals(val, compare);

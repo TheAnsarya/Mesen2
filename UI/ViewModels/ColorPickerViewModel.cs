@@ -5,7 +5,7 @@ namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the color picker dialog.
 /// </summary>
-public class ColorPickerViewModel : ViewModelBase {
+public sealed class ColorPickerViewModel : ViewModelBase {
 	/// <summary>Gets or sets the selected color.</summary>
 	[Reactive] public Color Color { get; set; }
 }

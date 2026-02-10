@@ -25,7 +25,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Supports sprite wrapping for consoles that wrap sprites around screen edges (SNES, GBA).
 /// </para>
 /// </remarks>
-public class SpritePreviewModel : ViewModelBase {
+public sealed class SpritePreviewModel : ViewModelBase {
 	/// <summary>Gets or sets the sprite's index in the OAM table.</summary>
 	[Reactive] public int SpriteIndex { get; set; }
 

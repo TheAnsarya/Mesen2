@@ -11,7 +11,7 @@ using Nexen.Utilities;
 using Nexen.ViewModels;
 
 namespace Nexen.Debugger.Utilities; 
-internal class SaveRomActionHelper {
+internal sealed class SaveRomActionHelper {
 	public static ContextMenuAction GetSaveRomAction(Window wnd) {
 		return new ContextMenuAction() {
 			ActionType = ActionType.SaveRom,

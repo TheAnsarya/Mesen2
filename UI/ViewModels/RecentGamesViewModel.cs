@@ -18,7 +18,7 @@ namespace Nexen.ViewModels;
 /// ViewModel for the recent games and save state selection screens.
 /// Handles displaying recent games, loading save states, and save state management.
 /// </summary>
-public class RecentGamesViewModel : ViewModelBase {
+public sealed class RecentGamesViewModel : ViewModelBase {
 	/// <summary>Gets or sets whether the recent games screen is visible.</summary>
 	[Reactive] public bool Visible { get; set; }
 
@@ -229,7 +229,7 @@ public enum GameScreenMode {
 /// <summary>
 /// Represents a single entry in the recent games or save state list.
 /// </summary>
-public class RecentGameInfo {
+public sealed class RecentGameInfo {
 	/// <summary>Gets or sets the file path to the game or save state.</summary>
 	public string FileName { get; set; } = "";
 

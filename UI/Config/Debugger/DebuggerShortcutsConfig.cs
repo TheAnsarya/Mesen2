@@ -7,7 +7,7 @@ using Nexen.ViewModels;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class DebuggerShortcutsConfig : BaseConfig<DebuggerShortcutsConfig>, IJsonOnDeserialized {
+public sealed class DebuggerShortcutsConfig : BaseConfig<DebuggerShortcutsConfig>, IJsonOnDeserialized {
 	private Dictionary<DebuggerShortcut, DebuggerShortcutInfo> _lookup = new();
 
 	public DebuggerShortcutsConfig() {
@@ -470,12 +470,12 @@ public enum DebuggerShortcut {
 	SyncPansyFolder,
 }
 
-public class DebuggerShortcutInfo : ViewModelBase {
+public sealed class DebuggerShortcutInfo : ViewModelBase {
 	[Reactive] public DebuggerShortcut Shortcut { get; set; }
 	[Reactive] public DbgShortKeys KeyBinding { get; set; } = new();
 }
 
-public class DbgShortKeys {
+public sealed class DbgShortKeys {
 	private static Regex _numberKeyRegex = new Regex("D[0-9]", RegexOptions.Compiled);
 
 	public KeyModifiers Modifiers { get; set; }

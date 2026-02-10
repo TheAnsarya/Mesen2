@@ -26,7 +26,7 @@ namespace Nexen.Debugger.ViewModels;
 /// ViewModel for the Lua script editor window.
 /// Provides functionality for editing, running, and managing Lua scripts for emulator automation.
 /// </summary>
-public class ScriptWindowViewModel : ViewModelBase {
+public sealed class ScriptWindowViewModel : ViewModelBase {
 	/// <summary>
 	/// Gets the configuration settings for the script window.
 	/// </summary>

@@ -18,7 +18,7 @@ namespace Nexen.Debugger.ViewModels;
 /// in the disassembly view.
 /// </para>
 /// </remarks>
-public class CommentEditViewModel : ViewModelBase {
+public sealed class CommentEditViewModel : ViewModelBase {
 	/// <summary>
 	/// Gets or sets the reactive code label being edited.
 	/// </summary>

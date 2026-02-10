@@ -3,7 +3,7 @@ using Nexen.Config;
 using Nexen.Interop;
 
 namespace Nexen.Debugger.Utilities; 
-internal class MarkSelectionHelper {
+internal sealed class MarkSelectionHelper {
 	public static ContextMenuAction GetAction(Func<MemoryType> getMemType, Func<int> getSelStart, Func<int> getSelEnd, Action refreshView, Func<bool>? isVisible = null) {
 		return new ContextMenuAction() {
 			ActionType = ActionType.MarkSelectionAs,

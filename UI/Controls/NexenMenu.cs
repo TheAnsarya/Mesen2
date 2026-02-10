@@ -13,7 +13,7 @@ namespace Nexen.Controls;
 /// Menu items with IsEnabled set will have their Enabled property updated when the submenu opens.
 /// Items without IsEnabled set default to enabled (Enabled = true).
 /// </summary>
-public class NexenMenu : Menu {
+public sealed class NexenMenu : Menu {
 	protected override Type StyleKeyOverride => typeof(Menu);
 
 	private void SubmenuOpened(object? sender, RoutedEventArgs e) {

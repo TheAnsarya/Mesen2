@@ -68,7 +68,7 @@ public class DebugMenuAction : MenuActionBase {
 /// Menu separator for debug menus.
 /// Works with DebugShortcutManager like DebugMenuAction.
 /// </summary>
-public class DebugMenuSeparator : DebugMenuAction {
+public sealed class DebugMenuSeparator : DebugMenuAction {
 	/// <summary>
 	/// Creates a new debug menu separator.
 	/// </summary>

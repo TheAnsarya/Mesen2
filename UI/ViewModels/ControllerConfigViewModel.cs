@@ -67,7 +67,7 @@ public class KeyMappingViewModel : ViewModelBase {
 	}
 }
 
-public class CustomKeyMapping : ViewModelBase {
+public sealed class CustomKeyMapping : ViewModelBase {
 	public string Name { get; set; }
 	public UInt16[] Mappings { get; set; }
 	public int Index { get; set; }

@@ -19,7 +19,7 @@ namespace Nexen.Debugger.ViewModels;
 /// which is useful for testing game behavior with specific inputs or for automation.
 /// </para>
 /// </remarks>
-public class ControllerListViewModel : ViewModelBase {
+public sealed class ControllerListViewModel : ViewModelBase {
 	/// <summary>
 	/// Gets or sets the list of controller input ViewModels.
 	/// </summary>

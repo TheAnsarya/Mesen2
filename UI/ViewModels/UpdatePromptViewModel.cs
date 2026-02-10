@@ -22,7 +22,7 @@ namespace Nexen.ViewModels;
 /// ViewModel for the update prompt dialog.
 /// Handles checking for updates, downloading, and installing new versions.
 /// </summary>
-public class UpdatePromptViewModel : ViewModelBase {
+public sealed class UpdatePromptViewModel : ViewModelBase {
 	/// <summary>Gets the latest available version.</summary>
 	public Version LatestVersion { get; }
 
@@ -190,13 +190,13 @@ public class UpdatePromptViewModel : ViewModelBase {
 	}
 }
 
-public class UpdateFileInfo {
+public sealed class UpdateFileInfo {
 	public string[] Platform { get; set; } = [];
 	public string DownloadUrl { get; set; } = "";
 	public string Hash { get; set; } = "";
 }
 
-public class UpdateInfo {
+public sealed class UpdateInfo {
 	public Version LatestVersion { get; set; } = new();
 	public string ReleaseNotes { get; set; } = "";
 	public UpdateFileInfo[] Files { get; set; } = [];
@@ -205,7 +205,7 @@ public class UpdateInfo {
 /// <summary>
 /// Represents a GitHub release from the API.
 /// </summary>
-public class GitHubRelease {
+public sealed class GitHubRelease {
 	[JsonPropertyName("tag_name")]
 	public string? TagName { get; set; }
 
@@ -225,7 +225,7 @@ public class GitHubRelease {
 /// <summary>
 /// Represents a GitHub release asset (downloadable file).
 /// </summary>
-public class GitHubAsset {
+public sealed class GitHubAsset {
 	[JsonPropertyName("name")]
 	public string? Name { get; set; }
 

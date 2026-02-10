@@ -5,7 +5,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media;
 
 namespace Nexen.Utilities; 
-public class FontNameConverter : IValueConverter {
+public sealed class FontNameConverter : IValueConverter {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
 		if (value is string fontName && targetType == typeof(FontFamily)) {
 			return new FontFamily(fontName);

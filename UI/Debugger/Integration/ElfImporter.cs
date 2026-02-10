@@ -140,12 +140,12 @@ public abstract class ElfImporter {
 	}
 }
 
-public class ElfSymbolInfo {
+public sealed class ElfSymbolInfo {
 	public AddressInfo Address;
 	public string Name = "";
 }
 
-public class ElfImporterWs : ElfImporter {
+public sealed class ElfImporterWs : ElfImporter {
 	protected override bool TryGetSymbolInfo(SymbolEntry<uint> symbol, int romSize, [MaybeNullWhen(false)] out ElfSymbolInfo symbolInfo) {
 		symbolInfo = null;
 
@@ -175,7 +175,7 @@ public class ElfImporterWs : ElfImporter {
 	}
 }
 
-public class ElfImporterGba : ElfImporter {
+public sealed class ElfImporterGba : ElfImporter {
 	protected override bool TryGetSymbolInfo(SymbolEntry<uint> symbol, int romSize, [MaybeNullWhen(false)] out ElfSymbolInfo symbolInfo) {
 		symbolInfo = null;
 

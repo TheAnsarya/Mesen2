@@ -46,7 +46,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Supports multiple CPU types including main CPUs and coprocessors.
 /// Uses a dockable panel layout that can be customized and saved.
 /// </remarks>
-public class DebuggerWindowViewModel : DisposableViewModel {
+public sealed class DebuggerWindowViewModel : DisposableViewModel {
 	/// <summary>
 	/// Gets the window title, customized for coprocessor debuggers.
 	/// </summary>

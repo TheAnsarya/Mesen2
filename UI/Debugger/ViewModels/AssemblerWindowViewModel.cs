@@ -34,7 +34,7 @@ namespace Nexen.Debugger.ViewModels;
 /// Supports editing existing code (with size warnings) or assembling new code at any address.
 /// </para>
 /// </remarks>
-public class AssemblerWindowViewModel : DisposableViewModel {
+public sealed class AssemblerWindowViewModel : DisposableViewModel {
 	/// <summary>Gets the assembler configuration settings.</summary>
 	public AssemblerConfig Config { get; }
 
@@ -355,7 +355,7 @@ public class AssemblerWindowViewModel : DisposableViewModel {
 /// <summary>
 /// Represents an assembly error at a specific line.
 /// </summary>
-public class AssemblerError {
+public sealed class AssemblerError {
 	/// <summary>Gets or sets the error message description.</summary>
 	public string Message { get; set; } = "";
 

@@ -22,7 +22,7 @@ namespace Nexen.Debugger.Labels;
 /// <item>WonderSwan: Display and sound registers</item>
 /// </list>
 /// </remarks>
-public class DefaultLabelHelper {
+public sealed class DefaultLabelHelper {
 	/// <summary>
 	/// Sets default hardware register labels for the currently loaded ROM.
 	/// Automatically detects the platform and applies appropriate labels.

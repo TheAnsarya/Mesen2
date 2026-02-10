@@ -21,7 +21,7 @@ namespace Nexen.Debugger.ViewModels;
 /// ViewModel for the palette viewer window.
 /// Displays and allows editing of color palettes used by the emulated system's PPU.
 /// </summary>
-public class PaletteViewerViewModel : DisposableViewModel, ICpuTypeModel {
+public sealed class PaletteViewerViewModel : DisposableViewModel, ICpuTypeModel {
 	/// <summary>
 	/// Gets or sets the CPU type for this palette viewer instance.
 	/// </summary>

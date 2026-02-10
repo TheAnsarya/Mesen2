@@ -9,7 +9,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
 
-public class WsConfig : BaseConfig<WsConfig> {
+public sealed class WsConfig : BaseConfig<WsConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 	[Reactive] public ControllerConfig ControllerHorizontal { get; set; } = new();

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Nexen.Utilities; 
-public class Utf8Utilities {
+public sealed class Utf8Utilities {
 	public static string GetStringFromArray(byte[] strArray) {
 		for (int i = 0; i < strArray.Length; i++) {
 			if (strArray[i] == 0) {

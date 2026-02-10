@@ -15,7 +15,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class HexEditorConfig : BaseWindowConfig<HexEditorConfig> {
+public sealed class HexEditorConfig : BaseWindowConfig<HexEditorConfig> {
 	[Reactive] public bool ShowOptionPanel { get; set; } = true;
 	[Reactive] public bool AutoRefresh { get; set; } = true;
 	[Reactive] public bool IgnoreRedundantWrites { get; set; } = false;
@@ -73,7 +73,7 @@ public static class HighlightFadeSpeedExtensions {
 	}
 }
 
-public class HighlightConfig : ReactiveObject {
+public sealed class HighlightConfig : ReactiveObject {
 	[Reactive] public bool Highlight { get; set; }
 	[Reactive] public UInt32 ColorCode { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Avalonia.Markup.Xaml;
 
 namespace Nexen.Localization; 
-public class TranslateExtension : MarkupExtension {
+public sealed class TranslateExtension : MarkupExtension {
 	public TranslateExtension(string key) {
 		this.Key = key;
 	}

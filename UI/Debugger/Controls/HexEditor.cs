@@ -817,7 +817,7 @@ public struct GridPoint {
 	public bool InStringView;
 }
 
-public class ByteUpdatedEventArgs : EventArgs {
+public sealed class ByteUpdatedEventArgs : EventArgs {
 	public int ByteOffset;
 	public int Length;
 	public byte? Value = null;

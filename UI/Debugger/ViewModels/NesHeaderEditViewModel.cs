@@ -36,7 +36,7 @@ namespace Nexen.Debugger.ViewModels;
 /// </list>
 /// </para>
 /// </remarks>
-public class NesHeaderEditViewModel : DisposableViewModel {
+public sealed class NesHeaderEditViewModel : DisposableViewModel {
 	/// <summary>Gets the header data being edited.</summary>
 	public NesHeader Header { get; }
 
@@ -264,7 +264,7 @@ public class NesHeaderEditViewModel : DisposableViewModel {
 	/// </list>
 	/// </para>
 	/// </remarks>
-	public class NesHeader : ViewModelBase {
+	public sealed class NesHeader : ViewModelBase {
 		/// <summary>
 		/// Maps NES 2.0 exponent-based sizes to their encoded byte values.
 		/// </summary>

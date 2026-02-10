@@ -141,7 +141,7 @@ public interface IFileDataProvider {
 /// <summary>
 /// Represents a source file referenced by debug symbols.
 /// </summary>
-public class SourceFileInfo {
+public sealed class SourceFileInfo {
 	/// <summary>
 	/// Gets the file name or path of the source file.
 	/// </summary>

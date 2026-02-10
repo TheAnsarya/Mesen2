@@ -12,7 +12,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class CheatEditWindowViewModel : DisposableViewModel {
+public sealed class CheatEditWindowViewModel : DisposableViewModel {
 	public CheatCode Cheat { get; }
 
 	[ObservableAsProperty] public string ConvertedCodes { get; } = "";

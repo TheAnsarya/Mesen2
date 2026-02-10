@@ -33,7 +33,7 @@ namespace Nexen.Debugger;
 /// This class uses ReactiveUI with Fody weaving for automatic property change notifications.
 /// </para>
 /// </remarks>
-public class Breakpoint : ReactiveObject {
+public sealed class Breakpoint : ReactiveObject {
 	/// <summary>
 	/// Gets or sets whether to break when the address is read from.
 	/// </summary>

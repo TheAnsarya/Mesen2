@@ -18,7 +18,7 @@ using Nexen.Windows;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels;
-public class CheatListWindowViewModel : DisposableViewModel {
+public sealed class CheatListWindowViewModel : DisposableViewModel {
 	[Reactive] public NexenList<CheatCode> Cheats { get; private set; } = new();
 	[Reactive] public List<ContextMenuAction> ToolbarActions { get; private set; } = new();
 	[Reactive] public bool DisableAllCheats { get; set; } = false;

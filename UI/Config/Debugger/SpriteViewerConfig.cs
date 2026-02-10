@@ -3,7 +3,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class SpriteViewerConfig : BaseWindowConfig<SpriteViewerConfig> {
+public sealed class SpriteViewerConfig : BaseWindowConfig<SpriteViewerConfig> {
 	[Reactive] public bool ShowSettingsPanel { get; set; } = true;
 
 	[Reactive] public bool ShowOutline { get; set; } = false;

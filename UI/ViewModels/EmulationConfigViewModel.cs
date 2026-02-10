@@ -7,7 +7,7 @@ namespace Nexen.ViewModels;
 /// <summary>
 /// ViewModel for the emulation configuration tab.
 /// </summary>
-public class EmulationConfigViewModel : DisposableViewModel {
+public sealed class EmulationConfigViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the current emulation configuration.</summary>
 	[Reactive] public EmulationConfig Config { get; set; }
 

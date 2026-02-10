@@ -8,7 +8,7 @@ using Nexen.Interop;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config; 
-public class SnesConfig : BaseConfig<SnesConfig> {
+public sealed class SnesConfig : BaseConfig<SnesConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 	//Input

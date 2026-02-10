@@ -9,7 +9,7 @@ using System.Xml;
 using Nexen.Interop;
 
 namespace Nexen.Utilities; 
-public class DipSwitchDatabase {
+public sealed class DipSwitchDatabase {
 	private static Dictionary<uint, GameDipSwitches> _gameDipswitches = new();
 
 	public static GameDipSwitches GetGameDipswitches(InteropDipSwitchInfo dipSwitches) {
@@ -72,7 +72,7 @@ public class DipSwitchDatabase {
 	}
 }
 
-public class DipSwitchDefinition {
+public sealed class DipSwitchDefinition {
 	public string Name { get; set; }
 	public List<string> Options { get; set; } = new();
 	public int SelectedOption { get; set; } = 0;
@@ -83,7 +83,7 @@ public class DipSwitchDefinition {
 	}
 }
 
-public class GameDipSwitches {
+public sealed class GameDipSwitches {
 	public UInt32 DefaultDipSwitches { get; set; } = 0;
 	public List<DipSwitchDefinition> DipSwitches { get; set; } = new();
 }

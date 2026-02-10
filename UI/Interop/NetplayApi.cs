@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Nexen.Config;
 
 namespace Nexen.Interop; 
-public class NetplayApi {
+public sealed class NetplayApi {
 	private const string DllPath = EmuApi.DllName;
 
 	[DllImport(DllPath)] public static extern void StartServer(UInt16 port, [MarshalAs(UnmanagedType.LPUTF8Str)] string password);

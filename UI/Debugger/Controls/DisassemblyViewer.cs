@@ -14,7 +14,7 @@ using Nexen.Interop;
 using Nexen.Utilities;
 
 namespace Nexen.Debugger.Controls;
-public class DisassemblyViewer : Control {
+public sealed class DisassemblyViewer : Control {
 	public static readonly StyledProperty<CodeLineData[]> LinesProperty = AvaloniaProperty.Register<DisassemblyViewer, CodeLineData[]>(nameof(Lines));
 	public static readonly StyledProperty<ILineStyleProvider> StyleProviderProperty = AvaloniaProperty.Register<DisassemblyViewer, ILineStyleProvider>(nameof(StyleProviderProperty));
 
@@ -568,7 +568,7 @@ public class DisassemblyViewer : Control {
 	}
 }
 
-public class TextFragment {
+public sealed class TextFragment {
 	public string Text { get; set; } = "";
 	public int StartIndex { get; set; }
 	public int TextLength { get; set; }
@@ -576,7 +576,7 @@ public class TextFragment {
 	public double Width { get; set; }
 }
 
-public class CodePointerMovedEventArgs : EventArgs {
+public sealed class CodePointerMovedEventArgs : EventArgs {
 	public CodePointerMovedEventArgs(int rowNumber, PointerEventArgs pointerEvent, CodeLineData? lineData, CodeSegmentInfo? codeSegment, List<TextFragment>? fragments = null, TextFragment? fragment = null) {
 		RowNumber = rowNumber;
 		Data = lineData;
@@ -594,7 +594,7 @@ public class CodePointerMovedEventArgs : EventArgs {
 	public int RowNumber { get; }
 }
 
-public class CodeSegmentInfo {
+public sealed class CodeSegmentInfo {
 	public CodeSegmentInfo(string text, CodeSegmentType type, Rect bounds, CodeLineData data, int originalTextIndex = -1, LineProgress? progress = null) {
 		Text = text;
 		Type = type;
@@ -612,7 +612,7 @@ public class CodeSegmentInfo {
 	public int OriginalTextIndex { get; }
 }
 
-public class RowClickedEventArgs {
+public sealed class RowClickedEventArgs {
 	public CodeLineData CodeLineData { get; private set; }
 	public int RowNumber { get; private set; }
 	public bool MarginClicked { get; private set; }
@@ -647,7 +647,7 @@ public interface ILineStyleProvider {
 	List<CodeColor> GetCodeColors(CodeLineData lineData, bool highlightCode, string addressFormat, Color? textColor, bool showMemoryValues);
 }
 
-public class LineProperties {
+public sealed class LineProperties {
 	public Color? LineBgColor;
 	public Color? TextBgColor;
 	public Color? OutlineColor;
@@ -661,7 +661,7 @@ public class LineProperties {
 	public LineProgress? Progress;
 }
 
-public class LineProgress {
+public sealed class LineProgress {
 	public int Current;
 	public int Maximum;
 	public string Text = "";
@@ -698,7 +698,7 @@ public enum CodeSegmentType {
 	InstructionProgress,
 }
 
-public class CodeColor {
+public sealed class CodeColor {
 	public string Text { get; }
 	public int OriginalIndex { get; }
 	public Color Color { get; }

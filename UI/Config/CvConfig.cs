@@ -9,7 +9,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Config;
 
-public class CvConfig : BaseConfig<CvConfig> {
+public sealed class CvConfig : BaseConfig<CvConfig> {
 	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 	[Reactive] public CvControllerConfig Port1 { get; set; } = new();

@@ -7,7 +7,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.StatusViews;
 
-public class WsStatusViewModel : BaseConsoleStatusViewModel {
+public sealed class WsStatusViewModel : BaseConsoleStatusViewModel {
 	[Reactive] public UInt16 RegAX { get; set; }
 	[Reactive] public UInt16 RegBX { get; set; }
 	[Reactive] public UInt16 RegCX { get; set; }

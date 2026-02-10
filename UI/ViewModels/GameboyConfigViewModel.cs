@@ -10,7 +10,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels; 
-public class GameboyConfigViewModel : DisposableViewModel {
+public sealed class GameboyConfigViewModel : DisposableViewModel {
 	[Reactive] public GameboyConfig Config { get; set; }
 	[Reactive] public GameboyConfig OriginalConfig { get; set; }
 	[Reactive] public GameboyConfigTab SelectedTab { get; set; } = 0;

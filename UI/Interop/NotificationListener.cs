@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Avalonia.Controls;
 
 namespace Nexen.Interop; 
-public class NotificationListener : IDisposable {
+public sealed class NotificationListener : IDisposable {
 	public delegate void NotificationCallback(int type, IntPtr parameter);
 	public delegate void NotificationEventHandler(NotificationEventArgs e);
 	public event NotificationEventHandler? OnNotification;
@@ -49,7 +49,7 @@ public class NotificationListener : IDisposable {
 	}
 }
 
-public class NotificationEventArgs {
+public sealed class NotificationEventArgs {
 	public ConsoleNotificationType NotificationType;
 	public IntPtr Parameter;
 }

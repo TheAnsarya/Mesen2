@@ -7,7 +7,7 @@ using Dock.Model.Mvvm.Core;
 /// instead of <see cref="Dock.Model.Mvvm.Controls.ProportionalDockSplitter"/>
 /// (which inherits from DockableBase and causes style application exceptions).
 /// </summary>
-public class NexenProportionalDockSplitter : DockBase, IProportionalDockSplitter {
+public sealed class NexenProportionalDockSplitter : DockBase, IProportionalDockSplitter {
 	/// <inheritdoc/>
 	public bool CanResize { get; set; } = true;
 

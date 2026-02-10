@@ -11,7 +11,7 @@ namespace Nexen.TAS;
 /// Manages input recording for TAS movie creation.
 /// Captures player inputs during gameplay and adds them to the movie.
 /// </summary>
-public class InputRecorder : IDisposable {
+public sealed class InputRecorder : IDisposable {
 	private readonly GreenzoneManager _greenzone;
 	private MovieData? _movie;
 	private bool _isRecording;
@@ -346,7 +346,7 @@ public enum RecordingMode {
 /// <summary>
 /// Event arguments for recording events.
 /// </summary>
-public class RecordingEventArgs : EventArgs {
+public sealed class RecordingEventArgs : EventArgs {
 	/// <summary>Gets the starting frame.</summary>
 	public int StartFrame { get; }
 
@@ -366,7 +366,7 @@ public class RecordingEventArgs : EventArgs {
 /// <summary>
 /// Event arguments for frame recorded events.
 /// </summary>
-public class FrameRecordedEventArgs : EventArgs {
+public sealed class FrameRecordedEventArgs : EventArgs {
 	/// <summary>Gets the frame index.</summary>
 	public int FrameIndex { get; }
 
@@ -386,7 +386,7 @@ public class FrameRecordedEventArgs : EventArgs {
 /// <summary>
 /// Event arguments for rerecord events.
 /// </summary>
-public class RerecordEventArgs : EventArgs {
+public sealed class RerecordEventArgs : EventArgs {
 	/// <summary>Gets the frame being rerecorded from.</summary>
 	public int Frame { get; }
 
@@ -406,7 +406,7 @@ public class RerecordEventArgs : EventArgs {
 /// <summary>
 /// Represents a branch (saved state of the movie for alternative attempts).
 /// </summary>
-public class BranchData {
+public sealed class BranchData {
 	/// <summary>Gets or sets the branch name.</summary>
 	public string Name { get; set; } = "";
 
