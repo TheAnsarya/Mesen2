@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Diagnostics;
 using Nexen.Interop;
 using StreamHash.Core;
@@ -53,8 +54,18 @@ public static class RomHashService {
 		hasher.Update(data);
 		var results = hasher.FinalizeAll();
 
+		// StreamHash outputs CRC32 as raw bytes in little-endian order (e.g., "2639F4CB").
+		// Standard CRC32 representation is big-endian (e.g., "CBF43926").
+		// Reverse the 4-byte hex pairs to match the standard convention.
+		string crc32Hex = results[HashAlgorithmNames.Crc32].ToUpperInvariant();
+		if (crc32Hex.Length == 8) {
+			uint rawCrc = uint.Parse(crc32Hex, System.Globalization.NumberStyles.HexNumber);
+			uint standardCrc = BinaryPrimitives.ReverseEndianness(rawCrc);
+			crc32Hex = standardCrc.ToString("X8");
+		}
+
 		return new RomHashInfo(
-			Crc32: results[HashAlgorithmNames.Crc32].ToUpperInvariant(),
+			Crc32: crc32Hex,
 			Md5: results[HashAlgorithmNames.Md5].ToUpperInvariant(),
 			Sha1: results[HashAlgorithmNames.Sha1].ToUpperInvariant(),
 			Sha256: results[HashAlgorithmNames.Sha256].ToUpperInvariant()

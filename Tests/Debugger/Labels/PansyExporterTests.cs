@@ -2,8 +2,8 @@ using Xunit;
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.IO.Hashing;
 using System.Text;
+using Nexen.Utilities;
 
 namespace Nexen.Tests.Debugger.Labels;
 
@@ -319,13 +319,13 @@ public class PansyExporterTests
 	#region Helper Methods (mirroring PansyExporter implementation)
 
 	/// <summary>
-	/// Calculate CRC32 using System.IO.Hashing.Crc32 (IEEE polynomial).
+	/// Calculate CRC32 using RomHashService (StreamHash-based).
 	/// Returns 0 for empty arrays to match PansyExporter behavior.
 	/// </summary>
 	private static uint ComputeCrc32(byte[] data)
 	{
 		if (data.Length == 0) return 0;
-		return Crc32.HashToUInt32(data);
+		return RomHashService.ComputeBasicHashes(data).Crc32Value;
 	}
 
 	private record TestHeader(ushort Version, byte Platform, byte Flags, uint RomSize, uint RomCrc32, long Timestamp);
