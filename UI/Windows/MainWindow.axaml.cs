@@ -293,6 +293,13 @@ public class MainWindow : NexenWindow {
 				CheatCodes.ApplyCheats();
 				RomInfo romInfo = EmuApi.GetRomInfo();
 
+				// Set per-ROM save state directory for C++ core
+				string saveStatesPath = GameDataManager.GetSaveStatesFolder(romInfo);
+				EmuApi.SetPerRomSaveStateDirectory(saveStatesPath);
+
+				// Migrate any legacy save states to the new per-game folder
+				GameDataManager.MigrateSaveStates(romInfo);
+
 				// Update global emulator state for menu enable/disable
 				Dispatcher.UIThread.Post(() => Services.EmulatorState.Instance.OnRomChanged(romInfo));
 

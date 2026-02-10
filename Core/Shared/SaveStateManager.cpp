@@ -35,6 +35,13 @@ string SaveStateManager::GetStateFilepath(int stateIndex) {
 }
 
 string SaveStateManager::GetRomSaveStateDirectory() {
+	// Use per-ROM directory override if set by C# GameDataManager
+	if (!_perRomSaveStateDir.empty()) {
+		FolderUtilities::CreateFolder(_perRomSaveStateDir);
+		return _perRomSaveStateDir;
+	}
+
+	// Fallback: legacy path {SaveStateFolder}/{RomName}/
 	string romName = FolderUtilities::GetFilename(_emu->GetRomInfo().RomFile.GetFileName(), false);
 	string folder = FolderUtilities::CombinePath(FolderUtilities::GetSaveStateFolder(), romName);
 	FolderUtilities::CreateFolder(folder);
@@ -662,4 +669,13 @@ bool SaveStateManager::HasDesignatedSave() const {
 void SaveStateManager::ClearDesignatedSave() {
 	_designatedSavePath.clear();
 	MessageManager::DisplayMessage("SaveStates", "DesignatedSaveCleared");
+}
+
+// ========== Per-ROM Directory Override ==========
+
+void SaveStateManager::SetPerRomSaveStateDirectory(const string& path) {
+	_perRomSaveStateDir = path;
+	if (!path.empty()) {
+		FolderUtilities::CreateFolder(path);
+	}
 }

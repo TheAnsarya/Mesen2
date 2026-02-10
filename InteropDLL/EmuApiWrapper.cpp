@@ -416,6 +416,12 @@ DllExport void __stdcall ClearDesignatedSave() {
 	_emu->GetSaveStateManager()->ClearDesignatedSave();
 }
 
+// ========== Per-ROM Save State Directory ==========
+
+DllExport void __stdcall SetPerRomSaveStateDirectory(char* path) {
+	_emu->GetSaveStateManager()->SetPerRomSaveStateDirectory(path ? path : "");
+}
+
 class PgoKeyManager : public IKeyManager {
 public:
 	void RefreshState() {}

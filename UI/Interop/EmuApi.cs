@@ -207,6 +207,16 @@ public sealed class EmuApi {
 	[DllImport(DllPath)]
 	public static extern void ClearDesignatedSave();
 
+	// ========== Per-ROM Save State Directory ==========
+
+	/// <summary>
+	/// Set the per-ROM save state directory for the C++ core.
+	/// Called on ROM load to redirect save states to the GameDataManager folder.
+	/// </summary>
+	/// <param name="path">Full path to per-ROM save state directory, or empty to use default.</param>
+	[DllImport(DllPath)]
+	public static extern void SetPerRomSaveStateDirectory([MarshalAs(UnmanagedType.LPUTF8Str)] string path);
+
 	[DllImport(DllPath, EntryPoint = "GetSaveStatePreview")] private static extern Int32 GetSaveStatePreviewWrapper([MarshalAs(UnmanagedType.LPUTF8Str)] string saveStatePath, [Out] byte[] imgData);
 	public static Bitmap? GetSaveStatePreview(string saveStatePath) {
 		if (File.Exists(saveStatePath)) {

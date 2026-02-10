@@ -83,6 +83,7 @@ private:
 	atomic<uint32_t> _recentPlaySlot; ///< Current Recent Play slot (0-11, wraps)
 	time_t _lastRecentPlayTime;       ///< Last Recent Play save timestamp
 	string _designatedSavePath;       ///< Path to user-designated quick-load save
+	string _perRomSaveStateDir;       ///< Per-ROM save state directory (set by C# GameDataManager)
 	Emulator* _emu;                   ///< Emulator instance
 
 	/// <summary>
@@ -316,4 +317,14 @@ public:
 	/// Clear the designated save (unset).
 	/// </summary>
 	void ClearDesignatedSave();
+
+	// ========== Per-ROM Directory Override ==========
+
+	/// <summary>
+	/// Set the per-ROM save state directory (called from C# on ROM load).
+	/// When set, all timestamped saves, recent plays, and auto-saves go here
+	/// instead of the default {SaveStateFolder}/{RomName}/ path.
+	/// </summary>
+	/// <param name="path">Full path to per-ROM save state directory, or empty to use default</param>
+	void SetPerRomSaveStateDirectory(const string& path);
 };

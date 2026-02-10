@@ -219,4 +219,59 @@ public static class GameDataManager {
 			Debug.WriteLine($"[GameDataManager] Failed to create directory '{path}': {ex.Message}");
 		}
 	}
+
+	/// <summary>
+	/// Migrates save state files from the legacy flat folder to the per-game folder.
+	/// Copies (not moves) files so legacy paths still work as fallback.
+	/// </summary>
+	/// <param name="romInfo">ROM information for the currently loaded game.</param>
+	/// <returns>Number of files migrated.</returns>
+	/// <remarks>
+	/// <para>
+	/// Legacy location: <c>{HomeFolder}/SaveStates/{RomName}/</c>
+	/// New location: <c>{GameDataRoot}/SaveStates/</c>
+	/// </para>
+	/// <para>
+	/// Only copies files that don't already exist at the destination.
+	/// Supports both .nexen-save and legacy .mss extensions.
+	/// </para>
+	/// </remarks>
+	public static int MigrateSaveStates(RomInfo romInfo) {
+		try {
+			string romName = romInfo.GetRomName();
+			string legacyFolder = Path.Combine(ConfigManager.HomeFolder, "SaveStates", romName);
+
+			if (!Directory.Exists(legacyFolder))
+				return 0;
+
+			string newFolder = GetSaveStatesFolder(romInfo);
+			int migrated = 0;
+
+			foreach (string sourceFile in Directory.GetFiles(legacyFolder)) {
+				string ext = Path.GetExtension(sourceFile).ToLowerInvariant();
+				if (ext is not ".nexen-save" and not ".mss")
+					continue;
+
+				string destFile = Path.Combine(newFolder, Path.GetFileName(sourceFile));
+				if (File.Exists(destFile))
+					continue;
+
+				try {
+					File.Copy(sourceFile, destFile, overwrite: false);
+					migrated++;
+				} catch (Exception ex) {
+					Log.Warn($"[GameDataManager] Failed to migrate save state '{sourceFile}': {ex.Message}");
+				}
+			}
+
+			if (migrated > 0) {
+				Log.Info($"[GameDataManager] Migrated {migrated} save state(s) for '{romName}' to per-game folder");
+			}
+
+			return migrated;
+		} catch (Exception ex) {
+			Log.Warn($"[GameDataManager] Save state migration failed: {ex.Message}");
+			return 0;
+		}
+	}
 }
