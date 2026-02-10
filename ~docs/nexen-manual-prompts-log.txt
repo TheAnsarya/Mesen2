@@ -96,6 +96,32 @@ you deleted the code from the designated slot, recreate it and continue;
 
 [Nexen] for "13.9" I want to approve all of the icons and new graphics before they are applied; Make a document (and open it) with a listing and description of what each does and how we're using it of all the packages that Nexen uses or inherited from Mesen and create plans and issues and docs for how we can replace these little packages with just standard microsoft dotnet libraries and are they big/robust and have to be kept or can we easily relace them; make isssues!; continue; work on current issues!; continue;
 
+use `C:\Users\me\source\repos\Nexen\~assets\big-logo.png` as the splash screen logo, only having the transparent background cropped so yu only see the main logo; continue;
+
+No i told you to add to the copilot instructions that you should never give up, if something is hard you should create a bunch of issues for research and break the issue up into a bunch of smaller issues to break it into blocks (update copilot instructions); so reopen issue #180 (databox) and break it into smaler issues, research, document, and check if other recent issues were closed too soon, reopen, add a new subisssue, do not give up! make a new effort! make docs and todos and code-plans and plans and issues etc; and then continue!;
+
+if you're trying to reduce png size, download and use the `pngcrush` utility; continue;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

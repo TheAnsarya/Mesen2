@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Debugger.Labels;
 using Nexen.Debugger.ViewModels;
 using Nexen.Debugger.Windows;
@@ -13,6 +13,9 @@ namespace Nexen.Debugger.Views;
 public class LabelListView : UserControl {
 	public LabelListView() {
 		InitializeComponent();
+
+		// Subscribe to DataGrid CellDoubleClick routed event
+		this.AddHandler(DataGridCellClickBehavior.CellDoubleClickEvent, OnCellDoubleClick);
 	}
 
 	private void InitializeComponent() {
@@ -27,8 +30,8 @@ public class LabelListView : UserControl {
 		base.OnDataContextChanged(e);
 	}
 
-	private void OnCellDoubleClick(DataBoxCell cell) {
-		if (DataContext is LabelListViewModel listModel && cell.DataContext is LabelViewModel label) {
+	private void OnCellDoubleClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (DataContext is LabelListViewModel listModel && e.RowItem is LabelViewModel label) {
 			LabelEditWindow.EditLabel(listModel.CpuType, this, label.Label);
 		}
 	}

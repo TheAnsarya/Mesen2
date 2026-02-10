@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using Avalonia.Controls.Selection;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Config;
 using Nexen.Utilities;
 using Nexen.ViewModels;

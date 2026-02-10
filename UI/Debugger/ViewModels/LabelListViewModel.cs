@@ -8,7 +8,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Media;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Config;
 using Nexen.Debugger.Labels;
 using Nexen.Debugger.Utilities;

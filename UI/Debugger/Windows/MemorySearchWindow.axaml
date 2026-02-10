@@ -13,6 +13,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:dvm="using:Nexen.Debugger.ViewModels"
 	xmlns:dc="using:Nexen.Debugger.Controls"
+	xmlns:ext="using:Nexen.Controls.DataGridExtensions"
 	mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
 	x:Class="Nexen.Debugger.Windows.MemorySearchWindow"
 	Icon="/Assets/Find.png"
@@ -162,37 +163,40 @@
 		</DockPanel>
 
 		<Border BorderBrush="Gray" BorderThickness="1">
-			<DataBox
-				Items="{Binding ListData}"
-				Selection="{Binding Selection}"
-				SortState="{Binding SortState}"
-				SortMode="Multiple"
-				SortCommand="{Binding SortCommand}"
+			<DataGrid
+				ItemsSource="{Binding ListData}"
+				SelectedItem="{Binding Selection.SelectedItem}"
+				IsReadOnly="True"
+				CanUserReorderColumns="False"
+				HeadersVisibility="Column"
 				GridLinesVisibility="All"
-				ColumnWidths="{Binding ColumnWidths}"
+				ext:DataGridSortBehavior.SortState="{Binding SortState}"
+				ext:DataGridSortBehavior.SortMode="Multiple"
+				ext:DataGridSortBehavior.SortCommand="{Binding SortCommand}"
+				ext:DataGridColumnWidthBehavior.ColumnWidths="{Binding ColumnWidths}"
 			>
-				<DataBox.Columns>
-					<DataBoxTextColumn ColumnName="Address" Header="{l:Translate colAddress}" Binding="{Binding AddressString, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="Value" Header="{l:Translate colValue}" Binding="{Binding Value, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="PrevValue" Header="{l:Translate colPrevValue}" Binding="{Binding PrevValue, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="ReadCount" Header="{l:Translate colReadCount}" Binding="{Binding ReadCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="LastRead" Header="{l:Translate colLastRead}" Binding="{Binding LastRead, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="WriteCount" Header="{l:Translate colWriteCount}" Binding="{Binding WriteCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="LastWrite" Header="{l:Translate colLastWrite}" Binding="{Binding LastWrite, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="ExecCount" Header="{l:Translate colExecCount}" Binding="{Binding ExecCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="LastExec" Header="{l:Translate colLastExec}" Binding="{Binding LastExec, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTemplateColumn
-						ColumnName="Match"
+				<DataGrid.Columns>
+					<DataGridTextColumn SortMemberPath="Address" Header="{l:Translate colAddress}" Binding="{Binding AddressString, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="Value" Header="{l:Translate colValue}" Binding="{Binding Value, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="PrevValue" Header="{l:Translate colPrevValue}" Binding="{Binding PrevValue, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="ReadCount" Header="{l:Translate colReadCount}" Binding="{Binding ReadCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="LastRead" Header="{l:Translate colLastRead}" Binding="{Binding LastRead, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="WriteCount" Header="{l:Translate colWriteCount}" Binding="{Binding WriteCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="LastWrite" Header="{l:Translate colLastWrite}" Binding="{Binding LastWrite, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="ExecCount" Header="{l:Translate colExecCount}" Binding="{Binding ExecCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTextColumn SortMemberPath="LastExec" Header="{l:Translate colLastExec}" Binding="{Binding LastExec, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" IsReadOnly="True" />
+					<DataGridTemplateColumn
+						SortMemberPath="Match"
 						CanUserSort="False"
 						Header="{l:Translate colMatch}"
-						InitialWidth="22"
+						Width="22"
 					>
 						<DataTemplate>
 							<CheckBox IsChecked="{Binding IsMatch, DataType={x:Type dvm:MemoryAddressViewModel}}" IsHitTestVisible="False" Classes.isNotMatch="{Binding !IsMatch, DataType={x:Type dvm:MemoryAddressViewModel}}" />
 						</DataTemplate>
-					</DataBoxTemplateColumn>
-				</DataBox.Columns>
-			</DataBox>
+					</DataGridTemplateColumn>
+				</DataGrid.Columns>
+			</DataGrid>
 		</Border>
 	</DockPanel>
 </Window>

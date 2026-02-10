@@ -6,7 +6,6 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
-using DataBoxControl;
 using Nexen.Config;
 using Nexen.Debugger.Labels;
 using Nexen.Interop;

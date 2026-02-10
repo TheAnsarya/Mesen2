@@ -8,7 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Config;
 using Nexen.Debugger.Labels;
 using Nexen.Debugger.Utilities;
@@ -78,7 +78,7 @@ public class ProfilerWindowViewModel : DisposableViewModel {
 			new ContextMenuAction() {
 				ActionType = ActionType.CopyToClipboard,
 				Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.Copy),
-				OnClick = () => wnd?.GetVisualDescendants().Where(a => a is DataBox).Cast<DataBox>().FirstOrDefault()?.CopyToClipboard()
+				OnClick = () => wnd?.GetVisualDescendants().Where(a => a is DataGrid).Cast<DataGrid>().FirstOrDefault()?.CopyToClipboard()
 			},
 			new ContextMenuSeparator(),
 			new ContextMenuAction() {

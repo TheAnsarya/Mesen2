@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Debugger.Labels;
 using Nexen.Debugger.ViewModels;
 using Nexen.Debugger.Windows;
@@ -13,6 +13,9 @@ namespace Nexen.Debugger.Views;
 public class FunctionListView : UserControl {
 	public FunctionListView() {
 		InitializeComponent();
+
+		// Subscribe to DataGrid CellDoubleClick routed event
+		this.AddHandler(DataGridCellClickBehavior.CellDoubleClickEvent, OnCellDoubleClick);
 	}
 
 	private void InitializeComponent() {
@@ -27,8 +30,8 @@ public class FunctionListView : UserControl {
 		base.OnDataContextChanged(e);
 	}
 
-	private void OnCellDoubleClick(DataBoxCell cell) {
-		if (DataContext is FunctionListViewModel listModel && cell.DataContext is FunctionViewModel vm && vm.RelAddress >= 0) {
+	private void OnCellDoubleClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (DataContext is FunctionListViewModel listModel && e.RowItem is FunctionViewModel vm && vm.RelAddress >= 0) {
 			listModel.Debugger.ScrollToAddress(vm.RelAddress);
 		}
 	}

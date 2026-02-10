@@ -5,7 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Config;
 using Nexen.Debugger;
 using Nexen.Debugger.Utilities;
@@ -19,6 +19,10 @@ namespace Nexen.Debugger.Views;
 public class BreakpointListView : UserControl {
 	public BreakpointListView() {
 		InitializeComponent();
+
+		// Subscribe to DataGrid CellClick and CellDoubleClick routed events
+		this.AddHandler(DataGridCellClickBehavior.CellClickEvent, OnCellClick);
+		this.AddHandler(DataGridCellClickBehavior.CellDoubleClickEvent, OnCellDoubleClick);
 	}
 
 	private void InitializeComponent() {
@@ -33,9 +37,9 @@ public class BreakpointListView : UserControl {
 		base.OnDataContextChanged(e);
 	}
 
-	private void OnCellClick(DataBoxCell cell) {
-		if (DataContext is BreakpointListViewModel bpList && cell.DataContext is BreakpointViewModel) {
-			string? header = cell.Column?.Header?.ToString() ?? "";
+	private void OnCellClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (DataContext is BreakpointListViewModel bpList && e.RowItem is BreakpointViewModel) {
+			string? header = e.Column?.Header?.ToString() ?? "";
 			if (header is "E" or "M") {
 				bool isEnabledColumn = header == "E";
 				bool newValue = !bpList.Selection.SelectedItems.Any(bp => (isEnabledColumn ? bp?.Breakpoint.Enabled : bp?.Breakpoint.MarkEvent) == true);
@@ -58,8 +62,8 @@ public class BreakpointListView : UserControl {
 		}
 	}
 
-	private void OnCellDoubleClick(DataBoxCell cell) {
-		if (cell.DataContext is BreakpointViewModel vm) {
+	private void OnCellDoubleClick(object? sender, DataGridCellClickRoutedEventArgs e) {
+		if (e.RowItem is BreakpointViewModel vm) {
 			BreakpointEditWindow.EditBreakpoint(vm.Breakpoint, this);
 		}
 	}

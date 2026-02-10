@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Debugger.Controls;
 using Nexen.Debugger.Utilities;
 using Nexen.Debugger.ViewModels;
@@ -21,6 +21,9 @@ public class ProfilerWindow : NexenWindow, INotificationHandler {
 #if DEBUG
 		this.AttachDevTools();
 #endif
+
+		// Subscribe to DataGrid CellDoubleClick routed event (bubbles from DataTemplate)
+		this.AddHandler(DataGridCellClickBehavior.CellDoubleClickEvent, OnCellDoubleClick);
 
 		_model = new ProfilerWindowViewModel(this);
 		DataContext = _model;
@@ -59,7 +62,7 @@ public class ProfilerWindow : NexenWindow, INotificationHandler {
 		}
 	}
 
-	private void OnCellDoubleClick(DataBoxCell cell) {
+	private void OnCellDoubleClick(object? sender, DataGridCellClickRoutedEventArgs e) {
 		if (_model.SelectedTab == null) {
 			return;
 		}

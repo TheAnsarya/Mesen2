@@ -6,7 +6,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using DataBoxControl;
 using Nexen.Debugger.Controls;
 using Nexen.Debugger.Utilities;
 using Nexen.Debugger.ViewModels;

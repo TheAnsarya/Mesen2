@@ -7,7 +7,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using DataBoxControl;
 using DynamicData;
 using Nexen.Config;
 using Nexen.Debugger.Controls;
@@ -33,7 +32,7 @@ public class EventViewerWindow : NexenWindow, INotificationHandler {
 #endif
 
 		PictureViewer viewer = this.GetControl<ScrollPictureViewer>("picViewer").InnerViewer;
-		DataBox listView = this.GetControl<DataBox>("lstEvents");
+		DataGrid listView = this.GetControl<DataGrid>("lstEvents");
 		_model = new EventViewerViewModel(cpuType, viewer, listView, this);
 		_model.Config.LoadWindowSettings(this);
 		DataContext = _model;

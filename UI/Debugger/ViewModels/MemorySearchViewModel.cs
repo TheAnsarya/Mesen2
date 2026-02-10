@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using DynamicData;
 using Nexen.Config;
 using Nexen.Debugger.Utilities;

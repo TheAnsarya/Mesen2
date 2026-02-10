@@ -9,8 +9,6 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.Styling;
-using DataBoxControl;
-using DataBoxControl.Primitives;
 
 namespace Nexen.Controls; 
 public class NexenScrollContentPresenter : ScrollContentPresenter {

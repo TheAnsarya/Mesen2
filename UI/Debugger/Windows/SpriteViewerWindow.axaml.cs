@@ -27,7 +27,7 @@ public class SpriteViewerWindow : NexenWindow, INotificationHandler {
 		ScrollPictureViewer scrollViewer = this.GetControl<ScrollPictureViewer>("picViewer");
 		PictureViewer picViewer = scrollViewer.InnerViewer;
 		Grid spriteGrid = this.GetControl<Grid>("spriteGrid");
-		var listView = this.GetControl<DataBoxControl.DataBox>("ListView");
+		var listView = this.GetControl<DataGrid>("ListView");
 		_model = new SpriteViewerViewModel(cpuType, picViewer, scrollViewer, spriteGrid, listView, this);
 		DataContext = _model;
 

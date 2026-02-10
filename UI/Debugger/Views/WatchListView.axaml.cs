@@ -9,7 +9,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using DataBoxControl;
+using Avalonia.VisualTree;
 using Nexen.Debugger.ViewModels;
 using Nexen.Utilities;
 
@@ -17,17 +17,26 @@ namespace Nexen.Debugger.Views;
 public class WatchListView : UserControl {
 	public WatchListViewModel Model => (WatchListViewModel)DataContext!;
 
-	private DataBox _grid;
+	private DataGrid _grid;
 
 	public WatchListView() {
 		InitializeComponent();
 
-		_grid = this.GetControl<DataBox>("WatchList");
+		_grid = this.GetControl<DataGrid>("WatchList");
 		_grid.AddHandler(WatchListView.KeyDownEvent, OnGridKeyDown, RoutingStrategies.Tunnel, true);
 	}
 
 	private void InitializeComponent() {
 		AvaloniaXamlLoader.Load(this);
+	}
+
+	/// <summary>
+	/// Gets a DataGridRow by its item index using visual tree traversal.
+	/// </summary>
+	private DataGridRow? GetRow(int index) {
+		return _grid.GetVisualDescendants()
+			.OfType<DataGridRow>()
+			.FirstOrDefault(r => r.Index == index);
 	}
 
 	protected override void OnDataContextChanged(EventArgs e) {
@@ -49,13 +58,13 @@ public class WatchListView : UserControl {
 		if (Model.Selection.Count == 1) {
 			Dispatcher.UIThread.Post(() => {
 				int index = Model.Selection.SelectedIndex;
-				if (_grid.GetRow(index)?.IsKeyboardFocusWithin == false) {
-					_grid.GetRow(index)?.Focus();
+				if (GetRow(index)?.IsKeyboardFocusWithin == false) {
+					GetRow(index)?.Focus();
 				}
 			});
 		} else if (Model.Selection.Count == 0) {
 			Dispatcher.UIThread.Post(() => {
-				_grid.GetRow(0)?.Focus();
+				GetRow(0)?.Focus();
 				Model.Selection.Select(0);
 			});
 		}
@@ -75,7 +84,7 @@ public class WatchListView : UserControl {
 					Model.Selection.EndBatchUpdate();
 				}
 
-				txt.FindLogicalAncestorOfType<DataBoxRow>()?.Focus();
+				txt.FindLogicalAncestorOfType<DataGridRow>()?.Focus();
 			}
 		}
 	}
@@ -92,21 +101,21 @@ public class WatchListView : UserControl {
 		if (sender is TextBox txt && txt.DataContext is WatchValueInfo entry) {
 			if (e.Key == Key.Enter) {
 				e.Handled = true;
-				DataBoxRow? row = txt.FindLogicalAncestorOfType<DataBoxRow>();
+				DataGridRow? row = txt.FindLogicalAncestorOfType<DataGridRow>();
 				int index = -1;
 				if (row != null) {
-					index = _grid.GetRowIndex(row);
+					index = row.Index;
 				}
 
 				Model.EditWatch(Model.WatchEntries.IndexOf(entry), entry.Expression);
 				if (index >= 0) {
-					Dispatcher.UIThread.Post(() => _grid.GetRow(index)?.Focus());
+					Dispatcher.UIThread.Post(() => GetRow(index)?.Focus());
 				}
 			} else if (e.Key == Key.Escape) {
 				//Undo
 				e.Handled = true;
 				Model.UpdateWatch();
-				txt.FindLogicalAncestorOfType<DataBoxRow>()?.Focus();
+				txt.FindLogicalAncestorOfType<DataGridRow>()?.Focus();
 			}
 		}
 	}
@@ -118,8 +127,8 @@ public class WatchListView : UserControl {
 	private void OnGridKeyDown(object? sender, KeyEventArgs e) {
 		//Start editing textbox if a text key is pressed while not focused on the textbox
 		//(except when control is held, to allow Ctrl+A select all to work properly)
-		if (e.Source is DataBoxRow row && e.KeyModifiers != KeyModifiers.Control && IsTextKey(e.Key)) {
-			WatchListTextBox? txt = row.CellsPresenter?.GetControl<WatchListTextBox>(0);
+		if (e.Source is DataGridRow row && e.KeyModifiers != KeyModifiers.Control && IsTextKey(e.Key)) {
+			WatchListTextBox? txt = row.GetVisualDescendants().OfType<WatchListTextBox>().FirstOrDefault();
 			txt?.FocusAndSelectAll();
 		}
 	}
@@ -144,7 +153,7 @@ public class WatchListTextBox : TextBox {
 		}
 
 		_inOnGotFocus = true;
-		DataBox? grid = this.FindLogicalAncestorOfType<DataBox>();
+		DataGrid? grid = this.FindLogicalAncestorOfType<DataGrid>();
 		if (grid != null && DataContext is WatchValueInfo watch && _listView != null) {
 			//When clicking the textbox, select the row, too
 			ISelectionModel selection = _listView.Model.Selection;

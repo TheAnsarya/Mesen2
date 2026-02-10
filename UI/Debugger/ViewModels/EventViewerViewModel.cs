@@ -9,7 +9,6 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
-using DataBoxControl;
 using Nexen.Config;
 using Nexen.Debugger.Controls;
 using Nexen.Debugger.Labels;
@@ -115,9 +114,9 @@ public class EventViewerViewModel : DisposableViewModel {
 	/// </summary>
 	/// <param name="cpuType">The CPU type to display events for.</param>
 	/// <param name="picViewer">The picture viewer control for zoom operations.</param>
-	/// <param name="listView">The DataBox control for the list view.</param>
+	/// <param name="listView">The DataGrid control for the list view.</param>
 	/// <param name="wnd">The parent window for menu registration.</param>
-	public EventViewerViewModel(CpuType cpuType, PictureViewer picViewer, DataBox listView, Window? wnd) {
+	public EventViewerViewModel(CpuType cpuType, PictureViewer picViewer, DataGrid listView, Window? wnd) {
 		CpuType = cpuType;
 		ListView = new EventViewerListViewModel(this);
 

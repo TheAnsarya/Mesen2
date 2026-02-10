@@ -15,6 +15,7 @@
 	xmlns:l="using:Nexen.Localization"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:dvm="using:Nexen.Debugger.ViewModels"
+	xmlns:ext="using:Nexen.Controls.DataGridExtensions"
 	mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
 	x:Class="Nexen.Debugger.Windows.EventViewerWindow"
 	x:DataType="dvm:EventViewerViewModel"
@@ -116,27 +117,30 @@
 			/>
 			
 			<Border BorderBrush="Gray" BorderThickness="1" Grid.Row="2">
-				<DataBox
+				<DataGrid
 					Name="lstEvents"
-					Items="{Binding ListView.DebugEvents}"
-					Selection="{Binding ListView.Selection}"
-					SortMode="Multiple"
-					SortCommand="{Binding ListView.SortCommand}"
-					SortState="{Binding ListView.SortState}"
+					ItemsSource="{Binding ListView.DebugEvents}"
+					SelectedItem="{Binding ListView.Selection.SelectedItem}"
+					IsReadOnly="True"
+					CanUserReorderColumns="False"
+					HeadersVisibility="Column"
 					GridLinesVisibility="All"
-					ColumnWidths="{Binding ListView.ColumnWidths}"
+					ext:DataGridSortBehavior.SortMode="Multiple"
+					ext:DataGridSortBehavior.SortCommand="{Binding ListView.SortCommand}"
+					ext:DataGridSortBehavior.SortState="{Binding ListView.SortState}"
+					ext:DataGridColumnWidthBehavior.ColumnWidths="{Binding ListView.ColumnWidths}"
 				>
-					<DataBox.Styles>
+					<DataGrid.Styles>
 						<Style Selector="TextBlock">
 							<Setter Property="Margin" Value="3 0 0 0" />
 						</Style>
-					</DataBox.Styles>
+					</DataGrid.Styles>
 
-					<DataBox.Columns>
-						<DataBoxTemplateColumn
+					<DataGrid.Columns>
+						<DataGridTemplateColumn
 							Header=""
-							ColumnName="Color"
-							InitialWidth="16"
+							SortMemberPath="Color"
+							Width="16"
 						>
 							<DataTemplate>
 								<Border
@@ -147,16 +151,16 @@
 									Height="12"
 								/>
 							</DataTemplate>
-						</DataBoxTemplateColumn>
-						<DataBoxTextColumn Header="{l:Translate colScanline}" ColumnName="Scanline" InitialWidth="88" Binding="{Binding Scanline, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colCycle}" ColumnName="Cycle" InitialWidth="77" Binding="{Binding Cycle, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colPc}" ColumnName="ProgramCounter" InitialWidth="62" Binding="{Binding ProgramCounter, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colType}" ColumnName="Type" InitialWidth="77" Binding="{Binding Type, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colAddress}" ColumnName="Address" InitialWidth="68" Binding="{Binding Address, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colValue}" ColumnName="Value" InitialWidth="50" Binding="{Binding Value, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colDetails}" CanUserSort="False" InitialWidth="416" Binding="{Binding Details, DataType={x:Type dvm:DebugEventViewModel}}" />
-					</DataBox.Columns>
-				</DataBox>
+						</DataGridTemplateColumn>
+						<DataGridTextColumn Header="{l:Translate colScanline}" SortMemberPath="Scanline" Width="88" Binding="{Binding Scanline, DataType={x:Type dvm:DebugEventViewModel}}" IsReadOnly="True" />
+						<DataGridTextColumn Header="{l:Translate colCycle}" SortMemberPath="Cycle" Width="77" Binding="{Binding Cycle, DataType={x:Type dvm:DebugEventViewModel}}" IsReadOnly="True" />
+						<DataGridTextColumn Header="{l:Translate colPc}" SortMemberPath="ProgramCounter" Width="62" Binding="{Binding ProgramCounter, DataType={x:Type dvm:DebugEventViewModel}}" IsReadOnly="True" />
+						<DataGridTextColumn Header="{l:Translate colType}" SortMemberPath="Type" Width="77" Binding="{Binding Type, DataType={x:Type dvm:DebugEventViewModel}}" IsReadOnly="True" />
+						<DataGridTextColumn Header="{l:Translate colAddress}" SortMemberPath="Address" Width="68" Binding="{Binding Address, DataType={x:Type dvm:DebugEventViewModel}}" IsReadOnly="True" />
+						<DataGridTextColumn Header="{l:Translate colValue}" SortMemberPath="Value" Width="50" Binding="{Binding Value, DataType={x:Type dvm:DebugEventViewModel}}" IsReadOnly="True" />
+						<DataGridTextColumn Header="{l:Translate colDetails}" CanUserSort="False" Width="416" Binding="{Binding Details, DataType={x:Type dvm:DebugEventViewModel}}" IsReadOnly="True" />
+					</DataGrid.Columns>
+				</DataGrid>
 			</Border>
 		</Grid>
 	</DockPanel>

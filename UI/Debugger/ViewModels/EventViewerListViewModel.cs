@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 using Avalonia.Collections;
 using Avalonia.Controls.Selection;
-using DataBoxControl;
+using Nexen.Controls.DataGridExtensions;
 using Nexen.Config;
 using Nexen.Interop;
 using Nexen.Utilities;
