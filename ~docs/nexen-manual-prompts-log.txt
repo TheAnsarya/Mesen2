@@ -114,9 +114,17 @@ yes, thank you, please continue;
 
 [Nexen] save files if they are the most modern versions of those files; save and close all the vscode open files; Switch `F1` and `Shift+F1` so that `F1` creates a Quick Save and `Shift+F1` opens the `Browse Save States` file dialog with the screen shots and tags (tags show which savestate type, with the associated color) and labels; work on issue #207; and then work on other issues; continue;
 
+[Nexen] work on issue #169; show me replacement icons next to the cuurent ones so I can approve them; continue;
 
+[Nexen] Delete dead icons, make sure `Icon.ico` is not Mesen and the NExen Icon is the one used; Most of the icons are tiny, makle scalable SVG versions of the simple ones so we can have different sized UI icons; continue;
 
+Don't use these new SVG icons yet, most of them suck, no offense
 
+move all the new svgs to a subfolder called `/Drafts/`; Then begin working on more perfomance benchmarks and improvements and increasing testing coverage; continue;
+
+[Nexen] make the copilot instructions says to use K&R style braces, as currently created code often does not; continue; did you run all the benchmarks and look for improvements?
+
+[Nexen] update the chat logs and session logs, git commit everything; Make sure all of the changes you made for performance are 100% covered by tests so that we did not change the ***outcome*** of any of those methods/code and just improved the speed and memory usage; make sure issues have been created for all of this work (and todos, and docs, and plans, etc, track everything and document everything and update docs to reflect the current usage); also make sure comments for all the code changes have been updated and update them in the future; continue; is there any other code sections on the hotpath that are easy performance improvements? (test the hell out of them, we can't afford to reduce emulator accuracy in any way, hit the corner cases! full coverage!); continue; update the readme to show the current state, and clean up any misinformation; combine the license files, so that the description of our changes being `the unlicence` but we're based on Mesen which is `GPL` and then at the end put the necessary text blocks in sections for `The  Unlicense` and then at thery bottom the `GPL` license text we're required to have; continue;
 
 
 
