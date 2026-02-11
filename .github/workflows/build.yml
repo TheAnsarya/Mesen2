@@ -298,14 +298,24 @@ jobs:
           mkdir -p release-assets
 
           # Windows builds
-          cp "artifacts/Nexen (Windows - net8.0)/Nexen.exe" "release-assets/Nexen-Windows-x64.exe" || true
-          cp "artifacts/Nexen (Windows - net8.0 - AoT)/Nexen.exe" "release-assets/Nexen-Windows-x64-AoT.exe" || true
+          cp "artifacts/Nexen (Windows)/Nexen.exe" "release-assets/Nexen-Windows-x64.exe" || true
+          cp "artifacts/Nexen (Windows - AoT)/Nexen.exe" "release-assets/Nexen-Windows-x64-AoT.exe" || true
 
-          # Linux builds
+          # Linux builds (gcc)
+          cp "artifacts/Nexen (Linux - ubuntu-22.04 - gcc)/Nexen" "release-assets/Nexen-Linux-x64-gcc" || true
+          chmod +x "release-assets/Nexen-Linux-x64-gcc" || true
+          cp "artifacts/Nexen (Linux - ubuntu-22.04-arm - gcc)/Nexen" "release-assets/Nexen-Linux-ARM64-gcc" || true
+          chmod +x "release-assets/Nexen-Linux-ARM64-gcc" || true
+
+          # Linux builds (clang)
           cp "artifacts/Nexen (Linux - ubuntu-22.04 - clang)/Nexen" "release-assets/Nexen-Linux-x64" || true
           chmod +x "release-assets/Nexen-Linux-x64" || true
           cp "artifacts/Nexen (Linux - ubuntu-22.04-arm - clang)/Nexen" "release-assets/Nexen-Linux-ARM64" || true
           chmod +x "release-assets/Nexen-Linux-ARM64" || true
+
+          # Linux AOT builds
+          cp "artifacts/Nexen (Linux - ubuntu-22.04 - clang_aot)/Nexen" "release-assets/Nexen-Linux-x64-AoT" || true
+          chmod +x "release-assets/Nexen-Linux-x64-AoT" || true
 
           # Linux AppImage builds
           cp "artifacts/Nexen (Linux x64 - AppImage)/Nexen.AppImage" "release-assets/Nexen-Linux-x64.AppImage" || true
@@ -314,8 +324,10 @@ jobs:
           chmod +x "release-assets/Nexen-Linux-ARM64.AppImage" || true
 
           # macOS builds
-          cp "artifacts/Nexen (macOS - macos-13 - clang)/Nexen.app.zip" "release-assets/Nexen-macOS-x64.zip" || true
+          cp "artifacts/Nexen (macOS - macos-15-large - clang)/Nexen.app.zip" "release-assets/Nexen-macOS-x64.zip" || true
           cp "artifacts/Nexen (macOS - macos-14 - clang)/Nexen.app.zip" "release-assets/Nexen-macOS-ARM64.zip" || true
+          cp "artifacts/Nexen (macOS - macos-15-large - clang_aot)/Nexen.app.zip" "release-assets/Nexen-macOS-x64-AoT.zip" || true
+          cp "artifacts/Nexen (macOS - macos-14 - clang_aot)/Nexen.app.zip" "release-assets/Nexen-macOS-ARM64-AoT.zip" || true
 
           ls -la release-assets/
 

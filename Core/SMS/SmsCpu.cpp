@@ -1595,11 +1595,9 @@ void SmsCpu::ClearFlag(uint8_t flag) {
 }
 
 void SmsCpu::SetFlagState(uint8_t flag, bool state) {
-	if (state) {
-		SetFlag(flag);
-	} else {
-		ClearFlag(flag);
-	}
+	// Branchless: clear flag, then conditionally OR it back
+	_state.Flags = (_state.Flags & ~flag) | (-static_cast<uint8_t>(state) & flag);
+	_state.FlagsChanged |= 0x01;
 }
 
 void SmsCpu::PushByte(uint8_t value) {

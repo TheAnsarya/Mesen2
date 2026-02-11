@@ -315,9 +315,9 @@ private:
 
 		ClearFlags(PSFlags::Carry | PSFlags::Negative | PSFlags::Overflow | PSFlags::Zero);
 		SetZeroNegativeFlags((uint8_t)result);
-		// Branchless Overflow and Carry
-		_state.PS |= (~(A() ^ value) & (A() ^ result) & 0x80) ? PSFlags::Overflow : 0;
-		_state.PS |= (result > 0xFF) ? PSFlags::Carry : 0;
+		// Truly branchless: shift overflow bit (0x80) to Overflow position (0x40)
+		_state.PS |= ((~(A() ^ value) & (A() ^ result) & 0x80) >> 1);  // 0x80>>1 = 0x40 = Overflow
+		_state.PS |= static_cast<uint8_t>(result >> 8);  // High byte = Carry (0 or 1)
 		SetA((uint8_t)result);
 	}
 

@@ -930,8 +930,9 @@ protected:
 		ps &= ~(PSFlags::Carry | PSFlags::Negative | PSFlags::Overflow | PSFlags::Zero);
 		ps |= ((uint8_t)result == 0) ? PSFlags::Zero : 0;
 		ps |= ((uint8_t)result & 0x80);
-		ps |= (~(a ^ value) & (a ^ result) & 0x80) ? PSFlags::Overflow : 0;
-		ps |= (result > 0xFF) ? PSFlags::Carry : 0;
+		// Truly branchless: shift overflow bit to Overflow position, no ternary
+		ps |= ((~(a ^ value) & (a ^ result) & 0x80) >> 1);  // 0x80>>1 = 0x40 = Overflow
+		ps |= static_cast<uint8_t>(result >> 8);  // High byte = Carry (0 or 1)
 		a = (uint8_t)result;
 	}
 };

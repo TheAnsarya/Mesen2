@@ -23,13 +23,16 @@
 
 Download pre-built binaries from the [Releases page](https://github.com/TheAnsarya/Nexen/releases/latest).
 
-| Platform | Architecture | Status |
-|----------|--------------|--------|
-| **Windows** | x64 | ✅ Available |
-| **Linux** | x64 | ❌ Coming soon |
-| **macOS** | Intel / Apple Silicon | ❌ Coming soon |
+| Platform | Architecture | Download | Notes |
+|----------|--------------|----------|-------|
+| **Windows** | x64 | [Nexen-Windows-x64.exe](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Windows-x64.exe) | Single-file |
+| **Windows** | x64 (AoT) | [Nexen-Windows-x64-AoT.exe](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Windows-x64-AoT.exe) | Native compiled |
+| **Linux** | x64 | [Nexen-Linux-x64.AppImage](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Linux-x64.AppImage) | AppImage (recommended) |
+| **Linux** | ARM64 | [Nexen-Linux-ARM64.AppImage](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-Linux-ARM64.AppImage) | AppImage (recommended) |
+| **macOS** | Intel (x64) | [Nexen-macOS-x64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-macOS-x64.zip) | Signed app bundle |
+| **macOS** | Apple Silicon | [Nexen-macOS-ARM64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-macOS-ARM64.zip) | Signed app bundle |
 
-> ℹ️ **Note:** Currently only Windows x64 is available. Linux and macOS builds are planned.
+> ℹ️ **Requirements:** Linux requires SDL2. macOS users: right-click → Open on first launch to bypass Gatekeeper.
 
 ---
 
@@ -58,9 +61,10 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 ### 💾 Save States
 
 - **Infinite Save States** - Unlimited timestamped saves per game
-- **Visual Picker** - Grid view with screenshots and timestamps
-- **Quick Save/Load** - Ctrl+Shift+S to save, Ctrl+Shift+L to browse
-- **Quick Slots** - F2-F7 save, Shift+F2-F7 load
+- **Visual Picker** - Grid view with screenshots and timestamps (Shift+F1)
+- **Quick Save** - F1 to save, Shift+F1 to browse
+- **Designated Slot** - F4 to load, Shift+F4 to save
+- **Auto-Save** - Periodic quick saves and recent play saves
 - **Per-Game Organization** - Saves organized by ROM
 
 ### 🎮 TAS Editor
@@ -140,12 +144,15 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 
 | Shortcut | Action |
 | ---------- | -------- |
-| Ctrl+Shift+S | Quick Save (Timestamped) |
-| Ctrl+Shift+L | Browse Save States |
-| F2-F7 | Save to Slot 2-7 |
-| Shift+F2-F7 | Load from Slot 2-7 |
+| F1 | Quick Save (Timestamped) |
+| Shift+F1 | Browse Save States |
+| F4 | Load Designated Slot |
+| Shift+F4 | Save Designated Slot |
+| Ctrl+S | Quick Save (Alt) |
+| Ctrl+Shift+S | Save State to File |
+| Ctrl+L | Load State from File |
 | Escape | Pause/Resume |
-| Alt+Enter | Toggle Fullscreen |
+| F11 | Toggle Fullscreen |
 
 ### TAS Editor
 

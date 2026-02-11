@@ -285,11 +285,9 @@ bool PceCpu::CheckFlag(uint8_t flag) {
 }
 
 void PceCpu::SetZeroNegativeFlags(uint8_t value) {
-	if (value == 0) {
-		SetFlags(PceCpuFlags::Zero);
-	} else if (value & 0x80) {
-		SetFlags(PceCpuFlags::Negative);
-	}
+	// Branchless: Negative flag (0x80) maps directly to bit 7 of value
+	_state.PS |= (value == 0) ? PceCpuFlags::Zero : 0;
+	_state.PS |= (value & PceCpuFlags::Negative);
 }
 
 void PceCpu::RunIdleCpuCycle() {

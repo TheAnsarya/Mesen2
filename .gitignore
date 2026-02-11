@@ -193,3 +193,18 @@ vcpkg_installed/
 
 TestHelper/*
 UI/Dependencies.zip
+
+# BenchmarkDotNet artifacts (regenerated per run)
+BenchmarkDotNet.Artifacts/
+Benchmarks/BenchmarkDotNet.Artifacts/
+MovieConverter.Benchmarks/BenchmarkDotNet.Artifacts/
+
+# Temp build/benchmark/test output files
+bench-*.json
+bench-*.txt
+build-*.log
+build-*.txt
+build-output.txt
+build-err*.txt
+test-*.log
+terminal-*.txt

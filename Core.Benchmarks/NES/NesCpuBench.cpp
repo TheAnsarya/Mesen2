@@ -307,6 +307,30 @@ static void BM_NesCpu_ADD_Branchless(benchmark::State& state) {
 }
 BENCHMARK(BM_NesCpu_ADD_Branchless);
 
+// --- ADD (ADC) Truly Branchless: bit shift instead of ternary ---
+
+static void BM_NesCpu_ADD_TrulyBranchless(benchmark::State& state) {
+	NesCpuState cpuState = {};
+	cpuState.A = 0;
+	uint8_t value = 0;
+	for (auto _ : state) {
+		uint16_t result = (uint16_t)cpuState.A + (uint16_t)value + (cpuState.PS & PSFlags::Carry);
+		cpuState.PS &= ~(PSFlags::Carry | PSFlags::Negative | PSFlags::Overflow | PSFlags::Zero);
+		cpuState.PS |= ((uint8_t)result == 0) ? PSFlags::Zero : 0;
+		cpuState.PS |= ((uint8_t)result & 0x80);
+		// Shift overflow bit (0x80) to Overflow position (0x40) — no ternary
+		cpuState.PS |= ((~(cpuState.A ^ value) & (cpuState.A ^ result) & 0x80) >> 1);
+		// High byte of result is 0 or 1 = Carry
+		cpuState.PS |= static_cast<uint8_t>(result >> 8);
+		cpuState.A = (uint8_t)result;
+		benchmark::DoNotOptimize(cpuState.PS);
+		benchmark::DoNotOptimize(cpuState.A);
+		value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_NesCpu_ADD_TrulyBranchless);
+
 // --- BIT ---
 
 static void BM_NesCpu_BIT_Branching(benchmark::State& state) {
