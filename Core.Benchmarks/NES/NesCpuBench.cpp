@@ -10,7 +10,7 @@
 static void BM_NesCpu_FlagManipulation(benchmark::State& state) {
 	NesCpuState cpuState = {};
 	cpuState.PS = 0x24;  // Initial: I flag + Reserved
-	
+
 	for (auto _ : state) {
 		// Simulate typical flag updates
 		cpuState.PS |= PSFlags::Carry;
@@ -27,7 +27,7 @@ BENCHMARK(BM_NesCpu_FlagManipulation);
 static void BM_NesCpu_SetZeroNegativeFlags(benchmark::State& state) {
 	NesCpuState cpuState = {};
 	uint8_t value = 0;
-	
+
 	for (auto _ : state) {
 		// Clear Z and N flags
 		cpuState.PS &= ~(PSFlags::Zero | PSFlags::Negative);
@@ -45,7 +45,7 @@ BENCHMARK(BM_NesCpu_SetZeroNegativeFlags);
 static void BM_NesCpu_SetZeroNegativeFlags_Branchless(benchmark::State& state) {
 	NesCpuState cpuState = {};
 	uint8_t value = 0;
-	
+
 	for (auto _ : state) {
 		cpuState.PS &= ~(PSFlags::Zero | PSFlags::Negative);
 		cpuState.PS |= (value == 0) ? PSFlags::Zero : 0;
@@ -62,7 +62,7 @@ static void BM_NesCpu_StackPushPop(benchmark::State& state) {
 	NesCpuState cpuState = {};
 	cpuState.SP = 0xFF;
 	std::array<uint8_t, 256> stack{};
-	
+
 	for (auto _ : state) {
 		// Push pattern
 		stack[0x100 + cpuState.SP--] = cpuState.A;
@@ -80,7 +80,7 @@ BENCHMARK(BM_NesCpu_StackPushPop);
 // Benchmark address mode calculations - Zero Page
 static void BM_NesCpu_AddrMode_ZeroPage(benchmark::State& state) {
 	uint8_t operand = 0x42;
-	
+
 	for (auto _ : state) {
 		uint16_t addr = operand;
 		benchmark::DoNotOptimize(addr);
@@ -94,7 +94,7 @@ BENCHMARK(BM_NesCpu_AddrMode_ZeroPage);
 static void BM_NesCpu_AddrMode_ZeroPageX(benchmark::State& state) {
 	uint8_t operand = 0x42;
 	uint8_t X = 0x10;
-	
+
 	for (auto _ : state) {
 		uint16_t addr = static_cast<uint8_t>(operand + X);  // Wraps in zero page
 		benchmark::DoNotOptimize(addr);
@@ -108,7 +108,7 @@ BENCHMARK(BM_NesCpu_AddrMode_ZeroPageX);
 static void BM_NesCpu_AddrMode_Absolute(benchmark::State& state) {
 	uint8_t lowByte = 0x42;
 	uint8_t highByte = 0x80;
-	
+
 	for (auto _ : state) {
 		uint16_t addr = lowByte | (static_cast<uint16_t>(highByte) << 8);
 		benchmark::DoNotOptimize(addr);
@@ -122,7 +122,7 @@ BENCHMARK(BM_NesCpu_AddrMode_Absolute);
 static void BM_NesCpu_AddrMode_AbsoluteX_PageCross(benchmark::State& state) {
 	uint16_t baseAddr = 0x80F0;
 	uint8_t X = 0x20;
-	
+
 	for (auto _ : state) {
 		uint16_t addr = baseAddr + X;
 		bool pageCrossed = ((baseAddr & 0xFF00) != (addr & 0xFF00));
@@ -141,7 +141,7 @@ static void BM_NesCpu_AddrMode_IndirectY(benchmark::State& state) {
 	zeroPage[0x43] = 0x80;
 	uint8_t zpAddr = 0x42;
 	uint8_t Y = 0x10;
-	
+
 	for (auto _ : state) {
 		uint16_t baseAddr = zeroPage[zpAddr] | (static_cast<uint16_t>(zeroPage[zpAddr + 1]) << 8);
 		uint16_t addr = baseAddr + Y;
@@ -159,10 +159,10 @@ static void BM_NesCpu_Instruction_ADC(benchmark::State& state) {
 	cpuState.A = 0x40;
 	cpuState.PS = 0;
 	uint8_t operand = 0x30;
-	
+
 	for (auto _ : state) {
 		uint16_t result = cpuState.A + operand + (cpuState.PS & PSFlags::Carry);
-		
+
 		// Set flags
 		cpuState.PS &= ~(PSFlags::Carry | PSFlags::Zero | PSFlags::Negative | PSFlags::Overflow);
 		if (result > 0xFF) cpuState.PS |= PSFlags::Carry;
@@ -172,7 +172,7 @@ static void BM_NesCpu_Instruction_ADC(benchmark::State& state) {
 		if (~(cpuState.A ^ operand) & (cpuState.A ^ result) & 0x80) {
 			cpuState.PS |= PSFlags::Overflow;
 		}
-		
+
 		cpuState.A = static_cast<uint8_t>(result);
 		benchmark::DoNotOptimize(cpuState.A);
 		benchmark::DoNotOptimize(cpuState.PS);
@@ -188,7 +188,7 @@ static void BM_NesCpu_Instruction_Branch(benchmark::State& state) {
 	cpuState.PC = 0x8000;
 	cpuState.PS = PSFlags::Zero;  // BEQ will be taken
 	int8_t offset = 10;
-	
+
 	for (auto _ : state) {
 		bool taken = (cpuState.PS & PSFlags::Zero) != 0;
 		if (taken) {
@@ -208,7 +208,7 @@ BENCHMARK(BM_NesCpu_Instruction_Branch);
 static void BM_NesCpu_Instruction_RMW_Pattern(benchmark::State& state) {
 	uint8_t memory = 0x42;
 	NesCpuState cpuState = {};
-	
+
 	for (auto _ : state) {
 		// Read
 		uint8_t value = memory;

@@ -1,7 +1,7 @@
 # Nexen
 
 <p align="center">
-  <img src="UI/Resources/icon.png" alt="Nexen" width="128"/>
+  <img src="~assets/Nexen%20icon.png" alt="Nexen" width="128"/>
 </p>
 
 <p align="center">
@@ -9,14 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml">
-    <img src="https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml/badge.svg" alt="Build Status"/>
-  </a>
   <a href="https://github.com/TheAnsarya/Nexen/releases">
     <img src="https://img.shields.io/github/v/release/TheAnsarya/Nexen?include_prereleases" alt="Latest Release"/>
   </a>
   <a href="LICENSE">
-    <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License"/>
+    <img src="https://img.shields.io/badge/license-Unlicense%20%2B%20GPL--3.0-blue.svg" alt="License"/>
   </a>
 </p>
 
@@ -24,25 +21,15 @@
 
 ## 📥 Downloads
 
-### Latest Release (v1.0.0)
-
 Download pre-built binaries from the [Releases page](https://github.com/TheAnsarya/Nexen/releases/latest).
 
-| Platform | Architecture | Status | Download |
-|----------|--------------|--------|----------|
-| **Windows** | x64 | ✅ | [Nexen-v1.0.0-Windows-x64.zip](https://github.com/TheAnsarya/Nexen/releases/latest/download/Nexen-v1.0.0-Windows-x64.zip) |
-| **Linux** | x64 | ❌ | *Coming soon* |
-| **Linux** | x64 AppImage | ❌ | *Coming soon* |
-| **Linux** | ARM64 | ❌ | *Coming soon* |
-| **Linux** | ARM64 AppImage | ❌ | *Coming soon* |
-| **macOS** | Intel (x64) | ❌ | *Coming soon* |
-| **macOS** | Apple Silicon | ❌ | *Coming soon* |
+| Platform | Architecture | Status |
+|----------|--------------|--------|
+| **Windows** | x64 | ✅ Available |
+| **Linux** | x64 | ❌ Coming soon |
+| **macOS** | Intel / Apple Silicon | ❌ Coming soon |
 
-> ℹ️ **Note:** Currently only Windows x64 is available. Linux and macOS builds are in progress.
-
-### Development Builds
-
-Automated builds from the latest code are available as artifacts from [GitHub Actions](https://github.com/TheAnsarya/Nexen/actions/workflows/build.yml). Click on a successful workflow run and download artifacts from the bottom of the page.
+> ℹ️ **Note:** Currently only Windows x64 is available. Linux and macOS builds are planned.
 
 ---
 
@@ -72,7 +59,8 @@ Automated builds from the latest code are available as artifacts from [GitHub Ac
 
 - **Infinite Save States** - Unlimited timestamped saves per game
 - **Visual Picker** - Grid view with screenshots and timestamps
-- **Quick Save/Load** - Shift+F1 to save, F1 to browse
+- **Quick Save/Load** - Ctrl+Shift+S to save, Ctrl+Shift+L to browse
+- **Quick Slots** - F2-F7 save, Shift+F2-F7 load
 - **Per-Game Organization** - Saves organized by ROM
 
 ### 🎮 TAS Editor
@@ -152,8 +140,8 @@ Automated builds from the latest code are available as artifacts from [GitHub Ac
 
 | Shortcut | Action |
 | ---------- | -------- |
-| F1 | Browse Save States |
-| Shift+F1 | Quick Save (Timestamped) |
+| Ctrl+Shift+S | Quick Save (Timestamped) |
+| Ctrl+Shift+L | Browse Save States |
 | F2-F7 | Save to Slot 2-7 |
 | Shift+F2-F7 | Load from Slot 2-7 |
 | Escape | Pause/Resume |
@@ -196,10 +184,10 @@ See [COMPILING.md](COMPILING.md) for detailed instructions.
 
 Nexen is dual-licensed:
 
-- **Base Code (GPL v3):** Original code from [Mesen](https://github.com/SourMesen/Mesen2) by Sour
-- **Nexen Additions (Unlicense):** All new features and modifications
+- **Nexen Additions (Unlicense):** All new features, modifications, and additions created for this fork are released into the public domain under [The Unlicense](https://unlicense.org).
+- **Base Code (GPL v3):** The original [Mesen](https://github.com/SourMesen/Mesen2) code by Sour remains under the GNU General Public License v3.
 
-See [LICENSE](LICENSE) and [LICENSE-UNLICENSE](LICENSE-UNLICENSE) for details.
+See [LICENSE](LICENSE) for full details.
 
 ## 🙏 Acknowledgments
 

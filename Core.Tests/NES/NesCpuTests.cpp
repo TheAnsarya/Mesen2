@@ -1120,3 +1120,112 @@ TEST_F(NesCpuShiftComparisonTest, ROR_Exhaustive_All256x2Carry) {
 		}
 	}
 }
+
+//=============================================================================
+// Phase 3: Extended Corner-Case Tests — Multi-PS-State Coverage
+//=============================================================================
+
+// NES CMP: Verify with multiple initial PS states (stale flag clearing)
+TEST_F(NesCpuCmpComparisonTest, Exhaustive_MultiPS_All256x256) {
+	uint8_t psStates[] = { 0x00, 0x24, 0x83, 0xC1, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int r = 0; r < 256; r++) {
+			for (int v = 0; v < 256; v++) {
+				uint8_t oldPS = CMP_Branching(initPS, (uint8_t)r, (uint8_t)v);
+				uint8_t newPS = CMP_Branchless(initPS, (uint8_t)r, (uint8_t)v);
+				ASSERT_EQ(oldPS, newPS)
+					<< "CMP MultiPS: PS=0x" << std::hex << (int)initPS
+					<< " reg=0x" << r << " val=0x" << v;
+			}
+		}
+	}
+}
+
+// NES ADD: Verify with ALL flags initially set (stale V/N/Z/C clearing)
+TEST_F(NesCpuAddComparisonTest, Exhaustive_AllFlagsSet_All256x256x2Carry) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int ai = 0; ai < 256; ai++) {
+			for (int vi = 0; vi < 256; vi++) {
+				uint8_t ps1 = 0xFF, ps2 = 0xFF;
+				uint8_t a1 = (uint8_t)ai, a2 = (uint8_t)ai;
+				ADD_Branching(ps1, a1, (uint8_t)vi, carry != 0);
+				ADD_Branchless(ps2, a2, (uint8_t)vi, carry != 0);
+				ASSERT_EQ(ps1, ps2)
+					<< "ADD AllFlags: A=0x" << std::hex << ai
+					<< " val=0x" << vi << " carry=" << carry;
+				ASSERT_EQ(a1, a2);
+			}
+		}
+	}
+}
+
+// NES BIT: Verify with multiple initial PS states (stale V/N flag clearing)
+TEST_F(NesCpuBitComparisonTest, Exhaustive_MultiPS_All256x256) {
+	uint8_t psStates[] = { 0x00, 0x24, 0xC0, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int a = 0; a < 256; a++) {
+			for (int v = 0; v < 256; v++) {
+				uint8_t oldPS = BIT_Branching(initPS, (uint8_t)a, (uint8_t)v);
+				uint8_t newPS = BIT_Branchless(initPS, (uint8_t)a, (uint8_t)v);
+				ASSERT_EQ(oldPS, newPS)
+					<< "BIT MultiPS: PS=0x" << std::hex << (int)initPS
+					<< " A=0x" << a << " value=0x" << v;
+			}
+		}
+	}
+}
+
+// NES Shifts: Verify with multiple initial PS states
+TEST_F(NesCpuShiftComparisonTest, ASL_MultiPS_Exhaustive) {
+	uint8_t psStates[] = { 0x00, 0x24, 0x83, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			uint8_t ps1 = ASL_Branching(initPS, (uint8_t)v, r1);
+			uint8_t ps2 = ASL_Branchless(initPS, (uint8_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "ASL MultiPS: PS=0x" << std::hex << (int)initPS << " value=0x" << v;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+TEST_F(NesCpuShiftComparisonTest, LSR_MultiPS_Exhaustive) {
+	uint8_t psStates[] = { 0x00, 0x24, 0x83, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			uint8_t ps1 = LSR_Branching(initPS, (uint8_t)v, r1);
+			uint8_t ps2 = LSR_Branchless(initPS, (uint8_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "LSR MultiPS: PS=0x" << std::hex << (int)initPS << " value=0x" << v;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+TEST_F(NesCpuShiftComparisonTest, ROL_MultiPS_Exhaustive) {
+	uint8_t psStates[] = { 0x00, 0x24, 0x83, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			bool carryIn = (initPS & PSFlags::Carry) != 0;
+			uint8_t ps1 = ROL_Branching(initPS, (uint8_t)v, carryIn, r1);
+			uint8_t ps2 = ROL_Branchless(initPS, (uint8_t)v, carryIn, r2);
+			ASSERT_EQ(ps1, ps2) << "ROL MultiPS: PS=0x" << std::hex << (int)initPS << " value=0x" << v;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+TEST_F(NesCpuShiftComparisonTest, ROR_MultiPS_Exhaustive) {
+	uint8_t psStates[] = { 0x00, 0x24, 0x83, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			bool carryIn = (initPS & PSFlags::Carry) != 0;
+			uint8_t ps1 = ROR_Branching(initPS, (uint8_t)v, carryIn, r1);
+			uint8_t ps2 = ROR_Branchless(initPS, (uint8_t)v, carryIn, r2);
+			ASSERT_EQ(ps1, ps2) << "ROR MultiPS: PS=0x" << std::hex << (int)initPS << " value=0x" << v;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}

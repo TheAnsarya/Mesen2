@@ -205,11 +205,11 @@ protected:
 	AddResult Add8(uint8_t a, uint8_t b) {
 		uint16_t sum = (uint16_t)a + (uint16_t)b;
 		uint8_t result = (uint8_t)sum;
-		
+
 		bool halfCarry = ((a & 0x0F) + (b & 0x0F)) > 0x0F;
 		bool carry = sum > 0xFF;
 		bool zero = result == 0;
-		
+
 		return { result, zero, halfCarry, carry };
 	}
 
@@ -218,22 +218,22 @@ protected:
 		uint8_t c = carryIn ? 1 : 0;
 		uint16_t sum = (uint16_t)a + (uint16_t)b + c;
 		uint8_t result = (uint8_t)sum;
-		
+
 		bool halfCarry = ((a & 0x0F) + (b & 0x0F) + c) > 0x0F;
 		bool carry = sum > 0xFF;
 		bool zero = result == 0;
-		
+
 		return { result, zero, halfCarry, carry };
 	}
 
 	// SUB A, n - flags: Z 1 H C
 	AddResult Sub8(uint8_t a, uint8_t b) {
 		uint8_t result = a - b;
-		
+
 		bool halfCarry = (a & 0x0F) < (b & 0x0F);
 		bool carry = a < b;
 		bool zero = result == 0;
-		
+
 		return { result, zero, halfCarry, carry };
 	}
 
@@ -241,11 +241,11 @@ protected:
 	AddResult SubWithBorrow8(uint8_t a, uint8_t b, bool carryIn) {
 		uint8_t c = carryIn ? 1 : 0;
 		uint8_t result = a - b - c;
-		
+
 		bool halfCarry = (a & 0x0F) < ((b & 0x0F) + c);
 		bool carry = (uint16_t)a < ((uint16_t)b + c);
 		bool zero = result == 0;
-		
+
 		return { result, zero, halfCarry, carry };
 	}
 };
@@ -346,11 +346,11 @@ protected:
 	Add16Result AddHL(uint16_t hl, uint16_t rr) {
 		uint32_t sum = (uint32_t)hl + (uint32_t)rr;
 		uint16_t result = (uint16_t)sum;
-		
+
 		// Half carry is from bit 11
 		bool halfCarry = ((hl & 0x0FFF) + (rr & 0x0FFF)) > 0x0FFF;
 		bool carry = sum > 0xFFFF;
-		
+
 		return { result, halfCarry, carry };
 	}
 
@@ -363,15 +363,15 @@ protected:
 
 	AddSpResult AddSP(uint16_t sp, int8_t offset) {
 		uint16_t result = sp + offset;
-		
+
 		// Half carry and carry are computed on lower byte
 		// treating the operation as unsigned
 		uint8_t lo = (uint8_t)sp;
 		uint8_t off = (uint8_t)offset;
-		
+
 		bool halfCarry = ((lo & 0x0F) + (off & 0x0F)) > 0x0F;
 		bool carry = ((uint16_t)lo + (uint16_t)off) > 0xFF;
-		
+
 		return { result, halfCarry, carry };
 	}
 };
@@ -842,7 +842,7 @@ protected:
 		uint8_t result = a;
 		uint8_t adjustment = 0;
 		bool newCarry = carry;
-		
+
 		if (!addSub) {
 			// After addition
 			if (halfCarry || (result & 0x0F) > 9) {
@@ -862,7 +862,7 @@ protected:
 				result -= 0x60;
 			}
 		}
-		
+
 		return { result, newCarry };
 	}
 };
@@ -971,10 +971,10 @@ class GbCpuFlagTest : public ::testing::TestWithParam<uint8_t> {};
 TEST_P(GbCpuFlagTest, IndividualFlag_SetAndRead) {
 	uint8_t flags = 0;
 	uint8_t flag = GetParam();
-	
+
 	flags |= flag;
 	EXPECT_EQ(flags & flag, flag);
-	
+
 	flags &= ~flag;
 	EXPECT_EQ(flags & flag, 0);
 }

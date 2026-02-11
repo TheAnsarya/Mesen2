@@ -1651,3 +1651,337 @@ TEST_F(SnesCpuTestBitsComparisonTest, TestBits16_EdgeCases) {
 		}
 	}
 }
+
+//=============================================================================
+// Phase 3: Extended Corner-Case Tests — Multi-PS-State Coverage
+//=============================================================================
+
+// SNES: Add8 with ALL initial flags set (verify proper flag clearing)
+TEST_F(SnesCpuAddSubComparisonTest, Add8_AllFlagsSet_Exhaustive) {
+	// PS = 0xFF: all flags set, verify branchless clears C/N/V/Z correctly
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int ai = 0; ai < 256; ai++) {
+			for (int vi = 0; vi < 256; vi++) {
+				uint8_t ps1 = 0xFF, ps2 = 0xFF;
+				if (!carry) { ps1 &= ~ProcFlags::Carry; ps2 &= ~ProcFlags::Carry; }
+				uint16_t a1 = (uint16_t)ai, a2 = (uint16_t)ai;
+				Add8_Branching(ps1, a1, (uint8_t)vi);
+				Add8_Branchless(ps2, a2, (uint8_t)vi);
+				ASSERT_EQ(ps1, ps2)
+					<< "Add8 AllFlags PS: A=0x" << std::hex << ai
+					<< " val=0x" << vi << " carry=" << carry;
+				ASSERT_EQ(a1, a2);
+			}
+		}
+	}
+}
+
+// SNES: Sub8 with ALL initial flags set
+TEST_F(SnesCpuAddSubComparisonTest, Sub8_AllFlagsSet_Exhaustive) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int ai = 0; ai < 256; ai++) {
+			for (int vi = 0; vi < 256; vi++) {
+				uint8_t ps1 = 0xFF, ps2 = 0xFF;
+				if (!carry) { ps1 &= ~ProcFlags::Carry; ps2 &= ~ProcFlags::Carry; }
+				uint16_t a1 = (uint16_t)ai, a2 = (uint16_t)ai;
+				Sub8_Branching(ps1, a1, (uint8_t)vi);
+				Sub8_Branchless(ps2, a2, (uint8_t)vi);
+				ASSERT_EQ(ps1, ps2)
+					<< "Sub8 AllFlags PS: A=0x" << std::hex << ai
+					<< " val=0x" << vi << " carry=" << carry;
+				ASSERT_EQ(a1, a2);
+			}
+		}
+	}
+}
+
+// SNES: Add16 branchless comparison — boundary values x 2 carry states
+TEST_F(SnesCpuAddSubComparisonTest, Add16_BoundaryValues_x2Carry) {
+	// 16-bit Add: test boundary values that exercise overflow, carry, sign transitions
+	uint16_t testValues[] = {
+		0x0000, 0x0001, 0x007F, 0x0080, 0x00FF, 0x0100, 0x0101,
+		0x3FFF, 0x4000, 0x7FFE, 0x7FFF, 0x8000, 0x8001, 0xBFFF,
+		0xC000, 0xFFFE, 0xFFFF
+	};
+	for (int carry = 0; carry <= 1; carry++) {
+		for (uint16_t ai : testValues) {
+			for (uint16_t vi : testValues) {
+				// Branching 16-bit Add
+				uint8_t ps1 = 0x00 | carry, ps2 = 0x00 | carry;
+				uint16_t a1 = ai, a2 = ai;
+
+				// Branching version
+				uint32_t result1 = a1 + vi + (ps1 & ProcFlags::Carry);
+				if (~(a1 ^ vi) & (a1 ^ result1) & 0x8000) {
+					ps1 |= ProcFlags::Overflow;
+				} else {
+					ps1 &= ~ProcFlags::Overflow;
+				}
+				ps1 &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+				ps1 |= ((uint16_t)result1 == 0) ? ProcFlags::Zero : 0;
+				ps1 |= ((result1 >> 8) & 0x80);
+				if (result1 > 0xFFFF) ps1 |= ProcFlags::Carry;
+				a1 = (uint16_t)result1;
+
+				// Branchless version
+				uint32_t result2 = a2 + vi + (ps2 & ProcFlags::Carry);
+				uint8_t overflowFlag = (~(a2 ^ vi) & (a2 ^ result2) & 0x8000) ? ProcFlags::Overflow : 0;
+				ps2 &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
+				ps2 |= ((uint16_t)result2 == 0) ? ProcFlags::Zero : 0;
+				ps2 |= ((result2 >> 8) & 0x80);
+				ps2 |= overflowFlag;
+				ps2 |= (result2 > 0xFFFF) ? ProcFlags::Carry : 0;
+				a2 = (uint16_t)result2;
+
+				ASSERT_EQ(ps1, ps2)
+					<< "Add16 PS: A=0x" << std::hex << ai
+					<< " val=0x" << vi << " carry=" << carry;
+				ASSERT_EQ(a1, a2);
+			}
+		}
+	}
+}
+
+// SNES: Sub16 branchless comparison — boundary values x 2 carry states
+TEST_F(SnesCpuAddSubComparisonTest, Sub16_BoundaryValues_x2Carry) {
+	uint16_t testValues[] = {
+		0x0000, 0x0001, 0x007F, 0x0080, 0x00FF, 0x0100, 0x0101,
+		0x3FFF, 0x4000, 0x7FFE, 0x7FFF, 0x8000, 0x8001, 0xBFFF,
+		0xC000, 0xFFFE, 0xFFFF
+	};
+	for (int carry = 0; carry <= 1; carry++) {
+		for (uint16_t ai : testValues) {
+			for (uint16_t vi : testValues) {
+				uint8_t value = ~vi;  // SBC uses complement
+				uint8_t ps1 = 0x00 | carry, ps2 = 0x00 | carry;
+				uint16_t a1 = ai, a2 = ai;
+
+				// Branching version (SBC uses A + ~value + carry)
+				int32_t result1 = a1 + (uint16_t)(vi ^ 0xFFFF) + (ps1 & ProcFlags::Carry);
+				if (~(a1 ^ (vi ^ 0xFFFF)) & (a1 ^ result1) & 0x8000) {
+					ps1 |= ProcFlags::Overflow;
+				} else {
+					ps1 &= ~ProcFlags::Overflow;
+				}
+				ps1 &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+				ps1 |= ((uint16_t)result1 == 0) ? ProcFlags::Zero : 0;
+				ps1 |= ((result1 >> 8) & 0x80);
+				if (result1 > 0xFFFF) ps1 |= ProcFlags::Carry;
+				a1 = (uint16_t)result1;
+
+				// Branchless version
+				int32_t result2 = a2 + (uint16_t)(vi ^ 0xFFFF) + (ps2 & ProcFlags::Carry);
+				uint8_t overflowFlag = (~(a2 ^ (vi ^ 0xFFFF)) & (a2 ^ result2) & 0x8000) ? ProcFlags::Overflow : 0;
+				ps2 &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
+				ps2 |= ((uint16_t)result2 == 0) ? ProcFlags::Zero : 0;
+				ps2 |= ((result2 >> 8) & 0x80);
+				ps2 |= overflowFlag;
+				ps2 |= (result2 > 0xFFFF) ? ProcFlags::Carry : 0;
+				a2 = (uint16_t)result2;
+
+				ASSERT_EQ(ps1, ps2)
+					<< "Sub16 PS: A=0x" << std::hex << ai
+					<< " val=0x" << vi << " carry=" << carry;
+				ASSERT_EQ(a1, a2);
+			}
+		}
+	}
+}
+
+//=============================================================================
+// Phase 3: SNES 16-bit Shift/Rotate Comparison Tests (previously missing)
+//=============================================================================
+
+class SnesCpuShift16ComparisonTest : public ::testing::Test {
+protected:
+	static uint8_t ShiftLeft16_Branching(uint8_t ps, uint16_t value, uint16_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x8000) ps |= ProcFlags::Carry;
+		result = value << 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+
+	static uint8_t ShiftLeft16_Branchless(uint8_t ps, uint16_t value, uint16_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value >> 15) & ProcFlags::Carry;
+		result = value << 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+
+	static uint8_t ShiftRight16_Branching(uint8_t ps, uint16_t value, uint16_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x0001) ps |= ProcFlags::Carry;
+		result = value >> 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+
+	static uint8_t ShiftRight16_Branchless(uint8_t ps, uint16_t value, uint16_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value & 0x0001);
+		result = value >> 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollLeft16_Branching(uint8_t ps, uint16_t value, uint16_t& result) {
+		bool carryIn = ps & ProcFlags::Carry;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x8000) ps |= ProcFlags::Carry;
+		result = (value << 1) | (carryIn ? 1 : 0);
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollLeft16_Branchless(uint8_t ps, uint16_t value, uint16_t& result) {
+		uint8_t oldCarry = ps & ProcFlags::Carry;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value >> 15) & ProcFlags::Carry;
+		result = (value << 1) | oldCarry;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollRight16_Branching(uint8_t ps, uint16_t value, uint16_t& result) {
+		bool carryIn = ps & ProcFlags::Carry;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x0001) ps |= ProcFlags::Carry;
+		result = (value >> 1) | (carryIn ? 0x8000 : 0x0000);
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollRight16_Branchless(uint8_t ps, uint16_t value, uint16_t& result) {
+		uint8_t oldCarry = ps & ProcFlags::Carry;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value & 0x0001);
+		result = (value >> 1) | ((uint16_t)oldCarry << 15);
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((result >> 8) & 0x80);
+		return ps;
+	}
+};
+
+TEST_F(SnesCpuShift16ComparisonTest, ShiftLeft16_Exhaustive_All65536) {
+	for (int v = 0; v < 65536; v++) {
+		uint16_t r1, r2;
+		uint8_t ps1 = ShiftLeft16_Branching(0x30, (uint16_t)v, r1);
+		uint8_t ps2 = ShiftLeft16_Branchless(0x30, (uint16_t)v, r2);
+		ASSERT_EQ(ps1, ps2) << "ShiftLeft16 PS: value=0x" << std::hex << v;
+		ASSERT_EQ(r1, r2);
+	}
+}
+
+TEST_F(SnesCpuShift16ComparisonTest, ShiftRight16_Exhaustive_All65536) {
+	for (int v = 0; v < 65536; v++) {
+		uint16_t r1, r2;
+		uint8_t ps1 = ShiftRight16_Branching(0x30, (uint16_t)v, r1);
+		uint8_t ps2 = ShiftRight16_Branchless(0x30, (uint16_t)v, r2);
+		ASSERT_EQ(ps1, ps2) << "ShiftRight16 PS: value=0x" << std::hex << v;
+		ASSERT_EQ(r1, r2);
+	}
+}
+
+TEST_F(SnesCpuShift16ComparisonTest, RollLeft16_Exhaustive_x2Carry) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int v = 0; v < 65536; v++) {
+			uint16_t r1, r2;
+			uint8_t ps1 = RollLeft16_Branching(0x30 | carry, (uint16_t)v, r1);
+			uint8_t ps2 = RollLeft16_Branchless(0x30 | carry, (uint16_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "RollLeft16 PS: value=0x" << std::hex << v << " carry=" << carry;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+TEST_F(SnesCpuShift16ComparisonTest, RollRight16_Exhaustive_x2Carry) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int v = 0; v < 65536; v++) {
+			uint16_t r1, r2;
+			uint8_t ps1 = RollRight16_Branching(0x30 | carry, (uint16_t)v, r1);
+			uint8_t ps2 = RollRight16_Branchless(0x30 | carry, (uint16_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "RollRight16 PS: value=0x" << std::hex << v << " carry=" << carry;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+// Multi-PS-state tests: verify flag clearing works with stale flags
+TEST_F(SnesCpuShiftComparisonTest, ShiftLeft8_MultiPS_AllFlagsSet) {
+	uint8_t psStates[] = { 0x00, 0x30, 0x83, 0xC1, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			uint8_t ps1 = ShiftLeft8_Branching(initPS, (uint8_t)v, r1);
+			uint8_t ps2 = ShiftLeft8_Branchless(initPS, (uint8_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "ShiftLeft8 MultiPS: PS=0x" << std::hex << (int)initPS << " value=0x" << v;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+TEST_F(SnesCpuShiftComparisonTest, ShiftRight8_MultiPS_AllFlagsSet) {
+	uint8_t psStates[] = { 0x00, 0x30, 0x83, 0xC1, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			uint8_t ps1 = ShiftRight8_Branching(initPS, (uint8_t)v, r1);
+			uint8_t ps2 = ShiftRight8_Branchless(initPS, (uint8_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "ShiftRight8 MultiPS: PS=0x" << std::hex << (int)initPS << " value=0x" << v;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+// SNES 16-bit TestBits: expanded edge cases with more boundary values
+TEST_F(SnesCpuTestBitsComparisonTest, TestBits16_ExpandedBoundary) {
+	uint16_t testValues[] = {
+		0x0000, 0x0001, 0x003F, 0x0040, 0x007F, 0x0080, 0x00C0, 0x00FF,
+		0x0100, 0x0101, 0x3F00, 0x3FFF, 0x4000, 0x4001, 0x7F00, 0x7F80,
+		0x7FFF, 0x8000, 0x8001, 0x80FF, 0xBFFF, 0xC000, 0xC001, 0xFF00,
+		0xFF7F, 0xFF80, 0xFFBF, 0xFFC0, 0xFFFF
+	};
+	// Test with multiple initial PS states
+	uint8_t psStates[] = { 0x00, 0x30, 0xC0, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (uint16_t a : testValues) {
+			for (uint16_t v : testValues) {
+				uint8_t oldPS = TestBits16_Branching(initPS, a, v);
+				uint8_t newPS = TestBits16_Branchless(initPS, a, v);
+				ASSERT_EQ(oldPS, newPS)
+					<< "TestBits16 expanded: PS=0x" << std::hex << (int)initPS
+					<< " A=0x" << a << " value=0x" << v;
+			}
+		}
+	}
+}
+
+// SNES 16-bit CMP: expanded boundary testing with multi-PS
+TEST_F(SnesCpuCmpComparisonTest, Exhaustive16Bit_ExpandedBoundary) {
+	uint16_t testValues[] = {
+		0x0000, 0x0001, 0x007F, 0x0080, 0x00FF, 0x0100, 0x0101,
+		0x3FFF, 0x4000, 0x7FFE, 0x7FFF, 0x8000, 0x8001, 0xBFFF,
+		0xC000, 0xFFFE, 0xFFFF
+	};
+	uint8_t psStates[] = { 0x00, 0x30, 0x83, 0xC1, 0xFF };
+	for (uint8_t initPS : psStates) {
+		for (uint16_t reg : testValues) {
+			for (uint16_t val : testValues) {
+				uint8_t ps1 = CMP16_Branching(initPS, reg, val);
+				uint8_t ps2 = CMP16_Branchless(initPS, reg, val);
+				ASSERT_EQ(ps1, ps2)
+					<< "CMP16 expanded: PS=0x" << std::hex << (int)initPS
+					<< " reg=0x" << reg << " val=0x" << val;
+			}
+		}
+	}
+}

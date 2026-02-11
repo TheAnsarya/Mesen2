@@ -130,6 +130,7 @@ move all the new svgs to a subfolder called `/Drafts/`; Then begin working on mo
 
 don't implement right away, create documentation of the work to be done, and make issues for this work and todos; continue working;
 
+[Nexen] update the readme to show the current state, and clean up any misinformation; combine the license files, so that the description of our changes being `the unlicence` but we're based on Mesen which is `GPL` so the unchanged code is gpl and then at the end put the necessary text blocks in sections for `The Unlicense` and then at the very bottom, the `GPL` license text we're required to have for now; continue; Go back to the performance improvements; make sure all performance improvements have content correctness tests (same value and side effects before and after changes) and before and after results on the benchmarks to prove that the new code is faster and uses less memory/allocation and also (test the hell out of them, we can't afford to reduce emulator accuracy in any way, hit the corner cases! full coverage!); continue; git commit, make/update issues/todos/docs/plans/code-plans, update session/chat logs; update the Nexen logo at the top of the `README.md` file to show an actual logo, since it currently points to a broken link; continue; make sure the results and lessons learned from the performance benchmarks result in improved, faster code with less memory usage; continue;
 
 
 
