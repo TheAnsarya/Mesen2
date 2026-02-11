@@ -1294,3 +1294,360 @@ TEST_F(SnesCpuBranchlessComparisonTest, Exhaustive16Bit_AllHighBytes_AllPSStates
 		}
 	}
 }
+
+//=============================================================================
+// Before/After Comparison: Branchless SNES Compare
+//=============================================================================
+
+class SnesCpuCmpComparisonTest : public ::testing::Test {
+protected:
+	static uint8_t CMP8_Branching(uint8_t ps, uint8_t reg, uint8_t value) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (reg >= value) ps |= ProcFlags::Carry;
+		uint8_t result = reg - value;
+		if (result == 0) ps |= ProcFlags::Zero;
+		if (result & 0x80) ps |= ProcFlags::Negative;
+		return ps;
+	}
+
+	static uint8_t CMP8_Branchless(uint8_t ps, uint8_t reg, uint8_t value) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		uint8_t result = reg - value;
+		ps |= (reg >= value) ? ProcFlags::Carry : 0;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t CMP16_Branching(uint8_t ps, uint16_t reg, uint16_t value) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (reg >= value) ps |= ProcFlags::Carry;
+		uint16_t result = reg - value;
+		if (result == 0) ps |= ProcFlags::Zero;
+		if (result & 0x8000) ps |= ProcFlags::Negative;
+		return ps;
+	}
+
+	static uint8_t CMP16_Branchless(uint8_t ps, uint16_t reg, uint16_t value) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		uint16_t result = reg - value;
+		ps |= (reg >= value) ? ProcFlags::Carry : 0;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result >> 8) & 0x80;
+		return ps;
+	}
+};
+
+TEST_F(SnesCpuCmpComparisonTest, Exhaustive8Bit_All256x256) {
+	for (int r = 0; r < 256; r++) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t oldPS = CMP8_Branching(0x30, (uint8_t)r, (uint8_t)v);
+			uint8_t newPS = CMP8_Branchless(0x30, (uint8_t)r, (uint8_t)v);
+			ASSERT_EQ(oldPS, newPS)
+				<< "CMP8 mismatch: reg=0x" << std::hex << r << " val=0x" << v;
+		}
+	}
+}
+
+TEST_F(SnesCpuCmpComparisonTest, Exhaustive16Bit_EdgeCases) {
+	// Test boundaries and representative values for 16-bit compare
+	uint16_t testValues[] = {
+		0x0000, 0x0001, 0x007F, 0x0080, 0x00FF,
+		0x0100, 0x7FFF, 0x8000, 0x8001, 0xFFFE, 0xFFFF
+	};
+	for (uint16_t reg : testValues) {
+		for (uint16_t val : testValues) {
+			uint8_t oldPS = CMP16_Branching(0x30, reg, val);
+			uint8_t newPS = CMP16_Branchless(0x30, reg, val);
+			ASSERT_EQ(oldPS, newPS)
+				<< "CMP16 mismatch: reg=0x" << std::hex << reg << " val=0x" << val;
+		}
+	}
+}
+
+//=============================================================================
+// Before/After Comparison: Branchless SNES Add8/Sub8 (Overflow + Carry)
+//=============================================================================
+
+class SnesCpuAddSubComparisonTest : public ::testing::Test {
+protected:
+	// Add8 non-decimal path only (hot path)
+	static void Add8_Branching(uint8_t& ps, uint16_t& a, uint8_t value) {
+		uint32_t result = (a & 0xFF) + value + (ps & ProcFlags::Carry);
+		if (~(a ^ value) & (a ^ result) & 0x80) {
+			ps |= ProcFlags::Overflow;
+		} else {
+			ps &= ~ProcFlags::Overflow;
+		}
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= ((uint8_t)result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((uint8_t)result & 0x80);
+		if (result > 0xFF) ps |= ProcFlags::Carry;
+		a = (a & 0xFF00) | (uint8_t)result;
+	}
+
+	static void Add8_Branchless(uint8_t& ps, uint16_t& a, uint8_t value) {
+		uint32_t result = (a & 0xFF) + value + (ps & ProcFlags::Carry);
+		uint8_t overflowFlag = (~(a ^ value) & (a ^ result) & 0x80) ? ProcFlags::Overflow : 0;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
+		ps |= ((uint8_t)result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((uint8_t)result & 0x80);
+		ps |= overflowFlag;
+		ps |= (result > 0xFF) ? ProcFlags::Carry : 0;
+		a = (a & 0xFF00) | (uint8_t)result;
+	}
+
+	// Sub8 non-decimal path only (hot path)
+	static void Sub8_Branching(uint8_t& ps, uint16_t& a, uint8_t value) {
+		int32_t result = (a & 0xFF) + value + (ps & ProcFlags::Carry);
+		if (~(a ^ value) & (a ^ result) & 0x80) {
+			ps |= ProcFlags::Overflow;
+		} else {
+			ps &= ~ProcFlags::Overflow;
+		}
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= ((uint8_t)result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((uint8_t)result & 0x80);
+		if (result > 0xFF) ps |= ProcFlags::Carry;
+		a = (a & 0xFF00) | (uint8_t)result;
+	}
+
+	static void Sub8_Branchless(uint8_t& ps, uint16_t& a, uint8_t value) {
+		int32_t result = (a & 0xFF) + value + (ps & ProcFlags::Carry);
+		uint8_t overflowFlag = (~(a ^ value) & (a ^ result) & 0x80) ? ProcFlags::Overflow : 0;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
+		ps |= ((uint8_t)result == 0) ? ProcFlags::Zero : 0;
+		ps |= ((uint8_t)result & 0x80);
+		ps |= overflowFlag;
+		ps |= (result > 0xFF) ? ProcFlags::Carry : 0;
+		a = (a & 0xFF00) | (uint8_t)result;
+	}
+};
+
+TEST_F(SnesCpuAddSubComparisonTest, Add8_Exhaustive_All256x256x2Carry) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int ai = 0; ai < 256; ai++) {
+			for (int vi = 0; vi < 256; vi++) {
+				uint8_t ps1 = 0x30 | carry, ps2 = 0x30 | carry;
+				uint16_t a1 = (uint16_t)ai, a2 = (uint16_t)ai;
+				Add8_Branching(ps1, a1, (uint8_t)vi);
+				Add8_Branchless(ps2, a2, (uint8_t)vi);
+				ASSERT_EQ(ps1, ps2)
+					<< "Add8 PS mismatch: A=0x" << std::hex << ai
+					<< " val=0x" << vi << " carry=" << carry;
+				ASSERT_EQ(a1, a2);
+			}
+		}
+	}
+}
+
+TEST_F(SnesCpuAddSubComparisonTest, Sub8_Exhaustive_All256x256x2Carry) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int ai = 0; ai < 256; ai++) {
+			for (int vi = 0; vi < 256; vi++) {
+				uint8_t ps1 = 0x30 | carry, ps2 = 0x30 | carry;
+				uint16_t a1 = (uint16_t)ai, a2 = (uint16_t)ai;
+				Sub8_Branching(ps1, a1, (uint8_t)vi);
+				Sub8_Branchless(ps2, a2, (uint8_t)vi);
+				ASSERT_EQ(ps1, ps2)
+					<< "Sub8 PS mismatch: A=0x" << std::hex << ai
+					<< " val=0x" << vi << " carry=" << carry;
+				ASSERT_EQ(a1, a2);
+			}
+		}
+	}
+}
+
+//=============================================================================
+// Before/After Comparison: Branchless SNES Shift/Roll
+//=============================================================================
+
+class SnesCpuShiftComparisonTest : public ::testing::Test {
+protected:
+	static uint8_t ShiftLeft8_Branching(uint8_t ps, uint8_t value, uint8_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x80) ps |= ProcFlags::Carry;
+		result = value << 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t ShiftLeft8_Branchless(uint8_t ps, uint8_t value, uint8_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value >> 7) & ProcFlags::Carry;
+		result = value << 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t ShiftRight8_Branching(uint8_t ps, uint8_t value, uint8_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x01) ps |= ProcFlags::Carry;
+		result = value >> 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t ShiftRight8_Branchless(uint8_t ps, uint8_t value, uint8_t& result) {
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value & 0x01);
+		result = value >> 1;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollLeft8_Branching(uint8_t ps, uint8_t value, uint8_t& result) {
+		bool carryIn = ps & ProcFlags::Carry;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x80) ps |= ProcFlags::Carry;
+		result = (value << 1) | (carryIn ? 1 : 0);
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollLeft8_Branchless(uint8_t ps, uint8_t value, uint8_t& result) {
+		uint8_t oldCarry = ps & ProcFlags::Carry;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value >> 7) & ProcFlags::Carry;
+		result = (value << 1) | oldCarry;
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollRight8_Branching(uint8_t ps, uint8_t value, uint8_t& result) {
+		bool carryIn = ps & ProcFlags::Carry;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x01) ps |= ProcFlags::Carry;
+		result = (value >> 1) | (carryIn ? 0x80 : 0x00);
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+
+	static uint8_t RollRight8_Branchless(uint8_t ps, uint8_t value, uint8_t& result) {
+		uint8_t oldCarry = ps & 0x01;
+		ps &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		ps |= (value & 0x01);
+		result = (value >> 1) | (oldCarry << 7);
+		ps |= (result == 0) ? ProcFlags::Zero : 0;
+		ps |= (result & 0x80);
+		return ps;
+	}
+};
+
+TEST_F(SnesCpuShiftComparisonTest, ShiftLeft8_Exhaustive) {
+	for (int v = 0; v < 256; v++) {
+		uint8_t r1, r2;
+		uint8_t ps1 = ShiftLeft8_Branching(0x30, (uint8_t)v, r1);
+		uint8_t ps2 = ShiftLeft8_Branchless(0x30, (uint8_t)v, r2);
+		ASSERT_EQ(ps1, ps2) << "ShiftLeft8 PS: value=0x" << std::hex << v;
+		ASSERT_EQ(r1, r2);
+	}
+}
+
+TEST_F(SnesCpuShiftComparisonTest, ShiftRight8_Exhaustive) {
+	for (int v = 0; v < 256; v++) {
+		uint8_t r1, r2;
+		uint8_t ps1 = ShiftRight8_Branching(0x30, (uint8_t)v, r1);
+		uint8_t ps2 = ShiftRight8_Branchless(0x30, (uint8_t)v, r2);
+		ASSERT_EQ(ps1, ps2) << "ShiftRight8 PS: value=0x" << std::hex << v;
+		ASSERT_EQ(r1, r2);
+	}
+}
+
+TEST_F(SnesCpuShiftComparisonTest, RollLeft8_Exhaustive_x2Carry) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			uint8_t ps1 = RollLeft8_Branching(0x30 | carry, (uint8_t)v, r1);
+			uint8_t ps2 = RollLeft8_Branchless(0x30 | carry, (uint8_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "RollLeft8 PS: value=0x" << std::hex << v << " carry=" << carry;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+TEST_F(SnesCpuShiftComparisonTest, RollRight8_Exhaustive_x2Carry) {
+	for (int carry = 0; carry <= 1; carry++) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t r1, r2;
+			uint8_t ps1 = RollRight8_Branching(0x30 | carry, (uint8_t)v, r1);
+			uint8_t ps2 = RollRight8_Branchless(0x30 | carry, (uint8_t)v, r2);
+			ASSERT_EQ(ps1, ps2) << "RollRight8 PS: value=0x" << std::hex << v << " carry=" << carry;
+			ASSERT_EQ(r1, r2);
+		}
+	}
+}
+
+//=============================================================================
+// Before/After Comparison: Branchless SNES TestBits (BIT instruction)
+//=============================================================================
+
+class SnesCpuTestBitsComparisonTest : public ::testing::Test {
+protected:
+	// 8-bit TestBits, alterZeroFlagOnly=false
+	static uint8_t TestBits8_Branching(uint8_t ps, uint8_t a, uint8_t value) {
+		ps &= ~(ProcFlags::Zero | ProcFlags::Overflow | ProcFlags::Negative);
+		if ((a & value) == 0) ps |= ProcFlags::Zero;
+		if (value & 0x40) ps |= ProcFlags::Overflow;
+		if (value & 0x80) ps |= ProcFlags::Negative;
+		return ps;
+	}
+
+	static uint8_t TestBits8_Branchless(uint8_t ps, uint8_t a, uint8_t value) {
+		ps &= ~(ProcFlags::Zero | ProcFlags::Overflow | ProcFlags::Negative);
+		ps |= ((a & value) == 0) ? ProcFlags::Zero : 0;
+		ps |= (value & 0x40);
+		ps |= (value & 0x80);
+		return ps;
+	}
+
+	// 16-bit TestBits, alterZeroFlagOnly=false
+	static uint8_t TestBits16_Branching(uint8_t ps, uint16_t a, uint16_t value) {
+		ps &= ~(ProcFlags::Zero | ProcFlags::Overflow | ProcFlags::Negative);
+		if ((a & value) == 0) ps |= ProcFlags::Zero;
+		if (value & 0x4000) ps |= ProcFlags::Overflow;
+		if (value & 0x8000) ps |= ProcFlags::Negative;
+		return ps;
+	}
+
+	static uint8_t TestBits16_Branchless(uint8_t ps, uint16_t a, uint16_t value) {
+		ps &= ~(ProcFlags::Zero | ProcFlags::Overflow | ProcFlags::Negative);
+		ps |= ((a & value) == 0) ? ProcFlags::Zero : 0;
+		ps |= (value >> 8) & 0x40;
+		ps |= (value >> 8) & 0x80;
+		return ps;
+	}
+};
+
+TEST_F(SnesCpuTestBitsComparisonTest, TestBits8_Exhaustive_All256x256) {
+	for (int a = 0; a < 256; a++) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t oldPS = TestBits8_Branching(0x30, (uint8_t)a, (uint8_t)v);
+			uint8_t newPS = TestBits8_Branchless(0x30, (uint8_t)a, (uint8_t)v);
+			ASSERT_EQ(oldPS, newPS)
+				<< "TestBits8 mismatch: A=0x" << std::hex << a << " value=0x" << v;
+		}
+	}
+}
+
+TEST_F(SnesCpuTestBitsComparisonTest, TestBits16_EdgeCases) {
+	uint16_t testValues[] = {
+		0x0000, 0x0001, 0x003F, 0x0040, 0x007F, 0x0080, 0x00FF,
+		0x3F00, 0x4000, 0x7F00, 0x8000, 0xBFFF, 0xC000, 0xFFFF
+	};
+	for (uint16_t a : testValues) {
+		for (uint16_t v : testValues) {
+			uint8_t oldPS = TestBits16_Branching(0x30, a, v);
+			uint8_t newPS = TestBits16_Branchless(0x30, a, v);
+			ASSERT_EQ(oldPS, newPS)
+				<< "TestBits16 mismatch: A=0x" << std::hex << a << " value=0x" << v;
+		}
+	}
+}

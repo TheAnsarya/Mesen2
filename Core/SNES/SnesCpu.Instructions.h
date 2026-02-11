@@ -12,22 +12,16 @@ void SnesCpu::Add8(uint8_t value) {
 		result = (_state.A & 0xFF) + value + (_state.PS & ProcFlags::Carry);
 	}
 
-	if (~(_state.A ^ value) & (_state.A ^ result) & 0x80) {
-		SetFlags(ProcFlags::Overflow);
-	} else {
-		ClearFlags(ProcFlags::Overflow);
-	}
+	uint8_t overflowFlag = (~(_state.A ^ value) & (_state.A ^ result) & 0x80) ? ProcFlags::Overflow : 0;
 
 	if (CheckFlag(ProcFlags::Decimal) && result > 0x9F) [[unlikely]] {
 		result += 0x60;
 	}
 
-	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
 	SetZeroNegativeFlags((uint8_t)result);
-
-	if (result > 0xFF) {
-		SetFlags(ProcFlags::Carry);
-	}
+	_state.PS |= overflowFlag;
+	_state.PS |= (result > 0xFF) ? ProcFlags::Carry : 0;
 
 	_state.A = (_state.A & 0xFF00) | (uint8_t)result;
 }
@@ -52,22 +46,16 @@ void SnesCpu::Add16(uint16_t value) {
 		result = _state.A + value + (_state.PS & ProcFlags::Carry);
 	}
 
-	if (~(_state.A ^ value) & (_state.A ^ result) & 0x8000) {
-		SetFlags(ProcFlags::Overflow);
-	} else {
-		ClearFlags(ProcFlags::Overflow);
-	}
+	uint8_t overflowFlag = (~(_state.A ^ value) & (_state.A ^ result) & 0x8000) ? ProcFlags::Overflow : 0;
 
 	if (CheckFlag(ProcFlags::Decimal) && result > 0x9FFF) [[unlikely]] {
 		result += 0x6000;
 	}
 
-	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
 	SetZeroNegativeFlags((uint16_t)result);
-
-	if (result > 0xFFFF) {
-		SetFlags(ProcFlags::Carry);
-	}
+	_state.PS |= overflowFlag;
+	_state.PS |= (result > 0xFFFF) ? ProcFlags::Carry : 0;
 
 	_state.A = (uint16_t)result;
 }
@@ -91,22 +79,16 @@ void SnesCpu::Sub8(uint8_t value) {
 		result = (_state.A & 0xFF) + value + (_state.PS & ProcFlags::Carry);
 	}
 
-	if (~(_state.A ^ value) & (_state.A ^ result) & 0x80) {
-		SetFlags(ProcFlags::Overflow);
-	} else {
-		ClearFlags(ProcFlags::Overflow);
-	}
+	uint8_t overflowFlag = (~(_state.A ^ value) & (_state.A ^ result) & 0x80) ? ProcFlags::Overflow : 0;
 
 	if (CheckFlag(ProcFlags::Decimal) && result <= 0xFF) [[unlikely]] {
 		result -= 0x60;
 	}
 
-	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
 	SetZeroNegativeFlags((uint8_t)result);
-
-	if (result > 0xFF) {
-		SetFlags(ProcFlags::Carry);
-	}
+	_state.PS |= overflowFlag;
+	_state.PS |= (result > 0xFF) ? ProcFlags::Carry : 0;
 
 	_state.A = (_state.A & 0xFF00) | (uint8_t)result;
 }
@@ -131,22 +113,16 @@ void SnesCpu::Sub16(uint16_t value) {
 		result = _state.A + value + (_state.PS & ProcFlags::Carry);
 	}
 
-	if (~(_state.A ^ value) & (_state.A ^ result) & 0x8000) {
-		SetFlags(ProcFlags::Overflow);
-	} else {
-		ClearFlags(ProcFlags::Overflow);
-	}
+	uint8_t overflowFlag = (~(_state.A ^ value) & (_state.A ^ result) & 0x8000) ? ProcFlags::Overflow : 0;
 
 	if (CheckFlag(ProcFlags::Decimal) && result <= 0xFFFF) [[unlikely]] {
 		result -= 0x6000;
 	}
 
-	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
 	SetZeroNegativeFlags((uint16_t)result);
-
-	if (result > 0xFFFF) {
-		SetFlags(ProcFlags::Carry);
-	}
+	_state.PS |= overflowFlag;
+	_state.PS |= (result > 0xFFFF) ? ProcFlags::Carry : 0;
 
 	_state.A = (uint16_t)result;
 }
@@ -326,23 +302,18 @@ Compare instructions
 void SnesCpu::Compare(uint16_t reg, bool eightBitMode) {
 	if (eightBitMode) {
 		uint8_t value = GetByteValue();
-		if ((uint8_t)reg >= value) {
-			SetFlags(ProcFlags::Carry);
-		} else {
-			ClearFlags(ProcFlags::Carry);
-		}
+		ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
 		uint8_t result = (uint8_t)reg - value;
-		SetZeroNegativeFlags(result);
+		_state.PS |= ((uint8_t)reg >= value) ? ProcFlags::Carry : 0;
+		_state.PS |= (result == 0) ? ProcFlags::Zero : 0;
+		_state.PS |= (result & 0x80);
 	} else {
 		uint16_t value = GetWordValue();
-		if (reg >= value) {
-			SetFlags(ProcFlags::Carry);
-		} else {
-			ClearFlags(ProcFlags::Carry);
-		}
-
+		ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
 		uint16_t result = reg - value;
-		SetZeroNegativeFlags(result);
+		_state.PS |= (reg >= value) ? ProcFlags::Carry : 0;
+		_state.PS |= (result == 0) ? ProcFlags::Zero : 0;
+		_state.PS |= (result >> 8) & 0x80;
 	}
 }
 
@@ -530,48 +501,38 @@ Shift operations
 *****************/
 template <typename T>
 T SnesCpu::ShiftLeft(T value) {
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	_state.PS |= (value >> (sizeof(T) * 8 - 1)) & ProcFlags::Carry;
 	T result = value << 1;
-	if (value & (1 << (sizeof(T) * 8 - 1))) {
-		SetFlags(ProcFlags::Carry);
-	} else {
-		ClearFlags(ProcFlags::Carry);
-	}
 	SetZeroNegativeFlags(result);
 	return result;
 }
 
 template <typename T>
 T SnesCpu::RollLeft(T value) {
-	T result = value << 1 | (_state.PS & ProcFlags::Carry);
-	if (value & (1 << (sizeof(T) * 8 - 1))) {
-		SetFlags(ProcFlags::Carry);
-	} else {
-		ClearFlags(ProcFlags::Carry);
-	}
+	uint8_t oldCarry = _state.PS & ProcFlags::Carry;
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	_state.PS |= (value >> (sizeof(T) * 8 - 1)) & ProcFlags::Carry;
+	T result = value << 1 | oldCarry;
 	SetZeroNegativeFlags(result);
 	return result;
 }
 
 template <typename T>
 T SnesCpu::ShiftRight(T value) {
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	_state.PS |= (value & 0x01);
 	T result = value >> 1;
-	if (value & 0x01) {
-		SetFlags(ProcFlags::Carry);
-	} else {
-		ClearFlags(ProcFlags::Carry);
-	}
 	SetZeroNegativeFlags(result);
 	return result;
 }
 
 template <typename T>
 T SnesCpu::RollRight(T value) {
-	T result = value >> 1 | ((_state.PS & 0x01) << (sizeof(T) * 8 - 1));
-	if (value & 0x01) {
-		SetFlags(ProcFlags::Carry);
-	} else {
-		ClearFlags(ProcFlags::Carry);
-	}
+	uint8_t oldCarry = _state.PS & 0x01;
+	ClearFlags(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+	_state.PS |= (value & 0x01);
+	T result = value >> 1 | (oldCarry << (sizeof(T) * 8 - 1));
 	SetZeroNegativeFlags(result);
 	return result;
 }
@@ -896,23 +857,17 @@ template <typename T>
 void SnesCpu::TestBits(T value, bool alterZeroFlagOnly) {
 	if (alterZeroFlagOnly) {
 		//"Immediate addressing only affects the z flag (with the result of the bitwise And), but does not affect the n and v flags."
-		if (((T)_state.A & value) == 0) {
-			SetFlags(ProcFlags::Zero);
-		} else {
-			ClearFlags(ProcFlags::Zero);
-		}
+		ClearFlags(ProcFlags::Zero);
+		_state.PS |= (((T)_state.A & value) == 0) ? ProcFlags::Zero : 0;
 	} else {
 		ClearFlags(ProcFlags::Zero | ProcFlags::Overflow | ProcFlags::Negative);
-
-		if (((T)_state.A & value) == 0) {
-			SetFlags(ProcFlags::Zero);
-		}
-
-		if (value & (1 << (sizeof(T) * 8 - 2))) {
-			SetFlags(ProcFlags::Overflow);
-		}
-		if (value & (1 << (sizeof(T) * 8 - 1))) {
-			SetFlags(ProcFlags::Negative);
+		_state.PS |= (((T)_state.A & value) == 0) ? ProcFlags::Zero : 0;
+		if constexpr (sizeof(T) == 1) {
+			_state.PS |= (value & 0x40);
+			_state.PS |= (value & 0x80);
+		} else {
+			_state.PS |= (value >> 8) & 0x40;
+			_state.PS |= (value >> 8) & 0x80;
 		}
 	}
 }

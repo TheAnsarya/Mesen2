@@ -422,3 +422,158 @@ static void BM_SnesCpu_Instruction_PushEffective(benchmark::State& state) {
 }
 BENCHMARK(BM_SnesCpu_Instruction_PushEffective);
 
+// =============================================================================
+// Phase 2: Branchless vs Branching Comparisons
+// =============================================================================
+
+// --- Compare 8-bit ---
+
+static void BM_SnesCpu_Compare8_Branching(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	uint8_t reg = 0, value = 0;
+	for (auto _ : state) {
+		cpuState.PS &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (reg >= value) cpuState.PS |= ProcFlags::Carry;
+		uint8_t result = reg - value;
+		if (result == 0) cpuState.PS |= ProcFlags::Zero;
+		if (result & 0x80) cpuState.PS |= ProcFlags::Negative;
+		benchmark::DoNotOptimize(cpuState.PS);
+		reg += 7; value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_Compare8_Branching);
+
+static void BM_SnesCpu_Compare8_Branchless(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	uint8_t reg = 0, value = 0;
+	for (auto _ : state) {
+		cpuState.PS &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		uint8_t result = reg - value;
+		cpuState.PS |= (reg >= value) ? ProcFlags::Carry : 0;
+		cpuState.PS |= (result == 0) ? ProcFlags::Zero : 0;
+		cpuState.PS |= (result & 0x80);
+		benchmark::DoNotOptimize(cpuState.PS);
+		reg += 7; value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_Compare8_Branchless);
+
+// --- Add8 Overflow+Carry ---
+
+static void BM_SnesCpu_Add8_Branching(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	cpuState.A = 0;
+	uint8_t value = 0;
+	for (auto _ : state) {
+		uint32_t result = (cpuState.A & 0xFF) + value + (cpuState.PS & ProcFlags::Carry);
+		if (~(cpuState.A ^ value) & (cpuState.A ^ result) & 0x80) {
+			cpuState.PS |= ProcFlags::Overflow;
+		} else {
+			cpuState.PS &= ~ProcFlags::Overflow;
+		}
+		cpuState.PS &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		cpuState.PS |= ((uint8_t)result == 0) ? ProcFlags::Zero : 0;
+		cpuState.PS |= ((uint8_t)result & 0x80);
+		if (result > 0xFF) cpuState.PS |= ProcFlags::Carry;
+		cpuState.A = (cpuState.A & 0xFF00) | (uint8_t)result;
+		benchmark::DoNotOptimize(cpuState.PS);
+		benchmark::DoNotOptimize(cpuState.A);
+		value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_Add8_Branching);
+
+static void BM_SnesCpu_Add8_Branchless(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	cpuState.A = 0;
+	uint8_t value = 0;
+	for (auto _ : state) {
+		uint32_t result = (cpuState.A & 0xFF) + value + (cpuState.PS & ProcFlags::Carry);
+		uint8_t overflowFlag = (~(cpuState.A ^ value) & (cpuState.A ^ result) & 0x80) ? ProcFlags::Overflow : 0;
+		cpuState.PS &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero | ProcFlags::Overflow);
+		cpuState.PS |= ((uint8_t)result == 0) ? ProcFlags::Zero : 0;
+		cpuState.PS |= ((uint8_t)result & 0x80);
+		cpuState.PS |= overflowFlag;
+		cpuState.PS |= (result > 0xFF) ? ProcFlags::Carry : 0;
+		cpuState.A = (cpuState.A & 0xFF00) | (uint8_t)result;
+		benchmark::DoNotOptimize(cpuState.PS);
+		benchmark::DoNotOptimize(cpuState.A);
+		value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_Add8_Branchless);
+
+// --- ShiftLeft 8-bit ---
+
+static void BM_SnesCpu_ShiftLeft8_Branching(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	uint8_t value = 0;
+	for (auto _ : state) {
+		cpuState.PS &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		if (value & 0x80) cpuState.PS |= ProcFlags::Carry;
+		uint8_t result = value << 1;
+		cpuState.PS |= (result == 0) ? ProcFlags::Zero : 0;
+		cpuState.PS |= (result & 0x80);
+		benchmark::DoNotOptimize(cpuState.PS);
+		benchmark::DoNotOptimize(result);
+		value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_ShiftLeft8_Branching);
+
+static void BM_SnesCpu_ShiftLeft8_Branchless(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	uint8_t value = 0;
+	for (auto _ : state) {
+		cpuState.PS &= ~(ProcFlags::Carry | ProcFlags::Negative | ProcFlags::Zero);
+		cpuState.PS |= (value >> 7) & ProcFlags::Carry;
+		uint8_t result = value << 1;
+		cpuState.PS |= (result == 0) ? ProcFlags::Zero : 0;
+		cpuState.PS |= (result & 0x80);
+		benchmark::DoNotOptimize(cpuState.PS);
+		benchmark::DoNotOptimize(result);
+		value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_ShiftLeft8_Branchless);
+
+// --- TestBits 8-bit ---
+
+static void BM_SnesCpu_TestBits8_Branching(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	cpuState.A = 0;
+	uint8_t value = 0;
+	for (auto _ : state) {
+		cpuState.PS &= ~(ProcFlags::Zero | ProcFlags::Overflow | ProcFlags::Negative);
+		if (((uint8_t)cpuState.A & value) == 0) cpuState.PS |= ProcFlags::Zero;
+		if (value & 0x40) cpuState.PS |= ProcFlags::Overflow;
+		if (value & 0x80) cpuState.PS |= ProcFlags::Negative;
+		benchmark::DoNotOptimize(cpuState.PS);
+		cpuState.A = (cpuState.A + 7) & 0xFF; value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_TestBits8_Branching);
+
+static void BM_SnesCpu_TestBits8_Branchless(benchmark::State& state) {
+	SnesCpuState cpuState = {};
+	cpuState.A = 0;
+	uint8_t value = 0;
+	for (auto _ : state) {
+		cpuState.PS &= ~(ProcFlags::Zero | ProcFlags::Overflow | ProcFlags::Negative);
+		cpuState.PS |= (((uint8_t)cpuState.A & value) == 0) ? ProcFlags::Zero : 0;
+		cpuState.PS |= (value & 0x40);
+		cpuState.PS |= (value & 0x80);
+		benchmark::DoNotOptimize(cpuState.PS);
+		cpuState.A = (cpuState.A + 7) & 0xFF; value += 13;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_SnesCpu_TestBits8_Branchless);
+
