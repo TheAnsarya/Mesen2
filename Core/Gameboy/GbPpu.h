@@ -165,6 +165,15 @@ private:
 	GbPixelType _lastPixelType = {};
 	uint8_t _lastBgColor = 0;
 
+	/// <summary>Cached config: disable sprite rendering (refreshed per scanline).</summary>
+	bool _cfgDisableSprites = false;
+
+	/// <summary>Cached config: disable background rendering (refreshed per scanline).</summary>
+	bool _cfgDisableBackground = false;
+
+	/// <summary>Refreshes cached GameboyConfig fields from settings. Called once per scanline at Drawing mode entry.</summary>
+	__forceinline void RefreshCachedConfig();
+
 	__forceinline void WriteBgPixel(uint8_t colorIndex);
 	__forceinline void WriteObjPixel(uint8_t colorIndex);
 

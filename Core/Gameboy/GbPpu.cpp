@@ -280,6 +280,7 @@ void GbPpu::ProcessFirstScanlineAfterPowerOn() {
 			_state.IrqMode = PpuMode::Drawing;
 			ResetRenderer();
 			_rendererIdle = true;
+			RefreshCachedConfig();
 			break;
 
 		case 92:
@@ -338,6 +339,7 @@ void GbPpu::ProcessVisibleScanline() {
 			_oamWriteBlocked = true;
 			_vramWriteBlocked = true;
 			_rendererIdle = true;
+			RefreshCachedConfig();
 			break;
 
 		case 89:
@@ -426,11 +428,9 @@ void GbPpu::RunDrawCycle() {
 
 	if (_fetchSprite == -1 && _bgFifo.Size > 0) {
 		if (_drawnPixels >= 0) {
-			GameboyConfig& cfg = _emu->GetSettings()->GetGameboyConfig();
-
 			GbFifoEntry entry = _insertGlitchBgPixel ? GbFifoEntry{} : _bgFifo.Content[_bgFifo.Position];
 			GbFifoEntry sprite = _oamFifo.Content[_oamFifo.Position];
-			if (!cfg.DisableSprites && sprite.Color != 0 && (entry.Color == 0 || (!(sprite.Attributes & 0x80) && !(entry.Attributes & 0x80)) || (_state.CgbEnabled && !_state.BgEnabled))) {
+			if (!_cfgDisableSprites && sprite.Color != 0 && (entry.Color == 0 || (!(sprite.Attributes & 0x80) && !(entry.Attributes & 0x80)) || (_state.CgbEnabled && !_state.BgEnabled))) {
 				// Use sprite pixel if:
 				//   -BG color is 0, OR
 				//   -Sprite is background priority AND BG does not have its priority bit set, OR
@@ -443,7 +443,7 @@ void GbPpu::RunDrawCycle() {
 				}
 				_lastPixelType = GbPixelType::Object;
 			} else {
-				if (!cfg.DisableBackground) {
+				if (!_cfgDisableBackground) {
 					if (_state.CgbEnabled) {
 						WriteBgPixel(entry.Color | ((entry.Attributes & 0x07) << 2));
 					} else {
@@ -512,6 +512,12 @@ void GbPpu::RunSpriteEvaluation() {
 	} else {
 		// TODO check proper timing for even&odd cycles
 	}
+}
+
+void GbPpu::RefreshCachedConfig() {
+	GameboyConfig& cfg = _emu->GetSettings()->GetGameboyConfig();
+	_cfgDisableSprites = cfg.DisableSprites;
+	_cfgDisableBackground = cfg.DisableBackground;
 }
 
 void GbPpu::ResetRenderer() {
