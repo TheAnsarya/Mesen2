@@ -33,7 +33,7 @@ SmsCpuState& SmsCpu::GetState() {
 void SmsCpu::Exec() {
 	uint8_t opCode = 0;
 	_state.FlagsChanged <<= 1;
-	if (_state.Halted) {
+	if (_state.Halted) [[unlikely]] {
 		// CPU is halted, process halted state
 		_emu->ProcessHaltedCpu<CpuType::Sms>();
 		ExecCycles(4);
@@ -46,7 +46,7 @@ void SmsCpu::Exec() {
 	}
 
 	// Handle pending NMI (highest priority)
-	if (_state.NmiPending) {
+	if (_state.NmiPending) [[unlikely]] {
 		_state.Halted = false;
 		_state.NmiPending = false;
 		_state.IFF1 = false;
@@ -55,7 +55,7 @@ void SmsCpu::Exec() {
 		uint16_t originalPc = _state.PC;
 		RST(0x66); // NMI vector
 		_emu->ProcessInterrupt<CpuType::Sms>(originalPc, _state.PC, true);
-	} else if (_state.IFF1 && _state.ActiveIrqs && opCode != 0xFB) {
+	} else if (_state.IFF1 && _state.ActiveIrqs && opCode != 0xFB) [[unlikely]] {
 		// Process IRQs if enabled, but not if the previous op was EI (0xFB)
 		_state.Halted = false;
 		_state.IFF1 = false;
@@ -1856,9 +1856,9 @@ void SmsCpu::XOR(uint8_t value) {
 
 void SmsCpu::UpdateLogicalOpFlags(uint8_t value) {
 	SetStandardFlags<0xEC>(value);
-	ClearFlag(SmsCpuFlags::AddSub);
-	ClearFlag(SmsCpuFlags::Carry);
-	ClearFlag(SmsCpuFlags::HalfCarry);
+	// Merged clear: 3 separate ClearFlag calls → single AND mask
+	_state.Flags &= ~(SmsCpuFlags::AddSub | SmsCpuFlags::Carry | SmsCpuFlags::HalfCarry);
+	_state.FlagsChanged |= 0x01;
 }
 
 void SmsCpu::CP(uint8_t value) {

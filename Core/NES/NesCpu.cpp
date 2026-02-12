@@ -178,7 +178,7 @@ void NesCpu::Exec() {
 	(this->*_opTable[opCode])();             // Execute instruction
 
 	// Handle pending IRQ or NMI after instruction
-	if (_prevRunIrq || _prevNeedNmi) {
+	if (_prevRunIrq || _prevNeedNmi) [[unlikely]] {
 		IRQ();
 	}
 }

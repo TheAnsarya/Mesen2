@@ -48,11 +48,11 @@ bool GbCpu::HandleStoppedState() {
 
 void GbCpu::Exec() {
 #ifndef DUMMYCPU
-	if (_state.Stopped) {
+	if (_state.Stopped) [[unlikely]] {
 		if (HandleStoppedState()) {
 			return;
 		}
-	} else if (_prevIrqVector && !_state.HaltBug) {
+	} else if (_prevIrqVector && !_state.HaltBug) [[unlikely]] {
 		if (_state.HaltCounter > 0) {
 			_state.HaltCounter = 0;
 			_memoryManager->ProcessHaltEnd();

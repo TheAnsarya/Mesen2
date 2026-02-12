@@ -136,15 +136,12 @@ void PceCpu::CMP(uint8_t reg, uint8_t value) {
 
 	auto result = reg - value;
 
-	if (reg >= value) {
-		SetFlags(PceCpuFlags::Carry);
-	}
-	if (reg == value) {
-		SetFlags(PceCpuFlags::Zero);
-	}
-	if ((result & 0x80) == 0x80) {
-		SetFlags(PceCpuFlags::Negative);
-	}
+	// Branchless: Carry=0x01 maps directly to bool(reg >= value)
+	_state.PS |= static_cast<uint8_t>(reg >= value);
+	// Branchless: Zero=0x02, shift bool left by 1
+	_state.PS |= static_cast<uint8_t>(reg == value) << 1;
+	// Branchless: Negative=0x80 maps directly to result bit 7
+	_state.PS |= (result & PceCpuFlags::Negative);
 }
 
 void PceCpu::CPA() {
@@ -183,9 +180,8 @@ void PceCpu::DEC() {
 
 uint8_t PceCpu::ASL(uint8_t value) {
 	ClearFlags(PceCpuFlags::Carry | PceCpuFlags::Negative | PceCpuFlags::Zero);
-	if (value & 0x80) {
-		SetFlags(PceCpuFlags::Carry);
-	}
+	// Branchless: bit 7 → Carry (bit 0)
+	_state.PS |= (value >> 7);
 
 	uint8_t result = value << 1;
 	SetZeroNegativeFlags(result);
@@ -194,9 +190,8 @@ uint8_t PceCpu::ASL(uint8_t value) {
 
 uint8_t PceCpu::LSR(uint8_t value) {
 	ClearFlags(PceCpuFlags::Carry | PceCpuFlags::Negative | PceCpuFlags::Zero);
-	if (value & 0x01) {
-		SetFlags(PceCpuFlags::Carry);
-	}
+	// Branchless: bit 0 maps directly to Carry (bit 0)
+	_state.PS |= (value & PceCpuFlags::Carry);
 
 	uint8_t result = value >> 1;
 	SetZeroNegativeFlags(result);
@@ -207,11 +202,10 @@ uint8_t PceCpu::ROL(uint8_t value) {
 	bool carryFlag = CheckFlag(PceCpuFlags::Carry);
 	ClearFlags(PceCpuFlags::Carry | PceCpuFlags::Negative | PceCpuFlags::Zero);
 
-	if (value & 0x80) {
-		SetFlags(PceCpuFlags::Carry);
-	}
+	// Branchless: bit 7 → Carry (bit 0)
+	_state.PS |= (value >> 7);
 
-	uint8_t result = (value << 1 | (carryFlag ? 0x01 : 0x00));
+	uint8_t result = (value << 1 | static_cast<uint8_t>(carryFlag));
 	SetZeroNegativeFlags(result);
 	return result;
 }
@@ -219,11 +213,10 @@ uint8_t PceCpu::ROL(uint8_t value) {
 uint8_t PceCpu::ROR(uint8_t value) {
 	bool carryFlag = CheckFlag(PceCpuFlags::Carry);
 	ClearFlags(PceCpuFlags::Carry | PceCpuFlags::Negative | PceCpuFlags::Zero);
-	if (value & 0x01) {
-		SetFlags(PceCpuFlags::Carry);
-	}
+	// Branchless: bit 0 maps directly to Carry (bit 0)
+	_state.PS |= (value & PceCpuFlags::Carry);
 
-	uint8_t result = (value >> 1 | (carryFlag ? 0x80 : 0x00));
+	uint8_t result = (value >> 1 | (static_cast<uint8_t>(carryFlag) << 7));
 	SetZeroNegativeFlags(result);
 	return result;
 }
@@ -269,32 +262,22 @@ void PceCpu::BranchRelative(bool branch) {
 void PceCpu::BIT() {
 	uint8_t value = GetOperandValue();
 	ClearFlags(PceCpuFlags::Zero | PceCpuFlags::Overflow | PceCpuFlags::Negative);
-	if ((A() & value) == 0) {
-		SetFlags(PceCpuFlags::Zero);
-	}
-	if (value & 0x40) {
-		SetFlags(PceCpuFlags::Overflow);
-	}
-	if (value & 0x80) {
-		SetFlags(PceCpuFlags::Negative);
-	}
+	// Branchless: Zero=0x02, shift bool left by 1
+	_state.PS |= static_cast<uint8_t>((A() & value) == 0) << 1;
+	// Branchless: Overflow=0x40 and Negative=0x80 map directly to value bits
+	_state.PS |= (value & (PceCpuFlags::Overflow | PceCpuFlags::Negative));
 }
 
 void PceCpu::TSB() {
 	uint8_t value = MemoryRead(_operand);
 
 	ClearFlags(PceCpuFlags::Zero | PceCpuFlags::Overflow | PceCpuFlags::Negative);
-	if (value & 0x40) {
-		SetFlags(PceCpuFlags::Overflow);
-	}
-	if (value & 0x80) {
-		SetFlags(PceCpuFlags::Negative);
-	}
+	// Branchless: Overflow=0x40 and Negative=0x80 from original value
+	_state.PS |= (value & (PceCpuFlags::Overflow | PceCpuFlags::Negative));
 
 	value |= A();
-	if (value == 0) {
-		SetFlags(PceCpuFlags::Zero);
-	}
+	// Branchless: Zero=0x02 from result after OR
+	_state.PS |= static_cast<uint8_t>(value == 0) << 1;
 
 	Idle();
 	MemoryWrite(_operand, value);
@@ -304,17 +287,12 @@ void PceCpu::TRB() {
 	uint8_t value = MemoryRead(_operand);
 
 	ClearFlags(PceCpuFlags::Zero | PceCpuFlags::Overflow | PceCpuFlags::Negative);
-	if (value & 0x40) {
-		SetFlags(PceCpuFlags::Overflow);
-	}
-	if (value & 0x80) {
-		SetFlags(PceCpuFlags::Negative);
-	}
+	// Branchless: Overflow=0x40 and Negative=0x80 from original value
+	_state.PS |= (value & (PceCpuFlags::Overflow | PceCpuFlags::Negative));
 
 	value &= ~A();
-	if (value == 0) {
-		SetFlags(PceCpuFlags::Zero);
-	}
+	// Branchless: Zero=0x02 from result after AND-NOT
+	_state.PS |= static_cast<uint8_t>(value == 0) << 1;
 
 	Idle();
 	MemoryWrite(_operand, value);
@@ -326,18 +304,13 @@ void PceCpu::TST() {
 	Idle();
 
 	ClearFlags(PceCpuFlags::Zero | PceCpuFlags::Overflow | PceCpuFlags::Negative);
-	if (value & 0x40) {
-		SetFlags(PceCpuFlags::Overflow);
-	}
-	if (value & 0x80) {
-		SetFlags(PceCpuFlags::Negative);
-	}
+	// Branchless: Overflow=0x40 and Negative=0x80 from original value
+	_state.PS |= (value & (PceCpuFlags::Overflow | PceCpuFlags::Negative));
 
 	value &= _operand;
 
-	if (value == 0) {
-		SetFlags(PceCpuFlags::Zero);
-	}
+	// Branchless: Zero=0x02 from result after AND
+	_state.PS |= static_cast<uint8_t>(value == 0) << 1;
 }
 
 void PceCpu::CSL() {

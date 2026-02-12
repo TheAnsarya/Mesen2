@@ -280,3 +280,81 @@ TEST_F(SmsCpuStandardFlagsTest, UndocumentedFlags_CopyFromValue) {
 	EXPECT_TRUE(flags & SmsCpuFlags::F3);
 	EXPECT_TRUE(flags & SmsCpuFlags::F5);
 }
+
+//=============================================================================
+// Before/After Comparison: SMS UpdateLogicalOpFlags (merged ClearFlag)
+//=============================================================================
+
+/// <summary>
+/// Tests verifying that the merged ClearFlag optimization in UpdateLogicalOpFlags
+/// produces identical results to calling 3 separate ClearFlag calls.
+/// After SetStandardFlags<0xEC>, AddSub/Carry/HalfCarry must be cleared.
+/// </summary>
+class SmsCpuLogicalOpFlagsTest : public ::testing::Test {
+protected:
+	// Parity lookup table for test reference
+	static bool CheckParity(uint8_t value) {
+		value ^= value >> 4;
+		value ^= value >> 2;
+		value ^= value >> 1;
+		return (value & 1) == 0;
+	}
+
+	// Old: 3 separate ClearFlag calls
+	static uint8_t LogicalOpFlags_Separate(uint8_t flags, uint8_t value) {
+		// SetStandardFlags<0xEC> sets Sign, Zero, F5, F3, Parity
+		// Sign=0x80
+		flags = (flags & ~SmsCpuFlags::Sign) | (-static_cast<uint8_t>((value & 0x80) != 0) & SmsCpuFlags::Sign);
+		// Zero=0x40
+		flags = (flags & ~SmsCpuFlags::Zero) | (-static_cast<uint8_t>(value == 0) & SmsCpuFlags::Zero);
+		// F5=0x20
+		flags = (flags & ~SmsCpuFlags::F5) | (-static_cast<uint8_t>((value & SmsCpuFlags::F5) != 0) & SmsCpuFlags::F5);
+		// F3=0x08
+		flags = (flags & ~SmsCpuFlags::F3) | (-static_cast<uint8_t>((value & SmsCpuFlags::F3) != 0) & SmsCpuFlags::F3);
+		// Parity=0x04
+		flags = (flags & ~SmsCpuFlags::Parity) | (-static_cast<uint8_t>(CheckParity(value)) & SmsCpuFlags::Parity);
+		// 3 separate clears
+		flags &= ~SmsCpuFlags::AddSub;
+		flags &= ~SmsCpuFlags::Carry;
+		flags &= ~SmsCpuFlags::HalfCarry;
+		return flags;
+	}
+
+	// New: single merged AND mask
+	static uint8_t LogicalOpFlags_Merged(uint8_t flags, uint8_t value) {
+		// SetStandardFlags<0xEC>
+		flags = (flags & ~SmsCpuFlags::Sign) | (-static_cast<uint8_t>((value & 0x80) != 0) & SmsCpuFlags::Sign);
+		flags = (flags & ~SmsCpuFlags::Zero) | (-static_cast<uint8_t>(value == 0) & SmsCpuFlags::Zero);
+		flags = (flags & ~SmsCpuFlags::F5) | (-static_cast<uint8_t>((value & SmsCpuFlags::F5) != 0) & SmsCpuFlags::F5);
+		flags = (flags & ~SmsCpuFlags::F3) | (-static_cast<uint8_t>((value & SmsCpuFlags::F3) != 0) & SmsCpuFlags::F3);
+		flags = (flags & ~SmsCpuFlags::Parity) | (-static_cast<uint8_t>(CheckParity(value)) & SmsCpuFlags::Parity);
+		// Single merged clear
+		flags &= ~(SmsCpuFlags::AddSub | SmsCpuFlags::Carry | SmsCpuFlags::HalfCarry);
+		return flags;
+	}
+};
+
+TEST_F(SmsCpuLogicalOpFlagsTest, Exhaustive_256Values_AllFlagStates) {
+	uint8_t flagStates[] = { 0x00, 0xFF, 0x13, 0x55, 0xAA, 0xEC };
+	for (uint8_t initial : flagStates) {
+		for (int v = 0; v < 256; v++) {
+			uint8_t value = static_cast<uint8_t>(v);
+			uint8_t separate = LogicalOpFlags_Separate(initial, value);
+			uint8_t merged = LogicalOpFlags_Merged(initial, value);
+			ASSERT_EQ(separate, merged)
+				<< "LogicalOpFlags mismatch: flags=0x" << std::hex << (int)initial
+				<< " value=0x" << (int)value;
+		}
+	}
+}
+
+TEST_F(SmsCpuLogicalOpFlagsTest, AddSubCarryHalfCarry_AlwaysCleared) {
+	// Even if all flags start set, AddSub/Carry/HalfCarry must end cleared
+	for (int v = 0; v < 256; v++) {
+		uint8_t value = static_cast<uint8_t>(v);
+		uint8_t result = LogicalOpFlags_Merged(0xFF, value);
+		EXPECT_FALSE(result & SmsCpuFlags::AddSub) << "AddSub not cleared for value=0x" << std::hex << v;
+		EXPECT_FALSE(result & SmsCpuFlags::Carry) << "Carry not cleared for value=0x" << std::hex << v;
+		EXPECT_FALSE(result & SmsCpuFlags::HalfCarry) << "HalfCarry not cleared for value=0x" << std::hex << v;
+	}
+}

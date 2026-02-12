@@ -108,7 +108,7 @@ void PceCpu::Exec() {
 	(this->*_opTable[opCode])();          // Execute instruction
 
 	// Check for pending IRQs (general or timer)
-	if (_pendingIrqs || _memoryManager->HasIrqSource(PceIrqSource::TimerIrq)) {
+	if (_pendingIrqs || _memoryManager->HasIrqSource(PceIrqSource::TimerIrq)) [[unlikely]] {
 		ProcessIrq(false);
 	}
 }

@@ -289,11 +289,11 @@ public:
 		_memoryManager->ProcessDma();
 
 		if constexpr (inlineHalt) {
-			if (_state.Stopped && InlineProcessHaltMode<debuggerEnabled>()) {
+			if (_state.Stopped && InlineProcessHaltMode<debuggerEnabled>()) [[unlikely]] {
 				return;
 			}
 		} else {
-			if (_state.Stopped && ProcessHaltMode<debuggerEnabled>()) {
+			if (_state.Stopped && ProcessHaltMode<debuggerEnabled>()) [[unlikely]] {
 				return;
 			}
 		}
