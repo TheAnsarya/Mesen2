@@ -263,6 +263,12 @@ jobs:
           ENTITLEMENTS: UI/Nexen.entitlements
           SIGNING_IDENTITY: Nexen
         run: |
+          # Skip signing if certificate not configured
+          if [ -z "$CERT_DATA" ]; then
+            echo "Skipping code signing - MACOS_CERTIFICATE secret not configured"
+            exit 0
+          fi
+
           # Export certs
           echo "$CERT_DATA" | base64 --decode > /tmp/certs.p12
           # Create keychain
