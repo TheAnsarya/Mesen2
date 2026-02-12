@@ -50,15 +50,15 @@ jobs:
         run: |
           $outDir = "bin\win-x64\Release"
           New-Item -ItemType Directory -Path $outDir -Force | Out-Null
-          
+
           # Find and copy SkiaSharp native libs from NuGet packages
           $nugetCache = Join-Path $env:USERPROFILE ".nuget\packages"
           $skipNativeLibs = Join-Path $nugetCache "skiasharp.nativeassets.win32\*\runtimes\win-x64\native\libSkiaSharp.dll"
           $harfNativeLibs = Join-Path $nugetCache "harfbuzzsharp.nativeassets.win32\*\runtimes\win-x64\native\libHarfBuzzSharp.dll"
-          
+
           $skiaDll = Get-ChildItem -Path $skipNativeLibs | Select-Object -Last 1
           $harfDll = Get-ChildItem -Path $harfNativeLibs | Select-Object -Last 1
-          
+
           if ($skiaDll) {
             Copy-Item $skiaDll.FullName -Destination $outDir -Force
             Write-Host "Copied: $($skiaDll.FullName)"
@@ -66,7 +66,7 @@ jobs:
             Write-Error "libSkiaSharp.dll not found in NuGet cache"
             exit 1
           }
-          
+
           if ($harfDll) {
             Copy-Item $harfDll.FullName -Destination $outDir -Force
             Write-Host "Copied: $($harfDll.FullName)"

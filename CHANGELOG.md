@@ -5,6 +5,18 @@ All notable changes to Nexen are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-02-12
+
+### Fixed
+
+- **CI/CD**: Fixed GitHub Actions build workflow for all platforms
+  - Windows: Fixed native library packaging from NuGet cache
+  - macOS: Made code signing optional when certificate not configured
+  - macOS: Fixed libc++ linking via NEXENFLAGS environment variable
+  - Linux AppImage: Fixed `--self-contained true` syntax (was `--no-self-contained false`)
+
+---
+
 ## [1.1.0] - 2026-02-12
 
 ### Performance
