@@ -10,6 +10,7 @@ using Nexen.Config;
 using Nexen.Debugger.Utilities;
 using Nexen.Debugger.ViewModels;
 using Nexen.Interop;
+using Nexen.Utilities;
 
 namespace Nexen.Debugger.Controls; 
 public sealed class BreakpointBar : Control {
@@ -50,8 +51,9 @@ public sealed class BreakpointBar : Control {
 			int? activeAddress = disModel.ActiveAddress;
 			if (activeAddress >= 0) {
 				int position = (int)((double)activeAddress.Value / maxAddress * height) - 2;
-				SolidColorBrush brush = new(ConfigManager.Config.Debug.Debugger.CodeActiveStatementColor);
-				Pen pen = new Pen(Colors.Black.ToUInt32());
+				// Use cached brush/pen to avoid per-frame allocation
+				SolidColorBrush brush = ColorHelper.GetBrush(Color.FromUInt32(ConfigManager.Config.Debug.Debugger.CodeActiveStatementColor));
+				Pen pen = ColorHelper.GetPen(Colors.Black);
 				context.FillRectangle(brush, new Rect(0.5, position - 0.5, width, 3));
 				context.DrawRectangle(pen, new Rect(0.5, position - 0.5, width, 3));
 			}
@@ -61,11 +63,11 @@ public sealed class BreakpointBar : Control {
 				if (address >= 0 && (bp.IsSingleAddress || bp.BreakOnExec)) {
 					int position = (int)((double)address / maxAddress * height) - 2;
 					if (bp.Enabled) {
-						SolidColorBrush brush = new(bp.GetColor());
+						SolidColorBrush brush = ColorHelper.GetBrush(bp.GetColor());
 						context.FillRectangle(brush, new Rect(0, position, 4, 4));
 					} else {
-						Pen pen = new Pen(bp.GetColor().ToUInt32());
-						SolidColorBrush brush = new(Colors.White);
+						Pen pen = ColorHelper.GetPen(bp.GetColor());
+						SolidColorBrush brush = ColorHelper.GetBrush(Colors.White);
 						context.FillRectangle(brush, new Rect(0, position, 4, 4));
 						context.DrawRectangle(pen, new Rect(0.5, position + 0.5, 3, 3));
 					}
@@ -75,8 +77,8 @@ public sealed class BreakpointBar : Control {
 			int? activeLine = srcModel.GetActiveLineIndex();
 			if (activeLine >= 0) {
 				int position = (int)((double)activeLine.Value / srcModel.SelectedFile.Data.Length * height) - 2;
-				SolidColorBrush brush = new(ConfigManager.Config.Debug.Debugger.CodeActiveStatementColor);
-				Pen pen = new Pen(Colors.Black.ToUInt32());
+				SolidColorBrush brush = ColorHelper.GetBrush(Color.FromUInt32(ConfigManager.Config.Debug.Debugger.CodeActiveStatementColor));
+				Pen pen = ColorHelper.GetPen(Colors.Black);
 				context.FillRectangle(brush, new Rect(0.5, position - 0.5, width, 3));
 				context.DrawRectangle(pen, new Rect(0.5, position - 0.5, width, 3));
 			}
@@ -86,10 +88,10 @@ public sealed class BreakpointBar : Control {
 				if (bp is not null) {
 					int position = (int)((double)i / len * height) - 2;
 					if (bp.Enabled) {
-						SolidColorBrush brush = new SolidColorBrush(bp.GetColor());
+						SolidColorBrush brush = ColorHelper.GetBrush(bp.GetColor());
 						context.FillRectangle(brush, new Rect(0, position, 4, 4));
 					} else {
-						Pen pen = new Pen(bp.GetColor().ToUInt32());
+						Pen pen = ColorHelper.GetPen(bp.GetColor());
 						context.DrawRectangle(pen, new Rect(0.5, position + 0.5, 3, 3));
 					}
 				}

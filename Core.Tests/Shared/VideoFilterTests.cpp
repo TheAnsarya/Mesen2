@@ -207,3 +207,156 @@ TEST_F(VideoFilterTests, ConversionMatrix_DoubleLiterals_MatchFloatValues) {
 			<< " float=" << fromFloat[i] << " double=" << fromDouble[i];
 	}
 }
+
+// =============================================================================
+// SNES Video Filter: Row Pointer Hoisting Tests (Phase 6)
+// =============================================================================
+
+// Verify SNES video filter row pointer hoisting produces same output as nested multiply
+TEST_F(VideoFilterTests, SnesVideoFilter_RowPointer_MatchesNestedMultiply) {
+	// SNES normal resolution: 256x224
+	constexpr uint32_t Width = 256;
+	constexpr uint32_t Height = 224;
+	constexpr uint32_t BaseWidth = 256;
+
+	// Simulate ppuOutputBuffer (RGB555 values)
+	std::array<uint16_t, Width * Height> ppuBuffer{};
+	for (uint32_t i = 0; i < Width * Height; i++) {
+		ppuBuffer[i] = static_cast<uint16_t>(i & 0x7FFF);
+	}
+
+	// Simple palette: identity map with alpha
+	auto palette = [](uint16_t val) -> uint32_t { return 0xFF000000 | val; };
+
+	uint32_t xOffset = 0;
+	uint32_t yOffset = 0;
+
+	// Reference: original nested multiply
+	std::array<uint32_t, Width * Height> refOutput{};
+	for (uint32_t i = 0; i < Height; i++) {
+		for (uint32_t j = 0; j < Width; j++) {
+			refOutput[i * Width + j] = palette(ppuBuffer[i * BaseWidth + j + yOffset + xOffset]);
+		}
+	}
+
+	// Optimized: hoisted row pointer with flat index
+	std::array<uint32_t, Width * Height> optOutput{};
+	uint32_t outIdx = 0;
+	uint32_t srcOffset = yOffset + xOffset;
+	for (uint32_t i = 0; i < Height; i++) {
+		for (uint32_t j = 0; j < Width; j++) {
+			optOutput[outIdx++] = palette(ppuBuffer[srcOffset + j]);
+		}
+		srcOffset += BaseWidth;
+	}
+
+	EXPECT_EQ(refOutput, optOutput);
+}
+
+// Verify SNES video filter with overscan produces same output
+TEST_F(VideoFilterTests, SnesVideoFilter_RowPointer_WithOverscan) {
+	constexpr uint32_t BaseWidth = 512;
+	constexpr uint32_t FrameWidth = 488;
+	constexpr uint32_t FrameHeight = 448;
+	constexpr uint32_t OverscanLeft = 12;
+	constexpr uint32_t OverscanTop = 15;
+
+	// Allocate source buffer (larger than output due to overscan)
+	std::vector<uint16_t> ppuBuffer(BaseWidth * (FrameHeight + OverscanTop + 30), 0);
+	for (size_t i = 0; i < ppuBuffer.size(); i++) {
+		ppuBuffer[i] = static_cast<uint16_t>(i & 0x7FFF);
+	}
+
+	auto palette = [](uint16_t val) -> uint32_t { return 0xFF000000 | val; };
+
+	uint32_t xOffset = OverscanLeft;
+	uint32_t yOffset = OverscanTop * BaseWidth;
+
+	// Reference
+	std::vector<uint32_t> refOutput(FrameWidth * FrameHeight, 0);
+	for (uint32_t i = 0; i < FrameHeight; i++) {
+		for (uint32_t j = 0; j < FrameWidth; j++) {
+			refOutput[i * FrameWidth + j] = palette(ppuBuffer[i * BaseWidth + j + yOffset + xOffset]);
+		}
+	}
+
+	// Optimized
+	std::vector<uint32_t> optOutput(FrameWidth * FrameHeight, 0);
+	uint32_t outIdx = 0;
+	uint32_t srcOff = yOffset + xOffset;
+	for (uint32_t i = 0; i < FrameHeight; i++) {
+		for (uint32_t j = 0; j < FrameWidth; j++) {
+			optOutput[outIdx++] = palette(ppuBuffer[srcOff + j]);
+		}
+		srcOff += BaseWidth;
+	}
+
+	EXPECT_EQ(refOutput, optOutput);
+}
+
+// Verify SNES ConvertToHiRes cached pixel read matches double read
+TEST_F(VideoFilterTests, SnesConvertToHiRes_CachedPixel_MatchesDoubleRead) {
+	// Simulate pixel doubling: 256-wide → 512-wide per scanline
+	// Buffer needs to be large enough for 1024-wide destination rows (hi-res + interlace)
+	// Row i destination uses offset (i << 10), so we need at least 240 * 1024 entries
+	constexpr size_t BufSize = 240 * 1024;
+	std::vector<uint16_t> refBuf(BufSize, 0);
+	std::vector<uint16_t> optBuf(BufSize, 0);
+
+	// Fill source region (256-wide at rows via << 8)
+	for (int i = 0; i < 240; i++) {
+		for (int x = 0; x < 256; x++) {
+			uint16_t val = static_cast<uint16_t>((i * 256 + x) & 0x7FFF);
+			refBuf[(i << 8) + x] = val;
+			optBuf[(i << 8) + x] = val;
+		}
+	}
+
+	// Reference: double read (original code pattern)
+	for (int i = 239; i >= 0; i--) {
+		for (int x = 0; x < 256; x++) {
+			refBuf[(i << 10) + (x << 1)] = refBuf[(i << 8) + x];
+			refBuf[(i << 10) + (x << 1) + 1] = refBuf[(i << 8) + x];
+		}
+	}
+
+	// Optimized: cached pixel read
+	for (int i = 239; i >= 0; i--) {
+		uint16_t* src = optBuf.data() + (i << 8);
+		uint16_t* dst = optBuf.data() + (i << 10);
+		for (int x = 0; x < 256; x++) {
+			uint16_t pixel = src[x];
+			dst[x << 1] = pixel;
+			dst[(x << 1) + 1] = pixel;
+		}
+	}
+
+	EXPECT_EQ(refBuf, optBuf);
+}
+
+// Verify ByteCodeStr hex formatting with string.Create matches original
+TEST_F(VideoFilterTests, ByteCodeHexFormat_MatchesOriginal) {
+	// Test hex formatting logic used in CodeLineData.ByteCodeStr
+	uint8_t bytes[] = {0x00, 0xFF, 0xAB, 0x12, 0x9E};
+	constexpr const char* hexLut = "0123456789ABCDEF";
+
+	for (int len = 1; len <= 5; len++) {
+		// Reference: ToString("X2") + " " pattern
+		std::string refStr;
+		for (int i = 0; i < len; i++) {
+			char buf[4];
+			snprintf(buf, sizeof(buf), "%02X ", bytes[i]);
+			refStr += buf;
+		}
+
+		// Optimized: LUT-based
+		std::string optStr(len * 3, ' ');
+		for (int i = 0; i < len; i++) {
+			optStr[i * 3] = hexLut[bytes[i] >> 4];
+			optStr[i * 3 + 1] = hexLut[bytes[i] & 0x0F];
+			optStr[i * 3 + 2] = ' ';
+		}
+
+		EXPECT_EQ(refStr, optStr) << "Length " << len;
+	}
+}

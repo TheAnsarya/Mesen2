@@ -607,3 +607,113 @@ static void BM_GbPpu_WritePixel_CachedOffset(benchmark::State& state) {
 	state.SetItemsProcessed(state.iterations() * 160);
 }
 BENCHMARK(BM_GbPpu_WritePixel_CachedOffset);
+
+// =============================================================================
+// SNES Video Filter Benchmarks (Phase 6)
+// =============================================================================
+
+// Reference: Nested loop with per-pixel multiply (original SNES video filter)
+static void BM_SnesVideoFilter_NestedMultiply(benchmark::State& state) {
+	constexpr uint32_t BaseWidth = 512;
+	constexpr uint32_t FrameWidth = 488;
+	constexpr uint32_t FrameHeight = 448;
+	constexpr uint32_t OverscanLeft = 12;
+	constexpr uint32_t OverscanTop = 15;
+
+	std::vector<uint16_t> ppuBuffer(BaseWidth * 512, 0);
+	for (auto& p : ppuBuffer) p = static_cast<uint16_t>(rand() & 0x7FFF);
+	std::array<uint32_t, 0x8000> palette{};
+	for (int i = 0; i < 0x8000; i++) palette[i] = 0xFF000000 | i;
+	std::vector<uint32_t> output(FrameWidth * FrameHeight, 0);
+
+	uint32_t xOffset = OverscanLeft;
+	uint32_t yOffset = OverscanTop * BaseWidth;
+
+	for (auto _ : state) {
+		for (uint32_t i = 0; i < FrameHeight; i++) {
+			for (uint32_t j = 0; j < FrameWidth; j++) {
+				output[i * FrameWidth + j] = palette[ppuBuffer[i * BaseWidth + j + yOffset + xOffset]];
+			}
+		}
+		benchmark::DoNotOptimize(output);
+	}
+	state.SetItemsProcessed(state.iterations() * FrameWidth * FrameHeight);
+}
+BENCHMARK(BM_SnesVideoFilter_NestedMultiply);
+
+// Optimized: Row pointer hoisting with flat output index
+static void BM_SnesVideoFilter_RowPointer(benchmark::State& state) {
+	constexpr uint32_t BaseWidth = 512;
+	constexpr uint32_t FrameWidth = 488;
+	constexpr uint32_t FrameHeight = 448;
+	constexpr uint32_t OverscanLeft = 12;
+	constexpr uint32_t OverscanTop = 15;
+
+	std::vector<uint16_t> ppuBuffer(BaseWidth * 512, 0);
+	for (auto& p : ppuBuffer) p = static_cast<uint16_t>(rand() & 0x7FFF);
+	std::array<uint32_t, 0x8000> palette{};
+	for (int i = 0; i < 0x8000; i++) palette[i] = 0xFF000000 | i;
+	std::vector<uint32_t> output(FrameWidth * FrameHeight, 0);
+
+	uint32_t xOffset = OverscanLeft;
+	uint32_t yOffset = OverscanTop * BaseWidth;
+
+	for (auto _ : state) {
+		uint32_t outIdx = 0;
+		uint32_t srcOffset = yOffset + xOffset;
+		for (uint32_t i = 0; i < FrameHeight; i++) {
+			for (uint32_t j = 0; j < FrameWidth; j++) {
+				output[outIdx++] = palette[ppuBuffer[srcOffset + j]];
+			}
+			srcOffset += BaseWidth;
+		}
+		benchmark::DoNotOptimize(output);
+	}
+	state.SetItemsProcessed(state.iterations() * FrameWidth * FrameHeight);
+}
+BENCHMARK(BM_SnesVideoFilter_RowPointer);
+
+// Reference: SNES ConvertToHiRes with double memory read per pixel
+static void BM_SnesConvertToHiRes_DoubleRead(benchmark::State& state) {
+	constexpr size_t BufSize = 240 * 1024;
+	std::vector<uint16_t> buffer(BufSize, 0);
+	for (int i = 0; i < 240; i++)
+		for (int x = 0; x < 256; x++)
+			buffer[(i << 8) + x] = static_cast<uint16_t>((i * 256 + x) & 0x7FFF);
+
+	for (auto _ : state) {
+		for (int i = 239; i >= 0; i--) {
+			for (int x = 0; x < 256; x++) {
+				buffer[(i << 10) + (x << 1)] = buffer[(i << 8) + x];
+				buffer[(i << 10) + (x << 1) + 1] = buffer[(i << 8) + x];
+			}
+		}
+		benchmark::DoNotOptimize(buffer);
+	}
+	state.SetItemsProcessed(state.iterations() * 240 * 256);
+}
+BENCHMARK(BM_SnesConvertToHiRes_DoubleRead);
+
+// Optimized: SNES ConvertToHiRes with cached pixel read
+static void BM_SnesConvertToHiRes_CachedPixel(benchmark::State& state) {
+	constexpr size_t BufSize = 240 * 1024;
+	std::vector<uint16_t> buffer(BufSize, 0);
+	for (int i = 0; i < 240; i++)
+		for (int x = 0; x < 256; x++)
+			buffer[(i << 8) + x] = static_cast<uint16_t>((i * 256 + x) & 0x7FFF);
+
+	for (auto _ : state) {
+		for (int i = 239; i >= 0; i--) {
+			uint16_t* src = buffer.data() + (i << 8);
+			uint16_t* dst = buffer.data() + (i << 10);
+			for (int x = 0; x < 256; x++) {
+				uint16_t pixel = src[x];
+				dst[x << 1] = pixel;
+				dst[(x << 1) + 1] = pixel;
+			}
+		}
+		benchmark::DoNotOptimize(buffer);
+	}
+	state.SetItemsProcessed(state.iterations() * 240 * 256);
+}
+BENCHMARK(BM_SnesConvertToHiRes_CachedPixel);

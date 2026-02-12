@@ -26,12 +26,17 @@ public sealed class CodeLineData {
 	public string ByteCodeStr {
 		get {
 			if (OpSize > 0 && field == "") {
-				string output = "";
-				for (int i = 0; i < OpSize && i < ByteCode.Length; i++) {
-					output += ByteCode[i].ToString("X2") + " ";
-				}
-
-				field = output;
+				// Use string.Create with hex LUT to avoid per-byte ToString allocation
+				int count = Math.Min((int)OpSize, ByteCode.Length);
+				field = string.Create(count * 3, (ByteCode, count), static (span, state) => {
+					ReadOnlySpan<char> hex = "0123456789ABCDEF";
+					for (int i = 0; i < state.count; i++) {
+						byte b = state.ByteCode[i];
+						span[i * 3] = hex[b >> 4];
+						span[i * 3 + 1] = hex[b & 0x0F];
+						span[i * 3 + 2] = ' ';
+					}
+				});
 			}
 
 			return field;

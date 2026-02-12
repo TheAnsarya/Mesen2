@@ -41,6 +41,9 @@ public partial class PaletteSelector : Control {
 	private Stopwatch _stopWatch = Stopwatch.StartNew();
 	private DispatcherTimer _timer = new DispatcherTimer();
 
+	// Cached semi-transparent black pen for palette selection overlay
+	private static readonly Pen SemiTransparentBlackPen2 = new(0x40000000, 2);
+
 	public event EventHandler<ColorClickEventArgs> ColorClick {
 		add => AddHandler(ColorClickEvent, value);
 		remove => RemoveHandler(ColorClickEvent, value);
@@ -208,7 +211,7 @@ public partial class PaletteSelector : Control {
 			for (int x = 0; x < columnCount; x++) {
 				Rect rect = new Rect(x * width, y * height, width, height);
 				int index = (y * columnCount) + x;
-				context.FillRectangle(new SolidColorBrush(paletteColors[(y * columnCount) + x]), rect);
+				context.FillRectangle(ColorHelper.GetBrush(Color.FromUInt32(paletteColors[(y * columnCount) + x])), rect);
 
 				if (ShowIndexes) {
 					rect = rect.Translate(new Vector(2, 0));
@@ -244,7 +247,8 @@ public partial class PaletteSelector : Control {
 			}
 
 			if (selectionRect != default) {
-				context.DrawRectangle(new Pen(0x40000000, 2), selectionRect);
+				// Cache the fixed semi-transparent pen; dash pen must vary per frame for animation
+				context.DrawRectangle(SemiTransparentBlackPen2, selectionRect);
 				context.DrawRectangle(new Pen(Brushes.White, 2, dashes), selectionRect);
 			}
 		}

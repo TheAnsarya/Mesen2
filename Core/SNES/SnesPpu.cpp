@@ -1503,19 +1503,25 @@ void SnesPpu::ConvertToHiRes() {
 	uint16_t scanline = _overscanFrame ? (_scanline - 1) : (_scanline + 6);
 
 	if (_drawStartX > 0) {
+		uint16_t* src = _currentBuffer + (scanline << 8);
+		uint16_t* dst = _currentBuffer + (scanline << 10);
 		for (int x = 0; x < _drawStartX; x++) {
-			_currentBuffer[(scanline << 10) + (x << 1)] = _currentBuffer[(scanline << 8) + x];
-			_currentBuffer[(scanline << 10) + (x << 1) + 1] = _currentBuffer[(scanline << 8) + x];
+			uint16_t pixel = src[x];
+			dst[x << 1] = pixel;
+			dst[(x << 1) + 1] = pixel;
 		}
-		memcpy(_currentBuffer + (scanline << 10) + 512, _currentBuffer + (scanline << 10), 512 * sizeof(uint16_t));
+		memcpy(dst + 512, dst, 512 * sizeof(uint16_t));
 	}
 
 	for (int i = scanline - 1; i >= 0; i--) {
+		uint16_t* src = _currentBuffer + (i << 8);
+		uint16_t* dst = _currentBuffer + (i << 10);
 		for (int x = 0; x < 256; x++) {
-			_currentBuffer[(i << 10) + (x << 1)] = _currentBuffer[(i << 8) + x];
-			_currentBuffer[(i << 10) + (x << 1) + 1] = _currentBuffer[(i << 8) + x];
+			uint16_t pixel = src[x];
+			dst[x << 1] = pixel;
+			dst[(x << 1) + 1] = pixel;
 		}
-		memcpy(_currentBuffer + (i << 10) + 512, _currentBuffer + (i << 10), 512 * sizeof(uint16_t));
+		memcpy(dst + 512, dst, 512 * sizeof(uint16_t));
 	}
 }
 

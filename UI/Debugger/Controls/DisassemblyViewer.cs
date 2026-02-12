@@ -108,6 +108,10 @@ public sealed class DisassemblyViewer : Control {
 	// Cached FormattedText for letter measurement - only needs recalc on font change
 	private FormattedText? _letterMeasureText = null;
 
+	// Cached rendering resources to avoid per-line allocations
+	private static readonly IDashStyle ForbidDashStyle = new ImmutableDashStyle(new double[] { 1, 1 }, 0.5);
+	private static readonly Pen BlackPen1 = new(Brushes.Black);
+
 	static DisassemblyViewer() {
 		AffectsRender<DisassemblyViewer>(
 			FontFamilyProperty, FontSizeProperty, StyleProviderProperty, ShowByteCodeProperty,
@@ -528,7 +532,7 @@ public sealed class DisassemblyViewer : Control {
 				using var translation = context.PushTransform(Matrix.CreateTranslation(2.5, y + (LetterSize.Height * 0.15 / 2)));
 				using var scale = context.PushTransform(Matrix.CreateScale(0.85, 0.85));
 
-				IDashStyle? dashStyle = lineStyle.Symbol.HasFlag(LineSymbol.ForbidDotted) ? new ImmutableDashStyle(new double[] { 1, 1 }, 0.5) : null;
+				IDashStyle? dashStyle = lineStyle.Symbol.HasFlag(LineSymbol.ForbidDotted) ? ForbidDashStyle : null;
 				EllipseGeometry geometry = new EllipseGeometry(new Rect(0, 0, LetterSize.Height, LetterSize.Height));
 				IBrush? b = lineStyle.Symbol.HasFlag(LineSymbol.Circle) ? new SolidColorBrush(lineStyle.SymbolColor.Value.ToUInt32()) : null;
 				IPen? p = showOutline ? new Pen(lineStyle.SymbolColor.Value.ToUInt32(), 1, dashStyle) : null;
@@ -552,7 +556,7 @@ public sealed class DisassemblyViewer : Control {
 
 				if (lineStyle.Symbol.HasFlag(LineSymbol.Mark)) {
 					EllipseGeometry markGeometry = new EllipseGeometry(new Rect(LetterSize.Height * 0.7, -LetterSize.Height * 0.1, LetterSize.Height / 2, LetterSize.Height / 2));
-					context.DrawGeometry(Brushes.LightSkyBlue, new Pen(Brushes.Black), markGeometry);
+					context.DrawGeometry(Brushes.LightSkyBlue, BlackPen1, markGeometry);
 				}
 			}
 		}
@@ -562,7 +566,7 @@ public sealed class DisassemblyViewer : Control {
 				double scaleFactor = LetterSize.Height / 16.0;
 				using var translation = context.PushTransform(Matrix.CreateTranslation(2.5, y + (LetterSize.Height * 0.15 / 2)));
 				using var scale = context.PushTransform(Matrix.CreateScale(scaleFactor * 0.85, scaleFactor * 0.85));
-				context.DrawGeometry(new SolidColorBrush(lineStyle.TextBgColor.Value), new Pen(Brushes.Black), DisassemblyViewer.ArrowShape);
+				context.DrawGeometry(new SolidColorBrush(lineStyle.TextBgColor.Value), BlackPen1, DisassemblyViewer.ArrowShape);
 			}
 		}
 	}

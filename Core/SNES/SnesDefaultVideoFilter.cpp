@@ -85,26 +85,34 @@ void SnesDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 	uint32_t yOffset = overscan.Top * width;
 
 	if (_baseFrameInfo.Width == 256 && _forceFixedRes) {
+		uint32_t outIdx = 0;
 		for (uint32_t i = 0; i < frameInfo.Height; i++) {
+			uint32_t srcRow = (i / 2) * width + yOffset + xOffset;
 			for (uint32_t j = 0; j < frameInfo.Width; j++) {
-				out[i * frameInfo.Width + j] = GetPixel(ppuOutputBuffer, i / 2 * width + j / 2 + yOffset + xOffset);
+				out[outIdx++] = GetPixel(ppuOutputBuffer, srcRow + j / 2);
 			}
 		}
 	} else {
+		// Hoist row offset outside inner loop to eliminate per-pixel multiply
+		uint32_t outIdx = 0;
+		uint32_t srcOffset = yOffset + xOffset;
 		for (uint32_t i = 0; i < frameInfo.Height; i++) {
 			for (uint32_t j = 0; j < frameInfo.Width; j++) {
-				out[i * frameInfo.Width + j] = GetPixel(ppuOutputBuffer, i * width + j + yOffset + xOffset);
+				out[outIdx++] = GetPixel(ppuOutputBuffer, srcOffset + j);
 			}
+			srcOffset += width;
 		}
 	}
 
 	if (_baseFrameInfo.Width == 512 && _blendHighRes) {
 		// Very basic blend effect for high resolution modes
+		// Use flat pointer to avoid per-pixel row multiply
+		uint32_t* row = out;
 		for (uint32_t i = 0; i < frameInfo.Height; i++) {
 			for (uint32_t j = 0; j < frameInfo.Width; j++) {
-				uint32_t& pixel1 = out[i * frameInfo.Width + j];
-				pixel1 = BlendPixels(pixel1, out[i * frameInfo.Width + j + 1]);
+				row[j] = BlendPixels(row[j], row[j + 1]);
 			}
+			row += frameInfo.Width;
 		}
 	}
 }
