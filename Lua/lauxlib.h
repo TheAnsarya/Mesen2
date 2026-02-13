@@ -13,10 +13,6 @@
 #include "luaconf.h"
 #include "lua.h"
 
-// ##### NEXEN MODIFICATION #####
-extern int SANDBOX_ALLOW_LOADFILE;
-// ##### NEXEN MODIFICATION #####
-
 /* global table */
 #define LUA_GNAME "_G"
 

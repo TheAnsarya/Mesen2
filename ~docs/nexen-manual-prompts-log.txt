@@ -170,7 +170,9 @@ it looks like `Nexen-Windows-x64-v1.1.4.exe` is there, I just downloaded it, is 
 
 [Nexen] update chat/session logs, git commit the prompts file; make issues/todos/docs/plans for this work effort: can we replace the Lua `C` code with a library or nuget package or something? or do we need to keep it because of our customizations? does interacting with our emulation core require us to have all of this code or can we have a smaller project and just use a library? what have we added to the base code that makes us have to compile it ourselves?; continue;
 
+[Nexen] Make a tag for this git-commit so we can reference it later if this effort doesn't work out; Work heavily on issue #239 and figure out how to simplify our Lua codebase and make sub issues if needed after research and testing and benchmarking, before implementing the changes, but only if merited; continue testing and updating until this issue is done; go for a long time, work work work, I'll be back later, make significant progress while I am gone; continue;
 
+[Nexen] Do NOT accept the 2.5x slowdown in performance for the Lua hook, instead check if new versions of Lua handle this better, so what version of Lua is our code based on? What's the current modern Lua version? are there performance improvements on hooks or a better different approach? document/issues/etc; And then also implement the other performance improvements you found in Lua with the sandbox flag, and update documents/issues/etc and chat/session logs and git commit the changes, all linked to an issue; continue;
 
 
 

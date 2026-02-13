@@ -155,11 +155,47 @@ lua_sethook(_lua, ScriptingContext::StandardExecutionHook, LUA_MASKCOUNT, 1000);
 - Update `Core.vcxproj` to link against lua library
 - Update include paths
 
-### Phase 3: Remove Sandbox Flag
+### Phase 3: Remove Sandbox Flag (COMPLETED)
 
-The `SANDBOX_ALLOW_LOADFILE` flag can likely be replaced by:
-1. Not registering `loadfile` and `dofile` in the first place (custom `linit.c` equivalent)
-2. Using a restricted `package.loader` setup
+~~The `SANDBOX_ALLOW_LOADFILE` flag can likely be replaced by:~~
+~~1. Not registering `loadfile` and `dofile` in the first place (custom `linit.c` equivalent)~~
+~~2. Using a restricted `package.loader` setup~~
+
+**DONE:** The `SANDBOX_ALLOW_LOADFILE` global has been removed. Instead, `LuaOpenLibs()` now
+unregisters `loadfile` and `dofile` from `_G` when not allowing I/O access:
+```cpp
+if (!allowIoOsAccess) {
+    lua_pushnil(L);
+    lua_setglobal(L, "loadfile");
+    lua_pushnil(L);
+    lua_setglobal(L, "dofile");
+}
+```
+
+This removes the vendored Lua modification (`SANDBOX_ALLOW_LOADFILE` global in `lauxlib.h`/`lauxlib.c`).
+
+## Lua Version Upgrade Research
+
+**Vendored Version:** Lua 5.4.4  
+**Current 5.4 Release:** Lua 5.4.8 (June 4, 2025)  
+**Major Release:** Lua 5.5.0 (December 22, 2025)
+
+### Lua 5.4.5-5.4.8 Changes (Hook-Related)
+- **5.4.6 Bug #2:** Fixed "Call hook may be called twice when count hook yields" — correctness fix, not performance
+- No performance improvements to `lua_sethook()` or hook mechanism found
+
+### Lua 5.5.0 Changes
+Main features (none improve hook performance):
+- Declarations for global variables
+- Named vararg tables
+- For-loop variables are read-only
+- More compact arrays (60% less memory for large arrays)
+- Major garbage collections done incrementally
+- External strings (memory not managed by Lua)
+
+**Conclusion:** Upgrading to Lua 5.4.8 or 5.5.0 would **not** improve hook performance. The standard
+`lua_sethook()` architecture remains the same — full debug info setup per hook call. Our custom
+watchdog is fast because it's a simple counter decrement in `vmfetch()`.
 
 ## Effort Estimate
 
@@ -170,6 +206,7 @@ The `SANDBOX_ALLOW_LOADFILE` flag can likely be replaced by:
 | Test all Lua scripts work correctly | 4-8 hours |
 | Migrate to vcpkg Lua | 4-8 hours |
 | Remove LuaSocket or add as separate dependency | 2-4 hours |
+| ~~Remove sandbox flag~~ | ~~2-4 hours~~ DONE |
 | **Total** | **16-32 hours** |
 
 ## Conclusion
@@ -177,16 +214,31 @@ The `SANDBOX_ALLOW_LOADFILE` flag can likely be replaced by:
 The Lua vendored code **cannot be easily replaced** without performance trade-offs:
 
 1. ✅ Standard `lua_sethook()` provides equivalent watchdog functionality
-2. ❌ Standard hook is **2.2x slower** than custom watchdog
-3. For scripts that run every frame, this could impact emulation performance
+2. ❌ Standard hook is **2.2x slower** than custom watchdog (benchmark confirmed)
+3. ❌ Upgrading to Lua 5.4.8 or 5.5.0 does not improve hook performance
+4. For scripts that run every frame, this could impact emulation performance
 
-**Updated Recommendation:** 
+**Final Recommendation:** 
 
-**Keep the vendored Lua with custom watchdog** for performance reasons. Instead focus on:
+**Keep the vendored Lua with custom watchdog** for performance reasons.
 
-1. **Clean up sandbox flag:** Replace `SANDBOX_ALLOW_LOADFILE` global with selective function registration
-2. **Document modifications:** Add clear comments explaining why vendored Lua is necessary
-3. **Upstream investigation:** Check if Lua 5.5 or LuaJIT have more efficient hook mechanisms
+### Completed Cleanup
+
+1. ✅ **Sandbox flag removed:** `SANDBOX_ALLOW_LOADFILE` global eliminated from `lauxlib.h`/`lauxlib.c`
+2. ✅ **Benchmark added:** `Core.Benchmarks/Lua/LuaHookBench.cpp` documents performance difference
+3. ✅ **Lua version research:** Confirmed newer Lua versions don't help
+
+### Remaining Vendored Modifications
+
+After sandbox flag cleanup, only **one modification** remains in vendored Lua:
+
+1. **Custom watchdog timer** (`lvm.c`, `lua.h`, `lstate.h`)
+   - `lua_setwatchdogtimer()` function
+   - `watchdogtimer` and `watchdoghook` fields in `lua_State`
+   - Counter decrement in `vmfetch()` macro
+
+This modification is essential for performance and cannot be removed without accepting
+the 2.2x slowdown of standard hooks.
 
 ### Alternative: Conditional Migration
 
@@ -204,4 +256,4 @@ The `lua_sethook()` prototype was tested in:
 - `Core/Debugger/ScriptingContext.h` — Hook signature changed to `void(lua_State*, lua_Debug*)`
 - `Core.Benchmarks/Lua/LuaHookBench.cpp` — Benchmark comparing both approaches
 
-Note: The prototype changes should be reverted if keeping the vendored Lua approach.
+Note: The prototype changes have been reverted; keeping vendored Lua with custom watchdog.

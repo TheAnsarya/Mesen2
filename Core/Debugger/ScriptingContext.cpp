@@ -63,9 +63,6 @@ bool ScriptingContext::LoadScript(string scriptName, string path, string scriptC
 	bool allowIoOsAccess = settings->GetDebugConfig().ScriptAllowIoOsAccess;
 	LuaOpenLibs(_lua, allowIoOsAccess);
 
-	// Prevent lua code from loading any files
-	SANDBOX_ALLOW_LOADFILE = allowIoOsAccess ? 1 : 0;
-
 	// Load LuaSocket into Lua core
 	if (allowIoOsAccess && settings->GetDebugConfig().ScriptAllowNetworkAccess) {
 		lua_getglobal(_lua, "package");
@@ -153,6 +150,15 @@ void ScriptingContext::LuaOpenLibs(lua_State* L, bool allowIoOsAccess) {
 		}
 		luaL_requiref(L, lib->name, lib->func, 1);
 		lua_pop(L, 1); /* remove lib */
+	}
+
+	if (!allowIoOsAccess) {
+		// Remove file-loading functions from base library when sandboxed.
+		// These call luaL_loadfilex internally and could bypass sandbox restrictions.
+		lua_pushnil(L);
+		lua_setglobal(L, "loadfile");
+		lua_pushnil(L);
+		lua_setglobal(L, "dofile");
 	}
 }
 
