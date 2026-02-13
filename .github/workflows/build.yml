@@ -341,36 +341,39 @@ jobs:
         run: |
           mkdir -p release-assets
 
+          # Extract version from tag (e.g., v1.1.4)
+          VERSION="${GITHUB_REF_NAME}"
+
           # Windows builds
-          cp "artifacts/Nexen (Windows)/Nexen.exe" "release-assets/Nexen-Windows-x64.exe" || true
-          cp "artifacts/Nexen (Windows - AoT)/Nexen.exe" "release-assets/Nexen-Windows-x64-AoT.exe" || true
+          cp "artifacts/Nexen (Windows)/Nexen.exe" "release-assets/Nexen-Windows-x64-${VERSION}.exe" || true
+          cp "artifacts/Nexen (Windows - AoT)/Nexen.exe" "release-assets/Nexen-Windows-x64-AoT-${VERSION}.exe" || true
 
           # Linux builds (gcc)
-          cp "artifacts/Nexen (Linux - ubuntu-22.04 - gcc)/Nexen" "release-assets/Nexen-Linux-x64-gcc" || true
-          chmod +x "release-assets/Nexen-Linux-x64-gcc" || true
-          cp "artifacts/Nexen (Linux - ubuntu-22.04-arm - gcc)/Nexen" "release-assets/Nexen-Linux-ARM64-gcc" || true
-          chmod +x "release-assets/Nexen-Linux-ARM64-gcc" || true
+          cp "artifacts/Nexen (Linux - ubuntu-22.04 - gcc)/Nexen" "release-assets/Nexen-Linux-x64-gcc-${VERSION}" || true
+          chmod +x "release-assets/Nexen-Linux-x64-gcc-${VERSION}" || true
+          cp "artifacts/Nexen (Linux - ubuntu-22.04-arm - gcc)/Nexen" "release-assets/Nexen-Linux-ARM64-gcc-${VERSION}" || true
+          chmod +x "release-assets/Nexen-Linux-ARM64-gcc-${VERSION}" || true
 
           # Linux builds (clang)
-          cp "artifacts/Nexen (Linux - ubuntu-22.04 - clang)/Nexen" "release-assets/Nexen-Linux-x64" || true
-          chmod +x "release-assets/Nexen-Linux-x64" || true
-          cp "artifacts/Nexen (Linux - ubuntu-22.04-arm - clang)/Nexen" "release-assets/Nexen-Linux-ARM64" || true
-          chmod +x "release-assets/Nexen-Linux-ARM64" || true
+          cp "artifacts/Nexen (Linux - ubuntu-22.04 - clang)/Nexen" "release-assets/Nexen-Linux-x64-${VERSION}" || true
+          chmod +x "release-assets/Nexen-Linux-x64-${VERSION}" || true
+          cp "artifacts/Nexen (Linux - ubuntu-22.04-arm - clang)/Nexen" "release-assets/Nexen-Linux-ARM64-${VERSION}" || true
+          chmod +x "release-assets/Nexen-Linux-ARM64-${VERSION}" || true
 
           # Linux AOT builds
-          cp "artifacts/Nexen (Linux - ubuntu-22.04 - clang_aot)/Nexen" "release-assets/Nexen-Linux-x64-AoT" || true
-          chmod +x "release-assets/Nexen-Linux-x64-AoT" || true
+          cp "artifacts/Nexen (Linux - ubuntu-22.04 - clang_aot)/Nexen" "release-assets/Nexen-Linux-x64-AoT-${VERSION}" || true
+          chmod +x "release-assets/Nexen-Linux-x64-AoT-${VERSION}" || true
 
           # Linux AppImage builds
-          cp "artifacts/Nexen (Linux x64 - AppImage)/Nexen.AppImage" "release-assets/Nexen-Linux-x64.AppImage" || true
-          chmod +x "release-assets/Nexen-Linux-x64.AppImage" || true
-          cp "artifacts/Nexen (Linux ARM64 - AppImage)/Nexen.AppImage" "release-assets/Nexen-Linux-ARM64.AppImage" || true
-          chmod +x "release-assets/Nexen-Linux-ARM64.AppImage" || true
+          cp "artifacts/Nexen (Linux x64 - AppImage)/Nexen.AppImage" "release-assets/Nexen-Linux-x64-${VERSION}.AppImage" || true
+          chmod +x "release-assets/Nexen-Linux-x64-${VERSION}.AppImage" || true
+          cp "artifacts/Nexen (Linux ARM64 - AppImage)/Nexen.AppImage" "release-assets/Nexen-Linux-ARM64-${VERSION}.AppImage" || true
+          chmod +x "release-assets/Nexen-Linux-ARM64-${VERSION}.AppImage" || true
 
           # macOS builds (ARM64 only - Intel x64 deprecated on GitHub Actions)
-          cp "artifacts/Nexen (macOS - macos-14 - clang)/Nexen.app.zip" "release-assets/Nexen-macOS-ARM64.zip" || true
+          cp "artifacts/Nexen (macOS - macos-14 - clang)/Nexen.app.zip" "release-assets/Nexen-macOS-ARM64-${VERSION}.zip" || true
           # NOTE: macOS AOT disabled - .NET 10 ILC crashes. Re-enable when fixed.
-          # cp "artifacts/Nexen (macOS - macos-14 - clang_aot)/Nexen.app.zip" "release-assets/Nexen-macOS-ARM64-AoT.zip" || true
+          # cp "artifacts/Nexen (macOS - macos-14 - clang_aot)/Nexen.app.zip" "release-assets/Nexen-macOS-ARM64-AoT-${VERSION}.zip" || true
 
           ls -la release-assets/
 

@@ -178,6 +178,55 @@ if (condition)
 	Nexen.sln /p:Configuration=Release /p:Platform=x64 /t:Clean
 ```
 
+## Release Process
+
+### ⚠️ CRITICAL: Update README Download Links on Every Release
+
+When publishing a new release (e.g., `v1.2.0`), you **MUST** update `README.md` to reference the new version in:
+
+1. **Download Table Links** — Update all `v1.1.4` references to `v1.2.0`:
+   - `Nexen-Windows-x64-v1.1.4.exe` → `Nexen-Windows-x64-v1.2.0.exe`
+   - All Linux, macOS assets similarly
+   - Both link text AND URL paths
+
+2. **Quick Start Section** — Update version references in:
+   - Download filenames (e.g., `Nexen-Linux-x64-v1.1.4.AppImage`)
+   - Release page links
+
+### Release Checklist
+
+```powershell
+# 1. Tag the release
+git tag -a v1.2.0 -m "Release v1.2.0 - Description"
+git push origin v1.2.0
+
+# 2. Create GitHub release (CI auto-uploads assets)
+gh release create v1.2.0 --repo TheAnsarya/Nexen --title "Nexen v1.2.0" --notes "Release notes..."
+
+# 3. After CI completes, update README.md download links
+# Search and replace: v1.1.4 → v1.2.0 (use regex or find-replace)
+
+# 4. Commit README update
+git add README.md
+git commit -m "docs: update README download links to v1.2.0"
+git push origin master
+```
+
+### Asset Naming Convention
+
+Release assets include version numbers in filenames:
+
+| Platform | Filename Pattern |
+|----------|------------------|
+| Windows | `Nexen-Windows-x64-vX.Y.Z.exe` |
+| Windows AOT | `Nexen-Windows-x64-AoT-vX.Y.Z.exe` |
+| Linux AppImage | `Nexen-Linux-x64-vX.Y.Z.AppImage` |
+| Linux ARM64 AppImage | `Nexen-Linux-ARM64-vX.Y.Z.AppImage` |
+| Linux Binary | `Nexen-Linux-x64-vX.Y.Z` |
+| Linux ARM64 Binary | `Nexen-Linux-ARM64-vX.Y.Z` |
+| Linux AOT | `Nexen-Linux-x64-AoT-vX.Y.Z` |
+| macOS | `Nexen-macOS-ARM64-vX.Y.Z.zip` |
+
 ## Documentation
 
 - Session logs: `~docs/session-logs/YYYY-MM-DD-session-NN.md`

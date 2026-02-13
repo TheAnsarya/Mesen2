@@ -162,6 +162,7 @@ Nexen v1.1.0 does not open, make the Windows release work; so we can play a game
 
 [Nexen] OK, fix the release problems: change the `build.yml` to remove macos aot temporarily, generate a new release `1.1.2` and insure afterwards that the readme release links work (update the macos aot release table row with an indication that it is broken, and an explaination of why), update issue #238; format all the markdown documents (markdownlinter) and ensure TABS NOT SPACES, and fix all the minor formatting warnings like MD031 (but ignore MD029 as some lists need to be split across sections); update chat/session logs, update docs and todolists and plans and git commit; continue;
 
+[Nexen] update the `build.yml` so our CI build/release includes a version number at the end of the filename for each build release file, like `Nexen-Windows-x64.exe` becomes `Nexen-Windows-x64-v1.1.4.exe`; re-release 1.1.4 with version numbers on the releases (or just rename the release asset files and fix all references); fix the `README.md` "releases" section to point to the files with version numbers and update copilot instructions to always update those links whenever a new release is published; continue;
 
 
 
