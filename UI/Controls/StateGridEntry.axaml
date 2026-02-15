@@ -39,23 +39,6 @@
 			TextWrapping="Wrap"
 			IsEnabled="{Binding Enabled, ElementName=root}"
 		/>
-		<!-- Origin badge (Auto=Blue, Save=Green, Recent=Red, Lua=Yellow) -->
-		<Border
-			DockPanel.Dock="Bottom"
-			IsVisible="{Binding ShowBadge, ElementName=root}"
-			Background="{Binding BadgeBackground, ElementName=root}"
-			CornerRadius="3"
-			Padding="6 1"
-			HorizontalAlignment="Center"
-			Margin="0 2"
-		>
-			<TextBlock
-				Text="{Binding BadgeText, ElementName=root}"
-				FontSize="10"
-				FontWeight="SemiBold"
-				Foreground="White"
-			/>
-		</Border>
 		<TextBlock
 			DockPanel.Dock="Bottom"
 			Text="{Binding Title, ElementName=root}"
@@ -64,24 +47,44 @@
 			TextTrimming="CharacterEllipsis"
 			IsEnabled="{Binding Enabled, ElementName=root}"
 		/>
-		<Button
-			Classes.activeEntry="{Binding IsActiveEntry, ElementName=root}"
-			BorderThickness="2"
-			Height="NaN"
-			Click="OnImageClick"
-			IsEnabled="{Binding Enabled, ElementName=root}"
-			HorizontalAlignment="Center"
-			VerticalAlignment="Stretch"
-			Padding="0"
-		>
-			<c:ImageAspectRatio
-				Source="{Binding Image, ElementName=root}"
-				AspectRatio="{Binding AspectRatio, ElementName=root}"
-				RenderOptions.BitmapInterpolationMode="LowQuality"
-				Stretch="Fill"
-				StretchDirection="Both"
-				VerticalAlignment="Center"
-			/>
-		</Button>
+		<!-- Image with overlaid origin badge -->
+		<Grid>
+			<Button
+				Classes.activeEntry="{Binding IsActiveEntry, ElementName=root}"
+				BorderThickness="2"
+				Height="NaN"
+				Click="OnImageClick"
+				IsEnabled="{Binding Enabled, ElementName=root}"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Stretch"
+				Padding="0"
+			>
+				<c:ImageAspectRatio
+					Source="{Binding Image, ElementName=root}"
+					AspectRatio="{Binding AspectRatio, ElementName=root}"
+					RenderOptions.BitmapInterpolationMode="LowQuality"
+					Stretch="Fill"
+					StretchDirection="Both"
+					VerticalAlignment="Center"
+				/>
+			</Button>
+			<!-- Origin badge (Auto=Blue, Save=Green, Recent=Red, Lua=Yellow) positioned at top-left of image -->
+			<Border
+				IsVisible="{Binding ShowBadge, ElementName=root}"
+				Background="{Binding BadgeBackground, ElementName=root}"
+				CornerRadius="3"
+				Padding="4 1"
+				HorizontalAlignment="Left"
+				VerticalAlignment="Top"
+				Margin="6 6 0 0"
+			>
+				<TextBlock
+					Text="{Binding BadgeText, ElementName=root}"
+					FontSize="10"
+					FontWeight="SemiBold"
+					Foreground="White"
+				/>
+			</Border>
+		</Grid>
 	</DockPanel>
 </UserControl>

@@ -20,7 +20,7 @@
 
 	<DockPanel>
 		<!-- Menu Bar -->
-		<c:NexenMenu DockPanel.Dock="Top" Name="MainMenu">
+		<c:NexenMenu DockPanel.Dock="Top" Name="ActionMenu">
 			<MenuItem Header="File" ItemsSource="{Binding FileMenuItems}" />
 			<MenuItem Header="Edit" ItemsSource="{Binding EditMenuItems}" />
 			<MenuItem Header="View" ItemsSource="{Binding ViewMenuItems}" />
@@ -32,18 +32,18 @@
 		<!-- Toolbar -->
 		<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
 			<StackPanel Orientation="Horizontal" Spacing="5">
-				<Button Content="Open" ToolTip.Tip="Open movie file" />
-				<Button Content="Save" ToolTip.Tip="Save movie file" IsEnabled="{Binding HasUnsavedChanges}" />
+				<Button Content="Open" ToolTip.Tip="Open movie file" Click="OnOpenClick" />
+				<Button Content="Save" ToolTip.Tip="Save movie file" IsEnabled="{Binding HasUnsavedChanges}" Click="OnSaveClick" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
-				<Button Content="↶" ToolTip.Tip="Undo (Ctrl+Z)" Width="30" IsEnabled="{Binding CanUndo}" />
-				<Button Content="↷" ToolTip.Tip="Redo (Ctrl+Y)" Width="30" IsEnabled="{Binding CanRedo}" />
+				<Button Content="↶" ToolTip.Tip="Undo (Ctrl+Z)" Width="30" IsEnabled="{Binding CanUndo}" Click="OnUndoClick" />
+				<Button Content="↷" ToolTip.Tip="Redo (Ctrl+Y)" Width="30" IsEnabled="{Binding CanRedo}" Click="OnRedoClick" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
-				<Button Content="+" ToolTip.Tip="Insert frame (Insert)" Width="30" />
-				<Button Content="-" ToolTip.Tip="Delete frame (Delete)" Width="30" />
+				<Button Content="+" ToolTip.Tip="Insert frame (Insert)" Width="30" Click="OnInsertFrameClick" />
+				<Button Content="-" ToolTip.Tip="Delete frame (Delete)" Width="30" Click="OnDeleteFrameClick" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
-				<Button Content="⏮" ToolTip.Tip="Frame rewind (R)" Width="30" />
-				<Button Content="⏯" ToolTip.Tip="Play/Pause (Space)" Width="30" />
-				<Button Content="⏭" ToolTip.Tip="Frame advance (F)" Width="30" />
+				<Button Content="⏮" ToolTip.Tip="Frame rewind (R)" Width="30" Click="OnFrameRewindClick" />
+				<Button Content="⏯" ToolTip.Tip="Play/Pause (Space)" Width="30" Click="OnPlayPauseClick" />
+				<Button Content="⏭" ToolTip.Tip="Frame advance (F)" Width="30" Click="OnFrameAdvanceClick" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
 				<ToggleButton Content="●" ToolTip.Tip="Record" Width="30" Foreground="Red" IsChecked="{Binding IsRecording}" />
 				<Rectangle Width="1" Fill="Gray" Margin="5 0" />
@@ -108,8 +108,9 @@
 								<TextBlock Grid.Column="0" Text="{Binding FrameNumber}" />
 								<TextBlock Grid.Column="1" Text="{Binding P1Input}" />
 								<TextBlock Grid.Column="2" Text="{Binding P2Input}" />
-								<TextBlock Grid.Column="3" Text="{Binding IsLagFrame}" />
-								<TextBlock Grid.Column="4" Text="{Binding CommentText}" />
+								<TextBlock Grid.Column="3" Text="L" FontWeight="Bold" Foreground="Red"
+									IsVisible="{Binding IsLagFrame}" HorizontalAlignment="Center" />
+								<TextBlock Grid.Column="4" Text="{Binding CommentText}" Foreground="Gray" />
 							</Grid>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
@@ -132,7 +133,7 @@
 							<TextBlock Grid.Column="1" Text="{Binding SelectedFrameIndex}" Margin="5 0 0 0" VerticalAlignment="Center" />
 
 							<TextBlock Grid.Row="1" Text="Lag Frame:" VerticalAlignment="Center" Margin="0 5 0 0" />
-							<CheckBox Grid.Row="1" Grid.Column="1" IsChecked="False" Margin="5 5 0 0" />
+							<CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedFrameIsLag}" Margin="5 5 0 0" IsEnabled="False" />
 						</Grid>
 
 						<!-- Controller Layout -->

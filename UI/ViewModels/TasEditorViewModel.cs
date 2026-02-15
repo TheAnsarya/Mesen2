@@ -16,6 +16,7 @@ using Nexen.Localization;
 using Nexen.MovieConverter;
 using Nexen.TAS;
 using Nexen.Utilities;
+using Nexen.Windows;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -38,6 +39,13 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 
 	/// <summary>Gets or sets the currently selected frame index.</summary>
 	[Reactive] public int SelectedFrameIndex { get; set; } = -1;
+
+	/// <summary>Gets whether the selected frame is a lag frame.</summary>
+	public bool SelectedFrameIsLag =>
+		Movie is not null &&
+		SelectedFrameIndex >= 0 &&
+		SelectedFrameIndex < Movie.InputFrames.Count &&
+		Movie.InputFrames[SelectedFrameIndex].IsLagFrame;
 
 	/// <summary>Gets the observable collection of frame view models.</summary>
 	public ObservableCollection<TasFrameViewModel> Frames { get; } = new();
@@ -198,6 +206,7 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}));
 		AddDisposable(this.WhenAnyValue(x => x.FilePath, x => x.HasUnsavedChanges).Subscribe(_ => UpdateWindowTitle()));
 		AddDisposable(this.WhenAnyValue(x => x.CurrentLayout).Subscribe(_ => UpdateControllerButtons()));
+		AddDisposable(this.WhenAnyValue(x => x.SelectedFrameIndex).Subscribe(_ => this.RaisePropertyChanged(nameof(SelectedFrameIsLag))));
 		UpdateControllerButtons();
 	}
 
@@ -741,6 +750,53 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		HasUnsavedChanges = true;
 	}
 
+	/// <summary>
+	/// Toggles a button at a specific frame (used by piano roll).
+	/// </summary>
+	public void ToggleButtonAtFrame(int frameIndex, int port, string button, bool newState) {
+		SetButtonAtFrame(frameIndex, port, button, newState);
+		UpdateFrames();
+	}
+
+	/// <summary>
+	/// Sets a button state at a specific frame without updating frames (for batch operations).
+	/// </summary>
+	public void SetButtonAtFrame(int frameIndex, int port, string button, bool state) {
+		if (Movie is null || frameIndex < 0 || frameIndex >= Movie.InputFrames.Count) {
+			return;
+		}
+
+		var frame = Movie.InputFrames[frameIndex];
+		if (port < 0 || port >= frame.Controllers.Length) {
+			return;
+		}
+
+		var controller = frame.Controllers[port];
+		switch (button.ToUpperInvariant()) {
+			case "A": controller.A = state; break;
+			case "B": controller.B = state; break;
+			case "X": controller.X = state; break;
+			case "Y": controller.Y = state; break;
+			case "L": controller.L = state; break;
+			case "R": controller.R = state; break;
+			case "UP": controller.Up = state; break;
+			case "DOWN": controller.Down = state; break;
+			case "LEFT": controller.Left = state; break;
+			case "RIGHT": controller.Right = state; break;
+			case "START": controller.Start = state; break;
+			case "SELECT": controller.Select = state; break;
+		}
+
+		HasUnsavedChanges = true;
+	}
+
+	/// <summary>
+	/// Refreshes the frame list display.
+	/// </summary>
+	public void RefreshFrames() {
+		UpdateFrames();
+	}
+
 	private void UpdateFrames() {
 		Frames.Clear();
 
@@ -975,6 +1031,121 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 			}
 		}
 	}
+
+	#region Playback Interrupt Detection
+
+	/// <summary>
+	/// Whether playback interrupt detection is enabled.
+	/// When enabled, user input during movie playback triggers an interrupt dialog.
+	/// </summary>
+	[Reactive] public bool InterruptOnInput { get; set; } = true;
+
+	/// <summary>
+	/// Checks if user input differs from the movie's expected input at the current frame.
+	/// If so, show the interrupt dialog.
+	/// </summary>
+	/// <param name="frame">Current playback frame.</param>
+	/// <param name="userInput">Actual controller input from the user.</param>
+	/// <returns>True if playback should continue, false if interrupted.</returns>
+	public async System.Threading.Tasks.Task<bool> CheckInputMismatchAsync(int frame, ControllerInput[] userInput) {
+		if (Movie is null || !IsPlaying || IsRecording || !InterruptOnInput) {
+			return true; // No interrupt needed
+		}
+
+		if (frame < 0 || frame >= Movie.InputFrames.Count) {
+			return true;
+		}
+
+		// Get expected input from movie
+		InputFrame expectedFrame = Movie.InputFrames[frame];
+
+		// Check if any controller has input that differs from expected
+		bool hasInputMismatch = false;
+		for (int i = 0; i < userInput.Length && i < expectedFrame.Controllers.Length; i++) {
+			// Only trigger on actual button press (not releases)
+			if (userInput[i].ButtonBits != 0 && userInput[i].ButtonBits != expectedFrame.Controllers[i].ButtonBits) {
+				hasInputMismatch = true;
+				break;
+			}
+		}
+
+		if (!hasInputMismatch) {
+			return true; // Continue playback
+		}
+
+		// Pause emulation immediately
+		if (EmuApi.IsRunning() && !EmuApi.IsPaused()) {
+			EmuApi.Pause();
+		}
+
+		IsPlaying = false; // Pause playback state
+
+		// Show interrupt dialog
+		PlaybackInterruptAction action = await PlaybackInterruptDialog.ShowDialog(
+			_window,
+			frame,
+			Movie.InputFrames.Count);
+
+		await HandleInterruptActionAsync(action, frame);
+
+		return action == PlaybackInterruptAction.Continue;
+	}
+
+	/// <summary>
+	/// Handles the user's choice from the interrupt dialog.
+	/// </summary>
+	private async System.Threading.Tasks.Task HandleInterruptActionAsync(PlaybackInterruptAction action, int frame) {
+		switch (action) {
+			case PlaybackInterruptAction.Fork:
+				// Create a branch from current state and start recording
+				string branchName = $"Fork at frame {frame + 1}";
+				var branch = Recorder.CreateBranch(branchName);
+				Branches.Add(branch);
+				StatusMessage = $"Created branch: {branchName}";
+
+				// Truncate movie to current frame and start recording
+				if (Movie != null && frame < Movie.InputFrames.Count) {
+					// Remove frames after current position
+					while (Movie.InputFrames.Count > frame) {
+						Movie.InputFrames.RemoveAt(Movie.InputFrames.Count - 1);
+					}
+
+					UpdateFrames();
+					HasUnsavedChanges = true;
+				}
+
+				// Start recording in overwrite mode from this frame
+				Recorder.Movie = Movie;
+				Recorder.StartRecording(RecordingMode.Overwrite, frame);
+				IsRecording = true;
+
+				// Resume emulation
+				if (EmuApi.IsRunning() && EmuApi.IsPaused()) {
+					EmuApi.Resume();
+				}
+				break;
+
+			case PlaybackInterruptAction.Edit:
+				// Open/focus piano roll at the interrupted frame
+				SelectedFrameIndex = frame;
+				PlaybackFrame = frame;
+				ShowPianoRoll = true;
+				StatusMessage = $"Editing frame {frame + 1}";
+				// Emulation stays paused for editing
+				break;
+
+			case PlaybackInterruptAction.Continue:
+				// Resume playback ignoring the input mismatch
+				IsPlaying = true;
+				if (EmuApi.IsRunning() && EmuApi.IsPaused()) {
+					EmuApi.Resume();
+				}
+				StatusMessage = $"Continuing playback at frame {frame + 1}";
+				break;
+		}
+	}
+
+	#endregion
 
 	/// <summary>
 	/// Seeks to a specific frame using the greenzone.

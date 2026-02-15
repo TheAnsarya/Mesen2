@@ -387,6 +387,11 @@ public class MainWindow : NexenWindow {
 				break;
 
 			case ConsoleNotificationType.EmulationStopped:
+				// Save Recent Play state before stopping (if ROM was loaded)
+				if (_model.RomInfo.Format != RomFormat.Unknown) {
+					EmuApi.SaveRecentPlayState();
+				}
+
 				// Save final Pansy file before stopping
 				BackgroundPansyExporter.OnRomUnloaded();
 
@@ -760,6 +765,11 @@ public class MainWindow : NexenWindow {
 				EmuApi.Resume();
 				_needResume = false;
 			}
+		}
+
+		// Check if we should save a Recent Play state (every 5 minutes)
+		if (EmuApi.IsRunning() && EmuApi.ShouldSaveRecentPlay()) {
+			EmuApi.SaveRecentPlayState();
 		}
 	}
 }
