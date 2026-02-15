@@ -192,6 +192,7 @@ no, how many C# and c++ tests do we have for the whole Nexen project? And how ma
 
 Nexen] continue working on the TAS/movie issues, look for problems and fix them;
 
+Did you create tests and performance benchmarks for the issues you just fixed? We want tests and benchmarks for every issue that changes code, unless it is super trivial and guaranteed not to cause problems. MAke those tests and benchmarks if you haven't, then work on the other issues;
 
 
 

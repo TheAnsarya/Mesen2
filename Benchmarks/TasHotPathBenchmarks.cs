@@ -268,4 +268,80 @@ public class TasHotPathBenchmarks {
 	}
 
 	#endregion
+
+	#region Truncation Benchmarks (Issue #253 fix)
+
+	// Note: These benchmarks demonstrate the O(n) vs O(n²) difference
+	// We use copies to avoid modifying the test data
+
+	/// <summary>
+	/// Benchmark truncation using RemoveRange - O(n)
+	/// </summary>
+	[Benchmark(Description = "Truncate 500 frames - RemoveRange (1K movie)")]
+	[BenchmarkCategory("Truncate")]
+	public int TruncateWithRemoveRange_Small() {
+		var copy = new List<InputFrame>(_smallMovie.InputFrames);
+		int truncateAt = 500;
+		copy.RemoveRange(truncateAt, copy.Count - truncateAt);
+		return copy.Count;
+	}
+
+	/// <summary>
+	/// Benchmark truncation using RemoveAt loop - O(n²) - OLD BAD APPROACH
+	/// </summary>
+	[Benchmark(Description = "Truncate 500 frames - RemoveAt loop (1K movie)")]
+	[BenchmarkCategory("Truncate")]
+	public int TruncateWithRemoveAtLoop_Small() {
+		var copy = new List<InputFrame>(_smallMovie.InputFrames);
+		int truncateAt = 500;
+		int removeCount = copy.Count - truncateAt;
+		for (int i = 0; i < removeCount; i++) {
+			copy.RemoveAt(truncateAt);
+		}
+		return copy.Count;
+	}
+
+	/// <summary>
+	/// Benchmark truncation using RemoveRange on medium movie - O(n)
+	/// </summary>
+	[Benchmark(Description = "Truncate 30K frames - RemoveRange (60K movie)")]
+	[BenchmarkCategory("Truncate")]
+	public int TruncateWithRemoveRange_Medium() {
+		var copy = new List<InputFrame>(_mediumMovie.InputFrames);
+		int truncateAt = 30_000;
+		copy.RemoveRange(truncateAt, copy.Count - truncateAt);
+		return copy.Count;
+	}
+
+	/// <summary>
+	/// Benchmark truncation using RemoveAt loop on medium movie - O(n²) - OLD BAD APPROACH
+	/// WARNING: This is intentionally slow to demonstrate the performance difference
+	/// </summary>
+	[Benchmark(Description = "Truncate 30K frames - RemoveAt loop (60K movie)")]
+	[BenchmarkCategory("Truncate")]
+	public int TruncateWithRemoveAtLoop_Medium() {
+		var copy = new List<InputFrame>(_mediumMovie.InputFrames);
+		int truncateAt = 30_000;
+		int removeCount = copy.Count - truncateAt;
+		for (int i = 0; i < removeCount; i++) {
+			copy.RemoveAt(truncateAt);
+		}
+		return copy.Count;
+	}
+
+	/// <summary>
+	/// Benchmark truncation using RemoveRange on large movie - O(n)
+	/// </summary>
+	[Benchmark(Description = "Truncate 150K frames - RemoveRange (300K movie)")]
+	[BenchmarkCategory("Truncate")]
+	public int TruncateWithRemoveRange_Large() {
+		var copy = new List<InputFrame>(_largeMovie.InputFrames);
+		int truncateAt = 150_000;
+		copy.RemoveRange(truncateAt, copy.Count - truncateAt);
+		return copy.Count;
+	}
+
+	// Intentionally NOT including RemoveAt loop for large movie - it would take minutes
+
+	#endregion
 }
