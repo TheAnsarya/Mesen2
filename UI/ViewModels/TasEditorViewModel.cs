@@ -947,7 +947,7 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 
 		// Clone the selected frame
 		var frame = Movie.InputFrames[SelectedFrameIndex];
-		_clipboard = new List<InputFrame> { CloneFrame(frame) };
+		_clipboard = new List<InputFrame> { frame.Clone() };
 		_clipboardStartIndex = SelectedFrameIndex;
 		HasClipboard = true;
 
@@ -963,40 +963,13 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 
 		int insertAt = Math.Max(0, SelectedFrameIndex >= 0 ? SelectedFrameIndex + 1 : Movie.InputFrames.Count);
-		var clonedFrames = _clipboard.Select(CloneFrame).ToList();
+		var clonedFrames = _clipboard.Select(f => f.Clone()).ToList();
 
 		ExecuteAction(new InsertFramesAction(Movie, insertAt, clonedFrames));
 		UpdateFrames();
 		SelectedFrameIndex = insertAt;
 
 		StatusMessage = $"Pasted {clonedFrames.Count} frame(s) at {insertAt + 1}";
-	}
-
-	private static InputFrame CloneFrame(InputFrame original) {
-		var clone = new InputFrame(original.FrameNumber) {
-			IsLagFrame = original.IsLagFrame,
-			Comment = original.Comment
-		};
-
-		for (int i = 0; i < original.Controllers.Length && i < clone.Controllers.Length; i++) {
-			var src = original.Controllers[i];
-			clone.Controllers[i] = new ControllerInput {
-				A = src.A,
-				B = src.B,
-				X = src.X,
-				Y = src.Y,
-				L = src.L,
-				R = src.R,
-				Up = src.Up,
-				Down = src.Down,
-				Left = src.Left,
-				Right = src.Right,
-				Start = src.Start,
-				Select = src.Select
-			};
-		}
-
-		return clone;
 	}
 
 	#endregion
@@ -1163,8 +1136,8 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 				// Truncate movie to current frame and start recording
 				if (Movie != null && frame < Movie.InputFrames.Count) {
 					// Remove frames after current position
-					while (Movie.InputFrames.Count > frame) {
-						Movie.InputFrames.RemoveAt(Movie.InputFrames.Count - 1);
+					if (frame < Movie.InputFrames.Count) {
+						Movie.InputFrames.RemoveRange(frame, Movie.InputFrames.Count - frame);
 					}
 
 					UpdateFrames();
@@ -1988,15 +1961,11 @@ public sealed class InsertFramesAction : UndoableAction {
 	}
 
 	public override void Execute() {
-		for (int i = 0; i < _frames.Count; i++) {
-			_movie.InputFrames.Insert(_index + i, _frames[i]);
-		}
+		_movie.InputFrames.InsertRange(_index, _frames);
 	}
 
 	public override void Undo() {
-		for (int i = 0; i < _frames.Count; i++) {
-			_movie.InputFrames.RemoveAt(_index);
-		}
+		_movie.InputFrames.RemoveRange(_index, _frames.Count);
 	}
 }
 
@@ -2013,19 +1982,15 @@ public sealed class DeleteFramesAction : UndoableAction {
 	public DeleteFramesAction(MovieData movie, int index, int count) {
 		_movie = movie;
 		_index = index;
-		_deletedFrames = _movie.InputFrames.Skip(index).Take(count).ToList();
+		_deletedFrames = _movie.InputFrames.GetRange(index, count);
 	}
 
 	public override void Execute() {
-		for (int i = 0; i < _deletedFrames.Count; i++) {
-			_movie.InputFrames.RemoveAt(_index);
-		}
+		_movie.InputFrames.RemoveRange(_index, _deletedFrames.Count);
 	}
 
 	public override void Undo() {
-		for (int i = 0; i < _deletedFrames.Count; i++) {
-			_movie.InputFrames.Insert(_index + i, _deletedFrames[i]);
-		}
+		_movie.InputFrames.InsertRange(_index, _deletedFrames);
 	}
 }
 

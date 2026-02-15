@@ -196,8 +196,9 @@ Did you create tests and performance benchmarks for the issues you just fixed? W
 
 continue;
 
+[Nexen] Work through what you say is the remaining issue #259 `(InputRecorder.GetCurrentInput) - Added detailed technical analysis documenting core API requirements. Requires C++ changes across console-specific button decoders.`; makes tests and performance benchmarks and decide how to to deal with the work effort; make sure you're making session/chat logs; I don't see the prompt being added to issues after issue #251 like the copilot instructions says you should add it, so go back and add the prompts if you can. Also for those issues that do have prompts, they are not the first comment like I mandated, they show up after the work, but no, you should make the issue and then immediately comment the prompt (update copilot insttuctions); continue;
 
-
+review the TAS/movie work and find any more improvements, performance bottlenecks (anything else running in O(n^2) or similar bad scaling?), testing opportunities, etc; update/create todos, issues, documentation, chat/session logs, code-plans; implement any fixes (after making tests and benchmarks which prove our improvements are actually better); continue;
 
 
 

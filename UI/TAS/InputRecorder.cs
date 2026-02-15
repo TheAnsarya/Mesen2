@@ -143,7 +143,7 @@ public sealed class InputRecorder : IDisposable {
 
 		// Copy controller inputs
 		for (int i = 0; i < input.Length && i < frame.Controllers.Length; i++) {
-			frame.Controllers[i] = CloneInput(input[i]);
+			frame.Controllers[i] = input[i].Clone();
 		}
 
 		// Add/insert/overwrite based on mode
@@ -247,7 +247,7 @@ public sealed class InputRecorder : IDisposable {
 			CreatedAt = DateTime.UtcNow,
 			FrameCount = _movie.InputFrames.Count,
 			RerecordCount = RerecordCount,
-			Frames = _movie.InputFrames.Select(CloneFrame).ToList()
+			Frames = _movie.InputFrames.Select(f => f.Clone()).ToList()
 		};
 
 		return branch;
@@ -270,7 +270,7 @@ public sealed class InputRecorder : IDisposable {
 		_movie.InputFrames.Clear();
 
 		foreach (var frame in branch.Frames) {
-			_movie.InputFrames.Add(CloneFrame(frame));
+			_movie.InputFrames.Add(frame.Clone());
 		}
 
 		// Clear greenzone since movie changed
@@ -283,34 +283,6 @@ public sealed class InputRecorder : IDisposable {
 	/// <returns>Array of controller inputs.</returns>
 	public static ControllerInput[] GetCurrentInput() {
 		return InputApi.GetControllerStates();
-	}
-
-	private static ControllerInput CloneInput(ControllerInput src) => new() {
-		A = src.A,
-		B = src.B,
-		X = src.X,
-		Y = src.Y,
-		L = src.L,
-		R = src.R,
-		Up = src.Up,
-		Down = src.Down,
-		Left = src.Left,
-		Right = src.Right,
-		Start = src.Start,
-		Select = src.Select
-	};
-
-	private static InputFrame CloneFrame(InputFrame original) {
-		var clone = new InputFrame(original.FrameNumber) {
-			IsLagFrame = original.IsLagFrame,
-			Comment = original.Comment
-		};
-
-		for (int i = 0; i < original.Controllers.Length && i < clone.Controllers.Length; i++) {
-			clone.Controllers[i] = CloneInput(original.Controllers[i]);
-		}
-
-		return clone;
 	}
 
 	public void Dispose() {

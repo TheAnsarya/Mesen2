@@ -16,6 +16,9 @@ namespace Nexen.TAS;
 /// </summary>
 public sealed class GreenzoneManager : IDisposable {
 	private readonly ConcurrentDictionary<int, SavestateData> _savestates = new();
+	private readonly SortedSet<int> _frameIndex = new();
+	private readonly object _indexLock = new();
+	private long _totalMemoryUsage;
 	private readonly SemaphoreSlim _compressionSemaphore = new(1, 1);
 	private readonly object _ringBufferLock = new();
 	private readonly Queue<int> _ringBuffer = new();
@@ -36,17 +39,29 @@ public sealed class GreenzoneManager : IDisposable {
 	/// <summary>Gets or sets the frame threshold after which states get compressed.</summary>
 	public int CompressionThreshold { get; set; } = 300; // 5 seconds
 
-	/// <summary>Gets the current frame with the latest savestate.</summary>
-	public int LatestFrame => _savestates.Keys.DefaultIfEmpty(-1).Max();
+	/// <summary>Gets the current frame with the latest savestate. O(log n) via SortedSet.</summary>
+	public int LatestFrame {
+		get {
+			lock (_indexLock) {
+				return _frameIndex.Count > 0 ? _frameIndex.Max : -1;
+			}
+		}
+	}
 
-	/// <summary>Gets the earliest frame with a savestate.</summary>
-	public int EarliestFrame => _savestates.Keys.DefaultIfEmpty(-1).Min();
+	/// <summary>Gets the earliest frame with a savestate. O(log n) via SortedSet.</summary>
+	public int EarliestFrame {
+		get {
+			lock (_indexLock) {
+				return _frameIndex.Count > 0 ? _frameIndex.Min : -1;
+			}
+		}
+	}
 
 	/// <summary>Gets the total number of savestates.</summary>
 	public int SavestateCount => _savestates.Count;
 
-	/// <summary>Gets the total memory usage of all savestates in bytes.</summary>
-	public long TotalMemoryUsage => _savestates.Values.Sum(s => s.Data?.LongLength ?? 0);
+	/// <summary>Gets the total memory usage of all savestates in bytes. O(1) tracked field.</summary>
+	public long TotalMemoryUsage => Interlocked.Read(ref _totalMemoryUsage);
 
 	/// <summary>Occurs when a savestate is captured.</summary>
 	public event EventHandler<GreenzoneEventArgs>? SavestateCaptured;
@@ -82,7 +97,18 @@ public sealed class GreenzoneManager : IDisposable {
 			IsCompressed = false
 		};
 
+		// Track memory: subtract old state if replacing, add new
+		if (_savestates.TryGetValue(frame, out var existing)) {
+			Interlocked.Add(ref _totalMemoryUsage, -(existing.Data?.LongLength ?? 0));
+		}
+
 		_savestates[frame] = savestate;
+
+		lock (_indexLock) {
+			_frameIndex.Add(frame);
+		}
+
+		Interlocked.Add(ref _totalMemoryUsage, data.Length);
 		AddToRingBuffer(frame);
 
 		// Prune if we're over the limit
@@ -139,10 +165,7 @@ public sealed class GreenzoneManager : IDisposable {
 		}
 
 		// Find nearest earlier state
-		var nearestFrame = _savestates.Keys
-			.Where(f => f <= frame)
-			.DefaultIfEmpty(-1)
-			.Max();
+		var nearestFrame = GetNearestStateFrame(frame);
 
 		if (nearestFrame < 0 || !_savestates.TryGetValue(nearestFrame, out var nearestState)) {
 			return false;
@@ -153,14 +176,24 @@ public sealed class GreenzoneManager : IDisposable {
 
 	/// <summary>
 	/// Gets the nearest frame with a savestate at or before the target frame.
+	/// O(log n) via SortedSet.GetViewBetween.
 	/// </summary>
 	/// <param name="targetFrame">The target frame.</param>
 	/// <returns>The nearest frame with a savestate, or -1 if none exists.</returns>
 	public int GetNearestStateFrame(int targetFrame) {
-		return _savestates.Keys
-			.Where(f => f <= targetFrame)
-			.DefaultIfEmpty(-1)
-			.Max();
+		lock (_indexLock) {
+			if (_frameIndex.Count == 0) {
+				return -1;
+			}
+
+			int minFrame = _frameIndex.Min;
+
+			if (minFrame > targetFrame) {
+				return -1;
+			}
+
+			return _frameIndex.GetViewBetween(minFrame, targetFrame).Max;
+		}
 	}
 
 	/// <summary>
@@ -215,10 +248,24 @@ public sealed class GreenzoneManager : IDisposable {
 	/// </summary>
 	/// <param name="fromFrame">The first frame to invalidate.</param>
 	public void InvalidateFrom(int fromFrame) {
-		var framesToRemove = _savestates.Keys.Where(f => f >= fromFrame).ToList();
+		List<int> framesToRemove;
+
+		lock (_indexLock) {
+			if (_frameIndex.Count == 0 || _frameIndex.Max < fromFrame) {
+				framesToRemove = [];
+			} else {
+				framesToRemove = _frameIndex.GetViewBetween(fromFrame, _frameIndex.Max).ToList();
+			}
+
+			foreach (var frame in framesToRemove) {
+				_frameIndex.Remove(frame);
+			}
+		}
 
 		foreach (var frame in framesToRemove) {
-			_savestates.TryRemove(frame, out _);
+			if (_savestates.TryRemove(frame, out var state)) {
+				Interlocked.Add(ref _totalMemoryUsage, -(state.Data?.LongLength ?? 0));
+			}
 		}
 
 		// Also clear ring buffer entries
@@ -236,6 +283,12 @@ public sealed class GreenzoneManager : IDisposable {
 	/// </summary>
 	public void Clear() {
 		_savestates.Clear();
+
+		lock (_indexLock) {
+			_frameIndex.Clear();
+		}
+
+		Interlocked.Exchange(ref _totalMemoryUsage, 0);
 
 		lock (_ringBufferLock) {
 			_ringBuffer.Clear();
@@ -273,7 +326,13 @@ public sealed class GreenzoneManager : IDisposable {
 
 				// Don't remove from main storage if it's at an interval
 				if (oldestFrame % CaptureInterval != 0) {
-					_savestates.TryRemove(oldestFrame, out _);
+					if (_savestates.TryRemove(oldestFrame, out var removed)) {
+						lock (_indexLock) {
+							_frameIndex.Remove(oldestFrame);
+						}
+
+						Interlocked.Add(ref _totalMemoryUsage, -(removed.Data?.LongLength ?? 0));
+					}
 				}
 			}
 
@@ -318,8 +377,14 @@ public sealed class GreenzoneManager : IDisposable {
 
 		foreach (var frame in toRemove) {
 			if (_savestates.TryRemove(frame, out var state)) {
+				lock (_indexLock) {
+					_frameIndex.Remove(frame);
+				}
+
+				long size = state.Data?.LongLength ?? 0;
 				prunedCount++;
-				freedMemory += state.Data?.LongLength ?? 0;
+				freedMemory += size;
+				Interlocked.Add(ref _totalMemoryUsage, -size);
 			}
 		}
 
@@ -341,8 +406,10 @@ public sealed class GreenzoneManager : IDisposable {
 
 					// Only use compressed if it's actually smaller
 					if (compressed.Length < kv.Value.Data.Length) {
+						long sizeDelta = compressed.Length - kv.Value.Data.Length;
 						kv.Value.Data = compressed;
 						kv.Value.IsCompressed = true;
+						Interlocked.Add(ref _totalMemoryUsage, sizeDelta);
 					}
 				}
 			}
@@ -383,6 +450,12 @@ public sealed class GreenzoneManager : IDisposable {
 
 		_disposed = true;
 		_savestates.Clear();
+
+		lock (_indexLock) {
+			_frameIndex.Clear();
+		}
+
+		Interlocked.Exchange(ref _totalMemoryUsage, 0);
 		_compressionSemaphore.Dispose();
 	}
 }
