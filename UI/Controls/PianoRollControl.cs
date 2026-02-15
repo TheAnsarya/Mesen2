@@ -168,6 +168,15 @@ public sealed class PianoRollControl : Control {
 	private static readonly Typeface BoldTypeface = new("Segoe UI", FontStyle.Normal, FontWeight.Bold);
 	private static readonly Typeface NormalTypeface = new("Segoe UI");
 
+	// Cached FormattedText for button labels (fixed set, can be cached for current zoom)
+	private Dictionary<string, FormattedText>? _buttonLabelCache;
+	private double _buttonLabelCacheZoom;
+
+	// Cached FormattedText for frame numbers (LRU cache for visible frames)
+	private readonly Dictionary<int, FormattedText> _frameNumberCache = new();
+	private double _frameNumberCacheZoom;
+	private const int MaxFrameNumberCacheSize = 200;
+
 	#endregion
 
 	static PianoRollControl() {
@@ -224,19 +233,29 @@ public sealed class PianoRollControl : Control {
 	private void DrawLaneHeaders(DrawingContext context, IReadOnlyList<string> buttons, int cellHeight) {
 		var textBrush = Brushes.Black;
 
+		// Invalidate cache if zoom changed
+		if (_buttonLabelCache is null || _buttonLabelCacheZoom != ZoomLevel) {
+			_buttonLabelCache = new Dictionary<string, FormattedText>();
+			_buttonLabelCacheZoom = ZoomLevel;
+		}
+
 		for (int i = 0; i < buttons.Count; i++) {
 			var rect = new Rect(0, HeaderHeight + i * cellHeight, LaneHeaderWidth, cellHeight);
 			context.FillRectangle(HeaderBrush, rect);
 			context.DrawRectangle(GrayBorderPen, rect);
 
-			var text = new FormattedText(
-				buttons[i],
-				System.Globalization.CultureInfo.CurrentCulture,
-				FlowDirection.LeftToRight,
-				BoldTypeface,
-				10 * ZoomLevel,
-				textBrush
-			);
+			// Get or create cached FormattedText
+			if (!_buttonLabelCache.TryGetValue(buttons[i], out var text)) {
+				text = new FormattedText(
+					buttons[i],
+					System.Globalization.CultureInfo.CurrentCulture,
+					FlowDirection.LeftToRight,
+					BoldTypeface,
+					10 * ZoomLevel,
+					textBrush
+				);
+				_buttonLabelCache[buttons[i]] = text;
+			}
 
 			var textX = rect.X + (rect.Width - text.Width) / 2;
 			var textY = rect.Y + (rect.Height - text.Height) / 2;
@@ -246,6 +265,12 @@ public sealed class PianoRollControl : Control {
 
 	private void DrawFrameHeaders(DrawingContext context, Rect bounds, int cellWidth) {
 		var textBrush = Brushes.Black;
+
+		// Invalidate cache if zoom changed
+		if (_frameNumberCacheZoom != ZoomLevel) {
+			_frameNumberCache.Clear();
+			_frameNumberCacheZoom = ZoomLevel;
+		}
 
 		int visibleFrames = (int)((bounds.Width - LaneHeaderWidth) / cellWidth) + 1;
 
@@ -259,14 +284,23 @@ public sealed class PianoRollControl : Control {
 
 			// Only show frame numbers at intervals
 			if (frame % 10 == 0 || ZoomLevel >= 2.0) {
-				var text = new FormattedText(
-					frame.ToString(),
-					System.Globalization.CultureInfo.CurrentCulture,
-					FlowDirection.LeftToRight,
-					NormalTypeface,
-					8 * ZoomLevel,
-					textBrush
-				);
+				// Get or create cached FormattedText
+				if (!_frameNumberCache.TryGetValue(frame, out var text)) {
+					// Prune cache if too large
+					if (_frameNumberCache.Count >= MaxFrameNumberCacheSize) {
+						_frameNumberCache.Clear();
+					}
+
+					text = new FormattedText(
+						frame.ToString(),
+						System.Globalization.CultureInfo.CurrentCulture,
+						FlowDirection.LeftToRight,
+						NormalTypeface,
+						8 * ZoomLevel,
+						textBrush
+					);
+					_frameNumberCache[frame] = text;
+				}
 
 				var textX = rect.X + (rect.Width - text.Width) / 2;
 				context.DrawText(text, new Point(textX, (HeaderHeight - text.Height) / 2));
