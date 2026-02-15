@@ -4,7 +4,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Nexen.Controls;
+using Nexen.Interop;
+using Nexen.MovieConverter;
 using Nexen.ViewModels;
 
 namespace Nexen.Windows;
@@ -12,9 +15,11 @@ namespace Nexen.Windows;
 /// <summary>
 /// TAS Editor window for frame-by-frame movie editing.
 /// </summary>
-public class TasEditorWindow : NexenWindow {
+public class TasEditorWindow : NexenWindow, IDisposable {
 	private ListBox _frameList = null!;
 	private PianoRollControl _pianoRoll = null!;
+	private NotificationListener? _notificationListener;
+	private bool _disposed;
 
 	public TasEditorWindow() {
 		InitializeComponent();
@@ -28,6 +33,7 @@ public class TasEditorWindow : NexenWindow {
 		}
 
 		SetupPianoRollEvents();
+		SetupNotificationListener();
 	}
 
 	public TasEditorWindow(TasEditorViewModel viewModel) {
@@ -39,6 +45,7 @@ public class TasEditorWindow : NexenWindow {
 		viewModel.InitActions(this);
 
 		SetupPianoRollEvents();
+		SetupNotificationListener();
 	}
 
 	private void InitializeComponent() {
@@ -54,6 +61,146 @@ public class TasEditorWindow : NexenWindow {
 		_pianoRoll.CellClicked += OnPianoRollCellClicked;
 		_pianoRoll.CellsPainted += OnPianoRollCellsPainted;
 		_pianoRoll.SelectionChanged += OnPianoRollSelectionChanged;
+	}
+
+	/// <summary>
+	/// Sets up the notification listener for emulation events.
+	/// </summary>
+	private void SetupNotificationListener() {
+		if (Design.IsDesignMode) {
+			return;
+		}
+
+		_notificationListener = new NotificationListener();
+		_notificationListener.OnNotification += OnEmulatorNotification;
+	}
+
+	/// <summary>
+	/// Handles emulator notifications for movie playback integration.
+	/// </summary>
+	private void OnEmulatorNotification(NotificationEventArgs e) {
+		switch (e.NotificationType) {
+			case ConsoleNotificationType.PpuFrameDone:
+				HandleFrameDone();
+				break;
+
+			case ConsoleNotificationType.GamePaused:
+				Dispatcher.UIThread.Post(() => {
+					if (ViewModel != null) {
+						ViewModel.IsPlaying = false;
+						ViewModel.StatusMessage = "Paused";
+					}
+				});
+				break;
+
+			case ConsoleNotificationType.GameResumed:
+				Dispatcher.UIThread.Post(() => {
+					if (ViewModel?.IsPlaying == true) {
+						ViewModel.StatusMessage = "Playing...";
+					}
+				});
+				break;
+
+			case ConsoleNotificationType.StateLoaded:
+				Dispatcher.UIThread.Post(() => {
+					// Update frame position after state load
+					ViewModel?.RefreshFrames();
+				});
+				break;
+		}
+	}
+
+	/// <summary>
+	/// Handles the frame done notification - feeds movie input to emulator.
+	/// </summary>
+	private void HandleFrameDone() {
+		var vm = ViewModel;
+		if (vm?.IsPlaying != true || vm.Movie == null) {
+			return;
+		}
+
+		int frame = vm.PlaybackFrame;
+		var movie = vm.Movie;
+
+		// Check if we've reached the end
+		if (frame >= movie.InputFrames.Count) {
+			Dispatcher.UIThread.Post(() => {
+				vm.StopPlayback();
+				vm.StatusMessage = "Playback finished";
+			});
+			return;
+		}
+
+		// Feed input to emulator for each controller
+		var inputFrame = movie.InputFrames[frame];
+		for (int i = 0; i < inputFrame.Controllers.Length && i < 4; i++) {
+			var ctrl = inputFrame.Controllers[i];
+			if (ctrl != null) {
+				FeedControllerInput(i, ctrl);
+			}
+		}
+
+		// Advance to next frame
+		Dispatcher.UIThread.Post(() => {
+			if (vm.IsPlaying) {
+				vm.PlaybackFrame++;
+				// Update UI less frequently for performance
+				if (frame % 10 == 0 || frame == movie.InputFrames.Count - 1) {
+					vm.SelectedFrameIndex = vm.PlaybackFrame;
+					vm.StatusMessage = $"Frame {vm.PlaybackFrame + 1} / {movie.InputFrames.Count}";
+				}
+			}
+		});
+	}
+
+	/// <summary>
+	/// Feeds a controller input to the emulator.
+	/// </summary>
+	private static void FeedControllerInput(int controllerIndex, ControllerInput input) {
+		var state = new DebugControllerState {
+			A = input.A,
+			B = input.B,
+			X = input.X,
+			Y = input.Y,
+			L = input.L,
+			R = input.R,
+			Up = input.Up,
+			Down = input.Down,
+			Left = input.Left,
+			Right = input.Right,
+			Select = input.Select,
+			Start = input.Start,
+			// Genesis buttons map to U/D
+			U = input.C,
+			D = input.Z
+		};
+
+		DebugApi.SetInputOverrides((uint)controllerIndex, state);
+	}
+
+	/// <summary>
+	/// Cleans up resources.
+	/// </summary>
+	public void Dispose() {
+		if (_disposed) {
+			return;
+		}
+
+		_disposed = true;
+		_notificationListener?.Dispose();
+		_notificationListener = null;
+
+		if (DataContext is IDisposable disposable) {
+			disposable.Dispose();
+		}
+	}
+
+	/// <summary>
+	/// Called when the window is closed.
+	/// </summary>
+	protected override void OnClosed(EventArgs e) {
+		base.OnClosed(e);
+		Dispose();
 	}
 
 	/// <summary>

@@ -16,32 +16,32 @@
 >
 	<StackPanel Margin="30" HorizontalAlignment="Center">
 		<!-- Header -->
-		<TextBlock 
-			Text="Input Detected" 
-			FontSize="24" 
+		<TextBlock
+			Text="Input Detected"
+			FontSize="24"
 			FontWeight="Bold"
 			Foreground="{StaticResource NexenAccentHighlightColor}"
 			HorizontalAlignment="Center"
 			Margin="0,0,0,10"
 		/>
-		
-		<TextBlock 
+
+		<TextBlock
 			Name="txtFrameInfo"
-			Text="Frame 1,234 of 10,000" 
+			Text="Frame 1,234 of 10,000"
 			FontSize="14"
 			Foreground="Gray"
 			HorizontalAlignment="Center"
 			Margin="0,0,0,5"
 		/>
-		
-		<TextBlock 
-			Text="You pressed a button during movie playback." 
+
+		<TextBlock
+			Text="You pressed a button during movie playback."
 			FontSize="12"
 			Foreground="LightGray"
 			HorizontalAlignment="Center"
 			Margin="0,0,0,25"
 		/>
-		
+
 		<!-- Card-style buttons -->
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
 			<StackPanel.Styles>
@@ -83,7 +83,7 @@
 					<Setter Property="TextAlignment" Value="Center"/>
 				</Style>
 			</StackPanel.Styles>
-			
+
 			<!-- Fork Button -->
 			<Button Classes="card" Name="btnFork" Click="OnForkClick">
 				<StackPanel>
@@ -92,7 +92,7 @@
 					<TextBlock Classes="card-desc" Text="Start recording from this frame"/>
 				</StackPanel>
 			</Button>
-			
+
 			<!-- Edit Button -->
 			<Button Classes="card" Name="btnEdit" Click="OnEditClick">
 				<StackPanel>
@@ -101,7 +101,7 @@
 					<TextBlock Classes="card-desc" Text="Open piano roll at this frame"/>
 				</StackPanel>
 			</Button>
-			
+
 			<!-- Continue Button -->
 			<Button Classes="card" Name="btnContinue" Click="OnContinueClick">
 				<StackPanel>
@@ -111,10 +111,10 @@
 				</StackPanel>
 			</Button>
 		</StackPanel>
-		
+
 		<!-- Footer hint -->
-		<TextBlock 
-			Text="Press Escape to continue playback" 
+		<TextBlock
+			Text="Press Escape to continue playback"
 			FontSize="10"
 			Foreground="DimGray"
 			HorizontalAlignment="Center"
