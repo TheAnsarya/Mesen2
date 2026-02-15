@@ -213,9 +213,8 @@ public sealed class InputRecorder : IDisposable {
 		if (truncate && frame < _movie.InputFrames.Count) {
 			int removeCount = _movie.InputFrames.Count - frame;
 
-			for (int i = 0; i < removeCount; i++) {
-				_movie.InputFrames.RemoveAt(frame);
-			}
+			// Use RemoveRange for O(n) instead of O(n²)
+			_movie.InputFrames.RemoveRange(frame, removeCount);
 
 			// Invalidate greenzone from this point
 			_greenzone.InvalidateFrom(frame);

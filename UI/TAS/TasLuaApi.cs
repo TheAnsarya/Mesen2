@@ -283,7 +283,7 @@ public sealed class TasLuaApi {
 	/// Checks if a frame has a greenzone savestate.
 	/// </summary>
 	public bool HasSavestate(int frame) {
-		return _greenzone.SavestateCount > 0; // Simplified check
+		return _greenzone.HasState(frame);
 	}
 
 	#endregion
