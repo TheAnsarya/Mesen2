@@ -317,7 +317,9 @@ public enum RomFormat {
 
 	Gba,
 
-	Ws
+	Ws,
+
+	Lynx,
 }
 
 public enum ConsoleType {
@@ -328,6 +330,7 @@ public enum ConsoleType {
 	Sms = 4,
 	Gba = 5,
 	Ws = 6,
+	Lynx = 7,
 }
 
 public struct InteropDipSwitchInfo {

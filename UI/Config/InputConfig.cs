@@ -392,6 +392,9 @@ public enum ControllerType {
 	//WonderSwan
 	WsController,
 	WsControllerVertical,
+
+	//Atari Lynx
+	LynxController,
 }
 
 public static class ControllerTypeExtensions {

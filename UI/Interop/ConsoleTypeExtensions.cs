@@ -11,6 +11,7 @@ public static class ConsoleTypeExtensions {
 			ConsoleType.Sms => CpuType.Sms,
 			ConsoleType.Gba => CpuType.Gba,
 			ConsoleType.Ws => CpuType.Ws,
+			ConsoleType.Lynx => CpuType.Lynx,
 			_ => throw new Exception("Invalid type")
 		};
 	}
@@ -19,6 +20,7 @@ public static class ConsoleTypeExtensions {
 		return type switch {
 			ConsoleType.Gba => false,
 			ConsoleType.Ws => false,
+			ConsoleType.Lynx => false,
 			_ => true
 		};
 	}

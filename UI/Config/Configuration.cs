@@ -33,6 +33,7 @@ public partial class Configuration : ReactiveObject {
 	[Reactive] public CvConfig Cv { get; set; } = new();
 	[Reactive] public GbaConfig Gba { get; set; } = new();
 	[Reactive] public WsConfig Ws { get; set; } = new();
+	[Reactive] public LynxConfig Lynx { get; set; } = new();
 	[Reactive] public PreferencesConfig Preferences { get; set; } = new();
 	[Reactive] public AudioPlayerConfig AudioPlayer { get; set; } = new();
 	[Reactive] public DebugConfig Debug { get; set; } = new();
@@ -84,6 +85,7 @@ public partial class Configuration : ReactiveObject {
 		Sms.ApplyConfig();
 		Cv.ApplyConfig();
 		Ws.ApplyConfig();
+		Lynx.ApplyConfig();
 		Preferences.ApplyConfig();
 		AudioPlayer.ApplyConfig();
 		Debug.ApplyConfig();
@@ -119,6 +121,10 @@ public partial class Configuration : ReactiveObject {
 			Ws.InitializeDefaults(DefaultKeyMappings);
 		}
 
+		if (ConfigUpgrade < (int)ConfigUpgradeHint.LynxInput) {
+			Lynx.InitializeDefaults(DefaultKeyMappings);
+		}
+
 		// Enable background CDL recording by default for existing users
 		if (ConfigUpgrade < (int)ConfigUpgradeHint.BackgroundCdlRecording) {
 			Debug.Integration.BackgroundCdlRecording = true;
@@ -138,6 +144,7 @@ public partial class Configuration : ReactiveObject {
 			Sms.InitializeDefaults(DefaultKeyMappings);
 			Cv.InitializeDefaults(DefaultKeyMappings);
 			Ws.InitializeDefaults(DefaultKeyMappings);
+			Lynx.InitializeDefaults(DefaultKeyMappings);
 			ConfigUpgrade = (int)ConfigUpgradeHint.NextValue - 1;
 		}
 
@@ -306,5 +313,6 @@ public enum ConfigUpgradeHint {
 	CvInput,
 	WsInput,
 	BackgroundCdlRecording,
+	LynxInput,
 	NextValue,
 }

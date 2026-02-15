@@ -561,6 +561,7 @@ public enum MemoryType {
 	SmsMemory,
 	GbaMemory,
 	WsMemory,
+	LynxMemory,
 
 	SnesPrgRom,
 	SnesWorkRam,
@@ -644,6 +645,11 @@ public enum MemoryType {
 	WsBootRom,
 	WsInternalEeprom,
 	WsPort,
+
+	LynxPrgRom,
+	LynxWorkRam,
+	LynxBootRom,
+	LynxSaveRam,
 
 	None,
 }
@@ -1431,7 +1437,8 @@ public enum CpuType : byte {
 	Pce,
 	Sms,
 	Gba,
-	Ws
+	Ws,
+	Lynx
 }
 
 public enum StepType {

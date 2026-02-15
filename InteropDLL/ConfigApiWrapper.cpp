@@ -59,6 +59,10 @@ DllExport void __stdcall SetWsConfig(WsConfig config) {
 	_emu->GetSettings()->SetWsConfig(config);
 }
 
+DllExport void __stdcall SetLynxConfig(LynxConfig config) {
+	_emu->GetSettings()->SetLynxConfig(config);
+}
+
 DllExport void __stdcall SetGameConfig(GameConfig config) {
 	_emu->GetSettings()->SetGameConfig(config);
 }

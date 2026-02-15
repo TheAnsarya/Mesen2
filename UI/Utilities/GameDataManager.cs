@@ -63,6 +63,7 @@ public static class GameDataManager {
 		ConsoleType.Sms => "SMS",
 		ConsoleType.Gba => "GBA",
 		ConsoleType.Ws => "WS",
+		ConsoleType.Lynx => "LYNX",
 		_ => system.ToString().ToUpperInvariant()
 	};
 

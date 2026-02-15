@@ -27,6 +27,7 @@ public sealed class ConfigApi {
 	[DllImport(DllPath)] public static extern void SetSmsConfig(InteropSmsConfig config);
 	[DllImport(DllPath)] public static extern void SetCvConfig(InteropCvConfig config);
 	[DllImport(DllPath)] public static extern void SetWsConfig(InteropWsConfig config);
+	[DllImport(DllPath)] public static extern void SetLynxConfig(InteropLynxConfig config);
 
 	[DllImport(DllPath)] public static extern void SetGameConfig(InteropGameConfig config);
 
@@ -71,6 +72,7 @@ public enum DebuggerFlags : UInt32 {
 	SmsDebuggerEnabled = 1 << 10,
 	GbaDebuggerEnabled = 1 << 11,
 	WsDebuggerEnabled = 1 << 12,
+	LynxDebuggerEnabled = 1 << 13,
 }
 
 public struct InteropShortcutKeyInfo {
