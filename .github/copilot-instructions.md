@@ -39,6 +39,39 @@ gh issue close <number> --repo TheAnsarya/Nexen --comment "Completed in commit a
 - `performance` - Performance related
 - Priority: `high-priority`, `medium-priority`, `low-priority`
 
+### ⚠️ MANDATORY: Issue-First Workflow
+
+**Always create GitHub issues BEFORE starting implementation work.** This is non-negotiable.
+
+1. **Before Implementation:**
+   - Create a GitHub issue describing the planned work
+   - Include scope, approach, and acceptance criteria
+   - Add appropriate labels
+
+2. **During Implementation:**
+   - Reference issue number in commits: `git commit -m "Fix piano roll rendering - #247"`
+   - Update issue with progress comments if work spans multiple sessions
+   - Add sub-issues for discovered work
+
+3. **After Implementation:**
+   - Close issue with completion comment including commit hash
+   - Link related issues if applicable
+
+**Workflow Pattern:**
+```powershell
+# 1. Create issue FIRST
+gh issue create --repo TheAnsarya/Nexen --title "Description" --body "Details" --label "label"
+
+# 2. Implement the fix/feature
+
+# 3. Commit with issue reference
+git add .
+git commit -m "Brief description - #<issue-number>"
+
+# 4. Close issue with summary
+gh issue close <number> --repo TheAnsarya/Nexen --comment "Completed in <commit-hash>"
+```
+
 ## Coding Standards
 
 ### Indentation
