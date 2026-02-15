@@ -151,4 +151,215 @@ public class ControllerInputTests {
 		Assert.True(input1.Equals(input2));
 		Assert.False(input1.Equals(input3));
 	}
+
+	#region Equals Covers All Fields
+
+	[Fact]
+	public void Equals_Null_ReturnsFalse() {
+		var input = new ControllerInput { A = true };
+		Assert.False(input.Equals(null));
+	}
+
+	[Fact]
+	public void Equals_SameReference_ReturnsTrue() {
+		var input = new ControllerInput { A = true };
+		Assert.True(input.Equals(input));
+	}
+
+	[Fact]
+	public void Equals_DifferentMouseDeltaX_ReturnsFalse() {
+		var a = new ControllerInput { MouseDeltaX = 10 };
+		var b = new ControllerInput { MouseDeltaX = -5 };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentMouseDeltaY_ReturnsFalse() {
+		var a = new ControllerInput { MouseDeltaY = 7 };
+		var b = new ControllerInput { MouseDeltaY = null };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentMouseButton1_ReturnsFalse() {
+		var a = new ControllerInput { MouseButton1 = true };
+		var b = new ControllerInput { MouseButton1 = false };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentMouseButton2_ReturnsFalse() {
+		var a = new ControllerInput { MouseButton2 = true };
+		var b = new ControllerInput { MouseButton2 = null };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentMouseButton3_ReturnsFalse() {
+		var a = new ControllerInput { MouseButton3 = false };
+		var b = new ControllerInput { MouseButton3 = true };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentAnalogRX_ReturnsFalse() {
+		var a = new ControllerInput { AnalogRX = 50 };
+		var b = new ControllerInput { AnalogRX = -50 };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentAnalogRY_ReturnsFalse() {
+		var a = new ControllerInput { AnalogRY = 127 };
+		var b = new ControllerInput { AnalogRY = null };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentTriggerL_ReturnsFalse() {
+		var a = new ControllerInput { TriggerL = 255 };
+		var b = new ControllerInput { TriggerL = 0 };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentTriggerR_ReturnsFalse() {
+		var a = new ControllerInput { TriggerR = 128 };
+		var b = new ControllerInput { TriggerR = null };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentPaddlePosition_ReturnsFalse() {
+		var a = new ControllerInput { PaddlePosition = 100 };
+		var b = new ControllerInput { PaddlePosition = 200 };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentPowerPadButtons_ReturnsFalse() {
+		var a = new ControllerInput { PowerPadButtons = 0x00ff };
+		var b = new ControllerInput { PowerPadButtons = 0xff00 };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentKeyboardData_ReturnsFalse() {
+		var a = new ControllerInput { KeyboardData = new byte[] { 1, 2, 3 } };
+		var b = new ControllerInput { KeyboardData = new byte[] { 1, 2, 4 } };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_KeyboardData_NullVsNonNull_ReturnsFalse() {
+		var a = new ControllerInput { KeyboardData = null };
+		var b = new ControllerInput { KeyboardData = new byte[] { 1 } };
+		Assert.False(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_KeyboardData_BothNull_ReturnsTrue() {
+		var a = new ControllerInput { KeyboardData = null };
+		var b = new ControllerInput { KeyboardData = null };
+		Assert.True(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_KeyboardData_BothSame_ReturnsTrue() {
+		var a = new ControllerInput { KeyboardData = new byte[] { 0xab, 0xcd } };
+		var b = new ControllerInput { KeyboardData = new byte[] { 0xab, 0xcd } };
+		Assert.True(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_AllFieldsMatch_ReturnsTrue() {
+		var a = CreateFullInput();
+		var b = CreateFullInput();
+		Assert.True(a.Equals(b));
+	}
+
+	[Fact]
+	public void Equals_DifferentType_ReturnsFalse() {
+		var a = new ControllerInput { Type = ControllerType.Gamepad };
+		var b = new ControllerInput { Type = ControllerType.Mouse };
+		Assert.False(a.Equals(b));
+	}
+
+	#endregion
+
+	#region GetHashCode Consistency
+
+	[Fact]
+	public void GetHashCode_EqualObjects_SameHash() {
+		var a = CreateFullInput();
+		var b = CreateFullInput();
+		Assert.Equal(a.GetHashCode(), b.GetHashCode());
+	}
+
+	[Fact]
+	public void GetHashCode_DifferentObjects_DifferentHash() {
+		var a = new ControllerInput { A = true, MouseDeltaX = 10 };
+		var b = new ControllerInput { A = true, MouseDeltaX = -10 };
+		// Hash codes may collide, but for these distinct inputs they should differ
+		Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
+	}
+
+	[Fact]
+	public void GetHashCode_DifferentAnalogTriggers_DifferentHash() {
+		var a = new ControllerInput { TriggerL = 0, TriggerR = 255 };
+		var b = new ControllerInput { TriggerL = 255, TriggerR = 0 };
+		Assert.NotEqual(a.GetHashCode(), b.GetHashCode());
+	}
+
+	[Fact]
+	public void GetHashCode_DefaultInput_Consistent() {
+		var a = new ControllerInput();
+		var b = new ControllerInput();
+		Assert.Equal(a.GetHashCode(), b.GetHashCode());
+	}
+
+	#endregion
+
+	#region Operator Equality
+
+	[Fact]
+	public void OperatorEquals_BothNull_ReturnsTrue() {
+		ControllerInput? a = null;
+		ControllerInput? b = null;
+		Assert.True(a == b);
+	}
+
+	[Fact]
+	public void OperatorEquals_OneNull_ReturnsFalse() {
+		var a = new ControllerInput { A = true };
+		ControllerInput? b = null;
+		Assert.False(a == b);
+		Assert.True(a != b);
+	}
+
+	[Fact]
+	public void OperatorEquals_EqualInputs_ReturnsTrue() {
+		var a = new ControllerInput { A = true, MouseDeltaX = 5 };
+		var b = new ControllerInput { A = true, MouseDeltaX = 5 };
+		Assert.True(a == b);
+		Assert.False(a != b);
+	}
+
+	#endregion
+
+	private static ControllerInput CreateFullInput() {
+		return new ControllerInput {
+			A = true, B = true, Start = true,
+			Type = ControllerType.Gamepad,
+			MouseX = 100, MouseY = 200,
+			MouseDeltaX = 5, MouseDeltaY = -3,
+			MouseButton1 = true, MouseButton2 = false, MouseButton3 = null,
+			AnalogX = 64, AnalogY = -32,
+			AnalogRX = 10, AnalogRY = -10,
+			TriggerL = 128, TriggerR = 64,
+			PaddlePosition = 150,
+			PowerPadButtons = 0x1234,
+			KeyboardData = new byte[] { 0x01, 0x02, 0x03 }
+		};
+	}
 }

@@ -323,4 +323,53 @@ public class GreenzoneManagerOptimizationTests : IDisposable {
 	}
 
 	#endregion
+
+	#region Ring Buffer + InvalidateFrom Integration
+
+	[Fact]
+	public void InvalidateFrom_WithManyStates_PreservesAllBelowThreshold() {
+		// Capture many states to exercise the ring buffer rebuild path
+		for (int i = 0; i < 50; i++) {
+			_greenzone.CaptureState(i * 10, new byte[64], forceCapture: true);
+		}
+
+		Assert.Equal(50, _greenzone.SavestateCount);
+
+		// Invalidate from frame 250 — should keep frames 0..240 (25 frames)
+		_greenzone.InvalidateFrom(250);
+
+		Assert.Equal(25, _greenzone.SavestateCount);
+		Assert.Equal(0, _greenzone.EarliestFrame);
+		Assert.Equal(240, _greenzone.LatestFrame);
+
+		// All frames below threshold should still be present
+		for (int i = 0; i < 25; i++) {
+			Assert.True(_greenzone.HasState(i * 10));
+		}
+
+		// All frames at/above threshold should be gone
+		for (int i = 25; i < 50; i++) {
+			Assert.False(_greenzone.HasState(i * 10));
+		}
+	}
+
+	[Fact]
+	public void InvalidateFrom_RepeatedCalls_ConvergesCorrectly() {
+		for (int i = 0; i < 20; i++) {
+			_greenzone.CaptureState(i * 100, new byte[64], forceCapture: true);
+		}
+
+		// Cascade invalidations
+		_greenzone.InvalidateFrom(1500);
+		Assert.Equal(15, _greenzone.SavestateCount);
+
+		_greenzone.InvalidateFrom(1000);
+		Assert.Equal(10, _greenzone.SavestateCount);
+
+		_greenzone.InvalidateFrom(500);
+		Assert.Equal(5, _greenzone.SavestateCount);
+		Assert.Equal(400, _greenzone.LatestFrame);
+	}
+
+	#endregion
 }

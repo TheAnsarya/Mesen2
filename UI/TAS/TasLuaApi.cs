@@ -23,6 +23,12 @@ public sealed class TasLuaApi {
 	private Dictionary<string, object> _searchState = new();
 
 	/// <summary>
+	/// Cached dictionary for <see cref="GetFrameInput"/> to avoid per-call allocation.
+	/// Callers must not hold a reference across calls.
+	/// </summary>
+	private readonly Dictionary<string, bool> _frameInputCache = new(12);
+
+	/// <summary>
 	/// Initializes TAS Lua API with references to core TAS components.
 	/// </summary>
 	public TasLuaApi(TasEditorViewModel viewModel) {
@@ -148,20 +154,21 @@ public sealed class TasLuaApi {
 		}
 
 		var input = frameData.Controllers[controller];
-		return new Dictionary<string, bool> {
-			["a"] = input.A,
-			["b"] = input.B,
-			["x"] = input.X,
-			["y"] = input.Y,
-			["l"] = input.L,
-			["r"] = input.R,
-			["select"] = input.Select,
-			["start"] = input.Start,
-			["up"] = input.Up,
-			["down"] = input.Down,
-			["left"] = input.Left,
-			["right"] = input.Right
-		};
+
+		_frameInputCache.Clear();
+		_frameInputCache["a"] = input.A;
+		_frameInputCache["b"] = input.B;
+		_frameInputCache["x"] = input.X;
+		_frameInputCache["y"] = input.Y;
+		_frameInputCache["l"] = input.L;
+		_frameInputCache["r"] = input.R;
+		_frameInputCache["select"] = input.Select;
+		_frameInputCache["start"] = input.Start;
+		_frameInputCache["up"] = input.Up;
+		_frameInputCache["down"] = input.Down;
+		_frameInputCache["left"] = input.Left;
+		_frameInputCache["right"] = input.Right;
+		return _frameInputCache;
 	}
 
 	/// <summary>

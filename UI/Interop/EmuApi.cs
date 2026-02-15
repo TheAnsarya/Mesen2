@@ -101,6 +101,23 @@ public sealed class EmuApi {
 	[DllImport(DllPath)] public static extern void SaveStateFile([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath);
 	[DllImport(DllPath)] public static extern void LoadStateFile([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath);
 
+	/// <summary>
+	/// Save the current state to a memory buffer.
+	/// Call with buffer=null to get required size, then call again with appropriately sized buffer.
+	/// </summary>
+	/// <param name="buffer">Buffer to write state data to, or null to query required size.</param>
+	/// <param name="maxSize">Maximum buffer size in bytes.</param>
+	/// <returns>Actual state size in bytes. If buffer is null or too small, returns the required size without writing.</returns>
+	[DllImport(DllPath)] public static extern Int32 SaveStateToMemory(IntPtr buffer, Int32 maxSize);
+
+	/// <summary>
+	/// Load a state from a memory buffer.
+	/// </summary>
+	/// <param name="data">Pointer to the state data buffer.</param>
+	/// <param name="size">Size of the state data in bytes.</param>
+	/// <returns>True if the state was loaded successfully.</returns>
+	[DllImport(DllPath)] public static extern bool LoadStateFromMemory(IntPtr data, Int32 size);
+
 	// ========== Timestamped Save State API ==========
 
 	[DllImport(DllPath, EntryPoint = "SaveTimestampedState")]

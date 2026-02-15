@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Nexen.Interop;
@@ -133,16 +134,29 @@ public sealed class GreenzoneManager : IDisposable {
 			return;
 		}
 
-		// Save to a temporary file and read the data
-		string tempPath = Path.Combine(Path.GetTempPath(), $"nexen_greenzone_{frame}.mss");
-
 		try {
-			EmuApi.SaveStateFile(tempPath);
+			// Query required buffer size first (pass null buffer)
+			int requiredSize = EmuApi.SaveStateToMemory(IntPtr.Zero, 0);
 
-			if (File.Exists(tempPath)) {
-				byte[] data = File.ReadAllBytes(tempPath);
-				CaptureState(frame, data, forceCapture: true);
-				File.Delete(tempPath);
+			if (requiredSize <= 0) {
+				return;
+			}
+
+			// Allocate buffer and save state directly to memory
+			byte[] data = new byte[requiredSize];
+			unsafe {
+				fixed (byte* ptr = data) {
+					int actualSize = EmuApi.SaveStateToMemory((IntPtr)ptr, requiredSize);
+
+					if (actualSize > 0 && actualSize <= requiredSize) {
+						// Trim if actual size differs
+						if (actualSize < requiredSize) {
+							Array.Resize(ref data, actualSize);
+						}
+
+						CaptureState(frame, data, forceCapture: true);
+					}
+				}
 			}
 		} catch (Exception ex) {
 			System.Diagnostics.Debug.WriteLine($"Failed to capture greenzone state at frame {frame}: {ex.Message}");
@@ -268,12 +282,14 @@ public sealed class GreenzoneManager : IDisposable {
 			}
 		}
 
-		// Also clear ring buffer entries
+		// Also clear ring buffer entries — rebuild in-place to avoid allocation
 		lock (_ringBufferLock) {
-			var newBuffer = new Queue<int>(_ringBuffer.Where(f => f < fromFrame));
-			_ringBuffer.Clear();
-			foreach (var f in newBuffer) {
-				_ringBuffer.Enqueue(f);
+			int count = _ringBuffer.Count;
+			for (int i = 0; i < count; i++) {
+				int f = _ringBuffer.Dequeue();
+				if (f < fromFrame) {
+					_ringBuffer.Enqueue(f);
+				}
 			}
 		}
 	}
@@ -347,16 +363,19 @@ public sealed class GreenzoneManager : IDisposable {
 
 		byte[] data = state.IsCompressed ? DecompressData(state.Data) : state.Data;
 
-		// Save to temp file and load
-		string tempPath = Path.Combine(Path.GetTempPath(), $"nexen_greenzone_load_{state.Frame}.mss");
-
 		try {
-			File.WriteAllBytes(tempPath, data);
-			EmuApi.LoadStateFile(tempPath);
-			File.Delete(tempPath);
+			// Load state directly from memory buffer
+			unsafe {
+				fixed (byte* ptr = data) {
+					bool success = EmuApi.LoadStateFromMemory((IntPtr)ptr, data.Length);
 
-			SavestateLoaded?.Invoke(this, new GreenzoneEventArgs(state.Frame, data.Length));
-			return true;
+					if (success) {
+						SavestateLoaded?.Invoke(this, new GreenzoneEventArgs(state.Frame, data.Length));
+					}
+
+					return success;
+				}
+			}
 		} catch (Exception ex) {
 			System.Diagnostics.Debug.WriteLine($"Failed to load greenzone state at frame {state.Frame}: {ex.Message}");
 			return false;

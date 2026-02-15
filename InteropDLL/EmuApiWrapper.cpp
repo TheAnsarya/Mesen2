@@ -6,6 +6,7 @@
 #include "Core/Shared/SystemActionManager.h"
 #include "Core/Shared/MessageManager.h"
 #include "Core/Shared/SaveStateManager.h"
+#include <sstream>
 #include "Core/Shared/BatteryManager.h"
 #include "Core/Shared/Interfaces/INotificationListener.h"
 #include "Core/Shared/KeyManager.h"
@@ -314,6 +315,27 @@ DllExport void __stdcall SaveStateFile(char* filepath) {
 DllExport void __stdcall LoadStateFile(char* filepath) {
 	_emu->GetSaveStateManager()->LoadState(filepath);
 }
+
+DllExport int32_t __stdcall SaveStateToMemory(uint8_t* buffer, int32_t maxSize) {
+	auto lock = _emu->AcquireLock();
+	std::ostringstream stream(std::ios::binary);
+	_emu->GetSaveStateManager()->SaveState(stream);
+	std::string data = stream.str();
+	int32_t size = static_cast<int32_t>(data.size());
+	if (buffer == nullptr || size > maxSize) {
+		return size; // Return required size if buffer is null or too small
+	}
+	memcpy(buffer, data.data(), size);
+	return size;
+}
+
+DllExport bool __stdcall LoadStateFromMemory(uint8_t* data, int32_t size) {
+	auto lock = _emu->AcquireLock();
+	std::string buf(reinterpret_cast<char*>(data), size);
+	std::istringstream stream(buf, std::ios::binary);
+	return _emu->GetSaveStateManager()->LoadState(stream);
+}
+
 DllExport void __stdcall LoadRecentGame(char* filepath, bool resetGame) {
 	_emu->GetSaveStateManager()->LoadRecentGame(filepath, resetGame);
 }

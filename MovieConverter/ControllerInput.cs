@@ -573,7 +573,8 @@ public sealed class ControllerInput : IEquatable<ControllerInput> {
 	};
 
 	/// <summary>
-	/// Check equality with another ControllerInput
+	/// Check equality with another ControllerInput.
+	/// Compares all fields to ensure correctness for mouse, analog, and special inputs.
 	/// </summary>
 	public bool Equals(ControllerInput? other) {
 		if (other is null) {
@@ -585,13 +586,43 @@ public sealed class ControllerInput : IEquatable<ControllerInput> {
 		}
 
 		return ButtonBits == other.ButtonBits && Type == other.Type &&
-			   MouseX == other.MouseX && MouseY == other.MouseY &&
-			   AnalogX == other.AnalogX && AnalogY == other.AnalogY;
+			MouseX == other.MouseX && MouseY == other.MouseY &&
+			MouseDeltaX == other.MouseDeltaX && MouseDeltaY == other.MouseDeltaY &&
+			MouseButton1 == other.MouseButton1 && MouseButton2 == other.MouseButton2 && MouseButton3 == other.MouseButton3 &&
+			AnalogX == other.AnalogX && AnalogY == other.AnalogY &&
+			AnalogRX == other.AnalogRX && AnalogRY == other.AnalogRY &&
+			TriggerL == other.TriggerL && TriggerR == other.TriggerR &&
+			PaddlePosition == other.PaddlePosition &&
+			PowerPadButtons == other.PowerPadButtons &&
+			KeyboardDataEquals(KeyboardData, other.KeyboardData);
+	}
+
+	private static bool KeyboardDataEquals(byte[]? a, byte[]? b) {
+		if (a is null) return b is null;
+		if (b is null) return false;
+		return a.AsSpan().SequenceEqual(b);
 	}
 
 	public override bool Equals(object? obj) => Equals(obj as ControllerInput);
 
-	public override int GetHashCode() => HashCode.Combine(ButtonBits, Type, MouseX, MouseY, AnalogX, AnalogY);
+	public override int GetHashCode() {
+		var hash = new HashCode();
+		hash.Add(ButtonBits);
+		hash.Add(Type);
+		hash.Add(MouseX);
+		hash.Add(MouseY);
+		hash.Add(MouseDeltaX);
+		hash.Add(MouseDeltaY);
+		hash.Add(AnalogX);
+		hash.Add(AnalogY);
+		hash.Add(AnalogRX);
+		hash.Add(AnalogRY);
+		hash.Add(TriggerL);
+		hash.Add(TriggerR);
+		hash.Add(PaddlePosition);
+		hash.Add(PowerPadButtons);
+		return hash.ToHashCode();
+	}
 
 	public static bool operator ==(ControllerInput? left, ControllerInput? right) =>
 		left is null ? right is null : left.Equals(right);
