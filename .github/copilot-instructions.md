@@ -62,15 +62,32 @@ gh issue close <number> --repo TheAnsarya/Nexen --comment "Completed in commit a
 # 1. Create issue FIRST
 gh issue create --repo TheAnsarya/Nexen --title "Description" --body "Details" --label "label"
 
-# 2. Implement the fix/feature
+# 2. Add prompt tracking comment (for AI-created issues)
+gh issue comment <number> --repo TheAnsarya/Nexen --body "Prompt for work:`n{original user prompt}"
 
-# 3. Commit with issue reference
+# 3. Implement the fix/feature
+
+# 4. Commit with issue reference
 git add .
 git commit -m "Brief description - #<issue-number>"
 
-# 4. Close issue with summary
+# 5. Close issue with summary
 gh issue close <number> --repo TheAnsarya/Nexen --comment "Completed in <commit-hash>"
 ```
+
+### ⚠️ MANDATORY: Prompt Tracking for AI-Created Issues
+
+When creating GitHub issues from AI prompts, **ALWAYS** add the original user prompt as the first comment:
+
+```powershell
+gh issue comment <number> --repo TheAnsarya/Nexen --body "Prompt for work:
+<original user prompt that triggered this work>"
+```
+
+This provides:
+- **Traceability** - Know where each issue originated
+- **Context** - Understand the user's original intent
+- **History** - Track AI-assisted development workflow
 
 ## Coding Standards
 
