@@ -807,6 +807,7 @@
     <ClInclude Include="Lynx\LynxCpu.h" />
     <ClInclude Include="Lynx\LynxMemoryManager.h" />
     <ClInclude Include="Lynx\LynxMikey.h" />
+    <ClInclude Include="Lynx\LynxSuzy.h" />
     <ClInclude Include="Lynx\LynxTypes.h" />
   </ItemGroup>
   <ItemGroup>
@@ -1110,6 +1111,7 @@
     <ClCompile Include="Lynx\LynxCpu.cpp" />
     <ClCompile Include="Lynx\LynxMemoryManager.cpp" />
     <ClCompile Include="Lynx\LynxMikey.cpp" />
+    <ClCompile Include="Lynx\LynxSuzy.cpp" />
     <ClCompile Include="WS\WsConsole.cpp" />
     <ClCompile Include="WS\WsControlManager.cpp" />
     <ClCompile Include="WS\WsCpu.cpp" />
