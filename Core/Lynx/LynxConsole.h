@@ -8,6 +8,8 @@
 #include "Lynx/LynxMemoryManager.h"
 #include "Lynx/LynxCart.h"
 #include "Lynx/LynxControlManager.h"
+#include "Lynx/LynxApu.h"
+#include "Lynx/LynxEeprom.h"
 
 class Emulator;
 
@@ -31,6 +33,8 @@ private:
 	unique_ptr<LynxMemoryManager> _memoryManager;
 	unique_ptr<LynxCart> _cart;
 	unique_ptr<LynxControlManager> _controlManager;
+	unique_ptr<LynxApu> _apu;
+	unique_ptr<LynxEeprom> _eeprom;
 
 	uint8_t* _workRam = nullptr;
 	uint32_t _workRamSize = 0;
@@ -87,6 +91,8 @@ public:
 	[[nodiscard]] LynxSuzy* GetSuzy() { return _suzy.get(); }
 	[[nodiscard]] LynxMemoryManager* GetMemoryManager() { return _memoryManager.get(); }
 	[[nodiscard]] LynxCart* GetCart() { return _cart.get(); }
+	[[nodiscard]] LynxApu* GetApu() { return _apu.get(); }
+	[[nodiscard]] LynxEeprom* GetEeprom() { return _eeprom.get(); }
 
 	// Memory accessors for components
 	[[nodiscard]] uint8_t* GetWorkRam() { return _workRam; }

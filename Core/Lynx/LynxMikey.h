@@ -8,6 +8,7 @@ class LynxConsole;
 class LynxCpu;
 class LynxMemoryManager;
 class LynxCart;
+class LynxApu;
 
 class LynxMikey final : public ISerializable {
 private:
@@ -16,6 +17,7 @@ private:
 	LynxCpu* _cpu = nullptr;
 	LynxMemoryManager* _memoryManager = nullptr;
 	LynxCart* _cart = nullptr;
+	LynxApu* _apu = nullptr;
 
 	LynxMikeyState _state = {};
 
@@ -49,6 +51,8 @@ private:
 
 public:
 	void Init(Emulator* emu, LynxConsole* console, LynxCpu* cpu, LynxMemoryManager* memoryManager);
+
+	void SetApu(LynxApu* apu) { _apu = apu; }
 
 	uint8_t ReadRegister(uint8_t addr);
 	void WriteRegister(uint8_t addr, uint8_t value);

@@ -7,6 +7,8 @@
 #include "Lynx/LynxMemoryManager.h"
 #include "Lynx/LynxCart.h"
 #include "Lynx/LynxControlManager.h"
+#include "Lynx/LynxApu.h"
+#include "Lynx/LynxEeprom.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/MessageManager.h"
@@ -153,6 +155,15 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 	// Initialize Mikey (timers, display, IRQs) — needs CPU reference for IRQ line
 	_mikey->Init(_emu, this, _cpu.get(), _memoryManager.get());
 
+	// Initialize APU (audio channels, integrated into Mikey)
+	_apu = std::make_unique<LynxApu>(_emu, this);
+	_apu->Init();
+	_mikey->SetApu(_apu.get());
+
+	// Initialize EEPROM (serial protocol for battery-backed save data)
+	_eeprom = std::make_unique<LynxEeprom>(_emu, this);
+	_eeprom->Init(LynxEepromType::Eeprom93c46); // Default to 93C46, TODO: detect from ROM database
+
 	// Wire memory manager to Mikey and Suzy for dispatching
 	_memoryManager->SetMikey(_mikey.get());
 	_memoryManager->SetSuzy(_suzy.get());
@@ -175,7 +186,12 @@ void LynxConsole::RunFrame() {
 		_cpu->Exec();
 		// Tick Mikey timers based on CPU cycle count
 		_mikey->Tick(_cpu->GetCycleCount());
+		// Tick audio
+		if (_apu) _apu->Tick();
 	}
+
+	// Flush remaining audio samples
+	if (_apu) _apu->EndFrame();
 
 	// Copy Mikey's frame buffer to output
 	memcpy(_frameBuffer, _mikey->GetFrameBuffer(), sizeof(_frameBuffer));
@@ -195,9 +211,15 @@ void LynxConsole::SaveBattery() {
 	if (_saveRam && _saveRamSize > 0) {
 		_emu->GetBatteryManager()->SaveBattery(".sav", std::span<const uint8_t>(_saveRam, _saveRamSize));
 	}
+	if (_eeprom) {
+		_eeprom->SaveBattery();
+	}
 }
 
 void LynxConsole::LoadBattery() {
+	if (_eeprom) {
+		_eeprom->LoadBattery();
+	}
 	if (_saveRam && _saveRamSize > 0) {
 		_emu->GetBatteryManager()->LoadBattery(".sav", std::span<uint8_t>(_saveRam, _saveRamSize));
 	}
@@ -300,6 +322,8 @@ void LynxConsole::Serialize(Serializer& s) {
 	if (_cpu) _cpu->Serialize(s);
 	if (_mikey) _mikey->Serialize(s);
 	if (_suzy) _suzy->Serialize(s);
+	if (_apu) _apu->Serialize(s);
+	if (_eeprom) _eeprom->Serialize(s);
 	if (_cart) _cart->Serialize(s);
 	if (_memoryManager) _memoryManager->Serialize(s);
 	if (_controlManager) _controlManager->Serialize(s);

@@ -3,6 +3,7 @@
 #include "Lynx/LynxConsole.h"
 #include "Lynx/LynxCpu.h"
 #include "Lynx/LynxMemoryManager.h"
+#include "Lynx/LynxApu.h"
 #include "Shared/Emulator.h"
 #include "Utilities/Serializer.h"
 
@@ -238,6 +239,11 @@ uint8_t LynxMikey::ReadRegister(uint8_t addr) {
 		return 0xff;
 	}
 
+	// Audio registers: $FD20-$FD4F → forwarded to APU
+	if (addr >= 0x20 && addr < 0x50) {
+		return _apu ? _apu->ReadRegister(addr - 0x20) : 0xff;
+	}
+
 	// Interrupt registers
 	switch (addr) {
 		case 0x80: // INTSET — read pending IRQs
@@ -324,6 +330,12 @@ void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 					break;
 			}
 		}
+		return;
+	}
+
+	// Audio registers: $FD20-$FD4F → forwarded to APU
+	if (addr >= 0x20 && addr < 0x50) {
+		if (_apu) _apu->WriteRegister(addr - 0x20, value);
 		return;
 	}
 
