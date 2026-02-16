@@ -12,7 +12,6 @@
 		<RootNamespace>CoreBenchmarks</RootNamespace>
 		<ProjectName>Core.Benchmarks</ProjectName>
 		<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-		<VcpkgEnableManifest>true</VcpkgEnableManifest>
 		<!-- Fallback for standalone builds (when SolutionDir is not set) -->
 		<SolutionDir Condition="'$(SolutionDir)'==''">$(MSBuildProjectDirectory)\..\</SolutionDir>
 	</PropertyGroup>

@@ -1,0 +1,8 @@
+<Project>
+	<PropertyGroup>
+		<!-- Enable vcpkg manifest mode for all C/C++ projects in the solution.
+		     The root vcpkg.json declares dependencies (gtest, benchmark, etc.)
+		     and vcpkg-configuration.json pins the baseline. -->
+		<VcpkgEnableManifest>true</VcpkgEnableManifest>
+	</PropertyGroup>
+</Project>
