@@ -4,6 +4,52 @@
 #include "Shared/SettingTypes.h"
 
 // ============================================================================
+// CPU Addressing Modes and Flags
+// ============================================================================
+
+/// <summary>
+/// 65C02 addressing modes (WDC variant).
+/// Includes the (zp) indirect mode not present on NMOS 6502.
+/// </summary>
+enum class LynxAddrMode : uint8_t {
+	None,      // No operand
+	Acc,       // Accumulator (implicit A)
+	Imp,       // Implied
+	Imm,       // #nn
+	Rel,       // Relative (branches)
+	Zpg,       // $nn (zero page)
+	ZpgX,      // $nn,X
+	ZpgY,      // $nn,Y
+	Abs,       // $nnnn
+	AbsX,      // $nnnn,X
+	AbsXW,     // $nnnn,X (always write, no page-cross optimization)
+	AbsY,      // $nnnn,Y
+	AbsYW,     // $nnnn,Y (always write)
+	Ind,       // ($nnnn) — JMP indirect
+	IndX,      // ($nn,X)
+	IndY,      // ($nn),Y
+	IndYW,     // ($nn),Y (always write)
+	ZpgInd,    // ($nn) — 65C02 zero page indirect (no index)
+	AbsIndX,   // ($nnnn,X) — 65C02 JMP (abs,X)
+};
+
+/// <summary>
+/// 65C02 processor status flags (same bit layout as 6502).
+/// </summary>
+namespace LynxPSFlags {
+	enum LynxPSFlags : uint8_t {
+		Carry     = 0x01,
+		Zero      = 0x02,
+		Interrupt = 0x04,
+		Decimal   = 0x08,
+		Break     = 0x10,
+		Reserved  = 0x20,
+		Overflow  = 0x40,
+		Negative  = 0x80
+	};
+}
+
+// ============================================================================
 // Constants
 // ============================================================================
 

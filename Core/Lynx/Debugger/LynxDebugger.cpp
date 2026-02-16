@@ -20,6 +20,7 @@
 #include "Lynx/Debugger/LynxEventManager.h"
 #include "Lynx/Debugger/LynxAssembler.h"
 #include "Lynx/Debugger/LynxPpuTools.h"
+#include "Lynx/Debugger/DummyLynxCpu.h"
 #include "Utilities/HexUtilities.h"
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/Patches/IpsPatcher.h"
@@ -55,6 +56,7 @@ LynxDebugger::LynxDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator
 	_traceLogger.reset(new LynxTraceLogger(debugger, this, console->GetMikey()));
 	_assembler.reset(new LynxAssembler(debugger->GetLabelManager()));
 	_ppuTools.reset(new LynxPpuTools(debugger, _emu, console));
+	_dummyCpu.reset(new DummyLynxCpu(_emu, _memoryManager));
 	_step.reset(new StepRequest());
 }
 
@@ -112,6 +114,18 @@ void LynxDebugger::ProcessInstruction() {
 		}
 		if (_breakpointManager) {
 			_debugger->ProcessBreakConditions(CpuType::Lynx, *_step.get(), _breakpointManager.get(), operation, addressInfo);
+		}
+
+		if (_step->StepCount != 0 && _breakpointManager->HasBreakpoints() && _settings->GetDebugConfig().UsePredictiveBreakpoints) {
+			_dummyCpu->SetDummyState(_cpu->GetState());
+			_dummyCpu->Exec();
+			for (uint32_t i = 1; i < _dummyCpu->GetOperationCount(); i++) {
+				MemoryOperationInfo memOp = _dummyCpu->GetOperationInfo(i);
+				if (_breakpointManager->HasBreakpointForType(memOp.Type)) {
+					AddressInfo absAddr = _memoryManager->GetAbsoluteAddress(memOp.Address);
+					_debugger->ProcessPredictiveBreakpoint(CpuType::Lynx, _breakpointManager.get(), memOp, absAddr);
+				}
+			}
 		}
 	}
 }

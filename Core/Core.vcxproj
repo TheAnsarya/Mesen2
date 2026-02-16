@@ -820,6 +820,7 @@
     <ClInclude Include="Lynx\Debugger\LynxPpuTools.h" />
     <ClInclude Include="Lynx\Debugger\LynxTraceLogger.h" />
     <ClInclude Include="Lynx\Debugger\LynxEventManager.h" />
+    <ClInclude Include="Lynx\Debugger\DummyLynxCpu.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugger\Base6502Assembler.cpp" />
@@ -1133,6 +1134,7 @@
     <ClCompile Include="Lynx\Debugger\LynxPpuTools.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxTraceLogger.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxEventManager.cpp" />
+    <ClCompile Include="Lynx\Debugger\DummyLynxCpu.cpp" />
     <ClCompile Include="WS\WsConsole.cpp" />
     <ClCompile Include="WS\WsControlManager.cpp" />
     <ClCompile Include="WS\WsCpu.cpp" />

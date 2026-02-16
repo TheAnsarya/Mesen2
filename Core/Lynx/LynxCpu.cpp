@@ -5,6 +5,7 @@
 #include "Shared/Emulator.h"
 #include "Utilities/Serializer.h"
 
+#ifndef DUMMYCPU
 LynxCpu::LynxCpu(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryManager) {
 	_emu = emu;
 	_console = console;
@@ -21,11 +22,13 @@ LynxCpu::LynxCpu(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryM
 	// Read reset vector ($FFFC-$FFFD)
 	_state.PC = MemoryReadWord(0xfffc);
 }
+#endif
 
 // =============================================================================
 // Memory Access — each access is one CPU cycle
 // =============================================================================
 
+#ifndef DUMMYCPU
 uint8_t LynxCpu::MemoryRead(uint16_t addr, MemoryOperationType opType) {
 	_state.CycleCount++;
 	return _memoryManager->Read(addr, opType);
@@ -35,6 +38,7 @@ void LynxCpu::MemoryWrite(uint16_t addr, uint8_t value, MemoryOperationType opTy
 	_state.CycleCount++;
 	_memoryManager->Write(addr, value, opType);
 }
+#endif
 
 // =============================================================================
 // Exec — execute one instruction
@@ -58,7 +62,9 @@ void LynxCpu::Exec() {
 		}
 	}
 
+#ifndef DUMMYCPU
 	_emu->ProcessInstruction<CpuType::Lynx>();
+#endif
 
 	// Fetch opcode
 	uint8_t opCode = MemoryRead(_state.PC, MemoryOperationType::ExecOpCode);
@@ -276,6 +282,7 @@ void LynxCpu::HandleIrq() {
 // Serialize
 // =============================================================================
 
+#ifndef DUMMYCPU
 void LynxCpu::Serialize(Serializer& s) {
 	SV(_state.PC);
 	SV(_state.SP);
@@ -288,6 +295,7 @@ void LynxCpu::Serialize(Serializer& s) {
 	SV(_irqPending);
 	SV(_prevIrqPending);
 }
+#endif
 
 // =============================================================================
 // Opcode Table Initialization

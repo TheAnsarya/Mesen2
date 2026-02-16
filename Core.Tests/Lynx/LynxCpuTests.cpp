@@ -1,20 +1,6 @@
 #include "pch.h"
 #include "Lynx/LynxTypes.h"
 
-// Mirror LynxPSFlags from LynxCpu.h to avoid pulling in full CPU dependencies
-namespace LynxPSFlags {
-	enum LynxPSFlags : uint8_t {
-		Carry     = 0x01,
-		Zero      = 0x02,
-		Interrupt = 0x04,
-		Decimal   = 0x08,
-		Break     = 0x10,
-		Reserved  = 0x20,
-		Overflow  = 0x40,
-		Negative  = 0x80
-	};
-}
-
 /// <summary>
 /// Test fixture for Lynx 65C02 CPU types, state, and hardware bug emulation.
 /// Verifies CPU state structures, flag calculations, and documented

@@ -1,4 +1,10 @@
-#pragma once
+#if (defined(DUMMYCPU) && !defined(__DUMMYLYNXCPU__H)) || (!defined(DUMMYCPU) && !defined(__LYNXCPU__H))
+#ifdef DUMMYCPU
+#define __DUMMYLYNXCPU__H
+#else
+#define __LYNXCPU__H
+#endif
+
 #include "pch.h"
 #include "Lynx/LynxTypes.h"
 #include "Shared/MemoryOperationType.h"
@@ -7,48 +13,6 @@
 class Emulator;
 class LynxConsole;
 class LynxMemoryManager;
-
-/// <summary>
-/// 65C02 addressing modes (WDC variant).
-/// Includes the (zp) indirect mode not present on NMOS 6502.
-/// </summary>
-enum class LynxAddrMode : uint8_t {
-	None,      // No operand
-	Acc,       // Accumulator (implicit A)
-	Imp,       // Implied
-	Imm,       // #nn
-	Rel,       // Relative (branches)
-	Zpg,       // $nn (zero page)
-	ZpgX,      // $nn,X
-	ZpgY,      // $nn,Y
-	Abs,       // $nnnn
-	AbsX,      // $nnnn,X
-	AbsXW,     // $nnnn,X (always write, no page-cross optimization)
-	AbsY,      // $nnnn,Y
-	AbsYW,     // $nnnn,Y (always write)
-	Ind,       // ($nnnn) — JMP indirect
-	IndX,      // ($nn,X)
-	IndY,      // ($nn),Y
-	IndYW,     // ($nn),Y (always write)
-	ZpgInd,    // ($nn) — 65C02 zero page indirect (no index)
-	AbsIndX,   // ($nnnn,X) — 65C02 JMP (abs,X)
-};
-
-/// <summary>
-/// 65C02 processor status flags (same bit layout as 6502).
-/// </summary>
-namespace LynxPSFlags {
-	enum LynxPSFlags : uint8_t {
-		Carry     = 0x01,
-		Zero      = 0x02,
-		Interrupt = 0x04,
-		Decimal   = 0x08,
-		Break     = 0x10,
-		Reserved  = 0x20,
-		Overflow  = 0x40,
-		Negative  = 0x80
-	};
-}
 
 /// <summary>
 /// WDC 65C02 CPU core for the Atari Lynx.
@@ -470,7 +434,11 @@ private:
 	void InitOpTable();
 
 public:
+#ifndef DUMMYCPU
 	LynxCpu(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryManager);
+#else
+	LynxCpu(Emulator* emu, LynxMemoryManager* memoryManager);
+#endif
 	~LynxCpu() = default;
 
 	/// <summary>Execute one instruction</summary>
@@ -492,4 +460,20 @@ public:
 	void AddCycles(uint32_t cycles) { _state.CycleCount += cycles; }
 
 	void Serialize(Serializer& s) override;
+
+#ifdef DUMMYCPU
+private:
+	uint32_t _memOpCounter = 0;
+	MemoryOperationInfo _memOperations[10] = {};
+
+	void LogMemoryOperation(uint32_t addr, uint8_t value, MemoryOperationType type);
+
+public:
+	void SetDummyState(LynxCpuState& state);
+
+	uint32_t GetOperationCount();
+	MemoryOperationInfo GetOperationInfo(uint32_t index);
+#endif
 };
+
+#endif
