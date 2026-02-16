@@ -45,6 +45,7 @@
 #include "WS/Debugger/WsDebugger.h"
 #include "WS/WsTypes.h"
 #include "Lynx/LynxTypes.h"
+#include "Lynx/Debugger/LynxDebugger.h"
 #include "Shared/BaseControlManager.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/Audio/SoundMixer.h"
@@ -131,7 +132,7 @@ Debugger::Debugger(Emulator* emu, IConsole* console) {
 				debugger.reset(new WsDebugger(this));
 				break;
 			case CpuType::Lynx:
-				// TODO: debugger.reset(new LynxDebugger(this));
+				debugger.reset(new LynxDebugger(this));
 				break;
 			default:
 				[[unlikely]] throw std::runtime_error("Unsupported CPU type");
@@ -230,8 +231,7 @@ uint64_t Debugger::GetCpuCycleCount() {
 		case CpuType::Ws:
 			return GetDebugger<type, WsDebugger>()->GetCpuCycleCount();
 		case CpuType::Lynx:
-			// TODO: return GetDebugger<type, LynxDebugger>()->GetCpuCycleCount();
-			return 0;
+			return GetDebugger<type, LynxDebugger>()->GetCpuCycleCount();
 		default:
 			return 0;
 			break;
@@ -307,7 +307,7 @@ void Debugger::ProcessInstruction() {
 			GetDebugger<type, WsDebugger>()->ProcessInstruction();
 			break;
 		case CpuType::Lynx:
-			// TODO: GetDebugger<type, LynxDebugger>()->ProcessInstruction();
+			GetDebugger<type, LynxDebugger>()->ProcessInstruction();
 			break;
 	}
 
@@ -371,7 +371,7 @@ void Debugger::ProcessMemoryRead(uint32_t addr, T& value, MemoryOperationType op
 			}
 			break;
 		case CpuType::Lynx:
-			// TODO: GetDebugger<CpuType::Lynx, LynxDebugger>()->ProcessRead(addr, value, opType);
+			GetDebugger<CpuType::Lynx, LynxDebugger>()->ProcessRead(addr, value, opType);
 			break;
 	}
 
@@ -430,7 +430,7 @@ bool Debugger::ProcessMemoryWrite(uint32_t addr, T& value, MemoryOperationType o
 			}
 			break;
 		case CpuType::Lynx:
-			// TODO: GetDebugger<CpuType::Lynx, LynxDebugger>()->ProcessWrite(addr, value, opType);
+			GetDebugger<CpuType::Lynx, LynxDebugger>()->ProcessWrite(addr, value, opType);
 			break;
 	}
 
@@ -470,7 +470,7 @@ void Debugger::ProcessMemoryAccess(uint32_t addr, T& value) {
 			GetDebugger<CpuType::Ws, WsDebugger>()->ProcessMemoryAccess<opType, T>(addr, value, memType);
 			break;
 		case CpuType::Lynx:
-			// TODO: GetDebugger<CpuType::Lynx, LynxDebugger>()->ProcessMemoryAccess<opType, T>(addr, value, memType);
+			// TODO: Wire ProcessMemoryAccess when LynxDebugger supports it
 			break;
 	}
 
@@ -628,7 +628,7 @@ void Debugger::ProcessPpuCycle() {
 			GetDebugger<type, WsDebugger>()->ProcessPpuCycle();
 			break;
 		case CpuType::Lynx:
-			// TODO: GetDebugger<type, LynxDebugger>()->ProcessPpuCycle();
+			GetDebugger<type, LynxDebugger>()->ProcessPpuCycle();
 			break;
 		default:
 			[[unlikely]] throw std::runtime_error("Invalid cpu type");
@@ -1170,7 +1170,7 @@ void Debugger::GetPpuState(BaseState& state, CpuType cpuType) {
 			break;
 		}
 		case CpuType::Lynx:
-			// TODO: GetDebugger<CpuType::Lynx, LynxDebugger>()->GetPpuState(state);
+			GetDebugger<CpuType::Lynx, LynxDebugger>()->GetPpuState(state);
 			break;
 	}
 }
@@ -1219,7 +1219,7 @@ void Debugger::SetPpuState(BaseState& state, CpuType cpuType) {
 			break;
 		}
 		case CpuType::Lynx:
-			// TODO: GetDebugger<CpuType::Lynx, LynxDebugger>()->SetPpuState(state);
+			GetDebugger<CpuType::Lynx, LynxDebugger>()->SetPpuState(state);
 			break;
 	}
 }
@@ -1329,8 +1329,7 @@ bool Debugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption str
 		case CpuType::Ws:
 			return GetDebugger<CpuType::Ws, WsDebugger>()->SaveRomToDisk(filename, saveAsIps, stripOption);
 		case CpuType::Lynx:
-			// TODO: return GetDebugger<CpuType::Lynx, LynxDebugger>()->SaveRomToDisk(filename, saveAsIps, stripOption);
-			return false;
+			return GetDebugger<CpuType::Lynx, LynxDebugger>()->SaveRomToDisk(filename, saveAsIps, stripOption);
 	}
 
 	return false;

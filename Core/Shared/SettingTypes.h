@@ -825,6 +825,8 @@ struct DebugConfig {
 
 	bool WsBreakOnInvalidOpCode = false;
 
+	bool LynxBreakOnBrk = false;
+
 	bool ScriptAllowIoOsAccess = false;
 	bool ScriptAllowNetworkAccess = false;
 	uint32_t ScriptTimeout = 1;

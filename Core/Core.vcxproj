@@ -815,6 +815,7 @@
     <ClInclude Include="Lynx\LynxSuzy.h" />
     <ClInclude Include="Lynx\LynxTypes.h" />
     <ClInclude Include="Lynx\Debugger\LynxDisUtils.h" />
+    <ClInclude Include="Lynx\Debugger\LynxDebugger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugger\Base6502Assembler.cpp" />
@@ -1123,6 +1124,7 @@
     <ClCompile Include="Lynx\LynxMikey.cpp" />
     <ClCompile Include="Lynx\LynxSuzy.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxDisUtils.cpp" />
+    <ClCompile Include="Lynx\Debugger\LynxDebugger.cpp" />
     <ClCompile Include="WS\WsConsole.cpp" />
     <ClCompile Include="WS\WsControlManager.cpp" />
     <ClCompile Include="WS\WsCpu.cpp" />
