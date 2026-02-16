@@ -10,6 +10,7 @@
 #include "Lynx/LynxControlManager.h"
 #include "Lynx/LynxApu.h"
 #include "Lynx/LynxEeprom.h"
+#include "Lynx/LynxDefaultVideoFilter.h"
 
 class Emulator;
 
