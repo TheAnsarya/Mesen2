@@ -21,8 +21,14 @@ void LynxEeprom::Init(LynxEepromType type) {
 		case LynxEepromType::Eeprom93c46:
 			_dataSize = 128;   // 64 × 16-bit words
 			break;
+		case LynxEepromType::Eeprom93c56:
+			_dataSize = 256;   // 128 × 16-bit words
+			break;
 		case LynxEepromType::Eeprom93c66:
 			_dataSize = 512;   // 256 × 16-bit words
+			break;
+		case LynxEepromType::Eeprom93c76:
+			_dataSize = 1024;  // 512 × 16-bit words
 			break;
 		case LynxEepromType::Eeprom93c86:
 			_dataSize = 2048;  // 1024 × 16-bit words
@@ -39,7 +45,9 @@ void LynxEeprom::Init(LynxEepromType type) {
 uint8_t LynxEeprom::GetAddressBits() const {
 	switch (_state.Type) {
 		case LynxEepromType::Eeprom93c46: return 6;
+		case LynxEepromType::Eeprom93c56: return 7;
 		case LynxEepromType::Eeprom93c66: return 8;
+		case LynxEepromType::Eeprom93c76: return 9;
 		case LynxEepromType::Eeprom93c86: return 10;
 		default: return 0;
 	}

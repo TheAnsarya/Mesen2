@@ -17,6 +17,42 @@
 #include "Utilities/Serializer.h"
 #include "Utilities/VirtualFile.h"
 
+// ============================================================================
+// EEPROM CRC32 Fallback Database
+// ============================================================================
+// For headerless ROMs (.o/.lyx format) that lack byte 60 EEPROM type info,
+// we use a CRC32 lookup on the PRG ROM data. All known EEPROM-using games
+// are homebrew titles — no commercial Lynx game uses EEPROM.
+//
+// PRG CRC32 values are computed over the raw ROM data (excluding LNX header).
+// ============================================================================
+
+struct LynxEepromDbEntry {
+	uint32_t prgCrc32;
+	LynxEepromType type;
+	const char* name;
+};
+
+static constexpr LynxEepromDbEntry LynxEepromDatabase[] = {
+	// Growing Ties (2019, Dr. Ludos) — header byte 60 = 0x41 (SD flag + 93C46)
+	{ 0xb0e94717, LynxEepromType::Eeprom93c46, "Growing Ties" },
+	// Leaf and the Forgotten Temple - Ynxa Version (2020, Fadest)
+	{ 0xdc8713ee, LynxEepromType::Eeprom93c46, "Ynxa" },
+	// Raid on TriCity - First Impact v1.01 (2021, Fadest)
+	{ 0x0fa40782, LynxEepromType::Eeprom93c46, "Raid on Tricity" },
+	// Starblader v0.4 (2021, Retroguru)
+	{ 0x4f2fa617, LynxEepromType::Eeprom93c46, "Star Blader" },
+};
+
+static LynxEepromType GetEepromTypeFromCrc32(uint32_t crc32) {
+	for (const auto& entry : LynxEepromDatabase) {
+		if (entry.prgCrc32 == crc32) {
+			return entry.type;
+		}
+	}
+	return LynxEepromType::None;
+}
+
 LynxConsole::LynxConsole(Emulator* emu) {
 	_emu = emu;
 }
@@ -119,8 +155,7 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 		MessageManager::Log("No boot ROM found — using HLE fallback.");
 	}
 
-	// Save RAM (EEPROM) — size determined by ROM database or header
-	// TODO: Determine EEPROM size from cart info
+	// Save RAM (EEPROM) — managed by LynxEeprom, not through _saveRam
 	_saveRamSize = 0;
 	_saveRam = nullptr;
 
@@ -151,10 +186,29 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 		memcpy(cartInfo.Manufacturer, &romData[42], 16);
 		cartInfo.Manufacturer[16] = 0;
 		cartInfo.Rotation = static_cast<LynxRotation>(romData[58]);
+
+		// Byte 59: AUDIN (reserved, unused for now)
+		// Byte 60: EEPROM type (BLL/LNX standard)
+		uint8_t eepromByte = romData[60];
+		// Mask off SD flag (bit 6) and 8-bit org flag (bit 7) — we only care about chip type
+		uint8_t eepromChip = eepromByte & 0x0f;
+		if (eepromChip >= 1 && eepromChip <= 5) {
+			cartInfo.HasEeprom = true;
+			cartInfo.EepromType = static_cast<LynxEepromType>(eepromChip);
+			MessageManager::Log(std::format("  EEPROM: 93C{} ({} bytes)",
+				eepromChip == 1 ? "46" : eepromChip == 2 ? "56" : eepromChip == 3 ? "66" :
+				eepromChip == 4 ? "76" : "86",
+				(1 << (eepromChip + 6))));  // 128, 256, 512, 1024, 2048
+		} else {
+			cartInfo.HasEeprom = false;
+			cartInfo.EepromType = LynxEepromType::None;
+		}
 	} else {
 		cartInfo.PageSizeBank0 = (uint16_t)(_prgRomSize / 256);
 		cartInfo.PageSizeBank1 = 0;
 		cartInfo.RomSize = _prgRomSize;
+		cartInfo.HasEeprom = false;
+		cartInfo.EepromType = LynxEepromType::None;
 	}
 	_cart->Init(_emu, this, cartInfo);
 
@@ -186,7 +240,17 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 
 	// Initialize EEPROM (serial protocol for battery-backed save data)
 	_eeprom = std::make_unique<LynxEeprom>(_emu, this);
-	_eeprom->Init(LynxEepromType::Eeprom93c46); // Default to 93C46, TODO: detect from ROM database
+	if (cartInfo.HasEeprom) {
+		_eeprom->Init(cartInfo.EepromType);
+	} else {
+		// No EEPROM indicated in header — check CRC32 fallback for headerless ROMs
+		LynxEepromType fallbackType = GetEepromTypeFromCrc32(_emu->GetCrc32());
+		if (fallbackType != LynxEepromType::None) {
+			_eeprom->Init(fallbackType);
+			MessageManager::Log(std::format("  EEPROM detected via CRC32 fallback"));
+		}
+		// else: no EEPROM, _eeprom stays uninitialized (Init not called)
+	}
 
 	// Wire EEPROM to Mikey for IODAT register access
 	_mikey->SetEeprom(_eeprom.get());

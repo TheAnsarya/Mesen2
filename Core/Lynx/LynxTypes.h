@@ -100,12 +100,21 @@ enum class LynxCpuStopState : uint8_t {
 	WaitingForIrq = 2 // WAI instruction
 };
 
-/// <summary>EEPROM chip type</summary>
+/// <summary>
+/// EEPROM chip type — values match the BLL/LNX header standard (byte offset 60).
+///
+/// The LNX header encodes the EEPROM type at byte 60. Values 1-5 specify the
+/// Microwire serial EEPROM chip (93Cxx family). Additional flags:
+///   - Bit 6 (0x40): SD card storage (flash cart feature, ignored by emulator)
+///   - Bit 7 (0x80): 8-bit word organization instead of 16-bit
+/// </summary>
 enum class LynxEepromType : uint8_t {
-	None = 0,
-	Eeprom93c46 = 1, // 128 bytes (1024 bits, 64 × 16-bit words)
-	Eeprom93c66 = 2, // 512 bytes (4096 bits, 256 × 16-bit words)
-	Eeprom93c86 = 3  // 2048 bytes (16384 bits, 1024 × 16-bit words)
+	None       = 0, // No EEPROM
+	Eeprom93c46 = 1, // 128 bytes  (64 × 16-bit words, 6 address bits)
+	Eeprom93c56 = 2, // 256 bytes  (128 × 16-bit words, 7 address bits)
+	Eeprom93c66 = 3, // 512 bytes  (256 × 16-bit words, 8 address bits)
+	Eeprom93c76 = 4, // 1024 bytes (512 × 16-bit words, 9 address bits)
+	Eeprom93c86 = 5  // 2048 bytes (1024 × 16-bit words, 10 address bits)
 };
 
 /// <summary>EEPROM serial protocol state</summary>
