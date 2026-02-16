@@ -120,6 +120,13 @@ public static class MemoryTypeExtensions {
 			case MemoryType.WsPort:
 				return CpuType.Ws;
 
+			case MemoryType.LynxMemory:
+			case MemoryType.LynxPrgRom:
+			case MemoryType.LynxWorkRam:
+			case MemoryType.LynxBootRom:
+			case MemoryType.LynxSaveRam:
+				return CpuType.Lynx;
+
 			default:
 				throw new NotImplementedException("Unsupported cpu type");
 		}
@@ -225,6 +232,7 @@ public static class MemoryTypeExtensions {
 			case MemoryType.SmsMemory:
 			case MemoryType.GbaMemory:
 			case MemoryType.WsMemory:
+			case MemoryType.LynxMemory:
 				return true;
 		}
 
@@ -251,6 +259,8 @@ public static class MemoryTypeExtensions {
 			case MemoryType.GbaPrgRom:
 			case MemoryType.GbaBootRom:
 			case MemoryType.WsPrgRom:
+			case MemoryType.LynxPrgRom:
+			case MemoryType.LynxBootRom:
 				return true;
 		}
 
@@ -327,6 +337,13 @@ public static class MemoryTypeExtensions {
 			case MemoryType.WsBootRom:
 			case MemoryType.WsPort:
 				return true;
+
+			//Lynx
+			case MemoryType.LynxMemory:
+			case MemoryType.LynxPrgRom:
+			case MemoryType.LynxWorkRam:
+			case MemoryType.LynxBootRom:
+				return true;
 		}
 
 		return false;
@@ -347,6 +364,7 @@ public static class MemoryTypeExtensions {
 			case MemoryType.SmsMemory:
 			case MemoryType.GbaMemory:
 			case MemoryType.WsMemory:
+			case MemoryType.LynxMemory:
 				return true;
 		}
 
@@ -379,6 +397,10 @@ public static class MemoryTypeExtensions {
 
 			case MemoryType.WsMemory:
 			case MemoryType.WsPrgRom:
+				return true;
+
+			case MemoryType.LynxMemory:
+			case MemoryType.LynxPrgRom:
 				return true;
 
 			case MemoryType.NesPpuMemory:
@@ -527,6 +549,12 @@ public static class MemoryTypeExtensions {
 			MemoryType.WsBootRom => "BOOT",
 			MemoryType.WsInternalEeprom => "IEEPROM",
 			MemoryType.WsPort => "PORT",
+
+			MemoryType.LynxMemory => "CPU",
+			MemoryType.LynxPrgRom => "ROM",
+			MemoryType.LynxWorkRam => "WRAM",
+			MemoryType.LynxBootRom => "BOOT",
+			MemoryType.LynxSaveRam => "SRAM",
 
 			MemoryType.None => "n/a",
 

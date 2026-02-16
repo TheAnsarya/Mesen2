@@ -469,6 +469,9 @@ void Debugger::ProcessMemoryAccess(uint32_t addr, T& value) {
 		case CpuType::Ws:
 			GetDebugger<CpuType::Ws, WsDebugger>()->ProcessMemoryAccess<opType, T>(addr, value, memType);
 			break;
+		case CpuType::Lynx:
+			// TODO: GetDebugger<CpuType::Lynx, LynxDebugger>()->ProcessMemoryAccess<opType, T>(addr, value, memType);
+			break;
 	}
 
 	if (_scriptManager->HasCpuMemoryCallbacks()) {
