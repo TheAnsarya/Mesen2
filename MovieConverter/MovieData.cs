@@ -83,6 +83,7 @@ public sealed class MovieData {
 			SystemType.Snes => 60.098814,
 			SystemType.Gb or SystemType.Gbc => 59.7275,
 			SystemType.Gba => 59.7275,
+			SystemType.Lynx => 75.0,
 			_ => 60.0
 		}
 	};

@@ -495,6 +495,18 @@ public sealed class ControllerInput : IEquatable<ControllerInput> {
 				chars[6] = input.B ? 'B' : '.';
 				chars[7] = input.C ? 'C' : '.';
 			}),
+			SystemType.Lynx => string.Create(9, this, static (chars, input) => {
+				// BK2 Lynx: UDLRABOoP
+				chars[0] = input.Up ? 'U' : '.';
+				chars[1] = input.Down ? 'D' : '.';
+				chars[2] = input.Left ? 'L' : '.';
+				chars[3] = input.Right ? 'R' : '.';
+				chars[4] = input.A ? 'A' : '.';
+				chars[5] = input.B ? 'B' : '.';
+				chars[6] = input.L ? 'O' : '.';     // Option1
+				chars[7] = input.R ? 'o' : '.';     // Option2
+				chars[8] = input.Start ? 'P' : '.'; // Pause
+			}),
 			_ => ToNexenFormat()
 		};
 	}
@@ -545,6 +557,18 @@ public sealed class ControllerInput : IEquatable<ControllerInput> {
 				A = input[5] != '.',
 				B = input[6] != '.',
 				C = input[7] != '.'
+			},
+			SystemType.Lynx when input.Length >= 9 => new ControllerInput {
+				Type = ControllerType.Gamepad,
+				Up = input[0] != '.',
+				Down = input[1] != '.',
+				Left = input[2] != '.',
+				Right = input[3] != '.',
+				A = input[4] != '.',
+				B = input[5] != '.',
+				L = input[6] != '.',     // Option1
+				R = input[7] != '.',     // Option2
+				Start = input[8] != '.'  // Pause
 			},
 			_ => ctrl
 		};

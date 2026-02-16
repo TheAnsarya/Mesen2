@@ -343,6 +343,10 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 				ParseGbaInput(segment, input);
 				break;
 
+			case SystemType.Lynx:
+				ParseLynxInput(segment, input);
+				break;
+
 			default:
 				// Generic button parsing
 				ParseGenericInput(segment, input);
@@ -432,6 +436,24 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		input.A = s[7] != '.';
 		input.L = s[8] != '.';
 		input.R = s[9] != '.';
+	}
+
+	private static void ParseLynxInput(string s, ControllerInput input) {
+		// Lynx: UDLRABOoP (9 chars)
+		// U=Up, D=Down, L=Left, R=Right, A=A, B=B, O=Option1, o=Option2, P=Pause
+		if (s.Length < 9) {
+			return;
+		}
+
+		input.Up = s[0] != '.';
+		input.Down = s[1] != '.';
+		input.Left = s[2] != '.';
+		input.Right = s[3] != '.';
+		input.A = s[4] != '.';
+		input.B = s[5] != '.';
+		input.L = s[6] != '.';     // Option1 -> L
+		input.R = s[7] != '.';     // Option2 -> R
+		input.Start = s[8] != '.'; // Pause -> Start
 	}
 
 	private static void ParseGenericInput(string s, ControllerInput input) {
@@ -619,6 +641,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 			SystemType.Genesis => "UDLRSABCxyzm",
 			SystemType.Gb or SystemType.Gbc => "RLDUTSBA",
 			SystemType.Gba => "RLDUTSBAlr",
+			SystemType.Lynx => "UDLRABOoP",
 			_ => "RLDUTSBA"
 		};
 	}
@@ -657,6 +680,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 			SystemType.Genesis => FormatGenesis(input),
 			SystemType.Gb or SystemType.Gbc => FormatNes(input),
 			SystemType.Gba => FormatGba(input),
+			SystemType.Lynx => FormatLynx(input),
 			_ => FormatNes(input)
 		};
 	}
@@ -720,6 +744,20 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 			chars[7] = input.A ? 'A' : '.';
 			chars[8] = input.L ? 'l' : '.';
 			chars[9] = input.R ? 'r' : '.';
+		});
+	}
+
+	private static string FormatLynx(ControllerInput i) {
+		return string.Create(9, i, static (chars, input) => {
+			chars[0] = input.Up ? 'U' : '.';
+			chars[1] = input.Down ? 'D' : '.';
+			chars[2] = input.Left ? 'L' : '.';
+			chars[3] = input.Right ? 'R' : '.';
+			chars[4] = input.A ? 'A' : '.';
+			chars[5] = input.B ? 'B' : '.';
+			chars[6] = input.L ? 'O' : '.';     // Option1
+			chars[7] = input.R ? 'o' : '.';     // Option2
+			chars[8] = input.Start ? 'P' : '.'; // Pause
 		});
 	}
 }
