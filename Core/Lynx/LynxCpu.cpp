@@ -266,7 +266,7 @@ void LynxCpu::HandleIrq() {
 	DummyRead();
 	DummyRead();
 	PushWord(_state.PC);
-	Push(PS() & ~LynxPSFlags::Break | LynxPSFlags::Reserved);
+	Push((PS() & ~LynxPSFlags::Break) | LynxPSFlags::Reserved);
 	SetFlag(LynxPSFlags::Interrupt);
 	ClearFlag(LynxPSFlags::Decimal); // 65C02: IRQ clears D flag
 	SetPC(MemoryReadWord(0xfffe));

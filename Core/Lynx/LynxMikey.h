@@ -35,7 +35,10 @@ private:
 	//   0 = 1 MHz (÷16), 1 = 500 kHz (÷32), 2 = 250 kHz (÷64),
 	//   3 = 125 kHz (÷128), 4 = 62.5 kHz (÷256), 5 = 31.25 kHz (÷512),
 	//   6 = 15.625 kHz (÷1024), 7 = linked (cascade from source timer)
-	static constexpr uint32_t _prescalerPeriods[8] = { 16, 32, 64, 128, 256, 512, 1024, 0 };
+	// Prescaler periods in CPU cycles (master clock / 4).
+	// Master clock = 16 MHz, CPU clock = 4 MHz (1 CPU cycle = 4 master clocks).
+	// Source 0 = 1 MHz (÷4 CPU), Source 1 = 500 kHz (÷8), etc.
+	static constexpr uint32_t _prescalerPeriods[8] = { 4, 8, 16, 32, 64, 128, 256, 0 };
 
 	// Timer register layout: 4 registers per timer
 	// Timer 0-3 at $FD00-$FD0F, Timer 4-7 at $FD10-$FD1F

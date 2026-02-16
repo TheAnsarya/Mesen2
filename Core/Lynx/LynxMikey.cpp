@@ -187,7 +187,11 @@ void LynxMikey::UpdatePalette(int index) {
 }
 
 void LynxMikey::UpdateIrqLine() {
-	bool irqActive = (_state.IrqPending & _state.IrqEnabled) != 0;
+	// On real Lynx, there's no separate IRQ enable mask register.
+	// IRQ enable/disable is controlled per-timer in each timer's CTLA bit 7.
+	// The IrqPending bits are set only when a timer with IRQ enabled fires,
+	// so we just check if any pending bits are set.
+	bool irqActive = _state.IrqPending != 0;
 	_cpu->SetIrqLine(irqActive);
 }
 
@@ -231,7 +235,8 @@ void LynxMikey::ClearIrqSource(LynxIrqSource::LynxIrqSource source) {
 }
 
 bool LynxMikey::HasPendingIrq() const {
-	return (_state.IrqPending & _state.IrqEnabled) != 0;
+	// No separate enable mask — IRQ enable is per-timer in CTLA bit 7
+	return _state.IrqPending != 0;
 }
 
 void LynxMikey::Tick(uint64_t currentCycle) {

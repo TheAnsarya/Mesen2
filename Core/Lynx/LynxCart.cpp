@@ -73,13 +73,14 @@ void LynxCart::WriteShiftRegister(uint8_t value) {
 
 void LynxCart::SetBank0Page(uint8_t page) {
 	_state.CurrentBank = 0;
-	// Page counter selects which page within bank 0
-	// Address = bank0Offset + (page * pageSize) + addressCounter
-	// The page multiplied by some granularity determines offset within the bank
+	// Page counter selects which 256-byte page within bank 0
+	// This effectively sets the upper bits of the address within the bank
+	_state.AddressCounter = (_state.AddressCounter & 0x00ff) | ((uint32_t)page << 8);
 }
 
 void LynxCart::SetBank1Page(uint8_t page) {
 	_state.CurrentBank = 1;
+	_state.AddressCounter = (_state.AddressCounter & 0x00ff) | ((uint32_t)page << 8);
 }
 
 void LynxCart::SelectBank(uint8_t bank) {

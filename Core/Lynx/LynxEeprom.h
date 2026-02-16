@@ -60,7 +60,7 @@ private:
 
 public:
 	LynxEeprom(Emulator* emu, LynxConsole* console);
-	~LynxEeprom() = default;
+	~LynxEeprom() { delete[] _data; _data = nullptr; }
 
 	void Init(LynxEepromType type);
 

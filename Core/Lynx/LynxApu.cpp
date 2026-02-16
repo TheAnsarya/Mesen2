@@ -188,7 +188,7 @@ void LynxApu::WriteRegister(uint8_t addr, uint8_t value) {
 		LynxAudioChannelState& channel = _state.Channels[ch];
 
 		switch (reg) {
-			case 0: channel.Volume = value & 0x0f; break;
+			case 0: channel.Volume = value; break; // Full 8-bit volume (7-bit magnitude)
 			case 1: channel.FeedbackEnable = value; break;
 			case 2: channel.Output = (int8_t)value; break;
 			case 3: channel.ShiftRegister = (channel.ShiftRegister & 0xf00) | value; break;

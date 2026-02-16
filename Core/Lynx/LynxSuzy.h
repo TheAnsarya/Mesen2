@@ -6,12 +6,14 @@
 class Emulator;
 class LynxConsole;
 class LynxMemoryManager;
+class LynxCart;
 
 class LynxSuzy final : public ISerializable {
 private:
 	Emulator* _emu = nullptr;
 	LynxConsole* _console = nullptr;
 	LynxMemoryManager* _memoryManager = nullptr;
+	LynxCart* _cart = nullptr;
 
 	LynxSuzyState _state = {};
 
@@ -31,7 +33,7 @@ private:
 	__forceinline uint16_t ReadRam16(uint16_t addr) const;
 
 public:
-	void Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryManager);
+	void Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryManager, LynxCart* cart);
 
 	uint8_t ReadRegister(uint8_t addr);
 	void WriteRegister(uint8_t addr, uint8_t value);

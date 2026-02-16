@@ -159,7 +159,7 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 	_cart->Init(_emu, this, cartInfo);
 
 	// Initialize Suzy (sprite engine, math, joystick)
-	_suzy->Init(_emu, this, _memoryManager.get());
+	_suzy->Init(_emu, this, _memoryManager.get(), _cart.get());
 
 	// Initialize CPU — needs memory manager
 	_cpu.reset(new LynxCpu(_emu, this, _memoryManager.get()));
@@ -219,6 +219,7 @@ void LynxConsole::RunFrame() {
 
 	// Copy Mikey's frame buffer to output
 	memcpy(_frameBuffer, _mikey->GetFrameBuffer(), sizeof(_frameBuffer));
+	_frameCount++;
 
 	// Update input state
 	_controlManager->UpdateInputState();
@@ -344,14 +345,13 @@ double LynxConsole::GetFps() {
 }
 
 BaseVideoFilter* LynxConsole::GetVideoFilter(bool getDefaultFilter) {
-	// TODO: Implement LynxDefaultVideoFilter
-	return nullptr;
+	return new LynxDefaultVideoFilter(_emu, this);
 }
 
 PpuFrameInfo LynxConsole::GetPpuFrame() {
 	PpuFrameInfo frame = {};
 	frame.FirstScanline = 0;
-	frame.FrameCount = 0; // TODO: Get from Mikey
+	frame.FrameCount = _frameCount;
 	frame.Width = LynxConstants::ScreenWidth;
 	frame.Height = LynxConstants::ScreenHeight;
 	frame.ScanlineCount = LynxConstants::ScanlineCount;
@@ -408,6 +408,7 @@ LynxState LynxConsole::GetState() {
 void LynxConsole::Serialize(Serializer& s) {
 	SV(_model);
 	SV(_rotation);
+	SV(_frameCount);
 
 	if (_cpu) _cpu->Serialize(s);
 	if (_mikey) _mikey->Serialize(s);

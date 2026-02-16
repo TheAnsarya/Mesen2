@@ -2,13 +2,15 @@
 #include "Lynx/LynxSuzy.h"
 #include "Lynx/LynxConsole.h"
 #include "Lynx/LynxMemoryManager.h"
+#include "Lynx/LynxCart.h"
 #include "Shared/Emulator.h"
 #include "Utilities/Serializer.h"
 
-void LynxSuzy::Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryManager) {
+void LynxSuzy::Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryManager, LynxCart* cart) {
 	_emu = emu;
 	_console = console;
 	_memoryManager = memoryManager;
+	_cart = cart;
 
 	memset(&_state, 0, sizeof(_state));
 	memset(_lineBuffer, 0, sizeof(_lineBuffer));
@@ -261,8 +263,11 @@ void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 				int x0 = hpos + pixelIndex;
 				int x1 = hpos + pixelIndex + 1;
 
+				// Get palette from Mikey for color lookup
+				uint32_t* palette = _console->GetMikey()->GetState().Palette;
+
 				if (pix0 != 0 && x0 >= 0 && x0 < (int)LynxConstants::ScreenWidth) {
-					frameBuffer[lineY * LynxConstants::ScreenWidth + x0] = _console->GetFrameBuffer()[0]; // Placeholder
+					frameBuffer[lineY * LynxConstants::ScreenWidth + x0] = palette[pix0];
 					// Collision detection
 					if (collNum > 0) {
 						uint8_t existing = _state.CollisionBuffer[pix0];
@@ -271,6 +276,18 @@ void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 							_state.CollisionBuffer[existing] |= collNum;
 						}
 						_state.CollisionBuffer[pix0] = collNum;
+					}
+				}
+				if (pix1 != 0 && x1 >= 0 && x1 < (int)LynxConstants::ScreenWidth) {
+					frameBuffer[lineY * LynxConstants::ScreenWidth + x1] = palette[pix1];
+					// Collision detection for second pixel
+					if (collNum > 0) {
+						uint8_t existing = _state.CollisionBuffer[pix1];
+						if (existing != 0) {
+							_state.CollisionBuffer[collNum] |= existing;
+							_state.CollisionBuffer[existing] |= collNum;
+						}
+						_state.CollisionBuffer[pix1] = collNum;
 					}
 				}
 				pixelIndex += 2;
@@ -349,6 +366,20 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 		case 0xb1: // SWITCHES
 			return _state.Switches;
 
+		// Cart access registers
+		case 0xa0: // RCART0 — read from cart bank 0 (auto-increment)
+			if (_cart) {
+				_cart->SelectBank(0);
+				return _cart->ReadData();
+			}
+			return 0xff;
+		case 0xa2: // RCART1 — read from cart bank 1 (auto-increment)
+			if (_cart) {
+				_cart->SelectBank(1);
+				return _cart->ReadData();
+			}
+			return 0xff;
+
 		default:
 			return 0xff;
 	}
@@ -423,6 +454,32 @@ void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			_state.CollisionBuffer[addr] = value;
+			break;
+
+		// Cart address / bank registers
+		case 0xa0: // RCART0 — write address low for bank 0
+			if (_cart) _cart->SetAddressLow(value);
+			break;
+		case 0xa1: // RCART0 high — write address high for bank 0
+			if (_cart) _cart->SetAddressHigh(value);
+			break;
+		case 0xa2: // RCART1 — write address low for bank 1
+			if (_cart) _cart->SetAddressLow(value);
+			break;
+		case 0xa3: // RCART1 high — write address high for bank 1
+			if (_cart) _cart->SetAddressHigh(value);
+			break;
+		case 0xb2: // CART0 — cart bank 0 strobe / shift register
+			if (_cart) {
+				_cart->SelectBank(0);
+				_cart->WriteShiftRegister(value);
+			}
+			break;
+		case 0xb3: // CART1 — cart bank 1 strobe / shift register
+			if (_cart) {
+				_cart->SelectBank(1);
+				_cart->WriteShiftRegister(value);
+			}
 			break;
 
 		default:

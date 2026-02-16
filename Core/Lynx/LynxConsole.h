@@ -48,6 +48,7 @@ private:
 
 	LynxModel _model = LynxModel::LynxII;
 	LynxRotation _rotation = LynxRotation::None;
+	uint32_t _frameCount = 0;
 
 	uint32_t _frameBuffer[LynxConstants::PixelCount] = {};
 
