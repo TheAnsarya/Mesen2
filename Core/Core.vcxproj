@@ -804,6 +804,8 @@
     <ClInclude Include="WS\WsTypes.h" />
     <ClInclude Include="Lynx\LynxCart.h" />
     <ClInclude Include="Lynx\LynxConsole.h" />
+    <ClInclude Include="Lynx\LynxController.h" />
+    <ClInclude Include="Lynx\LynxControlManager.h" />
     <ClInclude Include="Lynx\LynxCpu.h" />
     <ClInclude Include="Lynx\LynxMemoryManager.h" />
     <ClInclude Include="Lynx\LynxMikey.h" />
@@ -1108,6 +1110,7 @@
     <ClCompile Include="WS\Debugger\WsTraceLogger.cpp" />
     <ClCompile Include="Lynx\LynxCart.cpp" />
     <ClCompile Include="Lynx\LynxConsole.cpp" />
+    <ClCompile Include="Lynx\LynxControlManager.cpp" />
     <ClCompile Include="Lynx\LynxCpu.cpp" />
     <ClCompile Include="Lynx\LynxMemoryManager.cpp" />
     <ClCompile Include="Lynx\LynxMikey.cpp" />
