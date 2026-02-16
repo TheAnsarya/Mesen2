@@ -53,6 +53,9 @@
 		<DataTemplate DataType="{x:Type vm:WsConfigViewModel}">
 			<v:WsConfigView />
 		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:LynxConfigViewModel}">
+			<v:LynxConfigView />
+		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:OtherConsolesConfigViewModel}">
 			<v:OtherConsolesConfigView />
 		</DataTemplate>
@@ -171,6 +174,15 @@
 					<StackPanel Orientation="Horizontal">
 						<Image Source="/Assets/WsIcon.png" Margin="0 0 10 0" />
 						<TextBlock VerticalAlignment="Center" Text="{l:Translate tabWs}" />
+					</StackPanel>
+				</TabItem.Header>
+			</TabItem>
+
+			<TabItem Content="{Binding Lynx}">
+				<TabItem.Header>
+					<StackPanel Orientation="Horizontal">
+						<Image Source="/Assets/LynxIcon.png" Margin="0 0 10 0" />
+						<TextBlock VerticalAlignment="Center" Text="{l:Translate tabLynx}" />
 					</StackPanel>
 				</TabItem.Header>
 			</TabItem>

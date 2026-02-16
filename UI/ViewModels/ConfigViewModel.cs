@@ -47,6 +47,9 @@ public sealed class ConfigViewModel : DisposableViewModel {
 	/// <summary>Gets or sets the WonderSwan configuration ViewModel.</summary>
 	[Reactive] public WsConfigViewModel? Ws { get; set; }
 
+	/// <summary>Gets or sets the Lynx configuration ViewModel.</summary>
+	[Reactive] public LynxConfigViewModel? Lynx { get; set; }
+
 	/// <summary>Gets or sets the other consoles configuration ViewModel.</summary>
 	[Reactive] public OtherConsolesConfigViewModel? OtherConsoles { get; set; }
 
@@ -97,6 +100,7 @@ public sealed class ConfigViewModel : DisposableViewModel {
 			case ConfigWindowTab.PcEngine: PcEngine ??= AddDisposable(new PceConfigViewModel()); break;
 			case ConfigWindowTab.Sms: Sms ??= AddDisposable(new SmsConfigViewModel()); break;
 			case ConfigWindowTab.Ws: Ws ??= AddDisposable(new WsConfigViewModel()); break;
+			case ConfigWindowTab.Lynx: Lynx ??= AddDisposable(new LynxConfigViewModel()); break;
 			case ConfigWindowTab.OtherConsoles: OtherConsoles ??= AddDisposable(new OtherConsolesConfigViewModel()); break;
 
 			case ConfigWindowTab.Preferences: Preferences ??= AddDisposable(new PreferencesConfigViewModel()); break;
@@ -129,6 +133,8 @@ public sealed class ConfigViewModel : DisposableViewModel {
 		ConfigManager.Config.Gba = Gba?.OriginalConfig ?? ConfigManager.Config.Gba;
 		ConfigManager.Config.PcEngine = PcEngine?.OriginalConfig ?? ConfigManager.Config.PcEngine;
 		ConfigManager.Config.Sms = Sms?.OriginalConfig ?? ConfigManager.Config.Sms;
+		ConfigManager.Config.Ws = Ws?.OriginalConfig ?? ConfigManager.Config.Ws;
+		ConfigManager.Config.Lynx = Lynx?.OriginalConfig ?? ConfigManager.Config.Lynx;
 		ConfigManager.Config.Cv = OtherConsoles?.CvOriginalConfig ?? ConfigManager.Config.Cv;
 		ConfigManager.Config.ApplyConfig();
 		ConfigManager.Config.Save();
@@ -152,6 +158,7 @@ public sealed class ConfigViewModel : DisposableViewModel {
 			PcEngine?.OriginalConfig.IsIdentical(ConfigManager.Config.PcEngine) == false ||
 			Sms?.OriginalConfig.IsIdentical(ConfigManager.Config.Sms) == false ||
 			Ws?.OriginalConfig.IsIdentical(ConfigManager.Config.Ws) == false ||
+			Lynx?.OriginalConfig.IsIdentical(ConfigManager.Config.Lynx) == false ||
 			OtherConsoles?.CvOriginalConfig.IsIdentical(ConfigManager.Config.Cv) == false
 		;
 	}
@@ -184,9 +191,11 @@ public enum ConfigWindowTab {
 	Sms = 10,
 	/// <summary>WonderSwan-specific settings tab.</summary>
 	Ws = 11,
+	/// <summary>Lynx-specific settings tab.</summary>
+	Lynx = 12,
 	/// <summary>Other consoles settings tab.</summary>
-	OtherConsoles = 12,
+	OtherConsoles = 13,
 	//separator
 	/// <summary>General preferences tab.</summary>
-	Preferences = 14
+	Preferences = 15
 }

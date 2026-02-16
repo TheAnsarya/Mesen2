@@ -57,6 +57,10 @@ public class SystemSpecificSettings : UserControl {
 		NavigateTo(ConfigWindowTab.Ws);
 	}
 
+	private void OnClickLynx(object sender, RoutedEventArgs e) {
+		NavigateTo(ConfigWindowTab.Lynx);
+	}
+
 	private void NavigateTo(ConfigWindowTab console) {
 		if (VisualRoot is ConfigWindow wnd && wnd.DataContext is ConfigViewModel cfg) {
 			cfg.SelectTab(console);
@@ -141,6 +145,18 @@ public class SystemSpecificSettings : UserControl {
 							ConfigType.Emulation => WsConfigTab.Emulation,
 							ConfigType.Input => WsConfigTab.Input,
 							_ or ConfigType.Video => WsConfigTab.Video,
+						};
+					}
+
+					break;
+
+				case ConfigWindowTab.Lynx:
+					if (cfg.Lynx != null) {
+						cfg.Lynx.SelectedTab = ConfigType switch {
+							ConfigType.Audio => LynxConfigTab.Audio,
+							ConfigType.Emulation => LynxConfigTab.Emulation,
+							ConfigType.Input => LynxConfigTab.Input,
+							_ or ConfigType.Video => LynxConfigTab.Video,
 						};
 					}
 

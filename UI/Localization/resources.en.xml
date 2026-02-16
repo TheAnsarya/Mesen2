@@ -672,6 +672,7 @@
 			<Control ID="tabPcEngine">PC Engine</Control>
 			<Control ID="tabSms">SMS</Control>
 			<Control ID="tabWs">WonderSwan</Control>
+			<Control ID="tabLynx">Lynx</Control>
 			<Control ID="tabOtherConsoles">Other systems</Control>
 			<Control ID="tabPreferences">Preferences</Control>
 
@@ -1033,6 +1034,7 @@
 			<Control ID="lblPcEngine">PC Engine</Control>
 			<Control ID="lblSms">SMS</Control>
 			<Control ID="lblWs">WonderSwan</Control>
+			<Control ID="lblLynx">Lynx</Control>
 		</Form>
 
 		<Form ID="AudioPlayerView">
