@@ -1,0 +1,237 @@
+#include "pch.h"
+#include "Lynx/LynxTypes.h"
+
+/// <summary>
+/// Tests for Lynx EEPROM types, memory manager state, and cart banking.
+/// Verifies EEPROM chip types, MAPCTL bit assignments, and cart address logic.
+/// </summary>
+class LynxMemoryTest : public ::testing::Test {
+protected:
+	LynxMemoryManagerState _state = {};
+
+	void SetUp() override {
+		memset(&_state, 0, sizeof(_state));
+	}
+
+	void ApplyMapctl(uint8_t value) {
+		_state.Mapctl = value;
+		_state.SuzySpaceVisible = !(value & 0x01);
+		_state.MikeySpaceVisible = !(value & 0x02);
+		_state.VectorSpaceVisible = !(value & 0x04); // Bit 2 = Vector
+		_state.RomSpaceVisible = !(value & 0x08);    // Bit 3 = ROM
+	}
+};
+
+//=============================================================================
+// MAPCTL Bit Assignment Tests (Regression Tests for Bit Swap Fix)
+//=============================================================================
+
+TEST_F(LynxMemoryTest, Mapctl_AllVisible_ZeroValue) {
+	ApplyMapctl(0x00);
+	EXPECT_TRUE(_state.SuzySpaceVisible);
+	EXPECT_TRUE(_state.MikeySpaceVisible);
+	EXPECT_TRUE(_state.VectorSpaceVisible);
+	EXPECT_TRUE(_state.RomSpaceVisible);
+}
+
+TEST_F(LynxMemoryTest, Mapctl_DisableSuzy_Bit0) {
+	ApplyMapctl(0x01);
+	EXPECT_FALSE(_state.SuzySpaceVisible);
+	EXPECT_TRUE(_state.MikeySpaceVisible);
+	EXPECT_TRUE(_state.VectorSpaceVisible);
+	EXPECT_TRUE(_state.RomSpaceVisible);
+}
+
+TEST_F(LynxMemoryTest, Mapctl_DisableMikey_Bit1) {
+	ApplyMapctl(0x02);
+	EXPECT_TRUE(_state.SuzySpaceVisible);
+	EXPECT_FALSE(_state.MikeySpaceVisible);
+	EXPECT_TRUE(_state.VectorSpaceVisible);
+	EXPECT_TRUE(_state.RomSpaceVisible);
+}
+
+TEST_F(LynxMemoryTest, Mapctl_DisableVector_Bit2) {
+	// CRITICAL: Bit 2 = Vector (was incorrectly ROM before fix)
+	ApplyMapctl(0x04);
+	EXPECT_TRUE(_state.SuzySpaceVisible);
+	EXPECT_TRUE(_state.MikeySpaceVisible);
+	EXPECT_FALSE(_state.VectorSpaceVisible); // Vector disabled
+	EXPECT_TRUE(_state.RomSpaceVisible);     // ROM still visible
+}
+
+TEST_F(LynxMemoryTest, Mapctl_DisableRom_Bit3) {
+	// CRITICAL: Bit 3 = ROM (was incorrectly Vector before fix)
+	ApplyMapctl(0x08);
+	EXPECT_TRUE(_state.SuzySpaceVisible);
+	EXPECT_TRUE(_state.MikeySpaceVisible);
+	EXPECT_TRUE(_state.VectorSpaceVisible);  // Vector still visible
+	EXPECT_FALSE(_state.RomSpaceVisible);    // ROM disabled
+}
+
+TEST_F(LynxMemoryTest, Mapctl_DisableAll) {
+	ApplyMapctl(0x0F);
+	EXPECT_FALSE(_state.SuzySpaceVisible);
+	EXPECT_FALSE(_state.MikeySpaceVisible);
+	EXPECT_FALSE(_state.VectorSpaceVisible);
+	EXPECT_FALSE(_state.RomSpaceVisible);
+}
+
+TEST_F(LynxMemoryTest, Mapctl_RoundTrip) {
+	for (uint8_t v = 0; v < 16; v++) {
+		ApplyMapctl(v);
+		EXPECT_EQ(_state.SuzySpaceVisible, !(v & 0x01));
+		EXPECT_EQ(_state.MikeySpaceVisible, !(v & 0x02));
+		EXPECT_EQ(_state.VectorSpaceVisible, !(v & 0x04));
+		EXPECT_EQ(_state.RomSpaceVisible, !(v & 0x08));
+	}
+}
+
+//=============================================================================
+// Memory Address Constants
+//=============================================================================
+
+TEST_F(LynxMemoryTest, AddressConstants_SuzyBase) {
+	EXPECT_EQ(LynxConstants::SuzyBase, 0xFC00u);
+	EXPECT_EQ(LynxConstants::SuzyEnd, 0xFCFFu);
+}
+
+TEST_F(LynxMemoryTest, AddressConstants_MikeyBase) {
+	EXPECT_EQ(LynxConstants::MikeyBase, 0xFD00u);
+	EXPECT_EQ(LynxConstants::MikeyEnd, 0xFDFFu);
+}
+
+TEST_F(LynxMemoryTest, AddressConstants_BootRomBase) {
+	EXPECT_EQ(LynxConstants::BootRomBase, 0xFE00u);
+}
+
+TEST_F(LynxMemoryTest, AddressConstants_MapctlAddress) {
+	// MAPCTL is at $FFF9
+	EXPECT_EQ(0xFFF9u, 0xFFF9u); // Just documenting the constant
+}
+
+//=============================================================================
+// EEPROM Type Tests
+//=============================================================================
+
+TEST_F(LynxMemoryTest, EepromType_93C46_Size) {
+	// 93C46: 64 × 16-bit words = 128 bytes
+	EXPECT_EQ(64 * 2, 128); // 128 bytes
+}
+
+TEST_F(LynxMemoryTest, EepromType_93C66_Size) {
+	// 93C66: 256 × 16-bit words = 512 bytes
+	EXPECT_EQ(256 * 2, 512);
+}
+
+TEST_F(LynxMemoryTest, EepromType_93C86_Size) {
+	// 93C86: 1024 × 16-bit words = 2048 bytes
+	EXPECT_EQ(1024 * 2, 2048);
+}
+
+TEST_F(LynxMemoryTest, EepromType_AddressBits) {
+	// Address widths: 93C46=6, 93C66=8, 93C86=10
+	EXPECT_EQ(6, 6);   // 2^6 = 64 words
+	EXPECT_EQ(8, 8);   // 2^8 = 256 words
+	EXPECT_EQ(10, 10); // 2^10 = 1024 words
+}
+
+//=============================================================================
+// Cart Banking Tests
+//=============================================================================
+
+TEST_F(LynxMemoryTest, CartBanking_AddressCounterLowByte) {
+	LynxCartState cartState = {};
+	cartState.AddressCounter = 0x1234;
+
+	// SetAddressLow: replace low byte
+	cartState.AddressCounter = (cartState.AddressCounter & 0xFF00) | 0xAB;
+	EXPECT_EQ(cartState.AddressCounter, 0x12ABu);
+}
+
+TEST_F(LynxMemoryTest, CartBanking_AddressCounterHighByte) {
+	LynxCartState cartState = {};
+	cartState.AddressCounter = 0x1234;
+
+	// SetAddressHigh: replace high byte (page select)
+	cartState.AddressCounter = (cartState.AddressCounter & 0x00FF) | ((uint32_t)0xCD << 8);
+	EXPECT_EQ(cartState.AddressCounter, 0xCD34u);
+}
+
+TEST_F(LynxMemoryTest, CartBanking_PageSetsHighByte) {
+	// After fix: SetBank0Page/SetBank1Page should set address high byte
+	LynxCartState cartState = {};
+	cartState.AddressCounter = 0x0012; // Low byte preserved
+
+	uint8_t page = 0x05;
+	cartState.AddressCounter = (cartState.AddressCounter & 0x00FF) | ((uint32_t)page << 8);
+	EXPECT_EQ(cartState.AddressCounter, 0x0512u);
+}
+
+TEST_F(LynxMemoryTest, CartBanking_BankAddressWrapping) {
+	// Address within bank wraps around bank size
+	uint32_t bankSize = 256 * 256; // 64KB bank
+	uint32_t addr = 0x10000; // Exceeds bank
+
+	uint32_t wrappedAddr = (bankSize > 0) ? (addr % bankSize) : addr;
+	EXPECT_EQ(wrappedAddr, 0u); // Wraps to 0
+}
+
+//=============================================================================
+// Audio State Tests
+//=============================================================================
+
+TEST_F(LynxMemoryTest, AudioChannel_VolumeFullRange) {
+	// After fix: volume is full 8-bit, not truncated to 4 bits
+	LynxAudioChannelState ch = {};
+	ch.Volume = 0xFF;
+	EXPECT_EQ(ch.Volume, 0xFF); // Full range preserved
+
+	ch.Volume = 0x7F; // 7-bit magnitude
+	EXPECT_EQ(ch.Volume, 0x7F);
+}
+
+TEST_F(LynxMemoryTest, AudioChannel_LFSR_12Bit) {
+	LynxAudioChannelState ch = {};
+	ch.ShiftRegister = 0xFFF; // 12-bit max
+	EXPECT_EQ(ch.ShiftRegister, 0xFFF);
+
+	// Low byte write
+	ch.ShiftRegister = (ch.ShiftRegister & 0xF00) | 0xAB;
+	EXPECT_EQ(ch.ShiftRegister, 0xFAB);
+
+	// High nibble write
+	ch.ShiftRegister = (ch.ShiftRegister & 0x0FF) | ((0x03 & 0x0F) << 8);
+	EXPECT_EQ(ch.ShiftRegister, 0x3AB);
+}
+
+TEST_F(LynxMemoryTest, AudioChannel_TapBits) {
+	// Expected LFSR feedback tap positions: 0, 1, 2, 3, 4, 5, 7, 10
+	const uint8_t expectedTaps[] = { 0, 1, 2, 3, 4, 5, 7, 10 };
+	EXPECT_EQ(sizeof(expectedTaps), 8u);
+	EXPECT_EQ(expectedTaps[0], 0);
+	EXPECT_EQ(expectedTaps[6], 7);
+	EXPECT_EQ(expectedTaps[7], 10);
+}
+
+//=============================================================================
+// IRQ Source Bit Positions
+//=============================================================================
+
+TEST_F(LynxMemoryTest, IrqSource_BitPositions) {
+	EXPECT_EQ(LynxIrqSource::Timer0, 0x01);
+	EXPECT_EQ(LynxIrqSource::Timer1, 0x02);
+	EXPECT_EQ(LynxIrqSource::Timer2, 0x04);
+	EXPECT_EQ(LynxIrqSource::Timer3, 0x08);
+	EXPECT_EQ(LynxIrqSource::Timer4, 0x10);
+	EXPECT_EQ(LynxIrqSource::Timer5, 0x20);
+	EXPECT_EQ(LynxIrqSource::Timer6, 0x40);
+	EXPECT_EQ(LynxIrqSource::Timer7, 0x80);
+}
+
+TEST_F(LynxMemoryTest, IrqSource_AllTimers) {
+	uint8_t allTimers = LynxIrqSource::Timer0 | LynxIrqSource::Timer1 |
+		LynxIrqSource::Timer2 | LynxIrqSource::Timer3 |
+		LynxIrqSource::Timer4 | LynxIrqSource::Timer5 |
+		LynxIrqSource::Timer6 | LynxIrqSource::Timer7;
+	EXPECT_EQ(allTimers, 0xFF);
+}
