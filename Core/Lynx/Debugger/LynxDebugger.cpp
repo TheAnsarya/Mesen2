@@ -17,6 +17,7 @@
 #include "Lynx/Debugger/LynxDebugger.h"
 #include "Lynx/Debugger/LynxDisUtils.h"
 #include "Lynx/Debugger/LynxTraceLogger.h"
+#include "Lynx/Debugger/LynxEventManager.h"
 #include "Utilities/HexUtilities.h"
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/Patches/IpsPatcher.h"
@@ -46,7 +47,7 @@ LynxDebugger::LynxDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
 	_stepBackManager.reset(new StepBackManager(_emu, this));
-	// TODO: _eventManager.reset(new LynxEventManager(debugger, console));
+	_eventManager.reset(new LynxEventManager(debugger, console));
 	_callstackManager.reset(new CallstackManager(debugger, this));
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Lynx, _eventManager.get()));
 	_traceLogger.reset(new LynxTraceLogger(debugger, this, console->GetMikey()));
@@ -116,6 +117,10 @@ void LynxDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType
 	MemoryOperationInfo operation(addr, value, type, MemoryType::LynxMemory);
 	InstructionProgress.LastMemOperation = operation;
 
+	if (IsRegister(addr)) {
+		_eventManager->AddEvent(DebugEventType::Register, operation);
+	}
+
 	if (addressInfo.Address >= 0 && addressInfo.Type == MemoryType::LynxPrgRom) {
 		_codeDataLogger->SetData(addressInfo.Address);
 	}
@@ -148,6 +153,10 @@ void LynxDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationTyp
 	MemoryOperationInfo operation(addr, value, type, MemoryType::LynxMemory);
 	InstructionProgress.LastMemOperation = operation;
 
+	if (IsRegister(addr)) {
+		_eventManager->AddEvent(DebugEventType::Register, operation);
+	}
+
 	if (addressInfo.Address >= 0 && (addressInfo.Type == MemoryType::LynxWorkRam)) {
 		_disassembler->InvalidateCache(addressInfo, CpuType::Lynx);
 	}
@@ -164,6 +173,11 @@ void LynxDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationTyp
 			_debugger->ProcessBreakConditions(CpuType::Lynx, *_step.get(), _breakpointManager.get(), operation, addressInfo);
 		}
 	}
+}
+
+bool LynxDebugger::IsRegister(uint32_t addr) {
+	// Suzy: $FC00-$FCFF, Mikey: $FD00-$FDFF
+	return (addr >= LynxConstants::SuzyBase && addr <= LynxConstants::MikeyEnd);
 }
 
 void LynxDebugger::ProcessCallStackUpdates(AddressInfo& destAddr, uint16_t destPc, uint8_t sp) {

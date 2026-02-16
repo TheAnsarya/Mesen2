@@ -51,6 +51,7 @@ class LynxDebugger final : public IDebugger {
 	string _cdlFile;
 
 	__forceinline void ProcessCallStackUpdates(AddressInfo& destAddr, uint16_t destPc, uint8_t sp);
+	bool IsRegister(uint32_t addr);
 
 public:
 	LynxDebugger(Debugger* debugger);
