@@ -20,6 +20,18 @@ private:
 	// Sprite rendering scratch space
 	uint8_t _lineBuffer[LynxConstants::ScreenWidth] = {};
 
+	// Pen index remap table (16 entries, maps decoded pixel to palette index)
+	// Written by games via registers $FC00-$FC0F (PenIndex 0-15)
+	uint8_t _penIndex[16] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+
+	// Persistent SCB field values (reused when reload flags are clear)
+	int16_t _persistHpos = 0;
+	int16_t _persistVpos = 0;
+	uint16_t _persistHsize = 0x0100;  // 8.8 fixed: 1.0
+	uint16_t _persistVsize = 0x0100;
+	int16_t _persistStretch = 0;
+	int16_t _persistTilt = 0;
+
 	// Hardware math helpers
 	void DoMultiply();
 	void DoDivide();
@@ -27,7 +39,8 @@ private:
 	// Sprite engine internals
 	void ProcessSpriteChain();
 	void ProcessSprite(uint16_t scbAddr);
-	void WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum);
+	void WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum, LynxSpriteType spriteType);
+	int DecodeSpriteLinePixels(uint16_t& dataAddr, uint16_t lineEnd, int bpp, uint8_t* pixelBuf, int maxPixels);
 
 	__forceinline uint8_t ReadRam(uint16_t addr) const;
 	__forceinline uint16_t ReadRam16(uint16_t addr) const;

@@ -191,50 +191,102 @@ void LynxSuzy::ProcessSpriteChain() {
 }
 
 void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
-	// Read SCB header
+	// Read SCB header: SPRCTL0, SPRCTL1
 	uint8_t sprCtl0 = ReadRam(scbAddr + 2);
 	uint8_t sprCtl1 = ReadRam(scbAddr + 3);
+
+	// Check for skip flag (SPRCTL1 bit 2: "skip this sprite")
+	if (sprCtl1 & 0x04) {
+		return;
+	}
 
 	// Extract BPP from SPRCTL0 bits 7:6 (0=1bpp, 1=2bpp, 2=3bpp, 3=4bpp)
 	int bpp = ((sprCtl0 >> 6) & 0x03) + 1;
 
 	// Extract sprite type from SPRCTL0 bits 2:0
-	// (background, normal, boundary, shadow, etc.)
 	LynxSpriteType spriteType = static_cast<LynxSpriteType>(sprCtl0 & 0x07);
 
 	// Extract draw direction from SPRCTL0 bits 5:4
-	// Bit 5: H-flip (0=left-to-right, 1=right-to-left)
-	// Bit 4: V-flip (0=top-to-bottom, 1=bottom-to-top)
+	// Bit 5: H-flip (0 = left-to-right, 1 = right-to-left)
+	// Bit 4: V-flip (0 = top-to-bottom, 1 = bottom-to-top)
 	bool hFlip = (sprCtl0 & 0x20) != 0;
 	bool vFlip = (sprCtl0 & 0x10) != 0;
 
-	// Read sprite data pointer
+	// SPRCTL1 reload flags (bits 7:4) control which SCB fields reload
+	// from memory vs. reuse the previous sprite's values.
+	// 0 = reload from SCB, 1 = don't reload (reuse persistent value)
+	bool skipReloadHVST  = (sprCtl1 & 0x10) != 0; // Bit 4: skip reload HVST (hpos, vpos, hsize, vsize, stretch, tilt)
+	bool skipReloadHVS   = (sprCtl1 & 0x20) != 0; // Bit 5: skip reload HVS (hpos, vpos, hsize, vsize)
+	bool skipReloadHV    = (sprCtl1 & 0x40) != 0; // Bit 6: skip reload HV (hpos, vpos)
+	bool skipReloadPalette = (sprCtl1 & 0x80) != 0; // Bit 7: skip reload palette
+
+	// Read sprite data pointer (always loaded)
 	uint16_t dataAddr = ReadRam16(scbAddr + 4);
 
-	// Read position (signed 16-bit)
-	int16_t hpos = (int16_t)ReadRam16(scbAddr + 6);
-	int16_t vpos = (int16_t)ReadRam16(scbAddr + 8);
+	// SCB field layout after the fixed header (next, ctl0, ctl1, data_ptr):
+	// Offset 6:  HPOS (16-bit signed)
+	// Offset 8:  VPOS (16-bit signed)
+	// Offset 10: HSIZE (16-bit, 8.8 fixed-point)
+	// Offset 12: VSIZE (16-bit, 8.8 fixed-point)
+	// Offset 14: STRETCH (16-bit signed, 8.8 fixed-point)
+	// Offset 16: TILT (16-bit signed, 8.8 fixed-point)
+	// Offset 18: PALETTE REMAP (8 bytes for pen index remap)
+	// Offset 26: COLLNUM (next collision depository number)
 
-	// Read size (8.8 fixed-point) for stretch support
-	uint16_t hsizeRaw = ReadRam16(scbAddr + 10);
-	uint16_t vsizeRaw = ReadRam16(scbAddr + 12);
+	int scbOffset = 6;
 
-	// Stretch and tilt (8.8 fixed-point) — only used for scaled sprites
-	// uint16_t stretch = ReadRam16(scbAddr + 14);
-	// uint16_t tilt = ReadRam16(scbAddr + 16);
-
-	// Check for skip flag (SPRCTL1 bit 2)
-	if (sprCtl1 & 0x04) {
-		return;
+	// Load position
+	if (!skipReloadHV && !skipReloadHVS && !skipReloadHVST) {
+		_persistHpos = (int16_t)ReadRam16(scbAddr + scbOffset);
+		_persistVpos = (int16_t)ReadRam16(scbAddr + scbOffset + 2);
 	}
+	scbOffset += 4; // 10
 
-	// Collision number from collision depository index
-	uint8_t collNum = ReadRam(scbAddr + 14) & 0x0f;
+	// Load size
+	if (!skipReloadHVS && !skipReloadHVST) {
+		_persistHsize = ReadRam16(scbAddr + scbOffset);
+		_persistVsize = ReadRam16(scbAddr + scbOffset + 2);
+	}
+	scbOffset += 4; // 14
+
+	// Load stretch/tilt
+	if (!skipReloadHVST) {
+		_persistStretch = (int16_t)ReadRam16(scbAddr + scbOffset);
+		_persistTilt = (int16_t)ReadRam16(scbAddr + scbOffset + 2);
+	}
+	scbOffset += 4; // 18
+
+	// Load palette remap (8 bytes = 16 nibble entries for pen index remap)
+	if (!skipReloadPalette) {
+		for (int i = 0; i < 8; i++) {
+			uint8_t byte = ReadRam(scbAddr + scbOffset + i);
+			_penIndex[i * 2] = byte >> 4;
+			_penIndex[i * 2 + 1] = byte & 0x0f;
+		}
+	}
+	scbOffset += 8; // 26
+
+	// Collision number
+	uint8_t collNum = ReadRam(scbAddr + scbOffset) & 0x0f;
+
+	int16_t hpos = _persistHpos;
+	int16_t vpos = _persistVpos;
+
+	// 8.8 fixed-point scaling: integer part = pixels per sprite texel
+	// For unscaled sprites, hsize/vsize = 0x0100 (1.0)
+	int16_t stretch = _persistStretch; // Per-scanline horizontal size adjustment
+	int16_t tilt = _persistTilt;       // Per-scanline horizontal offset adjustment
 
 	// Process each scanline of sprite data
 	uint16_t currentDataAddr = dataAddr;
-	int hDir = hFlip ? -1 : 1;
 	int vDir = vFlip ? -1 : 1;
+	int hDir = hFlip ? -1 : 1;
+
+	// For stretch/tilt: accumulate across lines
+	// hsize changes by stretch each line, hpos changes by tilt each line
+	uint16_t currentHsize = _persistHsize;
+	int32_t currentHposAccum = (int32_t)hpos << 8; // 8.8 fixed-point accumulator
+	int32_t tiltAccum = 0;
 
 	for (int line = 0; line < 256; line++) {
 		// Read the line header — contains the byte count for this line
@@ -245,57 +297,117 @@ void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 			break; // End of sprite data (0-length line terminates)
 		}
 
-		int lineY = vpos + (vFlip ? -line : line);
+		int lineY = vpos + (vDir * line);
 
 		// lineHeader is the total byte count for this line including the header
-		// Data bytes = lineHeader - 1
 		int dataBytes = lineHeader - 1;
 		uint16_t lineEnd = currentDataAddr + dataBytes;
 
-		if (lineY < 0 || lineY >= (int)LynxConstants::ScreenHeight) {
-			// Off-screen — skip data but advance pointer
+		if (lineY < 0 || lineY >= (int)LynxConstants::ScreenHeight || dataBytes <= 0) {
+			// Off-screen or empty — skip data but advance pointer
 			currentDataAddr = lineEnd;
+			// Still apply stretch and tilt for off-screen lines
+			currentHsize = (uint16_t)((int32_t)currentHsize + stretch);
+			tiltAccum += tilt;
 			continue;
 		}
 
-		// Decode pixels from the packed data for this line
-		// Pixels are packed MSB-first within each byte
-		int pixelX = 0;
-		int bitBuffer = 0;
-		int bitsRemaining = 0;
+		// Decode pixel data for this line
+		uint8_t pixelBuf[512]; // Max decoded pixels for one line
+		int pixelCount = DecodeSpriteLinePixels(currentDataAddr, lineEnd, bpp, pixelBuf, 512);
+		currentDataAddr = lineEnd;
 
-		while (currentDataAddr < lineEnd) {
-			uint8_t dataByte = ReadRam(currentDataAddr);
-			currentDataAddr++;
+		// Calculate effective hpos for this line (with tilt)
+		int32_t lineHpos = (int32_t)hpos + (tiltAccum >> 8);
 
-			// Add 8 bits to our buffer
-			bitBuffer = (bitBuffer << 8) | dataByte;
-			bitsRemaining += 8;
+		// Calculate horizontal scale factor: pixels per texel (8.8 fixed-point)
+		int32_t hscale = currentHsize; // 8.8 fixed-point
 
-			// Extract as many pixels as we can from the bit buffer
-			while (bitsRemaining >= bpp) {
-				bitsRemaining -= bpp;
-				uint8_t penIndex = (bitBuffer >> bitsRemaining) & ((1 << bpp) - 1);
+		// Render scaled pixels
+		if (hscale == 0x0100) {
+			// Unscaled: 1:1 mapping
+			for (int px = 0; px < pixelCount; px++) {
+				uint8_t penRaw = pixelBuf[px];
+				if (penRaw == 0) continue; // Transparent
 
-				int drawX = hpos + (hFlip ? -pixelX : pixelX);
+				uint8_t penMapped = _penIndex[penRaw & 0x0f];
+				int drawX = (int)lineHpos + (hDir * px);
 
-				// Write the pixel to the frame buffer in work RAM
-				WriteSpritePixel(drawX, lineY, penIndex, collNum);
+				WriteSpritePixel(drawX, lineY, penMapped, collNum, spriteType);
+			}
+		} else {
+			// Scaled: walk source pixels, each covering hscale/256 output pixels
+			int32_t xAccum = 0; // 8.8 accumulator for sub-pixel position
+			for (int px = 0; px < pixelCount; px++) {
+				uint8_t penRaw = pixelBuf[px];
+				uint8_t penMapped = _penIndex[penRaw & 0x0f];
 
-				pixelX++;
+				// How many output pixels this source pixel covers
+				int32_t nextAccum = xAccum + hscale;
+				int startOut = xAccum >> 8;
+				int endOut = nextAccum >> 8;
+
+				if (penRaw != 0) {
+					for (int outPx = startOut; outPx < endOut; outPx++) {
+						int drawX = (int)lineHpos + (hDir * outPx);
+						WriteSpritePixel(drawX, lineY, penMapped, collNum, spriteType);
+					}
+				}
+
+				xAccum = nextAccum;
 			}
 		}
 
-		// Ensure we consumed exactly the right number of bytes
-		currentDataAddr = lineEnd;
+		// Apply stretch and tilt for next line
+		currentHsize = (uint16_t)((int32_t)currentHsize + stretch);
+		tiltAccum += tilt;
 	}
+}
+
+/// <summary>
+/// Decode one line of sprite pixel data from the packed format.
+/// Lynx sprites use a bit-packed format where each pixel is bpp bits wide.
+/// The offset byte (first data byte) contains the number of leading
+/// transparent pixels followed by literal pixel data.
+/// </summary>
+int LynxSuzy::DecodeSpriteLinePixels(uint16_t& dataAddr, uint16_t lineEnd, int bpp, uint8_t* pixelBuf, int maxPixels) {
+	int pixelCount = 0;
+	int bitBuffer = 0;
+	int bitsRemaining = 0;
+	uint8_t bppMask = (1 << bpp) - 1;
+
+	// Decode packed pixel data
+	while (dataAddr < lineEnd && pixelCount < maxPixels) {
+		// Read next packet header
+		uint8_t packetByte = ReadRam(dataAddr);
+		dataAddr++;
+
+		if (bitsRemaining == 0 && dataAddr <= lineEnd) {
+			// First byte after header or continuation — just raw pixel bits
+			bitBuffer = packetByte;
+			bitsRemaining = 8;
+		} else {
+			// Add to existing bit buffer
+			bitBuffer = (bitBuffer << 8) | packetByte;
+			bitsRemaining += 8;
+		}
+
+		// Extract as many pixels as we can
+		while (bitsRemaining >= bpp && pixelCount < maxPixels) {
+			bitsRemaining -= bpp;
+			uint8_t penIndex = (bitBuffer >> bitsRemaining) & bppMask;
+			pixelBuf[pixelCount++] = penIndex;
+		}
+	}
+
+	return pixelCount;
 }
 
 __forceinline void LynxSuzy::WriteRam(uint16_t addr, uint8_t value) const {
 	_console->GetWorkRam()[addr & 0xFFFF] = value;
 }
 
-void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum) {
+void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum, LynxSpriteType spriteType) {
 	// Bounds check
 	if (x < 0 || x >= (int)LynxConstants::ScreenWidth ||
 		y < 0 || y >= (int)LynxConstants::ScreenHeight) {
@@ -307,30 +419,66 @@ void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum)
 		return;
 	}
 
+	// Non-collidable sprites draw pixels but don't update collision
+	bool doCollision = (spriteType != LynxSpriteType::NonCollidable);
+
+	// Background sprites only draw where the pixel is currently 0 (transparent)
+	// and don't participate in collision
+	if (spriteType == LynxSpriteType::Background) {
+		doCollision = false;
+	}
+
+	// Shadow sprites: XOR the pixel value with the existing value
+	bool isShadow = (spriteType == LynxSpriteType::NormalShadow ||
+					 spriteType == LynxSpriteType::BoundaryShadow ||
+					 spriteType == LynxSpriteType::XorShadow ||
+					 spriteType == LynxSpriteType::Shadow);
+
 	// Write pixel as 4bpp nibble into work RAM frame buffer
-	// The frame buffer is at DisplayAddress in RAM, organized as
-	// 80 bytes per scanline (160 pixels at 4bpp, 2 pixels per byte)
-	// High nibble = even pixel, low nibble = odd pixel
 	uint16_t dispAddr = _console->GetMikey()->GetState().DisplayAddress;
 	uint16_t byteAddr = dispAddr + y * LynxConstants::BytesPerScanline + (x >> 1);
 	uint8_t byte = ReadRam(byteAddr);
 
+	uint8_t existingPixel;
+	uint8_t writePixel = penIndex & 0x0f;
+
 	if (x & 1) {
-		// Odd pixel → low nibble
-		byte = (byte & 0xF0) | (penIndex & 0x0F);
+		existingPixel = byte & 0x0f;
 	} else {
-		// Even pixel → high nibble
-		byte = (byte & 0x0F) | ((penIndex & 0x0F) << 4);
+		existingPixel = (byte >> 4) & 0x0f;
+	}
+
+	// Background sprite: only draw if existing pixel is transparent
+	if (spriteType == LynxSpriteType::Background && existingPixel != 0) {
+		return;
+	}
+
+	// Shadow/XOR sprites: XOR with existing pixel
+	if (isShadow) {
+		writePixel = existingPixel ^ writePixel;
+	}
+
+	if (x & 1) {
+		byte = (byte & 0xF0) | writePixel;
+	} else {
+		byte = (byte & 0x0F) | (writePixel << 4);
 	}
 	WriteRam(byteAddr, byte);
 
-	// Collision detection
-	if (collNum > 0 && collNum < LynxConstants::CollisionBufferSize) {
+	// Collision detection — stores the highest-numbered colliding sprite
+	if (doCollision && collNum > 0 && collNum < LynxConstants::CollisionBufferSize) {
+		// Read existing collision value for this sprite's collision number
 		uint8_t existing = _state.CollisionBuffer[collNum];
-		if (penIndex < LynxConstants::CollisionBufferSize) {
-			uint8_t depository = _state.CollisionBuffer[penIndex];
-			if (depository > existing) {
-				_state.CollisionBuffer[collNum] = depository;
+		// Use the pen index of the existing pixel as the collider ID
+		if (existingPixel > 0 && existingPixel > existing) {
+			_state.CollisionBuffer[collNum] = existingPixel;
+		}
+
+		// Also update the colliding sprite's entry
+		if (existingPixel > 0 && existingPixel < LynxConstants::CollisionBufferSize) {
+			uint8_t otherExisting = _state.CollisionBuffer[existingPixel];
+			if (collNum > otherExisting) {
+				_state.CollisionBuffer[existingPixel] = (uint8_t)collNum;
 			}
 		}
 	}
@@ -547,4 +695,15 @@ void LynxSuzy::Serialize(Serializer& s) {
 	// Input
 	SV(_state.Joystick);
 	SV(_state.Switches);
+
+	// Pen index remap table
+	SVArray(_penIndex, 16);
+
+	// Persistent SCB fields (reused across sprites when reload flags clear)
+	SV(_persistHpos);
+	SV(_persistVpos);
+	SV(_persistHsize);
+	SV(_persistVsize);
+	SV(_persistStretch);
+	SV(_persistTilt);
 }
