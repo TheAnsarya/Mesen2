@@ -14,6 +14,7 @@ public sealed class DebuggerOptionsViewModel : ViewModelBase {
 	public bool IsSms { get; }
 	public bool IsGba { get; }
 	public bool IsWs { get; }
+	public bool IsLynx { get; }
 
 	public bool HasSpecificBreakOptions { get; }
 
@@ -29,7 +30,8 @@ public sealed class DebuggerOptionsViewModel : ViewModelBase {
 		IsSms = cpuType == CpuType.Sms;
 		IsGba = cpuType == CpuType.Gba;
 		IsWs = cpuType == CpuType.Ws;
+		IsLynx = cpuType == CpuType.Lynx;
 
-		HasSpecificBreakOptions = IsSnes || IsSpc || IsNes || IsGameboy || IsPce || IsSms || IsGba || IsWs;
+		HasSpecificBreakOptions = IsSnes || IsSpc || IsNes || IsGameboy || IsPce || IsSms || IsGba || IsWs || IsLynx;
 	}
 }

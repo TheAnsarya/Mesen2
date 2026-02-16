@@ -147,6 +147,8 @@ public sealed class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTyp
 			_state = DebugApi.GetConsoleState<GbaState>(ConsoleType.Gba);
 		} else if (_romInfo.ConsoleType == ConsoleType.Ws) {
 			_state = DebugApi.GetConsoleState<WsState>(ConsoleType.Ws);
+		} else if (_romInfo.ConsoleType == ConsoleType.Lynx) {
+			_state = DebugApi.GetConsoleState<LynxState>(ConsoleType.Lynx);
 		}
 
 		Dispatcher.UIThread.Post(() => RefreshTabs());
@@ -178,6 +180,8 @@ public sealed class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTyp
 			tabs = GbaRegisterViewer.GetTabs(ref gbaState);
 		} else if (lastState is WsState wsState) {
 			tabs = WsRegisterViewer.GetTabs(ref wsState);
+		} else if (lastState is LynxState lynxState) {
+			tabs = LynxRegisterViewer.GetTabs(ref lynxState);
 		}
 
 		foreach (RegisterViewerTab tab in tabs) {

@@ -328,6 +328,14 @@ public sealed class ShortcutHandler {
 				}
 
 				break;
+
+			case ConsoleType.Lynx:
+				switch (layer) {
+					case VideoLayer.Bg1: return (() => ConfigManager.Config.Lynx.DisableBackground, (val) => ConfigManager.Config.Lynx.DisableBackground = val);
+					case VideoLayer.Sprite1: return (() => ConfigManager.Config.Lynx.DisableSprites, (val) => ConfigManager.Config.Lynx.DisableSprites = val);
+				}
+
+				break;
 		}
 
 		return (null, null);

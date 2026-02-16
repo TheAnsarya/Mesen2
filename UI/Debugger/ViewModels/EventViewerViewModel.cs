@@ -309,6 +309,7 @@ public sealed class EventViewerViewModel : DisposableViewModel {
 			CpuType.Sms => Config.SmsConfig,
 			CpuType.Gba => Config.GbaConfig,
 			CpuType.Ws => Config.WsConfig,
+			CpuType.Lynx => Config.LynxConfig,
 			_ => throw new Exception("Invalid cpu type")
 		};
 	}
@@ -406,6 +407,7 @@ public sealed class EventViewerViewModel : DisposableViewModel {
 			CpuType.Sms => new PixelPoint(evt.Cycle * 2, evt.Scanline * 2),
 			CpuType.Gba => new PixelPoint(evt.Cycle, evt.Scanline * 4),
 			CpuType.Ws => new PixelPoint(evt.Cycle * 2, evt.Scanline * 2),
+			CpuType.Lynx => new PixelPoint(evt.Cycle * 2, evt.Scanline * 2),
 			_ => throw new Exception("Invalid cpu type")
 		};
 	}
@@ -472,6 +474,12 @@ public sealed class EventViewerViewModel : DisposableViewModel {
 				yPos = result.Y / 2;
 				break;
 
+			case CpuType.Lynx:
+				result.X = p.X / 2 * 2;
+				xPos = result.X / 2;
+				yPos = result.Y / 2;
+				break;
+
 			default:
 				throw new Exception("Invalid cpu type");
 		}
@@ -499,6 +507,8 @@ public sealed class EventViewerViewModel : DisposableViewModel {
 			DebugApi.SetEventViewerConfig(CpuType, smsCfg.ToInterop());
 		} else if (ConsoleConfig is WsEventViewerConfig wsCfg) {
 			DebugApi.SetEventViewerConfig(CpuType, wsCfg.ToInterop());
+		} else if (ConsoleConfig is LynxEventViewerConfig lynxCfg) {
+			DebugApi.SetEventViewerConfig(CpuType, lynxCfg.ToInterop());
 		}
 	}
 

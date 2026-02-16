@@ -49,6 +49,8 @@ public sealed class DefaultLabelHelper {
 			SetGbaDefaultLabels();
 		} else if (cpuTypes.Contains(CpuType.Ws)) {
 			SetWsDefaultLabels();
+		} else if (cpuTypes.Contains(CpuType.Lynx)) {
+			SetLynxDefaultLabels();
 		}
 	}
 
@@ -655,5 +657,73 @@ public sealed class DefaultLabelHelper {
 		addLabel(0xD6, 1, "IO_CART_KARNAK_TIMER");
 		addLabel(0xD8, 1, "IO_CART_KARNAK_ADPCM_INPUT");
 		addLabel(0xD9, 1, "IO_CART_KARNAK_ADPCM_OUTPUT");*/
+	}
+
+	private static void SetLynxDefaultLabels() {
+		// Suzy registers ($FC00-$FCFF)
+		LabelManager.SetLabel(0xFC00, MemoryType.LynxMemory, "TMPADR", "Suzy - Temporary Address");
+		LabelManager.SetLabel(0xFC04, MemoryType.LynxMemory, "TILTACUM", "Suzy - Tilt Accumulator");
+		LabelManager.SetLabel(0xFC08, MemoryType.LynxMemory, "HOFF", "Suzy - H Offset");
+		LabelManager.SetLabel(0xFC0A, MemoryType.LynxMemory, "VOFF", "Suzy - V Offset");
+		LabelManager.SetLabel(0xFC10, MemoryType.LynxMemory, "SCBNEXT", "Suzy - SCB Next Address");
+		LabelManager.SetLabel(0xFC14, MemoryType.LynxMemory, "SPRDLINE", "Suzy - Sprite Data Line Address");
+		LabelManager.SetLabel(0xFC18, MemoryType.LynxMemory, "HPOSSTRT", "Suzy - H Position Start");
+		LabelManager.SetLabel(0xFC1A, MemoryType.LynxMemory, "VPOSSTRT", "Suzy - V Position Start");
+		LabelManager.SetLabel(0xFC1C, MemoryType.LynxMemory, "SPRHSIZ", "Suzy - Sprite H Size");
+		LabelManager.SetLabel(0xFC1E, MemoryType.LynxMemory, "SPRVSIZ", "Suzy - Sprite V Size");
+		LabelManager.SetLabel(0xFC28, MemoryType.LynxMemory, "COLLOFF", "Suzy - Collision Offset");
+		LabelManager.SetLabel(0xFC2C, MemoryType.LynxMemory, "VSIZACUM", "Suzy - V Size Accumulator");
+		LabelManager.SetLabel(0xFC40, MemoryType.LynxMemory, "HSIZOFF", "Suzy - H Size Offset");
+		LabelManager.SetLabel(0xFC42, MemoryType.LynxMemory, "VSIZOFF", "Suzy - V Size Offset");
+		LabelManager.SetLabel(0xFC52, MemoryType.LynxMemory, "MATHD", "Suzy - Math D Register");
+		LabelManager.SetLabel(0xFC54, MemoryType.LynxMemory, "MATHC", "Suzy - Math C Register");
+		LabelManager.SetLabel(0xFC56, MemoryType.LynxMemory, "MATHB", "Suzy - Math B Register");
+		LabelManager.SetLabel(0xFC58, MemoryType.LynxMemory, "MATHA", "Suzy - Math A Register");
+		LabelManager.SetLabel(0xFC60, MemoryType.LynxMemory, "MATHP", "Suzy - Math P Register");
+		LabelManager.SetLabel(0xFC6C, MemoryType.LynxMemory, "MATHM", "Suzy - Math M Register");
+		LabelManager.SetLabel(0xFC80, MemoryType.LynxMemory, "COLLBUF", "Suzy - Collision Buffer");
+		LabelManager.SetLabel(0xFC90, MemoryType.LynxMemory, "SPRCTL0", "Suzy - Sprite Control 0");
+		LabelManager.SetLabel(0xFC91, MemoryType.LynxMemory, "SPRCTL1", "Suzy - Sprite Control 1");
+		LabelManager.SetLabel(0xFC92, MemoryType.LynxMemory, "SPRCOLL", "Suzy - Sprite Collision Number");
+		LabelManager.SetLabel(0xFC93, MemoryType.LynxMemory, "SPRINIT", "Suzy - Sprite Initialize");
+		LabelManager.SetLabel(0xFCA0, MemoryType.LynxMemory, "SUZYMATH", "Suzy - Math Control");
+		LabelManager.SetLabel(0xFCB0, MemoryType.LynxMemory, "SUZYHREV", "Suzy - Hardware Revision");
+		LabelManager.SetLabel(0xFCB2, MemoryType.LynxMemory, "SUZYSREV", "Suzy - Software Revision");
+		LabelManager.SetLabel(0xFCC0, MemoryType.LynxMemory, "JOYSTICK", "Suzy - Joystick Port");
+		LabelManager.SetLabel(0xFCC2, MemoryType.LynxMemory, "SWITCHES", "Suzy - Switch Port");
+
+		// Mikey timer registers ($FD00-$FD1F)
+		LabelManager.SetLabel(0xFD00, MemoryType.LynxMemory, "TIM0BKUP", "Mikey - Timer 0 Backup");
+		LabelManager.SetLabel(0xFD01, MemoryType.LynxMemory, "TIM0CTLA", "Mikey - Timer 0 Control A");
+		LabelManager.SetLabel(0xFD02, MemoryType.LynxMemory, "TIM0CNT", "Mikey - Timer 0 Count");
+		LabelManager.SetLabel(0xFD03, MemoryType.LynxMemory, "TIM0CTLB", "Mikey - Timer 0 Control B");
+
+		// Mikey audio registers ($FD20-$FD4F)
+		LabelManager.SetLabel(0xFD20, MemoryType.LynxMemory, "AUD0VOL", "Mikey - Audio Channel 0 Volume");
+		LabelManager.SetLabel(0xFD28, MemoryType.LynxMemory, "AUD1VOL", "Mikey - Audio Channel 1 Volume");
+		LabelManager.SetLabel(0xFD30, MemoryType.LynxMemory, "AUD2VOL", "Mikey - Audio Channel 2 Volume");
+		LabelManager.SetLabel(0xFD38, MemoryType.LynxMemory, "AUD3VOL", "Mikey - Audio Channel 3 Volume");
+		LabelManager.SetLabel(0xFD50, MemoryType.LynxMemory, "MSTEREO", "Mikey - Stereo Control");
+
+		// Mikey display/IRQ/serial
+		LabelManager.SetLabel(0xFD80, MemoryType.LynxMemory, "INTRST", "Mikey - Interrupt Reset");
+		LabelManager.SetLabel(0xFD81, MemoryType.LynxMemory, "INTSET", "Mikey - Interrupt Set");
+		LabelManager.SetLabel(0xFD84, MemoryType.LynxMemory, "MAGRDY0", "Mikey - Magazine Port 0");
+		LabelManager.SetLabel(0xFD85, MemoryType.LynxMemory, "MAGRDY1", "Mikey - Magazine Port 1");
+		LabelManager.SetLabel(0xFD87, MemoryType.LynxMemory, "SYSCTL1", "Mikey - System Control 1");
+		LabelManager.SetLabel(0xFD88, MemoryType.LynxMemory, "MIKYHREV", "Mikey - Hardware Revision");
+		LabelManager.SetLabel(0xFD8B, MemoryType.LynxMemory, "MIKYREV", "Mikey - Software Revision");
+		LabelManager.SetLabel(0xFD8C, MemoryType.LynxMemory, "SERDAT", "Mikey - Serial Data");
+		LabelManager.SetLabel(0xFD8D, MemoryType.LynxMemory, "SERCTL", "Mikey - Serial Control");
+		LabelManager.SetLabel(0xFD92, MemoryType.LynxMemory, "DISPCTL", "Mikey - Display Control");
+		LabelManager.SetLabel(0xFD94, MemoryType.LynxMemory, "PBKUP", "Mikey - Audio Sample Period Backup");
+		LabelManager.SetLabel(0xFD9C, MemoryType.LynxMemory, "DISPADRL", "Mikey - Display Address Low");
+		LabelManager.SetLabel(0xFD9D, MemoryType.LynxMemory, "DISPADRH", "Mikey - Display Address High");
+
+		// Mikey palette ($FDA0-$FDBF)
+		LabelManager.SetLabel(0xFDA0, MemoryType.LynxMemory, "PALETTE", "Mikey - Palette Start");
+
+		// Memory map control
+		LabelManager.SetLabel(0xFFF9, MemoryType.LynxMemory, "MAPCTL", "Memory Map Control");
 	}
 }

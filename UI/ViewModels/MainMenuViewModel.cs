@@ -713,7 +713,7 @@ public sealed class MainMenuViewModel : ViewModelBase {
 				return ResourceHelper.GetEnumText(region);
 			},
 			IsVisible = () => {
-				if (MainWindow.RomInfo.ConsoleType is ConsoleType.PcEngine or ConsoleType.Gameboy or ConsoleType.Ws) {
+				if (MainWindow.RomInfo.ConsoleType is ConsoleType.PcEngine or ConsoleType.Gameboy or ConsoleType.Ws or ConsoleType.Lynx) {
 					return false;
 				}
 

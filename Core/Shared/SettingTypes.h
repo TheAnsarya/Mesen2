@@ -742,6 +742,7 @@ struct LynxConfig {
 	bool BlendFrames = false;
 
 	bool DisableSprites = false;
+	bool DisableBackground = false;
 
 	uint32_t Channel1Vol = 100;
 	uint32_t Channel2Vol = 100;

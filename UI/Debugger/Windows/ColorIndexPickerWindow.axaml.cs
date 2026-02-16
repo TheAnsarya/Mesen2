@@ -50,6 +50,11 @@ public class ColorIndexPickerWindow : NexenWindow {
 				ColumnCount = 8;
 				break;
 
+			case CpuType.Lynx:
+				Palette = GenerateLynxPalette();
+				ColumnCount = 16;
+				break;
+
 			default:
 				throw new NotImplementedException();
 		}
@@ -75,6 +80,17 @@ public class ColorIndexPickerWindow : NexenWindow {
 		UInt32[] pal = new UInt32[0x40];
 		for (int i = 0; i < 0x40; i++) {
 			pal[i] = Rgb222ToArgb((byte)i);
+		}
+
+		return pal;
+	}
+
+	private static UInt32[] GenerateLynxPalette() {
+		// Lynx has 16 palette entries, read from current state
+		LynxState state = DebugApi.GetConsoleState<LynxState>(ConsoleType.Lynx);
+		UInt32[] pal = new UInt32[16];
+		for (int i = 0; i < 16; i++) {
+			pal[i] = state.Mikey.Palette[i] | 0xFF000000;
 		}
 
 		return pal;

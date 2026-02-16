@@ -862,6 +862,15 @@ public sealed class TraceLoggerOptionTab : DisposableViewModel {
 					StatusFlagFormat.Text or _ => "F:[F,10] "
 				});
 				break;
+
+			case CpuType.Lynx:
+				addTag(cfg.ShowRegisters, "A:[A,2h] X:[X,2h] Y:[Y,2h] S:[SP,2h] ");
+				addTag(cfg.ShowStatusFlags, cfg.StatusFormat switch {
+					StatusFlagFormat.Hexadecimal => "P:[P,h] ",
+					StatusFlagFormat.CompactText => "P:[P] ",
+					StatusFlagFormat.Text or _ => "P:[P,8] "
+				});
+				break;
 		}
 
 		addTag(cfg.ShowFramePosition, "V:[Scanline,3] H:[Cycle,3] ");
@@ -919,6 +928,7 @@ public sealed class TraceLoggerOptionTab : DisposableViewModel {
 			CpuType.Sms => new string[] { "A", "B", "C", "D", "E", "F", "H", "L", "IX", "IY", "A'", "B'", "C'", "D'", "E'", "F'", "H'", "L'", "I", "R", "PS", "SP" },
 			CpuType.Gba or CpuType.St018 => new string[] { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "CPSR" },
 			CpuType.Ws => new string[] { "AX", "BX", "CX", "DX", "CS", "IP", "SS", "SP", "BP", "DS", "ES", "SI", "DI", "F" },
+			CpuType.Lynx => new string[] { "A", "X", "Y", "P", "SP" },
 			_ => throw new Exception("unsupported cpu type")
 		};
 

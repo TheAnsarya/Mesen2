@@ -32,6 +32,7 @@ public sealed class TraceLoggerConfig : BaseWindowConfig<TraceLoggerConfig> {
 	[Reactive] public TraceLoggerCpuConfig SmsConfig { get; set; } = new();
 	[Reactive] public TraceLoggerCpuConfig GbaConfig { get; set; } = new();
 	[Reactive] public TraceLoggerCpuConfig WsConfig { get; set; } = new();
+	[Reactive] public TraceLoggerCpuConfig LynxConfig { get; set; } = new();
 
 	public TraceLoggerConfig() {
 	}
@@ -51,6 +52,7 @@ public sealed class TraceLoggerConfig : BaseWindowConfig<TraceLoggerConfig> {
 			CpuType.Sms => SmsConfig,
 			CpuType.Gba => GbaConfig,
 			CpuType.Ws => WsConfig,
+			CpuType.Lynx => LynxConfig,
 			_ => throw new NotImplementedException("Unsupport cpu type")
 		};
 	}

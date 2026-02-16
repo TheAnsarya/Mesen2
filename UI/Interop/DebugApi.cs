@@ -115,6 +115,7 @@ public sealed class DebugApi {
 			CpuType.Sms => GetPpuState<SmsVdpState>(cpuType),
 			CpuType.Gba => GetPpuState<GbaPpuState>(cpuType),
 			CpuType.Ws => GetPpuState<WsPpuState>(cpuType),
+			CpuType.Lynx => GetPpuState<LynxPpuState>(cpuType),
 			_ => throw new Exception("Unsupported cpu type")
 		};
 	}
@@ -135,6 +136,7 @@ public sealed class DebugApi {
 			CpuType.Sms => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
 			CpuType.Gba => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
 			CpuType.Ws => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
+			CpuType.Lynx => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
 			_ => throw new Exception("Unsupported cpu type")
 		};
 	}
@@ -384,6 +386,7 @@ public sealed class DebugApi {
 	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropPceEventViewerConfig config);
 	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropSmsEventViewerConfig config);
 	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropWsEventViewerConfig config);
+	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropLynxEventViewerConfig config);
 
 	[DllImport(DllPath, EntryPoint = "GetEventViewerEvent")] private static extern DebugEventInfo GetEventViewerEventWrapper(CpuType cpuType, UInt16 scanline, UInt16 cycle);
 	public static DebugEventInfo? GetEventViewerEvent(CpuType cpuType, UInt16 scanline, UInt16 cycle) {
@@ -521,6 +524,7 @@ public sealed class DebugApi {
 			CpuType.Sms => state is SmsCpuState,
 			CpuType.Gba => state is GbaCpuState,
 			CpuType.Ws => state is WsCpuState,
+			CpuType.Lynx => state is LynxCpuState,
 			_ => false
 		};
 	}
@@ -534,6 +538,7 @@ public sealed class DebugApi {
 			ConsoleType.Sms => state is SmsVdpState,
 			ConsoleType.Gba => state is GbaPpuState,
 			ConsoleType.Ws => state is WsPpuState,
+			ConsoleType.Lynx => state is LynxPpuState,
 			_ => false
 		};
 	}
@@ -997,6 +1002,24 @@ public sealed class InteropWsEventViewerConfig {
 
 	public InteropEventViewerCategoryCfg Irq;
 	public InteropEventViewerCategoryCfg MarkedBreakpoints;
+
+	[MarshalAs(UnmanagedType.I1)] public bool ShowPreviousFrameEvents;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public sealed class InteropLynxEventViewerConfig {
+	public InteropEventViewerCategoryCfg Irq;
+	public InteropEventViewerCategoryCfg MarkedBreakpoints;
+
+	public InteropEventViewerCategoryCfg MikeyRegisterWrite;
+	public InteropEventViewerCategoryCfg MikeyRegisterRead;
+	public InteropEventViewerCategoryCfg SuzyRegisterWrite;
+	public InteropEventViewerCategoryCfg SuzyRegisterRead;
+	public InteropEventViewerCategoryCfg AudioRegisterWrite;
+	public InteropEventViewerCategoryCfg AudioRegisterRead;
+	public InteropEventViewerCategoryCfg PaletteWrite;
+	public InteropEventViewerCategoryCfg TimerWrite;
+	public InteropEventViewerCategoryCfg TimerRead;
 
 	[MarshalAs(UnmanagedType.I1)] public bool ShowPreviousFrameEvents;
 }

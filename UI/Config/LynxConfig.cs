@@ -15,6 +15,7 @@ public sealed class LynxConfig : BaseConfig<LynxConfig> {
 	[Reactive] public bool BlendFrames { get; set; } = false;
 
 	[Reactive] public bool DisableSprites { get; set; } = false;
+	[Reactive] public bool DisableBackground { get; set; } = false;
 
 	[Reactive][MinMax(0, 100)] public UInt32 Channel1Vol { get; set; } = 100;
 	[Reactive][MinMax(0, 100)] public UInt32 Channel2Vol { get; set; } = 100;
@@ -34,6 +35,7 @@ public sealed class LynxConfig : BaseConfig<LynxConfig> {
 			BlendFrames = BlendFrames,
 
 			DisableSprites = DisableSprites,
+			DisableBackground = DisableBackground,
 
 			Channel1Vol = Channel1Vol,
 			Channel2Vol = Channel2Vol,
@@ -56,6 +58,7 @@ public struct InteropLynxConfig {
 	[MarshalAs(UnmanagedType.I1)] public bool BlendFrames;
 
 	[MarshalAs(UnmanagedType.I1)] public bool DisableSprites;
+	[MarshalAs(UnmanagedType.I1)] public bool DisableBackground;
 
 	public UInt32 Channel1Vol;
 	public UInt32 Channel2Vol;

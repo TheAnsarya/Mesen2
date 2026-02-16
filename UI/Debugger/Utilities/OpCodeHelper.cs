@@ -25,6 +25,7 @@ public static class OpCodeHelper {
 		InitSmsDocumentation();
 		InitGbaDocumentation();
 		InitWsDocumentation();
+		InitLynxDocumentation();
 	}
 
 	public static DynamicTooltip? GetTooltip(CodeSegmentInfo seg) {
@@ -139,6 +140,12 @@ public static class OpCodeHelper {
 	private static void InitWsDocumentation() {
 		//TODOWS add missing descriptions, etc.
 		InitDocumentation(CpuType.Ws, ReadDocumentationFile("WsDocumentation.json"));
+	}
+
+	private static void InitLynxDocumentation() {
+		// Lynx uses 65SC02 - share NES (6502) base docs like PCE does
+		Dictionary<string, OpCodeDesc> baseDesc = new(_data[CpuType.Nes].OpDesc);
+		InitDocumentation(CpuType.Lynx, ReadDocumentationFile("PceDocumentation.json"), baseDesc);
 	}
 
 	private static void InitGbaDocumentation() {

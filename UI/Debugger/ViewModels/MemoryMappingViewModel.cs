@@ -80,6 +80,8 @@ public sealed class MemoryMappingViewModel : ViewModelBase {
 				CpuMappings = UpdateMappings(CpuMappings, GetSmsCpuMappings(DebugApi.GetConsoleState<SmsState>(ConsoleType.Sms).MemoryManager));
 			} else if (_cpuType == CpuType.Ws) {
 				CpuMappings = UpdateMappings(CpuMappings, GetWsCpuMappings(DebugApi.GetConsoleState<WsState>(ConsoleType.Ws).MemoryManager));
+			} else if (_cpuType == CpuType.Lynx) {
+				CpuMappings = UpdateMappings(CpuMappings, GetLynxCpuMappings(DebugApi.GetConsoleState<LynxState>(ConsoleType.Lynx).MemoryManager));
 			}
 		} catch { }
 	}
@@ -605,6 +607,61 @@ public sealed class MemoryMappingViewModel : ViewModelBase {
 			}
 
 			prevAddr = absAddr;
+		}
+
+		return mappings;
+	}
+
+	private List<MemoryMappingBlock> GetLynxCpuMappings(LynxMemoryManagerState state) {
+		List<MemoryMappingBlock> mappings = new();
+
+		// Lynx has a 64KB address space with simple bank layout:
+		// $0000-$FBFF: RAM (or cartridge depending on MAPCTL)
+		// $FC00-$FCFF: Suzy registers
+		// $FD00-$FDFF: Mikey registers
+		// $FE00-$FFF7: RAM/ROM
+		// $FFF8-$FFFF: Vectors (Boot ROM or RAM)
+
+		Color ramColor = Color.FromRgb(0xCD, 0xDC, 0xFA);
+		Color suzyColor = Color.FromRgb(0xFA, 0xDC, 0xCD);
+		Color mikeyColor = Color.FromRgb(0xC4, 0xE7, 0xD4);
+		Color romColor = Color.FromRgb(0xFA, 0xCD, 0xFA);
+
+		mappings.Add(new MemoryMappingBlock() {
+			Length = 0xFC00,
+			Name = "RAM",
+			Note = "RW",
+			Color = ramColor
+		});
+
+		mappings.Add(new MemoryMappingBlock() {
+			Length = 0x100,
+			Name = "Suzy",
+			Note = "RW",
+			Color = suzyColor
+		});
+
+		mappings.Add(new MemoryMappingBlock() {
+			Length = 0x100,
+			Name = "Mikey",
+			Note = "RW",
+			Color = mikeyColor
+		});
+
+		if (state.BootRomActive) {
+			mappings.Add(new MemoryMappingBlock() {
+				Length = 0x200,
+				Name = "Boot ROM",
+				Note = "R",
+				Color = romColor
+			});
+		} else {
+			mappings.Add(new MemoryMappingBlock() {
+				Length = 0x200,
+				Name = "RAM",
+				Note = "RW",
+				Color = ramColor
+			});
 		}
 
 		return mappings;
