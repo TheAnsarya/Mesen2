@@ -300,7 +300,7 @@ void ModularExponentiate(
 void EncryptBlock(
 	std::span<uint8_t, BlockSize> output,
 	std::span<const uint8_t, OutputBytesPerBlock> block,
-	uint8_t& accumulator
+	uint8_t accumulator  // Input only: previous block's last byte (or 0)
 );
 
 } // namespace LynxCrypto

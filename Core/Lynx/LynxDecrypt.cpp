@@ -110,21 +110,18 @@ void MontgomeryMultiply(
 			if (bit) {
 				// L += M
 				AddValue(result.data(), multiplicand.data(), BlockSize);
-				// L -= modulus (normalize)
-				bool noBorrow = SubtractValue(result.data(), modulus.data(), BlockSize);
-				// If still >= modulus (no borrow), subtract again
-				if (noBorrow) {
-					SubtractValue(result.data(), modulus.data(), BlockSize);
-				}
-			} else {
-				// Try to subtract modulus (normalize if >= modulus)
-				// Save current value in case we need to undo
+			}
+
+			// Normalize: subtract modulus while L >= modulus
+			// After double+add, L < 3*modulus, so at most 2 subtractions needed
+			for (int k = 0; k < 2; k++) {
 				std::array<uint8_t, BlockSize> backup;
 				std::memcpy(backup.data(), result.data(), BlockSize);
 				bool noBorrow = SubtractValue(result.data(), modulus.data(), BlockSize);
 				if (!noBorrow) {
-					// Borrow occurred — result was < modulus, restore
+					// Borrow occurred — result was < modulus, restore and stop
 					std::memcpy(result.data(), backup.data(), BlockSize);
+					break;
 				}
 			}
 		}
@@ -140,12 +137,19 @@ void DecryptBlock(
 	std::span<const uint8_t, BlockSize> block,
 	uint8_t& accumulator
 ) {
+	// Reverse byte order before RSA operation
+	// Reference: cleaned.c decrypt_block() reverses before cubing
+	std::array<uint8_t, BlockSize> reversed;
+	for (size_t i = 0; i < BlockSize; i++) {
+		reversed[i] = block[BlockSize - 1 - i];
+	}
+
 	// Compute B² = B × B mod PublicModulus
 	std::array<uint8_t, BlockSize> squared;
 	MontgomeryMultiply(
 		std::span<uint8_t, BlockSize>(squared),
-		block,
-		block,
+		std::span<const uint8_t, BlockSize>(reversed),
+		std::span<const uint8_t, BlockSize>(reversed),
 		std::span<const uint8_t, BlockSize>(PublicModulus)
 	);
 
@@ -153,7 +157,7 @@ void DecryptBlock(
 	std::array<uint8_t, BlockSize> cubed;
 	MontgomeryMultiply(
 		std::span<uint8_t, BlockSize>(cubed),
-		block,
+		std::span<const uint8_t, BlockSize>(reversed),
 		std::span<const uint8_t, BlockSize>(squared),
 		std::span<const uint8_t, BlockSize>(PublicModulus)
 	);
@@ -302,28 +306,41 @@ void ModularExponentiate(
 void EncryptBlock(
 	std::span<uint8_t, BlockSize> output,
 	std::span<const uint8_t, OutputBytesPerBlock> block,
-	uint8_t& accumulator
+	uint8_t accumulator  // Input only (from previous block's last byte)
 ) {
-	// Build 51-byte plaintext block with reverse accumulator obfuscation
-	// This reverses the DecryptBlock post-processing
-	std::array<uint8_t, BlockSize> plainBlock;
-	plainBlock[0] = 0; // Byte 0 is metadata/padding
+	// Build 51-byte encoded block before RSA
+	// 
+	// For decryption to work with forward cumulative sum:
+	//   encodedBlock[1] = p0 - accumulator (first byte)
+	//   encodedBlock[k+1] = pk - p(k-1) for k=1..49 (differences)
+	//
+	// Then decryption: output[k] = cumsum(buf[1..k+1]) = pk
 
-	// Reverse the accumulator: decrypt does acc += byte; output = acc
-	// So encrypt needs: value = output - prevAcc; acc = output
-	for (size_t j = 0; j < OutputBytesPerBlock; j++) {
-		uint8_t nextAcc = block[j];
-		plainBlock[j + 1] = static_cast<uint8_t>(nextAcc - accumulator);
-		accumulator = nextAcc;
+	std::array<uint8_t, BlockSize> encodedBlock;
+	encodedBlock[0] = 0x15; // Padding byte (matches original Lynx encryption)
+
+	// First difference: p0 - accumulator
+	encodedBlock[1] = static_cast<uint8_t>(block[0] - accumulator);
+
+	// Remaining differences: pk - p(k-1) for k=1..49
+	for (size_t k = 1; k < OutputBytesPerBlock; k++) {
+		encodedBlock[k + 1] = static_cast<uint8_t>(block[k] - block[k - 1]);
 	}
 
-	// Compute M^d mod PublicModulus using full private exponent
+	// RSA encryption: result = encodedBlock^d mod PublicModulus
+	std::array<uint8_t, BlockSize> rsaResult;
 	ModularExponentiate(
-		output,
-		std::span<const uint8_t, BlockSize>(plainBlock),
+		std::span<uint8_t, BlockSize>(rsaResult),
+		std::span<const uint8_t, BlockSize>(encodedBlock),
 		std::span<const uint8_t, BlockSize>(PrivateExponent),
 		std::span<const uint8_t, BlockSize>(PublicModulus)
 	);
+
+	// Reverse bytes: output[i] = rsaResult[50-i]
+	// This matches how decryption reverses when loading
+	for (size_t i = 0; i < BlockSize; i++) {
+		output[i] = rsaResult[BlockSize - 1 - i];
+	}
 }
 
 // ============================================================================
@@ -348,17 +365,21 @@ EncryptResult Encrypt(std::span<const uint8_t> plaintext) {
 	// Write block count byte (256 - N)
 	result.Data[0] = static_cast<uint8_t>(256 - blocks);
 
+	// Pad plaintext to full blocks
+	std::vector<uint8_t> paddedPlaintext(blocks * OutputBytesPerBlock, 0);
+	std::memcpy(paddedPlaintext.data(), plaintext.data(), plaintext.size());
+
+	// Process blocks in FORWARD order
+	// For each block, accumulator is the last byte of the PREVIOUS plaintext block
+	// (or 0 for the first block)
 	uint8_t accumulator = 0;
 
-	for (size_t i = 0; i < blocks; i++) {
-		// Get 50 bytes of plaintext (pad with zeros if needed)
-		std::array<uint8_t, OutputBytesPerBlock> blockInput{};
-		size_t offset = i * OutputBytesPerBlock;
-		size_t remaining = (plaintext.size() > offset) ? plaintext.size() - offset : 0;
-		size_t toCopy = std::min(remaining, OutputBytesPerBlock);
-		if (toCopy > 0) {
-			std::memcpy(blockInput.data(), &plaintext[offset], toCopy);
-		}
+	for (size_t blockIdx = 0; blockIdx < blocks; blockIdx++) {
+		// Get this block's plaintext
+		std::array<uint8_t, OutputBytesPerBlock> blockInput;
+		std::memcpy(blockInput.data(),
+			&paddedPlaintext[blockIdx * OutputBytesPerBlock],
+			OutputBytesPerBlock);
 
 		// Encrypt block
 		std::array<uint8_t, BlockSize> encryptedBlock;
@@ -369,7 +390,11 @@ EncryptResult Encrypt(std::span<const uint8_t> plaintext) {
 		);
 
 		// Copy to output
-		std::memcpy(&result.Data[1 + i * BlockSize], encryptedBlock.data(), BlockSize);
+		std::memcpy(&result.Data[1 + blockIdx * BlockSize],
+			encryptedBlock.data(), BlockSize);
+
+		// Update accumulator to last byte of this block for next block
+		accumulator = blockInput[OutputBytesPerBlock - 1];
 	}
 
 	result.Valid = true;
