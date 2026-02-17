@@ -242,4 +242,138 @@ DecryptResult Decrypt(std::span<const uint8_t> encrypted) {
 	return result;
 }
 
+// ============================================================================
+// Modular Exponentiation (for Encryption)
+// ============================================================================
+
+void ModularExponentiate(
+	std::span<uint8_t, BlockSize> result,
+	std::span<const uint8_t, BlockSize> base,
+	std::span<const uint8_t, BlockSize> exponent,
+	std::span<const uint8_t, BlockSize> modulus
+) {
+	// Initialize result to 1 (identity for multiplication)
+	std::memset(result.data(), 0, BlockSize);
+	result[BlockSize - 1] = 1;
+
+	// Find the first set bit (skip leading zeros for efficiency)
+	bool foundFirstBit = false;
+
+	// Square-and-multiply: scan exponent bits from MSB to LSB
+	// Process bytes from 0 (MSB) to BlockSize-1 (LSB)
+	for (size_t byteIdx = 0; byteIdx < BlockSize; byteIdx++) {
+		uint8_t expByte = exponent[byteIdx];
+
+		// Process bits from MSB to LSB within the byte
+		for (int bit = 7; bit >= 0; bit--) {
+			if (foundFirstBit) {
+				// Square: result = result² mod modulus
+				std::array<uint8_t, BlockSize> squared;
+				MontgomeryMultiply(
+					std::span<uint8_t, BlockSize>(squared),
+					std::span<const uint8_t, BlockSize>(result.data(), BlockSize),
+					std::span<const uint8_t, BlockSize>(result.data(), BlockSize),
+					modulus
+				);
+				std::memcpy(result.data(), squared.data(), BlockSize);
+			}
+
+			bool bitSet = (expByte & (1 << bit)) != 0;
+			if (bitSet) {
+				foundFirstBit = true;
+				// Multiply: result = result × base mod modulus
+				std::array<uint8_t, BlockSize> temp;
+				MontgomeryMultiply(
+					std::span<uint8_t, BlockSize>(temp),
+					std::span<const uint8_t, BlockSize>(result.data(), BlockSize),
+					base,
+					modulus
+				);
+				std::memcpy(result.data(), temp.data(), BlockSize);
+			}
+		}
+	}
+}
+
+// ============================================================================
+// Block Encryption
+// ============================================================================
+
+void EncryptBlock(
+	std::span<uint8_t, BlockSize> output,
+	std::span<const uint8_t, OutputBytesPerBlock> block,
+	uint8_t& accumulator
+) {
+	// Build 51-byte plaintext block with reverse accumulator obfuscation
+	// This reverses the DecryptBlock post-processing
+	std::array<uint8_t, BlockSize> plainBlock;
+	plainBlock[0] = 0; // Byte 0 is metadata/padding
+
+	// Reverse the accumulator: decrypt does acc += byte; output = acc
+	// So encrypt needs: value = output - prevAcc; acc = output
+	for (size_t j = 0; j < OutputBytesPerBlock; j++) {
+		uint8_t nextAcc = block[j];
+		plainBlock[j + 1] = static_cast<uint8_t>(nextAcc - accumulator);
+		accumulator = nextAcc;
+	}
+
+	// Compute M^d mod PublicModulus using full private exponent
+	ModularExponentiate(
+		output,
+		std::span<const uint8_t, BlockSize>(plainBlock),
+		std::span<const uint8_t, BlockSize>(PrivateExponent),
+		std::span<const uint8_t, BlockSize>(PublicModulus)
+	);
+}
+
+// ============================================================================
+// High-Level Encryption API
+// ============================================================================
+
+EncryptResult Encrypt(std::span<const uint8_t> plaintext) {
+	EncryptResult result;
+
+	if (plaintext.empty() || plaintext.size() > 15 * OutputBytesPerBlock) {
+		// Max 15 blocks × 50 bytes = 750 bytes
+		return result;
+	}
+
+	// Calculate block count (round up)
+	size_t blocks = (plaintext.size() + OutputBytesPerBlock - 1) / OutputBytesPerBlock;
+	result.BlockCount = blocks;
+
+	// Allocate output: 1 byte block count + blocks × 51 bytes
+	result.Data.resize(1 + blocks * BlockSize);
+
+	// Write block count byte (256 - N)
+	result.Data[0] = static_cast<uint8_t>(256 - blocks);
+
+	uint8_t accumulator = 0;
+
+	for (size_t i = 0; i < blocks; i++) {
+		// Get 50 bytes of plaintext (pad with zeros if needed)
+		std::array<uint8_t, OutputBytesPerBlock> blockInput{};
+		size_t offset = i * OutputBytesPerBlock;
+		size_t remaining = (plaintext.size() > offset) ? plaintext.size() - offset : 0;
+		size_t toCopy = std::min(remaining, OutputBytesPerBlock);
+		if (toCopy > 0) {
+			std::memcpy(blockInput.data(), &plaintext[offset], toCopy);
+		}
+
+		// Encrypt block
+		std::array<uint8_t, BlockSize> encryptedBlock;
+		EncryptBlock(
+			std::span<uint8_t, BlockSize>(encryptedBlock),
+			std::span<const uint8_t, OutputBytesPerBlock>(blockInput),
+			accumulator
+		);
+
+		// Copy to output
+		std::memcpy(&result.Data[1 + i * BlockSize], encryptedBlock.data(), BlockSize);
+	}
+
+	result.Valid = true;
+	return result;
+}
+
 } // namespace LynxCrypto

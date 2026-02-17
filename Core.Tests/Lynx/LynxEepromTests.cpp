@@ -33,8 +33,8 @@ protected:
 	void SetUp() override {
 		_state = {};
 		_state.WriteEnabled = false;
-		_state.BitsReceived = 0;
-		_state.CurrentData = 0;
+		_state.BitCount = 0;
+		_state.DataBuffer = 0;
 		_state.Address = 0;
 		_state.DataOut = false;
 	}
@@ -107,14 +107,14 @@ TEST_F(LynxEepromTest, State_InitialIdle) {
 }
 
 TEST_F(LynxEepromTest, State_ChipSelectLow_StaysIdle) {
-	_state.ChipSelect = false;
+	_state.CsActive = false;
 	_state.State = LynxEepromState::Idle;
 	// When CS low, state machine should not advance
 	EXPECT_EQ(_state.State, LynxEepromState::Idle);
 }
 
 TEST_F(LynxEepromTest, State_ChipSelectHigh_BeginsTransaction) {
-	_state.ChipSelect = true;
+	_state.CsActive = true;
 	// On CS high, prepare to receive opcode
 	_state.State = LynxEepromState::ReceivingOpcode;
 	EXPECT_EQ(_state.State, LynxEepromState::ReceivingOpcode);
@@ -122,7 +122,7 @@ TEST_F(LynxEepromTest, State_ChipSelectHigh_BeginsTransaction) {
 
 TEST_F(LynxEepromTest, State_ReceivingOpcode_To_ReceivingAddress) {
 	_state.State = LynxEepromState::ReceivingOpcode;
-	_state.BitsReceived = 3; // Start bit + 2 opcode bits received
+	_state.BitCount = 3; // Start bit + 2 opcode bits received
 	// Check transition to address phase
 	_state.State = LynxEepromState::ReceivingAddress;
 	EXPECT_EQ(_state.State, LynxEepromState::ReceivingAddress);
@@ -212,13 +212,13 @@ TEST_F(LynxEepromTest, Write_WhenEnabled_Succeeds) {
 
 TEST_F(LynxEepromTest, DataIn_ShiftRegister_MSBFirst) {
 	// Serial data is transmitted MSB first
-	_state.CurrentData = 0;
+	_state.DataBuffer = 0;
 	// Shift in bits: 1, 0, 1, 0 (0xA high nibble)
-	_state.CurrentData = (_state.CurrentData << 1) | 1;
-	_state.CurrentData = (_state.CurrentData << 1) | 0;
-	_state.CurrentData = (_state.CurrentData << 1) | 1;
-	_state.CurrentData = (_state.CurrentData << 1) | 0;
-	EXPECT_EQ(_state.CurrentData, 0x0a);
+	_state.DataBuffer = (_state.DataBuffer << 1) | 1;
+	_state.DataBuffer = (_state.DataBuffer << 1) | 0;
+	_state.DataBuffer = (_state.DataBuffer << 1) | 1;
+	_state.DataBuffer = (_state.DataBuffer << 1) | 0;
+	EXPECT_EQ(_state.DataBuffer, 0x0a);
 }
 
 TEST_F(LynxEepromTest, DataOut_ShiftRegister_MSBFirst) {
@@ -231,12 +231,12 @@ TEST_F(LynxEepromTest, DataOut_ShiftRegister_MSBFirst) {
 	EXPECT_FALSE(_state.DataOut);
 }
 
-TEST_F(LynxEepromTest, BitsReceived_Counter) {
-	_state.BitsReceived = 0;
+TEST_F(LynxEepromTest, BitCount_Counter) {
+	_state.BitCount = 0;
 	for (int i = 0; i < 16; i++) {
-		_state.BitsReceived++;
+		_state.BitCount++;
 	}
-	EXPECT_EQ(_state.BitsReceived, 16);
+	EXPECT_EQ(_state.BitCount, 16);
 }
 
 //=============================================================================
@@ -285,26 +285,26 @@ TEST_F(LynxEepromTest, EraseAll_ERAL_WhenEnabled) {
 //=============================================================================
 
 TEST_F(LynxEepromTest, ChipSelect_FallingEdge_ResetState) {
-	_state.ChipSelect = true;
+	_state.CsActive = true;
 	_state.State = LynxEepromState::SendingData;
-	_state.BitsReceived = 5;
+	_state.BitCount = 5;
 
 	// CS goes low — reset state machine
-	_state.ChipSelect = false;
+	_state.CsActive = false;
 	_state.State = LynxEepromState::Idle;
-	_state.BitsReceived = 0;
+	_state.BitCount = 0;
 
 	EXPECT_EQ(_state.State, LynxEepromState::Idle);
-	EXPECT_EQ(_state.BitsReceived, 0);
+	EXPECT_EQ(_state.BitCount, 0);
 }
 
 TEST_F(LynxEepromTest, ChipSelect_MidTransaction_Abort) {
-	_state.ChipSelect = true;
+	_state.CsActive = true;
 	_state.State = LynxEepromState::ReceivingData;
-	_state.CurrentData = 0x5678;
+	_state.DataBuffer = 0x5678;
 
 	// Abort by dropping CS
-	_state.ChipSelect = false;
+	_state.CsActive = false;
 	_state.State = LynxEepromState::Idle;
 
 	// Data should not be written

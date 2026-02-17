@@ -23,16 +23,17 @@
 ///   - Bytes 1+: N × 51 bytes of encrypted data
 ///   - Each block decrypts to 50 bytes of output
 ///
-/// **Note:** The private key is permanently lost, so re-encryption is
-/// NOT possible. Homebrew developers use pre-encrypted bootloaders
-/// created by Harry Dodgson.
+/// **Note:** The private key was recovered from the original Atari keyfile
+/// floppies. Re-encryption IS possible using the PrivateExponent.
 ///
 /// **References:**
 ///   - libretro-handy `lynxdec.cpp` (zlib license)
+///   - 42Bastian/lynx-encryption-tools `keys.h` (zlib license)
 ///   - AtariAge "Lynx Encryption?" thread
 ///   - ~docs/plans/lynx-bootloader-encryption-research.md
 ///
 /// @see https://github.com/libretro/libretro-handy/blob/master/lynx/lynxdec.cpp
+/// @see https://github.com/42Bastian/lynx-encryption-tools/blob/master/keys.h
 
 namespace LynxCrypto {
 
@@ -41,8 +42,7 @@ namespace LynxCrypto {
 /// This 51-byte (408-bit) value is the same for all Lynx units.
 /// </summary>
 /// <remarks>
-/// The private key was encrypted with a secondary key that was destroyed.
-/// Only decryption using this public modulus is possible.
+/// Used for decryption: `PLAINTEXT = ENCRYPTED³ mod PublicModulus`
 /// </remarks>
 inline constexpr uint8_t PublicModulus[51] = {
 	0x35, 0xB5, 0xA3, 0x94, 0x28, 0x06, 0xD8, 0xA2,
@@ -52,6 +52,25 @@ inline constexpr uint8_t PublicModulus[51] = {
 	0x1B, 0xD4, 0x1C, 0x13, 0x64, 0x89, 0x36, 0x4C,
 	0xF2, 0xBA, 0x2A, 0x58, 0xF4, 0xFE, 0xE1, 0xFD,
 	0xAC, 0x7E, 0x79
+};
+
+/// <summary>
+/// RSA private exponent recovered from Atari keyfile floppies.
+/// Used for encryption: `ENCRYPTED = PLAINTEXT^d mod PublicModulus`
+/// </summary>
+/// <remarks>
+/// The private exponent was reconstructed by XOR'ing together three
+/// keyfile blocks from original Atari development floppies.
+/// Source: https://github.com/42Bastian/lynx-encryption-tools/blob/master/keys.h
+/// </remarks>
+inline constexpr uint8_t PrivateExponent[51] = {
+	0x23, 0xCE, 0x6D, 0x0D, 0x70, 0x04, 0x90, 0x6C,
+	0x19, 0xB9, 0x3A, 0x4B, 0xCC, 0x28, 0xA8, 0xE4,
+	0x12, 0xDC, 0x11, 0x24, 0x6D, 0x20, 0x19, 0x55,
+	0x79, 0x87, 0xAB, 0x5C, 0xA8, 0x18, 0xA3, 0xD3,
+	0xC8, 0xE3, 0x27, 0x6D, 0x42, 0x70, 0xCB, 0x80,
+	0x21, 0xD6, 0xBD, 0xA4, 0x29, 0x6D, 0x47, 0xB1,
+	0xE5, 0xE2, 0xA3
 };
 
 /// <summary>Block size for RSA encryption (51 bytes = 408 bits).</summary>
@@ -107,6 +126,52 @@ struct DecryptResult {
 /// ```
 /// </remarks>
 [[nodiscard]] DecryptResult Decrypt(std::span<const uint8_t> encrypted);
+
+/// <summary>
+/// Encryption result containing the encrypted data for cartridge use.
+/// </summary>
+struct EncryptResult {
+	/// <summary>Encrypted data ready for cartridge (includes block count byte).</summary>
+	std::vector<uint8_t> Data;
+
+	/// <summary>True if encryption succeeded.</summary>
+	bool Valid = false;
+
+	/// <summary>Number of encrypted blocks generated.</summary>
+	size_t BlockCount = 0;
+};
+
+/// <summary>
+/// Encrypt plaintext data for Lynx cartridge bootloader format.
+/// </summary>
+/// <param name="plaintext">
+/// Plaintext loader code to encrypt.
+/// Must be 1-750 bytes (1-15 blocks × 50 bytes).
+/// </param>
+/// <returns>
+/// EncryptResult containing encrypted data with block count prefix.
+/// Returns empty result with Valid=false if input is invalid.
+/// </returns>
+/// <remarks>
+/// **Algorithm:**
+/// 1. Pad plaintext to block boundary (50 bytes per block)
+/// 2. Apply reverse accumulator obfuscation
+/// 3. For each 51-byte block, compute M^d mod PublicModulus
+/// 4. Prepend block count byte (256 - N)
+///
+/// **Output Format:**
+/// - Byte 0: Block count (256 - N)
+/// - Bytes 1+: N × 51 bytes of encrypted blocks
+///
+/// **Example:**
+/// ```cpp
+/// auto result = LynxCrypto::Encrypt(loaderCode);
+/// if (result.Valid) {
+///     // Write result.Data to cartridge offset 0
+/// }
+/// ```
+/// </remarks>
+[[nodiscard]] EncryptResult Encrypt(std::span<const uint8_t> plaintext);
 
 /// <summary>
 /// Validate encrypted cartridge data structure without full decryption.
@@ -196,6 +261,46 @@ void MontgomeryMultiply(
 	std::span<const uint8_t, BlockSize> multiplicand,
 	std::span<const uint8_t, BlockSize> multiplier,
 	std::span<const uint8_t, BlockSize> modulus
+);
+
+/// <summary>
+/// Perform modular exponentiation: result = base^exp mod modulus.
+/// </summary>
+/// <param name="result">Output buffer (51 bytes).</param>
+/// <param name="base">Base value (51 bytes).</param>
+/// <param name="exponent">Exponent value (51 bytes).</param>
+/// <param name="modulus">Modulus (typically PublicModulus, 51 bytes).</param>
+/// <remarks>
+/// Uses square-and-multiply algorithm with Montgomery multiplication.
+/// Required for encryption with the full 408-bit private exponent.
+///
+/// **Performance:** O(n³) where n = 51 bytes.
+/// For a 408-bit exponent, worst case ~408 multiplications.
+/// </remarks>
+void ModularExponentiate(
+	std::span<uint8_t, BlockSize> result,
+	std::span<const uint8_t, BlockSize> base,
+	std::span<const uint8_t, BlockSize> exponent,
+	std::span<const uint8_t, BlockSize> modulus
+);
+
+/// <summary>
+/// Encrypt a single 50-byte plaintext block to 51-byte encrypted block.
+/// </summary>
+/// <param name="output">Output buffer (51 bytes encrypted).</param>
+/// <param name="block">Input plaintext (50 bytes, will be padded).</param>
+/// <param name="accumulator">
+/// Running accumulator value (modified in-place).
+/// Initialize to 0 for first block.
+/// </param>
+/// <remarks>
+/// Applies reverse accumulator obfuscation, then computes
+/// `M^PrivateExponent mod PublicModulus`.
+/// </remarks>
+void EncryptBlock(
+	std::span<uint8_t, BlockSize> output,
+	std::span<const uint8_t, OutputBytesPerBlock> block,
+	uint8_t& accumulator
 );
 
 } // namespace LynxCrypto

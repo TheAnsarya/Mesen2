@@ -252,20 +252,48 @@ Each block produces 50 output bytes (not 51). The accumulator carries across blo
 
 ### Historical Context
 
+The original Lynx development kit used an Amiga-based encryption tool. The private key was protected using a complex multi-floppy system:
+
+1. The private exponent was split across **three keyfile floppies** using XOR
+2. All three floppies were required to reconstruct the key in Amiga RAM
+3. The key was never stored in plaintext on any single disk
+
 From AtariAge (karri, 2009):
 > "The private key used for signing the binary is signed by another key that is lost forever. At the signing process we have only the public key of the 'lost forever' key. With this public key you can retrieve the private key. But the private key will only be retrieved in Amiga RAM."
 
-The original Lynx development kit used an Amiga-based encryption tool. The private key was:
-1. Encrypted with a secondary RSA key
-2. Only decrypted temporarily in Amiga RAM during signing
-3. Never stored in plaintext
-4. The secondary private key was destroyed
+### Private Key Recovery
 
-### Current Workaround
+Despite the original security measures, the private exponent **was recovered**. The three keyfile blocks were obtained from the Lynx community (likely from Atari insiders) and when XOR'd together, they produce the working private exponent.
 
-Harry Dodgson created pre-encrypted bootloaders (410 bytes) that work for all games:
-- Boot ROM only validates the encrypted portion
-- The loader reads the rest of the cart unencrypted
+Source: [42Bastian/lynx-encryption-tools](https://github.com/42Bastian/lynx-encryption-tools/blob/master/keys.h) (David Huseby, zlib license)
+
+The private exponent (51 bytes / 408 bits):
+```cpp
+const uint8_t lynx_private_exp[51] = {
+    0x23, 0xCE, 0x6D, 0x0D, 0x70, 0x04, 0x90, 0x6C,
+    0x19, 0xB9, 0x3A, 0x4B, 0xCC, 0x28, 0xA8, 0xE4,
+    0x12, 0xDC, 0x11, 0x24, 0x6D, 0x20, 0x19, 0x55,
+    0x79, 0x87, 0xAB, 0x5C, 0xA8, 0x18, 0xA3, 0xD3,
+    0xC8, 0xE3, 0x27, 0x6D, 0x42, 0x70, 0xCB, 0x80,
+    0x21, 0xD6, 0xBD, 0xA4, 0x29, 0x6D, 0x47, 0xB1,
+    0xE5, 0xE2, 0xA3
+};
+```
+
+### Encryption Formula
+
+With the private exponent known, encryption is:
+```
+ENCRYPTED = PLAINTEXT^d mod PUBLIC_KEY
+```
+
+Where `d` is the 408-bit private exponent above.
+
+### Legacy Workaround (Still Useful)
+
+Harry Dodgson's pre-encrypted bootloaders (410 bytes) remain useful for:
+- Quick homebrew development (no encryption step needed)
+- Compatibility testing
 - Three variants exist for different cart sizes (512B/1KB/2KB sectors)
 
 ---
@@ -280,54 +308,54 @@ Harry Dodgson created pre-encrypted bootloaders (410 bytes) that work for all ga
 | `libretro-handy/lynx/system.cpp` (HLE) | C++ | zlib |
 | Mednafen/Beetle-Lynx | C++ | GPL-2.0 |
 
-### Encryption (Not Available)
+### Encryption (Now Available!)
 
-No public implementation exists for encryption because the private key is unknown.
-Pre-encrypted bootloaders are used instead.
+| Location | Language | License |
+|----------|----------|---------|
+| [42Bastian/lynx-encryption-tools](https://github.com/42Bastian/lynx-encryption-tools) | C | zlib |
+| **Nexen** `Core/Lynx/LynxDecrypt.h` | C++ | MIT |
 
 ---
 
-## 9. Nexen Implementation Plan
+## 9. Nexen Implementation (COMPLETED)
 
-### Current State
+### Implementation Status: ✅ COMPLETE
 
-- HLE boot (`ApplyHleBootState()`) skips decryption entirely
-- Real boot ROM support reads vectors from ROM but doesn't execute decryption
-- No cart encryption/decryption utilities
+The full encryption/decryption API is implemented in `Core/Lynx/LynxDecrypt.h/.cpp`.
 
-### Required Implementation
+### API Summary
 
-1. **Core Decryption** (`Core/Lynx/LynxDecrypt.h/.cpp`)
-   - Port `lynx_decrypt()` from libretro-handy
-   - Add C++ wrapper with modern types
-   - Support both single-frame and multi-frame decryption
+```cpp
+namespace LynxCrypto {
+    // High-Level API
+    DecryptResult Decrypt(std::span<const uint8_t> encrypted);
+    EncryptResult Encrypt(std::span<const uint8_t> plaintext);
+    bool Validate(std::span<const uint8_t> encrypted);
+    size_t GetDecryptedSize(std::span<const uint8_t> encrypted);
+    size_t GetBlockCount(std::span<const uint8_t> encrypted);
+    
+    // Low-Level API
+    void DecryptBlock(output, block, accumulator);
+    void EncryptBlock(output, block, accumulator);
+    void MontgomeryMultiply(result, multiplicand, multiplier, modulus);
+    void ModularExponentiate(result, base, exponent, modulus);
+    
+    // Constants
+    constexpr uint8_t PublicModulus[51];
+    constexpr uint8_t PrivateExponent[51];
+    constexpr size_t BlockSize = 51;
+    constexpr size_t OutputBytesPerBlock = 50;
+}
+```
 
-2. **Boot ROM Emulation**
-   - Option 1: Full emulation (execute boot ROM code)
-   - Option 2: HLE interception (trap calls to $FE19/$FE4A, run native decryption)
-
-3. **API for Tools** (Peony/Poppy integration)
-   ```cpp
-   namespace LynxCrypto {
-       // Decrypt encrypted cart data
-       std::vector<uint8_t> Decrypt(std::span<const uint8_t> encrypted);
-       
-       // Validate encrypted data (check structure, not content)
-       bool Validate(std::span<const uint8_t> encrypted);
-       
-       // Get decrypted size from encrypted data
-       size_t GetDecryptedSize(std::span<const uint8_t> encrypted);
-   }
-   ```
-
-### Files to Create/Modify
+### Files Created
 
 | File | Purpose |
 |------|---------|
-| `Core/Lynx/LynxDecrypt.h` | Decryption API header |
-| `Core/Lynx/LynxDecrypt.cpp` | Montgomery multiplication, RSA decryption |
-| `Core/Lynx/LynxConsole.cpp` | Integrate decryption into boot process |
-| `Core.Tests/Lynx/LynxDecryptTests.cpp` | Unit tests |
+| `Core/Lynx/LynxDecrypt.h` | Full API header with XML documentation |
+| `Core/Lynx/LynxDecrypt.cpp` | Montgomery multiplication, RSA encrypt/decrypt |
+| `Core.Tests/Lynx/LynxDecryptTests.cpp` | 45+ unit tests |
+| `Core.Benchmarks/Lynx/LynxDecryptBench.cpp` | Performance benchmarks |
 | `Core.Benchmarks/Lynx/LynxDecryptBench.cpp` | Performance benchmarks |
 
 ---

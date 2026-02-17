@@ -813,6 +813,7 @@
     <ClInclude Include="Lynx\LynxDefaultVideoFilter.h" />
     <ClInclude Include="Lynx\LynxMemoryManager.h" />
     <ClInclude Include="Lynx\LynxMikey.h" />
+    <ClInclude Include="Lynx\LynxDecrypt.h" />
     <ClInclude Include="Lynx\LynxSuzy.h" />
     <ClInclude Include="Lynx\LynxTypes.h" />
     <ClInclude Include="Lynx\Debugger\LynxDisUtils.h" />
@@ -1129,6 +1130,7 @@
     <ClCompile Include="Lynx\LynxDefaultVideoFilter.cpp" />
     <ClCompile Include="Lynx\LynxMemoryManager.cpp" />
     <ClCompile Include="Lynx\LynxMikey.cpp" />
+    <ClCompile Include="Lynx\LynxDecrypt.cpp" />
     <ClCompile Include="Lynx\LynxSuzy.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxDisUtils.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxDebugger.cpp" />

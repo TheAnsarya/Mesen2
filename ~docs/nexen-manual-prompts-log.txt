@@ -278,6 +278,7 @@ continue testing and benchmarking and documenting the UART/ComLynx code effort i
 
 [Nexen] (Lynx) The games bootloaders are compressed/encrypted data, research and analyze are we dealing with that? make issues/todos/docs, etc; make decryption and re-encryption (compression/descompression) if we don't already have it; fix it and then make the code available through an API so we can use it it in peony and poppy; continue fixing issues and bugs and commenting and add tests and benchmarks for everything that is uncovered; continue;
 
+Is the private key in `https://github.com/42Bastian/lynx-encryption-tools/blob/master/keys.h` not the private key for Lynx bootloader encryption? continue;
 
 
 
