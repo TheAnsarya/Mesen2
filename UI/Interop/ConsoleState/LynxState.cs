@@ -134,6 +134,10 @@ public struct LynxAudioChannelState {
 	[MarshalAs(UnmanagedType.I1)] public bool Integrate;
 	/// <summary>Channel enabled.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
+	/// <summary>Timer done flag — blocks counting until cleared (HW Bug 13.6).</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool TimerDone;
+	/// <summary>Last master clock cycle this channel's timer was updated.</summary>
+	public UInt64 LastTick;
 }
 
 /// <summary>Combined APU state for all 4 audio channels.</summary>
