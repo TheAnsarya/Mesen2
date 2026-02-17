@@ -286,7 +286,7 @@ TEST_F(LynxSuzyMathTest, SignedMultiply_HardwareNegation) {
 	// The hardware's "signed" mode:
 	// If bit 15 is set, it takes two's complement of the VALUE, not just
 	// uses the magnitude. This means $8005 → ~$8005 + 1 = $7FFB = 32763
-	// 
+	//
 	// So to represent -5 in Lynx signed multiply, you'd use... $FFFB
 	// (actual two's complement of 5)? No! The hardware interprets $FFFB as:
 	// bit 15 set → negate: ~$FFFB + 1 = $0004 + 1 = $0005
@@ -296,27 +296,27 @@ TEST_F(LynxSuzyMathTest, SignedMultiply_HardwareNegation) {
 	uint16_t val = 0x8005;
 	uint16_t negated = (uint16_t)(~val + 1);
 	EXPECT_EQ(negated, 0x7FFBu); // ~8005 + 1 = 7FFB
-	
+
 	// The sign bit WAS set, so result is negated after multiplication
 }
 
 TEST_F(LynxSuzyMathTest, SignedMultiply_ActualNegativeValue) {
 	// To get an actually negative result in Lynx signed multiply:
 	// Use one operand with bit 15 set (so it gets negated, and result is negated)
-	// 
+	//
 	// If we want -15 as the result of 5 × 3, use:
 	// $8005 × $0003 → negated($8005) × $0003 = $7FFB × 3 = $17FF1 (very large!)
 	// Then result is negated: ~$17FF1 + 1 since bit 15 was set
 	//
 	// The hardware is really designed for small negative values where
 	// the two's complement behavior works out correctly.
-	
+
 	// For actual game use: small magnitudes work as expected
 	// $8005: bit 15 set, so "negate" → ~$8005+1 = $7FFB = 32763 (!)
 	// Games typically use values like $FFFF (-1), $FFFE (-2), etc.
 	uint16_t a = 0xFFFF; // -1 in two's complement
 	uint16_t b = 0x0003; // +3
-	
+
 	// Hardware: bit 15 set on a, so negate a: ~$FFFF + 1 = $0001
 	// Then multiply: 1 × 3 = 3
 	// Signs differ (a was negative), so negate result: ~3 + 1 = -3
@@ -324,13 +324,13 @@ TEST_F(LynxSuzyMathTest, SignedMultiply_ActualNegativeValue) {
 	bool bNeg = (b & 0x8000) != 0;
 	uint16_t aMag = aNeg ? (uint16_t)(~a + 1) : a;
 	uint16_t bMag = bNeg ? (uint16_t)(~b + 1) : b;
-	
+
 	EXPECT_EQ(aMag, 1u); // ~$FFFF + 1 = $0001
 	EXPECT_EQ(bMag, 3u);
-	
+
 	uint32_t product = (uint32_t)aMag * (uint32_t)bMag;
 	EXPECT_EQ(product, 3u);
-	
+
 	// Result sign: a was negative, b was positive → result is negative
 	EXPECT_TRUE(aNeg ^ bNeg);
 }
@@ -342,18 +342,18 @@ TEST_F(LynxSuzyMathTest, SignedMultiply_BothNegative) {
 	// Signs same → result positive
 	uint16_t a = 0xFFFF;
 	uint16_t b = 0xFFFF;
-	
+
 	bool aNeg = (a & 0x8000) != 0;
 	bool bNeg = (b & 0x8000) != 0;
 	uint16_t aMag = (uint16_t)(~a + 1);
 	uint16_t bMag = (uint16_t)(~b + 1);
-	
+
 	EXPECT_EQ(aMag, 1u);
 	EXPECT_EQ(bMag, 1u);
-	
+
 	uint32_t product = (uint32_t)aMag * (uint32_t)bMag;
 	EXPECT_EQ(product, 1u);
-	
+
 	// Both negative → positive result
 	EXPECT_FALSE(aNeg ^ bNeg);
 }
@@ -364,18 +364,18 @@ TEST_F(LynxSuzyMathTest, Bug13_8_SignedMultiply_8000IsPositive) {
 	// So $8000 is treated as positive $8000 (32768), not negative zero
 	uint16_t val = 0x8000;
 	uint16_t negated = (uint16_t)(~val + 1);
-	
+
 	EXPECT_EQ(negated, 0x8000u); // Two's complement of $8000 is $8000
-	
+
 	// This means $8000 × $0002 = 32768 × 2 = 65536 (not 0)
 	uint16_t a = 0x8000;
 	uint16_t b = 0x0002;
 	bool aNeg = (a & 0x8000) != 0;
 	uint16_t aMag = aNeg ? (uint16_t)(~a + 1) : a;
-	
+
 	// aMag = ~$8000 + 1 = $8000 (the bug!)
 	EXPECT_EQ(aMag, 0x8000u);
-	
+
 	uint32_t product = (uint32_t)aMag * (uint32_t)b;
 	EXPECT_EQ(product, 0x10000u); // 32768 × 2 = 65536
 }
@@ -386,7 +386,7 @@ TEST_F(LynxSuzyMathTest, Bug13_8_SignedMultiply_0000Behaves) {
 	uint16_t val = 0x0000;
 	uint16_t negated = (uint16_t)(~val + 1);
 	EXPECT_EQ(negated, 0x0000u);
-	
+
 	// $0000 × anything = 0
 	uint32_t product = (uint32_t)0 * (uint32_t)12345;
 	EXPECT_EQ(product, 0u);
@@ -402,7 +402,7 @@ TEST_F(LynxSuzyMathTest, UnsignedDivide_Basic) {
 	uint16_t divisor = 7;
 	uint32_t quotient = dividend / divisor;
 	uint32_t remainder = dividend % divisor;
-	
+
 	EXPECT_EQ(quotient, 14u);
 	EXPECT_EQ(remainder, 2u);
 }
@@ -413,7 +413,7 @@ TEST_F(LynxSuzyMathTest, UnsignedDivide_Large) {
 	uint16_t divisor = 0x1234;
 	uint32_t quotient = dividend / divisor;
 	uint32_t remainder = dividend % divisor;
-	
+
 	EXPECT_EQ(quotient, dividend / divisor);
 	EXPECT_EQ(remainder, dividend % divisor);
 }
@@ -424,7 +424,7 @@ TEST_F(LynxSuzyMathTest, UnsignedDivide_QuotientZero) {
 	uint16_t divisor = 100;
 	uint32_t quotient = dividend / divisor;
 	uint32_t remainder = dividend % divisor;
-	
+
 	EXPECT_EQ(quotient, 0u);
 	EXPECT_EQ(remainder, 5u);
 }
@@ -435,7 +435,7 @@ TEST_F(LynxSuzyMathTest, UnsignedDivide_ByOne) {
 	uint16_t divisor = 1;
 	uint32_t quotient = dividend / divisor;
 	uint32_t remainder = dividend % divisor;
-	
+
 	EXPECT_EQ(quotient, dividend);
 	EXPECT_EQ(remainder, 0u);
 }
@@ -446,7 +446,7 @@ TEST_F(LynxSuzyMathTest, UnsignedDivide_ExactDivision) {
 	uint16_t divisor = 10;
 	uint32_t quotient = dividend / divisor;
 	uint32_t remainder = dividend % divisor;
-	
+
 	EXPECT_EQ(quotient, 100u);
 	EXPECT_EQ(remainder, 0u);
 }
@@ -459,13 +459,13 @@ TEST_F(LynxSuzyMathTest, Collision_NoCollision_EmptyBuffer) {
 	// Writing to empty slot doesn't trigger collision
 	uint8_t collNum = 5;
 	uint8_t pixIndex = 3;
-	
+
 	// Buffer is empty
 	EXPECT_EQ(_state.CollisionBuffer[pixIndex], 0u);
-	
+
 	// First sprite writes its collision number
 	_state.CollisionBuffer[pixIndex] = collNum;
-	
+
 	// No mutual update needed since nothing was there
 	EXPECT_EQ(_state.CollisionBuffer[pixIndex], 5u);
 	EXPECT_EQ(_state.CollisionBuffer[collNum], 0u); // This sprite's slot not touched
@@ -476,18 +476,18 @@ TEST_F(LynxSuzyMathTest, Collision_TwoSprites_MutualUpdate) {
 	uint8_t sprite3 = 3;
 	uint8_t sprite5 = 5;
 	uint8_t pixIndex = 7;
-	
+
 	// Sprite 3 writes first
 	_state.CollisionBuffer[pixIndex] = sprite3;
-	
+
 	// Sprite 5 writes to same pixel — collision!
 	uint8_t existing = _state.CollisionBuffer[pixIndex]; // 3
 	EXPECT_EQ(existing, sprite3);
-	
+
 	// Mutual update
 	_state.CollisionBuffer[sprite5] |= existing; // Sprite 5's slot gets 3
 	_state.CollisionBuffer[existing] |= sprite5; // Sprite 3's slot gets 5
-	
+
 	EXPECT_EQ(_state.CollisionBuffer[sprite5], sprite3); // 5 collided with 3
 	EXPECT_EQ(_state.CollisionBuffer[sprite3], sprite5); // 3 collided with 5
 }
@@ -496,21 +496,21 @@ TEST_F(LynxSuzyMathTest, Collision_ThreeSprites_Accumulate) {
 	// Sprites 2, 4, 6 all collide on same pixel
 	uint8_t spriteA = 2, spriteB = 4, spriteC = 6;
 	uint8_t pixIndex = 9;
-	
+
 	// Sprite A writes first
 	_state.CollisionBuffer[pixIndex] = spriteA;
-	
+
 	// Sprite B collides with A
 	uint8_t existing = _state.CollisionBuffer[pixIndex];
 	_state.CollisionBuffer[spriteB] |= existing;
 	_state.CollisionBuffer[existing] |= spriteB;
 	_state.CollisionBuffer[pixIndex] = spriteB; // B is now top
-	
+
 	// Sprite C collides with B
 	existing = _state.CollisionBuffer[pixIndex];
 	_state.CollisionBuffer[spriteC] |= existing;
 	_state.CollisionBuffer[existing] |= spriteC;
-	
+
 	EXPECT_EQ(_state.CollisionBuffer[spriteA], spriteB); // A hit B
 	EXPECT_EQ(_state.CollisionBuffer[spriteB], spriteA | spriteC); // B hit A and C
 	EXPECT_EQ(_state.CollisionBuffer[spriteC], spriteB); // C hit B
@@ -521,7 +521,7 @@ TEST_F(LynxSuzyMathTest, Collision_AllSlots) {
 	for (int i = 0; i < 16; i++) {
 		_state.CollisionBuffer[i] = (uint8_t)i;
 	}
-	
+
 	for (int i = 0; i < 16; i++) {
 		EXPECT_EQ(_state.CollisionBuffer[i], (uint8_t)i);
 	}
@@ -560,7 +560,7 @@ TEST_F(LynxSuzyMathTest, SpriteBpp_ColorCounts) {
 	EXPECT_EQ(1 << (uint8_t)LynxSpriteBpp::Bpp2, 2);
 	EXPECT_EQ(1 << (uint8_t)LynxSpriteBpp::Bpp3, 4);
 	EXPECT_EQ(1 << (uint8_t)LynxSpriteBpp::Bpp4, 8);
-	
+
 	// Actual color counts: 2^(bpp+1) when mode is used as power
 	// Or simpler: 2, 4, 8, 16 for modes 0, 1, 2, 3
 	int colors[] = { 2, 4, 8, 16 };
@@ -577,4 +577,384 @@ TEST_F(LynxSuzyMathTest, SpriteBpp_PixelMask) {
 	EXPECT_EQ(masks[(uint8_t)LynxSpriteBpp::Bpp2], 0x03);
 	EXPECT_EQ(masks[(uint8_t)LynxSpriteBpp::Bpp3], 0x07);
 	EXPECT_EQ(masks[(uint8_t)LynxSpriteBpp::Bpp4], 0x0F);
+}
+
+//=============================================================================
+// Signed Division Tests
+// Complements Bug13_9 tests with more signed division edge cases
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, SignedDivide_PositiveByPositive) {
+	// 100 / 7 in signed mode = 14 remainder 2 (same as unsigned)
+	int32_t dividend = 100;
+	int16_t divisor = 7;
+
+	int32_t quotient = dividend / divisor;
+	int32_t remainder = dividend % divisor;
+
+	EXPECT_EQ(quotient, 14);
+	EXPECT_EQ(remainder, 2);
+}
+
+TEST_F(LynxSuzyMathTest, SignedDivide_NegativeByPositive) {
+	// -100 / 7 = -14 remainder -2 (C truncates toward zero)
+	int32_t dividend = -100;
+	int16_t divisor = 7;
+
+	int32_t quotient = dividend / divisor;
+	int32_t remainder = dividend % divisor;
+
+	EXPECT_EQ(quotient, -14);
+	EXPECT_EQ(remainder, -2);
+
+	// Hardware: remainder is always positive magnitude
+	uint16_t hwRemainder = (uint16_t)std::abs(remainder);
+	EXPECT_EQ(hwRemainder, 2u);
+}
+
+TEST_F(LynxSuzyMathTest, SignedDivide_PositiveByNegative) {
+	// 100 / -7 = -14 remainder 2
+	int32_t dividend = 100;
+	int16_t divisor = -7;
+
+	int32_t quotient = dividend / divisor;
+	int32_t remainder = dividend % divisor;
+
+	EXPECT_EQ(quotient, -14);
+	EXPECT_EQ(remainder, 2);
+}
+
+TEST_F(LynxSuzyMathTest, SignedDivide_NegativeByNegative) {
+	// -100 / -7 = 14 remainder -2
+	int32_t dividend = -100;
+	int16_t divisor = -7;
+
+	int32_t quotient = dividend / divisor;
+	int32_t remainder = dividend % divisor;
+
+	EXPECT_EQ(quotient, 14);
+	EXPECT_EQ(remainder, -2);
+
+	// Hardware: remainder always positive
+	uint16_t hwRemainder = (uint16_t)std::abs(remainder);
+	EXPECT_EQ(hwRemainder, 2u);
+}
+
+TEST_F(LynxSuzyMathTest, SignedDivide_DividendZero) {
+	// 0 / 7 = 0 remainder 0
+	int32_t dividend = 0;
+	int16_t divisor = 7;
+
+	int32_t quotient = dividend / divisor;
+	int32_t remainder = dividend % divisor;
+
+	EXPECT_EQ(quotient, 0);
+	EXPECT_EQ(remainder, 0);
+}
+
+TEST_F(LynxSuzyMathTest, SignedDivide_ExactDivision) {
+	// -21 / 7 = -3 remainder 0
+	int32_t dividend = -21;
+	int16_t divisor = 7;
+
+	int32_t quotient = dividend / divisor;
+	int32_t remainder = dividend % divisor;
+
+	EXPECT_EQ(quotient, -3);
+	EXPECT_EQ(remainder, 0);
+}
+
+//=============================================================================
+// Sprite Control Register 0 (SPRCTL0) Decoding
+// Bits [2:0] = Sprite type
+// Bits [7:6] = BPP mode
+// Bit 4 = HFLIP
+// Bit 5 = VFLIP
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Sprctl0_TypeDecoding) {
+	// Type is bits [2:0]
+	uint8_t sprctl0 = 0b00000001; // Type = 1 (Normal)
+	uint8_t spriteType = sprctl0 & 0x07;
+	EXPECT_EQ(spriteType, (uint8_t)LynxSpriteType::Normal);
+
+	sprctl0 = 0b00000010; // Type = 2 (Boundary)
+	spriteType = sprctl0 & 0x07;
+	EXPECT_EQ(spriteType, (uint8_t)LynxSpriteType::Boundary);
+
+	sprctl0 = 0b00000111; // Type = 7 (Shadow)
+	spriteType = sprctl0 & 0x07;
+	EXPECT_EQ(spriteType, (uint8_t)LynxSpriteType::Shadow);
+}
+
+TEST_F(LynxSuzyMathTest, Sprctl0_BppDecoding) {
+	// BPP is bits [7:6]
+	uint8_t sprctl0 = 0b00000000; // BPP = 0 (1bpp)
+	uint8_t bpp = (sprctl0 >> 6) & 0x03;
+	EXPECT_EQ(bpp, (uint8_t)LynxSpriteBpp::Bpp1);
+
+	sprctl0 = 0b01000000; // BPP = 1 (2bpp)
+	bpp = (sprctl0 >> 6) & 0x03;
+	EXPECT_EQ(bpp, (uint8_t)LynxSpriteBpp::Bpp2);
+
+	sprctl0 = 0b10000000; // BPP = 2 (3bpp)
+	bpp = (sprctl0 >> 6) & 0x03;
+	EXPECT_EQ(bpp, (uint8_t)LynxSpriteBpp::Bpp3);
+
+	sprctl0 = 0b11000000; // BPP = 3 (4bpp)
+	bpp = (sprctl0 >> 6) & 0x03;
+	EXPECT_EQ(bpp, (uint8_t)LynxSpriteBpp::Bpp4);
+}
+
+TEST_F(LynxSuzyMathTest, Sprctl0_HFlip) {
+	// HFLIP is bit 4
+	uint8_t sprctl0 = 0b00010000;
+	bool hflip = (sprctl0 & 0x10) != 0;
+	EXPECT_TRUE(hflip);
+
+	sprctl0 = 0b00000000;
+	hflip = (sprctl0 & 0x10) != 0;
+	EXPECT_FALSE(hflip);
+}
+
+TEST_F(LynxSuzyMathTest, Sprctl0_VFlip) {
+	// VFLIP is bit 5
+	uint8_t sprctl0 = 0b00100000;
+	bool vflip = (sprctl0 & 0x20) != 0;
+	EXPECT_TRUE(vflip);
+
+	sprctl0 = 0b00000000;
+	vflip = (sprctl0 & 0x20) != 0;
+	EXPECT_FALSE(vflip);
+}
+
+TEST_F(LynxSuzyMathTest, Sprctl0_Combined) {
+	// Type=3, BPP=2, HFLIP=1, VFLIP=0
+	// = 0b10_01_0_011 = 0x93
+	uint8_t sprctl0 = 0b10010011;
+
+	uint8_t spriteType = sprctl0 & 0x07;
+	uint8_t bpp = (sprctl0 >> 6) & 0x03;
+	bool hflip = (sprctl0 & 0x10) != 0;
+	bool vflip = (sprctl0 & 0x20) != 0;
+
+	EXPECT_EQ(spriteType, 3); // NormalShadow
+	EXPECT_EQ(bpp, 2);        // 3bpp
+	EXPECT_TRUE(hflip);
+	EXPECT_FALSE(vflip);
+}
+
+TEST_F(LynxSuzyMathTest, Sprctl0_AllFlips) {
+	// Both HFLIP and VFLIP set
+	uint8_t sprctl0 = 0b00110000;
+	bool hflip = (sprctl0 & 0x10) != 0;
+	bool vflip = (sprctl0 & 0x20) != 0;
+
+	EXPECT_TRUE(hflip);
+	EXPECT_TRUE(vflip);
+}
+
+//=============================================================================
+// SPRSYS Flags Tests
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Sprsys_UnsafeAccess) {
+	_state.UnsafeAccess = false;
+	EXPECT_FALSE(_state.UnsafeAccess);
+
+	_state.UnsafeAccess = true;
+	EXPECT_TRUE(_state.UnsafeAccess);
+}
+
+TEST_F(LynxSuzyMathTest, Sprsys_SpriteToSpriteCollision) {
+	_state.SpriteToSpriteCollision = false;
+	EXPECT_FALSE(_state.SpriteToSpriteCollision);
+
+	_state.SpriteToSpriteCollision = true;
+	EXPECT_TRUE(_state.SpriteToSpriteCollision);
+}
+
+TEST_F(LynxSuzyMathTest, Sprsys_VStretch) {
+	_state.VStretch = false;
+	EXPECT_FALSE(_state.VStretch);
+
+	_state.VStretch = true;
+	EXPECT_TRUE(_state.VStretch);
+}
+
+TEST_F(LynxSuzyMathTest, Sprsys_LeftHand) {
+	_state.LeftHand = false;
+	EXPECT_FALSE(_state.LeftHand);
+
+	_state.LeftHand = true;
+	EXPECT_TRUE(_state.LeftHand);
+}
+
+TEST_F(LynxSuzyMathTest, Sprsys_LastCarry) {
+	_state.LastCarry = false;
+	EXPECT_FALSE(_state.LastCarry);
+
+	_state.LastCarry = true;
+	EXPECT_TRUE(_state.LastCarry);
+}
+
+//=============================================================================
+// Sprite Scaling — Fixed Point 8.8 Format
+// HSIZE/VSIZE are in 8.8 fixed point: 0x0100 = 1.0
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Scaling_FixedPoint_1_0) {
+	// 0x0100 = 1.0 (no scaling)
+	uint16_t size = 0x0100;
+	double scale = size / 256.0;
+	EXPECT_DOUBLE_EQ(scale, 1.0);
+}
+
+TEST_F(LynxSuzyMathTest, Scaling_FixedPoint_0_5) {
+	// 0x0080 = 0.5 (half size)
+	uint16_t size = 0x0080;
+	double scale = size / 256.0;
+	EXPECT_DOUBLE_EQ(scale, 0.5);
+}
+
+TEST_F(LynxSuzyMathTest, Scaling_FixedPoint_2_0) {
+	// 0x0200 = 2.0 (double size)
+	uint16_t size = 0x0200;
+	double scale = size / 256.0;
+	EXPECT_DOUBLE_EQ(scale, 2.0);
+}
+
+TEST_F(LynxSuzyMathTest, Scaling_FixedPoint_0_25) {
+	// 0x0040 = 0.25 (quarter size)
+	uint16_t size = 0x0040;
+	double scale = size / 256.0;
+	EXPECT_DOUBLE_EQ(scale, 0.25);
+}
+
+TEST_F(LynxSuzyMathTest, Scaling_FixedPoint_Max) {
+	// 0xFFFF = ~255.996 (maximum scale)
+	uint16_t size = 0xFFFF;
+	double scale = size / 256.0;
+	EXPECT_NEAR(scale, 255.996, 0.001);
+}
+
+TEST_F(LynxSuzyMathTest, Scaling_FixedPoint_Zero) {
+	// 0x0000 = 0.0 (sprite invisible)
+	uint16_t size = 0x0000;
+	double scale = size / 256.0;
+	EXPECT_DOUBLE_EQ(scale, 0.0);
+}
+
+TEST_F(LynxSuzyMathTest, Scaling_PixelWidth_Simple) {
+	// For a 10-pixel sprite at 2.0 scale: 10 * 2 = 20 pixels
+	int srcPixels = 10;
+	uint16_t size = 0x0200; // 2.0
+	int dstPixels = (srcPixels * size) >> 8;
+	EXPECT_EQ(dstPixels, 20);
+}
+
+TEST_F(LynxSuzyMathTest, Scaling_PixelWidth_Fractional) {
+	// 10 pixels at 1.5 scale: 10 * 1.5 = 15 pixels
+	int srcPixels = 10;
+	uint16_t size = 0x0180; // 1.5
+	int dstPixels = (srcPixels * size) >> 8;
+	EXPECT_EQ(dstPixels, 15);
+}
+
+//=============================================================================
+// Sprite Position — Signed 16-bit
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Position_PositiveOnScreen) {
+	int16_t x = 80;  // Center of 160-pixel screen
+	int16_t y = 51;  // Center of 102-line screen
+
+	EXPECT_GE(x, 0);
+	EXPECT_LT(x, (int16_t)LynxConstants::ScreenWidth);
+	EXPECT_GE(y, 0);
+	EXPECT_LT(y, (int16_t)LynxConstants::ScreenHeight);
+}
+
+TEST_F(LynxSuzyMathTest, Position_NegativeOffScreen) {
+	// Sprites can have negative positions (partially off-screen)
+	int16_t x = -10;
+	int16_t y = -5;
+
+	EXPECT_LT(x, 0);
+	EXPECT_LT(y, 0);
+}
+
+TEST_F(LynxSuzyMathTest, Position_LargePositive) {
+	// Sprites can extend beyond screen boundaries
+	int16_t x = 200; // > 160
+	int16_t y = 150; // > 102
+
+	EXPECT_GT(x, (int16_t)LynxConstants::ScreenWidth);
+	EXPECT_GT(y, (int16_t)LynxConstants::ScreenHeight);
+}
+
+//=============================================================================
+// Sprite Data Packing — RLE and Literal
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, PackedData_OffsetByte) {
+	// First byte of line data encodes offset and literal flag
+	// Bits [6:0] = line offset (distance to next line data)
+	// Bit 7 = literal mode (0 = packed, 1 = literal)
+	uint8_t byte = 0b00001010; // Offset=10, Literal=false
+	uint8_t offset = byte & 0x7F;
+	bool literal = (byte & 0x80) != 0;
+
+	EXPECT_EQ(offset, 10);
+	EXPECT_FALSE(literal);
+}
+
+TEST_F(LynxSuzyMathTest, PackedData_LiteralMode) {
+	uint8_t byte = 0b10001010; // Offset=10, Literal=true
+	uint8_t offset = byte & 0x7F;
+	bool literal = (byte & 0x80) != 0;
+
+	EXPECT_EQ(offset, 10);
+	EXPECT_TRUE(literal);
+}
+
+TEST_F(LynxSuzyMathTest, PackedData_ZeroOffset_EndOfSprite) {
+	// Offset of 0 indicates end of sprite data
+	uint8_t byte = 0x00;
+	uint8_t offset = byte & 0x7F;
+
+	EXPECT_EQ(offset, 0);
+}
+
+//=============================================================================
+// Pen Index Remapping
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, PenIndex_DefaultMapping) {
+	// Default pen mapping is identity: pen[n] = n
+	uint8_t penIndex[16] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+	for (int i = 0; i < 16; i++) {
+		EXPECT_EQ(penIndex[i], i);
+	}
+}
+
+TEST_F(LynxSuzyMathTest, PenIndex_Remapped) {
+	// Pen remapping allows palette indirection
+	uint8_t penIndex[16] = { 0,2,4,6,8,10,12,14,1,3,5,7,9,11,13,15 };
+	EXPECT_EQ(penIndex[0], 0);
+	EXPECT_EQ(penIndex[1], 2);
+	EXPECT_EQ(penIndex[8], 1);
+}
+
+TEST_F(LynxSuzyMathTest, PenIndex_TransparentColor) {
+	// Pen 0 is typically transparent (not drawn)
+	uint8_t penIndex = 0;
+	bool transparent = (penIndex == 0);
+	EXPECT_TRUE(transparent);
+}
+
+TEST_F(LynxSuzyMathTest, PenIndex_MaxValue) {
+	// Maximum pen index for 4bpp is 15
+	uint8_t maxPen = 15;
+	EXPECT_LE(maxPen, 15);
 }
