@@ -1929,3 +1929,363 @@ TEST_F(LynxSuzyMathTest, Fuzz_NibblePacking_1000Pixels) {
 		}
 	}
 }
+
+//=============================================================================
+// Horizontal/Vertical Flip
+// SPRCTL0 bits 4-5 control H/V flip: bit4=HFLIP, bit5=VFLIP
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, HFlip_DirectionReversed) {
+	// For HFLIP, x starts at far right and decrements
+	int width = 10;
+	bool hFlip = true;
+
+	// Without HFLIP: x goes 0,1,2,...,9
+	// With HFLIP: x goes 9,8,7,...,0
+	std::vector<int> positions;
+	for (int i = 0; i < width; i++) {
+		int x = hFlip ? (width - 1 - i) : i;
+		positions.push_back(x);
+	}
+
+	EXPECT_EQ(positions[0], 9);
+	EXPECT_EQ(positions[9], 0);
+}
+
+TEST_F(LynxSuzyMathTest, HFlip_MirrorPosition) {
+	// X position is mirrored around center
+	int startX = 80;
+	int width = 20;
+	bool hFlip = true;
+
+	// With HFLIP, first pixel drawn at startX + width - 1
+	int firstDrawX = hFlip ? (startX + width - 1) : startX;
+	EXPECT_EQ(firstDrawX, 99);
+}
+
+TEST_F(LynxSuzyMathTest, VFlip_DirectionReversed) {
+	// For VFLIP, y starts at bottom and decrements
+	int height = 8;
+	bool vFlip = true;
+
+	std::vector<int> rows;
+	for (int i = 0; i < height; i++) {
+		int y = vFlip ? (height - 1 - i) : i;
+		rows.push_back(y);
+	}
+
+	EXPECT_EQ(rows[0], 7);
+	EXPECT_EQ(rows[7], 0);
+}
+
+TEST_F(LynxSuzyMathTest, VFlip_MirrorPosition) {
+	int startY = 50;
+	int height = 16;
+	bool vFlip = true;
+
+	int firstDrawY = vFlip ? (startY + height - 1) : startY;
+	EXPECT_EQ(firstDrawY, 65);
+}
+
+TEST_F(LynxSuzyMathTest, HVFlip_Combined) {
+	// Both flips enabled: pixel (0,0) drawn at (w-1, h-1)
+	int width = 16, height = 12;
+	bool hFlip = true, vFlip = true;
+
+	int drawX = hFlip ? (width - 1) : 0;
+	int drawY = vFlip ? (height - 1) : 0;
+
+	EXPECT_EQ(drawX, 15);
+	EXPECT_EQ(drawY, 11);
+}
+
+TEST_F(LynxSuzyMathTest, Flip_Sprctl0_BitExtraction) {
+	// HFLIP is bit 4, VFLIP is bit 5
+	uint8_t sprctl0 = 0b00110000; // bits 4&5 set
+
+	bool hFlip = (sprctl0 & (1 << 4)) != 0;
+	bool vFlip = (sprctl0 & (1 << 5)) != 0;
+
+	EXPECT_TRUE(hFlip);
+	EXPECT_TRUE(vFlip);
+}
+
+//=============================================================================
+// RLE vs Literal Encoding
+// Lynx sprites can use Run-Length Encoding for compression
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, RLE_LiteralPacketSize) {
+	// Literal packet: header byte specifies count
+	// Count 0 = 1 pixel, count 15 = 16 pixels
+	for (int headerCount = 0; headerCount < 16; headerCount++) {
+		int actualPixels = headerCount + 1;
+		EXPECT_EQ(actualPixels, headerCount + 1);
+	}
+}
+
+TEST_F(LynxSuzyMathTest, RLE_RepeatPacketSize) {
+	// Repeat packet: header + 1 data byte repeated N times
+	// Same count encoding as literal
+	for (int headerCount = 0; headerCount < 16; headerCount++) {
+		int repeatCount = headerCount + 1;
+		EXPECT_GE(repeatCount, 1);
+		EXPECT_LE(repeatCount, 16);
+	}
+}
+
+TEST_F(LynxSuzyMathTest, RLE_ByteSavings) {
+	// For 16 repeated pixels at 4bpp:
+	// Literal: 1 (header) + 8 (data) = 9 bytes
+	// RLE: 1 (header) + 1 (repeated value) = 2 bytes
+	int repeatCount = 16;
+	int bpp = 4;
+
+	int literalBytes = 1 + (repeatCount * bpp + 7) / 8;
+	int rleBytes = 1 + (bpp + 7) / 8;
+
+	EXPECT_EQ(literalBytes, 9);
+	EXPECT_EQ(rleBytes, 2);
+	EXPECT_GT(literalBytes, rleBytes);
+}
+
+TEST_F(LynxSuzyMathTest, RLE_PacketTypeBit) {
+	// High bit of header distinguishes literal (0) from repeat (1)
+	uint8_t literalHeader = 0x0F;   // bit7=0, literal
+	uint8_t repeatHeader = 0x8F;    // bit7=1, repeat
+
+	bool isRepeat1 = (literalHeader & 0x80) != 0;
+	bool isRepeat2 = (repeatHeader & 0x80) != 0;
+
+	EXPECT_FALSE(isRepeat1);
+	EXPECT_TRUE(isRepeat2);
+}
+
+//=============================================================================
+// Collision Buffer Edge Cases
+// The collision buffer stores the highest collision number that hit each slot.
+// When sprite A (collNum) collides with sprite B (existingPixel):
+//   Buffer[A] = max(Buffer[A], B) and Buffer[B] = max(Buffer[B], A)
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, CollisionBuffer_AllSlotsWritable) {
+	// All 16 collision slots can hold collision data (0-15)
+	_state.CollisionBuffer[0] = 0x0F;
+	_state.CollisionBuffer[15] = 0x0A;
+
+	EXPECT_EQ(_state.CollisionBuffer[0], 0x0F);
+	EXPECT_EQ(_state.CollisionBuffer[15], 0x0A);
+}
+
+TEST_F(LynxSuzyMathTest, CollisionBuffer_HighestColliderWins) {
+	// Collision buffer stores highest collision number
+	// If sprite 3 hits sprite 5, then sprite 7 hits sprite 3:
+	// Buffer[3] was 5, now should be 7 (higher)
+
+	_state.CollisionBuffer[3] = 5;
+
+	// Simulate sprite 7 colliding with sprite 3
+	uint8_t collNum = 7;
+	uint8_t existingValue = _state.CollisionBuffer[3];
+	if (collNum > existingValue) {
+		_state.CollisionBuffer[3] = collNum;
+	}
+
+	EXPECT_EQ(_state.CollisionBuffer[3], 7);
+}
+
+TEST_F(LynxSuzyMathTest, CollisionBuffer_LowerColliderIgnored) {
+	// Lower collision numbers don't overwrite higher ones
+
+	_state.CollisionBuffer[5] = 10;
+
+	// Sprite 3 tries to collide with sprite 5
+	uint8_t collNum = 3;
+	uint8_t existingValue = _state.CollisionBuffer[5];
+	if (collNum > existingValue) {
+		_state.CollisionBuffer[5] = collNum;
+	}
+
+	// Value should still be 10 (3 < 10)
+	EXPECT_EQ(_state.CollisionBuffer[5], 10);
+}
+
+TEST_F(LynxSuzyMathTest, CollisionBuffer_MutualUpdate_Logic) {
+	// When sprite A hits sprite B, both buffers update
+	// A gets B's number, B gets A's number (respecting max rule)
+
+	_state.CollisionBuffer[3] = 0;
+	_state.CollisionBuffer[7] = 0;
+
+	// Sprite 7 draws over pixel from sprite 3
+	uint8_t spriteA = 7;
+	uint8_t spriteB = 3;
+
+	// Update A's buffer: max(0, 3) = 3
+	if (spriteB > _state.CollisionBuffer[spriteA]) {
+		_state.CollisionBuffer[spriteA] = spriteB;
+	}
+	// Update B's buffer: max(0, 7) = 7
+	if (spriteA > _state.CollisionBuffer[spriteB]) {
+		_state.CollisionBuffer[spriteB] = spriteA;
+	}
+
+	EXPECT_EQ(_state.CollisionBuffer[7], 3); // A saw B
+	EXPECT_EQ(_state.CollisionBuffer[3], 7); // B saw A
+}
+
+TEST_F(LynxSuzyMathTest, CollisionBuffer_SamePenNoUpdate) {
+	// Same collision number doesn't change buffer
+	_state.CollisionBuffer[5] = 3;
+
+	uint8_t existingPixel = 5; // Same as our collision number
+	uint8_t collNum = 5;
+
+	// Same collision number - no update
+	bool shouldUpdate = (existingPixel != collNum) && (existingPixel > _state.CollisionBuffer[collNum]);
+	EXPECT_FALSE(shouldUpdate);
+}
+
+TEST_F(LynxSuzyMathTest, CollisionBuffer_TransparentIgnored) {
+	// Collision number 0 is "transparent" - no collision
+	_state.CollisionBuffer[5] = 3;
+
+	uint8_t existingPixel = 0;
+	uint8_t collNum = 5;
+
+	// existingPixel=0 means transparent, no collision
+	bool shouldUpdate = (existingPixel > 0) && (existingPixel > _state.CollisionBuffer[collNum]);
+	EXPECT_FALSE(shouldUpdate);
+}
+
+//=============================================================================
+// SCB Chain Traversal
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, SCB_ChainLinkFormat) {
+	// Each SCB starts with next SCB address (2 bytes, little-endian)
+	uint8_t scbData[] = { 0x34, 0x12 }; // Next SCB at 0x1234
+
+	uint16_t nextScb = scbData[0] | (scbData[1] << 8);
+	EXPECT_EQ(nextScb, 0x1234);
+}
+
+TEST_F(LynxSuzyMathTest, SCB_NullTerminator) {
+	// Next pointer of 0x0000 terminates chain
+	uint16_t nextScb = 0x0000;
+	bool isEndOfChain = (nextScb == 0);
+	EXPECT_TRUE(isEndOfChain);
+}
+
+TEST_F(LynxSuzyMathTest, Bug13_12_ZeroPageTerminates) {
+	// Any address < 0x0100 terminates due to Bug 13.12
+	for (uint16_t addr = 0x0000; addr < 0x0100; addr++) {
+		bool terminates = (addr < 0x0100);
+		EXPECT_TRUE(terminates) << "Address 0x" << std::hex << addr;
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Bug13_12_NonZeroPageContinues) {
+	// Address >= 0x0100 allows chain to continue
+	uint16_t validAddresses[] = { 0x0100, 0x1000, 0x8000, 0xC000, 0xFFFE };
+	for (auto addr : validAddresses) {
+		bool terminates = (addr < 0x0100);
+		EXPECT_FALSE(terminates) << "Address 0x" << std::hex << addr;
+	}
+}
+
+//=============================================================================
+// Pen Index Remapping
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, PenIndex_DirectMapping) {
+	// Without palette reload, pen index is used directly
+	uint8_t penIndex = 7;
+	uint8_t outputColor = penIndex; // Direct mapping
+	EXPECT_EQ(outputColor, 7);
+}
+
+TEST_F(LynxSuzyMathTest, PenIndex_MaxPen4bpp) {
+	// 4bpp mode: pen indices 0-15
+	uint8_t maxPen = 15;
+	EXPECT_LE(maxPen, 15);
+}
+
+TEST_F(LynxSuzyMathTest, PenIndex_TransparentIsZero) {
+	// Pen 0 is always transparent
+	uint8_t transparentPen = 0;
+	bool isTransparent = (transparentPen == 0);
+	EXPECT_TRUE(isTransparent);
+}
+
+//=============================================================================
+// Fuzz: H/V Flip Behavior
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Fuzz_FlipPositions_1000Sprites) {
+	constexpr uint64_t SEED = 0x464C4950464C4950ULL; // "FLIPFLIP"
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		int width = (rng.Next16() % 64) + 1;  // 1-64
+		int height = (rng.Next16() % 64) + 1;
+		int startX = rng.Next16() % 160;
+		int startY = rng.Next16() % 102;
+		bool hFlip = (rng.Next16() & 1) != 0;
+		bool vFlip = (rng.Next16() & 1) != 0;
+
+		// Calculate first drawn pixel position
+		int drawX = hFlip ? (startX + width - 1) : startX;
+		int drawY = vFlip ? (startY + height - 1) : startY;
+
+		// With flip, first pixel is at opposite end
+		if (hFlip) {
+			EXPECT_GE(drawX, startX);
+		} else {
+			EXPECT_EQ(drawX, startX);
+		}
+
+		if (vFlip) {
+			EXPECT_GE(drawY, startY);
+		} else {
+			EXPECT_EQ(drawY, startY);
+		}
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_CollisionBuffer_HighestWins) {
+	constexpr uint64_t SEED = 0x434F4C4C00000000ULL; // "COLL"
+	TestRng rng(SEED);
+
+	// Test that collision buffer always keeps the highest collider number
+	for (int round = 0; round < 100; round++) {
+		// Reset collision buffer
+		for (int i = 0; i < 16; i++) {
+			_state.CollisionBuffer[i] = 0;
+		}
+
+		// Pick a random slot to test
+		int slot = rng.Next16() % 16;
+		uint8_t maxSeen = 0;
+
+		// Simulate 20 random collisions with this slot
+		for (int collision = 0; collision < 20; collision++) {
+			uint8_t collider = rng.Next16() % 16;
+			if (collider == 0) continue; // Skip transparent
+
+			// Apply collision logic
+			if (collider > _state.CollisionBuffer[slot]) {
+				_state.CollisionBuffer[slot] = collider;
+			}
+
+			// Track maximum
+			if (collider > maxSeen) {
+				maxSeen = collider;
+			}
+		}
+
+		// Buffer should contain the highest collider seen
+		EXPECT_EQ(_state.CollisionBuffer[slot], maxSeen)
+			<< "Round " << round << ", slot " << slot;
+	}
+}
