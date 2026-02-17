@@ -287,6 +287,17 @@ public struct LynxSuzyState : BaseState {
 	/// <summary>Math overflow occurred.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool MathOverflow;
 
+	/// <summary>Last carry bit from multiply — SPRSYS read bit 2.</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool LastCarry;
+	/// <summary>Unsafe access detected — CPU tried to access Suzy during sprite processing. SPRSYS read bit 3.</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool UnsafeAccess;
+	/// <summary>Sprite-to-sprite collision occurred (sticky flag). SPRSYS read bit 4.</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool SpriteToSpriteCollision;
+	/// <summary>VStretch enable — SPRSYS write bit 4. When set, vsize is applied as stretch factor.</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool VStretch;
+	/// <summary>LeftHand enable — SPRSYS write bit 5. Flips coordinate system for left-handed orientation.</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool LeftHand;
+
 	/// <summary>Collision depository (16 entries, one per pen color).</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
 	public byte[] CollisionBuffer;
