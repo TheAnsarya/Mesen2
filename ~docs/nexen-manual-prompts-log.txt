@@ -286,7 +286,11 @@ Is the private key in `https://github.com/42Bastian/lynx-encryption-tools/blob/m
 
 Oh god, yes please!
 
+Continue working on these tests and issues; continue;
 
+[Nexen] (Lynx) For the multiply/divide and other math function, don't just test zero and max, also pick a seed, make an rng, and then test a loop with like 1000 value-pairs to make sure regular numbers are tested; continue to make tests and benchmarks and issues and adding inline code comments; continue;
+
+Continue working on these tests and issues; continue;
 
 
 

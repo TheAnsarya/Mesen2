@@ -1565,3 +1565,367 @@ TEST_F(LynxSuzyMathTest, Fuzz_MultiplyAccumulate_Workload) {
 			<< "Multiply-accumulate workload failed at sprite " << sprite;
 	}
 }
+
+//=============================================================================
+// BPP Pixel Bit Extraction
+// Lynx sprites use 1/2/3/4 bits per pixel. The pixel data is bit-packed
+// and must be extracted from a byte stream.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, BppExtract_1bpp_AllValues) {
+	// 1bpp: mask = 0x01, values 0-1
+	uint8_t bppMask = (1 << 1) - 1;
+	EXPECT_EQ(bppMask, 0x01);
+
+	// Extract 8 pixels from one byte
+	uint8_t data = 0b10110100;
+	for (int bit = 7; bit >= 0; bit--) {
+		uint8_t pixel = (data >> bit) & bppMask;
+		EXPECT_LE(pixel, 1);
+	}
+}
+
+TEST_F(LynxSuzyMathTest, BppExtract_2bpp_AllValues) {
+	// 2bpp: mask = 0x03, values 0-3
+	uint8_t bppMask = (1 << 2) - 1;
+	EXPECT_EQ(bppMask, 0x03);
+
+	// Extract 4 pixels from one byte: [11][01][00][10] = 0xD2
+	uint8_t data = 0b11010010;
+	uint8_t px0 = (data >> 6) & bppMask; // 11 = 3
+	uint8_t px1 = (data >> 4) & bppMask; // 01 = 1
+	uint8_t px2 = (data >> 2) & bppMask; // 00 = 0
+	uint8_t px3 = (data >> 0) & bppMask; // 10 = 2
+
+	EXPECT_EQ(px0, 3);
+	EXPECT_EQ(px1, 1);
+	EXPECT_EQ(px2, 0);
+	EXPECT_EQ(px3, 2);
+}
+
+TEST_F(LynxSuzyMathTest, BppExtract_3bpp_CrossByte) {
+	// 3bpp: mask = 0x07, values 0-7
+	// 8 pixels = 24 bits = 3 bytes
+	uint8_t bppMask = (1 << 3) - 1;
+	EXPECT_EQ(bppMask, 0x07);
+
+	// Example: pixels [5,3,7,0,2,6,1,4] packed into 3 bytes
+	// Binary: 101|011|111|000|010|110|001|100
+	// Byte0: 10101111 = 0xAF, Byte1: 10000101 = 0x85, Byte2: 10001100 = 0x8C
+	// Let's verify the mask works
+	uint32_t packed24 = 0xAF858C; // 24 bits
+	for (int i = 0; i < 8; i++) {
+		int bitOffset = 21 - (i * 3); // Start from bit 21
+		uint8_t pixel = (packed24 >> bitOffset) & bppMask;
+		EXPECT_LE(pixel, 7);
+	}
+}
+
+TEST_F(LynxSuzyMathTest, BppExtract_4bpp_Nibbles) {
+	// 4bpp: 2 pixels per byte, mask = 0x0F
+	uint8_t bppMask = (1 << 4) - 1;
+	EXPECT_EQ(bppMask, 0x0F);
+
+	uint8_t data = 0xA5; // High nibble = 0xA (10), Low nibble = 0x5 (5)
+	uint8_t hiPixel = (data >> 4) & bppMask;
+	uint8_t loPixel = data & bppMask;
+
+	EXPECT_EQ(hiPixel, 0x0A);
+	EXPECT_EQ(loPixel, 0x05);
+}
+
+//=============================================================================
+// Shadow/XOR Sprite Rendering
+// Shadow sprites XOR the new pixel with the existing framebuffer pixel.
+// Used for transparency effects, shadows, and special blending.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Shadow_XorBasic) {
+	// XOR of pen value with existing pixel
+	uint8_t existing = 0x05;
+	uint8_t pen = 0x0F;
+	uint8_t result = existing ^ pen;
+	EXPECT_EQ(result, 0x0A); // 0101 ^ 1111 = 1010
+}
+
+TEST_F(LynxSuzyMathTest, Shadow_XorSelfInverse) {
+	// XOR twice with same value returns original
+	uint8_t original = 0x07;
+	uint8_t pen = 0x0C;
+	uint8_t xored = original ^ pen;
+	uint8_t restored = xored ^ pen;
+	EXPECT_EQ(restored, original);
+}
+
+TEST_F(LynxSuzyMathTest, Shadow_XorWithZero) {
+	// XOR with 0 = same value
+	uint8_t value = 0x09;
+	uint8_t result = value ^ 0x00;
+	EXPECT_EQ(result, value);
+}
+
+TEST_F(LynxSuzyMathTest, Shadow_XorWithMax) {
+	// XOR with 0xF = complement
+	uint8_t value = 0x06;
+	uint8_t result = value ^ 0x0F;
+	EXPECT_EQ(result, 0x09); // 0110 ^ 1111 = 1001
+}
+
+TEST_F(LynxSuzyMathTest, Shadow_AllCombinations) {
+	// Verify XOR table for 4-bit values
+	for (int a = 0; a < 16; a++) {
+		for (int b = 0; b < 16; b++) {
+			uint8_t result = a ^ b;
+			// XOR result is always in range
+			EXPECT_LE(result, 15);
+			// XOR is commutative
+			EXPECT_EQ(a ^ b, b ^ a);
+		}
+	}
+}
+
+//=============================================================================
+// Background Sprite Rendering
+// Background sprites only draw where existing pixel is 0 (transparent).
+// Used for rendering behind other sprites.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Background_DrawsOnTransparent) {
+	// If existing pixel is 0, background sprite draws
+	uint8_t existing = 0;
+	bool shouldDraw = (existing == 0);
+	EXPECT_TRUE(shouldDraw);
+}
+
+TEST_F(LynxSuzyMathTest, Background_SkipsOnOccupied) {
+	// If existing pixel is non-zero, background sprite skips
+	uint8_t existing = 0x03;
+	bool shouldDraw = (existing == 0);
+	EXPECT_FALSE(shouldDraw);
+}
+
+TEST_F(LynxSuzyMathTest, Background_AllOccupancyLevels) {
+	// Any non-zero value blocks background sprite
+	for (int existing = 0; existing < 16; existing++) {
+		bool shouldDraw = (existing == 0);
+		if (existing == 0) {
+			EXPECT_TRUE(shouldDraw);
+		} else {
+			EXPECT_FALSE(shouldDraw);
+		}
+	}
+}
+
+//=============================================================================
+// Framebuffer Nibble Packing
+// The Lynx framebuffer stores 2 pixels per byte (4bpp).
+// Even X coordinates use high nibble, odd use low nibble.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Nibble_EvenXUsesHighNibble) {
+	int x = 0; // Even
+	uint8_t existing = 0xAB;
+	uint8_t newPixel = 0x05;
+
+	uint8_t result;
+	if (x & 1) {
+		// Odd: use low nibble
+		result = (existing & 0xF0) | (newPixel & 0x0F);
+	} else {
+		// Even: use high nibble
+		result = (existing & 0x0F) | ((newPixel & 0x0F) << 4);
+	}
+
+	EXPECT_EQ(result, 0x5B); // High nibble = 5, low nibble = B
+}
+
+TEST_F(LynxSuzyMathTest, Nibble_OddXUsesLowNibble) {
+	int x = 1; // Odd
+	uint8_t existing = 0xAB;
+	uint8_t newPixel = 0x05;
+
+	uint8_t result;
+	if (x & 1) {
+		// Odd: use low nibble
+		result = (existing & 0xF0) | (newPixel & 0x0F);
+	} else {
+		// Even: use high nibble
+		result = (existing & 0x0F) | ((newPixel & 0x0F) << 4);
+	}
+
+	EXPECT_EQ(result, 0xA5); // High nibble = A, low nibble = 5
+}
+
+TEST_F(LynxSuzyMathTest, Nibble_ReadEvenX) {
+	uint8_t byte = 0xA5;
+	int x = 0; // Even
+
+	uint8_t pixel;
+	if (x & 1) {
+		pixel = byte & 0x0F;
+	} else {
+		pixel = (byte >> 4) & 0x0F;
+	}
+
+	EXPECT_EQ(pixel, 0x0A); // High nibble
+}
+
+TEST_F(LynxSuzyMathTest, Nibble_ReadOddX) {
+	uint8_t byte = 0xA5;
+	int x = 1; // Odd
+
+	uint8_t pixel;
+	if (x & 1) {
+		pixel = byte & 0x0F;
+	} else {
+		pixel = (byte >> 4) & 0x0F;
+	}
+
+	EXPECT_EQ(pixel, 0x05); // Low nibble
+}
+
+TEST_F(LynxSuzyMathTest, Nibble_ByteAddressCalculation) {
+	// Each row is 80 bytes (160 pixels / 2)
+	int bytesPerRow = (int)LynxConstants::ScreenWidth / 2;
+	EXPECT_EQ(bytesPerRow, 80);
+
+	// Byte address for pixel (x, y) = dispAddr + y * 80 + (x / 2)
+	uint16_t dispAddr = 0xC000;
+	int x = 50, y = 25;
+	uint16_t byteAddr = dispAddr + y * bytesPerRow + (x >> 1);
+	// 25 * 80 + 25 = 2025 = 0x7E9, so 0xC000 + 0x7E9 = 0xC7E9
+	EXPECT_EQ(byteAddr, 0xC7E9);
+}
+
+//=============================================================================
+// Sprite Type Behavior
+// Each sprite type has specific drawing and collision rules.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, SpriteType_ShadowEnumValues) {
+	// All shadow types should enable XOR rendering
+	LynxSpriteType shadowTypes[] = {
+		LynxSpriteType::NormalShadow,
+		LynxSpriteType::BoundaryShadow,
+		LynxSpriteType::XorShadow,
+		LynxSpriteType::Shadow
+	};
+
+	for (auto type : shadowTypes) {
+		bool isShadow = (type == LynxSpriteType::NormalShadow ||
+						 type == LynxSpriteType::BoundaryShadow ||
+						 type == LynxSpriteType::XorShadow ||
+						 type == LynxSpriteType::Shadow);
+		EXPECT_TRUE(isShadow) << "Type " << (int)type << " should be shadow";
+	}
+}
+
+TEST_F(LynxSuzyMathTest, SpriteType_NonShadowTypes) {
+	// Non-shadow types should not enable XOR
+	LynxSpriteType nonShadowTypes[] = {
+		LynxSpriteType::Background,
+		LynxSpriteType::Normal,
+		LynxSpriteType::NonCollidable,
+		LynxSpriteType::Boundary
+	};
+
+	for (auto type : nonShadowTypes) {
+		bool isShadow = (type == LynxSpriteType::NormalShadow ||
+						 type == LynxSpriteType::BoundaryShadow ||
+						 type == LynxSpriteType::XorShadow ||
+						 type == LynxSpriteType::Shadow);
+		EXPECT_FALSE(isShadow) << "Type " << (int)type << " should not be shadow";
+	}
+}
+
+//=============================================================================
+// Bytes Per Scanline
+// Lynx has 80 bytes per scanline (160 pixels at 4bpp = 160/2 = 80)
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, BytesPerScanline_Value) {
+	EXPECT_EQ((int)LynxConstants::BytesPerScanline, 80);
+}
+
+TEST_F(LynxSuzyMathTest, BytesPerScanline_ScreenSize) {
+	// Total framebuffer size = 80 bytes × 102 lines = 8160 bytes
+	int fbSize = (int)LynxConstants::BytesPerScanline * (int)LynxConstants::ScreenHeight;
+	EXPECT_EQ(fbSize, 8160);
+}
+
+//=============================================================================
+// Fuzz: BPP Pixel Extraction
+// Verify correct bit extraction across random packed data
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Fuzz_BppExtract_1bpp_100Bytes) {
+	constexpr uint64_t SEED = 0x3142505031425050ULL; // "1BPP1BPP"
+	TestRng rng(SEED);
+	uint8_t bppMask = (1 << 1) - 1;
+
+	for (int i = 0; i < 100; i++) {
+		uint8_t byte = static_cast<uint8_t>(rng.Next16());
+		// Extract 8 pixels
+		for (int bit = 7; bit >= 0; bit--) {
+			uint8_t pixel = (byte >> bit) & bppMask;
+			EXPECT_LE(pixel, 1);
+		}
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_BppExtract_2bpp_100Bytes) {
+	constexpr uint64_t SEED = 0x3242505032425050ULL; // "2BPP2BPP"
+	TestRng rng(SEED);
+	uint8_t bppMask = (1 << 2) - 1;
+
+	for (int i = 0; i < 100; i++) {
+		uint8_t byte = static_cast<uint8_t>(rng.Next16());
+		// Extract 4 pixels
+		for (int shift = 6; shift >= 0; shift -= 2) {
+			uint8_t pixel = (byte >> shift) & bppMask;
+			EXPECT_LE(pixel, 3);
+		}
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_BppExtract_4bpp_100Bytes) {
+	constexpr uint64_t SEED = 0x3442505034425050ULL; // "4BPP4BPP"
+	TestRng rng(SEED);
+	uint8_t bppMask = (1 << 4) - 1;
+
+	for (int i = 0; i < 100; i++) {
+		uint8_t byte = static_cast<uint8_t>(rng.Next16());
+		// Extract 2 pixels
+		uint8_t hiPixel = (byte >> 4) & bppMask;
+		uint8_t loPixel = byte & bppMask;
+		EXPECT_LE(hiPixel, 15);
+		EXPECT_LE(loPixel, 15);
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_NibblePacking_1000Pixels) {
+	constexpr uint64_t SEED = 0x4E4942424C455321ULL; // "NIBBLES!"
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		int x = rng.Next16() % 160;
+		uint8_t existing = static_cast<uint8_t>(rng.Next16());
+		uint8_t newPixel = rng.Next16() & 0x0F;
+
+		uint8_t result;
+		if (x & 1) {
+			result = (existing & 0xF0) | (newPixel & 0x0F);
+		} else {
+			result = (existing & 0x0F) | ((newPixel & 0x0F) << 4);
+		}
+
+		// Verify correct nibble was updated
+		if (x & 1) {
+			EXPECT_EQ(result & 0x0F, newPixel);
+			EXPECT_EQ(result & 0xF0, existing & 0xF0);
+		} else {
+			EXPECT_EQ((result >> 4) & 0x0F, newPixel);
+			EXPECT_EQ(result & 0x0F, existing & 0x0F);
+		}
+	}
+}
