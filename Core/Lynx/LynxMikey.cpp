@@ -187,7 +187,7 @@ void LynxMikey::CascadeTimer(int sourceIndex) {
 		return;
 	}
 
-	// HW Bug 13.6: Timer does not count while Timer Done fla (§5)g is set
+	// HW Bug 13.6: Timer does not count while Timer Done flag is set (§5)
 	// Exception: Timer 4 (UART baud generator) always counts
 	if (timer.TimerDone && target != 4) {
 		return;
@@ -195,8 +195,8 @@ void LynxMikey::CascadeTimer(int sourceIndex) {
 
 	timer.Count--;
 	if (timer.Count == 0xff) { // Underflow
-		if (§5: Timer 4 = UART baud generator — no TimerDone, calls TickUart()
-			// Timer 4 = UART baud generator
+		// Timer 4 = UART baud generator — no TimerDone, calls TickUart()
+		if (target == 4) {
 			timer.Count = timer.BackupValue;
 			TickUart();
 			return;

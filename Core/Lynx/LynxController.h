@@ -8,6 +8,32 @@
 
 class LynxConsole;
 
+/// <summary>
+/// Atari Lynx controller device — handles physical input from the built-in
+/// gamepad and provides movie/TAS serialization.
+///
+/// The Lynx has a fixed controller with 9 inputs:
+///   - D-pad: Up, Down, Left, Right
+///   - Face buttons: A, B
+///   - Option buttons: Option1, Option2 (mapped as L/R in settings)
+///   - Pause (mapped as Start in settings, triggers Mikey IRQ)
+///
+/// Input is read via two Suzy registers (active-low encoding):
+///   - JOYSTICK ($FCB0): D-pad + A/B + Option1/2
+///     Bit layout: [A][B][Opt2][Opt1][Up][Down][Left][Right]
+///   - SWITCHES ($FCB1): Pause, cart control bits
+///
+/// TAS key names string: "UDLRabOoP" (9 characters per frame in BK2 format)
+/// This allows full serialization of Lynx input state for movie playback.
+///
+/// The Lynx supports hardware rotation (0°, 90° left, 90° right) which
+/// games can use to swap button mappings for left-handed play. Rotation
+/// is detected from the LNX header or game database.
+///
+/// References:
+///   - ~docs/plans/lynx-subsystems-deep-dive.md (Section: Input System)
+///   - Epyx hardware reference: monlynx.de/lynx/hardware.html
+/// </summary>
 class LynxController : public BaseControlDevice {
 private:
 	uint32_t _turboSpeed = 0;

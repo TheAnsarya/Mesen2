@@ -7,6 +7,31 @@ class DisassemblyInfo;
 class Debugger;
 class LynxMikey;
 
+/// <summary>
+/// Trace logger for the Atari Lynx 65C02 CPU.
+///
+/// Logs per-instruction CPU state for debugging and TAS verification:
+///   - Program counter (PC)
+///   - Accumulator (A), X, Y registers
+///   - Stack pointer (SP)
+///   - Processor status flags (NV-BDIZC)
+///   - Cycle count
+///   - Current scanline and display cycle from Mikey
+///
+/// Output format matches other 6502-based cores (NES, PCE) for familiarity.
+/// Supports all standard trace format tags:
+///   [PC] [A] [X] [Y] [SP] [PS] [CYC] [SL] [Disassembly]
+///
+/// The trace log is essential for:
+///   - Debugging game logic
+///   - Verifying TAS movie determinism
+///   - Comparing execution paths between versions
+///   - Detecting desync issues in replays
+///
+/// References:
+///   - ~docs/DEBUGGER.md (Section: Trace Logger)
+///   - Core/PCE/Debugger/PceTraceLogger.h (reference implementation)
+/// </summary>
 class LynxTraceLogger : public BaseTraceLogger<LynxTraceLogger, LynxCpuState> {
 private:
 	LynxMikey* _mikey = nullptr;
