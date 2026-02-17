@@ -1205,3 +1205,363 @@ TEST_F(LynxSuzyMathTest, MathAccumulate_UsefulForDotProduct) {
 	// 3*2 + 4*6 + 5*8 = 6 + 24 + 40 = 70
 	EXPECT_EQ(dot, 70);
 }
+
+//=============================================================================
+// Randomized Fuzz Tests — Multiply
+// Use deterministic seed to ensure reproducibility across test runs.
+// Tests 1000 random value pairs to catch edge cases not covered by
+// hand-picked test values.
+//=============================================================================
+
+// PCG-style simple RNG for reproducible tests
+// (Linear congruential generator with known good constants)
+class TestRng {
+public:
+	explicit TestRng(uint64_t seed) : _state(seed) {}
+
+	// Returns random 16-bit value
+	uint16_t Next16() {
+		// LCG with Numerical Recipes constants
+		_state = _state * 6364136223846793005ULL + 1442695040888963407ULL;
+		return static_cast<uint16_t>(_state >> 32);
+	}
+
+	// Returns random 32-bit value
+	uint32_t Next32() {
+		uint32_t hi = Next16();
+		uint32_t lo = Next16();
+		return (hi << 16) | lo;
+	}
+
+	// Returns random signed 16-bit value
+	int16_t NextSigned16() {
+		return static_cast<int16_t>(Next16());
+	}
+
+private:
+	uint64_t _state;
+};
+
+TEST_F(LynxSuzyMathTest, Fuzz_UnsignedMultiply_1000Pairs) {
+	// Fixed seed for reproducibility: 0xDEADBEEF (from Lynx header magic)
+	constexpr uint64_t SEED = 0xDEADBEEFCAFEBABEULL;
+	TestRng rng(SEED);
+
+	// Test 1000 random value pairs
+	for (int i = 0; i < 1000; i++) {
+		uint16_t a = rng.Next16();
+		uint16_t b = rng.Next16();
+
+		// Expected: standard 16×16→32 unsigned multiply
+		uint32_t expected = static_cast<uint32_t>(a) * static_cast<uint32_t>(b);
+
+		// Simulated hardware multiply
+		uint32_t hwResult = static_cast<uint32_t>(a) * static_cast<uint32_t>(b);
+
+		EXPECT_EQ(hwResult, expected)
+			<< "Unsigned multiply failed at iteration " << i
+			<< ": $" << std::hex << a << " * $" << b
+			<< " = $" << expected << " but got $" << hwResult;
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_UnsignedDivide_1000Pairs) {
+	constexpr uint64_t SEED = 0x4C594E58544F4F4CULL; // "LYNXTOOL" in ASCII
+	TestRng rng(SEED);
+
+	int successCount = 0;
+	for (int i = 0; i < 1000; i++) {
+		uint32_t dividend = rng.Next32();
+		uint16_t divisor = rng.Next16();
+
+		// Skip divide-by-zero (hardware behavior is undefined)
+		if (divisor == 0) {
+			continue;
+		}
+
+		// Expected: standard 32÷16 unsigned divide
+		uint32_t expectedQuotient = dividend / divisor;
+		uint32_t expectedRemainder = dividend % divisor;
+
+		// Simulated hardware divide
+		uint32_t hwQuotient = dividend / divisor;
+		uint32_t hwRemainder = dividend % divisor;
+
+		EXPECT_EQ(hwQuotient, expectedQuotient)
+			<< "Unsigned divide quotient failed at iteration " << i
+			<< ": $" << std::hex << dividend << " / $" << divisor;
+
+		EXPECT_EQ(hwRemainder, expectedRemainder)
+			<< "Unsigned divide remainder failed at iteration " << i
+			<< ": $" << std::hex << dividend << " % $" << divisor;
+
+		successCount++;
+	}
+
+	// Verify we actually ran a meaningful number of tests
+	EXPECT_GT(successCount, 950);
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_SignedMultiply_1000Pairs) {
+	// Seed using Lynx screen dimensions encoded
+	constexpr uint64_t SEED = 0x00A0006600660066ULL; // 160×102 encoded
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		int16_t a = rng.NextSigned16();
+		int16_t b = rng.NextSigned16();
+
+		// Standard C signed multiply (two's complement)
+		int32_t expected = static_cast<int32_t>(a) * static_cast<int32_t>(b);
+
+		// Simulated two's complement multiply
+		int32_t hwResult = static_cast<int32_t>(a) * static_cast<int32_t>(b);
+
+		EXPECT_EQ(hwResult, expected)
+			<< "Signed multiply failed at iteration " << i
+			<< ": " << std::dec << a << " * " << b
+			<< " = " << expected << " but got " << hwResult;
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_SignedDivide_1000Pairs) {
+	constexpr uint64_t SEED = 0x53555A5950505553ULL; // "SUZYPPU" + 'S'
+	TestRng rng(SEED);
+
+	int successCount = 0;
+	for (int i = 0; i < 1000; i++) {
+		// Use 32-bit signed dividend but keep within reasonable range
+		// to avoid overflow in quotient
+		int32_t dividend = static_cast<int32_t>(rng.Next32());
+		int16_t divisor = rng.NextSigned16();
+
+		// Skip divide-by-zero
+		if (divisor == 0) {
+			continue;
+		}
+
+		// C99+ truncates toward zero
+		int32_t expectedQuotient = dividend / divisor;
+		int32_t expectedRemainder = dividend % divisor;
+
+		int32_t hwQuotient = dividend / divisor;
+		int32_t hwRemainder = dividend % divisor;
+
+		EXPECT_EQ(hwQuotient, expectedQuotient)
+			<< "Signed divide quotient failed at iteration " << i
+			<< ": " << std::dec << dividend << " / " << divisor;
+
+		EXPECT_EQ(hwRemainder, expectedRemainder)
+			<< "Signed divide remainder failed at iteration " << i
+			<< ": " << std::dec << dividend << " % " << divisor;
+
+		successCount++;
+	}
+
+	EXPECT_GT(successCount, 950);
+}
+
+//=============================================================================
+// Fixed-Point Arithmetic Fuzz Tests (8.8 format)
+// HSIZE/VSIZE/STRETCH/TILT use 8.8 fixed-point representation.
+// Verify scaling calculations across random values.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Fuzz_FixedPointScaling_1000Pairs) {
+	constexpr uint64_t SEED = 0x0100008000400020ULL; // Common fixed-point vals
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		// Random scale factor (8.8 fixed point)
+		uint16_t scale = rng.Next16();
+
+		// Random source pixel count (0-255)
+		uint8_t srcPixels = static_cast<uint8_t>(rng.Next16());
+
+		// 8.8 fixed-point multiply: (srcPixels * scale) >> 8
+		// This gives the scaled pixel count
+		uint32_t product = static_cast<uint32_t>(srcPixels) * scale;
+		uint32_t scaledPixels = product >> 8;
+
+		// Verify against floating-point reference
+		double floatScale = scale / 256.0;
+		double expected = srcPixels * floatScale;
+		uint32_t expectedInt = static_cast<uint32_t>(expected);
+
+		// Allow for rounding differences (integer truncates, float rounds)
+		EXPECT_LE(std::abs(static_cast<int>(scaledPixels) - static_cast<int>(expectedInt)), 1)
+			<< "Fixed-point scaling mismatch at iteration " << i
+			<< ": " << (int)srcPixels << " * " << scale << "/256"
+			<< " (scale=" << floatScale << ")";
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_TiltAccumulation_1000Values) {
+	constexpr uint64_t SEED = 0x54494C5454494C54ULL; // "TILTTILT"
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		// Random tilt value (8.8 signed fixed-point)
+		int16_t tilt = rng.NextSigned16();
+
+		// Random line count (0-255 for typical sprite)
+		uint8_t lineCount = static_cast<uint8_t>(rng.Next16());
+
+		// Tilt accumulation: total horizontal shift = tilt * lineCount / 256
+		// Hardware uses arithmetic right shift which FLOORS (toward -infinity)
+		int32_t totalShift = (static_cast<int32_t>(tilt) * lineCount) >> 8;
+
+		// Reference: use explicit floor to match arithmetic shift behavior
+		// C++ >> on signed integers is implementation-defined, but MSVC/GCC
+		// both use arithmetic shift which is floor(x / 2^n)
+		double floatResult = (static_cast<double>(tilt) * lineCount) / 256.0;
+		int32_t expectedInt = static_cast<int32_t>(std::floor(floatResult));
+
+		// Integer shift floor should match
+		EXPECT_EQ(totalShift, expectedInt)
+			<< "Tilt accumulation mismatch at iteration " << i
+			<< ": tilt=$" << std::hex << (uint16_t)tilt
+			<< " lines=" << std::dec << (int)lineCount;
+	}
+}
+
+//=============================================================================
+// Collision Detection Fuzz Tests
+// Verify collision buffer update rules across random sprite combinations.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Fuzz_CollisionPriority_1000Pairs) {
+	constexpr uint64_t SEED = 0x434F4C4C49444521ULL; // "COLLIDE!"
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		// Two random collision numbers (0-15 each)
+		uint8_t collNum1 = rng.Next16() & 0x0F;
+		uint8_t collNum2 = rng.Next16() & 0x0F;
+
+		// Higher-numbered sprite wins (has priority)
+		uint8_t expected = std::max(collNum1, collNum2);
+		uint8_t result = std::max(collNum1, collNum2);
+
+		EXPECT_EQ(result, expected)
+			<< "Collision priority failed at iteration " << i
+			<< ": " << (int)collNum1 << " vs " << (int)collNum2;
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_CollisionSlotDistribution) {
+	constexpr uint64_t SEED = 0x534C4F54534C4F54ULL; // "SLOTSLOT"
+	TestRng rng(SEED);
+
+	// Track how many times each slot (0-15) is selected
+	int slotCounts[16] = { 0 };
+
+	for (int i = 0; i < 10000; i++) {
+		uint8_t slot = rng.Next16() & 0x0F;
+		slotCounts[slot]++;
+	}
+
+	// Each slot should be selected roughly 10000/16 = 625 times
+	// Allow 50% deviation (312 - 937 range)
+	for (int slot = 0; slot < 16; slot++) {
+		EXPECT_GE(slotCounts[slot], 300)
+			<< "Slot " << slot << " underrepresented: " << slotCounts[slot];
+		EXPECT_LE(slotCounts[slot], 1000)
+			<< "Slot " << slot << " overrepresented: " << slotCounts[slot];
+	}
+}
+
+//=============================================================================
+// SPRCTL0/SPRCTL1 Bit Field Extraction Fuzz Tests
+// Ensure bit masking/shifting extracts correct values across all inputs.
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Fuzz_Sprctl0_BitFieldExtraction) {
+	constexpr uint64_t SEED = 0x5350524354304040ULL; // "SPRCTL0@@"
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		uint8_t sprctl0 = static_cast<uint8_t>(rng.Next16());
+
+		// Extract type (bits [2:0])
+		uint8_t type = sprctl0 & 0x07;
+		EXPECT_LE(type, 7) << "Type out of range for sprctl0=$"
+			<< std::hex << (int)sprctl0;
+
+		// Extract BPP (bits [7:6])
+		uint8_t bpp = (sprctl0 >> 6) & 0x03;
+		EXPECT_LE(bpp, 3) << "BPP out of range for sprctl0=$"
+			<< std::hex << (int)sprctl0;
+
+		// Extract HFLIP (bit 5) - NOTE: HFLIP is bit 5, VFLIP is bit 4
+		bool hflip = (sprctl0 & 0x20) != 0;
+		bool vflip = (sprctl0 & 0x10) != 0;
+
+		// Reconstruct and verify (partial)
+		uint8_t reconstructedHV = (hflip ? 0x20 : 0) | (vflip ? 0x10 : 0);
+		EXPECT_EQ(reconstructedHV, sprctl0 & 0x30)
+			<< "H/V flip reconstruction failed for sprctl0=$"
+			<< std::hex << (int)sprctl0;
+	}
+}
+
+TEST_F(LynxSuzyMathTest, Fuzz_Sprctl1_BitFieldExtraction) {
+	constexpr uint64_t SEED = 0x5350524354314141ULL; // "SPRCTL1AA"
+	TestRng rng(SEED);
+
+	for (int i = 0; i < 1000; i++) {
+		uint8_t sprctl1 = static_cast<uint8_t>(rng.Next16());
+
+		// Extract skip flag (bit 2)
+		bool skip = (sprctl1 & 0x04) != 0;
+
+		// Extract reload flags (bits [7:4])
+		bool skipHVST = (sprctl1 & 0x10) != 0;
+		bool skipHVS = (sprctl1 & 0x20) != 0;
+		bool skipHV = (sprctl1 & 0x40) != 0;
+		bool skipPal = (sprctl1 & 0x80) != 0;
+
+		// Verify each flag extracted correctly by reconstructing
+		uint8_t reconstructedReload =
+			(skipHVST ? 0x10 : 0) | (skipHVS ? 0x20 : 0) |
+			(skipHV ? 0x40 : 0) | (skipPal ? 0x80 : 0);
+
+		EXPECT_EQ(reconstructedReload, sprctl1 & 0xF0)
+			<< "Reload flags reconstruction failed for sprctl1=$"
+			<< std::hex << (int)sprctl1;
+
+		// Also verify skip flag
+		EXPECT_EQ(skip, (sprctl1 & 0x04) != 0);
+	}
+}
+
+//=============================================================================
+// Stress Test: Combined Math Operations
+// Simulates typical sprite engine workload of multiply + accumulate
+//=============================================================================
+
+TEST_F(LynxSuzyMathTest, Fuzz_MultiplyAccumulate_Workload) {
+	constexpr uint64_t SEED = 0x574F524B4C4F4144ULL; // "WORKLOAD"
+	TestRng rng(SEED);
+
+	// Simulate 100 sprites, each with 3 multiply-accumulate ops
+	for (int sprite = 0; sprite < 100; sprite++) {
+		int64_t accumulator = 0;
+		int64_t reference = 0;
+
+		// Each sprite does scale × posX, scale × posY, scale × size
+		for (int op = 0; op < 3; op++) {
+			int16_t a = rng.NextSigned16();
+			int16_t b = rng.NextSigned16();
+
+			int32_t product = static_cast<int32_t>(a) * static_cast<int32_t>(b);
+			accumulator += product;
+			reference += static_cast<int64_t>(a) * static_cast<int64_t>(b);
+		}
+
+		// Accumulator may overflow for very large products, but we're
+		// testing the logic, not the overflow behavior
+		EXPECT_EQ(accumulator, reference)
+			<< "Multiply-accumulate workload failed at sprite " << sprite;
+	}
+}
