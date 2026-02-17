@@ -289,8 +289,13 @@ void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 
 	// 8.8 fixed-point scaling: integer part = pixels per sprite texel
 	// For unscaled sprites, hsize/vsize = 0x0100 (1.0)
-	int16_t stretch = _persistStretch; // Per-scanline horizontal size adjustment
-	int16_t tilt = _persistTilt;       // Per-scanline horizontal offset adjustment
+	// The fractional part (lower 8 bits) allows sub-pixel positioning
+	// and enables hardware to draw sprites at arbitrary scales.
+	// Example: 0x0180 = 1.5x scale, 0x0040 = 0.25x scale
+	int16_t stretch = _persistStretch; // Per-scanline horizontal size delta (8.8 fixed-point)
+	int16_t tilt = _persistTilt;       // Per-scanline horizontal offset delta (8.8 fixed-point)
+	// Stretch creates trapezoid/triangle shapes: each line is wider/narrower
+	// Tilt creates parallelogram/italic shapes: each line is offset horizontally
 
 	// Process each scanline of sprite data
 	uint16_t currentDataAddr = dataAddr;
@@ -481,18 +486,25 @@ void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum,
 	}
 	WriteRam(byteAddr, byte);
 
-	// Collision detection — stores the highest-numbered colliding sprite
+	// Collision detection — mutual update algorithm
+	// The collision buffer has 16 slots (indices 0-15).
+	// When sprite A (collNum) draws over sprite B (existingPixel):
+	//   1. Buffer[A] = max(Buffer[A], B) — A records that B collided with it
+	//   2. Buffer[B] = max(Buffer[B], A) — B records that A collided with it
+	// This ensures both sprites' entries reflect the highest-numbered collider.
+	// The game reads Buffer[spriteN] to see what collided with sprite N.
 	if (doCollision && collNum > 0 && collNum < LynxConstants::CollisionBufferSize) {
 		// Read existing collision value for this sprite's collision number
 		uint8_t existing = _state.CollisionBuffer[collNum];
 		// Use the pen index of the existing pixel as the collider ID
+		// Higher-numbered sprites have priority; only update if existingPixel > current value
 		if (existingPixel > 0 && existingPixel > existing) {
 			_state.CollisionBuffer[collNum] = existingPixel;
-			// Set sticky sprite-to-sprite collision flag
+			// Set sticky sprite-to-sprite collision flag (cleared only by explicit write)
 			_state.SpriteToSpriteCollision = true;
 		}
 
-		// Also update the colliding sprite's entry
+		// Also update the colliding sprite's entry (mutual)
 		if (existingPixel > 0 && existingPixel < LynxConstants::CollisionBufferSize) {
 			uint8_t otherExisting = _state.CollisionBuffer[existingPixel];
 			if (collNum > otherExisting) {
