@@ -10,13 +10,30 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.ViewModels;
+
+/// <summary>
+/// ViewModel for the Lynx configuration dialog.
+/// </summary>
+/// <remarks>
+/// Manages the Lynx settings UI with tabs for:
+/// - General (boot ROM, rotation, frame blending)
+/// - Audio (per-channel volume)
+/// - Emulation (sprite/background toggles)
+/// - Input (controller mapping)
+/// - Video (filter settings)
+/// </remarks>
 public sealed class LynxConfigViewModel : DisposableViewModel {
+	/// <summary>Current Lynx configuration being edited.</summary>
 	[Reactive] public LynxConfig Config { get; set; }
+	/// <summary>Original configuration for cancel/revert.</summary>
 	[Reactive] public LynxConfig OriginalConfig { get; set; }
+	/// <summary>Currently selected configuration tab.</summary>
 	[Reactive] public LynxConfigTab SelectedTab { get; set; } = 0;
 
+	/// <summary>Command to open controller setup dialog.</summary>
 	public ReactiveCommand<Button, Unit> SetupPlayer { get; }
 
+	/// <summary>Create a new Lynx configuration view model.</summary>
 	public LynxConfigViewModel() {
 		Config = ConfigManager.Config.Lynx;
 		OriginalConfig = Config.Clone();
@@ -31,6 +48,7 @@ public sealed class LynxConfigViewModel : DisposableViewModel {
 		AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => Config.ApplyConfig()));
 	}
 
+	/// <summary>Open controller configuration popup window.</summary>
 	private async void OpenSetup(Button btn, int port) {
 		PixelPoint startPosition = btn.PointToScreen(new Point(-7, btn.Bounds.Height));
 		ControllerConfigWindow wnd = new ControllerConfigWindow();
@@ -44,10 +62,16 @@ public sealed class LynxConfigViewModel : DisposableViewModel {
 	}
 }
 
+/// <summary>Configuration tab selection for the Lynx settings dialog.</summary>
 public enum LynxConfigTab {
+	/// <summary>General settings (boot ROM, rotation).</summary>
 	General,
+	/// <summary>Audio settings (per-channel volume).</summary>
 	Audio,
+	/// <summary>Emulation settings (layer toggles).</summary>
 	Emulation,
+	/// <summary>Input settings (controller mapping).</summary>
 	Input,
+	/// <summary>Video settings (filters).</summary>
 	Video
 }

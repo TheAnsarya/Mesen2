@@ -3,79 +3,148 @@ using System.Runtime.InteropServices;
 
 namespace Nexen.Interop;
 
+/// <summary>Atari Lynx hardware model.</summary>
 public enum LynxModel : byte {
+	/// <summary>Original Lynx (1989) — larger form factor.</summary>
 	LynxI = 0,
+	/// <summary>Lynx II (1991) — smaller, improved battery life.</summary>
 	LynxII = 1
 }
 
+/// <summary>Screen rotation for Lynx games.</summary>
+/// <remarks>
+/// The Lynx physically supports 180° flip via hardware rotation.
+/// Games declare their preferred rotation in the LNX header.
+/// </remarks>
 public enum LynxRotation : byte {
+	/// <summary>Landscape (default, 160×102).</summary>
 	None = 0,
+	/// <summary>Portrait, rotated left (102×160).</summary>
 	Left = 1,
+	/// <summary>Portrait, rotated right (102×160).</summary>
 	Right = 2
 }
 
+/// <summary>65C02 CPU halt state.</summary>
 public enum LynxCpuStopState : byte {
+	/// <summary>CPU actively executing instructions.</summary>
 	Running = 0,
+	/// <summary>CPU halted via STP instruction (requires reset).</summary>
 	Stopped = 1,
+	/// <summary>CPU halted via WAI instruction (resumes on IRQ).</summary>
 	WaitingForIrq = 2
 }
 
+/// <summary>Microwire serial EEPROM chip type (93Cxx family).</summary>
+/// <remarks>
+/// Values match the BLL/LNX header standard (byte offset 60).
+/// Address bits and word count vary by chip.
+/// </remarks>
 public enum LynxEepromType : byte {
+	/// <summary>No EEPROM present.</summary>
 	None = 0,
+	/// <summary>93C46: 128 bytes (64 × 16-bit words, 6 address bits).</summary>
 	Eeprom93c46 = 1,
+	/// <summary>93C66: 512 bytes (256 × 16-bit words, 8 address bits).</summary>
 	Eeprom93c66 = 2,
+	/// <summary>93C86: 2048 bytes (1024 × 16-bit words, 10 address bits).</summary>
 	Eeprom93c86 = 3
 }
 
+/// <summary>EEPROM serial protocol state machine phase.</summary>
 public enum LynxEepromState : byte {
+	/// <summary>Awaiting CS assertion and start bit.</summary>
 	Idle = 0,
+	/// <summary>Receiving 2-bit opcode after start bit.</summary>
 	ReceivingOpcode = 1,
+	/// <summary>Receiving address bits (6/8/10 depending on chip).</summary>
 	ReceivingAddress = 2,
+	/// <summary>Receiving 16-bit data word (WRITE/WRAL).</summary>
 	ReceivingData = 3,
+	/// <summary>Sending 16-bit data word (READ).</summary>
 	SendingData = 4
 }
 
+/// <summary>65C02 CPU register state for debugger interop.</summary>
+/// <remarks>Matches memory layout of LynxCpuState in Core/Lynx/LynxTypes.h.</remarks>
 public struct LynxCpuState : BaseState {
+	/// <summary>Total CPU cycles executed since power-on.</summary>
 	public UInt64 CycleCount;
+	/// <summary>Program Counter (16-bit).</summary>
 	public UInt16 PC;
+	/// <summary>Stack Pointer (8-bit, page $01).</summary>
 	public byte SP;
+	/// <summary>Accumulator register.</summary>
 	public byte A;
+	/// <summary>X index register.</summary>
 	public byte X;
+	/// <summary>Y index register.</summary>
 	public byte Y;
+	/// <summary>Processor Status flags (N/V/-/B/D/I/Z/C).</summary>
 	public byte PS;
+	/// <summary>IRQ pending flags (hardware signals).</summary>
 	public byte IRQFlag;
+	/// <summary>NMI pending (not used on Lynx, no NMI line).</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool NmiFlag;
+	/// <summary>CPU halt state (Running, Stopped, WaitingForIrq).</summary>
 	public LynxCpuStopState StopState;
 }
 
+/// <summary>Mikey timer state for a single timer (0-7).</summary>
+/// <remarks>Matches memory layout of LynxTimerState in Core/Lynx/LynxTypes.h.</remarks>
 public struct LynxTimerState {
+	/// <summary>Reload value (written via BACKUP register).</summary>
 	public byte BackupValue;
+	/// <summary>Control A: clock source, enable, linking, reset-on-done.</summary>
 	public byte ControlA;
+	/// <summary>Current countdown value.</summary>
 	public byte Count;
+	/// <summary>Control B / status: timer-done, last-clock, borrow flags.</summary>
 	public byte ControlB;
+	/// <summary>Master clock cycle at last timer tick.</summary>
 	public UInt64 LastTick;
+	/// <summary>Timer done flag (fired).</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool TimerDone;
+	/// <summary>Linked (cascaded) to another timer.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool Linked;
 }
 
+/// <summary>Audio channel state (LFSR-based synthesis).</summary>
+/// <remarks>Matches memory layout of LynxAudioChannelState in Core/Lynx/LynxTypes.h.</remarks>
 public struct LynxAudioChannelState {
+	/// <summary>Output volume (4-bit, 0-15).</summary>
 	public byte Volume;
+	/// <summary>Feedback tap enable mask for LFSR.</summary>
 	public byte FeedbackEnable;
+	/// <summary>Current output sample (signed 8-bit).</summary>
 	public sbyte Output;
+	/// <summary>12-bit linear feedback shift register.</summary>
 	public UInt16 ShiftRegister;
+	/// <summary>Timer reload value (frequency control).</summary>
 	public byte BackupValue;
+	/// <summary>Channel control register.</summary>
 	public byte Control;
+	/// <summary>Current timer countdown value.</summary>
 	public byte Counter;
+	/// <summary>Left channel attenuation (4-bit).</summary>
 	public byte LeftAtten;
+	/// <summary>Right channel attenuation (4-bit).</summary>
 	public byte RightAtten;
+	/// <summary>Integration mode: output feeds into next channel.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool Integrate;
+	/// <summary>Channel enabled.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
 }
 
+/// <summary>Combined APU state for all 4 audio channels.</summary>
+/// <remarks>Matches memory layout of LynxApuState in Core/Lynx/LynxTypes.h.</remarks>
 public struct LynxApuState {
+	/// <summary>State for all 4 audio channels.</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 	public LynxAudioChannelState[] Channels;
+	/// <summary>Master volume / attenuation control.</summary>
 	public byte MasterVolume;
+	/// <summary>Stereo output enabled.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool StereoEnabled;
 }
 
@@ -149,102 +218,191 @@ public struct LynxMikeyState : BaseState {
 	public byte HardwareRevision;
 }
 
+/// <summary>Lynx PPU (display) state for debugger interop.</summary>
+/// <remarks>The Lynx has no discrete PPU; display is managed by Mikey.</remarks>
 public struct LynxPpuState : BaseState {
+	/// <summary>Total frames rendered since power-on.</summary>
 	public UInt32 FrameCount;
+	/// <summary>Current horizontal position within scanline.</summary>
 	public UInt16 Cycle;
+	/// <summary>Current scanline (0-104, 102 visible + 3 VBlank).</summary>
 	public UInt16 Scanline;
+	/// <summary>Display buffer start address in RAM.</summary>
 	public UInt16 DisplayAddress;
+	/// <summary>Display control register.</summary>
 	public byte DisplayControl;
+	/// <summary>LCD output enabled.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool LcdEnabled;
 }
 
+/// <summary>Suzy coprocessor state for debugger interop.</summary>
+/// <remarks>
+/// Suzy handles sprite rendering, collision detection, and 16×16 math.
+/// Matches memory layout of LynxSuzyState in Core/Lynx/LynxTypes.h.
+/// </remarks>
 public struct LynxSuzyState : BaseState {
+	/// <summary>Sprite Control Block address in RAM.</summary>
 	public UInt16 SCBAddress;
+	/// <summary>SPRCTL0: sprite type, BPP, H/V flip.</summary>
 	public byte SpriteControl0;
+	/// <summary>SPRCTL1: reload flags, sizing mode, literal.</summary>
 	public byte SpriteControl1;
+	/// <summary>SPRINIT: initialization flags.</summary>
 	public byte SpriteInit;
+	/// <summary>Sprite engine currently processing.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool SpriteBusy;
+	/// <summary>Sprite engine enabled (halts CPU during rendering).</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool SpriteEnabled;
 
+	/// <summary>Math register A (unsigned multiplicand / dividend high).</summary>
 	public UInt16 MathA;
+	/// <summary>Math register B (unsigned multiplicand / dividend low).</summary>
 	public UInt16 MathB;
+	/// <summary>Math register C (signed operand).</summary>
 	public Int16 MathC;
+	/// <summary>Math register D (signed operand).</summary>
 	public Int16 MathD;
+	/// <summary>Math register E (result / accumulator high).</summary>
 	public UInt16 MathE;
+	/// <summary>Math register F (result / accumulator low).</summary>
 	public UInt16 MathF;
+	/// <summary>Math register G (result).</summary>
 	public UInt16 MathG;
+	/// <summary>Math register H (result).</summary>
 	public UInt16 MathH;
+	/// <summary>Math register J (result / quotient high).</summary>
 	public UInt16 MathJ;
+	/// <summary>Math register K (result / quotient low).</summary>
 	public UInt16 MathK;
+	/// <summary>Math register M (result / remainder high).</summary>
 	public UInt16 MathM;
+	/// <summary>Math register N (result / remainder low).</summary>
 	public UInt16 MathN;
+	/// <summary>Signed math operation in progress.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool MathSign;
+	/// <summary>Accumulate mode (add to existing result).</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool MathAccumulate;
+	/// <summary>Math operation currently executing.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool MathInProgress;
+	/// <summary>Math overflow occurred.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool MathOverflow;
 
+	/// <summary>Collision depository (16 entries, one per pen color).</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
 	public byte[] CollisionBuffer;
 
+	/// <summary>Joystick register (active-low: A/B/Opt1/Opt2/Up/Down/Left/Right).</summary>
 	public byte Joystick;
+	/// <summary>Switches register (Pause, cart control bits).</summary>
 	public byte Switches;
 }
 
+/// <summary>Memory manager state (MAPCTL-based overlays).</summary>
+/// <remarks>Matches memory layout of LynxMemoryManagerState in Core/Lynx/LynxTypes.h.</remarks>
 public struct LynxMemoryManagerState : BaseState {
+	/// <summary>MAPCTL register raw value.</summary>
 	public byte Mapctl;
+	/// <summary>Vector space ($FFFA-$FFFF) mapped to ROM.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool VectorSpaceVisible;
+	/// <summary>Mikey registers ($FD00-$FDFF) visible.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool MikeySpaceVisible;
+	/// <summary>Suzy registers ($FC00-$FCFF) visible.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool SuzySpaceVisible;
+	/// <summary>ROM space ($FE00-$FFF7) visible.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool RomSpaceVisible;
+	/// <summary>Boot ROM currently active (after reset).</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool BootRomActive;
 }
 
+/// <summary>Complete Lynx console state snapshot for debugger interop.</summary>
+/// <remarks>Aggregates all subsystem states for save states and debugging.</remarks>
 public struct LynxState : BaseState {
+	/// <summary>Hardware model (Lynx I or II).</summary>
 	public LynxModel Model;
+	/// <summary>65C02 CPU state.</summary>
 	public LynxCpuState Cpu;
+	/// <summary>PPU/display state.</summary>
 	public LynxPpuState Ppu;
+	/// <summary>Mikey chip state (timers, display, UART).</summary>
 	public LynxMikeyState Mikey;
+	/// <summary>Suzy chip state (sprites, math, collision).</summary>
 	public LynxSuzyState Suzy;
+	/// <summary>Audio subsystem state.</summary>
 	public LynxApuState Apu;
+	/// <summary>Memory manager state.</summary>
 	public LynxMemoryManagerState MemoryManager;
+	/// <summary>Controller/input state.</summary>
 	public LynxControlManagerState ControlManager;
+	/// <summary>Cartridge state.</summary>
 	public LynxCartState Cart;
+	/// <summary>EEPROM state.</summary>
 	public LynxEepromSerialState Eeprom;
 }
 
+/// <summary>Controller manager state.</summary>
 public struct LynxControlManagerState : BaseState {
+	/// <summary>Joystick register value (active-low).</summary>
 	public byte Joystick;
+	/// <summary>Switches register value.</summary>
 	public byte Switches;
 }
 
+/// <summary>Cartridge information from LNX header.</summary>
 public struct LynxCartInfo {
+	/// <summary>Game title (max 32 chars + null).</summary>
 	[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)] public string Name;
+	/// <summary>Manufacturer name (max 16 chars + null).</summary>
 	[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 17)] public string Manufacturer;
+	/// <summary>Total ROM size in bytes.</summary>
 	public UInt32 RomSize;
+	/// <summary>Page size for bank 0 (in bytes).</summary>
 	public UInt16 PageSizeBank0;
+	/// <summary>Page size for bank 1 (in bytes).</summary>
 	public UInt16 PageSizeBank1;
+	/// <summary>Declared screen rotation.</summary>
 	public LynxRotation Rotation;
+	/// <summary>Cart has EEPROM for save data.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool HasEeprom;
+	/// <summary>EEPROM chip type.</summary>
 	public LynxEepromType EepromType;
+	/// <summary>LNX format version.</summary>
 	public UInt16 Version;
 }
 
+/// <summary>Cartridge state (bank switching, page counters).</summary>
+/// <remarks>Matches memory layout of LynxCartState in Core/Lynx/LynxTypes.h.</remarks>
 public struct LynxCartState : BaseState {
+	/// <summary>Cartridge header info.</summary>
 	public LynxCartInfo Info;
+	/// <summary>Currently selected bank.</summary>
 	public UInt16 CurrentBank;
+	/// <summary>Shift register for bank selection.</summary>
 	public byte ShiftRegister;
+	/// <summary>Address counter for sequential access.</summary>
 	public UInt32 AddressCounter;
 }
 
+/// <summary>EEPROM serial protocol state.</summary>
+/// <remarks>Matches memory layout of LynxEepromSerialState in Core/Lynx/LynxTypes.h.</remarks>
 public struct LynxEepromSerialState : BaseState {
+	/// <summary>EEPROM chip type.</summary>
 	public LynxEepromType Type;
+	/// <summary>Protocol state machine phase.</summary>
 	public LynxEepromState State;
+	/// <summary>Opcode being received (2 bits + extended).</summary>
 	public UInt16 Opcode;
+	/// <summary>Address being received.</summary>
 	public UInt16 Address;
+	/// <summary>Data word buffer (read/write).</summary>
 	public UInt16 DataBuffer;
+	/// <summary>Bits received in current phase.</summary>
 	public byte BitCount;
+	/// <summary>Write operations enabled (EWEN command issued).</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool WriteEnabled;
+	/// <summary>Chip select active.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool CsActive;
+	/// <summary>Current clock line state.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool ClockState;
+	/// <summary>Data out pin state.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool DataOut;
 }

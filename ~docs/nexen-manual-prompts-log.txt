@@ -280,8 +280,11 @@ continue testing and benchmarking and documenting the UART/ComLynx code effort i
 
 Is the private key in `https://github.com/42Bastian/lynx-encryption-tools/blob/master/keys.h` not the private key for Lynx bootloader encryption? continue;
 
+[Nexen] (Lynx) fix problems with the bootloader encryption/compression stuff, make sure you're updating/making issues and todos and documentation (make sure the key file from github is in the docs) and test/benchmarks/chat & session logs; continue;
 
+[Nexen] (Lynx) Any other problems with the bootloader and compression/encryption codebase? fix them! ; find other problems with the Atari Lynx code, make tests and benchmarks and documentation and logs and code-plans and comment (xmldocs and inline code comments) all of the Lynx code, C# and c++; continue;
 
+Oh god, yes please!
 
 
 

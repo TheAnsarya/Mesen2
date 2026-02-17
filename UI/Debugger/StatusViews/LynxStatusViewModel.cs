@@ -6,27 +6,54 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Nexen.Debugger.StatusViews;
 
+/// <summary>
+/// ViewModel for the Lynx CPU status panel in the debugger.
+/// </summary>
+/// <remarks>
+/// Displays and allows editing of:
+/// - 65C02 registers (A, X, Y, SP, PC, PS)
+/// - Processor status flags (N, V, D, I, Z, C)
+/// - PPU timing (cycle, scanline, frame count)
+/// - Stack preview (current stack contents)
+/// </remarks>
 public sealed class LynxStatusViewModel : BaseConsoleStatusViewModel {
+	/// <summary>Accumulator register.</summary>
 	[Reactive] public byte RegA { get; set; }
+	/// <summary>X index register.</summary>
 	[Reactive] public byte RegX { get; set; }
+	/// <summary>Y index register.</summary>
 	[Reactive] public byte RegY { get; set; }
+	/// <summary>Stack pointer (page $01).</summary>
 	[Reactive] public byte RegSP { get; set; }
+	/// <summary>Program counter.</summary>
 	[Reactive] public UInt16 RegPC { get; set; }
+	/// <summary>Processor status register.</summary>
 	[Reactive] public byte RegPS { get; set; }
 
+	/// <summary>Negative flag (bit 7 of PS).</summary>
 	[Reactive] public bool FlagN { get; set; }
+	/// <summary>Overflow flag (bit 6 of PS).</summary>
 	[Reactive] public bool FlagV { get; set; }
+	/// <summary>Decimal mode flag (bit 3 of PS).</summary>
 	[Reactive] public bool FlagD { get; set; }
+	/// <summary>Interrupt disable flag (bit 2 of PS).</summary>
 	[Reactive] public bool FlagI { get; set; }
+	/// <summary>Zero flag (bit 1 of PS).</summary>
 	[Reactive] public bool FlagZ { get; set; }
+	/// <summary>Carry flag (bit 0 of PS).</summary>
 	[Reactive] public bool FlagC { get; set; }
 
+	/// <summary>Current horizontal position within scanline.</summary>
 	[Reactive] public UInt16 Cycle { get; private set; }
+	/// <summary>Current scanline (0-104).</summary>
 	[Reactive] public UInt16 Scanline { get; private set; }
+	/// <summary>Total frames rendered.</summary>
 	[Reactive] public UInt32 FrameCount { get; private set; }
 
+	/// <summary>Hex dump of current stack contents.</summary>
 	[Reactive] public string StackPreview { get; private set; } = "";
 
+	/// <summary>Create a new Lynx status view model.</summary>
 	public LynxStatusViewModel() {
 		this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ).Subscribe(x => RegPS = (byte)(
 			(FlagN ? 0x80 : 0) |
@@ -49,6 +76,7 @@ public sealed class LynxStatusViewModel : BaseConsoleStatusViewModel {
 		});
 	}
 
+	/// <summary>Update UI state from emulator core.</summary>
 	protected override void InternalUpdateUiState() {
 		LynxCpuState cpu = DebugApi.GetCpuState<LynxCpuState>(CpuType.Lynx);
 		LynxPpuState ppu = DebugApi.GetPpuState<LynxPpuState>(CpuType.Lynx);
@@ -74,6 +102,7 @@ public sealed class LynxStatusViewModel : BaseConsoleStatusViewModel {
 		FrameCount = ppu.FrameCount;
 	}
 
+	/// <summary>Apply edited register values back to emulator core.</summary>
 	protected override void InternalUpdateConsoleState() {
 		LynxCpuState cpu = DebugApi.GetCpuState<LynxCpuState>(CpuType.Lynx);
 

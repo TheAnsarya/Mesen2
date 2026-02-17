@@ -309,7 +309,7 @@ void EncryptBlock(
 	uint8_t accumulator  // Input only (from previous block's last byte)
 ) {
 	// Build 51-byte encoded block before RSA
-	// 
+	//
 	// For decryption to work with forward cumulative sum:
 	//   encodedBlock[1] = p0 - accumulator (first byte)
 	//   encodedBlock[k+1] = pk - p(k-1) for k=1..49 (differences)

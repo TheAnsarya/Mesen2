@@ -238,10 +238,13 @@ TEST_F(LynxApuTest, StereoAtten_AllChannels) {
 //=============================================================================
 
 TEST_F(LynxApuTest, Counter_Underflow_ReloadsBackup) {
-	_channel.Counter = 1;
+	// Counter at 0, decrement causes 8-bit underflow to 0xFF
+	// which triggers reload from BackupValue
+	_channel.Counter = 0;
 	_channel.BackupValue = 50;
-	// Simulate decrement
+	// Simulate decrement with underflow
 	_channel.Counter--;
+	// After 8-bit underflow: 0 - 1 = 0xFF (in unsigned 8-bit)
 	if (_channel.Counter == 0xff) {
 		_channel.Counter = _channel.BackupValue;
 		_channel.TimerDone = true;

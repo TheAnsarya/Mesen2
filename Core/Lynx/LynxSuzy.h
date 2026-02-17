@@ -8,6 +8,30 @@ class LynxConsole;
 class LynxMemoryManager;
 class LynxCart;
 
+/// @file LynxSuzy.h
+/// @brief Atari Lynx Suzy chip emulation.
+///
+/// Suzy is the Lynx's custom graphics/math coprocessor containing:
+/// - **Sprite Engine**: Hardware sprite rendering with scaling, clipping, collisions
+/// - **Math Unit**: 16×16→32 multiply, 32÷16 divide with accumulate modes
+/// - **Joystick/Switch Interface**: Button input and system switches
+///
+/// **Memory Map** ($FC00–$FCFF):
+/// | Address | Name | Description |
+/// |---------|------|-------------|
+/// | $FC00–$FC0F | SPRSYS | Sprite control registers |
+/// | $FC10–$FC1F | MATHA–MATHN | Math operands/results |
+/// | $FC80 | JOYSTICK | Controller input |
+/// | $FC88 | SWITCHES | System switches (Opt1/2, Pause, Cart power) |
+/// | $FC90 | SUZY_BUSEN | Bus enable (for debugging) |
+///
+/// **Hardware Bugs Emulated** (Chapter 13 of Lynx Hardware Reference):
+/// - Bug 13.8: Signed multiply edge cases ($8000, $0000)
+/// - Bug 13.10: MathOverflow flag overwritten on each operation
+///
+/// @see https://atarilynxdeveloper.wordpress.com/suzy-chip/
+/// @see ~docs/plans/lynx-suzy-sprite-engine.md
+
 class LynxSuzy final : public ISerializable {
 private:
 	Emulator* _emu = nullptr;
@@ -17,11 +41,14 @@ private:
 
 	LynxSuzyState _state = {};
 
-	// Sprite rendering scratch space
+	/// <summary>Per-scanline buffer for sprite pixel writes.</summary>
 	uint8_t _lineBuffer[LynxConstants::ScreenWidth] = {};
 
-	// Pen index remap table (16 entries, maps decoded pixel to palette index)
-	// Written by games via registers $FC00-$FC0F (PenIndex 0-15)
+	/// <summary>Pen index remap table (16 entries → palette indices).</summary>
+	/// <remarks>
+	/// Games can reroute decoded sprite pixels to different palette entries.
+	/// Written via registers $FC00-$FC0F (PenIndex 0-15).
+	/// </remarks>
 	uint8_t _penIndex[16] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 
 	// Persistent SCB field values (reused when reload flags are clear)
@@ -32,20 +59,49 @@ private:
 	int16_t _persistStretch = 0;
 	int16_t _persistTilt = 0;
 
-	// Sprite bus contention — tracks CPU cycles consumed during sprite processing.
-	// On real hardware, the CPU is stalled while Suzy accesses the bus for sprite
-	// rendering. Each bus access (read/write of work RAM) costs 1 CPU cycle.
+	/// <summary>CPU cycles consumed by sprite bus accesses.</summary>
+	/// <remarks>
+	/// On real hardware, the CPU stalls while Suzy accesses work RAM.
+	/// Each bus read/write costs 1 CPU cycle.
+	/// </remarks>
 	uint32_t _spriteBusCycles = 0;
 	bool _spriteProcessingActive = false;
 
-	// Hardware math helpers
+	/// <summary>Perform 16×16→32-bit hardware multiply (MATHC × MATHE).</summary>
+	/// <remarks>
+	/// Result stored in MATHG:MATHH (high:low).
+	/// If MathAccumulate is set, result is added to accumulator.
+	/// </remarks>
 	void DoMultiply();
+
+	/// <summary>Perform 32÷16-bit hardware divide (numerator / MATHP).</summary>
+	/// <remarks>
+	/// Quotient stored in MATHC, remainder in MATHE or accumulator.
+	/// </remarks>
 	void DoDivide();
 
-	// Sprite engine internals
+	/// <summary>Walk sprite chain starting from SPRCTL1 SCB pointer.</summary>
 	void ProcessSpriteChain();
+
+	/// <summary>Render a single sprite from its SCB (Sprite Control Block).</summary>
+	/// <param name="scbAddr">Address of SCB header in work RAM.</param>
 	void ProcessSprite(uint16_t scbAddr);
+
+	/// <summary>Write one sprite pixel with collision detection.</summary>
+	/// <param name="x">Screen X coordinate.</param>
+	/// <param name="y">Screen Y coordinate.</param>
+	/// <param name="penIndex">Remapped palette index (0-15).</param>
+	/// <param name="collNum">Collision number for this sprite.</param>
+	/// <param name="spriteType">Controls visibility and collision behavior.</param>
 	void WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum, LynxSpriteType spriteType);
+
+	/// <summary>Decode packed sprite line data into pixel buffer.</summary>
+	/// <param name="dataAddr">Current address in sprite data (updated).</param>
+	/// <param name="lineEnd">End address for this line's data.</param>
+	/// <param name="bpp">Bits per pixel (1, 2, 3, or 4).</param>
+	/// <param name="pixelBuf">Output buffer for decoded pixels.</param>
+	/// <param name="maxPixels">Maximum pixels to decode.</param>
+	/// <returns>Number of pixels decoded.</returns>
 	int DecodeSpriteLinePixels(uint16_t& dataAddr, uint16_t lineEnd, int bpp, uint8_t* pixelBuf, int maxPixels);
 
 	__forceinline uint8_t ReadRam(uint16_t addr);
@@ -53,20 +109,32 @@ private:
 	__forceinline void WriteRam(uint16_t addr, uint8_t value);
 
 public:
+	/// <summary>Initialize Suzy with system references.</summary>
 	void Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memoryManager, LynxCart* cart);
 
-	uint8_t ReadRegister(uint8_t addr);
+	/// <summary>Read Suzy register ($FC00-$FCFF offset).</summary>
+	[[nodiscard]] uint8_t ReadRegister(uint8_t addr);
+
+	/// <summary>Write Suzy register ($FC00-$FCFF offset).</summary>
 	void WriteRegister(uint8_t addr, uint8_t value);
 
-	bool IsSpriteBusy() const { return _state.SpriteBusy; }
+	/// <summary>Check if sprite engine is currently busy.</summary>
+	[[nodiscard]] bool IsSpriteBusy() const { return _state.SpriteBusy; }
 
-	uint8_t GetJoystick() const { return _state.Joystick; }
+	/// <summary>Get current joystick button state.</summary>
+	[[nodiscard]] uint8_t GetJoystick() const { return _state.Joystick; }
+
+	/// <summary>Set joystick button state (from controller input).</summary>
 	void SetJoystick(uint8_t value) { _state.Joystick = value; }
 
-	uint8_t GetSwitches() const { return _state.Switches; }
+	/// <summary>Get system switch state (Opt1, Opt2, Pause, Cart0).</summary>
+	[[nodiscard]] uint8_t GetSwitches() const { return _state.Switches; }
+
+	/// <summary>Set system switch state.</summary>
 	void SetSwitches(uint8_t value) { _state.Switches = value; }
 
-	LynxSuzyState& GetState() { return _state; }
+	/// <summary>Get internal state (for debugging/serialization).</summary>
+	[[nodiscard]] LynxSuzyState& GetState() { return _state; }
 
 	void Serialize(Serializer& s) override;
 };
