@@ -932,11 +932,10 @@ void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 			break;
 
 		// Cart access registers (FCB2-FCB3)
-		case 0xb2: // RCART0 — read/write cart bank 0
-			if (_cart) _cart->SetAddressLow(value);
-			break;
-		case 0xb3: // RCART1 — read/write cart bank 1
-			if (_cart) _cart->SetAddressLow(value);
+		// RCART0/RCART1 are read-only on hardware. Writes here are a no-op.
+		// Handy also ignores writes to these addresses (no Poke case).
+		case 0xb2:
+		case 0xb3:
 			break;
 
 		default:

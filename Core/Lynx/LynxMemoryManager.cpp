@@ -27,8 +27,8 @@ void LynxMemoryManager::UpdateMapctl(uint8_t value) {
 	// Active-low: bit = 0 means overlay IS visible
 	_state.SuzySpaceVisible = !(value & 0x01);  // Bit 0: Suzy disable
 	_state.MikeySpaceVisible = !(value & 0x02); // Bit 1: Mikey disable
-	_state.VectorSpaceVisible = !(value & 0x04); // Bit 2: Vector disable
-	_state.RomSpaceVisible = !(value & 0x08);    // Bit 3: ROM disable
+	_state.RomSpaceVisible = !(value & 0x04);    // Bit 2: ROM disable ($FE00-$FFF7)
+	_state.VectorSpaceVisible = !(value & 0x08); // Bit 3: Vector disable ($FFFA-$FFFF)
 }
 
 uint8_t LynxMemoryManager::Read(uint16_t addr, MemoryOperationType opType) {

@@ -627,13 +627,13 @@ struct LynxMemoryManagerState {
 	/// <summary>Vector space ($FFFA-$FFFF) overlay visible (MAPCTL bit 3)</summary>
 	bool VectorSpaceVisible;
 
-	/// <summary>Mikey space ($FD00-$FDFF) visible (MAPCTL bit 2)</summary>
+	/// <summary>Mikey space ($FD00-$FDFF) visible (MAPCTL bit 1)</summary>
 	bool MikeySpaceVisible;
 
-	/// <summary>Suzy space ($FC00-$FCFF) visible (MAPCTL bit 1)</summary>
+	/// <summary>Suzy space ($FC00-$FCFF) visible (MAPCTL bit 0)</summary>
 	bool SuzySpaceVisible;
 
-	/// <summary>ROM space ($FE00-$FFF7) visible (MAPCTL bit 0)</summary>
+	/// <summary>ROM space ($FE00-$FFF7) visible (MAPCTL bit 2)</summary>
 	bool RomSpaceVisible;
 
 	/// <summary>Whether the boot ROM sequence is active</summary>
