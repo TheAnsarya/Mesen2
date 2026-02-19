@@ -22,6 +22,16 @@ void LynxSuzy::Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memo
 	// Hardware defaults (matching Handy's Reset)
 	_state.HSizeOff = 0x007f;
 	_state.VSizeOff = 0x007f;
+
+	// Handy initializes math registers to 0xFFFFFFFF due to
+	// stun runner math initialization bug (see Handy whatsnew v0.7)
+	_state.MathABCD = 0xffffffff;
+	_state.MathEFGH = 0xffffffff;
+	_state.MathJKLM = 0xffffffff;
+	_state.MathNP = 0xffff;
+	_state.MathAB_sign = 1;
+	_state.MathCD_sign = 1;
+	_state.MathEFGH_sign = 1;
 }
 
 __forceinline uint8_t LynxSuzy::ReadRam(uint16_t addr) {
@@ -36,139 +46,57 @@ __forceinline uint16_t LynxSuzy::ReadRam16(uint16_t addr) {
 }
 
 void LynxSuzy::DoMultiply() {
-	// 16x16 → 32-bit multiply
-	// MATHC:MATHD × MATHE:MATHF → MATHG:MATHH:MATHJ:MATHK
+	// AB × CD → EFGH (matching Handy DoMathMultiply)
+	// Sign conversion has ALREADY been applied at register write time.
+	// The values in ABCD are positive magnitude; signs tracked separately.
 	_state.MathInProgress = true;
-
-	// HW Bug 13.10: The math overflow flag is OVERWRITTEN by each new operation,
-	// not OR'd. A previous overflow is lost if the CPU doesn't read SPRSYS before
-	// the next math operation completes. We clear it at the start of each operation.
 	_state.MathOverflow = false;
 	_state.LastCarry = false;
 
+	// Basic multiply is ALWAYS unsigned
+	uint16_t ab = (uint16_t)((_state.MathABCD >> 16) & 0xffff);
+	uint16_t cd = (uint16_t)(_state.MathABCD & 0xffff);
+	uint32_t result = (uint32_t)ab * (uint32_t)cd;
+	_state.MathEFGH = result;
+
 	if (_state.MathSign) {
-		// Signed multiply
-		// HW Bug 13.8: The hardware sign-detection logic has two errors:
-		//   1. $8000 is treated as POSITIVE (the sign bit is checked, but the
-		//      negate-and-complement produces $8000 again, so it stays positive)
-		//   2. $0000 with the sign flag is treated as NEGATIVE (negate of 0 =
-		//      $10000 which truncates to $0000, but sign is still set)
-		// We emulate this by converting to sign-magnitude the way the HW does:
-		//   - Check bit 15 of each operand for sign
-		//   - If set, negate (two's complement) the value
-		//   - Multiply as unsigned
-		//   - If signs differ, negate the result
-		// The bug manifests because negating $8000 = $8000 (positive $8000)
-		// and negating $0000 = $0000 but still flagged as negative.
-		uint16_t a = (uint16_t)_state.MathC;
-		uint16_t b = (uint16_t)_state.MathE;
-		bool aNeg = (a & 0x8000) != 0;
-		bool bNeg = (b & 0x8000) != 0;
-
-		// Hardware performs two's complement if sign bit set
-		// Bug: ~$8000 + 1 = $7FFF + 1 = $8000 (unchanged, treated as positive magnitude)
-		// Bug: ~$0000 + 1 = $FFFF + 1 = $0000 (truncated, but sign still flagged)
-		if (aNeg) a = (uint16_t)(~a + 1);
-		if (bNeg) b = (uint16_t)(~b + 1);
-
-		uint32_t result = (uint32_t)a * (uint32_t)b;
-
-		// If signs differ, negate the result
-		bool resultNeg = aNeg ^ bNeg;
-		if (resultNeg) {
-			result = ~result + 1;
+		// Add the sign bits, only >0 is +ve result (matching Handy)
+		_state.MathEFGH_sign = _state.MathAB_sign + _state.MathCD_sign;
+		if (!_state.MathEFGH_sign) {
+			_state.MathEFGH ^= 0xffffffff;
+			_state.MathEFGH++;
 		}
+	}
 
-		if (_state.MathAccumulate) {
-			uint32_t accum = ((uint32_t)_state.MathG << 16) | _state.MathH;
-			uint64_t sum64 = (uint64_t)result + (uint64_t)accum;
-			if (sum64 > 0xFFFFFFFF) {
-				_state.MathOverflow = true;
-				_state.LastCarry = true;
-			}
-			result = (uint32_t)sum64;
+	// Accumulate: JKLM += EFGH
+	if (_state.MathAccumulate) {
+		uint32_t tmp = _state.MathJKLM + _state.MathEFGH;
+		// Overflow if result wrapped around
+		if (tmp < _state.MathJKLM) {
+			_state.MathOverflow = true;
+			_state.LastCarry = true;
 		}
-
-		_state.MathG = (uint16_t)((result >> 16) & 0xffff);
-		_state.MathH = (uint16_t)(result & 0xffff);
-	} else {
-		// Unsigned multiply
-		uint32_t a = (uint16_t)_state.MathC;
-		uint32_t b = (uint16_t)_state.MathE;
-		uint32_t result = a * b;
-
-		if (_state.MathAccumulate) {
-			uint32_t accum = ((uint32_t)_state.MathG << 16) | _state.MathH;
-			uint64_t sum64 = (uint64_t)result + (uint64_t)accum;
-			if (sum64 > 0xFFFFFFFF) {
-				_state.MathOverflow = true;
-				_state.LastCarry = true;
-			}
-			result = (uint32_t)sum64;
-		}
-
-		_state.MathG = (uint16_t)((result >> 16) & 0xffff);
-		_state.MathH = (uint16_t)(result & 0xffff);
+		_state.MathJKLM = tmp;
 	}
 
 	_state.MathInProgress = false;
 }
 
 void LynxSuzy::DoDivide() {
-	// 32÷16 → 16 quotient, 16 remainder
-	// MATHG:MATHH ÷ MATHE → MATHC (quotient), MATHG (remainder)
+	// EFGH ÷ NP → quotient in ABCD, remainder in JKLM (matching Handy)
+	// Divide is ALWAYS unsigned arithmetic.
 	_state.MathInProgress = true;
+	_state.MathOverflow = false;
+	_state.LastCarry = false;
 
-	if (_state.MathE == 0) {
-		// Division by zero
-		_state.MathC = 0;
-		_state.MathD = 0;
-		_state.MathG = 0;
-		_state.MathH = 0;
-	} else if (_state.MathSign) {
-		// HW Bug 13.9: Signed division remainder errors.
-		// The hardware performs sign-magnitude division similar to multiply:
-		// 1. Extract signs, negate to positive magnitude
-		// 2. Divide as unsigned
-		// 3. Negate quotient if signs differ
-		// 4. The remainder follows the dividend's sign, BUT has the same
-		//    $8000/$0000 bugs as multiply (Bug 13.8).
-		uint32_t dividend = ((uint32_t)_state.MathG << 16) | (uint16_t)_state.MathH;
-		uint16_t divisor = _state.MathE;
-		bool dividendNeg = (dividend & 0x80000000) != 0;
-		bool divisorNeg = (divisor & 0x8000) != 0;
-
-		// Two's complement like the hardware does (same $8000 bug as multiply)
-		if (dividendNeg) dividend = ~dividend + 1;
-		if (divisorNeg) divisor = (uint16_t)(~divisor + 1);
-
-		uint32_t quotient = dividend / (uint32_t)divisor;
-		uint32_t remainder = dividend % (uint32_t)divisor;
-
-		// Negate quotient if signs differ
-		if (dividendNeg ^ divisorNeg) {
-			quotient = ~quotient + 1;
-		}
-
-		// HW Bug 13.9: Remainder should follow dividend sign but the hardware
-		// doesn't always negate it correctly — remainder is always positive
-		// magnitude from the unsigned division. We match the hardware behavior:
-		// remainder is NOT negated, regardless of dividend sign.
-
-		_state.MathC = (int16_t)(quotient & 0xffff);
-		_state.MathD = (int16_t)((quotient >> 16) & 0xffff);
-		_state.MathG = (uint16_t)(remainder & 0xffff);
-		_state.MathH = 0;
+	if (_state.MathNP) {
+		_state.MathABCD = _state.MathEFGH / (uint32_t)_state.MathNP;
+		_state.MathJKLM = _state.MathEFGH % (uint32_t)_state.MathNP;
 	} else {
-		uint32_t dividend = ((uint32_t)_state.MathG << 16) | (uint16_t)_state.MathH;
-		uint16_t divisor = _state.MathE;
-		uint32_t quotient = dividend / divisor;
-		uint32_t remainder = dividend % divisor;
-
-		_state.MathC = (int16_t)(quotient & 0xffff);
-		_state.MathD = (int16_t)((quotient >> 16) & 0xffff);
-		_state.MathG = (uint16_t)(remainder & 0xffff);
-		_state.MathH = 0;
+		// Division by zero
+		_state.MathABCD = 0xffffffff;
+		_state.MathJKLM = 0;
+		_state.MathOverflow = true;
 	}
 
 	_state.MathInProgress = false;
@@ -777,23 +705,27 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 		case 0x10: return (uint8_t)(_state.SCBAddress & 0xff);
 		case 0x11: return (uint8_t)((_state.SCBAddress >> 8) & 0xff);
 
-		// Math registers (read result)
-		case 0x60: return (uint8_t)(_state.MathC & 0xff);
-		case 0x61: return (uint8_t)((_state.MathC >> 8) & 0xff);
-		case 0x62: return (uint8_t)(_state.MathD & 0xff);
-		case 0x63: return (uint8_t)((_state.MathD >> 8) & 0xff);
-		case 0x64: return (uint8_t)(_state.MathE & 0xff);
-		case 0x65: return (uint8_t)((_state.MathE >> 8) & 0xff);
-		case 0x66: return (uint8_t)(_state.MathF & 0xff);
-		case 0x67: return (uint8_t)((_state.MathF >> 8) & 0xff);
-		case 0x6c: return (uint8_t)(_state.MathG & 0xff);
-		case 0x6d: return (uint8_t)((_state.MathG >> 8) & 0xff);
-		case 0x6e: return (uint8_t)(_state.MathH & 0xff);
-		case 0x6f: return (uint8_t)((_state.MathH >> 8) & 0xff);
-		case 0x70: return (uint8_t)(_state.MathJ & 0xff);
-		case 0x71: return (uint8_t)((_state.MathJ >> 8) & 0xff);
-		case 0x72: return (uint8_t)(_state.MathK & 0xff);
-		case 0x73: return (uint8_t)((_state.MathK >> 8) & 0xff);
+		// Math registers — ABCD group (0x52-0x55): multiply operands
+		case 0x52: return (uint8_t)(_state.MathABCD & 0xff);         // MATHD
+		case 0x53: return (uint8_t)((_state.MathABCD >> 8) & 0xff);  // MATHC
+		case 0x54: return (uint8_t)((_state.MathABCD >> 16) & 0xff); // MATHB
+		case 0x55: return (uint8_t)((_state.MathABCD >> 24) & 0xff); // MATHA
+
+		// Math registers — NP group (0x56-0x57): divide divisor
+		case 0x56: return (uint8_t)(_state.MathNP & 0xff);        // MATHP
+		case 0x57: return (uint8_t)((_state.MathNP >> 8) & 0xff); // MATHN
+
+		// Math registers — EFGH group (0x60-0x63): result / dividend
+		case 0x60: return (uint8_t)(_state.MathEFGH & 0xff);         // MATHH
+		case 0x61: return (uint8_t)((_state.MathEFGH >> 8) & 0xff);  // MATHG
+		case 0x62: return (uint8_t)((_state.MathEFGH >> 16) & 0xff); // MATHF
+		case 0x63: return (uint8_t)((_state.MathEFGH >> 24) & 0xff); // MATHE
+
+		// Math registers — JKLM group (0x6C-0x6F): accumulator / remainder
+		case 0x6c: return (uint8_t)(_state.MathJKLM & 0xff);         // MATHM
+		case 0x6d: return (uint8_t)((_state.MathJKLM >> 8) & 0xff);  // MATHL
+		case 0x6e: return (uint8_t)((_state.MathJKLM >> 16) & 0xff); // MATHK
+		case 0x6f: return (uint8_t)((_state.MathJKLM >> 24) & 0xff); // MATHJ
 
 		// Sprite rendering register reads
 		case 0x04: return (uint8_t)(_state.HOffset & 0xff);
@@ -895,33 +827,94 @@ void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 		case 0x2a: _state.VSizeOff = (_state.VSizeOff & 0xff00) | value; break;
 		case 0x2b: _state.VSizeOff = (_state.VSizeOff & 0x00ff) | ((uint16_t)value << 8); break;
 
-		// Math registers (write operands)
-		case 0x60: _state.MathC = (_state.MathC & (int16_t)0xff00) | value; break;
-		case 0x61: _state.MathC = (_state.MathC & 0x00ff) | ((int16_t)value << 8); break;
-		case 0x62: _state.MathD = (_state.MathD & (int16_t)0xff00) | value; break;
-		case 0x63: _state.MathD = (_state.MathD & 0x00ff) | ((int16_t)value << 8); break;
-		case 0x64: _state.MathE = (_state.MathE & 0xff00) | value; break;
-		case 0x65: _state.MathE = (_state.MathE & 0x00ff) | ((uint16_t)value << 8); break;
-		case 0x66: _state.MathF = (_state.MathF & 0xff00) | value; break;
-		case 0x67:
-			_state.MathF = (_state.MathF & 0x00ff) | ((uint16_t)value << 8);
-			// Writing to MATHF high triggers multiply
-			DoMultiply();
+		// Math registers — ABCD group (0x52-0x55): multiply operands
+		// Matching Handy: cascading clears + sign conversion at write time
+		case 0x52: // MATHD — set byte 0, clear C (matching Handy stun runner fix)
+			_state.MathABCD = (_state.MathABCD & 0xffff0000) | value;
+			// Writing D clears C (hardware quirk, required for stun runner)
+			_state.MathABCD &= 0xffff00ff;
+			break;
+		case 0x53: { // MATHC — set byte 1, do sign conversion on CD if signed
+			_state.MathABCD = (_state.MathABCD & 0xffff00ff) | ((uint32_t)value << 8);
+			// Sign conversion at write time (matching Handy)
+			if (_state.MathSign) {
+				uint16_t cd = (uint16_t)(_state.MathABCD & 0xffff);
+				// HW Bug 13.8: (value-1)&0x8000 check — $8000 is +ve, $0000 is -ve
+				if ((uint16_t)(cd - 1) & 0x8000) {
+					uint16_t conv = (uint16_t)(cd ^ 0xffff);
+					conv++;
+					_state.MathCD_sign = -1;
+					_state.MathABCD = (_state.MathABCD & 0xffff0000) | conv;
+				} else {
+					_state.MathCD_sign = 1;
+				}
+			}
+			break;
+		}
+		case 0x54: // MATHB — set byte 2, clear A
+			_state.MathABCD = (_state.MathABCD & 0xff00ffff) | ((uint32_t)value << 16);
+			_state.MathABCD &= 0x00ffffff; // Clear A
+			break;
+		case 0x55: { // MATHA — set byte 3, do sign conversion on AB, trigger multiply
+			_state.MathABCD = (_state.MathABCD & 0x00ffffff) | ((uint32_t)value << 24);
+			// Sign conversion at write time (matching Handy)
+			if (_state.MathSign) {
+				uint16_t ab = (uint16_t)((_state.MathABCD >> 16) & 0xffff);
+				// HW Bug 13.8: same (value-1)&0x8000 check
+				if ((uint16_t)(ab - 1) & 0x8000) {
+					uint16_t conv = (uint16_t)(ab ^ 0xffff);
+					conv++;
+					_state.MathAB_sign = -1;
+					_state.MathABCD = (_state.MathABCD & 0x0000ffff) | ((uint32_t)conv << 16);
+				} else {
+					_state.MathAB_sign = 1;
+				}
+			}
+			DoMultiply(); // Writing MATHA triggers multiply
+			break;
+		}
+
+		// Math registers — NP group (0x56-0x57): divide divisor
+		case 0x56: // MATHP — set low byte, clear N
+			_state.MathNP = value;
+			break;
+		case 0x57: // MATHN — set high byte
+			_state.MathNP = (_state.MathNP & 0x00ff) | ((uint16_t)value << 8);
 			break;
 
-		// Writing to MATHK high triggers divide
-		case 0x72: _state.MathK = (_state.MathK & 0xff00) | value; break;
-		case 0x73:
-			_state.MathK = (_state.MathK & 0x00ff) | ((uint16_t)value << 8);
-			DoDivide();
+		// Math registers — EFGH group (0x60-0x63): result / divide dividend
+		case 0x60: // MATHH — set byte 0, clear G
+			_state.MathEFGH = (_state.MathEFGH & 0xffffff00) | value;
+			_state.MathEFGH &= 0xffff00ff; // Clear G
+			break;
+		case 0x61: // MATHG — set byte 1
+			_state.MathEFGH = (_state.MathEFGH & 0xffff00ff) | ((uint32_t)value << 8);
+			break;
+		case 0x62: // MATHF — set byte 2, clear E
+			_state.MathEFGH = (_state.MathEFGH & 0xff00ffff) | ((uint32_t)value << 16);
+			_state.MathEFGH &= 0x00ffffff; // Clear E
+			break;
+		case 0x63: // MATHE — set byte 3, trigger divide
+			_state.MathEFGH = (_state.MathEFGH & 0x00ffffff) | ((uint32_t)value << 24);
+			DoDivide(); // Writing MATHE triggers divide
 			break;
 
-		case 0x6c: _state.MathG = (_state.MathG & 0xff00) | value; break;
-		case 0x6d: _state.MathG = (_state.MathG & 0x00ff) | ((uint16_t)value << 8); break;
-		case 0x6e: _state.MathH = (_state.MathH & 0xff00) | value; break;
-		case 0x6f: _state.MathH = (_state.MathH & 0x00ff) | ((uint16_t)value << 8); break;
-		case 0x70: _state.MathJ = (_state.MathJ & 0xff00) | value; break;
-		case 0x71: _state.MathJ = (_state.MathJ & 0x00ff) | ((uint16_t)value << 8); break;
+		// Math registers — JKLM group (0x6C-0x6F): accumulator / remainder
+		case 0x6c: // MATHM — set byte 0, clear L, clear overflow (matching Handy)
+			_state.MathJKLM = (_state.MathJKLM & 0xffffff00) | value;
+			_state.MathJKLM &= 0xffff00ff; // Clear L
+			_state.MathOverflow = false;
+			break;
+		case 0x6d: // MATHL — set byte 1
+			_state.MathJKLM = (_state.MathJKLM & 0xffff00ff) | ((uint32_t)value << 8);
+			break;
+		case 0x6e: // MATHK — set byte 2, clear J
+			_state.MathJKLM = (_state.MathJKLM & 0xff00ffff) | ((uint32_t)value << 16);
+			_state.MathJKLM &= 0x00ffffff; // Clear J
+			break;
+		case 0x6f: // MATHJ — set byte 3
+			_state.MathJKLM = (_state.MathJKLM & 0x00ffffff) | ((uint32_t)value << 24);
+			break;
 
 		// Collision depository writes: slots 0-3, 12-15 via registers
 		// Note: offsets 0x04-0x0B are sprite rendering registers (HOFF, VOFF, VIDBAS, COLLBAS)
@@ -954,19 +947,14 @@ void LynxSuzy::Serialize(Serializer& s) {
 	SV(_state.SpriteBusy);
 	SV(_state.SpriteEnabled);
 
-	// Math
-	SV(_state.MathA);
-	SV(_state.MathB);
-	SV(_state.MathC);
-	SV(_state.MathD);
-	SV(_state.MathE);
-	SV(_state.MathF);
-	SV(_state.MathG);
-	SV(_state.MathH);
-	SV(_state.MathJ);
-	SV(_state.MathK);
-	SV(_state.MathM);
-	SV(_state.MathN);
+	// Math (grouped registers matching Handy hardware layout)
+	SV(_state.MathABCD);
+	SV(_state.MathEFGH);
+	SV(_state.MathJKLM);
+	SV(_state.MathNP);
+	SV(_state.MathAB_sign);
+	SV(_state.MathCD_sign);
+	SV(_state.MathEFGH_sign);
 	SV(_state.MathSign);
 	SV(_state.MathAccumulate);
 	SV(_state.MathInProgress);

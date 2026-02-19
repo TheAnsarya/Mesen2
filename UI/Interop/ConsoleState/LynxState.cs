@@ -258,30 +258,24 @@ public struct LynxSuzyState : BaseState {
 	/// <summary>Sprite engine enabled (halts CPU during rendering).</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool SpriteEnabled;
 
-	/// <summary>Math register A (unsigned multiplicand / dividend high).</summary>
-	public UInt16 MathA;
-	/// <summary>Math register B (unsigned multiplicand / dividend low).</summary>
-	public UInt16 MathB;
-	/// <summary>Math register C (signed operand).</summary>
-	public Int16 MathC;
-	/// <summary>Math register D (signed operand).</summary>
-	public Int16 MathD;
-	/// <summary>Math register E (result / accumulator high).</summary>
-	public UInt16 MathE;
-	/// <summary>Math register F (result / accumulator low).</summary>
-	public UInt16 MathF;
-	/// <summary>Math register G (result).</summary>
-	public UInt16 MathG;
-	/// <summary>Math register H (result).</summary>
-	public UInt16 MathH;
-	/// <summary>Math register J (result / quotient high).</summary>
-	public UInt16 MathJ;
-	/// <summary>Math register K (result / quotient low).</summary>
-	public UInt16 MathK;
-	/// <summary>Math register M (result / remainder high).</summary>
-	public UInt16 MathM;
-	/// <summary>Math register N (result / remainder low).</summary>
-	public UInt16 MathN;
+	/// <summary>Math register group ABCD (0xFC52-55): D=byte0, C=byte1, B=byte2, A=byte3.
+	/// AB=multiplier, CD=multiplicand. Writing A triggers multiply.</summary>
+	public UInt32 MathABCD;
+	/// <summary>Math register group EFGH (0xFC60-63): H=byte0, G=byte1, F=byte2, E=byte3.
+	/// Multiply result / divide dividend. Writing E triggers divide.</summary>
+	public UInt32 MathEFGH;
+	/// <summary>Math register group JKLM (0xFC6C-6F): M=byte0, L=byte1, K=byte2, J=byte3.
+	/// Accumulator (multiply-add) / remainder (divide).</summary>
+	public UInt32 MathJKLM;
+	/// <summary>Math register group NP (0xFC56-57): P=byte0, N=byte1.
+	/// Divisor for divide operations.</summary>
+	public UInt16 MathNP;
+	/// <summary>Sign tracking for AB group (1 = positive, -1 = negative).</summary>
+	public Int32 MathAB_sign;
+	/// <summary>Sign tracking for CD group (1 = positive, -1 = negative).</summary>
+	public Int32 MathCD_sign;
+	/// <summary>Sign tracking for EFGH group (1 = positive, -1 = negative).</summary>
+	public Int32 MathEFGH_sign;
 	/// <summary>Signed math operation in progress.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool MathSign;
 	/// <summary>Accumulate mode (add to existing result).</summary>
@@ -305,6 +299,25 @@ public struct LynxSuzyState : BaseState {
 	/// <summary>Collision depository (16 entries, one per pen color).</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
 	public byte[] CollisionBuffer;
+
+	/// <summary>Horizontal screen offset (FC04-FC05). Scroll offset for sprite rendering.</summary>
+	public Int16 HOffset;
+	/// <summary>Vertical screen offset (FC06-FC07). Scroll offset for sprite rendering.</summary>
+	public Int16 VOffset;
+	/// <summary>Video buffer base address in RAM (FC08-FC09).</summary>
+	public UInt16 VideoBase;
+	/// <summary>Collision buffer base address in RAM (FC0A-FC0B).</summary>
+	public UInt16 CollisionBase;
+	/// <summary>Collision depository offset (FC24-FC25).</summary>
+	public UInt16 CollOffset;
+	/// <summary>Horizontal size offset / accumulator init (FC28-FC29).</summary>
+	public UInt16 HSizeOff;
+	/// <summary>Vertical size offset / accumulator init (FC2A-FC2B).</summary>
+	public UInt16 VSizeOff;
+	/// <summary>EVERON flag from SPRGO bit 2. Tracks if any sprite pixel was on-screen.</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool EverOn;
+	/// <summary>NoCollide mode — all collision detection globally disabled.</summary>
+	[MarshalAs(UnmanagedType.I1)] public bool NoCollide;
 
 	/// <summary>Joystick register (active-low: A/B/Opt1/Opt2/Up/Down/Left/Right).</summary>
 	public byte Joystick;

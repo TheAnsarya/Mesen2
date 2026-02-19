@@ -250,10 +250,10 @@ TEST_F(LynxSuzyMathTest, SpriteBpp_Values) {
 //=============================================================================
 
 TEST_F(LynxSuzyMathTest, MathState_DefaultZero) {
-	EXPECT_EQ(_state.MathA, 0);
-	EXPECT_EQ(_state.MathB, 0);
-	EXPECT_EQ(_state.MathC, 0);
-	EXPECT_EQ(_state.MathD, 0);
+	EXPECT_EQ(_state.MathABCD, 0u);
+	EXPECT_EQ(_state.MathEFGH, 0u);
+	EXPECT_EQ(_state.MathJKLM, 0u);
+	EXPECT_EQ(_state.MathNP, 0u);
 	EXPECT_FALSE(_state.MathSign);
 	EXPECT_FALSE(_state.MathAccumulate);
 	EXPECT_FALSE(_state.MathInProgress);

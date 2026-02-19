@@ -480,42 +480,58 @@ struct LynxSuzyState {
 	/// <summary>Sprite engine enable</summary>
 	bool SpriteEnabled;
 
-	// --- Hardware math ---
-	/// <summary>Math operand A (16-bit: MATHA high, MATHB low — confusing Atari naming)</summary>
-	uint16_t MathA;
+	// --- Hardware math (matching Handy/hardware byte-level registers) ---
+	// The Lynx math hardware uses 4 register groups operated on as byte-level
+	// CPU registers but processed internally as 32/16-bit values:
+	//
+	// ABCD (0xFC52-0x55): Multiply operands
+	//   CD = multiplicand (C=high, D=low) at 0x52-0x53
+	//   AB = multiplier (A=high, B=low) at 0x54-0x55
+	//   Writing A triggers multiply. Writing D clears C. Writing B clears A.
+	//
+	// EFGH (0xFC60-0x63): Multiply result / divide dividend
+	//   H(LSB)=0x60, G=0x61, F=0x62, E(MSB)=0x63
+	//   Writing H clears G. Writing F clears E.
+	//   Writing E triggers divide.
+	//
+	// NP (0xFC56-0x57): Divide divisor
+	//   P(low)=0x56, N(high)=0x57. Writing P clears N.
+	//
+	// JKLM (0xFC6C-0x6F): Accumulator / divide remainder
+	//   M(LSB)=0x6C, L=0x6D, K=0x6E, J(MSB)=0x6F
+	//   Writing M clears L and clears MathOverflow.
+	//   Writing K clears J.
 
-	/// <summary>Math operand B</summary>
-	uint16_t MathB;
+	/// <summary>ABCD register group — multiply operands (32-bit).
+	/// High word = AB (multiplier), Low word = CD (multiplicand).
+	/// Initialized to 0xFFFFFFFF per Handy Reset (stun runner bug).</summary>
+	uint32_t MathABCD;
 
-	/// <summary>Math operand C</summary>
-	int16_t MathC;
+	/// <summary>EFGH register group — multiply result / divide dividend (32-bit).
+	/// E=MSB(byte 3), F(byte 2), G(byte 1), H=LSB(byte 0).
+	/// Initialized to 0xFFFFFFFF per Handy Reset.</summary>
+	uint32_t MathEFGH;
 
-	/// <summary>Math operand D</summary>
-	int16_t MathD;
+	/// <summary>JKLM register group — accumulator / divide remainder (32-bit).
+	/// J=MSB(byte 3), K(byte 2), L(byte 1), M=LSB(byte 0).
+	/// Initialized to 0xFFFFFFFF per Handy Reset.</summary>
+	uint32_t MathJKLM;
 
-	/// <summary>Math operand E</summary>
-	uint16_t MathE;
+	/// <summary>NP register group — divide divisor (16-bit).
+	/// N=high byte, P=low byte.
+	/// Initialized to 0xFFFF per Handy Reset.</summary>
+	uint16_t MathNP;
 
-	/// <summary>Math operand F</summary>
-	uint16_t MathF;
+	/// <summary>Sign of AB operand, tracked at register write time.
+	/// +1 = positive, -1 = negative. HW Bug 13.8: $8000 treated as positive,
+	/// $0000 treated as negative.</summary>
+	int32_t MathAB_sign;
 
-	/// <summary>Math result G (high word of multiply result)</summary>
-	uint16_t MathG;
+	/// <summary>Sign of CD operand, tracked at register write time.</summary>
+	int32_t MathCD_sign;
 
-	/// <summary>Math result H</summary>
-	uint16_t MathH;
-
-	/// <summary>Math result J</summary>
-	uint16_t MathJ;
-
-	/// <summary>Math result K (low word of multiply result)</summary>
-	uint16_t MathK;
-
-	/// <summary>Math result M (accumulator high)</summary>
-	uint16_t MathM;
-
-	/// <summary>Math result N (accumulator low)</summary>
-	uint16_t MathN;
+	/// <summary>Sign of EFGH result, computed during multiply.</summary>
+	int32_t MathEFGH_sign;
 
 	/// <summary>Signed math mode enabled</summary>
 	bool MathSign;
