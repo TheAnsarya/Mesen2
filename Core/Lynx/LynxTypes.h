@@ -554,6 +554,43 @@ struct LynxSuzyState {
 	/// <summary>16-slot collision depository</summary>
 	uint8_t CollisionBuffer[LynxConstants::CollisionBufferSize];
 
+	// --- Sprite rendering registers ---
+	/// <summary>Horizontal screen offset (FC04-FC05). Scroll offset for sprite rendering.
+	/// Most games use 0 but scrolling games modify this.</summary>
+	int16_t HOffset;
+
+	/// <summary>Vertical screen offset (FC06-FC07). Scroll offset for sprite rendering.</summary>
+	int16_t VOffset;
+
+	/// <summary>Video buffer base address in RAM (FC08-FC09).
+	/// The sprite engine writes rendered pixels to this framebuffer.</summary>
+	uint16_t VideoBase;
+
+	/// <summary>Collision buffer base address in RAM (FC0A-FC0B).
+	/// Collision data is written relative to this address.</summary>
+	uint16_t CollisionBase;
+
+	/// <summary>Collision depository offset (FC24-FC25).
+	/// Collision results are written at SCBAddr + CollOffset in RAM.</summary>
+	uint16_t CollOffset;
+
+	/// <summary>Horizontal size offset / accumulator init (FC28-FC29).
+	/// Initial value for the horizontal size accumulator. Reset default 0x007F.</summary>
+	uint16_t HSizeOff;
+
+	/// <summary>Vertical size offset / accumulator init (FC2A-FC2B).
+	/// Initial value for the vertical size accumulator. Reset default 0x007F.</summary>
+	uint16_t VSizeOff;
+
+	/// <summary>EVERON flag from SPRGO bit 2.
+	/// When set, the hardware tracks whether any sprite pixel was ever on-screen
+	/// and writes the result into the collision depository high bit.</summary>
+	bool EverOn;
+
+	/// <summary>NoCollide mode — SPRSYS write bit 5.
+	/// When set, all collision detection is globally disabled.</summary>
+	bool NoCollide;
+
 	// --- Input ---
 	/// <summary>Joystick register ($FCB0) — D-pad + face buttons</summary>
 	uint8_t Joystick;

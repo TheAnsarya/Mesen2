@@ -18,6 +18,10 @@ void LynxSuzy::Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memo
 
 	_state.Joystick = 0xff; // All buttons released (active-low)
 	_state.Switches = 0xff;
+
+	// Hardware defaults (matching Handy's Reset)
+	_state.HSizeOff = 0x007f;
+	_state.VSizeOff = 0x007f;
 }
 
 __forceinline uint8_t LynxSuzy::ReadRam(uint16_t addr) {
@@ -208,87 +212,86 @@ void LynxSuzy::ProcessSpriteChain() {
 void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 	// SCB Layout (matching Handy/hardware):
 	// Offset 0:    SPRCTL0 — sprite type, BPP, H/V flip
-	// Offset 1:    SPRCTL1 — skip, reload, sizing, literal
+	// Offset 1:    SPRCTL1 — skip, reload, sizing, literal, quadrant
 	// Offset 2:    SPRCOLL — collision number and flags
 	// Offset 3-4:  SCBNEXT — link to next SCB (read in ProcessSpriteChain)
 	// Offset 5-6:  SPRDLINE — sprite data pointer (always loaded)
 	// Offset 7-8:  HPOSSTRT — horizontal position (always loaded)
 	// Offset 9-10: VPOSSTRT — vertical position (always loaded)
-	// Offset 11+:  Variable-length optional fields:
-	//   If ReloadDepth >= 1: SPRHSIZ(2), SPRVSIZ(2)
-	//   If ReloadDepth >= 2: STRETCH(2)
-	//   If ReloadDepth >= 3: TILT(2)
-	//   If ReloadPalette:    PALETTE(8)
+	// Offset 11+:  Variable-length optional fields based on ReloadDepth
 
 	uint8_t sprCtl0 = ReadRam(scbAddr);       // Offset 0: SPRCTL0
 	uint8_t sprCtl1 = ReadRam(scbAddr + 1);   // Offset 1: SPRCTL1
 	uint8_t sprColl = ReadRam(scbAddr + 2);   // Offset 2: SPRCOLL
 
-	// Check for skip flag (SPRCTL1 bit 2: "skip this sprite")
+	// SPRCTL1 bit 2: skip this sprite in the chain
 	if (sprCtl1 & 0x04) {
 		return;
 	}
 
-	// SPRCTL0 decoding:
-	// Bits 7:6 = BPP (0=1bpp, 1=2bpp, 2=3bpp, 3=4bpp)
-	// Bit 5 = H-flip (0 = left-to-right, 1 = right-to-left)
-	// Bit 4 = V-flip (0 = top-to-bottom, 1 = bottom-to-top)
+	// === SPRCTL0 decoding ===
+	// Bits 7:6 = BPP: 00=1bpp, 01=2bpp, 10=3bpp, 11=4bpp
+	// Bit 5 = H-flip (mirror horizontally)
+	// Bit 4 = V-flip (mirror vertically)
 	// Bits 2:0 = Sprite type (0-7)
 	int bpp = ((sprCtl0 >> 6) & 0x03) + 1;
 	LynxSpriteType spriteType = static_cast<LynxSpriteType>(sprCtl0 & 0x07);
 	bool hFlip = (sprCtl0 & 0x20) != 0;
 	bool vFlip = (sprCtl0 & 0x10) != 0;
 
-	// SPRCTL1 decoding (Handy/hardware bit layout):
-	// Bit 0: StartLeft — start drawing quadrant (left side)
-	// Bit 1: StartUp — start drawing quadrant (upper side)
-	// Bit 2: SkipSprite — handled above
-	// Bit 3: ReloadPalette — 0 = reload from SCB, 1 = reuse previous
-	// Bits 5:4: ReloadDepth — 0=none, 1=size, 2=size+stretch, 3=size+stretch+tilt
-	// Bit 6: Sizing enable
-	// Bit 7: Literal mode — 1 = raw pixel data (no RLE packets)
-	bool reloadPalette = (sprCtl1 & 0x08) == 0;   // Bit 3: 0 means reload
-	int reloadDepth    = (sprCtl1 >> 4) & 0x03;    // Bits 5:4
-	bool literalMode   = (sprCtl1 & 0x80) != 0;    // Bit 7
+	// === SPRCTL1 decoding (Handy/hardware bit layout) ===
+	// Bit 0: StartLeft — quadrant start (left side)
+	// Bit 1: StartUp — quadrant start (upper side)
+	// Bit 3: ReloadPalette — 0 = reload from SCB, 1 = skip
+	// Bits 5:4: ReloadDepth — 0=none, 1=size, 2=stretch, 3=tilt
+	// Bit 7: Literal mode — raw pixel data
+	bool startLeft      = (sprCtl1 & 0x01) != 0;
+	bool startUp        = (sprCtl1 & 0x02) != 0;
+	bool reloadPalette  = (sprCtl1 & 0x08) == 0; // Active low: 0=reload
+	int  reloadDepth    = (sprCtl1 >> 4) & 0x03;
+	bool literalMode    = (sprCtl1 & 0x80) != 0;
 
-	// SPRCOLL decoding:
-	// Bits 3:0 = Collision number (0-15)
-	// Bit 5 = Don't collide flag
-	uint8_t collNum = sprColl & 0x0f;
+	// === SPRCOLL decoding ===
+	uint8_t collNum      = sprColl & 0x0f;       // Collision number (0-15)
+	bool    dontCollide  = (sprColl & 0x20) != 0; // Don't participate in collision
 
-	// Read always-present fields from SCB (after fixed 5-byte header):
-	// Data pointer at offset 5-6
-	uint16_t dataAddr = ReadRam16(scbAddr + 5);
-	// Position at offset 7-8, 9-10 (always loaded)
-	_persistHpos = (int16_t)ReadRam16(scbAddr + 7);
-	_persistVpos = (int16_t)ReadRam16(scbAddr + 9);
+	// Determine which SCB fields to enable based on ReloadDepth
+	bool enableStretch = false;
+	bool enableTilt    = false;
 
-	// Variable-length fields start at offset 11.
-	// Which fields are present depends on ReloadDepth and ReloadPalette.
-	// The walking pointer advances only for fields actually present in the SCB.
+	// Read always-present fields from SCB:
+	uint16_t sprDataLine = ReadRam16(scbAddr + 5);   // Sprite data pointer
+	_persistHpos = (int16_t)ReadRam16(scbAddr + 7);  // Horizontal start position
+	_persistVpos = (int16_t)ReadRam16(scbAddr + 9);  // Vertical start position
+
+	// Variable-length fields start at offset 11
 	int scbOffset = 11;
 
-	// Load size if ReloadDepth >= 1
-	if (reloadDepth >= 1) {
-		_persistHsize = ReadRam16(scbAddr + scbOffset);
-		_persistVsize = ReadRam16(scbAddr + scbOffset + 2);
-		scbOffset += 4;
+	switch (reloadDepth) {
+		case 3: // Size + stretch + tilt
+			enableTilt = true;
+			[[fallthrough]];
+		case 2: // Size + stretch
+			enableStretch = true;
+			[[fallthrough]];
+		case 1: // Size only
+			_persistHsize = ReadRam16(scbAddr + scbOffset);
+			_persistVsize = ReadRam16(scbAddr + scbOffset + 2);
+			scbOffset += 4;
+			if (reloadDepth >= 2) {
+				_persistStretch = (int16_t)ReadRam16(scbAddr + scbOffset);
+				scbOffset += 2;
+			}
+			if (reloadDepth >= 3) {
+				_persistTilt = (int16_t)ReadRam16(scbAddr + scbOffset);
+				scbOffset += 2;
+			}
+			break;
+		default: // 0 = no optional fields
+			break;
 	}
 
-	// Load stretch if ReloadDepth >= 2
-	if (reloadDepth >= 2) {
-		_persistStretch = (int16_t)ReadRam16(scbAddr + scbOffset);
-		scbOffset += 2;
-	}
-
-	// Load tilt if ReloadDepth >= 3
-	if (reloadDepth >= 3) {
-		_persistTilt = (int16_t)ReadRam16(scbAddr + scbOffset);
-		scbOffset += 2;
-	}
-
-	// Load palette remap (8 bytes = 16 nibble entries for pen index remap)
-	// Only present in SCB when ReloadPalette is true (SPRCTL1 bit 3 = 0)
+	// Load palette remap if ReloadPalette is active
 	if (reloadPalette) {
 		for (int i = 0; i < 8; i++) {
 			uint8_t byte = ReadRam(scbAddr + scbOffset + i);
@@ -297,103 +300,249 @@ void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 		}
 	}
 
-	int16_t hpos = _persistHpos;
-	int16_t vpos = _persistVpos;
+	// === Quadrant rendering (matching Handy) ===
+	// The Lynx renders each sprite in 4 quadrants: SE(0), NE(1), NW(2), SW(3)
+	// starting from the quadrant specified by StartLeft/StartUp.
+	//
+	// Quadrant layout:    2 | 1
+	//                    -------
+	//                     3 | 0
+	//
+	// Each quadrant has independent hsign/vsign:
+	//   Quadrant 0 (SE): hsign=+1, vsign=+1
+	//   Quadrant 1 (NE): hsign=+1, vsign=-1
+	//   Quadrant 2 (NW): hsign=-1, vsign=-1
+	//   Quadrant 3 (SW): hsign=-1, vsign=+1
+	//
+	// H/V flip invert the signs.
 
-	// 8.8 fixed-point scaling: integer part = pixels per sprite texel
-	// For unscaled sprites, hsize/vsize = 0x0100 (1.0)
-	// The fractional part (lower 8 bits) allows sub-pixel positioning
-	// and enables hardware to draw sprites at arbitrary scales.
-	// Example: 0x0180 = 1.5x scale, 0x0040 = 0.25x scale
-	int16_t stretch = _persistStretch; // Per-scanline horizontal size delta (8.8 fixed-point)
-	int16_t tilt = _persistTilt;       // Per-scanline horizontal offset delta (8.8 fixed-point)
-	// Stretch creates trapezoid/triangle shapes: each line is wider/narrower
-	// Tilt creates parallelogram/italic shapes: each line is offset horizontally
+	// Screen boundaries for clipping
+	int screenHStart = (int)_state.HOffset;
+	int screenHEnd   = (int)_state.HOffset + (int)LynxConstants::ScreenWidth;
+	int screenVStart = (int)_state.VOffset;
+	int screenVEnd   = (int)_state.VOffset + (int)LynxConstants::ScreenHeight;
 
-	// Process each scanline of sprite data
-	uint16_t currentDataAddr = dataAddr;
-	int vDir = vFlip ? -1 : 1;
-	int hDir = hFlip ? -1 : 1;
+	int worldHMid = screenHStart + (int)LynxConstants::ScreenWidth / 2;
+	int worldVMid = screenVStart + (int)LynxConstants::ScreenHeight / 2;
 
-	// For stretch/tilt: accumulate across lines
-	// hsize changes by stretch each line, hpos changes by tilt each line
-	uint16_t currentHsize = _persistHsize;
-	int32_t currentHposAccum = (int32_t)hpos << 8; // 8.8 fixed-point accumulator
-	int32_t tiltAccum = 0;
+	// Determine starting quadrant from SPRCTL1 bits 0-1
+	int quadrant;
+	if (startLeft) {
+		quadrant = startUp ? 2 : 3;
+	} else {
+		quadrant = startUp ? 1 : 0;
+	}
 
-	for (int line = 0; line < 256; line++) {
-		// Read the line header — contains the byte count for this line
-		uint8_t lineHeader = ReadRam(currentDataAddr);
-		currentDataAddr++;
+	// Superclipping: if sprite origin is off-screen, only render quadrants
+	// that overlap the visible screen area
+	int16_t sprH = _persistHpos;
+	int16_t sprV = _persistVpos;
+	bool superclip = (sprH < screenHStart || sprH >= screenHEnd ||
+	                  sprV < screenVStart || sprV >= screenVEnd);
 
-		if (lineHeader == 0) {
-			break; // End of sprite data (0-length line terminates)
-		}
+	// Track collision for this sprite
+	bool everOnScreen = false;
 
-		int lineY = vpos + (vDir * line);
+	// Current sprite data pointer (advances through quadrants)
+	uint16_t currentDataAddr = sprDataLine;
 
-		// lineHeader is the total byte count for this line including the header
-		int dataBytes = lineHeader - 1;
-		uint16_t lineEnd = currentDataAddr + dataBytes;
+	// Loop over 4 quadrants
+	for (int loop = 0; loop < 4; loop++) {
+		// Calculate direction signs for this quadrant
+		int hsign = (quadrant == 0 || quadrant == 1) ? 1 : -1;
+		int vsign = (quadrant == 0 || quadrant == 3) ? 1 : -1;
 
-		if (lineY < 0 || lineY >= (int)LynxConstants::ScreenHeight || dataBytes <= 0) {
-			// Off-screen or empty — skip data but advance pointer
-			currentDataAddr = lineEnd;
-			// Still apply stretch and tilt for off-screen lines
-			currentHsize = (uint16_t)((int32_t)currentHsize + stretch);
-			tiltAccum += tilt;
-			continue;
-		}
+		// H/V flip inverts the signs
+		if (vFlip) vsign = -vsign;
+		if (hFlip) hsign = -hsign;
 
-		// Decode pixel data for this line
-		uint8_t pixelBuf[512]; // Max decoded pixels for one line
-		int pixelCount = DecodeSpriteLinePixels(currentDataAddr, lineEnd, bpp, literalMode, pixelBuf, 512);
-		currentDataAddr = lineEnd;
+		// Determine whether to render this quadrant
+		bool render = false;
 
-		// Calculate effective hpos for this line (with tilt)
-		int32_t lineHpos = (int32_t)hpos + (tiltAccum >> 8);
+		if (superclip) {
+			// Superclipping: only render if the screen overlaps this quadrant
+			// relative to the sprite origin. Must account for h/v flip.
+			int modquad = quadrant;
+			static const int vquadflip[4] = { 1, 0, 3, 2 };
+			static const int hquadflip[4] = { 3, 2, 1, 0 };
+			if (vFlip) modquad = vquadflip[modquad];
+			if (hFlip) modquad = hquadflip[modquad];
 
-		// Calculate horizontal scale factor: pixels per texel (8.8 fixed-point)
-		int32_t hscale = currentHsize; // 8.8 fixed-point
-
-		// Render scaled pixels
-		if (hscale == 0x0100) {
-			// Unscaled: 1:1 mapping
-			for (int px = 0; px < pixelCount; px++) {
-				uint8_t penRaw = pixelBuf[px];
-				if (penRaw == 0) continue; // Transparent
-
-				uint8_t penMapped = _penIndex[penRaw & 0x0f];
-				int drawX = (int)lineHpos + (hDir * px);
-
-				WriteSpritePixel(drawX, lineY, penMapped, collNum, spriteType);
+			switch (modquad) {
+				case 0: // SE: screen to the right and below
+					render = ((sprH < screenHEnd || sprH >= worldHMid) &&
+					          (sprV < screenVEnd || sprV >= worldVMid));
+					break;
+				case 1: // NE: screen to the right and above
+					render = ((sprH < screenHEnd || sprH >= worldHMid) &&
+					          (sprV >= screenVStart || sprV <= worldVMid));
+					break;
+				case 2: // NW: screen to the left and above
+					render = ((sprH >= screenHStart || sprH <= worldHMid) &&
+					          (sprV >= screenVStart || sprV <= worldVMid));
+					break;
+				case 3: // SW: screen to the left and below
+					render = ((sprH >= screenHStart || sprH <= worldHMid) &&
+					          (sprV < screenVEnd || sprV >= worldVMid));
+					break;
 			}
 		} else {
-			// Scaled: walk source pixels, each covering hscale/256 output pixels
-			int32_t xAccum = 0; // 8.8 accumulator for sub-pixel position
-			for (int px = 0; px < pixelCount; px++) {
-				uint8_t penRaw = pixelBuf[px];
-				uint8_t penMapped = _penIndex[penRaw & 0x0f];
+			render = true; // Origin on-screen: render all quadrants
+		}
 
-				// How many output pixels this source pixel covers
-				int32_t nextAccum = xAccum + hscale;
-				int startOut = xAccum >> 8;
-				int endOut = nextAccum >> 8;
+		if (render) {
+			// Initialize vertical offset from sprite origin to screen
+			int voff = (int)_persistVpos - screenVStart;
 
-				if (penRaw != 0) {
-					for (int outPx = startOut; outPx < endOut; outPx++) {
-						int drawX = (int)lineHpos + (hDir * outPx);
-						WriteSpritePixel(drawX, lineY, penMapped, collNum, spriteType);
-					}
+			// Reset tilt accumulator for each quadrant
+			int32_t tiltAccum = 0;
+
+			// Initialize size accumulators
+			uint16_t vsizAccum = (vsign == 1) ? _state.VSizeOff : 0;
+			uint16_t hsizAccum;
+
+			// Quad offset fix: sprites drawn in a direction opposite to quad 0's
+			// direction get offset by 1 pixel to prevent the squashed look
+			int vquadoff = (loop == 0) ? vsign : ((vsign != ((quadrant == 0 || quadrant == 3) ? 1 : -1)) ? vsign : 0);
+			int hquadoff_sign = 0; // Will be set on first quad
+
+			// Working copies for this quadrant
+			uint16_t hsize = _persistHsize;
+			uint16_t vsize = _persistVsize;
+			int16_t  qStretch = _persistStretch;
+			int16_t  qTilt    = _persistTilt;
+			int16_t  qHpos    = _persistHpos;
+
+			// Render scanlines for this quadrant
+			for (;;) {
+				// Vertical scaling: accumulate vsize
+				vsizAccum += vsize;
+				int pixelHeight = (vsizAccum >> 8);
+				vsizAccum &= 0x00ff; // Keep fractional part
+
+				// Read line offset byte from sprite data
+				uint8_t lineOffset = ReadRam(currentDataAddr);
+				currentDataAddr++;
+
+				if (lineOffset == 1) {
+					// End of this quadrant — advance to next
+					break;
+				}
+				if (lineOffset == 0) {
+					// End of sprite — halt all quadrants
+					loop = 4; // Will exit the outer for loop
+					break;
 				}
 
-				xAccum = nextAccum;
+				// lineOffset gives total bytes for this line's data (including the offset byte)
+				int lineDataBytes = lineOffset - 1;
+				uint16_t lineEnd = currentDataAddr + lineDataBytes;
+
+				// Decode pixel data for this line
+				uint8_t pixelBuf[512];
+				int pixelCount = DecodeSpriteLinePixels(currentDataAddr, lineEnd, bpp, literalMode, pixelBuf, 512);
+				currentDataAddr = lineEnd;
+
+				// Render this source line for pixelHeight destination lines
+				for (int vloop = 0; vloop < pixelHeight; vloop++) {
+					// Early bailout if off-screen in the render direction
+					if (vsign == 1 && voff >= (int)LynxConstants::ScreenHeight) break;
+					if (vsign == -1 && voff < 0) break;
+
+					if (voff >= 0 && voff < (int)LynxConstants::ScreenHeight) {
+						// Calculate horizontal start with tilt offset
+						int hoff = (int)qHpos + (int)(tiltAccum >> 8) - screenHStart;
+
+						// Initialize horizontal size accumulator
+						hsizAccum = _state.HSizeOff;
+
+						// Quad offset fix for horizontal
+						if (loop == 0) hquadoff_sign = hsign;
+						if (hsign != hquadoff_sign) hoff += hsign;
+
+						// Render decoded pixels with horizontal scaling
+						bool onscreen = false;
+						for (int px = 0; px < pixelCount; px++) {
+							uint8_t pixel = pixelBuf[px];
+
+							// Horizontal scaling: accumulate hsize
+							hsizAccum += hsize;
+							int pixelWidth = (hsizAccum >> 8);
+							hsizAccum &= 0x00ff;
+
+							// Map through pen index table
+							uint8_t penMapped = _penIndex[pixel & 0x0f];
+
+							for (int hloop = 0; hloop < pixelWidth; hloop++) {
+								if (hoff >= 0 && hoff < (int)LynxConstants::ScreenWidth) {
+									if (pixel != 0) {
+										WriteSpritePixel(hoff, voff, penMapped, collNum, spriteType);
+									}
+									onscreen = true;
+									everOnScreen = true;
+								} else {
+									if (onscreen) break; // Went off-screen, skip rest
+								}
+								hoff += hsign;
+							}
+						}
+					}
+
+					voff += vsign;
+
+					// Apply stretch and tilt per destination line (matching Handy)
+					if (enableStretch) {
+						hsize = (uint16_t)((int32_t)hsize + qStretch);
+						// VStretch: also apply stretch to vsize per dest line
+						if (_state.VStretch) {
+							vsize = (uint16_t)((int32_t)vsize + qStretch);
+						}
+					}
+					if (enableTilt) {
+						tiltAccum += qTilt;
+					}
+				}
+			}
+		} else {
+			// Skip through data to next quadrant
+			// We need to consume data without rendering
+			for (;;) {
+				uint8_t lineOffset = ReadRam(currentDataAddr);
+				currentDataAddr++;
+
+				if (lineOffset == 1) break; // End of quadrant
+				if (lineOffset == 0) {
+					loop = 4; // End of sprite
+					break;
+				}
+				// Skip over line data
+				currentDataAddr += (lineOffset - 1);
 			}
 		}
 
-		// Apply stretch and tilt for next line
-		currentHsize = (uint16_t)((int32_t)currentHsize + stretch);
-		tiltAccum += tilt;
+		// Advance to next quadrant (wrapping 0-3)
+		quadrant = (quadrant + 1) & 0x03;
+	}
+
+	// Write collision depositary (per Handy: stored in RAM at SCBAddr + COLLOFF)
+	// TODO: Implement proper per-pixel collision tracking via COLLBAS buffer
+	if (!dontCollide && !_state.NoCollide) {
+		uint16_t collDep = (scbAddr + _state.CollOffset) & 0xFFFF;
+		// Collision depositary: currently a placeholder, needs proper pixel-level
+		// collision tracking against the collision buffer at COLLBAS
+		WriteRam(collDep, 0);
+	}
+
+	// EVERON tracking: set high bit of collision byte if sprite was never on-screen
+	if (_state.EverOn) {
+		uint16_t collDep = (scbAddr + _state.CollOffset) & 0xFFFF;
+		uint8_t colDat = ReadRam(collDep);
+		if (!everOnScreen) {
+			colDat |= 0x80;
+		} else {
+			colDat &= 0x7f;
+		}
+		WriteRam(collDep, colDat);
 	}
 }
 
@@ -528,7 +677,10 @@ void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum,
 					 spriteType == LynxSpriteType::Shadow);
 
 	// Write pixel as 4bpp nibble into work RAM frame buffer
-	uint16_t dispAddr = _console->GetMikey()->GetState().DisplayAddress;
+	// Use Suzy's VIDBAS register for sprite rendering target;
+	// fall back to Mikey's display address for backward compatibility
+	uint16_t dispAddr = _state.VideoBase ? _state.VideoBase
+	                    : _console->GetMikey()->GetState().DisplayAddress;
 	uint16_t byteAddr = dispAddr + y * LynxConstants::BytesPerScanline + (x >> 1);
 	uint8_t byte = ReadRam(byteAddr);
 
@@ -589,13 +741,19 @@ void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum,
 
 uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 	switch (addr) {
-		// Sprite engine registers
-		case 0x88: // SPRCTL0
+		// Sprite engine registers (FC80-FC83)
+		case 0x80: // SPRCTL0
 			return _state.SpriteControl0;
-		case 0x89: // SPRCTL1
+		case 0x81: // SPRCTL1
 			return _state.SpriteControl1;
-		case 0x8a: // SPRINIT
+		case 0x82: // SPRCOLL
+			return _state.SpriteInit; // TODO: separate SPRCOLL register
+		case 0x83: // SPRINIT
 			return _state.SpriteInit;
+
+		// Suzy hardware revision (FC88)
+		case 0x88: // SUZYHREV
+			return 0x01; // Hardware revision = $01
 
 		// Sprite engine status
 		case 0x90: // SUZYBUSEN — sprite engine busy
@@ -603,12 +761,17 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 		case 0x91: // SPRGO
 			return _state.SpriteEnabled ? 0x01 : 0x00;
 		case 0x92: // SPRSYS — system status (read)
-			return (_state.MathInProgress ? 0x01 : 0x00) |     // Bit 0: math in progress
-				(_state.SpriteBusy ? 0x02 : 0x00) |              // Bit 1: sprite busy
-				(_state.LastCarry ? 0x04 : 0x00) |               // Bit 2: last carry
-				(_state.UnsafeAccess ? 0x08 : 0x00) |            // Bit 3: unsafe access
-				(_state.SpriteToSpriteCollision ? 0x10 : 0x00) | // Bit 4: sprite-to-sprite collision
-				(_state.MathOverflow ? 0x20 : 0x00);             // Bit 5: math overflow
+			// Per Handy: bit0=SpriteWorking, bit1=StopOnCurrent, bit2=UnsafeAccess,
+			// bit3=LeftHand, bit4=VStretch, bit5=LastCarry, bit6=MathOverflow,
+			// bit7=MathInProgress
+			return (_state.SpriteBusy ? 0x01 : 0x00) |              // Bit 0: sprite working
+				(0) |                                                  // Bit 1: stop on current (TODO)
+				(_state.UnsafeAccess ? 0x04 : 0x00) |                 // Bit 2: unsafe access
+				(_state.LeftHand ? 0x08 : 0x00) |                     // Bit 3: left-handed
+				(_state.VStretch ? 0x10 : 0x00) |                     // Bit 4: VStretch
+				(_state.LastCarry ? 0x20 : 0x00) |                    // Bit 5: last carry
+				(_state.MathOverflow ? 0x40 : 0x00) |                 // Bit 6: math overflow
+				(_state.MathInProgress ? 0x80 : 0x00);                // Bit 7: math in progress
 
 		// SCB address
 		case 0x10: return (uint8_t)(_state.SCBAddress & 0xff);
@@ -632,10 +795,18 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 		case 0x72: return (uint8_t)(_state.MathK & 0xff);
 		case 0x73: return (uint8_t)((_state.MathK >> 8) & 0xff);
 
-		// Collision depository: 16 slots at Suzy offsets 0x00-0x0F
+		// Sprite rendering register reads
+		case 0x04: return (uint8_t)(_state.HOffset & 0xff);
+		case 0x05: return (uint8_t)((_state.HOffset >> 8) & 0xff);
+		case 0x06: return (uint8_t)(_state.VOffset & 0xff);
+		case 0x07: return (uint8_t)((_state.VOffset >> 8) & 0xff);
+		case 0x08: return (uint8_t)(_state.VideoBase & 0xff);
+		case 0x09: return (uint8_t)((_state.VideoBase >> 8) & 0xff);
+		case 0x0a: return (uint8_t)(_state.CollisionBase & 0xff);
+		case 0x0b: return (uint8_t)((_state.CollisionBase >> 8) & 0xff);
+
+		// Collision depository: slots 0-3, 12-15
 		case 0x00: case 0x01: case 0x02: case 0x03:
-		case 0x04: case 0x05: case 0x06: case 0x07:
-		case 0x08: case 0x09: case 0x0a: case 0x0b:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			return _state.CollisionBuffer[addr];
 
@@ -645,14 +816,14 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 		case 0xb1: // SWITCHES
 			return _state.Switches;
 
-		// Cart access registers
-		case 0xa0: // RCART0 — read from cart bank 0 (auto-increment)
+		// Cart access registers (FCB2-FCB3)
+		case 0xb2: // RCART0 — read from cart bank 0 (auto-increment)
 			if (_cart) {
 				_cart->SelectBank(0);
 				return _cart->ReadData();
 			}
 			return 0xff;
-		case 0xa2: // RCART1 — read from cart bank 1 (auto-increment)
+		case 0xb3: // RCART1 — read from cart bank 1 (auto-increment)
 			if (_cart) {
 				_cart->SelectBank(1);
 				return _cart->ReadData();
@@ -666,40 +837,63 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 
 void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 	switch (addr) {
-		// Sprite engine
-		case 0x88: // SPRCTL0
+		// Sprite engine registers (FC80-FC83)
+		case 0x80: // SPRCTL0
 			_state.SpriteControl0 = value;
 			break;
-		case 0x89: // SPRCTL1
+		case 0x81: // SPRCTL1
 			_state.SpriteControl1 = value;
 			break;
-		case 0x8a: // SPRINIT
+		case 0x82: // SPRCOLL
+			// TODO: separate SPRCOLL register
+			break;
+		case 0x83: // SPRINIT
 			_state.SpriteInit = value;
 			break;
 
 		// Sprite go
 		case 0x91: // SPRGO — write 1 starts sprite engine
 			_state.SpriteEnabled = (value & 0x01) != 0;
+			_state.EverOn = (value & 0x04) != 0;    // Bit 2: EVERON tracking enable
 			if (_state.SpriteEnabled) {
 				ProcessSpriteChain();
 			}
 			break;
 		case 0x92: // SPRSYS — write control bits
-			_state.MathSign = (value & 0x01) != 0;       // Bit 0: signed math
-			_state.MathAccumulate = (value & 0x02) != 0;  // Bit 1: accumulate mode
+			_state.MathSign = (value & 0x80) != 0;       // Bit 7: signed math
+			_state.MathAccumulate = (value & 0x40) != 0;  // Bit 6: accumulate mode
+			_state.NoCollide = (value & 0x20) != 0;       // Bit 5: no collide
 			_state.VStretch = (value & 0x10) != 0;        // Bit 4: vertical stretch
-			_state.LeftHand = (value & 0x20) != 0;        // Bit 5: left-handed controller
-			if (value & 0x40) _state.UnsafeAccess = false;            // Bit 6: clear unsafe access
-			if (value & 0x80) _state.SpriteToSpriteCollision = false; // Bit 7: clear collision flag
+			_state.LeftHand = (value & 0x08) != 0;        // Bit 3: left-handed
+			if (value & 0x04) _state.UnsafeAccess = false;            // Bit 2: clear unsafe access
+			if (value & 0x02) _state.SpriteToSpriteCollision = false; // Bit 1: clear collision flag (spritestop)
 			break;
 
-		// SCB address
+		// Sprite rendering registers (FC04-FC2B)
+		case 0x04: _state.HOffset = (_state.HOffset & (int16_t)0xff00) | value; break;
+		case 0x05: _state.HOffset = (int16_t)((_state.HOffset & 0x00ff) | ((int16_t)value << 8)); break;
+		case 0x06: _state.VOffset = (_state.VOffset & (int16_t)0xff00) | value; break;
+		case 0x07: _state.VOffset = (int16_t)((_state.VOffset & 0x00ff) | ((int16_t)value << 8)); break;
+		case 0x08: _state.VideoBase = (_state.VideoBase & 0xff00) | value; break;
+		case 0x09: _state.VideoBase = (_state.VideoBase & 0x00ff) | ((uint16_t)value << 8); break;
+		case 0x0a: _state.CollisionBase = (_state.CollisionBase & 0xff00) | value; break;
+		case 0x0b: _state.CollisionBase = (_state.CollisionBase & 0x00ff) | ((uint16_t)value << 8); break;
+
+		// SCB address (FC10-FC11)
 		case 0x10:
 			_state.SCBAddress = (_state.SCBAddress & 0xff00) | value;
 			break;
 		case 0x11:
 			_state.SCBAddress = (_state.SCBAddress & 0x00ff) | ((uint16_t)value << 8);
 			break;
+
+		// Collision offset and size offset registers
+		case 0x24: _state.CollOffset = (_state.CollOffset & 0xff00) | value; break;
+		case 0x25: _state.CollOffset = (_state.CollOffset & 0x00ff) | ((uint16_t)value << 8); break;
+		case 0x28: _state.HSizeOff = (_state.HSizeOff & 0xff00) | value; break;
+		case 0x29: _state.HSizeOff = (_state.HSizeOff & 0x00ff) | ((uint16_t)value << 8); break;
+		case 0x2a: _state.VSizeOff = (_state.VSizeOff & 0xff00) | value; break;
+		case 0x2b: _state.VSizeOff = (_state.VSizeOff & 0x00ff) | ((uint16_t)value << 8); break;
 
 		// Math registers (write operands)
 		case 0x60: _state.MathC = (_state.MathC & (int16_t)0xff00) | value; break;
@@ -729,38 +923,21 @@ void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 		case 0x70: _state.MathJ = (_state.MathJ & 0xff00) | value; break;
 		case 0x71: _state.MathJ = (_state.MathJ & 0x00ff) | ((uint16_t)value << 8); break;
 
-		// Collision depository writes: 16 slots at Suzy offsets 0x00-0x0F
+		// Collision depository writes: slots 0-3, 12-15 via registers
+		// Note: offsets 0x04-0x0B are sprite rendering registers (HOFF, VOFF, VIDBAS, COLLBAS)
+		// On real hardware, collision data is stored in RAM at SCBAddr+COLLOFF, not
+		// in the register space. This is a simplification for now.
 		case 0x00: case 0x01: case 0x02: case 0x03:
-		case 0x04: case 0x05: case 0x06: case 0x07:
-		case 0x08: case 0x09: case 0x0a: case 0x0b:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			_state.CollisionBuffer[addr] = value;
 			break;
 
-		// Cart address / bank registers
-		case 0xa0: // RCART0 — write address low for bank 0
+		// Cart access registers (FCB2-FCB3)
+		case 0xb2: // RCART0 — read/write cart bank 0
 			if (_cart) _cart->SetAddressLow(value);
 			break;
-		case 0xa1: // RCART0 high — write address high for bank 0
-			if (_cart) _cart->SetAddressHigh(value);
-			break;
-		case 0xa2: // RCART1 — write address low for bank 1
+		case 0xb3: // RCART1 — read/write cart bank 1
 			if (_cart) _cart->SetAddressLow(value);
-			break;
-		case 0xa3: // RCART1 high — write address high for bank 1
-			if (_cart) _cart->SetAddressHigh(value);
-			break;
-		case 0xb2: // CART0 — cart bank 0 strobe / shift register
-			if (_cart) {
-				_cart->SelectBank(0);
-				_cart->WriteShiftRegister(value);
-			}
-			break;
-		case 0xb3: // CART1 — cart bank 1 strobe / shift register
-			if (_cart) {
-				_cart->SelectBank(1);
-				_cart->WriteShiftRegister(value);
-			}
 			break;
 
 		default:
@@ -802,6 +979,17 @@ void LynxSuzy::Serialize(Serializer& s) {
 
 	// Collision
 	SVArray(_state.CollisionBuffer, LynxConstants::CollisionBufferSize);
+
+	// Sprite rendering registers
+	SV(_state.HOffset);
+	SV(_state.VOffset);
+	SV(_state.VideoBase);
+	SV(_state.CollisionBase);
+	SV(_state.CollOffset);
+	SV(_state.HSizeOff);
+	SV(_state.VSizeOff);
+	SV(_state.EverOn);
+	SV(_state.NoCollide);
 
 	// Input
 	SV(_state.Joystick);
