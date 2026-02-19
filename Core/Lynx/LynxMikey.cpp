@@ -424,6 +424,16 @@ uint8_t LynxMikey::ReadRegister(uint8_t addr) {
 	}
 }
 
+uint8_t LynxMikey::PeekRegister(uint8_t addr) const {
+	switch (addr) {
+		case 0x8d: // SERDAT — return RX data without clearing RXRDY or updating IRQ
+			return (uint8_t)(_state.UartRxData & 0xff);
+		default:
+			// All other registers are safe to read without side effects
+			return const_cast<LynxMikey*>(this)->ReadRegister(addr);
+	}
+}
+
 void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 	// Timer registers: $FD00-$FD1F
 	if (addr < 0x20) {

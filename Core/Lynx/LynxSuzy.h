@@ -116,6 +116,10 @@ public:
 	/// <summary>Read Suzy register ($FC00-$FCFF offset).</summary>
 	[[nodiscard]] uint8_t ReadRegister(uint8_t addr);
 
+	/// <summary>Read Suzy register without side effects (for debugger).
+	/// Avoids cart address auto-increment on RCART0/RCART1 reads.</summary>
+	[[nodiscard]] uint8_t PeekRegister(uint8_t addr) const;
+
 	/// <summary>Write Suzy register ($FC00-$FCFF offset).</summary>
 	void WriteRegister(uint8_t addr, uint8_t value);
 

@@ -122,11 +122,11 @@ uint8_t LynxMemoryManager::DebugRead(uint16_t addr) {
 		}
 
 		if (_state.SuzySpaceVisible && addr >= LynxConstants::SuzyBase && addr <= LynxConstants::SuzyEnd) {
-			return _suzy ? _suzy->ReadRegister(addr & 0xff) : 0;
+			return _suzy ? _suzy->PeekRegister(addr & 0xff) : 0;
 		}
 
 		if (_state.MikeySpaceVisible && addr >= LynxConstants::MikeyBase && addr <= LynxConstants::MikeyEnd) {
-			return _mikey ? _mikey->ReadRegister(addr & 0xff) : 0;
+			return _mikey ? _mikey->PeekRegister(addr & 0xff) : 0;
 		}
 
 		if (_state.VectorSpaceVisible && addr >= 0xfffa) {

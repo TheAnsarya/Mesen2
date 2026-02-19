@@ -773,6 +773,17 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 	}
 }
 
+uint8_t LynxSuzy::PeekRegister(uint8_t addr) const {
+	switch (addr) {
+		case 0xb2: // RCART0 — peek without cart address auto-increment
+		case 0xb3: // RCART1
+			return _cart ? _cart->PeekData() : 0xff;
+		default:
+			// All other registers are safe to read without side effects
+			return const_cast<LynxSuzy*>(this)->ReadRegister(addr);
+	}
+}
+
 void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 	switch (addr) {
 		// Sprite engine registers (FC80-FC83)

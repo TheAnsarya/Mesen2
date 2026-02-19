@@ -191,6 +191,10 @@ public:
 	/// I/O ($FD88–$FD89), and hardware revision ($FD84).</summary>
 	uint8_t ReadRegister(uint8_t addr);
 
+	/// <summary>Read a Mikey register without side effects (for debugger).
+	/// Avoids clearing UART RX ready flag on SERDAT reads.</summary>
+	uint8_t PeekRegister(uint8_t addr) const;
+
 	/// <summary>Write a Mikey register. Same address ranges as ReadRegister.
 	/// Note: SERCTL ($FD8C) has different bit meanings on write (§2) vs read (§3).</summary>
 	void WriteRegister(uint8_t addr, uint8_t value);
