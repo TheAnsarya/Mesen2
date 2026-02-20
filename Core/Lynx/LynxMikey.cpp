@@ -484,6 +484,11 @@ void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 			UpdateIrqLine();
 			return;
 
+		// CPU sleep register
+		case 0x91: // CPUSLEEP — write any value to halt CPU until next IRQ
+			_cpu->GetState().StopState = LynxCpuStopState::WaitingForIrq;
+			return;
+
 		// Display registers
 		case 0x92: // DISPCTL
 			_state.DisplayControl = value;
