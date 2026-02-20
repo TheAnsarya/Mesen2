@@ -126,10 +126,8 @@ public struct LynxAudioChannelState {
 	public byte Control;
 	/// <summary>Current timer countdown value.</summary>
 	public byte Counter;
-	/// <summary>Left channel attenuation (4-bit).</summary>
-	public byte LeftAtten;
-	/// <summary>Right channel attenuation (4-bit).</summary>
-	public byte RightAtten;
+	/// <summary>Per-channel stereo attenuation (ATTEN_x). Upper nibble = left, lower = right.</summary>
+	public byte Attenuation;
 	/// <summary>Integration mode: output feeds into next channel.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool Integrate;
 	/// <summary>Channel enabled.</summary>
@@ -146,10 +144,10 @@ public struct LynxApuState {
 	/// <summary>State for all 4 audio channels.</summary>
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 	public LynxAudioChannelState[] Channels;
-	/// <summary>Master volume / attenuation control.</summary>
-	public byte MasterVolume;
-	/// <summary>Stereo output enabled.</summary>
-	[MarshalAs(UnmanagedType.I1)] public bool StereoEnabled;
+	/// <summary>MSTEREO ($FD50) — per-channel stereo enable bitmask.</summary>
+	public byte Stereo;
+	/// <summary>MPAN ($FD48) — per-channel panning enable.</summary>
+	public byte Panning;
 }
 
 /// <summary>

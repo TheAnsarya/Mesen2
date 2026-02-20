@@ -281,11 +281,10 @@ struct LynxAudioChannelState {
 	/// <summary>Current timer countdown value</summary>
 	uint8_t Counter;
 
-	/// <summary>Left channel attenuation (4-bit)</summary>
-	uint8_t LeftAtten;
-
-	/// <summary>Right channel attenuation (4-bit)</summary>
-	uint8_t RightAtten;
+	/// <summary>Per-channel stereo attenuation (ATTEN_x at $FD40-$FD43).
+	/// Upper nibble (bits 7-4) = left attenuation, lower nibble (bits 3-0) = right.
+	/// Value 0 = channel off, 15 = near-max (full would be 16). Defaults to 0xFF.</summary>
+	uint8_t Attenuation;
 
 	/// <summary>Integration mode — channel output feeds into next channel</summary>
 	bool Integrate;
@@ -304,11 +303,16 @@ struct LynxAudioChannelState {
 struct LynxApuState {
 	LynxAudioChannelState Channels[LynxConstants::AudioChannelCount];
 
-	/// <summary>Master volume / attenuation control</summary>
-	uint8_t MasterVolume;
+	/// <summary>MSTEREO register ($FD50) — per-channel stereo enable bitmask.
+	/// Bits 7-4: left channel disable (bit 4=ch0, 5=ch1, 6=ch2, 7=ch3).
+	/// Bits 3-0: right channel disable (bit 0=ch0, 1=ch1, 2=ch2, 3=ch3).
+	/// 0 = enabled, 1 = disabled. Default 0x00 (all enabled).</summary>
+	uint8_t Stereo;
 
-	/// <summary>Stereo output enable</summary>
-	bool StereoEnabled;
+	/// <summary>MPAN register ($FD48) — per-channel panning enable.
+	/// Same bit layout as Stereo. When bit is set, ATTEN attenuation is applied.
+	/// When clear, full volume on that side. Default 0x00 (no attenuation).</summary>
+	uint8_t Panning;
 };
 
 // ============================================================================

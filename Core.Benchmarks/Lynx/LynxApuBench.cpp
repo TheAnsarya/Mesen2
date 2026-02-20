@@ -99,8 +99,7 @@ static void BM_LynxApu_StereoMix(benchmark::State& state) {
 	for (int i = 0; i < 4; i++) {
 		channels[i].Output = static_cast<int8_t>(32 + i * 16);
 		channels[i].Volume = static_cast<uint8_t>(128 + i * 32);
-		channels[i].LeftAtten = static_cast<uint8_t>(15 - i);
-		channels[i].RightAtten = static_cast<uint8_t>(i * 4);
+		channels[i].Attenuation = static_cast<uint8_t>(((15 - i) << 4) | (i * 4));
 		channels[i].Enabled = true;
 	}
 
@@ -110,8 +109,8 @@ static void BM_LynxApu_StereoMix(benchmark::State& state) {
 		for (int ch = 0; ch < 4; ch++) {
 			if (!channels[ch].Enabled) continue;
 			int16_t sample = channels[ch].Output;
-			left += static_cast<int16_t>((sample * channels[ch].LeftAtten) >> 4);
-			right += static_cast<int16_t>((sample * channels[ch].RightAtten) >> 4);
+			left += static_cast<int16_t>((sample * (channels[ch].Attenuation & 0xf0)) / (16 * 16));
+			right += static_cast<int16_t>((sample * (channels[ch].Attenuation & 0x0f)) / 16);
 		}
 		benchmark::DoNotOptimize(left);
 		benchmark::DoNotOptimize(right);
@@ -189,8 +188,7 @@ static void BM_LynxApu_GenerateSamples(benchmark::State& state) {
 		channels[i].ShiftRegister = static_cast<uint16_t>(0x001 + i * 0x111);
 		channels[i].FeedbackEnable = static_cast<uint8_t>(0x3F - i * 8);
 		channels[i].Volume = 200;
-		channels[i].LeftAtten = 15;
-		channels[i].RightAtten = 15;
+		channels[i].Attenuation = 0xff; // Full volume both sides
 		channels[i].Enabled = true;
 		channels[i].Counter = static_cast<uint8_t>(10 + i * 5);
 		channels[i].BackupValue = channels[i].Counter;
@@ -223,8 +221,8 @@ static void BM_LynxApu_GenerateSamples(benchmark::State& state) {
 			int16_t left = 0, right = 0;
 			for (int ch = 0; ch < 4; ch++) {
 				int16_t sample = channels[ch].Output;
-				left += static_cast<int16_t>((sample * channels[ch].LeftAtten) >> 4);
-				right += static_cast<int16_t>((sample * channels[ch].RightAtten) >> 4);
+				left += static_cast<int16_t>((sample * (channels[ch].Attenuation & 0xf0)) / (16 * 16));
+				right += static_cast<int16_t>((sample * (channels[ch].Attenuation & 0x0f)) / 16);
 			}
 			buffer[s * 2] = left;
 			buffer[s * 2 + 1] = right;
@@ -239,12 +237,11 @@ BENCHMARK(BM_LynxApu_GenerateSamples)->Range(256, 4096);
 // Benchmark volume attenuation computation (per channel per sample)
 static void BM_LynxApu_VolumeAttenuation(benchmark::State& state) {
 	int8_t output = 64;
-	uint8_t leftAtten = 12;
-	uint8_t rightAtten = 8;
+	uint8_t attenuation = 0xc8; // Left=12, Right=8
 
 	for (auto _ : state) {
-		int16_t left = static_cast<int16_t>((output * leftAtten) >> 4);
-		int16_t right = static_cast<int16_t>((output * rightAtten) >> 4);
+		int16_t left = static_cast<int16_t>((output * (attenuation & 0xf0)) / (16 * 16));
+		int16_t right = static_cast<int16_t>((output * (attenuation & 0x0f)) / 16);
 		benchmark::DoNotOptimize(left);
 		benchmark::DoNotOptimize(right);
 		output ^= 3;

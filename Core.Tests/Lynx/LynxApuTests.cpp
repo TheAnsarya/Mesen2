@@ -30,8 +30,7 @@ protected:
 		_channel.ShiftRegister = 0x001; // Non-zero initial LFSR state
 		_channel.Volume = 0x7f;         // Max volume
 		_channel.FeedbackEnable = 0x01; // Tap bit 0
-		_channel.LeftAtten = 0x0f;      // Max left
-		_channel.RightAtten = 0x0f;     // Max right
+		_channel.Attenuation = 0xff;    // Full volume both sides (L=0xF, R=0xF)
 		_channel.Counter = 0;
 		_channel.BackupValue = 100;
 		_channel.Enabled = true;
@@ -41,8 +40,8 @@ protected:
 		for (int i = 0; i < 4; i++) {
 			_apu.Channels[i] = _channel;
 		}
-		_apu.MasterVolume = 0xff;
-		_apu.StereoEnabled = true;
+		_apu.Stereo = 0x00;   // All channels enabled on both sides
+		_apu.Panning = 0x00;  // No attenuation (full volume)
 	}
 
 	/// <summary>Clock the LFSR with the specified feedback enable mask</summary>
@@ -211,26 +210,25 @@ TEST_F(LynxApuTest, IntegrateMode_ClampToNegative128) {
 //=============================================================================
 
 TEST_F(LynxApuTest, StereoAtten_LeftMax_RightZero) {
-	_channel.LeftAtten = 0x0f;
-	_channel.RightAtten = 0x00;
+	_channel.Attenuation = 0xf0; // Left=15, Right=0
 	// Left is full, right is silent
-	EXPECT_EQ(_channel.LeftAtten, 15);
-	EXPECT_EQ(_channel.RightAtten, 0);
+	EXPECT_EQ(_channel.Attenuation >> 4, 15);
+	EXPECT_EQ(_channel.Attenuation & 0x0f, 0);
 }
 
 TEST_F(LynxApuTest, StereoAtten_Balance_Center) {
-	_channel.LeftAtten = 0x08;
-	_channel.RightAtten = 0x08;
-	EXPECT_EQ(_channel.LeftAtten, _channel.RightAtten);
+	_channel.Attenuation = 0x88; // Left=8, Right=8
+	EXPECT_EQ(_channel.Attenuation >> 4, _channel.Attenuation & 0x0f);
 }
 
 TEST_F(LynxApuTest, StereoAtten_AllChannels) {
 	for (int i = 0; i < 4; i++) {
-		_apu.Channels[i].LeftAtten = i * 3;
-		_apu.Channels[i].RightAtten = 15 - (i * 3);
+		uint8_t left = static_cast<uint8_t>(i * 3);
+		uint8_t right = static_cast<uint8_t>(15 - (i * 3));
+		_apu.Channels[i].Attenuation = static_cast<uint8_t>((left << 4) | right);
 	}
-	EXPECT_EQ(_apu.Channels[0].LeftAtten, 0);
-	EXPECT_EQ(_apu.Channels[3].LeftAtten, 9);
+	EXPECT_EQ(_apu.Channels[0].Attenuation >> 4, 0);
+	EXPECT_EQ(_apu.Channels[3].Attenuation >> 4, 9);
 }
 
 //=============================================================================
@@ -277,21 +275,25 @@ TEST_F(LynxApuTest, Counter_LinkedMode) {
 }
 
 //=============================================================================
-// Master Volume / Global State Tests
+// STEREO / PAN / Global State Tests
 //=============================================================================
 
-TEST_F(LynxApuTest, MasterVolume_Range) {
-	_apu.MasterVolume = 0x00;
-	EXPECT_EQ(_apu.MasterVolume, 0);
-	_apu.MasterVolume = 0xff;
-	EXPECT_EQ(_apu.MasterVolume, 255);
+TEST_F(LynxApuTest, Stereo_Default_AllEnabled) {
+	// Default 0x00 = all channels enabled on both sides
+	_apu.Stereo = 0x00;
+	EXPECT_EQ(_apu.Stereo, 0);
+	// Setting bits disables channels
+	_apu.Stereo = 0xff;
+	EXPECT_EQ(_apu.Stereo, 0xff);
 }
 
-TEST_F(LynxApuTest, StereoEnabled_Default) {
-	_apu.StereoEnabled = true;
-	EXPECT_TRUE(_apu.StereoEnabled);
-	_apu.StereoEnabled = false;
-	EXPECT_FALSE(_apu.StereoEnabled);
+TEST_F(LynxApuTest, Panning_Default_NoAttenuation) {
+	// Default 0x00 = no attenuation applied (full volume)
+	_apu.Panning = 0x00;
+	EXPECT_EQ(_apu.Panning, 0);
+	// Setting bits enables per-channel attenuation
+	_apu.Panning = 0xff;
+	EXPECT_EQ(_apu.Panning, 0xff);
 }
 
 TEST_F(LynxApuTest, AllChannels_IndependentState) {

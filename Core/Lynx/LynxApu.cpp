@@ -20,7 +20,11 @@ void LynxApu::Init() {
 	for (int i = 0; i < 4; i++) {
 		_state.Channels[i] = {};
 		_state.Channels[i].ShiftRegister = 0x001; // Non-zero initial LFSR
+		_state.Channels[i].Attenuation = 0xff;    // Full volume (both nibbles = 0xF)
 	}
+
+	_state.Stereo = 0x00;  // All channels enabled on both sides
+	_state.Panning = 0x00; // No attenuation applied (full volume)
 }
 
 void LynxApu::Tick(uint64_t currentCycle) {
@@ -143,35 +147,42 @@ void LynxApu::MixOutput() {
 	int32_t leftSum = 0;
 	int32_t rightSum = 0;
 
+	// Mixing logic matches Handy's UpdateSound():
+	// - STEREO register: per-channel enable (0 = enabled, 1 = disabled)
+	//   Bits 7-4 control left side, bits 3-0 control right side
+	// - PAN register: per-channel attenuation enable (same bit layout)
+	//   When PAN bit is set, ATTEN attenuation is applied
+	//   When PAN bit is clear, channel plays at full volume
+	// - ATTEN registers: per-channel stereo attenuation
+	//   Upper nibble = left (0-15), lower nibble = right (0-15)
 	for (int ch = 0; ch < 4; ch++) {
 		LynxAudioChannelState& channel = _state.Channels[ch];
-		if (!channel.Enabled) {
-			continue;
-		}
-
 		int32_t sample = channel.Output;
 
-		// Apply per-channel stereo attenuation (4-bit, 0-15)
-		int32_t left = (sample * channel.LeftAtten) >> 2;
-		int32_t right = (sample * channel.RightAtten) >> 2;
+		// Left channel: enabled when STEREO bit (0x10 << ch) is NOT set
+		if (!(_state.Stereo & (0x10 << ch))) {
+			if (_state.Panning & (0x10 << ch)) {
+				// PAN enabled: apply left attenuation (upper nibble)
+				leftSum += (sample * (channel.Attenuation & 0xf0)) / (16 * 16);
+			} else {
+				// PAN disabled: full volume
+				leftSum += sample;
+			}
+		}
 
-		leftSum += left;
-		rightSum += right;
+		// Right channel: enabled when STEREO bit (0x01 << ch) is NOT set
+		if (!(_state.Stereo & (0x01 << ch))) {
+			if (_state.Panning & (0x01 << ch)) {
+				// PAN enabled: apply right attenuation (lower nibble)
+				rightSum += (sample * (channel.Attenuation & 0x0f)) / 16;
+			} else {
+				// PAN disabled: full volume
+				rightSum += sample;
+			}
+		}
 	}
 
-	// Apply master volume (simple scaling)
-	// MasterVolume is 0-255, treat as 0-1 fraction
-	leftSum = (leftSum * (_state.MasterVolume + 1)) >> 4;
-	rightSum = (rightSum * (_state.MasterVolume + 1)) >> 4;
-
-	// If not stereo, output mono on both channels
-	if (!_state.StereoEnabled) {
-		int32_t mono = (leftSum + rightSum) / 2;
-		leftSum = mono;
-		rightSum = mono;
-	}
-
-	// Scale to 16-bit range
+	// Scale to 16-bit range — 4 channels of ±127 = ±508, ×64 ≈ ±32512
 	leftSum = std::clamp(leftSum * 64, static_cast<int32_t>(INT16_MIN), static_cast<int32_t>(INT16_MAX));
 	rightSum = std::clamp(rightSum * 64, static_cast<int32_t>(INT16_MIN), static_cast<int32_t>(INT16_MAX));
 
@@ -214,19 +225,19 @@ uint8_t LynxApu::ReadRegister(uint8_t addr) {
 		}
 	}
 
-	// $FD40-$FD47: Stereo attenuation (4 channels × 2 bytes L/R)
-	if (addr >= 0x20 && addr < 0x28) {
-		int ch = (addr - 0x20) >> 1;
-		if (addr & 1) {
-			return _state.Channels[ch].RightAtten;
-		} else {
-			return _state.Channels[ch].LeftAtten;
-		}
+	// $FD40-$FD43: ATTEN_A-D — per-channel stereo attenuation (nibble-packed L/R)
+	if (addr >= 0x20 && addr <= 0x23) {
+		return _state.Channels[addr - 0x20].Attenuation;
 	}
 
-	// $FD50: Master volume / attenuation
+	// $FD48: MPAN — per-channel panning enable
+	if (addr == 0x28) {
+		return _state.Panning;
+	}
+
+	// $FD50: MSTEREO — per-channel stereo enable bitmask
 	if (addr == 0x30) {
-		return _state.MasterVolume;
+		return _state.Stereo;
 	}
 
 	return 0;
@@ -261,20 +272,21 @@ void LynxApu::WriteRegister(uint8_t addr, uint8_t value) {
 		return;
 	}
 
-	// $FD40-$FD47: Stereo attenuation
-	if (addr >= 0x20 && addr < 0x28) {
-		int ch = (addr - 0x20) >> 1;
-		if (addr & 1) {
-			_state.Channels[ch].RightAtten = value & 0x0f;
-		} else {
-			_state.Channels[ch].LeftAtten = value & 0x0f;
-		}
+	// $FD40-$FD43: ATTEN_A-D — per-channel stereo attenuation (nibble-packed L/R)
+	if (addr >= 0x20 && addr <= 0x23) {
+		_state.Channels[addr - 0x20].Attenuation = value;
 		return;
 	}
 
-	// $FD50: Master volume
+	// $FD48: MPAN — per-channel panning enable
+	if (addr == 0x28) {
+		_state.Panning = value;
+		return;
+	}
+
+	// $FD50: MSTEREO — per-channel stereo enable bitmask
 	if (addr == 0x30) {
-		_state.MasterVolume = value;
+		_state.Stereo = value;
 		return;
 	}
 }
@@ -288,15 +300,14 @@ void LynxApu::Serialize(Serializer& s) {
 		SVI(_state.Channels[i].BackupValue);
 		SVI(_state.Channels[i].Control);
 		SVI(_state.Channels[i].Counter);
-		SVI(_state.Channels[i].LeftAtten);
-		SVI(_state.Channels[i].RightAtten);
+		SVI(_state.Channels[i].Attenuation);
 		SVI(_state.Channels[i].Integrate);
 		SVI(_state.Channels[i].Enabled);
 		SVI(_state.Channels[i].TimerDone);
 		SVI(_state.Channels[i].LastTick);
 	}
-	SV(_state.MasterVolume);
-	SV(_state.StereoEnabled);
+	SV(_state.Stereo);
+	SV(_state.Panning);
 
 	SV(_sampleCount);
 	SV(_lastSampleCycle);

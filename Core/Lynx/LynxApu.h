@@ -12,7 +12,7 @@ class SoundMixer;
 ///
 /// 4 LFSR-based audio channels in Mikey at $FD20-$FD3F.
 /// Each channel has an 8-byte register block:
-///   +0 Volume     (4-bit left/right volumes)
+///   +0 Volume     (signed 8-bit output magnitude)
 ///   +1 Feedback    (LFSR feedback tap select)
 ///   +2 Output      (current audio output, signed 8-bit)
 ///   +3 ShiftLo     (LFSR shift register low byte)
@@ -22,8 +22,9 @@ class SoundMixer;
 ///   +7 Counter     (current timer countdown)
 ///
 /// Channel 3 ($FD38-$FD3F) supports DAC mode for PCM playback.
-/// Global stereo attenuation at $FD40-$FD47 (4 pairs L/R).
-/// Master volume at $FD50 (ATTEN registers).
+/// Per-channel stereo attenuation at $FD40-$FD43 (ATTEN_A-D, nibble-packed L/R).
+/// Panning enable at $FD48 (MPAN).
+/// Stereo channel enable at $FD50 (MSTEREO).
 /// </summary>
 class LynxApu final : public ISerializable {
 public:
