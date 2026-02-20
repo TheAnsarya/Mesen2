@@ -260,7 +260,7 @@ void LynxConsole::RunFrame() {
 		// Tick Mikey timers based on CPU cycle count
 		_mikey->Tick(_cpu->GetCycleCount());
 		// Tick audio
-		if (_apu) _apu->Tick();
+		if (_apu) _apu->Tick(_cpu->GetCycleCount());
 	}
 
 	// Flush remaining audio samples

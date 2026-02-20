@@ -14,7 +14,7 @@ LynxApu::LynxApu(Emulator* emu, LynxConsole* console)
 void LynxApu::Init() {
 	_state = {};
 	_sampleCount = 0;
-	_clockAccumulator = 0;
+	_lastSampleCycle = 0;
 
 	// Initialize channels to default state
 	for (int i = 0; i < 4; i++) {
@@ -23,28 +23,26 @@ void LynxApu::Init() {
 	}
 }
 
-void LynxApu::Tick() {
-	_clockAccumulator++;
-
-	// Clock each audio channel's own timer at its prescaler rate
-	// Audio channel timers work like system timers: each has a prescaler
-	// selection (bits 0-2 of Control), or can be linked to the previous
-	// audio channel (clock source 7)
+void LynxApu::Tick(uint64_t currentCycle) {
+	// Clock each audio channel's own timer using actual CPU cycle count.
+	// This matches how Mikey system timers work: elapsed = currentCycle - LastTick.
 	for (int ch = 0; ch < 4; ch++) {
-		TickChannelTimer(ch);
+		TickChannelTimer(ch, currentCycle);
 	}
 
-	// Generate one audio sample every ClocksPerSample master clocks
-	if (_clockAccumulator >= ClocksPerSample) {
-		_clockAccumulator -= ClocksPerSample;
+	// Generate audio samples at the target sample rate
+	while (currentCycle - _lastSampleCycle >= CpuCyclesPerSample) {
+		_lastSampleCycle += CpuCyclesPerSample;
 		MixOutput();
 	}
 }
 
-void LynxApu::TickChannelTimer(int ch) {
+void LynxApu::TickChannelTimer(int ch, uint64_t currentCycle) {
 	LynxAudioChannelState& channel = _state.Channels[ch];
 
 	if (!channel.Enabled || channel.TimerDone) {
+		// Advance LastTick so we don't accumulate a huge delta
+		channel.LastTick = currentCycle;
 		return;
 	}
 
@@ -60,13 +58,9 @@ void LynxApu::TickChannelTimer(int ch) {
 		return;
 	}
 
-	uint64_t currentCycle = _clockAccumulator; // Use accumulator as cycle counter
-	// Actually, we need a global cycle counter. Use a simple per-tick approach:
-	// Since Tick() is called every master clock, just track per-channel accumulators
-	channel.LastTick++;
-
-	if (channel.LastTick >= period) {
-		channel.LastTick = 0;
+	// Process all elapsed ticks using actual CPU cycle delta
+	while (currentCycle - channel.LastTick >= period) {
+		channel.LastTick += period;
 
 		// Decrement counter
 		channel.Counter--;
@@ -80,6 +74,9 @@ void LynxApu::TickChannelTimer(int ch) {
 
 			// Cascade to next linked audio channel
 			CascadeAudioChannel(ch);
+
+			// Stop counting while done flag is set (matching Mikey HW Bug 13.6)
+			break;
 		}
 	}
 }
@@ -302,5 +299,5 @@ void LynxApu::Serialize(Serializer& s) {
 	SV(_state.StereoEnabled);
 
 	SV(_sampleCount);
-	SV(_clockAccumulator);
+	SV(_lastSampleCycle);
 }

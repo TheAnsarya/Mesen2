@@ -30,8 +30,8 @@ public:
 	/// <summary>Audio sample rate — Lynx master clock / 4 / timer period</summary>
 	static constexpr uint32_t SampleRate = 22050;
 
-	/// <summary>Master clocks per audio sample: 16MHz / 22050 ≈ 726</summary>
-	static constexpr uint32_t ClocksPerSample = LynxConstants::MasterClockRate / SampleRate;
+	/// <summary>CPU cycles per audio sample: 4MHz / 22050 ≈ 181</summary>
+	static constexpr uint32_t CpuCyclesPerSample = LynxConstants::CpuClockRate / SampleRate;
 
 	/// <summary>Max samples buffered before flush</summary>
 	static constexpr uint32_t MaxSamples = 2048;
@@ -45,7 +45,7 @@ private:
 
 	unique_ptr<int16_t[]> _soundBuffer;
 	uint32_t _sampleCount = 0;
-	uint32_t _clockAccumulator = 0;
+	uint64_t _lastSampleCycle = 0;
 
 	/// <summary>Audio channel prescaler periods (CPU cycles per tick).</summary>
 	/// <summary>Same prescaler values as system timers: {4,8,16,32,64,128,256,0}</summary>
@@ -54,8 +54,8 @@ private:
 	/// <summary>Clock a single audio channel's LFSR (called on timer underflow)</summary>
 	void ClockChannel(int ch);
 
-	/// <summary>Tick a channel's timer based on its prescaler</summary>
-	void TickChannelTimer(int ch);
+	/// <summary>Tick a channel's timer based on its prescaler and elapsed CPU cycles</summary>
+	void TickChannelTimer(int ch, uint64_t currentCycle);
 
 	/// <summary>Cascade audio channel underflow to next linked channel</summary>
 	void CascadeAudioChannel(int sourceChannel);
@@ -72,8 +72,8 @@ public:
 
 	void Init();
 
-	/// <summary>Called every master clock cycle — accumulates and generates samples</summary>
-	void Tick();
+	/// <summary>Called with current CPU cycle count — ticks audio timers and generates samples</summary>
+	void Tick(uint64_t currentCycle);
 
 	/// <summary>Read an audio register ($FD20-$FD4F range, relative offset)</summary>
 	[[nodiscard]] uint8_t ReadRegister(uint8_t addr);
