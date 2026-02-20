@@ -345,7 +345,7 @@ void LynxConsole::ApplyHleBootState() {
 	// Don't enable any IRQs by default — let the game set them up
 
 	// --- Set PC to cart entry point ---
-	// The standard Lynx cart header (after the 64-byte LNX header) has the 
+	// The standard Lynx cart header (after the 64-byte LNX header) has the
 	// entry point at the start of the ROM data. The boot ROM loads the first
 	// page of the cart and jumps to the entry address.
 	// Most games expect to start at $0200 (loaded into RAM by the boot ROM)

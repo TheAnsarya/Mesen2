@@ -459,7 +459,12 @@ struct LynxSuzyState {
 	/// <summary>Sprite control register 1 (reload, draw action)</summary>
 	uint8_t SpriteControl1;
 
-	/// <summary>Sprite initialization register</summary>
+	/// <summary>Sprite collision register (SPRCOLL, FC82). Bits 3:0 = collision number,
+	/// bit 5 = don't collide flag. Written by games to configure per-sprite
+	/// collision behavior before SPRGO.</summary>
+	uint8_t SpriteCollision;
+
+	/// <summary>Sprite initialization register (SPRINIT, FC83)</summary>
 	uint8_t SpriteInit;
 
 	/// <summary>Whether the sprite engine is currently processing</summary>

@@ -251,7 +251,9 @@ public struct LynxSuzyState : BaseState {
 	public byte SpriteControl0;
 	/// <summary>SPRCTL1: reload flags, sizing mode, literal.</summary>
 	public byte SpriteControl1;
-	/// <summary>SPRINIT: initialization flags.</summary>
+	/// <summary>SPRCOLL (FC82): collision number (bits 3:0), don't collide (bit 5).</summary>
+	public byte SpriteCollision;
+	/// <summary>SPRINIT (FC83): initialization flags.</summary>
 	public byte SpriteInit;
 	/// <summary>Sprite engine currently processing.</summary>
 	[MarshalAs(UnmanagedType.I1)] public bool SpriteBusy;

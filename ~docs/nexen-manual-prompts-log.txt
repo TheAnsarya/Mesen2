@@ -300,7 +300,9 @@ Continue working on these tests and issues; continue;
 
 [Nexen] (Lynx) Keep finding problems with your implementation of Atari Lynx emulation and fixing bugs and issues and documentation, make sure all recent and future code is covered with lots of tests to prove the code and benchmarks to make sure it's efficient; and always add in-line code comments and xmldoc class/method/field.etc comments and validate our code and system; keep working through the issues and make new issues and work them too; continue;
 
-[Nexen] (Lynx) It looks like you are using `Handy` as a source-of-truth when it conflicts with technical docs on the Lynx, please document in a `Handy` versus `Mednafen` versus `Techinical Docs` code/algorithm/label/datastructure differences documentation; continue;
+[Nexen] update chat session logs, git commit, [Nexen] (Lynx) Well, by `It looks like you are using `Handy` as a source-of-truth` I meant don't do that, use handy as a very useful resource but don't always believe it over official docs, unless it results in a correct implementation; you know what I mean; continue; when it conflicts with technical docs on the Lynx, please document in a `Handy` versus `Mednafen` versus `Techinical Docs` code/algorithm/label/datastructure differences documentation; continue; continue working issues (making new ones if need, track all work in issues!); continue;
+
+[Nexen] (Lynx) continue working through the issues; update everything as you go; continue;
 
 
 

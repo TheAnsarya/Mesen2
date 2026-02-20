@@ -756,7 +756,7 @@ uint8_t LynxSuzy::ReadRegister(uint8_t addr) {
 		case 0x81: // SPRCTL1
 			return _state.SpriteControl1;
 		case 0x82: // SPRCOLL
-			return _state.SpriteInit; // TODO: separate SPRCOLL register
+			return _state.SpriteCollision;
 		case 0x83: // SPRINIT
 			return _state.SpriteInit;
 
@@ -869,7 +869,7 @@ void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 			_state.SpriteControl1 = value;
 			break;
 		case 0x82: // SPRCOLL
-			// TODO: separate SPRCOLL register
+			_state.SpriteCollision = value;
 			break;
 		case 0x83: // SPRINIT
 			_state.SpriteInit = value;
@@ -1034,6 +1034,7 @@ void LynxSuzy::Serialize(Serializer& s) {
 	SV(_state.SCBAddress);
 	SV(_state.SpriteControl0);
 	SV(_state.SpriteControl1);
+	SV(_state.SpriteCollision);
 	SV(_state.SpriteInit);
 	SV(_state.SpriteBusy);
 	SV(_state.SpriteEnabled);
