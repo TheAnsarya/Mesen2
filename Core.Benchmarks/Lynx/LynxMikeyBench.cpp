@@ -310,3 +310,80 @@ static void BM_LynxMikey_RenderFullFrame(benchmark::State& state) {
 	state.SetItemsProcessed(state.iterations() * LynxConstants::PixelCount);
 }
 BENCHMARK(BM_LynxMikey_RenderFullFrame);
+
+//=============================================================================
+// Audit Fix Benchmarks
+//=============================================================================
+
+/// [12.7] CTLA bit 6 self-clearing mask — must be zero-cost.
+static void BM_LynxMikey_CtlaBit6Mask(benchmark::State& state) {
+	uint8_t controlA = 0;
+	uint8_t input = 0;
+	for (auto _ : state) {
+		controlA = input & ~0x40; // Mask off self-clearing bit 6
+		benchmark::DoNotOptimize(controlA);
+		input++;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_LynxMikey_CtlaBit6Mask);
+
+/// [12.6] CTLB write — clear timer-done only.
+static void BM_LynxMikey_CtlbWriteClearDone(benchmark::State& state) {
+	uint8_t controlB = 0xFF;
+	for (auto _ : state) {
+		controlB &= ~0x08; // Clear timer-done bit only
+		benchmark::DoNotOptimize(controlB);
+		controlB = 0xFF; // Reset for next iteration
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_LynxMikey_CtlbWriteClearDone);
+
+/// [12.15/#397] IODAT read — bit extraction and direction masking.
+static void BM_LynxMikey_IodatBitExtraction(benchmark::State& state) {
+	uint8_t ioDir = 0x07;   // Bits 0-2 output
+	uint8_t ioData = 0;
+	uint8_t audin = 0;
+	for (auto _ : state) {
+		uint8_t result = (ioData & ioDir) | (audin & ~ioDir);
+		result = (result & 0x07) | (audin << 3); // EEPROM + AUDIN
+		benchmark::DoNotOptimize(result);
+		ioData++;
+		audin = (audin + 1) & 1;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_LynxMikey_IodatBitExtraction);
+
+/// [12.1] IrqEnabled tracking — per-timer IRQ enable bit set/clear.
+static void BM_LynxMikey_IrqEnabledTracking(benchmark::State& state) {
+	uint8_t irqEnabled = 0;
+	uint8_t timerIdx = 0;
+	for (auto _ : state) {
+		uint8_t ctla = timerIdx; // pseudo-random pattern
+		if (ctla & 0x80) {
+			irqEnabled |= (1 << (timerIdx & 0x07));
+		} else {
+			irqEnabled &= ~(1 << (timerIdx & 0x07));
+		}
+		benchmark::DoNotOptimize(irqEnabled);
+		timerIdx++;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_LynxMikey_IrqEnabledTracking);
+
+/// [12.25/#407] Display address computation with uint16_t wrapping.
+static void BM_LynxMikey_DisplayAddressWrap(benchmark::State& state) {
+	uint16_t displayAddr = 0xFDA0;
+	uint16_t lineAddr = 0;
+	for (auto _ : state) {
+		for (uint32_t scanline = 0; scanline < LynxConstants::ScreenHeight; scanline++) {
+			lineAddr = displayAddr + (uint16_t)(scanline * LynxConstants::BytesPerScanline);
+			benchmark::DoNotOptimize(lineAddr);
+		}
+	}
+	state.SetItemsProcessed(state.iterations() * LynxConstants::ScreenHeight);
+}
+BENCHMARK(BM_LynxMikey_DisplayAddressWrap);

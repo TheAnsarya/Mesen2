@@ -350,3 +350,53 @@ static void BM_LynxCpu_Branch_Mixed(benchmark::State& state) {
 	state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(BM_LynxCpu_Branch_Mixed);
+
+//=============================================================================
+// Audit Fix Benchmarks
+//=============================================================================
+
+/// [12.21/#403] NOP opcode dispatch — multi-byte NOP variants must correctly
+/// consume different cycle counts without branching overhead.
+static void BM_LynxCpu_NopDispatch(benchmark::State& state) {
+	// Simulate opcode dispatch for all NOP variants
+	constexpr uint8_t opcodes[] = {0xEA, 0x5C, 0xDC, 0xFC};
+	constexpr uint8_t cycles[]  = {2,    8,    4,    4   };
+	constexpr uint8_t bytes[]   = {1,    3,    3,    3   };
+	uint32_t totalCycles = 0;
+	for (auto _ : state) {
+		for (int i = 0; i < 4; i++) {
+			uint8_t opcode = opcodes[i];
+			uint8_t c, b;
+			switch (opcode) {
+				case 0xEA: c = 2; b = 1; break;
+				case 0x5C: c = 8; b = 3; break;
+				case 0xDC: [[fallthrough]];
+				case 0xFC: c = 4; b = 3; break;
+				default: c = 2; b = 1; break;
+			}
+			totalCycles += c;
+			benchmark::DoNotOptimize(b);
+		}
+	}
+	benchmark::DoNotOptimize(totalCycles);
+	state.SetItemsProcessed(state.iterations() * 4);
+}
+BENCHMARK(BM_LynxCpu_NopDispatch);
+
+/// [12.3] WAI instruction — wake check must be efficient.
+static void BM_LynxCpu_WaiWakeCheck(benchmark::State& state) {
+	uint8_t irqPending = 0;
+	bool iFlag = true;
+	LynxCpuStopState stopState = LynxCpuStopState::WaitingForIrq;
+	for (auto _ : state) {
+		// Check if IRQ wakes CPU regardless of I flag
+		irqPending = (irqPending + 1) & 0xFF;
+		if (irqPending && stopState == LynxCpuStopState::WaitingForIrq) {
+			stopState = LynxCpuStopState::Running;
+		}
+		benchmark::DoNotOptimize(stopState);
+		stopState = LynxCpuStopState::WaitingForIrq;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_LynxCpu_WaiWakeCheck);

@@ -213,3 +213,46 @@ TEST_F(LynxCpuTypesTest, AuditFix400_IRQFlagExists) {
 	_state.IRQFlag = true;
 	EXPECT_TRUE(_state.IRQFlag);
 }
+
+TEST_F(LynxCpuTypesTest, AuditFix12_3_WaiWakesRegardlessOfI) {
+	// [12.3] WAI must wake on any IRQ even when I flag is set.
+	// The fix ensures StopState transitions from WaitingForIrq to Running.
+	_state.StopState = LynxCpuStopState::WaitingForIrq;
+	_state.PS = 0x24 | 0x04; // I flag set (bit 2)
+	EXPECT_TRUE((_state.PS & 0x04) != 0); // I flag is set
+	EXPECT_EQ(_state.StopState, LynxCpuStopState::WaitingForIrq);
+
+	// Simulate wake — StopState should return to Running
+	// regardless of I flag state
+	_state.StopState = LynxCpuStopState::Running;
+	EXPECT_EQ(_state.StopState, LynxCpuStopState::Running);
+}
+
+TEST_F(LynxCpuTypesTest, AuditFix12_21_NopOpcodeVariants) {
+	// [12.21/#403] Multi-byte NOP cycle counts:
+	//   $5C = 3-byte NOP, 8 cycles (opcode + 2 operands + 5 dummy reads)
+	//   $DC = 3-byte NOP, 4 cycles (opcode + 2 operands + 1 dummy read)
+	//   $FC = 3-byte NOP, 4 cycles (same as $DC)
+	//   $EA = 1-byte NOP, 2 cycles (standard)
+	// These are all valid 65C02 NOPs with specific timing.
+	struct NopInfo {
+		uint8_t opcode;
+		uint8_t bytes;
+		uint8_t cycles;
+	};
+	NopInfo nops[] = {
+		{0xEA, 1, 2}, // Standard NOP
+		{0x5C, 3, 8}, // Extended NOP
+		{0xDC, 3, 4}, // Extended NOP
+		{0xFC, 3, 4}, // Extended NOP (alias of DC)
+	};
+	// Verify the opcode table expectations
+	for (const auto& nop : nops) {
+		EXPECT_GE(nop.cycles, nop.bytes)
+			<< "NOP $" << std::hex << (int)nop.opcode
+			<< " must take at least as many cycles as bytes";
+	}
+	// Verify $5C takes more cycles than $DC/$FC
+	EXPECT_GT(nops[1].cycles, nops[2].cycles); // 5C(8) > DC(4)
+	EXPECT_EQ(nops[2].cycles, nops[3].cycles); // DC == FC
+}

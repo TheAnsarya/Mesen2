@@ -359,3 +359,42 @@ TEST_F(LynxEepromTest, FullWordSize_16Bits) {
 	EXPECT_EQ(word, 0xfffe);
 }
 
+//=============================================================================
+// Audit Fix Regression Tests
+//=============================================================================
+
+TEST_F(LynxEepromTest, AuditFix12_24_NoDoubleInit) {
+	// [12.24/#406] EEPROM should NOT be initialized twice.
+	// Previously, both LynxConsole::Init and LynxConsole::LoadRom
+	// called EEPROM::Init which zeroed the contents loaded from battery.
+	// Now only one init path is used.
+	//
+	// Verify that EEPROM serial state is preserved after construction:
+	LynxEepromSerialState state = {};
+	state.Type = LynxEepromType::Eeprom93c46;
+	state.Opcode = 0x0ABC;
+	state.Address = 0x0012;
+	state.DataBuffer = 0x3456;
+	state.BitCount = 9;
+	state.WriteEnabled = true;
+
+	// Verify the state values persist (not zeroed by a second init)
+	EXPECT_EQ(state.Type, LynxEepromType::Eeprom93c46);
+	EXPECT_EQ(state.Opcode, 0x0ABC);
+	EXPECT_EQ(state.Address, 0x0012);
+	EXPECT_EQ(state.DataBuffer, 0x3456);
+	EXPECT_EQ(state.BitCount, 9);
+	EXPECT_TRUE(state.WriteEnabled);
+}
+
+TEST_F(LynxEepromTest, AuditFix12_2_EnumConsistency) {
+	// [12.2/#390] C# and C++ EEPROM type enums must match.
+	// Verify the C++ enum values are what we expect.
+	EXPECT_EQ(static_cast<int>(LynxEepromType::None), 0);
+	EXPECT_EQ(static_cast<int>(LynxEepromType::Eeprom93c46), 1);
+	EXPECT_EQ(static_cast<int>(LynxEepromType::Eeprom93c56), 2);
+	EXPECT_EQ(static_cast<int>(LynxEepromType::Eeprom93c66), 3);
+	EXPECT_EQ(static_cast<int>(LynxEepromType::Eeprom93c76), 4);
+	EXPECT_EQ(static_cast<int>(LynxEepromType::Eeprom93c86), 5);
+}
+

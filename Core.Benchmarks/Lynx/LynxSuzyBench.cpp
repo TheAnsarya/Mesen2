@@ -407,3 +407,70 @@ static void BM_LynxSuzy_JoystickRead(benchmark::State& state) {
 	state.SetItemsProcessed(state.iterations());
 }
 BENCHMARK(BM_LynxSuzy_JoystickRead);
+
+//=============================================================================
+// Audit Fix Benchmarks
+//=============================================================================
+
+/// [12.23/#405] PeekRegister math byte extraction — must be zero side-effect.
+static void BM_LynxSuzy_PeekMathRegisters(benchmark::State& state) {
+	uint32_t mathJKLM = 0xDEADBEEF;
+	uint32_t mathEFGH = 0xCAFEBABE;
+	uint32_t mathABCD = 0x12345678;
+	uint16_t mathNP = 0x9ABC;
+	for (auto _ : state) {
+		// Extract all byte-level views (what PeekRegister does)
+		uint8_t h = (uint8_t)(mathEFGH & 0xFF);
+		uint8_t g = (uint8_t)((mathEFGH >> 8) & 0xFF);
+		uint8_t f = (uint8_t)((mathEFGH >> 16) & 0xFF);
+		uint8_t e = (uint8_t)((mathEFGH >> 24) & 0xFF);
+		uint8_t m = (uint8_t)(mathJKLM & 0xFF);
+		uint8_t l = (uint8_t)((mathJKLM >> 8) & 0xFF);
+		uint8_t k = (uint8_t)((mathJKLM >> 16) & 0xFF);
+		uint8_t j = (uint8_t)((mathJKLM >> 24) & 0xFF);
+		uint8_t d = (uint8_t)(mathABCD & 0xFF);
+		uint8_t c = (uint8_t)((mathABCD >> 8) & 0xFF);
+		uint8_t b = (uint8_t)((mathABCD >> 16) & 0xFF);
+		uint8_t a = (uint8_t)((mathABCD >> 24) & 0xFF);
+		uint8_t p = (uint8_t)(mathNP & 0xFF);
+		uint8_t n = (uint8_t)((mathNP >> 8) & 0xFF);
+		benchmark::DoNotOptimize(h); benchmark::DoNotOptimize(g);
+		benchmark::DoNotOptimize(f); benchmark::DoNotOptimize(e);
+		benchmark::DoNotOptimize(m); benchmark::DoNotOptimize(l);
+		benchmark::DoNotOptimize(k); benchmark::DoNotOptimize(j);
+		benchmark::DoNotOptimize(d); benchmark::DoNotOptimize(c);
+		benchmark::DoNotOptimize(b); benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(p); benchmark::DoNotOptimize(n);
+		mathJKLM++; mathEFGH++; // Vary inputs
+	}
+	state.SetItemsProcessed(state.iterations() * 14); // 14 byte extractions
+}
+BENCHMARK(BM_LynxSuzy_PeekMathRegisters);
+
+/// [12.23/#405] SPRSYS register read — combined flag packing in PeekRegister.
+static void BM_LynxSuzy_SprsysRead(benchmark::State& state) {
+	bool mathInProgress = false;
+	bool mathOverflow = false;
+	bool lastCarry = false;
+	bool unsafeAccess = false;
+	bool vstretch = true;
+	bool leftHand = false;
+	bool stopOnCurrent = false;
+	bool spriteBusy = true;
+	for (auto _ : state) {
+		uint8_t sprsys = 0;
+		if (mathInProgress) sprsys |= 0x80;
+		if (mathOverflow)   sprsys |= 0x40;
+		if (lastCarry)      sprsys |= 0x20;
+		if (vstretch)       sprsys |= 0x10;
+		if (leftHand)       sprsys |= 0x08;
+		if (unsafeAccess)   sprsys |= 0x04;
+		if (stopOnCurrent)  sprsys |= 0x02;
+		if (spriteBusy)     sprsys |= 0x01;
+		benchmark::DoNotOptimize(sprsys);
+		mathInProgress = !mathInProgress;
+		mathOverflow = !mathOverflow;
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(BM_LynxSuzy_SprsysRead);
