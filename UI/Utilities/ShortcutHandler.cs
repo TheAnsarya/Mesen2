@@ -378,6 +378,8 @@ public sealed class ShortcutHandler {
 		ConfigManager.Config.Ws.HideBgLayer1 = false;
 		ConfigManager.Config.Ws.HideBgLayer2 = false;
 		ConfigManager.Config.Ws.DisableSprites = false;
+		ConfigManager.Config.Lynx.DisableBackground = false;
+		ConfigManager.Config.Lynx.DisableSprites = false;
 		UpdateAllCoreConfig();
 		DisplayMessageHelper.DisplayMessage("Debug", ResourceHelper.GetMessage("AllLayersEnabled"));
 	}
@@ -391,6 +393,7 @@ public sealed class ShortcutHandler {
 		ConfigManager.Config.Sms.ApplyConfig();
 		ConfigManager.Config.Cv.ApplyConfig();
 		ConfigManager.Config.Ws.ApplyConfig();
+		ConfigManager.Config.Lynx.ApplyConfig();
 	}
 
 	private void SetEmulationSpeed(uint emulationSpeed) {

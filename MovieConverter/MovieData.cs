@@ -75,6 +75,7 @@ public sealed class MovieData {
 			SystemType.Nes => 50.006978,
 			SystemType.Snes => 50.006979,
 			SystemType.Gb or SystemType.Gbc => 59.7275,
+			SystemType.Lynx => 75.0,
 			_ => 50.0
 		},
 		RegionType.Dendy => 50.006978,

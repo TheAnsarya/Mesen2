@@ -415,6 +415,7 @@ public static class ControllerTypeExtensions {
 			case ControllerType.ColecoVisionController:
 			case ControllerType.WsController:
 			case ControllerType.WsControllerVertical:
+			case ControllerType.LynxController:
 				return true;
 		}
 
@@ -436,6 +437,7 @@ public static class ControllerTypeExtensions {
 			case ControllerType.HoriTrack:
 			case ControllerType.BandaiHyperShot:
 			case ControllerType.SmsController:
+			case ControllerType.LynxController:
 				return true;
 		}
 
@@ -481,6 +483,7 @@ public static class ControllerTypeExtensions {
 			case ControllerType.ColecoVisionController:
 			case ControllerType.WsController:
 			case ControllerType.WsControllerVertical:
+			case ControllerType.LynxController:
 				return true;
 		}
 
@@ -498,6 +501,7 @@ public static class ControllerTypeExtensions {
 			case ControllerType.BandaiHyperShot:
 			case ControllerType.SmsController:
 			case ControllerType.WsController:
+			case ControllerType.LynxController:
 				return true;
 		}
 
