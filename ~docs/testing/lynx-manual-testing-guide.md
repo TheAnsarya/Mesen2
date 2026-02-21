@@ -1,6 +1,6 @@
 # 🎮 Atari Lynx Manual Testing Guide
 
-> **Last updated:** 2025-06 | **Platform:** Nexen (Mesen2 fork) | **Branch:** `features-atari-lynx`
+> **Last updated:** 2026-02-20 | **Platform:** Nexen (Mesen2 fork) | **Branch:** `features-atari-lynx`
 
 This guide covers manual testing procedures for the Atari Lynx emulation in Nexen. Use it to verify functionality after code changes.
 
