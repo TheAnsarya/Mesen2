@@ -252,6 +252,13 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 }
 
 void LynxConsole::RunFrame() {
+	// Update input state BEFORE frame execution to avoid 1-frame input lag.
+	// On real hardware, Suzy latches joystick state when the CPU reads $FCB0/$FCB1
+	// mid-frame, so input must be current before execution begins.
+	_controlManager->UpdateInputState();
+	_suzy->SetJoystick(_controlManager->ReadJoystick());
+	_suzy->SetSwitches(_controlManager->ReadSwitches());
+
 	// Run CPU instructions for one frame's worth of cycles
 	uint32_t targetCycles = LynxConstants::CpuCyclesPerFrame;
 	uint64_t startCycle = _cpu->GetCycleCount();
@@ -270,11 +277,6 @@ void LynxConsole::RunFrame() {
 	// Copy Mikey's frame buffer to output
 	memcpy(_frameBuffer, _mikey->GetFrameBuffer(), sizeof(_frameBuffer));
 	_frameCount++;
-
-	// Update input state
-	_controlManager->UpdateInputState();
-	_suzy->SetJoystick(_controlManager->ReadJoystick());
-	_suzy->SetSwitches(_controlManager->ReadSwitches());
 }
 
 void LynxConsole::Reset() {
