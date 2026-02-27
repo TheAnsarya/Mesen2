@@ -194,7 +194,7 @@ void SaveStateManager::SaveVideoData(ostream& stream) {
 
 	unsigned long compressedSize = compressBound(frame.FrameBufferSize);
 	vector<uint8_t> compressedData(compressedSize, 0);
-	compress2(compressedData.data(), &compressedSize, (const unsigned char*)frame.FrameBuffer, frame.FrameBufferSize, MZ_DEFAULT_LEVEL);
+	compress2(compressedData.data(), &compressedSize, (const unsigned char*)frame.FrameBuffer, frame.FrameBufferSize, MZ_BEST_SPEED);
 
 	WriteValue(stream, (uint32_t)compressedSize);
 	stream.write((char*)compressedData.data(), (uint32_t)compressedSize);

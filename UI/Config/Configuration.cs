@@ -125,9 +125,11 @@ public partial class Configuration : ReactiveObject {
 			Lynx.InitializeDefaults(DefaultKeyMappings);
 		}
 
-		// Enable background CDL recording by default for existing users
+		// Background CDL recording is now opt-in (disabled by default) for performance
+		// The full debugger was being initialized on every ROM load, adding 30-50% overhead
+		// See: https://github.com/TheAnsarya/Nexen/issues/419
 		if (ConfigUpgrade < (int)ConfigUpgradeHint.BackgroundCdlRecording) {
-			Debug.Integration.BackgroundCdlRecording = true;
+			Debug.Integration.BackgroundCdlRecording = false;
 		}
 
 		ConfigUpgrade = (int)ConfigUpgradeHint.NextValue - 1;

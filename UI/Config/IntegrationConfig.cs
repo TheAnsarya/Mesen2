@@ -20,7 +20,7 @@ public sealed class IntegrationConfig : BaseConfig<IntegrationConfig> {
 	[Reactive] public bool AutoExportPansy { get; set; } = true;
 
 	// Background CDL recording settings
-	[Reactive] public bool BackgroundCdlRecording { get; set; } = true;
+	[Reactive] public bool BackgroundCdlRecording { get; set; } = false;
 	[Reactive] public int AutoSaveIntervalMinutes { get; set; } = 5;
 	[Reactive] public bool SavePansyOnRomUnload { get; set; } = true;
 
