@@ -215,3 +215,17 @@ Full test suite: **1495 tests passing**, zero regressions.
 - Issue #419 — BackgroundCdlRecording default (completed)
 - Issue #420 — Audio turbo fix (completed)
 - Issue #421 — VideoDecoder busy-spin (completed)
+
+## Phase 6 — Metadata Recording Benchmarks (CDL & Pansy)
+
+Benchmarks show:
+- **Disabled:** 0.000ns (no cost)
+- **Enabled:** CDL ~0.26ns/call, Pansy ~0.25ns/call, combined ~0.75ns/call
+- All hooks are properly conditional; no unconditional cost in hot path.
+
+### Future Work
+- Profile metadata recording in large games
+- Investigate lock-free ring buffers, flat arrays, intrusive lists for future scalability
+- Track in [#429](https://github.com/TheAnsarya/Nexen/issues/429)
+
+Benchmarks: `Core.Benchmarks/Debugger/MetadataRecordingBench.cpp`

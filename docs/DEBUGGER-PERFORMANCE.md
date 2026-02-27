@@ -87,3 +87,17 @@ These benchmarks remain in the suite for future reference if cache patterns chan
 - [#426](https://github.com/TheAnsarya/Nexen/issues/426) — Profiler cached pointer optimization
 - [#427](https://github.com/TheAnsarya/Nexen/issues/427) — CallstackManager ring buffer
 - [#428](https://github.com/TheAnsarya/Nexen/issues/428) — Debugger pipeline benchmarks
+
+## Metadata Recording Benchmarks (CDL & Pansy)
+
+Recent benchmarks confirm:
+- **Disabled:** 0.000ns (no cost)
+- **Enabled:** CDL ~0.26ns/call, Pansy ~0.25ns/call, combined ~0.75ns/call
+- All hooks are properly conditional; no unconditional cost in hot path.
+
+### Next Steps
+- Profile real-world metadata recording in large games
+- Investigate lock-free ring buffers, flat arrays, and intrusive lists for future scalability
+- Track all findings in [#429](https://github.com/TheAnsarya/Nexen/issues/429)
+
+Benchmarks: `Core.Benchmarks/Debugger/MetadataRecordingBench.cpp`
