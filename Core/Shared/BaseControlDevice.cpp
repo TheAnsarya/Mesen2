@@ -59,7 +59,14 @@ void BaseControlDevice::StrobeProcessWrite(uint8_t value) {
 
 void BaseControlDevice::ClearState() {
 	auto lock = _stateLock.AcquireSafe();
-	_state = ControlDeviceState();
+	if (IsRawString()) [[unlikely]] {
+		// Raw string devices (tape/barcode) need full reset since data is variable-length
+		_state.State.clear();
+	} else {
+		// Standard button devices: zero-fill existing buffer to avoid heap
+		// dealloc/realloc of the state vector every frame per controller
+		std::fill(_state.State.begin(), _state.State.end(), 0);
+	}
 }
 
 ControlDeviceState BaseControlDevice::GetRawState() {

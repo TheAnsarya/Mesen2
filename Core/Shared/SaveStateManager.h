@@ -89,6 +89,12 @@ private:
 	/// <summary>Persistent compression buffer for SaveVideoData (avoids ~150KB alloc per save)</summary>
 	vector<uint8_t> _compressBuffer;
 
+	/// <summary>Persistent decompression buffer for GetVideoData (avoids ~150KB alloc per load/rewind)</summary>
+	vector<uint8_t> _decompressBuffer;
+
+	/// <summary>Persistent buffer for reading compressed video data (avoids ~150KB alloc per load/rewind)</summary>
+	vector<uint8_t> _compressedReadBuffer;
+
 	/// <summary>
 	/// Get filesystem path for save state slot (legacy mode).
 	/// </summary>

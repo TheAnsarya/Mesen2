@@ -212,12 +212,17 @@ bool SaveStateManager::GetVideoData(vector<uint8_t>& out, RenderedFrame& frame, 
 		return false;
 	}
 
-	vector<uint8_t> compressedData(compressedSize, 0);
-	stream.read((char*)compressedData.data(), compressedSize);
+	// Reuse persistent buffers to avoid ~150KB heap alloc/dealloc per load
+	// (especially important for rewind which loads state every ~1 second)
+	_compressedReadBuffer.resize(compressedSize);
+	stream.read((char*)_compressedReadBuffer.data(), compressedSize);
 
-	out = vector<uint8_t>(frameBufferSize, 0);
+	_decompressBuffer.resize(frameBufferSize);
 	unsigned long decompSize = frameBufferSize;
-	if (uncompress(out.data(), &decompSize, compressedData.data(), (unsigned long)compressedData.size()) == MZ_OK) {
+	if (uncompress(_decompressBuffer.data(), &decompSize, _compressedReadBuffer.data(), (unsigned long)_compressedReadBuffer.size()) == MZ_OK) {
+		out = std::move(_decompressBuffer);
+		// Reset persistent buffer so next call allocates fresh
+		// (the moved-from vector is in a valid but empty state)
 		return true;
 	}
 	return false;

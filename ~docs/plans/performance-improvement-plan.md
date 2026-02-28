@@ -1,8 +1,9 @@
 # Performance Improvement Plan — Emulation Speed & Audio
 
 **Created:** 2026-02-26
+**Updated:** 2026-02-28
 **Epic Issue:** #418
-**Branch:** `features-atari-lynx`
+**Branch:** `master` (merged from `features-atari-lynx`)
 
 ## Problem Statement
 
@@ -61,45 +62,126 @@ User reports while playing Dragon Warrior 4 (NES):
 
 ## Future Work (Issues Created)
 
-### Phase 1: Quick Wins (Low Risk)
-| Issue | Description | Estimated Impact |
-|-------|-------------|-----------------|
-| #419 | ✅ BackgroundCdlRecording default to false | 30-50% speed recovery |
-| #424 | ✅ SaveVideoData compression level | 2-4x faster saves |
+### Phase 1: Quick Wins — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #419 | BackgroundCdlRecording default to false | ✅ Done | 30-50% speed recovery |
+| #424 | SaveVideoData compression level | ✅ Done | 2-4x faster saves |
+| #425 | Lightweight CDL recorder | ✅ Done | ~0.1% overhead vs 30-50% |
 
-### Phase 2: Audio & Video (Medium Risk)
-| Issue | Description | Estimated Impact |
-|-------|-------------|-----------------|
-| #420 | Audio frame skipping at turbo speed | Removes audio as speed bottleneck |
-| #421 | VideoDecoder frame skipping/condition variable | Removes video as speed cap |
+### Phase 2: Audio & Video — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #420 | Audio frame skipping at turbo speed | ✅ Done | Removes audio speed bottleneck |
+| #421 | VideoDecoder condition variable | ✅ Done | Removes spin-wait speed cap |
 
-### Phase 3: Async Architecture (High Complexity)
-| Issue | Description | Estimated Impact |
-|-------|-------------|-----------------|
-| #422 | Background save state thread | Eliminates save stalls |
-| #423 | Reduce rewind frequency at turbo | ~3% CPU savings at 3x |
+### Phase 3: Debugger Pipeline — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #426 | Profiler cached pointers | ✅ Done | 6-9.4x profiler speedup |
+| #427 | CallstackManager ring buffer | ✅ Done | 1.5-2.2x callstack speedup |
 
-### Phase 4: Lightweight CDL (Future)
-Create a CDL-only recording mode that doesn't need the full debugger:
-- Track code/data boundaries only
-- No breakpoints, trace logging, disassembly cache
-- Use a simple bitfield per ROM byte (code/data/unknown)
-- ~0.1% overhead instead of 30-50%
+### Phase 4: Audio Pipeline — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #431 | ReverbFilter ring buffer | ✅ Done | Eliminates buffer rotation |
+| #432 | SDL audio atomics | ✅ Done | Lock-free audio buffer |
+| #433 | AudioConfig const ref | ✅ Done | Eliminates per-sample copy |
 
-## What's NOT Causing Issues
+### Phase 5: Rewind System — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #434 | Audio ring buffer for rewind | ✅ Done | O(1) audio rewind |
+| #435 | O(1) memory tracking | ✅ Done | Eliminates per-frame map walk |
+| #436 | CompressionHelper direct-write | ✅ Done | Eliminates intermediate buffer |
+| #437 | Video frame reuse | ✅ Done | Reuses framebuffer allocation |
 
-These were investigated and found to be negligible:
-- **Pansy export** — Only runs on timer (5 min) or user action, not per-frame. No C++ hooks.
-- **Movie recording** — Just copies a few bytes of controller state per frame
-- **Cheat checking** — Empty loop when no cheats active
-- **Auto-save countdown** — Just a decrement per frame (the actual save is rare)
-- **Frame limiter** — Correctly calculates delay for turbo speeds
-- **Run-ahead** — Correctly disabled at speed > 100%
+### Phase 6: Run-Ahead & Allocations — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #439 | RunAhead persistent stream | ✅ Done | Eliminates stringstream allocs |
+| #440 | CrossFeedFilter overflow fix | ✅ Done | Correct int32_t arithmetic |
+| #441 | SaveVideoData buffer reuse | ✅ Done | 2x faster (8us vs 16us) |
+| #442 | HermiteResampler reserve | ✅ Done | Eliminates reallocation |
+| #443 | FastBinary positional serializer | ✅ Done | **8.2x round-trip speedup** |
 
-## Files Changed
+### Phase 7: Move Semantics & HUD — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #444 | RenderedFrame/VideoDecoder move | ✅ Done | Eliminates frame copy |
+| #445 | NotificationManager cleanup | ✅ Done | 2.3x dispatch speedup |
+| #446 | MessageManager single lookup | ✅ Done | 1.5x lookup speedup |
+| #447 | HUD string copy elimination | ✅ Done | Move semantics for DrawStringCommand |
+
+### Phase 8: Benchmarks & Validation — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #448 | Performance regression benchmarks | ✅ Done | 30+ benchmarks added |
+| #449 | Pansy/CDL tracking audit | ✅ Done | Already idempotent, no changes needed |
+
+### Remaining Open Work
+| Issue | Description | Priority |
+|-------|-------------|----------|
+| #422 | Async save states | Medium |
+| #423 | Rewind at turbo speed | Medium |
+
+## Benchmark Results Summary
+
+### FastBinary Serializer (run-ahead hot path)
+| Benchmark | Binary | FastBinary | Speedup |
+|-----------|--------|------------|---------|
+| SaveSmallState | 914ns | 32ns | **29x** |
+| SavePpuState | 1308ns | 73ns | **17.9x** |
+| SaveLargeState | 3555ns | 1293ns | **2.7x** |
+| RoundTrip (save+load) | 22576ns | 2739ns | **8.2x** |
+| KeyPrefixManagement | 844ns | 49ns | **17.2x** |
+| DeepNesting | 684ns | 69ns | **9.9x** |
+
+### Other Optimizations
+| Benchmark | Old | New | Speedup |
+|-----------|-----|-----|---------|
+| NotificationManager dispatch | 2166ns | 961ns | **2.3x** |
+| MessageManager lookup | 1684ns | 1112ns | **1.5x** |
+| Persistent buffer (SaveVideoData) | 15978ns | 8041ns | **2.0x** |
+| CDL disabled overhead | N/A | 0ns | **zero cost** |
+| CDL enabled (hot/idempotent) | N/A | 3.6us/10K | negligible |
+
+## Pansy/CDL Tracking Audit (#449)
+
+The user's concern about Pansy tracking firing redundant events (e.g., same jump address) was investigated
+thoroughly. The system is **already idempotent at every level**:
+
+- **Lightweight CDL**: Byte-OR operations — OR'ing an already-set bit is a no-op (~10-15ns/instruction)
+- **Full debugger CDL**: Same byte-OR pattern with richer flags
+- **Pansy export**: Runs on UI thread via timer (minutes apart), never during emulation
+- **Cross-references**: HashSet deduplication at export time
+- **Tiers are mutually exclusive**: Lightweight and full debugger never both active
+
+**Conclusion: No caching mechanism needed.** The byte-OR pattern IS the cache — it's inherently idempotent.
+
+## Files Changed (All Phases)
 
 | File | Change |
 |------|--------|
 | `UI/Config/IntegrationConfig.cs` | `BackgroundCdlRecording` default: `true` → `false` |
-| `UI/Config/Configuration.cs` | Config upgrade: `true` → `false` + comment |
-| `Core/Shared/SaveStateManager.cpp` | `MZ_DEFAULT_LEVEL` → `MZ_BEST_SPEED` |
+| `UI/Config/Configuration.cs` | Config upgrade: `true` → `false` |
+| `Core/Shared/SaveStateManager.cpp` | Compression `MZ_DEFAULT_LEVEL` → `MZ_BEST_SPEED` |
+| `Core/Shared/LightweightCdlRecorder.h/cpp` | New lightweight CDL recorder |
+| `Core/Shared/Video/VideoDecoder.cpp` | Condition variable replaces busy-spin |
+| `Core/Debugger/Profiler.cpp` | Cached pointers for 6-9.4x speedup |
+| `Core/Debugger/CallstackManager.cpp` | Ring buffer for 1.5-2.2x speedup |
+| `Core/Shared/Audio/ReverbFilter.cpp` | Ring buffer replaces rotation |
+| `Core/Shared/Audio/SdlSoundManager.cpp` | SDL atomics for lock-free audio |
+| `Core/Shared/Audio/SoundMixer.cpp` | AudioConfig const ref |
+| `Core/Shared/Audio/CrossFeedFilter.cpp` | int32_t + std::clamp overflow fix |
+| `Core/Shared/RewindManager.cpp` | Ring buffer, O(1) tracking, direct-write |
+| `Core/Shared/Emulator.cpp` | RunAhead persistent stream |
+| `Core/Shared/Video/SystemHud.cpp` | String move semantics |
+| `Core/Shared/NotificationManager.cpp` | Index-based iteration under lock |
+| `Core/Shared/MessageManager.cpp` | Single find() lookup |
+| `Core/Shared/Video/RenderedFrame.h` | Move constructor/assignment |
+| `Core/Shared/Serializer.h/cpp` | FastBinary positional format |
+| `Core/Shared/Audio/HermiteResampler.h` | Vector reserve |
+| `Core.Benchmarks/Serialization/SerializerBench.cpp` | 9 FastBinary benchmarks |
+| `Core.Benchmarks/Debugger/MetadataRecordingBench.cpp` | CDL/CrossFeed/Notification/Message benchmarks |
+| `Core.Benchmarks/Shared/MoveSemanticsBench.cpp` | Move semantics benchmarks |
