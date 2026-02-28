@@ -12,7 +12,7 @@ private:
 	int16_t _left = 0;
 	int16_t _right = 0;
 
-	vector<int16_t> _pendingSamples;
+	vector<int16_t> _pendingSamples = []{ vector<int16_t> v; v.reserve(256); return v; }();
 
 	__forceinline int16_t HermiteInterpolate(double values[4], double mu);
 	__forceinline void PushSample(double prevValues[4], int16_t sample);

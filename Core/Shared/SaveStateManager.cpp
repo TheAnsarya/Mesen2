@@ -193,11 +193,11 @@ void SaveStateManager::SaveVideoData(ostream& stream) {
 	WriteValue(stream, (uint32_t)(_emu->GetVideoDecoder()->GetLastFrameScale() * 100));
 
 	unsigned long compressedSize = compressBound(frame.FrameBufferSize);
-	vector<uint8_t> compressedData(compressedSize, 0);
-	compress2(compressedData.data(), &compressedSize, (const unsigned char*)frame.FrameBuffer, frame.FrameBufferSize, MZ_BEST_SPEED);
+	_compressBuffer.resize(compressedSize);
+	compress2(_compressBuffer.data(), &compressedSize, (const unsigned char*)frame.FrameBuffer, frame.FrameBufferSize, MZ_BEST_SPEED);
 
 	WriteValue(stream, (uint32_t)compressedSize);
-	stream.write((char*)compressedData.data(), (uint32_t)compressedSize);
+	stream.write((char*)_compressBuffer.data(), (uint32_t)compressedSize);
 }
 
 bool SaveStateManager::GetVideoData(vector<uint8_t>& out, RenderedFrame& frame, istream& stream) {

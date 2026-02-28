@@ -145,6 +145,9 @@ private:
 	atomic<bool> _isRunAheadFrame;
 	bool _frameRunning = false;
 
+	/// <summary>Persistent run-ahead state buffer (avoids ~300KB alloc/free per frame)</summary>
+	stringstream _runAheadStream;
+
 	RomInfo _rom;
 	ConsoleType _consoleType = {};
 

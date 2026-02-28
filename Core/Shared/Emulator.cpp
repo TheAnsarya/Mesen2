@@ -196,13 +196,15 @@ bool Emulator::ProcessSystemActions() {
 }
 
 void Emulator::RunFrameWithRunAhead() {
-	stringstream runAheadState;
+	// Reuse persistent stream (avoids ~300KB alloc/free per frame)
+	_runAheadStream.str("");
+	_runAheadStream.clear();
 	uint32_t frameCount = _settings->GetEmulationConfig().RunAheadFrames;
 
 	// Run a single frame and save the state (no audio/video)
 	_isRunAheadFrame = true;
 	_console->RunFrame();
-	Serialize(runAheadState, false, 0);
+	Serialize(_runAheadStream, false, 0);
 
 	while (frameCount > 1) {
 		// Run extra frames if the requested run ahead frame count is higher than 1
@@ -220,7 +222,7 @@ void Emulator::RunFrameWithRunAhead() {
 	if (!wasReset) {
 		// Load the state we saved earlier
 		_isRunAheadFrame = true;
-		Deserialize(runAheadState, SaveStateManager::FileFormatVersion, false);
+		Deserialize(_runAheadStream, SaveStateManager::FileFormatVersion, false);
 		_isRunAheadFrame = false;
 	}
 }

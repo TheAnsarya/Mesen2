@@ -86,6 +86,9 @@ private:
 	string _perRomSaveStateDir;       ///< Per-ROM save state directory (set by C# GameDataManager)
 	Emulator* _emu;                   ///< Emulator instance
 
+	/// <summary>Persistent compression buffer for SaveVideoData (avoids ~150KB alloc per save)</summary>
+	vector<uint8_t> _compressBuffer;
+
 	/// <summary>
 	/// Get filesystem path for save state slot (legacy mode).
 	/// </summary>
