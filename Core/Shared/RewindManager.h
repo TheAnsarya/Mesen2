@@ -3,12 +3,12 @@
 #include <deque>
 #include "Shared/Interfaces/INotificationListener.h"
 #include "Shared/RewindData.h"
+#include "Shared/RenderedFrame.h"
 #include "Shared/Interfaces/IInputProvider.h"
 #include "Shared/Interfaces/IInputRecorder.h"
 
 class Emulator;
 class EmuSettings;
-struct RenderedFrame;
 
 /// <summary>Rewind state machine states</summary>
 enum class RewindState {
@@ -22,14 +22,27 @@ enum class RewindState {
 /// <summary>
 /// Video frame snapshot for rewind playback.
 /// Stores rendered frame data and input state for replay.
+/// Data vector is reused across frames to avoid per-frame heap allocation.
 /// </summary>
 struct VideoFrame {
-	vector<uint32_t> Data;            ///< RGBA pixel data
+	vector<uint32_t> Data;            ///< RGBA pixel data (reused, not reallocated)
 	uint32_t Width = 0;               ///< Frame width
 	uint32_t Height = 0;              ///< Frame height
 	double Scale = 0;                 ///< Display scale factor
 	uint32_t FrameNumber = 0;         ///< Frame sequence number
 	vector<ControllerData> InputData; ///< Input state for this frame
+
+	/// <summary>Copy frame data from a rendered frame, reusing existing buffer</summary>
+	void CopyFrom(const RenderedFrame& frame) {
+		uint32_t pixelCount = frame.Width * frame.Height;
+		Data.resize(pixelCount);
+		memcpy(Data.data(), frame.FrameBuffer, pixelCount * sizeof(uint32_t));
+		Width = frame.Width;
+		Height = frame.Height;
+		Scale = frame.Scale;
+		FrameNumber = frame.FrameNumber;
+		InputData = frame.InputData;
+	}
 };
 
 /// <summary>Statistics about rewind buffer state</summary>
@@ -81,13 +94,21 @@ private:
 	deque<RewindData> _history;       ///< Savestate history (main timeline)
 	deque<RewindData> _historyBackup; ///< Backup history (for resume after rewind)
 	RewindData _currentHistory = {};  ///< Current savestate being built
+	uint64_t _totalMemoryUsage = 0;  ///< Running total of history memory usage in bytes
 
 	RewindState _rewindState = RewindState::Stopped; ///< Current rewind state
 	int32_t _framesToFastForward = 0;                ///< Frames to skip when resuming
 
 	deque<VideoFrame> _videoHistory;         ///< Video frame snapshots
 	vector<VideoFrame> _videoHistoryBuilder; ///< Buffer for current video segment
-	deque<int16_t> _audioHistory;            ///< Audio sample history
+
+	/// <summary>Audio ring buffer for rewind playback (replaces deque for cache-friendly bulk ops)</summary>
+	vector<int16_t> _audioRingBuffer;        ///< Contiguous audio sample ring buffer
+	uint32_t _audioRingReadPos = 0;          ///< Read position in ring buffer
+	uint32_t _audioRingWritePos = 0;         ///< Write position in ring buffer
+	uint32_t _audioRingCount = 0;            ///< Number of samples currently in ring buffer
+	static constexpr uint32_t AudioRingCapacity = 1024 * 1024; ///< 1M samples (~10 seconds stereo at 48kHz)
+
 	vector<int16_t> _audioHistoryBuilder;    ///< Buffer for current audio segment
 
 	/// <summary>Add completed history block to deque</summary>

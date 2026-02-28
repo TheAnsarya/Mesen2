@@ -43,10 +43,13 @@ void RewindManager::ClearBuffer() {
 	_framesToFastForward = 0;
 	_videoHistory.clear();
 	_videoHistoryBuilder.clear();
-	_audioHistory.clear();
+	_audioRingReadPos = 0;
+	_audioRingWritePos = 0;
+	_audioRingCount = 0;
 	_audioHistoryBuilder.clear();
 	_rewindState = RewindState::Stopped;
 	_currentHistory = {};
+	_totalMemoryUsage = 0;
 }
 
 void RewindManager::ProcessNotification(ConsoleNotificationType type, void* parameter) {
@@ -99,13 +102,8 @@ void RewindManager::ProcessNotification(ConsoleNotificationType type, void* para
 }
 
 RewindStats RewindManager::GetStats() {
-	uint32_t memoryUsage = 0;
-	for (int i = (int)_history.size() - 1; i >= 0; i--) {
-		memoryUsage += _history[i].GetStateSize();
-	}
-
 	RewindStats stats = {};
-	stats.MemoryUsage = memoryUsage;
+	stats.MemoryUsage = (uint32_t)_totalMemoryUsage;
 	stats.HistorySize = (uint32_t)_history.size();
 	stats.HistoryDuration = stats.HistorySize * RewindManager::BufferSize;
 	return stats;
@@ -114,28 +112,26 @@ RewindStats RewindManager::GetStats() {
 void RewindManager::AddHistoryBlock() {
 	uint32_t maxHistorySize = _settings->GetPreferences().RewindBufferSize;
 	if (maxHistorySize > 0) {
-		uint32_t memoryUsage = 0;
-		for (int i = (int)_history.size() - 1; i >= 0; i--) {
-			memoryUsage += _history[i].GetStateSize();
-			if ((memoryUsage >> 20) >= maxHistorySize) {
-				// Remove all old state data above the memory limit
-				for (int j = 0; j < i; j++) {
-					_history.pop_front();
-				}
+		// Use running total instead of O(n) iteration over entire history
+		uint64_t maxBytes = (uint64_t)maxHistorySize << 20; // Convert MB to bytes
+		while (_totalMemoryUsage > maxBytes && !_history.empty()) {
+			_totalMemoryUsage -= _history.front().GetStateSize();
+			_history.pop_front();
 
-				while (_history.size() > 0 && !_history.front().IsFullState) {
-					// Remove everything until the next full state
-					_history.pop_front();
-				}
-				break;
+			// Remove until next full state (deltas need their base)
+			while (!_history.empty() && !_history.front().IsFullState) {
+				_totalMemoryUsage -= _history.front().GetStateSize();
+				_history.pop_front();
 			}
 		}
 
 		if (_currentHistory.FrameCount > 0) {
+			_totalMemoryUsage += _currentHistory.GetStateSize();
 			_history.push_back(_currentHistory);
 		}
 		_currentHistory = RewindData();
 		_currentHistory.SaveState(_emu, _history);
+		_totalMemoryUsage += _currentHistory.GetStateSize();
 	}
 }
 
@@ -159,7 +155,29 @@ void RewindManager::PopHistory() {
 		_currentHistory.LoadState(_emu, _history, -1, false);
 
 		if (!_audioHistoryBuilder.empty()) {
-			_audioHistory.insert(_audioHistory.begin(), _audioHistoryBuilder.begin(), _audioHistoryBuilder.end());
+			// Bulk insert into audio ring buffer (replaces O(n) deque front-insert)
+			uint32_t count = (uint32_t)_audioHistoryBuilder.size();
+			if (count > AudioRingCapacity) {
+				// More samples than ring can hold - keep only the most recent
+				_audioHistoryBuilder.erase(_audioHistoryBuilder.begin(), _audioHistoryBuilder.begin() + (count - AudioRingCapacity));
+				count = AudioRingCapacity;
+			}
+
+			// Write samples into ring buffer at current write position
+			// These go "before" existing data (prepend), so we move writePos backward
+			if (count <= _audioRingWritePos) {
+				_audioRingWritePos -= count;
+				memcpy(_audioRingBuffer.data() + _audioRingWritePos, _audioHistoryBuilder.data(), count * sizeof(int16_t));
+			} else {
+				// Wrap around: split into two copies
+				uint32_t tailCount = count - _audioRingWritePos;
+				memcpy(_audioRingBuffer.data() + (AudioRingCapacity - tailCount), _audioHistoryBuilder.data(), tailCount * sizeof(int16_t));
+				memcpy(_audioRingBuffer.data(), _audioHistoryBuilder.data() + tailCount, _audioRingWritePos * sizeof(int16_t));
+				_audioRingWritePos = AudioRingCapacity - tailCount;
+			}
+			_audioRingCount = std::min(_audioRingCount + count, AudioRingCapacity);
+			// Read position stays at the "end" (most recent data)
+			_audioRingReadPos = (_audioRingWritePos + _audioRingCount) % AudioRingCapacity;
 			_audioHistoryBuilder.clear();
 		}
 	}
@@ -186,7 +204,12 @@ void RewindManager::InternalStart(bool forDebugger) {
 	_videoHistoryBuilder.clear();
 	_videoHistory.clear();
 	_audioHistoryBuilder.clear();
-	_audioHistory.clear();
+	_audioRingReadPos = 0;
+	_audioRingWritePos = 0;
+	_audioRingCount = 0;
+	if (_audioRingBuffer.empty()) {
+		_audioRingBuffer.resize(AudioRingCapacity);
+	}
 	_historyBackup.clear();
 
 	PopHistory();
@@ -278,7 +301,9 @@ void RewindManager::Stop() {
 		_videoHistoryBuilder.clear();
 		_videoHistory.clear();
 		_audioHistoryBuilder.clear();
-		_audioHistory.clear();
+		_audioRingReadPos = 0;
+		_audioRingWritePos = 0;
+		_audioRingCount = 0;
 	}
 }
 
@@ -311,18 +336,13 @@ void RewindManager::ProcessFrame(RenderedFrame& frame, bool forRewind) {
 			return;
 		}
 
-		VideoFrame newFrame;
-		newFrame.Data = vector<uint32_t>((uint32_t*)frame.FrameBuffer, (uint32_t*)frame.FrameBuffer + frame.Width * frame.Height);
-		newFrame.Width = frame.Width;
-		newFrame.Height = frame.Height;
-		newFrame.Scale = frame.Scale;
-		newFrame.FrameNumber = frame.FrameNumber;
-		newFrame.InputData = frame.InputData;
-		_videoHistoryBuilder.push_back(newFrame);
+		// Reuse VideoFrame buffer via CopyFrom (avoids per-frame heap allocation)
+		_videoHistoryBuilder.emplace_back();
+		_videoHistoryBuilder.back().CopyFrom(frame);
 
 		if (_videoHistoryBuilder.size() == (size_t)_historyBackup.front().FrameCount) {
 			for (int i = (int)_videoHistoryBuilder.size() - 1; i >= 0; i--) {
-				_videoHistory.push_front(_videoHistoryBuilder[i]);
+				_videoHistory.push_front(std::move(_videoHistoryBuilder[i]));
 			}
 			_videoHistoryBuilder.clear();
 		}
@@ -341,15 +361,9 @@ void RewindManager::ProcessFrame(RenderedFrame& frame, bool forRewind) {
 		// Display nothing while resyncing
 	} else if (_rewindState == RewindState::Debugging) {
 		// Keep the last frame to be able to display it once step back reaches its target
-		VideoFrame newFrame;
-		newFrame.Data = vector<uint32_t>((uint32_t*)frame.FrameBuffer, (uint32_t*)frame.FrameBuffer + frame.Width * frame.Height);
-		newFrame.Width = frame.Width;
-		newFrame.Height = frame.Height;
-		newFrame.Scale = frame.Scale;
-		newFrame.FrameNumber = frame.FrameNumber;
-		newFrame.InputData = frame.InputData;
 		_videoHistory.clear();
-		_videoHistory.push_back(newFrame);
+		_videoHistory.emplace_back();
+		_videoHistory.back().CopyFrom(frame);
 	} else {
 		_emu->GetVideoRenderer()->UpdateFrame(frame);
 	}
@@ -359,11 +373,15 @@ bool RewindManager::ProcessAudio(int16_t* soundBuffer, uint32_t sampleCount) {
 	if (_rewindState == RewindState::Starting || _rewindState == RewindState::Started) {
 		_audioHistoryBuilder.insert(_audioHistoryBuilder.end(), soundBuffer, soundBuffer + sampleCount * 2);
 
-		if (_rewindState == RewindState::Started && _audioHistory.size() > sampleCount * 2) {
-			for (uint32_t i = 0; i < sampleCount * 2; i++) {
-				soundBuffer[i] = _audioHistory.back();
-				_audioHistory.pop_back();
+		uint32_t totalSamples = sampleCount * 2;
+		if (_rewindState == RewindState::Started && _audioRingCount > totalSamples) {
+			// Bulk read from ring buffer (replaces per-sample deque pop_back)
+			// Read from the "back" (most recent) — decrement readPos
+			for (uint32_t i = 0; i < totalSamples; i++) {
+				_audioRingReadPos = (_audioRingReadPos == 0) ? AudioRingCapacity - 1 : _audioRingReadPos - 1;
+				soundBuffer[i] = _audioRingBuffer[_audioRingReadPos];
 			}
+			_audioRingCount -= totalSamples;
 
 			return true;
 		} else {

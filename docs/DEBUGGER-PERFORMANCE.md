@@ -90,6 +90,10 @@ These benchmarks remain in the suite for future reference if cache patterns chan
 - [#431](https://github.com/TheAnsarya/Nexen/issues/431) — ReverbFilter ring buffer optimization
 - [#433](https://github.com/TheAnsarya/Nexen/issues/433) — SDL ring buffer atomic fix
 - [#434](https://github.com/TheAnsarya/Nexen/issues/434) — AudioConfig const reference
+- [#435](https://github.com/TheAnsarya/Nexen/issues/435) — Rewind audio ring buffer
+- [#436](https://github.com/TheAnsarya/Nexen/issues/436) — AddHistoryBlock O(1) memory tracking
+- [#437](https://github.com/TheAnsarya/Nexen/issues/437) — CompressionHelper direct compression
+- [#438](https://github.com/TheAnsarya/Nexen/issues/438) — Video frame buffer reuse
 
 ## Metadata Recording Benchmarks (CDL & Pansy)
 
@@ -158,3 +162,31 @@ The SDL audio backend (`SdlSoundManager`) shares a ring buffer between the SDL c
 | HermiteResampler vector realloc | HermiteResampler.h | Medium | Rare in practice |
 | CrossFeedFilter int16_t overflow | CrossFeedFilter.cpp | Low | Correctness bug, not performance |
 | DirectSound deprecated API | SoundManager.cpp | Low | Works fine; WASAPI migration future work |
+
+## Rewind System Optimizations
+
+A performance audit of the rewind system identified multiple heap allocation storms and O(n) operations that cause stuttering during rewind, especially at turbo speed.
+
+### Audio History Ring Buffer
+
+**Issue:** [#435](https://github.com/TheAnsarya/Nexen/issues/435)
+
+Replaced `std::deque<int16_t>` audio history with a pre-allocated 1M-sample contiguous ring buffer. Eliminates ~2000 individual `pop_back()` calls per audio callback and O(n) front-insertion. Uses bulk `memcpy` for insert and sequential index access for playback.
+
+### AddHistoryBlock O(1) Memory Tracking
+
+**Issue:** [#436](https://github.com/TheAnsarya/Nexen/issues/436)
+
+`AddHistoryBlock()` and `GetStats()` iterated the entire history deque to sum memory usage — O(n) every 30 frames. Replaced with a running `_totalMemoryUsage` counter that increments on add and decrements on remove. Both operations now O(1).
+
+### CompressionHelper Direct Compression
+
+**Issue:** [#437](https://github.com/TheAnsarya/Nexen/issues/437)
+
+`CompressionHelper::Compress()` used naked `new/delete` for a temporary buffer, then byte-by-byte inserted into the output vector. Now pre-sizes the output vector with `compressBound()` and compresses directly into it — zero temporary allocations.
+
+### Video Frame Buffer Reuse
+
+**Issue:** [#438](https://github.com/TheAnsarya/Nexen/issues/438)
+
+During rewind, `ProcessFrame()` allocated a new `vector<uint32_t>` (~246KB) for every frame. Now uses `VideoFrame::CopyFrom()` which reuses existing buffer capacity via `resize()` + `memcpy`, and `std::move` when pushing into the video history deque.

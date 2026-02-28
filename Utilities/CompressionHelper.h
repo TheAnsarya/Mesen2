@@ -43,15 +43,23 @@ public:
 	/// </remarks>
 	static void Compress(string data, int compressionLevel, vector<uint8_t>& output) {
 		unsigned long compressedSize = compressBound((unsigned long)data.size());
-		uint8_t* compressedData = new uint8_t[compressedSize];
-		compress2(compressedData, &compressedSize, (unsigned char*)data.c_str(), (unsigned long)data.size(), compressionLevel);
 
-		uint32_t size = (uint32_t)compressedSize;
 		uint32_t originalSize = (uint32_t)data.size();
-		output.insert(output.end(), (char*)&originalSize, (char*)&originalSize + sizeof(uint32_t));
-		output.insert(output.end(), (char*)&size, (char*)&size + sizeof(uint32_t));
-		output.insert(output.end(), (char*)compressedData, (char*)compressedData + compressedSize);
-		delete[] compressedData;
+		uint32_t headerSize = sizeof(uint32_t) * 2;
+
+		// Pre-size output and compress directly into it (no temp allocation)
+		size_t prevSize = output.size();
+		output.resize(prevSize + headerSize + compressedSize);
+
+		compress2(output.data() + prevSize + headerSize, &compressedSize, (unsigned char*)data.c_str(), (unsigned long)data.size(), compressionLevel);
+
+		// Write headers
+		uint32_t size = (uint32_t)compressedSize;
+		memcpy(output.data() + prevSize, &originalSize, sizeof(uint32_t));
+		memcpy(output.data() + prevSize + sizeof(uint32_t), &size, sizeof(uint32_t));
+
+		// Trim to actual compressed size
+		output.resize(prevSize + headerSize + compressedSize);
 	}
 
 	/// <summary>
