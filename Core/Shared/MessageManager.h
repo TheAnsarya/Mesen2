@@ -73,7 +73,7 @@ public:
 	/// </summary>
 	/// <param name="key">Localization key (e.g., "Cheats.CheatsApplied")</param>
 	/// <returns>Localized string or key if not found</returns>
-	static string Localize(string key);
+	static string Localize(const string& key);
 
 	/// <summary>Register UI message handler</summary>
 	static void RegisterMessageManager(IMessageManager* messageManager);

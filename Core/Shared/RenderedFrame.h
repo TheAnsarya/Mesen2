@@ -96,5 +96,5 @@ struct RenderedFrame {
 	                                                                                                                                                              Scale(scale),
 	                                                                                                                                                              FrameNumber(frameNumber),
 	                                                                                                                                                              VideoPhase(videoPhase),
-	                                                                                                                                                              InputData(inputData) {}
+	                                                                                                                                                              InputData(std::move(inputData)) {}
 };

@@ -125,7 +125,7 @@ void VideoDecoder::DecodeFrame(bool forRewind) {
 		ScanlineFilter::ApplyFilter(outputBuffer, frameSize.Width, frameSize.Height, _emu->GetSettings()->GetVideoConfig().ScanlineIntensity, scale);
 	}
 
-	RenderedFrame convertedFrame((void*)outputBuffer, frameSize.Width, frameSize.Height, _frame.Scale, _frame.FrameNumber, _frame.InputData);
+	RenderedFrame convertedFrame((void*)outputBuffer, frameSize.Width, frameSize.Height, _frame.Scale, _frame.FrameNumber, std::move(_frame.InputData));
 
 	double aspectRatio = _emu->GetSettings()->GetAspectRatio(_emu->GetRegion(), _baseFrameSize);
 	if (frameSize.Height != _lastFrameSize.Height || frameSize.Width != _lastFrameSize.Width || aspectRatio != _lastAspectRatio) {
@@ -188,7 +188,7 @@ void VideoDecoder::UpdateFrame(RenderedFrame frame, bool sync, bool forRewind) {
 
 	_emu->OnBeforeSendFrame();
 
-	_frame = frame;
+	_frame = std::move(frame);
 	if (sync) {
 		DecodeFrame(forRewind);
 	} else {
