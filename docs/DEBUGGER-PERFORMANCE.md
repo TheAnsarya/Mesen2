@@ -87,6 +87,9 @@ These benchmarks remain in the suite for future reference if cache patterns chan
 - [#426](https://github.com/TheAnsarya/Nexen/issues/426) — Profiler cached pointer optimization
 - [#427](https://github.com/TheAnsarya/Nexen/issues/427) — CallstackManager ring buffer
 - [#428](https://github.com/TheAnsarya/Nexen/issues/428) — Debugger pipeline benchmarks
+- [#431](https://github.com/TheAnsarya/Nexen/issues/431) — ReverbFilter ring buffer optimization
+- [#433](https://github.com/TheAnsarya/Nexen/issues/433) — SDL ring buffer atomic fix
+- [#434](https://github.com/TheAnsarya/Nexen/issues/434) — AudioConfig const reference
 
 ## Metadata Recording Benchmarks (CDL & Pansy)
 
@@ -115,3 +118,43 @@ Recent benchmarks:
 - Track all findings in [#430](https://github.com/TheAnsarya/Nexen/issues/430)
 
 Benchmarks: `Core.Benchmarks/Debugger/AudioTimingBench.cpp`
+
+## Audio Pipeline Optimizations
+
+A deep audit of the audio pipeline (SoundMixer → SoundResampler → Effects → AudioDevice) identified several performance and correctness issues. Three have been implemented:
+
+### ReverbFilter: Ring Buffer (deque → vector)
+
+**Issue:** [#431](https://github.com/TheAnsarya/Nexen/issues/431)
+
+The ReverbFilter maintains 10 delay lines, each using `std::deque<int16_t>` with per-sample `push_back()`/`pop_front()` — approximately 8,000 heap operations per frame when reverb is enabled. `std::deque` stores data in scattered 512-byte chunks, causing cache misses on every access.
+
+**Optimization:** Replace each `std::deque` with a contiguous `std::vector<int16_t>` ring buffer using modulo arithmetic for read/write positions. `SetParameters()` pre-allocates `delay + 8192` capacity.
+
+- Eliminates per-sample heap allocations
+- Cache-friendly contiguous memory access
+- Estimated 20-40μs/frame savings when reverb is enabled
+- Zero cost when reverb is disabled
+
+### SDL Ring Buffer: Atomic Fix
+
+**Issue:** [#433](https://github.com/TheAnsarya/Nexen/issues/433)
+
+The SDL audio backend (`SdlSoundManager`) shares a ring buffer between the SDL callback thread (reads) and the emulation thread (writes). The `_writePosition` and `_readPosition` members were plain `uint32_t` with no synchronization — a data race (undefined behavior in C++).
+
+**Fix:** Changed both to `std::atomic<uint32_t>`. On x86 this compiles to identical instructions (natural alignment provides atomicity) but provides the required memory ordering guarantees for correct behavior on all architectures.
+
+### AudioConfig Const Reference
+
+**Issue:** [#434](https://github.com/TheAnsarya/Nexen/issues/434)
+
+`SoundMixer::PlayAudioBuffer()` and `GetMasterVolume()` copied the entire `AudioConfig` struct (~224 bytes) by value on every call. Changed to `const AudioConfig&` to avoid unnecessary per-frame copies.
+
+### Remaining Findings (Not Yet Implemented)
+
+| Finding | File | Priority | Notes |
+|---------|------|----------|-------|
+| Equalizer 20-band double-precision | Equalizer.cpp | Medium | Disabled by default; SIMD would help |
+| HermiteResampler vector realloc | HermiteResampler.h | Medium | Rare in practice |
+| CrossFeedFilter int16_t overflow | CrossFeedFilter.cpp | Low | Correctness bug, not performance |
+| DirectSound deprecated API | SoundManager.cpp | Low | Works fine; WASAPI migration future work |

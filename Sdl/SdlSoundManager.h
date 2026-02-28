@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "SDL.h"
 #include "Core/Shared/Audio/BaseSoundManager.h"
+#include <atomic>
 
 class Emulator;
 
@@ -38,6 +39,6 @@ private:
 	uint16_t _previousLatency = 0;
 
 	uint8_t* _buffer = nullptr;
-	uint32_t _writePosition = 0;
-	uint32_t _readPosition = 0;
+	std::atomic<uint32_t> _writePosition{0};
+	std::atomic<uint32_t> _readPosition{0};
 };

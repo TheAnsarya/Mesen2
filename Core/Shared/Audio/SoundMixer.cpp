@@ -63,7 +63,7 @@ void SoundMixer::PlayAudioBuffer(int16_t* samples, uint32_t sampleCount, uint32_
 
 	EmuSettings* settings = _emu->GetSettings();
 	AudioPlayerHud* audioPlayer = _emu->GetAudioPlayerHud();
-	AudioConfig cfg = settings->GetAudioConfig();
+	const AudioConfig& cfg = settings->GetAudioConfig();
 	bool isRecording = _waveRecorder || _emu->GetVideoRenderer()->IsRecording();
 
 	uint32_t masterVolume = audioPlayer ? audioPlayer->GetVolume() : cfg.MasterVolume;
@@ -163,7 +163,7 @@ void SoundMixer::PlayAudioBuffer(int16_t* samples, uint32_t sampleCount, uint32_
 }
 
 void SoundMixer::ProcessEqualizer(int16_t* samples, uint32_t sampleCount, uint32_t targetRate) {
-	AudioConfig cfg = _emu->GetSettings()->GetAudioConfig();
+	const AudioConfig& cfg = _emu->GetSettings()->GetAudioConfig();
 	if (!_equalizer) {
 		_equalizer.reset(new Equalizer());
 	}
