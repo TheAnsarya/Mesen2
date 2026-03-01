@@ -894,4 +894,16 @@ public enum ActionType {
 	AutoSaveStates,
 	AutoSavePansy,
 	SavePansyOnUnload,
+
+	/// <summary>
+	/// Export game package (.nexen-pack.zip) with ROM, saves, CDL, Pansy, etc.
+	/// </summary>
+	[IconFile("Export")]
+	ExportGamePackage,
+
+	/// <summary>
+	/// Open the GamePacks output folder in the system file explorer.
+	/// </summary>
+	[IconFile("Folder")]
+	OpenGamePacksFolder,
 }

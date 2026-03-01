@@ -1904,6 +1904,10 @@ E
 		<Message ID="InstallHdPackConfirmOverwrite">The destination folder ({0}) already exists - are you sure you want to overwrite it?</Message>
 		<Message ID="InstallHdPackConfirmReset">The HD Pack has been installed successfully. Do you want to reset the game and load the HD Pack now?</Message>
 
+		<Message ID="GamePackageExported">Game package exported successfully: {0}</Message>
+		<Message ID="GamePackageExportFailed">Failed to export game package. No ROM is currently loaded.</Message>
+		<Message ID="GamePackageExportError">An error occurred while exporting the game package: &#xA;&#xA;{0}</Message>
+
 		<Message ID="Player">Player</Message>
 
 		<Message ID="HexEditor_Location">Location: ${0}</Message>
@@ -3767,6 +3771,8 @@ E
 			<Value ID="AutoSaveStates">Auto Save States</Value>
 			<Value ID="AutoSavePansy">Auto Save Pansy Data</Value>
 			<Value ID="SavePansyOnUnload">Save Pansy on ROM Unload</Value>
+			<Value ID="ExportGamePackage">Export Game Package...</Value>
+			<Value ID="OpenGamePacksFolder">Open Game Packs Folder</Value>
 		</Enum>
 	</Enums>
 </Resources>

@@ -944,6 +944,18 @@ public sealed class MainMenuViewModel : ViewModelBase {
 			new ShortcutMenuAction(EmulatorShortcut.TakeScreenshot) {
 				ActionType = ActionType.TakeScreenshot,
 			},
+
+			new MenuSeparator(),
+
+			new SimpleMenuAction() {
+				ActionType = ActionType.ExportGamePackage,
+				IsEnabled = () => EmulatorState.Instance.IsRomLoaded,
+				OnClick = () => ExportGamePackage(wnd)
+			},
+			new SimpleMenuAction() {
+				ActionType = ActionType.OpenGamePacksFolder,
+				OnClick = () => GamePackageExporter.OpenGamePacksFolder()
+			},
 		];
 	}
 
@@ -1283,6 +1295,20 @@ public sealed class MainMenuViewModel : ViewModelBase {
 				Dispatcher.UIThread.Post(() => NexenMsgBox.Show(null, "NexenUpToDate", MessageBoxButtons.OK, MessageBoxIcon.Info));
 			}
 		});
+	}
+
+	private async void ExportGamePackage(Window wnd) {
+		try {
+			string? outputPath = await GamePackageExporter.ExportAsync();
+			if (outputPath is not null) {
+				string filename = Path.GetFileName(outputPath);
+				DisplayMessageHelper.DisplayMessage("Tools", ResourceHelper.GetMessage("GamePackageExported", filename));
+			} else {
+				await NexenMsgBox.Show(wnd, "GamePackageExportFailed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+		} catch (Exception ex) {
+			await NexenMsgBox.Show(wnd, "GamePackageExportError", MessageBoxButtons.OK, MessageBoxIcon.Error, ex.Message);
+		}
 	}
 
 	private async void InstallHdPack(Window wnd) {
