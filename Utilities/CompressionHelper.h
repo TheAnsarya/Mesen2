@@ -41,7 +41,7 @@ public:
 	/// Uses compressBound() to allocate worst-case buffer size.
 	/// Allocates temporary buffer (deleted after compression).
 	/// </remarks>
-	static void Compress(string data, int compressionLevel, vector<uint8_t>& output) {
+	static void Compress(const string& data, int compressionLevel, vector<uint8_t>& output) {
 		unsigned long compressedSize = compressBound((unsigned long)data.size());
 
 		uint32_t originalSize = (uint32_t)data.size();
