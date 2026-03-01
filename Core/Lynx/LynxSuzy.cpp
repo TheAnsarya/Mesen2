@@ -14,7 +14,6 @@ void LynxSuzy::Init(Emulator* emu, LynxConsole* console, LynxMemoryManager* memo
 	_cart = cart;
 
 	_state = {};
-	std::fill_n(_lineBuffer, LynxConstants::ScreenWidth, uint8_t{0});
 
 	_state.Joystick = 0xff; // All buttons released (active-low)
 	_state.Switches = 0xff;
@@ -121,6 +120,13 @@ void LynxSuzy::ProcessSpriteChain() {
 	// terminates. Conversely, $0100 would NOT terminate (upper byte = $01).
 	while ((scbAddr >> 8) != 0 && spriteCount < 256) { // Safety limit
 		ProcessSprite(scbAddr);
+
+		// StopOnCurrent: software can set this mid-chain (e.g., in an IRQ
+		// handler) to halt sprite processing after the current sprite.
+		if (_state.StopOnCurrent) {
+			break;
+		}
+
 		// Read next SCB pointer from SCB offset 3-4 (after CTL0, CTL1, COLL)
 		scbAddr = ReadRam16(scbAddr + 3);
 		spriteCount++;
@@ -480,7 +486,9 @@ void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 		}
 	}
 
-	// EVERON tracking: set high bit of collision byte if sprite was never on-screen
+	// EVERON tracking: set high bit of collision byte if sprite was never on-screen.
+	// This must happen while _spriteProcessingActive is still true so that
+	// the ReadRam/WriteRam bus cycles are counted in _spriteBusCycles.
 	if (_state.EverOn) {
 		uint16_t collDep = (scbAddr + _state.CollOffset) & 0xFFFF;
 		uint8_t colDat = ReadRam(collDep);

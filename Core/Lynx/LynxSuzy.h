@@ -41,8 +41,7 @@ private:
 
 	LynxSuzyState _state = {};
 
-	/// <summary>Per-scanline buffer for sprite pixel writes.</summary>
-	uint8_t _lineBuffer[LynxConstants::ScreenWidth] = {};
+
 
 	/// <summary>Max collision number encountered during current sprite rendering.
 	/// Reset to 0 at start of each sprite; written to depositary (SCBAddr + CollOffset)
