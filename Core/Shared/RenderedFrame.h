@@ -89,12 +89,12 @@ struct RenderedFrame {
 	/// <param name="frameNumber">Frame counter value</param>
 	/// <param name="inputData">Controller input state for this frame</param>
 	/// <param name="videoPhase">Interlaced field indicator (default 0=progressive)</param>
-	RenderedFrame(void* buffer, uint32_t width, uint32_t height, double scale, uint32_t frameNumber, vector<ControllerData> inputData, uint32_t videoPhase = 0) : FrameBuffer(buffer),
-	                                                                                                                                                              Data(nullptr),
-	                                                                                                                                                              Width(width),
-	                                                                                                                                                              Height(height),
-	                                                                                                                                                              Scale(scale),
-	                                                                                                                                                              FrameNumber(frameNumber),
-	                                                                                                                                                              VideoPhase(videoPhase),
-	                                                                                                                                                              InputData(std::move(inputData)) {}
+	RenderedFrame(void* buffer, uint32_t width, uint32_t height, double scale, uint32_t frameNumber, const vector<ControllerData>& inputData, uint32_t videoPhase = 0) : FrameBuffer(buffer),
+	                                                                                                                                                                     Data(nullptr),
+	                                                                                                                                                                     Width(width),
+	                                                                                                                                                                     Height(height),
+	                                                                                                                                                                     Scale(scale),
+	                                                                                                                                                                     FrameNumber(frameNumber),
+	                                                                                                                                                                     VideoPhase(videoPhase),
+	                                                                                                                                                                     InputData(inputData) {}
 };

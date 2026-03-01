@@ -306,6 +306,59 @@ Continue working on these tests and issues; continue;
 
 [Nexen] (Lynx) Check the Lynx code for problems, testing coverage, performance benchmarks, etc, and fix the problems; Make/update Atari Lynx manual testing documentation so we check if it works; continue;
 
+[Nexen] (Lynx) Awesome job! Continue working through the remaining problems you found, make sure you are creating github issues for all work and try to make those issues **before** you do the changes, like make all 16 issues and then work on the changes, and then update the issues after the code/documentation changes are implemented, update plans, isuues, documentation, chat/session logs, etc, and cover all changes with tests and add performance benchmarks when helpful; continue;
+
+[Nexen] (Lynx) make sure all 24 problems have been fixed and have tests added, and performance benchmarks, and continue; update plans, issues, documentation, chat/session logs, etc; continue;
+
+[Nexen] Make more Tests (correctness of everything! reference external Lynx technical docs) and performance Benchmarks (speed and memory and allocation!) and create countless documentation sections (and update `readme.md`) and update chat/session logs and todos, and make the Atari Lynx emulator super accurate and fully tested and with no problems, fix issues and everything and analyze both Core and UI for problems with the Lynx code, does Movie/TAS work with Lynx? Are all Atari Lynx joypad buttons represented in the TAS/Movie input file? fix it!; continue;
+
+{Nexen] I was playing Nexen (an NES game, `Dragon Warrior 4`) but I got Audio problems and every now and then it would slow down, and I could never run the emulator at like 2x or 3x or whatever speed, are our changes slowing down emulation? Our saving of state and pansy and auto-saves, etc, make issues and plans, etc, to fix these performance problems so we don't slow down emulation ever; continue;
+
+[Nexen] continue fixing these performance problems and issues and make issues and find bottlenecks and manke pansy recording, etc, not affect emulator speed; emulator performance is the most important thing, find more performant datastructures for adding pansy information and cdl etc; continue;
+
+[Nexen] continue working issues and making new ones; git commit; emulator performance is the most important thing; get rid of sound and speed and processing hiccups; you mentioned that `The heavyweight debugger pipeline adds 200-700ns per instruction for CDL that only needs ~15ns` and we want to reduce that time for the `heavyweight debugger pipeline` so make a ton of benchmarks and find more efficient ways to accomplish those recording issues, there are faster datastructures and code algorithms for saving the info, make before and after benchmarks, and tests, and performance improvements; make plans and issues and tests and benchmarks and documentation/documents/instructions/readmes/etc; git commit; continue;
+
+[Nexen] continue working issues and making new ones; git commit; emulator performance is the most important thing; get rid of sound and speed and processing hiccups; you mentioned that `The heavyweight debugger pipeline adds 200-700ns per instruction for CDL that only needs ~15ns` and we want to reduce that time for the `heavyweight debugger pipeline` so make a ton of benchmarks and find more efficient ways to accomplish those recording issues, there are faster datastructures and code algorithms for saving the info, make before and after benchmarks, and tests, and performance improvements; make plans and issues and tests and benchmarks and documentation/documents/instructions/readmes/etc; git commit; continue fixing these performance problems and issues and make issues and find bottlenecks and manke pansy recording, etc, not affect emulator speed; emulator performance is the most important thing, find more performant datastructures for adding pansy information and cdl etc; continue;
+
+[Nexen] continue working issues and making new ones; git commit; emulator performance is the most important thing; get rid of sound and speed and processing hiccups; continue;
+
+continue;
+
+continue working issues and make new ones; go!; continue;
+
+continue working issues and make new ones; go!; continue;
+
+I have already updated my premium budget, stick with Claude 4.6; continue working issues and make new ones; go!; continue; also merge current branch into main; continue;
+
+continue working issues and make new ones; go!; continue; also merge current branch into main and then close this branch, work in main/master for a while; continue;
+
+[Nexen] I forgot to mention benchmarking, make sure we are making benchmarks for performance improvements to prove the theoretical gain when we make code changes, go back through recent performance gains and make benchmarks show the before and after when you can easily do that; update documentaion and plans; continue working issues and make new ones, increase performance and lower memory usage/allocation, and make the `pansy` information tracking doesn't slow us down (for example, we don't need to update the data structure every single time a jump occurs with the same address destination make spend a few megabytes of memory to track recent updates so we don't re-fire those events (only do that if it would help, if you do implement it, benchmark it)); go!; continue;
+
+For `#453 — DebugHud flat buffer for pixel tracking (LOW priority, debug-only path)` is that build-as-debug-not-release build debug or is that the internal debug when emulating games?
+
+[Nexen] ok then i don't care about that; continue working performance issues then, especially those related to `pansy` and auto-saving, etc; and make an easy way in the menu to download/save a game package with the rom, recent save states, cdl, pansy file, etc, everything this emulator creates for my current play experience, bundle it into a zip file package, named "{rom file name} ({yyyy-MM-dd-hh-mm-ss}).nexen-pack.zip" and put this in an easily accesible folder; make this work, and then improve performance; and update documentation for `{rom file name} ({yyyy-MM-dd-hh-mm-ss}).nexen-pack.zip`; benchmarks and docs and tests and issues, performance increases and make everything faster and less blocking than ever before, do in-emulator debug HUD stuff too; continue;
+
+don't spiral or circle, exit early and documentat it for later work, continue;
+
+continue working issues and make new ones; go!; continue;
+
+[Nexen] I want to remphasize (and make sure it's in the copilot instructions) that we can never ever sacrifice ***emulator accuracy*** these performance boosts are awesome and necessary but make sure we are testing everything as well as benchmarking so that our changes make things better but don't mess up emulation; continue working issues and make new ones; go!; continue;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

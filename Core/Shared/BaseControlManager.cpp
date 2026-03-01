@@ -51,14 +51,14 @@ void BaseControlManager::UnregisterInputRecorder(IInputRecorder* provider) {
 	vec.erase(std::remove(vec.begin(), vec.end(), provider), vec.end());
 }
 
-vector<ControllerData> BaseControlManager::GetPortStates() {
-	vector<ControllerData> states;
+const vector<ControllerData>& BaseControlManager::GetPortStates() {
+	_portStatesBuffer.clear();
 	for (shared_ptr<BaseControlDevice>& device : _controlDevices) {
-		states.push_back({device->GetControllerType(),
-		                  device->GetRawState(),
-		                  device->GetPort()});
+		_portStatesBuffer.push_back({device->GetControllerType(),
+		                             device->GetRawState(),
+		                             device->GetPort()});
 	}
-	return states;
+	return _portStatesBuffer;
 }
 
 shared_ptr<BaseControlDevice> BaseControlManager::GetControlDevice(uint8_t port, uint8_t subPort) {

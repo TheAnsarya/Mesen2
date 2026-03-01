@@ -148,7 +148,7 @@ DllExport void __stdcall GetControllerStates(ControllerStateInterop* buffer, uin
 		return;
 	}
 
-	vector<ControllerData> states = controlManager->GetPortStates();
+	const vector<ControllerData>& states = controlManager->GetPortStates();
 	*count = (uint32_t)std::min(states.size(), (size_t)8);
 
 	for (size_t i = 0; i < *count; i++) {

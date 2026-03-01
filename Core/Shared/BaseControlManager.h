@@ -69,6 +69,7 @@ protected:
 	SimpleLock _deviceLock;                                ///< Device list lock
 	vector<shared_ptr<BaseControlDevice>> _systemDevices;  ///< System devices (power, reset)
 	vector<shared_ptr<BaseControlDevice>> _controlDevices; ///< Controllers
+	vector<ControllerData> _portStatesBuffer;              ///< Reusable buffer for GetPortStates (avoids per-frame alloc)
 	uint32_t _pollCounter = 0;                             ///< Total input polls
 	uint32_t _lagCounter = 0;                              ///< Lag frame counter
 	bool _wasInputRead = false;                            ///< Input polled this frame flag
@@ -168,8 +169,8 @@ public:
 	/// <returns>Controller device instance</returns>
 	virtual shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) = 0;
 
-	/// <summary>Get controller states for all ports</summary>
-	vector<ControllerData> GetPortStates();
+	/// <summary>Get controller states for all ports (returns ref to internal reusable buffer)</summary>
+	const vector<ControllerData>& GetPortStates();
 
 	/// <summary>
 	/// Get controller device by port.
