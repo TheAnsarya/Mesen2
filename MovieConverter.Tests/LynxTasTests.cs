@@ -203,10 +203,10 @@ public class LynxTasTests {
 	}
 
 	[Fact]
-	public void FrameRate_Lynx_PAL_FallsToDefault() {
-		// Lynx is region-free — PAL falls to default 50.0 in the switch
+	public void FrameRate_Lynx_PAL_StillIs75FPS() {
+		// Lynx is region-free — always 75 Hz regardless of region setting
 		var movie = new MovieData { SystemType = SystemType.Lynx, Region = RegionType.PAL };
-		Assert.Equal(50.0, movie.FrameRate);
+		Assert.Equal(75.0, movie.FrameRate);
 	}
 
 	// ========================================================================
