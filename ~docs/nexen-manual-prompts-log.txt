@@ -356,7 +356,9 @@ fix all the warnings in the file;
 
 [Nexen] There are many pull requests (`https://github.com/SourMesen/Mesen2/pulls`) for the Mesen version we forked from, please review and analyze the pull requests and make an issue in guthub for evaluating and researching each and every one and then after processing all the requests implement them if the code fix would still improve the emulator and don't just apply the code fixes because we've radically changed the code already, but rather re-implement the changes using the old code changes as reference; create a `Mesen Pull Requests.md` file with complete documentation for every pull request and what it means and what we've done about it, and keep thqat file up to date as we work through the PRs; and make comprehensive documentation about each PR as we fix or ignore it ; continue;
 
+only do the open PRS, old closed prs don't matter; continue working;
 
+[Nexen] continue making issues for each open PR and analyzing them and implementing new fixes; continue;
 
 
 

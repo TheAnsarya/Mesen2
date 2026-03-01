@@ -42,6 +42,20 @@ public partial class HexEditor {
 		private SKFont? _altFont;
 		private SKPaint? _selectedPaint;
 
+		// Static typeface cache — SKTypeface.FromFamilyName() uses FontConfig on Linux,
+		// which is extremely slow. Caching avoids per-frame overhead. (Mesen2 PR #85)
+		private static string? _cachedFontFamily;
+		private static SKTypeface? _cachedTypeface;
+
+		private static SKTypeface GetCachedTypeface(string fontFamily) {
+			if (_cachedTypeface == null || _cachedFontFamily != fontFamily) {
+				_cachedTypeface?.Dispose();
+				_cachedTypeface = SKTypeface.FromFamilyName(fontFamily);
+				_cachedFontFamily = fontFamily;
+			}
+			return _cachedTypeface;
+		}
+
 		/// <summary>
 		/// Precomputed hex strings for all 256 byte values in both uppercase ("X2") and
 		/// lowercase ("x2") formats. Eliminates per-byte ToString(_hexFormat) allocation
@@ -99,8 +113,8 @@ public partial class HexEditor {
 				}
 			}
 
-			// Cache typeface and fonts (expensive to create repeatedly)
-			_typeface = SKTypeface.FromFamilyName(_fontFamily);
+			// Cache typeface and fonts (expensive to create repeatedly, especially on Linux)
+			_typeface = GetCachedTypeface(_fontFamily);
 			_monoFont = new SKFont(_typeface, _fontSize);
 			SetFontProperties(_monoFont);
 

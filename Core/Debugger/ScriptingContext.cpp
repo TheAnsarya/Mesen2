@@ -98,14 +98,15 @@ bool ScriptingContext::LoadScript(string scriptName, string path, string scriptC
 		}
 	}
 
-	if (lua_isstring(_lua, -1)) {
-		ProcessLuaError();
-	}
+	ProcessLuaError();
 	return false;
 }
 
 void ScriptingContext::ProcessLuaError() {
-	string errorMsg = lua_tostring(_lua, -1);
+	// Use luaL_tolstring instead of lua_tostring — safely converts any Lua value
+	// to a string (lua_tostring returns NULL for non-string/number types, which
+	// would crash when assigned to std::string). Fixes: Mesen2 PR #76.
+	string errorMsg = luaL_tolstring(_lua, -1, nullptr);
 	if (StringUtilities::Contains(errorMsg, "attempt to call a nil value (global 'require')") || StringUtilities::Contains(errorMsg, "attempt to index a nil value (global 'os')") || StringUtilities::Contains(errorMsg, "attempt to index a nil value (global 'io')")) {
 		Log("I/O and OS libraries are disabled by default for security.\nYou can enable them here:\nScript->Settings->Script Window->Restrictions->Allow access to I/O and OS functions.");
 	} else if (StringUtilities::Contains(errorMsg, "module 'socket.core' not found")) {
@@ -113,7 +114,8 @@ void ScriptingContext::ProcessLuaError() {
 	} else {
 		Log(errorMsg);
 	}
-	lua_pop(_lua, 1);
+	// luaL_tolstring pushes a string representation, so pop both it and the original value
+	lua_pop(_lua, 2);
 }
 
 void ScriptingContext::ExecutionCountHook(lua_State* lua) {

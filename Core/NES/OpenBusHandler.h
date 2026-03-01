@@ -67,9 +67,9 @@ public:
 	}
 
 	/// <summary>Gets the internal open bus value.</summary>
-	/// <returns>Last internal bus value (same as external currently).</returns>
+	/// <returns>Last internal bus value.</returns>
 	__forceinline uint8_t GetInternalOpenBus() {
-		return _externalOpenBus;
+		return _internalOpenBus;
 	}
 
 	/// <summary>

@@ -42,6 +42,9 @@ struct Cx4Cache {
 	/// <summary>Cache is enabled when true.</summary>
 	bool Enabled;
 
+	/// <summary>Cache preload mode — skip address match check and force load.</summary>
+	bool Preload;
+
 	/// <summary>Currently active cache page (0 or 1).</summary>
 	uint8_t Page;
 
