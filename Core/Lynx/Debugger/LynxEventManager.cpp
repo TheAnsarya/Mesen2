@@ -23,7 +23,7 @@ LynxEventManager::LynxEventManager(Debugger* debugger, LynxConsole* console) {
 LynxEventManager::~LynxEventManager() = default;
 
 void LynxEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Flags = static_cast<uint32_t>(EventFlags::ReadWriteOp);
 	evt.Operation = operation;
@@ -32,18 +32,16 @@ void LynxEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operat
 	evt.BreakpointId = breakpointId;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _debugger->GetProgramCounter(CpuType::Lynx, true);
-	_debugEvents.push_back(evt);
 }
 
 void LynxEventManager::AddEvent(DebugEventType type) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Scanline = _mikey->GetState().CurrentScanline;
 	evt.Cycle = static_cast<uint16_t>(_cpu->GetCycleCount() % LynxConstants::CpuCyclesPerScanline);
 	evt.BreakpointId = -1;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _cpu->GetState().PC;
-	_debugEvents.push_back(evt);
 }
 
 DebugEventInfo LynxEventManager::GetEvent(uint16_t y, uint16_t x) {

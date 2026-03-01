@@ -614,7 +614,7 @@ public:
 	/// <summary>
 	/// Log debug message to debugger.
 	/// </summary>
-	__forceinline void DebugLog(string log) {
+	__forceinline void DebugLog(const string& log) {
 		if (_debugger) {
 			_debugger->Log(log);
 		}

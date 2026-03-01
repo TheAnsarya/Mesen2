@@ -102,7 +102,7 @@ public:
 	/// Thread-safe. Logs accumulate in memory until ClearLog() called.
 	/// Use LogDebug() macro for debug-only logging.
 	/// </remarks>
-	static void Log(string message = "");
+	static void Log(const string& message = "");
 
 	/// <summary>Clear in-memory log buffer</summary>
 	static void ClearLog();

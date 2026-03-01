@@ -22,7 +22,7 @@ SmsEventManager::SmsEventManager(Debugger* debugger, SmsConsole* console, SmsCpu
 SmsEventManager::~SmsEventManager() = default;
 
 void SmsEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Flags = (uint32_t)EventFlags::ReadWriteOp;
 	evt.Operation = operation;
@@ -69,18 +69,16 @@ void SmsEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operati
 	}
 
 	evt.ProgramCounter = _debugger->GetProgramCounter(CpuType::Sms, true);
-	_debugEvents.push_back(evt);
 }
 
 void SmsEventManager::AddEvent(DebugEventType type) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Scanline = _vdp->GetScanline();
 	evt.Cycle = _vdp->GetCycle();
 	evt.BreakpointId = -1;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _cpu->GetState().PC;
-	_debugEvents.push_back(evt);
 }
 
 DebugEventInfo SmsEventManager::GetEvent(uint16_t y, uint16_t x) {

@@ -21,7 +21,7 @@ GbEventManager::GbEventManager(Debugger* debugger, GbCpu* cpu, GbPpu* ppu) {
 GbEventManager::~GbEventManager() = default;
 
 void GbEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Flags = (uint32_t)EventFlags::ReadWriteOp;
 	evt.Operation = operation;
@@ -30,18 +30,16 @@ void GbEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operatio
 	evt.BreakpointId = breakpointId;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _debugger->GetProgramCounter(CpuType::Gameboy, true);
-	_debugEvents.push_back(evt);
 }
 
 void GbEventManager::AddEvent(DebugEventType type) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Scanline = _ppu->GetState().Scanline;
 	evt.Cycle = _ppu->GetState().Cycle;
 	evt.BreakpointId = -1;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _cpu->GetState().PC;
-	_debugEvents.push_back(evt);
 }
 
 DebugEventInfo GbEventManager::GetEvent(uint16_t y, uint16_t x) {

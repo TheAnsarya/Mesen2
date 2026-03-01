@@ -31,7 +31,7 @@ PceEventManager::PceEventManager(Debugger* debugger, PceConsole* console) {
 PceEventManager::~PceEventManager() = default;
 
 void PceEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Flags = (uint32_t)EventFlags::ReadWriteOp;
 	evt.Operation = operation;
@@ -54,19 +54,16 @@ void PceEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operati
 			}
 		}
 	}
-
-	_debugEvents.push_back(evt);
 }
 
 void PceEventManager::AddEvent(DebugEventType type) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Scanline = _vdc->GetScanline();
 	evt.Cycle = _vdc->GetHClock();
 	evt.BreakpointId = -1;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _cpu->GetState().PC;
-	_debugEvents.push_back(evt);
 }
 
 DebugEventInfo PceEventManager::GetEvent(uint16_t y, uint16_t x) {

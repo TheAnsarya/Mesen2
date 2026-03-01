@@ -29,7 +29,7 @@ NesEventManager::~NesEventManager() = default;
 
 void NesEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
 	BaseNesPpu* ppu = _console->GetPpu();
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Operation = operation;
 	evt.Scanline = (int16_t)ppu->GetCurrentScanline();
@@ -74,8 +74,6 @@ void NesEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operati
 				break;
 		}
 	}
-
-	_debugEvents.push_back(evt);
 }
 
 void NesEventManager::AddEvent(DebugEventType type) {
@@ -85,7 +83,7 @@ void NesEventManager::AddEvent(DebugEventType type) {
 	}
 
 	BaseNesPpu* ppu = _console->GetPpu();
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Operation = op;
 	evt.Scanline = (int16_t)ppu->GetCurrentScanline();
@@ -93,7 +91,6 @@ void NesEventManager::AddEvent(DebugEventType type) {
 	evt.BreakpointId = -1;
 	evt.ProgramCounter = _cpu->GetState().PC;
 	evt.DmaChannel = -1;
-	_debugEvents.push_back(evt);
 }
 
 void NesEventManager::ClearFrameEvents() {

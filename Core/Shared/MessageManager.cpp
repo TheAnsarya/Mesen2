@@ -166,18 +166,19 @@ void MessageManager::DisplayMessage(string title, string message, string param1,
 	}
 }
 
-void MessageManager::Log(string message) {
+void MessageManager::Log(const string& message) {
 	auto lock = _logLock.AcquireSafe();
 	if (message.empty()) {
-		message = "------------------------------------------------------";
+		_log.push_back("------------------------------------------------------");
+	} else {
+		_log.push_back(message);
 	}
-	if (_log.size() >= 1000) {
+	if (_log.size() > 1000) {
 		_log.pop_front();
 	}
-	_log.push_back(message);
 
 	if (_outputToStdout) {
-		std::cout << message << std::endl;
+		std::cout << (message.empty() ? _log.back() : message) << '\n';
 	}
 }
 

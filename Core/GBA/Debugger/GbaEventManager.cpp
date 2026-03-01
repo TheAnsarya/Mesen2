@@ -25,7 +25,7 @@ GbaEventManager::GbaEventManager(Debugger* debugger, GbaCpu* cpu, GbaPpu* ppu, G
 GbaEventManager::~GbaEventManager() = default;
 
 void GbaEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 
 	uint16_t cycle = _ppu->GetCycle();
 	uint16_t scanline = _ppu->GetScanline();
@@ -46,18 +46,16 @@ void GbaEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operati
 	}
 
 	evt.ProgramCounter = _debugger->GetProgramCounter(CpuType::Gba, true);
-	_debugEvents.push_back(evt);
 }
 
 void GbaEventManager::AddEvent(DebugEventType type) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Scanline = _ppu->GetScanline();
 	evt.Cycle = _ppu->GetCycle();
 	evt.BreakpointId = -1;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _debugger->GetProgramCounter(CpuType::Gba, true);
-	_debugEvents.push_back(evt);
 }
 
 DebugEventInfo GbaEventManager::GetEvent(uint16_t y, uint16_t x) {

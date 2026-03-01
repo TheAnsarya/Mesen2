@@ -22,7 +22,7 @@ WsEventManager::WsEventManager(Debugger* debugger, WsConsole* console, WsCpu* cp
 WsEventManager::~WsEventManager() = default;
 
 void WsEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Flags = (uint32_t)EventFlags::ReadWriteOp;
 	evt.Operation = operation;
@@ -32,18 +32,16 @@ void WsEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operatio
 	evt.DmaChannel = -1;
 
 	evt.ProgramCounter = _debugger->GetProgramCounter(CpuType::Ws, true);
-	_debugEvents.push_back(evt);
 }
 
 void WsEventManager::AddEvent(DebugEventType type) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Scanline = _ppu->GetScanline();
 	evt.Cycle = _ppu->GetCycle();
 	evt.BreakpointId = -1;
 	evt.DmaChannel = -1;
 	evt.ProgramCounter = _cpu->GetProgramCounter();
-	_debugEvents.push_back(evt);
 }
 
 DebugEventInfo WsEventManager::GetEvent(uint16_t y, uint16_t x) {

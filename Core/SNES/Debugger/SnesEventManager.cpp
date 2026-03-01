@@ -24,7 +24,7 @@ SnesEventManager::SnesEventManager(Debugger* debugger, SnesCpu* cpu, SnesPpu* pp
 SnesEventManager::~SnesEventManager() = default;
 
 void SnesEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Flags = (uint32_t)EventFlags::ReadWriteOp;
 	evt.Operation = operation;
@@ -40,12 +40,10 @@ void SnesEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operat
 	}
 
 	evt.ProgramCounter = _debugger->GetProgramCounter(CpuType::Snes, true);
-
-	_debugEvents.push_back(evt);
 }
 
 void SnesEventManager::AddEvent(DebugEventType type) {
-	DebugEventInfo evt = {};
+	auto& evt = _debugEvents.emplace_back();
 	evt.Type = type;
 	evt.Scanline = _ppu->GetScanline();
 	evt.Cycle = _memoryManager->GetHClock();
@@ -53,8 +51,6 @@ void SnesEventManager::AddEvent(DebugEventType type) {
 	evt.DmaChannel = -1;
 
 	evt.ProgramCounter = (_cpu->GetState().K << 16) | _cpu->GetState().PC;
-
-	_debugEvents.push_back(evt);
 }
 
 DebugEventInfo SnesEventManager::GetEvent(uint16_t y, uint16_t x) {
