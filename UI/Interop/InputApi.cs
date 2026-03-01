@@ -9,7 +9,7 @@ using ControllerInput = Nexen.MovieConverter.ControllerInput;
 [assembly: InternalsVisibleTo("Nexen.Tests")]
 [assembly: InternalsVisibleTo("Nexen.Benchmarks")]
 
-namespace Nexen.Interop; 
+namespace Nexen.Interop;
 public sealed class InputApi {
 	private const string DllPath = EmuApi.DllName;
 

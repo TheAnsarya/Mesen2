@@ -46,7 +46,7 @@ protected:
 	// $C000-$FFFF: Last 16KB bank (or mirror)
 	static uint32_t GetPrgRomOffset(uint16_t addr, [[maybe_unused]] uint32_t prgSize, bool is16K) {
 		if (addr < 0x8000) return 0xFFFFFFFF;  // Not PRG ROM
-		
+
 		uint16_t offset = addr - 0x8000;
 		if (is16K) {
 			// 16KB ROM is mirrored at $C000-$FFFF
@@ -149,9 +149,9 @@ protected:
 	static uint8_t GetMmc1PrgBank(const Mmc1State& state, uint16_t addr, uint8_t prgBankCount) {
 		uint8_t prgMode = (state.control >> 2) & 0x03;
 		uint8_t bank = state.prgBank & 0x0F;
-		
+
 		if (addr < 0x8000) return 0xFF;  // Invalid
-		
+
 		switch (prgMode) {
 			case 0:
 			case 1:
@@ -180,7 +180,7 @@ TEST_F(NesMapperTest, Mmc1_Mode3_FixedLastBank) {
 	Mmc1State state;
 	state.control = 0x0C;  // Mode 3
 	state.prgBank = 2;
-	
+
 	EXPECT_EQ(GetMmc1PrgBank(state, 0x8000, 16), 2);   // Switchable bank
 	EXPECT_EQ(GetMmc1PrgBank(state, 0xC000, 16), 15);  // Fixed last bank
 }
@@ -189,7 +189,7 @@ TEST_F(NesMapperTest, Mmc1_Mode2_FixedFirstBank) {
 	Mmc1State state;
 	state.control = 0x08;  // Mode 2
 	state.prgBank = 5;
-	
+
 	EXPECT_EQ(GetMmc1PrgBank(state, 0x8000, 16), 0);   // Fixed first bank
 	EXPECT_EQ(GetMmc1PrgBank(state, 0xC000, 16), 5);   // Switchable bank
 }
@@ -198,7 +198,7 @@ TEST_F(NesMapperTest, Mmc1_Mode0_32KBSwitching) {
 	Mmc1State state;
 	state.control = 0x00;  // Mode 0 (32KB)
 	state.prgBank = 6;  // Even bank
-	
+
 	EXPECT_EQ(GetMmc1PrgBank(state, 0x8000, 16), 6);   // Lower 16KB
 	EXPECT_EQ(GetMmc1PrgBank(state, 0xC000, 16), 7);   // Upper 16KB
 }
@@ -226,10 +226,10 @@ protected:
 		// LoROM: Data only in upper half ($8000-$FFFF) of banks $00-$7D
 		if (addr < 0x8000) return 0xFFFFFFFF;  // Not ROM space
 		if (bank >= 0x7E && bank <= 0x7F) return 0xFFFFFFFF;  // WRAM banks
-		
+
 		// Mirror banks $80-$FF to $00-$7F
 		uint8_t effectiveBank = bank & 0x7F;
-		
+
 		// Each bank contributes 32KB
 		return ((uint32_t)effectiveBank * 0x8000) + (addr - 0x8000);
 	}
@@ -244,7 +244,7 @@ protected:
 			}
 			return 0xFFFFFFFF;  // Not ROM space
 		}
-		
+
 		// Direct HiROM access
 		return ((uint32_t)(bank - 0xC0) * 0x10000) + addr;
 	}
@@ -253,10 +253,10 @@ protected:
 	static bool IsWram(uint8_t bank, uint16_t addr) {
 		// Banks $7E-$7F are always WRAM
 		if (bank >= 0x7E && bank <= 0x7F) return true;
-		
+
 		// First 8KB of banks $00-$3F mirror WRAM
 		if ((bank & 0xC0) == 0x00 && addr < 0x2000) return true;
-		
+
 		return false;
 	}
 

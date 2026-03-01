@@ -11,7 +11,7 @@ using Avalonia.Skia;
 using Nexen.Utilities;
 using SkiaSharp;
 
-namespace Nexen.Controls; 
+namespace Nexen.Controls;
 public sealed class SimpleImageViewer : Control {
 	public static readonly StyledProperty<DynamicBitmap> SourceProperty = AvaloniaProperty.Register<SimpleImageViewer, DynamicBitmap>(nameof(Source));
 	public static readonly StyledProperty<bool> UseBilinearInterpolationProperty = AvaloniaProperty.Register<SimpleImageViewer, bool>(nameof(UseBilinearInterpolation));
