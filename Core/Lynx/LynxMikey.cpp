@@ -309,9 +309,29 @@ bool LynxMikey::HasPendingIrq() const {
 	return _state.IrqPending != 0;
 }
 
-void LynxMikey::Tick(uint64_t currentCycle) {
+void LynxMikey::UpdateTickableMask(int index) {
+	uint8_t ctla = _state.Timers[index].ControlA;
+	bool enabled = (ctla & 0x08) != 0;
+	bool linked = (ctla & 0x07) == 7;
+	uint8_t bit = static_cast<uint8_t>(1 << index);
+	// Set bit if timer needs per-Tick() processing (enabled AND not linked)
+	_tickableMask = (_tickableMask & ~bit) | (bit & static_cast<uint8_t>(-static_cast<int8_t>(enabled && !linked)));
+}
+
+void LynxMikey::RecalculateTickableMask() {
 	for (int i = 0; i < 8; i++) {
+		UpdateTickableMask(i);
+	}
+}
+
+void LynxMikey::Tick(uint64_t currentCycle) {
+	// Only tick timers that are enabled and not linked (driven by cascade).
+	// Typically 2-3 of 8 timers are active, saving ~5 function calls per tick.
+	uint32_t mask = _tickableMask;
+	while (mask) {
+		int i = std::countr_zero(mask);
 		TickTimer(i, currentCycle);
+		mask &= mask - 1; // Clear lowest set bit
 	}
 }
 
@@ -579,6 +599,8 @@ void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 					} else {
 						_state.IrqEnabled &= ~(1 << timerIdx);
 					}
+					// Update tickable mask (enabled AND not linked)
+					UpdateTickableMask(timerIdx);
 					break;
 				}
 				case 2: // COUNT
@@ -802,6 +824,10 @@ void LynxMikey::Serialize(Serializer& s) {
 
 	// Frame buffer
 	SVArray(_frameBuffer, LynxConstants::ScreenWidth * LynxConstants::ScreenHeight);
+
+	// Reconstruct tickable mask from timer CTLA state after load.
+	// Not serialized — derived from timer state to avoid save-state version issues.
+	RecalculateTickableMask();
 }
 
 // ============================================================================

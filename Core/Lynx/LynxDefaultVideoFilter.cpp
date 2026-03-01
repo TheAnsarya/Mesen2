@@ -67,46 +67,63 @@ void LynxDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 
 	uint32_t srcW = LynxConstants::ScreenWidth;   // 160
 	uint32_t srcH = LynxConstants::ScreenHeight;   // 102
+	uint32_t pixelCount = srcW * srcH;
 
-	// Helper lambda to apply color adjustments when enabled
+	// When no palette adjustment is needed, skip the per-pixel lookup entirely.
+	// This eliminates a branch + lambda call per pixel (~16,320 pixels/frame).
+	if (!_useAdjustedPalette) {
+		switch (rotation) {
+			case LynxRotation::None:
+				memcpy(out, srcBuffer, pixelCount * sizeof(uint32_t));
+				break;
+
+			case LynxRotation::Left:
+				for (uint32_t y = 0; y < srcH; y++) {
+					for (uint32_t x = 0; x < srcW; x++) {
+						out[(srcW - 1 - x) * srcH + y] = srcBuffer[y * srcW + x];
+					}
+				}
+				break;
+
+			case LynxRotation::Right:
+				for (uint32_t y = 0; y < srcH; y++) {
+					for (uint32_t x = 0; x < srcW; x++) {
+						out[x * srcH + (srcH - 1 - y)] = srcBuffer[y * srcW + x];
+					}
+				}
+				break;
+		}
+		return;
+	}
+
+	// Color-adjusted path — apply palette lookup per pixel
 	auto adjustPixel = [this](uint32_t pixel) -> uint32_t {
-		if (!_useAdjustedPalette) return pixel;
-		// Extract 4-bit RGB components from the 32-bit ARGB pixel
-		uint8_t r4 = ((pixel >> 16) & 0xFF) >> 4;
-		uint8_t g4 = ((pixel >> 8) & 0xFF) >> 4;
-		uint8_t b4 = (pixel & 0xFF) >> 4;
+		uint8_t r4 = ((pixel >> 16) & 0xff) >> 4;
+		uint8_t g4 = ((pixel >> 8) & 0xff) >> 4;
+		uint8_t b4 = (pixel & 0xff) >> 4;
 		uint16_t rgb444 = (r4 << 8) | (g4 << 4) | b4;
 		return _adjustedPalette[rgb444];
 	};
 
 	switch (rotation) {
 		case LynxRotation::None:
-			// Direct copy — no rotation
-			for (uint32_t i = 0; i < srcW * srcH; i++) {
+			for (uint32_t i = 0; i < pixelCount; i++) {
 				out[i] = adjustPixel(srcBuffer[i]);
 			}
 			break;
 
 		case LynxRotation::Left:
-			// Rotate 90° counter-clockwise: output is 102×160
-			// src(x,y) → dst(y, srcW-1-x)
 			for (uint32_t y = 0; y < srcH; y++) {
 				for (uint32_t x = 0; x < srcW; x++) {
-					uint32_t dstX = y;
-					uint32_t dstY = srcW - 1 - x;
-					out[dstY * srcH + dstX] = adjustPixel(srcBuffer[y * srcW + x]);
+					out[(srcW - 1 - x) * srcH + y] = adjustPixel(srcBuffer[y * srcW + x]);
 				}
 			}
 			break;
 
 		case LynxRotation::Right:
-			// Rotate 90° clockwise: output is 102×160
-			// src(x,y) → dst(srcH-1-y, x)
 			for (uint32_t y = 0; y < srcH; y++) {
 				for (uint32_t x = 0; x < srcW; x++) {
-					uint32_t dstX = srcH - 1 - y;
-					uint32_t dstY = x;
-					out[dstY * srcH + dstX] = adjustPixel(srcBuffer[y * srcW + x]);
+					out[x * srcH + (srcH - 1 - y)] = adjustPixel(srcBuffer[y * srcW + x]);
 				}
 			}
 			break;

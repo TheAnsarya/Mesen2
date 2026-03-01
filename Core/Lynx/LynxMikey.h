@@ -58,6 +58,13 @@ private:
 
 	LynxMikeyState _state = {};
 
+	/// <summary>Bitmask of timers that need per-Tick() processing.
+	/// A bit is set when the timer is enabled (CTLA bit 3) AND not linked
+	/// (clock source != 7). Linked timers are driven by cascade only.
+	/// Updated on every CTLA write. Allows Tick() to skip 5-6 disabled/linked
+	/// timers per call (~53K calls/frame).</summary>
+	uint8_t _tickableMask = 0;
+
 	// I/O direction and data registers for EEPROM/misc I/O
 	uint8_t _ioDir = 0;   // IODIR ($FD88) — direction (1=output, 0=input)
 	uint8_t _ioData = 0;  // IODAT ($FD89) — data
@@ -145,6 +152,8 @@ private:
 
 	void TickTimer(int index, uint64_t currentCycle);
 	void CascadeTimer(int sourceIndex);
+	void UpdateTickableMask(int index);
+	void RecalculateTickableMask();
 	void UpdatePalette(int index);
 	__forceinline void UpdateIrqLine();
 	void RenderScanline();
