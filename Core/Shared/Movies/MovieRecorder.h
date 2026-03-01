@@ -26,9 +26,9 @@ private:
 	stringstream _saveStateData;
 
 	void GetGameSettings(stringstream& out);
-	void WriteString(stringstream& out, string name, string value);
-	void WriteInt(stringstream& out, string name, uint32_t value);
-	void WriteBool(stringstream& out, string name, bool enabled);
+	void WriteString(stringstream& out, const string& name, const string& value);
+	void WriteInt(stringstream& out, const string& name, uint32_t value);
+	void WriteBool(stringstream& out, const string& name, bool enabled);
 
 public:
 	MovieRecorder(Emulator* emu);

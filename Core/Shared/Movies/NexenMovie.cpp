@@ -233,7 +233,7 @@ bool NexenMovie::ApplySettings(istream& settingsData) {
 	return true;
 }
 
-uint32_t NexenMovie::LoadInt(std::unordered_map<string, string>& settings, string name, uint32_t defaultValue) {
+uint32_t NexenMovie::LoadInt(std::unordered_map<string, string>& settings, const string& name, uint32_t defaultValue) {
 	auto result = settings.find(name);
 	if (result != settings.end()) {
 		try {
@@ -247,7 +247,7 @@ uint32_t NexenMovie::LoadInt(std::unordered_map<string, string>& settings, strin
 	}
 }
 
-bool NexenMovie::LoadBool(std::unordered_map<string, string>& settings, string name) {
+bool NexenMovie::LoadBool(std::unordered_map<string, string>& settings, const string& name) {
 	auto result = settings.find(name);
 	if (result != settings.end()) {
 		if (result->second == "true") {
@@ -263,7 +263,7 @@ bool NexenMovie::LoadBool(std::unordered_map<string, string>& settings, string n
 	}
 }
 
-string NexenMovie::LoadString(std::unordered_map<string, string>& settings, string name) {
+string NexenMovie::LoadString(std::unordered_map<string, string>& settings, const string& name) {
 	auto result = settings.find(name);
 	if (result != settings.end()) {
 		return result->second;

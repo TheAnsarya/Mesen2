@@ -34,9 +34,9 @@ private:
 	void ParseSettings(stringstream& data);
 	bool ApplySettings(istream& settingsData);
 
-	uint32_t LoadInt(std::unordered_map<string, string>& settings, string name, uint32_t defaultValue = 0);
-	bool LoadBool(std::unordered_map<string, string>& settings, string name);
-	string LoadString(std::unordered_map<string, string>& settings, string name);
+	uint32_t LoadInt(std::unordered_map<string, string>& settings, const string& name, uint32_t defaultValue = 0);
+	bool LoadBool(std::unordered_map<string, string>& settings, const string& name);
+	string LoadString(std::unordered_map<string, string>& settings, const string& name);
 
 	void LoadCheats();
 	bool LoadCheat(string cheatData, CheatCode& code);
