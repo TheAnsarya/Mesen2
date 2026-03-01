@@ -43,6 +43,19 @@ private:
 
 	bool _irqPending = false;
 
+	// Precomputed NZ flag table: for each byte value 0-255, stores the correct
+	// Zero and Negative flag bits. This replaces two conditional branches per
+	// instruction in SetZeroNeg() with a single indexed lookup.
+	// Entry[0] = Zero flag (0x02); Entry[128-255] = Negative flag (0x80); else 0.
+	static constexpr auto _nzTable = [] {
+		std::array<uint8_t, 256> table{};
+		for (int i = 0; i < 256; i++) {
+			table[i] = (i == 0 ? LynxPSFlags::Zero : 0)
+			         | ((i & 0x80) ? LynxPSFlags::Negative : 0);
+		}
+		return table;
+	}();
+
 	// =========================================================================
 	// Memory Access — each access counts as one CPU cycle
 	// =========================================================================
@@ -107,8 +120,9 @@ private:
 	}
 
 	__forceinline void SetZeroNeg(uint8_t value) {
-		SetFlagValue(LynxPSFlags::Zero, value == 0);
-		SetFlagValue(LynxPSFlags::Negative, (value & 0x80) != 0);
+		// Single table lookup replaces two conditional branches.
+		// Mask out old Z+N, OR in precomputed flags for this value.
+		_state.PS = (_state.PS & ~(LynxPSFlags::Zero | LynxPSFlags::Negative)) | _nzTable[value];
 	}
 
 	// =========================================================================

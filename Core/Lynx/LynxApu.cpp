@@ -115,17 +115,20 @@ void LynxApu::ClockChannel(int ch) {
 	// Feedback taps are selected by FeedbackEnable register
 	// The feedback value is XOR of selected shift register bits
 	uint16_t sr = channel.ShiftRegister;
-	uint8_t feedback = 0;
 
-	// Each bit in FeedbackEnable selects a tap on the shift register
+	// Each bit in FeedbackEnable selects a tap on the shift register.
 	// Taps: bits 0,1,2,3,4,5,7,10 of the shift register correspond to
-	// bits 0,1,2,3,4,5,6,7 of the feedback enable register
-	static constexpr uint8_t tapBits[] = { 0, 1, 2, 3, 4, 5, 7, 10 };
-	for (int i = 0; i < 8; i++) {
-		if (channel.FeedbackEnable & (1 << i)) {
-			feedback ^= ((sr >> tapBits[i]) & 1);
-		}
-	}
+	// bits 0,1,2,3,4,5,6,7 of the feedback enable register.
+	//
+	// Branchless approach: extract the 8 non-contiguous tap bits from the
+	// shift register into a contiguous byte, AND with FeedbackEnable, then
+	// popcount parity gives the XOR reduction in one instruction.
+	uint8_t tapValues = static_cast<uint8_t>(
+		((sr >> 0) & 0x3f)         // SR bits 0-5 → byte bits 0-5
+		| (((sr >> 7) & 1) << 6)   // SR bit 7 → byte bit 6
+		| (((sr >> 10) & 1) << 7)  // SR bit 10 → byte bit 7
+	);
+	uint8_t feedback = static_cast<uint8_t>(std::popcount(static_cast<uint8_t>(tapValues & channel.FeedbackEnable)) & 1);
 
 	// Shift register: shift right, new bit enters at bit 11
 	sr = (sr >> 1) | (feedback << 11);

@@ -25,6 +25,8 @@
 #include <cctype>
 #include <cmath>
 #include <vector>
+#include <array>
+#include <bit>
 #include <unordered_map>
 #include <unordered_set>
 #include <sstream>
