@@ -8,6 +8,8 @@
 #include "Shared/EmuSettings.h"
 #include "Utilities/FastString.h"
 #include "Utilities/HexUtilities.h"
+#include "Lynx/Debugger/DummyLynxCpu.h"
+#include "Lynx/LynxMemoryManager.h"
 
 /// <summary>
 /// Operand byte size for each LynxAddrMode.
@@ -283,8 +285,46 @@ void LynxDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t m
 }
 
 EffectiveAddressInfo LynxDisUtils::GetEffectiveAddress(DisassemblyInfo& info, LynxConsole* console, LynxCpuState& state) {
-	// TODO: Implement using DummyCpu approach like PceDisUtils
-	// For now, return empty to indicate no effective address resolution
+	bool isJump = LynxDisUtils::IsUnconditionalJump(info.GetOpCode()) || LynxDisUtils::IsConditionalJump(info.GetOpCode());
+	if (isJump) {
+		return {};
+	}
+
+	bool showEffectiveAddress = false;
+	switch (_opMode[info.GetOpCode()]) {
+		case LynxAddrMode::Imp:
+		case LynxAddrMode::Acc:
+			return {};
+
+		case LynxAddrMode::Zpg:
+		case LynxAddrMode::ZpgX:
+		case LynxAddrMode::ZpgY:
+		case LynxAddrMode::IndX:
+		case LynxAddrMode::IndY:
+		case LynxAddrMode::ZpgInd:
+		case LynxAddrMode::AbsX:
+		case LynxAddrMode::AbsY:
+		case LynxAddrMode::AbsIndX:
+			showEffectiveAddress = true;
+			break;
+
+		default:
+			showEffectiveAddress = false;
+			break;
+	}
+
+	DummyLynxCpu dummyCpu(nullptr, console->GetMemoryManager());
+	dummyCpu.SetDummyState(state);
+	dummyCpu.Exec();
+
+	uint32_t count = dummyCpu.GetOperationCount();
+	for (int i = count - 1; i > 0; i--) {
+		MemoryOperationInfo opInfo = dummyCpu.GetOperationInfo(i);
+		if (opInfo.Type != MemoryOperationType::ExecOperand && opInfo.Type != MemoryOperationType::DummyRead) {
+			return {(int32_t)opInfo.Address, 1, showEffectiveAddress};
+		}
+	}
+
 	return {};
 }
 
