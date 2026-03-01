@@ -68,7 +68,7 @@ public:
 	void SetChipSelect(bool active);
 
 	/// <summary>Clock a data bit in/out. Returns the DO (data out) state.</summary>
-	bool ClockData(bool dataIn);
+	[[nodiscard]] bool ClockData(bool dataIn);
 
 	/// <summary>Get current data out pin state</summary>
 	[[nodiscard]] bool GetDataOut() const { return _state.DataOut; }

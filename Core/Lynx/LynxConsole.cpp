@@ -472,10 +472,12 @@ LynxState LynxConsole::GetState() {
 	// PPU state is synthesized from Mikey display registers and console frame count
 	state.Ppu.FrameCount = _frameCount;
 	if (_mikey) {
-		state.Ppu.Scanline = _mikey->GetState().CurrentScanline;
-		state.Ppu.DisplayAddress = _mikey->GetState().DisplayAddress;
-		state.Ppu.DisplayControl = _mikey->GetState().DisplayControl;
-		state.Ppu.LcdEnabled = (_mikey->GetState().DisplayControl & 0x01) != 0;
+		// Use already-populated state.Mikey (from GetState() call above) to
+		// avoid calling _mikey->GetState() again and copying the full struct.
+		state.Ppu.Scanline = state.Mikey.CurrentScanline;
+		state.Ppu.DisplayAddress = state.Mikey.DisplayAddress;
+		state.Ppu.DisplayControl = state.Mikey.DisplayControl;
+		state.Ppu.LcdEnabled = (state.Mikey.DisplayControl & 0x01) != 0;
 	}
 	return state;
 }

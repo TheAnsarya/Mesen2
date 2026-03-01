@@ -1115,9 +1115,13 @@ void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 		// FC0C-FC0F: VIDADR/COLLADR are read-only — writes ignored
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f: break;
 
-		// Cart access registers (FCB2-FCB3)
-		// RCART0/RCART1 are read-only on hardware. Writes here are a no-op.
-		// Handy also ignores writes to these addresses (no Poke case).
+		// Cart access registers (FCB2-FCB3) — write path
+		// In Handy, writes to RCART0/RCART1 call Poke0/Poke1 which write to
+		// cart memory (for EEPROM save) at the current address and increment
+		// the counter. This is needed for games that save to EEPROM.
+		// TODO: Implement EEPROM write support — requires writable EEPROM
+		// buffer, EEPROM protocol emulation (93C46/93C66/93C86), and
+		// persistence to disk. See #499.
 		case 0xb2:
 		case 0xb3:
 			break;
