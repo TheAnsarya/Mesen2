@@ -604,13 +604,14 @@ void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum,
 	// the display appears mirrored. This allows players to hold the Lynx
 	// upside-down (rotated 180°) for left-handed use.
 	// Fix for #415: LeftHand flag was read but never applied to coordinates.
-	if (_state.LeftHand) {
+	if (_state.LeftHand) [[unlikely]] {
 		x = static_cast<int>(LynxConstants::ScreenWidth) - 1 - x;
 	}
 
-	// Bounds check
-	if (x < 0 || x >= static_cast<int>(LynxConstants::ScreenWidth) ||
-		y < 0 || y >= static_cast<int>(LynxConstants::ScreenHeight)) {
+	// Bounds check — unsigned comparison catches negative values (they wrap
+	// to large unsigned) in a single test per axis, halving the branch count.
+	if (static_cast<unsigned>(x) >= LynxConstants::ScreenWidth ||
+		static_cast<unsigned>(y) >= LynxConstants::ScreenHeight) [[unlikely]] {
 		return;
 	}
 
@@ -672,7 +673,7 @@ void LynxSuzy::WriteSpritePixel(int x, int y, uint8_t penIndex, uint8_t collNum,
 			}
 			break;
 
-		case LynxSpriteType::Normal:
+		case LynxSpriteType::Normal: [[likely]]
 			// Type 4: Skip pen 0 for draw. Collision on ALL non-zero pixels
 			// (including 0x0E — only shadow types exclude 0x0E from collision).
 			if (writePixel != 0x00) {

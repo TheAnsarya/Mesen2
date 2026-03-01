@@ -229,7 +229,7 @@ void LynxMikey::UpdatePalette(int index) {
 	_state.Palette[index] = 0xFF000000 | (r << 16) | (g << 8) | b;
 }
 
-void LynxMikey::UpdateIrqLine() {
+__forceinline void LynxMikey::UpdateIrqLine() {
 	// On real Lynx, there's no separate IRQ enable mask register.
 	// IRQ enable/disable is controlled per-timer in each timer's CTLA bit 7.
 	// The IrqPending bits are set only when a timer with IRQ enabled fires,
@@ -240,12 +240,12 @@ void LynxMikey::UpdateIrqLine() {
 
 void LynxMikey::RenderScanline() {
 	uint16_t scanline = _state.CurrentScanline;
-	if (scanline >= LynxConstants::ScreenHeight) {
+	if (scanline >= LynxConstants::ScreenHeight) [[unlikely]] {
 		return; // VBlank period, nothing to render
 	}
 
 	// DMA not enabled check
-	if (!(_state.DisplayControl & 0x01)) {
+	if (!(_state.DisplayControl & 0x01)) [[unlikely]] {
 		return;
 	}
 

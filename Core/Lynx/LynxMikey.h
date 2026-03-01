@@ -140,13 +140,13 @@ private:
 	// Timer register layout: 4 registers per timer
 	// Timer 0-3 at $FD00-$FD0F, Timer 4-7 at $FD10-$FD1F
 	// Offset 0: BACKUP, 1: CTLA, 2: COUNT, 3: CTLB
-	__forceinline int GetTimerIndex(uint8_t addr) const;
-	__forceinline int GetTimerRegOffset(uint8_t addr) const;
+	[[nodiscard]] __forceinline int GetTimerIndex(uint8_t addr) const;
+	[[nodiscard]] __forceinline int GetTimerRegOffset(uint8_t addr) const;
 
 	void TickTimer(int index, uint64_t currentCycle);
 	void CascadeTimer(int sourceIndex);
 	void UpdatePalette(int index);
-	void UpdateIrqLine();
+	__forceinline void UpdateIrqLine();
 	void RenderScanline();
 	/// <summary>Advance UART TX/RX state by one Timer 4 tick (one bit-time).
 	/// Called from TickTimer/CascadeTimer when Timer 4 underflows (§5).

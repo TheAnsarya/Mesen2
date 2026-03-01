@@ -142,7 +142,7 @@ void LynxCpu::ADC() {
 	uint8_t operand = GetOperandValue();
 	uint8_t carry = CheckFlag(LynxPSFlags::Carry) ? 1 : 0;
 
-	if (CheckFlag(LynxPSFlags::Decimal)) {
+	if (CheckFlag(LynxPSFlags::Decimal)) [[unlikely]] {
 		// 65C02 BCD mode — correct flag behavior
 		uint8_t al = (A() & 0x0f) + (operand & 0x0f) + carry;
 		if (al > 9) al += 6;
@@ -174,7 +174,7 @@ void LynxCpu::SBC() {
 	uint8_t operand = GetOperandValue();
 	uint8_t carry = CheckFlag(LynxPSFlags::Carry) ? 0 : 1;
 
-	if (CheckFlag(LynxPSFlags::Decimal)) {
+	if (CheckFlag(LynxPSFlags::Decimal)) [[unlikely]] {
 		// 65C02 BCD subtraction
 		int8_t al = (A() & 0x0f) - (operand & 0x0f) - carry;
 		if (al < 0) al = ((al - 6) & 0x0f) | 0x80; // Borrow from high nibble

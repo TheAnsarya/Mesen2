@@ -111,8 +111,8 @@ private:
 	/// <returns>Number of pixels decoded.</returns>
 	int DecodeSpriteLinePixels(uint16_t& dataAddr, uint16_t lineEnd, int bpp, bool literalMode, uint8_t* pixelBuf, int maxPixels);
 
-	__forceinline uint8_t ReadRam(uint16_t addr);
-	__forceinline uint16_t ReadRam16(uint16_t addr);
+	[[nodiscard]] __forceinline uint8_t ReadRam(uint16_t addr);
+	[[nodiscard]] __forceinline uint16_t ReadRam16(uint16_t addr);
 	__forceinline void WriteRam(uint16_t addr, uint8_t value);
 
 public:

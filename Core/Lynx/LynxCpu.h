@@ -111,12 +111,15 @@ private:
 	// Flag Helpers
 	// =========================================================================
 
-	__forceinline bool CheckFlag(uint8_t flag) const { return (_state.PS & flag) != 0; }
+	[[nodiscard]] __forceinline bool CheckFlag(uint8_t flag) const { return (_state.PS & flag) != 0; }
 	__forceinline void SetFlag(uint8_t flag) { _state.PS |= flag; }
 	__forceinline void ClearFlag(uint8_t flag) { _state.PS &= ~flag; }
 
 	__forceinline void SetFlagValue(uint8_t flag, bool set) {
-		if (set) { _state.PS |= flag; } else { _state.PS &= ~flag; }
+		// Branchless: clear the flag bit, then OR in (flag & -set).
+		// -true == 0xFF (all bits set), -false == 0x00 (no bits).
+		// Avoids a branch on every ADC, SBC, CMP, shift, and rotate.
+		_state.PS = (_state.PS & ~flag) | (flag & static_cast<uint8_t>(-static_cast<int8_t>(set)));
 	}
 
 	__forceinline void SetZeroNeg(uint8_t value) {
@@ -129,12 +132,12 @@ private:
 	// Register Accessors
 	// =========================================================================
 
-	__forceinline uint8_t A() const { return _state.A; }
-	__forceinline uint8_t X() const { return _state.X; }
-	__forceinline uint8_t Y() const { return _state.Y; }
-	__forceinline uint16_t PC() const { return _state.PC; }
-	__forceinline uint8_t SP() const { return _state.SP; }
-	__forceinline uint8_t PS() const { return _state.PS; }
+	[[nodiscard]] __forceinline uint8_t A() const { return _state.A; }
+	[[nodiscard]] __forceinline uint8_t X() const { return _state.X; }
+	[[nodiscard]] __forceinline uint8_t Y() const { return _state.Y; }
+	[[nodiscard]] __forceinline uint16_t PC() const { return _state.PC; }
+	[[nodiscard]] __forceinline uint8_t SP() const { return _state.SP; }
+	[[nodiscard]] __forceinline uint8_t PS() const { return _state.PS; }
 
 	__forceinline void SetA(uint8_t v) { _state.A = v; SetZeroNeg(v); }
 	__forceinline void SetX(uint8_t v) { _state.X = v; SetZeroNeg(v); }
@@ -147,9 +150,9 @@ private:
 	// Operand Access
 	// =========================================================================
 
-	__forceinline uint16_t GetOperand() { return _operand; }
+	[[nodiscard]] __forceinline uint16_t GetOperand() { return _operand; }
 
-	__forceinline uint8_t GetOperandValue() {
+	[[nodiscard]] __forceinline uint8_t GetOperandValue() {
 		if (_instAddrMode >= LynxAddrMode::Zpg) {
 			return MemoryRead(GetOperand());
 		} else {
@@ -240,7 +243,7 @@ private:
 	// Page-crossing check
 	// =========================================================================
 
-	__forceinline bool CheckPageCrossed(uint16_t base, int8_t offset) {
+	[[nodiscard]] __forceinline bool CheckPageCrossed(uint16_t base, int8_t offset) {
 		return ((base + offset) & 0xff00) != (base & 0xff00);
 	}
 

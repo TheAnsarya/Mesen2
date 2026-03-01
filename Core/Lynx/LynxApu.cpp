@@ -44,7 +44,7 @@ void LynxApu::Tick(uint64_t currentCycle) {
 void LynxApu::TickChannelTimer(int ch, uint64_t currentCycle) {
 	LynxAudioChannelState& channel = _state.Channels[ch];
 
-	if (!channel.Enabled) {
+	if (!channel.Enabled) [[unlikely]] {
 		// Advance LastTick so we don't accumulate a huge delta
 		channel.LastTick = currentCycle;
 		return;
@@ -52,7 +52,7 @@ void LynxApu::TickChannelTimer(int ch, uint64_t currentCycle) {
 
 	// Check clock source — bits 0-2 of Control register
 	uint8_t clockSource = channel.Control & 0x07;
-	if (clockSource == 7) {
+	if (clockSource == 7) [[unlikely]] {
 		// Linked timer — clocked by cascade from previous channel, not master clock
 		return;
 	}
@@ -69,7 +69,7 @@ void LynxApu::TickChannelTimer(int ch, uint64_t currentCycle) {
 		// Decrement counter
 		channel.Counter--;
 
-		if (channel.Counter == 0xff) { // Underflow (wrapped from 0 to 0xFF)
+		if (channel.Counter == 0xff) [[unlikely]] { // Underflow (wrapped from 0 to 0xFF)
 			channel.Counter = channel.BackupValue;
 
 			// Clock the LFSR (actual audio generation)
@@ -94,12 +94,12 @@ void LynxApu::CascadeAudioChannel(int sourceChannel) {
 	LynxAudioChannelState& channel = _state.Channels[target];
 
 	// Only cascade if target is linked (clock source 7) and enabled
-	if (!channel.Enabled || (channel.Control & 0x07) != 7) {
+	if (!channel.Enabled || (channel.Control & 0x07) != 7) [[likely]] {
 		return;
 	}
 
 	channel.Counter--;
-	if (channel.Counter == 0xff) { // Underflow
+	if (channel.Counter == 0xff) [[unlikely]] { // Underflow
 		channel.TimerDone = true;
 		channel.Counter = channel.BackupValue;
 
