@@ -40,7 +40,7 @@ static void GenerateStereoSineWave(int16_t* buffer, size_t samplePairs, double f
 }
 
 /// <summary>Generate random noise samples</summary>
-static void GenerateNoise(int16_t* buffer, size_t count) {
+[[maybe_unused]] static void GenerateNoise(int16_t* buffer, size_t count) {
 	std::mt19937 rng(42);
 	std::uniform_int_distribution<int16_t> dist(-16000, 16000);
 	for (size_t i = 0; i < count; i++) {

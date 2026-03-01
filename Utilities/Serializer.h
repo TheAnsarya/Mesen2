@@ -158,7 +158,7 @@ private:
 				}
 			} else if constexpr (std::is_floating_point<T>::value) {
 				if (mapVal.Format == SerializeMapValueFormat::Double) {
-					value = (double)mapVal.Value.Double;
+					value = static_cast<T>(mapVal.Value.Double);
 				}
 			} else if constexpr (std::is_same<T, string>::value) {
 				if (mapVal.Format == SerializeMapValueFormat::String) {
@@ -207,7 +207,7 @@ private:
 		}
 	}
 
-	__forceinline void CheckDuplicateKey(string& key) {
+	__forceinline void CheckDuplicateKey([[maybe_unused]] string& key) {
 #ifdef DEBUG
 		if (!_usedKeys.emplace(key).second) {
 			throw std::runtime_error("Duplicate key");

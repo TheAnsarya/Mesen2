@@ -218,7 +218,7 @@ void LynxPpuTools::GetSpriteList(GetSpritePreviewOptions options, BaseState& bas
 		bool skipSprite = (sprCtl1 & 0x04) != 0;
 		bool reloadPalette = (sprCtl1 & 0x08) == 0;   // Bit 3: 0 means reload
 		int reloadDepth    = (sprCtl1 >> 4) & 0x03;    // Bits 5:4
-		bool literalMode   = (sprCtl1 & 0x80) != 0;    // Bit 7
+		[[maybe_unused]] bool literalMode = (sprCtl1 & 0x80) != 0; // Bit 7
 
 		// Data pointer at SCB offset 5-6 (always loaded)
 		uint16_t dataAddr = vram[(scbAddr + 5) & 0xFFFF] | (vram[(scbAddr + 6) & 0xFFFF] << 8);

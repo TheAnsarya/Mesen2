@@ -1752,7 +1752,6 @@ TEST_F(SnesCpuAddSubComparisonTest, Sub16_BoundaryValues_x2Carry) {
 	for (int carry = 0; carry <= 1; carry++) {
 		for (uint16_t ai : testValues) {
 			for (uint16_t vi : testValues) {
-				uint8_t value = ~vi;  // SBC uses complement
 				uint8_t ps1 = 0x00 | carry, ps2 = 0x00 | carry;
 				uint16_t a1 = ai, a2 = ai;
 

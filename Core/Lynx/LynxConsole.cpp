@@ -192,7 +192,7 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 				MessageManager::Log(std::format("  EEPROM auto-detected from database: 93C46"));
 			}
 			// Copy game title from database
-			strncpy(cartInfo.Name, dbEntry->Name, 32);
+			strncpy_s(cartInfo.Name, sizeof(cartInfo.Name), dbEntry->Name, 32);
 			cartInfo.Name[32] = 0;
 		}
 	}

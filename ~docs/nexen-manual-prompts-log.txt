@@ -348,6 +348,28 @@ continue working issues and make new ones; go!; continue;
 
 [Nexen] make sure the Atari Lynx implementation is good; continue working issues and make new ones; also work performance improvements; continue;
 
+[Nexen] show me a giant list of warnings (from compilers and linters, etc) in a text file so I can delete the warnings I don't care about and then tell you to fix all the ones in the file after I edit it; git commit everything, and then release another version of Nexen to github, updating the minor version number; Make an announcement `discord` post ***with formatting*** for this Nexen release, with all the differences since we forked from Mesen and why we did and save it in an `md` dicumentation file and show me this file;
+
+continue working on warnings, but ignore 3rd party libraries and other code we don't control;
+
+fix all the warnings in the file;
+
+[Nexen] There are many pull requests (`https://github.com/SourMesen/Mesen2/pulls`) for the Mesen version we forked from, please review and analyze the pull requests and make an issue in guthub for evaluating and researching each and every one and then after processing all the requests implement them if the code fix would still improve the emulator and don't just apply the code fixes because we've radically changed the code already, but rather re-implement the changes using the old code changes as reference; create a `Mesen Pull Requests.md` file with complete documentation for every pull request and what it means and what we've done about it, and keep thqat file up to date as we work through the PRs; and make comprehensive documentation about each PR as we fix or ignore it ; continue;
+
+
+
+
+
+
+
+
+
+
+
+[Nexen] show me a giant list of warnings (from compilers and linters, etc) in a text file so I can delete the warnings I don't care about and then tell you to fix all the ones in the file after I edit it; git commit everything, and then release another version of Nexen to github, updating the minor version number; Make an announcement `discord` post ***with formatting*** for this Nexen release, with all the differences since we forked from Mesen and why we did and save it in an `md` dicumentation file and show me this file; work performance improvements, and work on Atari Lynx, then work on performance again; always benchmarks, always tests (unit/integration/system/acceptance/etc); continue; 
+
+
+fix as many warnings as you can; continue;
 
 
 

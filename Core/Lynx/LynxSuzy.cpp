@@ -521,7 +521,7 @@ void LynxSuzy::ProcessSprite(uint16_t scbAddr) {
 /// </summary>
 int LynxSuzy::DecodeSpriteLinePixels(uint16_t& dataAddr, uint16_t lineEnd, int bpp, bool literalMode, uint8_t* pixelBuf, int maxPixels) {
 	int pixelCount = 0;
-	uint8_t bppMask = (1 << bpp) - 1;
+	[[maybe_unused]] uint8_t bppMask = (1 << bpp) - 1;
 
 	// Bit-level reading state
 	uint32_t shiftReg = 0;

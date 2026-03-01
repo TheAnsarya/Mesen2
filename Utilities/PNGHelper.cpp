@@ -14,17 +14,17 @@ bool PNGHelper::WritePNG(std::stringstream& stream, uint32_t* buffer, uint32_t x
 	if (bitsPerPixel == 32) {
 		// ARGB -> ABGR
 		for (uint32_t i = 0; i < size / 4; i++) {
-			convertedData[i * 4] = (buffer[i] & 0xFF0000) >> 16;
-			convertedData[i * 4 + 1] = (buffer[i] & 0xFF00) >> 8;
-			convertedData[i * 4 + 2] = (buffer[i] & 0xFF);
-			convertedData[i * 4 + 3] = (buffer[i] & 0xFF000000) >> 24;
+			convertedData[i * 4] = static_cast<uint8_t>((buffer[i] & 0xFF0000) >> 16);
+			convertedData[i * 4 + 1] = static_cast<uint8_t>((buffer[i] & 0xFF00) >> 8);
+			convertedData[i * 4 + 2] = static_cast<uint8_t>(buffer[i] & 0xFF);
+			convertedData[i * 4 + 3] = static_cast<uint8_t>((buffer[i] & 0xFF000000) >> 24);
 		}
 	} else if (bitsPerPixel == 24) {
 		// ARGB -> BGR
 		for (uint32_t i = 0; i < size / 3; i++) {
-			convertedData[i * 3] = (buffer[i] & 0xFF0000) >> 16;
-			convertedData[i * 3 + 1] = (buffer[i] & 0xFF00) >> 8;
-			convertedData[i * 3 + 2] = (buffer[i] & 0xFF);
+			convertedData[i * 3] = static_cast<uint8_t>((buffer[i] & 0xFF0000) >> 16);
+			convertedData[i * 3 + 1] = static_cast<uint8_t>((buffer[i] & 0xFF00) >> 8);
+			convertedData[i * 3 + 2] = static_cast<uint8_t>(buffer[i] & 0xFF);
 		}
 	} else {
 		return false;
@@ -96,7 +96,7 @@ bool PNGHelper::ReadPNG(string filename, vector<uint8_t>& pngData, uint32_t& png
 }
 
 template <typename T>
-int PNGHelper::DecodePNG(vector<T>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32) {
+int PNGHelper::DecodePNG(vector<T>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, [[maybe_unused]] bool convert_to_rgba32) {
 	int r = 0;
 	spng_ctx* ctx = spng_ctx_new(0);
 	if ((r = spng_set_crc_action(ctx, SPNG_CRC_USE, SPNG_CRC_USE))) {

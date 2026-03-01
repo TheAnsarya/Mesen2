@@ -194,7 +194,6 @@ TEST_F(LynxEepromTest, WriteEnabled_EWDS_Clears) {
 
 TEST_F(LynxEepromTest, Write_WhenDisabled_Ignored) {
 	_state.WriteEnabled = false;
-	uint16_t testWord = 0xabcd;
 	// Write should be ignored
 	bool writeSucceeded = _state.WriteEnabled;
 	EXPECT_FALSE(writeSucceeded);

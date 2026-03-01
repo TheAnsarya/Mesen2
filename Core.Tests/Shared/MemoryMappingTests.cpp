@@ -44,7 +44,7 @@ protected:
 	// Calculate PRG ROM offset for simple mappers (NROM-like)
 	// $8000-$BFFF: First 16KB bank
 	// $C000-$FFFF: Last 16KB bank (or mirror)
-	static uint32_t GetPrgRomOffset(uint16_t addr, uint32_t prgSize, bool is16K) {
+	static uint32_t GetPrgRomOffset(uint16_t addr, [[maybe_unused]] uint32_t prgSize, bool is16K) {
 		if (addr < 0x8000) return 0xFFFFFFFF;  // Not PRG ROM
 		
 		uint16_t offset = addr - 0x8000;

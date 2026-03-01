@@ -66,7 +66,7 @@ Socket::Socket(uintptr_t socket) {
 
 Socket::~Socket() {
 	if (_UPnPPort != -1) {
-		UPnPPortMapper::RemoveNATPortMapping(_UPnPPort, IPProtocol::TCP);
+		UPnPPortMapper::RemoveNATPortMapping(static_cast<uint16_t>(_UPnPPort), IPProtocol::TCP);
 	}
 
 	if (_socket != INVALID_SOCKET) {

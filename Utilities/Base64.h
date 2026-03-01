@@ -64,7 +64,7 @@ public:
 			val = (val << 6) + T[c];
 			valb += 6;
 			if (valb >= 0) {
-				out.push_back(val >> valb);
+				out.push_back(static_cast<uint8_t>(val >> valb));
 				valb -= 8;
 			}
 		}

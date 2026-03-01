@@ -88,6 +88,6 @@ TEST_F(StringUtilitiesTest, Trim_ConstRef_NoMutation) {
 	// Verify the const& parameter doesn't modify the original
 	std::string original = "  test  ";
 	std::string copy = original;
-	StringUtilities::Trim(original);
+	(void)StringUtilities::Trim(original);
 	EXPECT_EQ(original, copy);
 }

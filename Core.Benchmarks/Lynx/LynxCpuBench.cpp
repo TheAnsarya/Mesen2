@@ -386,7 +386,7 @@ BENCHMARK(BM_LynxCpu_NopDispatch);
 /// [12.3] WAI instruction — wake check must be efficient.
 static void BM_LynxCpu_WaiWakeCheck(benchmark::State& state) {
 	uint8_t irqPending = 0;
-	bool iFlag = true;
+	[[maybe_unused]] bool iFlag = true;
 	LynxCpuStopState stopState = LynxCpuStopState::WaitingForIrq;
 	for (auto _ : state) {
 		// Check if IRQ wakes CPU regardless of I flag

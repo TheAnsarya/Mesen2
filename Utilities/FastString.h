@@ -102,7 +102,7 @@ public:
 		} else {
 			memcpy(_buffer + _pos, str, size);
 		}
-		_pos += size;
+		_pos += static_cast<uint16_t>(size);
 	}
 
 	/// <summary>

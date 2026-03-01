@@ -55,10 +55,10 @@ void AviWriter::host_writew(uint8_t* buffer, uint16_t value) {
 }
 
 void AviWriter::host_writed(uint8_t* buffer, uint32_t value) {
-	buffer[0] = value;
-	buffer[1] = value >> 8;
-	buffer[2] = value >> 16;
-	buffer[3] = value >> 24;
+	buffer[0] = static_cast<uint8_t>(value);
+	buffer[1] = static_cast<uint8_t>(value >> 8);
+	buffer[2] = static_cast<uint8_t>(value >> 16);
+	buffer[3] = static_cast<uint8_t>(value >> 24);
 }
 
 bool AviWriter::StartWrite(string filename, VideoCodec codec, uint32_t width, uint32_t height, uint32_t bpp, uint32_t fps, uint32_t audioSampleRate, uint32_t compressionLevel) {
@@ -165,7 +165,7 @@ void AviWriter::EndWrite() {
 	AVIOUTd(0);                   /* Start */
 	AVIOUTd(_frames);             /* Length */
 	AVIOUTd(0);                   /* SuggestedBufferSize */
-	AVIOUTd(~0);                  /* Quality */
+	AVIOUTd(~0u);                 /* Quality */
 	AVIOUTd(0);                   /* SampleSize */
 	AVIOUTd(0);                   /* Frame */
 	AVIOUTd(0);                   /* Frame */
@@ -204,7 +204,7 @@ void AviWriter::EndWrite() {
 		_audiorate = 1;
 	AVIOUTd(_audiowritten / 4); /* Length */
 	AVIOUTd(0);                 /* SuggestedBufferSize */
-	AVIOUTd(~0);                /* Quality */
+	AVIOUTd(~0u);               /* Quality */
 	AVIOUTd(4);                 /* SampleSize */
 	AVIOUTd(0);                 /* Frame */
 	AVIOUTd(0);                 /* Frame */

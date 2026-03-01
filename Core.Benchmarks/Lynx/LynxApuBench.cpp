@@ -148,7 +148,7 @@ static void BM_LynxApu_IntegrationMode(benchmark::State& state) {
 	LynxAudioChannelState channels[4] = {};
 	for (int i = 0; i < 4; i++) {
 		channels[i].Output = static_cast<int8_t>(32);
-		channels[i].Volume = 128;
+		channels[i].Volume = static_cast<int8_t>(127);
 		channels[i].Integrate = (i > 0); // Channels 1-3 integrate from previous
 		channels[i].Enabled = true;
 	}
@@ -187,7 +187,7 @@ static void BM_LynxApu_GenerateSamples(benchmark::State& state) {
 	for (int i = 0; i < 4; i++) {
 		channels[i].ShiftRegister = static_cast<uint16_t>(0x001 + i * 0x111);
 		channels[i].FeedbackEnable = static_cast<uint8_t>(0x3F - i * 8);
-		channels[i].Volume = 200;
+		channels[i].Volume = static_cast<int8_t>(127);
 		channels[i].Attenuation = 0xff; // Full volume both sides
 		channels[i].Enabled = true;
 		channels[i].Counter = static_cast<uint8_t>(10 + i * 5);

@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "Lynx/LynxTypes.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4310)  // cast truncates constant value (intentional for hardware register tests)
+#endif
+
 /// <summary>
 /// Tests for Lynx Suzy math coprocessor, sprite system, and hardware bugs.
 /// Verifies multiply/divide behavior, sign-magnitude bugs (13.8, 13.9, 13.10),

@@ -42,7 +42,7 @@ class Program {
 
 		// Set up global exception handlers
 		AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
-			Log.Fatal(e.ExceptionObject as Exception, "Unhandled exception in AppDomain");
+			Log.Fatal(e.ExceptionObject as Exception ?? new Exception($"Non-Exception thrown: {e.ExceptionObject}"), "Unhandled exception in AppDomain");
 			Log.CloseAndFlush();
 		};
 

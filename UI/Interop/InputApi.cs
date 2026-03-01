@@ -69,7 +69,9 @@ public sealed class InputApi {
 	/// <returns>Array of controller input states decoded to ControllerInput format.</returns>
 	public static unsafe ControllerInput[] GetControllerStates() {
 		var buffer = new ControllerStateInterop[8];
+#pragma warning disable CS8500 // Takes address of managed type (required for P/Invoke interop)
 		fixed (ControllerStateInterop* ptr = buffer) {
+#pragma warning restore CS8500
 			GetControllerStatesWrapper((IntPtr)ptr, out uint count);
 
 			var result = new ControllerInput[Math.Min(count, 4)];

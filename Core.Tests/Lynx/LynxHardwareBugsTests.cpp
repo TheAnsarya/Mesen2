@@ -198,6 +198,8 @@ TEST_F(LynxHardwareBugsTest, Bug13_5_SpritePixelDepths) {
 	uint8_t bpp3 = 3;
 	uint8_t bpp4 = 4;
 	EXPECT_LE(bpp1, 4);
+	EXPECT_LE(bpp2, 4);
+	EXPECT_LE(bpp3, 4);
 	EXPECT_LE(bpp4, 4);
 }
 
@@ -244,6 +246,7 @@ TEST_F(LynxHardwareBugsTest, Bug13_6_TimerStatusRegister) {
 	uint8_t timer1Static = 0x05;
 	uint8_t timer2Static = 0x09;
 	EXPECT_EQ(timer1Static - timer0Static, 4);
+	EXPECT_EQ(timer2Static - timer1Static, 4);
 }
 
 TEST_F(LynxHardwareBugsTest, Bug13_6_DoneBlocksCounting) {

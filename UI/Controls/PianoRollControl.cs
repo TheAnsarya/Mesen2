@@ -125,7 +125,9 @@ public sealed class PianoRollControl : Control {
 	public event EventHandler<PianoRollSelectionEventArgs>? SelectionChanged;
 
 	/// <summary>Occurs when a marker is clicked.</summary>
+#pragma warning disable CS0067 // Event is never used (reserved for future marker click handling)
 	public event EventHandler<PianoRollMarkerEventArgs>? MarkerClicked;
+#pragma warning restore CS0067
 
 	#endregion
 

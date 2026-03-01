@@ -301,7 +301,6 @@ TEST_F(LynxDecryptTest, DecryptBlock_ModifiesAccumulator) {
 
 	std::array<uint8_t, 50> output{};
 	uint8_t accumulator = 0;
-	uint8_t initialAcc = accumulator;
 
 	LynxCrypto::DecryptBlock(
 		std::span<uint8_t, 50>(output),

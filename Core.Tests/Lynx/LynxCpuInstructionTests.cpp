@@ -81,7 +81,7 @@ protected:
 		bool& carryOut, bool& overflowOut, bool& zeroOut, bool& negOut) {
 		uint8_t borrow = carryIn ? 0 : 1;
 		int8_t al = (a & 0x0f) - (operand & 0x0f) - borrow;
-		if (al < 0) al = ((al - 6) & 0x0f) | (int8_t)0x80;
+		if (al < 0) al = ((al - 6) & 0x0f) | static_cast<int8_t>(-128);
 		int16_t ah = (a >> 4) - (operand >> 4) + (al < 0 ? -1 : 0);
 		al &= 0x0f;
 
