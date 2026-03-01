@@ -74,7 +74,8 @@ uint32_t BaseEventManager::GetEventCount() {
 }
 
 void BaseEventManager::ClearFrameEvents() {
-	_prevDebugEvents = _debugEvents;
+	// O(1) swap instead of O(n) copy — _debugEvents gets _prevDebugEvents' old storage
+	std::swap(_prevDebugEvents, _debugEvents);
 	_debugEvents.clear();
 }
 
