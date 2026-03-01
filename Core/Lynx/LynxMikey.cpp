@@ -96,7 +96,7 @@ void LynxMikey::TickTimer(int index, uint64_t currentCycle) {
 
 	// Check if timer is enabled (bit 3 of CTLA)
 	bool enabled = (timer.ControlA & 0x08) != 0;
-	if (!enabled) {
+	if (!enabled) [[unlikely]] {
 		return;
 	}
 
@@ -106,7 +106,7 @@ void LynxMikey::TickTimer(int index, uint64_t currentCycle) {
 	// blocks the borrow output that drives the count enable.
 	// Exception: Timer 4 (UART baud generator) always counts regardless
 	// of TimerDone, as the UART needs continuous clocking.
-	if (timer.TimerDone && index != 4) {
+	if (timer.TimerDone && index != 4) [[unlikely]] {
 		// Still advance LastTick so we don't accumulate a huge delta
 		timer.LastTick = currentCycle;
 		return;
@@ -129,7 +129,7 @@ void LynxMikey::TickTimer(int index, uint64_t currentCycle) {
 		timer.LastTick += period;
 		timer.Count--;
 
-		if (timer.Count == 0xff) { // Underflow (wrapped from 0 to 0xFF)
+		if (timer.Count == 0xff) [[unlikely]] { // Underflow (wrapped from 0 to 0xFF)
 			if (index == 4) {
 				// §5: Timer 4 = UART baud rate generator.
 				// Does not set TimerDone, does not fire normal timer IRQ (§10).
@@ -523,10 +523,23 @@ void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 				case 0: // BACKUP
 					timer.BackupValue = value;
 					break;
-				case 1: // CTLA
+				case 1: { // CTLA
+					// Detect clock source change before storing new CTLA.
+					// Fix for #417: When clock source bits (2:0) change, LastTick must
+					// be reset to the current cycle to prevent the TickTimer while-loop
+					// from firing a burst of phantom ticks accumulated under the old period.
+					uint8_t oldClockSource = timer.ControlA & 0x07;
+					uint8_t newClockSource = value & 0x07;
+
 					// Bit 6 is a self-clearing "reset timer" strobe — do not store it
 					timer.ControlA = value & ~0x40;
-					timer.Linked = (value & 0x07) == 7;
+					timer.Linked = (newClockSource == 7);
+
+					// Reset LastTick when clock source changes to prevent spurious ticks
+					if (oldClockSource != newClockSource) {
+						timer.LastTick = _cpu->GetState().CycleCount;
+					}
+
 					// If bit 6 set, reset count to backup on next clock
 					if (value & 0x40) {
 						timer.Count = timer.BackupValue;
@@ -538,6 +551,7 @@ void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 						_state.IrqEnabled &= ~(1 << timerIdx);
 					}
 					break;
+				}
 				case 2: // COUNT
 					timer.Count = value;
 					break;
