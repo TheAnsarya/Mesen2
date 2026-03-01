@@ -313,13 +313,23 @@ EffectiveAddressInfo LynxDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Ly
 			break;
 	}
 
-	DummyLynxCpu dummyCpu(nullptr, console->GetMemoryManager());
-	dummyCpu.SetDummyState(state);
-	dummyCpu.Exec();
+	// Cache DummyCpu to avoid rebuilding 256-entry op table on every call
+	// thread_local for thread safety; recreated only when memory manager changes (ROM load)
+	thread_local static std::unique_ptr<DummyLynxCpu> cachedCpu;
+	thread_local static LynxMemoryManager* cachedMemMgr = nullptr;
 
-	uint32_t count = dummyCpu.GetOperationCount();
+	LynxMemoryManager* memMgr = console->GetMemoryManager();
+	if (!cachedCpu || cachedMemMgr != memMgr) {
+		cachedCpu = std::make_unique<DummyLynxCpu>(nullptr, memMgr);
+		cachedMemMgr = memMgr;
+	}
+
+	cachedCpu->SetDummyState(state);
+	cachedCpu->Exec();
+
+	uint32_t count = cachedCpu->GetOperationCount();
 	for (int i = count - 1; i > 0; i--) {
-		MemoryOperationInfo opInfo = dummyCpu.GetOperationInfo(i);
+		MemoryOperationInfo opInfo = cachedCpu->GetOperationInfo(i);
 		if (opInfo.Type != MemoryOperationType::ExecOperand && opInfo.Type != MemoryOperationType::DummyRead) {
 			return {(int32_t)opInfo.Address, 1, showEffectiveAddress};
 		}
