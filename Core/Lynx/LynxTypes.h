@@ -339,8 +339,15 @@ struct LynxMikeyState {
 	/// <summary>Display buffer start address in RAM</summary>
 	uint16_t DisplayAddress;
 
-	/// <summary>Display control register</summary>
+	/// <summary>Display control register ($FD92 — DISPCTL)</summary>
 	uint8_t DisplayControl;
+
+	/// <summary>Display buffer backup register ($FD93 — PBKUP).
+	/// Controls the "magic P count" backup value for display DMA timing.
+	/// Determines the number of bytes between DMA fetches minus 1.
+	/// Default = 0 (1 byte per fetch). Most games write $29 (41 = 80/2 - 1)
+	/// for standard 160-pixel 4bpp lines.</summary>
+	uint8_t DisplayBufferBackup;
 
 	/// <summary>Current scanline being rendered (0-104)</summary>
 	uint16_t CurrentScanline;

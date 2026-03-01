@@ -324,6 +324,9 @@ uint8_t LynxMikey::ReadRegister(uint8_t addr) {
 		case 0x92: // DISPCTL
 			return _state.DisplayControl;
 
+		case 0x93: // PBKUP — display buffer backup (magic P count)
+			return _state.DisplayBufferBackup;
+
 		case 0x94: // DISPADR low
 			return static_cast<uint8_t>(_state.DisplayAddress & 0xff);
 
@@ -490,6 +493,7 @@ uint8_t LynxMikey::PeekRegister(uint8_t addr) const {
 		case 0x8d:                                     // SERDAT — peek without clearing RXRDY
 			return static_cast<uint8_t>(_state.UartRxData & 0xff);
 		case 0x92: return _state.DisplayControl;       // DISPCTL
+		case 0x93: return _state.DisplayBufferBackup;   // PBKUP
 		case 0x94: return static_cast<uint8_t>(_state.DisplayAddress & 0xff);        // DISPADR low
 		case 0x95: return static_cast<uint8_t>((_state.DisplayAddress >> 8) & 0xff); // DISPADR high
 
@@ -593,6 +597,10 @@ void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 		// Display registers
 		case 0x92: // DISPCTL
 			_state.DisplayControl = value;
+			return;
+
+		case 0x93: // PBKUP — display buffer backup (magic P count)
+			_state.DisplayBufferBackup = value;
 			return;
 
 		case 0x94: // DISPADR low
@@ -732,6 +740,7 @@ void LynxMikey::Serialize(Serializer& s) {
 	// Display state
 	SV(_state.DisplayAddress);
 	SV(_state.DisplayControl);
+	SV(_state.DisplayBufferBackup);
 	SV(_state.CurrentScanline);
 
 	// Palette
