@@ -38,7 +38,7 @@ public:
 	bool Stop();
 
 	// Inherited via IInputRecorder
-	void RecordInput(vector<shared_ptr<BaseControlDevice>> devices) override;
+	void RecordInput(const vector<shared_ptr<BaseControlDevice>>& devices) override;
 
 	// Inherited via IBatteryRecorder
 	void OnLoadBattery(string extension, vector<uint8_t> batteryData) override;

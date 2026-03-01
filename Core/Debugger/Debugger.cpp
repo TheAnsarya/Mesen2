@@ -1287,14 +1287,15 @@ void Debugger::GetAvailableInputOverrides(uint8_t* availableIndexes) {
 	}
 }
 
-void Debugger::Log(string message) {
+void Debugger::Log(const string& message) {
 	auto lock = _logLock.AcquireSafe();
 	if (_debuggerLog.size() >= 1000) {
 		_debuggerLog.pop_front();
 	}
 	_debuggerLog.push_back(message);
 
-	std::cout << message << std::endl;
+	// Use '\n' instead of std::endl to avoid flushing stdout on every log call
+	std::cout << message << '\n';
 }
 
 string Debugger::GetLog() {

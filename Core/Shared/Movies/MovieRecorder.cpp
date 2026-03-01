@@ -161,8 +161,8 @@ bool MovieRecorder::Stop() {
 	return false;
 }
 
-void MovieRecorder::RecordInput(vector<shared_ptr<BaseControlDevice>> devices) {
-	for (shared_ptr<BaseControlDevice>& device : devices) {
+void MovieRecorder::RecordInput(const vector<shared_ptr<BaseControlDevice>>& devices) {
+	for (const shared_ptr<BaseControlDevice>& device : devices) {
 		_inputData << ("|" + device->GetTextState());
 	}
 	_inputData << "\n";

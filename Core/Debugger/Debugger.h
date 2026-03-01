@@ -123,7 +123,7 @@ private:
 	unique_ptr<TraceLogFileSaver> _traceLogSaver;       ///< Trace log file output
 
 	SimpleLock _logLock;
-	std::list<string> _debuggerLog;  ///< Debug message log
+	std::deque<string> _debuggerLog;  ///< Debug message log (deque for cache-friendly ring buffer)
 
 	// Execution control
 	atomic<bool> _executionStopped;       ///< Emulation paused for debugging
@@ -239,7 +239,7 @@ public:
 	void SetInputOverrides(uint32_t index, DebugControllerState state);
 	void GetAvailableInputOverrides(uint8_t* availableIndexes);
 
-	void Log(string message);
+	void Log(const string& message);
 	string GetLog();
 
 	bool SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption);

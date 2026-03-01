@@ -85,7 +85,7 @@ public:
 	static vector<NetplayControllerUsageInfo> GetControllerList(Emulator* emu, vector<PlayerInfo>& players);
 
 	bool SetInput(BaseControlDevice* device) override;
-	void RecordInput(vector<shared_ptr<BaseControlDevice>> devices) override;
+	void RecordInput(const vector<shared_ptr<BaseControlDevice>>& devices) override;
 
 	// Inherited via INotificationListener
 	virtual void ProcessNotification(ConsoleNotificationType type, void* parameter) override;

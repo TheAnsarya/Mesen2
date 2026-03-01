@@ -34,5 +34,5 @@ public:
 	/// Device states reflect post-processing (after lag reduction, auto-fire, etc.).
 	/// Recorder must clone/serialize state immediately (devices may be modified after call).
 	/// </remarks>
-	virtual void RecordInput(vector<shared_ptr<BaseControlDevice>> devices) = 0;
+	virtual void RecordInput(const vector<shared_ptr<BaseControlDevice>>& devices) = 0;
 };

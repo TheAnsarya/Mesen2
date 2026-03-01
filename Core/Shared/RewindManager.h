@@ -162,7 +162,7 @@ public:
 	void ProcessEndOfFrame();
 
 	/// <summary>Record input state for replay (IInputRecorder)</summary>
-	void RecordInput(vector<shared_ptr<BaseControlDevice>> devices) override;
+	void RecordInput(const vector<shared_ptr<BaseControlDevice>>& devices) override;
 
 	/// <summary>Set input from history during rewind (IInputProvider)</summary>
 	bool SetInput(BaseControlDevice* device) override;

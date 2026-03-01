@@ -78,8 +78,8 @@ bool GameServer::SetInput(BaseControlDevice* device) {
 	return false;
 }
 
-void GameServer::RecordInput(vector<shared_ptr<BaseControlDevice>> devices) {
-	for (shared_ptr<BaseControlDevice>& device : devices) {
+void GameServer::RecordInput(const vector<shared_ptr<BaseControlDevice>>& devices) {
+	for (const shared_ptr<BaseControlDevice>& device : devices) {
 		for (unique_ptr<GameServerConnection>& connection : _openConnections) {
 			if (!connection->ConnectionError()) {
 				// Send movie stream
