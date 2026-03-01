@@ -351,7 +351,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 			data.OpSize = row.GetByteCount();
 			memcpy(data.Text, str.ToString(), str.GetSize() + 1);
 		} else if ((data.Flags & LineFlags::Comment) && row.CommentLine >= 0) {
-			string comment = ";" + StringUtilities::Split(_labelManager->GetComment(row.Address), '\n')[row.CommentLine];
+			string comment = ";" + StringUtilities::GetNthSegment(_labelManager->GetComment(row.Address), '\n', row.CommentLine);
 			data.Flags |= LineFlags::VerifiedCode;
 			memcpy(data.Comment, comment.c_str(), std::min<int>((int)comment.size() + 1, 1000));
 		} else if (data.Flags & LineFlags::Label) {

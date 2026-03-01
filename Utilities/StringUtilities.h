@@ -34,6 +34,33 @@ public:
 	}
 
 	/// <summary>
+	/// Extracts the Nth segment from a delimited string without constructing the full split vector.
+	/// </summary>
+	/// <param name="input">String to search</param>
+	/// <param name="delimiter">Character to split on</param>
+	/// <param name="n">Zero-based index of the segment to retrieve</param>
+	/// <returns>The Nth segment, or empty string if n exceeds the number of segments</returns>
+	/// <remarks>
+	/// More efficient than Split()[n] when only one segment is needed.
+	/// Example: GetNthSegment("a\nb\nc", '\n', 1) returns "b"
+	/// </remarks>
+	[[nodiscard]] static string GetNthSegment(string_view input, char delimiter, int n) {
+		size_t start = 0;
+		for (int i = 0; i < n; i++) {
+			size_t pos = input.find(delimiter, start);
+			if (pos == string_view::npos) {
+				return "";
+			}
+			start = pos + 1;
+		}
+		size_t end = input.find(delimiter, start);
+		if (end == string_view::npos) {
+			return string(input.substr(start));
+		}
+		return string(input.substr(start, end - start));
+	}
+
+	/// <summary>
 	/// Removes leading whitespace (tabs and spaces) from a string.
 	/// </summary>
 	/// <param name="str">String to trim</param>
