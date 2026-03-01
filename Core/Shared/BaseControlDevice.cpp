@@ -128,7 +128,11 @@ string BaseControlDevice::GetTextState() {
 	if (IsRawString()) {
 		return string((char*)_state.State.data(), _state.State.size());
 	} else {
-		string keyNames = GetKeyNames();
+		if (!_keyNamesCached) {
+			_cachedKeyNames = GetKeyNames();
+			_keyNamesCached = true;
+		}
+		const string& keyNames = _cachedKeyNames;
 		string output = "";
 
 		if (HasCoordinates()) {

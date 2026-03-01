@@ -54,6 +54,8 @@ protected:
 	uint8_t _port = 0;
 	bool _connected = true;
 	SimpleLock _stateLock;
+	string _cachedKeyNames;
+	bool _keyNamesCached = false;
 
 	virtual void RefreshStateBuffer() {}
 
