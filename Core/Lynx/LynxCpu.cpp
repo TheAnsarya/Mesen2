@@ -609,7 +609,7 @@ void LynxCpu::InitOpTable() {
 	// 2-byte NOPs (read and discard immediate byte)
 	uint8_t twoByteNops[] = {
 		0x02, 0x22, 0x42, 0x62, 0x82, 0xc2, 0xe2,
-		0x44
+		0x44, 0x54, 0xd4
 	};
 	for (uint8_t op : twoByteNops) {
 		_opTable[op] = &LynxCpu::NOP_Imm;

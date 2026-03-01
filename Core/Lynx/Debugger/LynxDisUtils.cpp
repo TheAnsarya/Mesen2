@@ -119,12 +119,12 @@ constexpr LynxAddrMode _opMode[256] = {
 	LynxAddrMode::AbsX,  LynxAddrMode::AbsX,  LynxAddrMode::AbsX,  LynxAddrMode::Imp,
 	// 0x40-0x4F
 	LynxAddrMode::Imp,   LynxAddrMode::IndX,  LynxAddrMode::Imm,   LynxAddrMode::Imp,
-	LynxAddrMode::Imp,   LynxAddrMode::Zpg,   LynxAddrMode::Zpg,   LynxAddrMode::Imp,
+	LynxAddrMode::Zpg,   LynxAddrMode::Zpg,   LynxAddrMode::Zpg,   LynxAddrMode::Imp,  // $44=2-byte NOP
 	LynxAddrMode::Imp,   LynxAddrMode::Imm,   LynxAddrMode::Acc,   LynxAddrMode::Imp,
 	LynxAddrMode::Abs,   LynxAddrMode::Abs,   LynxAddrMode::Abs,   LynxAddrMode::Imp,
 	// 0x50-0x5F
 	LynxAddrMode::Rel,   LynxAddrMode::IndY,  LynxAddrMode::ZpgInd, LynxAddrMode::Imp,
-	LynxAddrMode::Imp,   LynxAddrMode::ZpgX,  LynxAddrMode::ZpgX,  LynxAddrMode::Imp,
+	LynxAddrMode::Zpg,   LynxAddrMode::ZpgX,  LynxAddrMode::ZpgX,  LynxAddrMode::Imp,  // $54=2-byte NOP
 	LynxAddrMode::Imp,   LynxAddrMode::AbsY,  LynxAddrMode::Imp,   LynxAddrMode::Imp,
 	LynxAddrMode::Abs,   LynxAddrMode::AbsX,  LynxAddrMode::AbsX,  LynxAddrMode::Imp,
 	// 0x60-0x6F
@@ -164,7 +164,7 @@ constexpr LynxAddrMode _opMode[256] = {
 	LynxAddrMode::Abs,   LynxAddrMode::Abs,   LynxAddrMode::Abs,   LynxAddrMode::Imp,
 	// 0xD0-0xDF
 	LynxAddrMode::Rel,   LynxAddrMode::IndY,  LynxAddrMode::ZpgInd, LynxAddrMode::Imp,
-	LynxAddrMode::Imp,   LynxAddrMode::ZpgX,  LynxAddrMode::ZpgX,  LynxAddrMode::Imp,
+	LynxAddrMode::Zpg,   LynxAddrMode::ZpgX,  LynxAddrMode::ZpgX,  LynxAddrMode::Imp,  // $D4=2-byte NOP
 	LynxAddrMode::Imp,   LynxAddrMode::AbsY,  LynxAddrMode::Imp,   LynxAddrMode::Imp,
 	LynxAddrMode::Abs,   LynxAddrMode::AbsX,  LynxAddrMode::AbsX,  LynxAddrMode::Imp,
 	// 0xE0-0xEF
