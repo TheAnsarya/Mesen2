@@ -160,6 +160,16 @@ User reports while playing Dragon Warrior 4 (NES):
 | #472 | TraceLogger persistent buffers + ScriptingContext const ref | ✅ Done | Eliminates per-instruction allocs |
 | #473 | NesSoundMixer timestamps reserve(512) | ✅ Done | Prevents early-frame reallocs |
 
+### Phase 12: Sixth Audit Sweep — Micro-optimizations & Cleanup — COMPLETE
+| Issue | Description | Status | Impact |
+|-------|-------------|--------|--------|
+| #474 | Audio providers reserve _samplesToPlay | ✅ Done | Eliminates early reallocs (SmsFm/PceCd/PceAdpcm) |
+| #475 | NecDsp/Cx4 TraceLogger stack buffer for flags | ✅ Done | Zero heap allocs per trace row |
+| #476 | ExpressionEvaluator cache emplace (single lookup) | ✅ Done | Eliminates double hash lookup on cache miss |
+| #477 | ShortcutKeyHandler move pressedKeys | ✅ Done | O(1) move vs O(n) copy per input poll |
+| #478 | StepBack emplace_back + MovieRecorder/NexenMovie const ref | ✅ Done | Eliminates temp + avoids string copies |
+| #479 | SystemHud snprintf + DebugStats stringstream reuse | ✅ Done | Eliminates stringstream allocs per frame |
+
 ## Benchmark Results Summary
 
 ### FastBinary Serializer (run-ahead hot path)
@@ -242,3 +252,14 @@ thoroughly. The system is **already idempotent at every level**:
 | `Core/Debugger/ScriptingContext.h/cpp` | Log() const string& |
 | `Core/NES/NesSoundMixer.cpp` | _timestamps.reserve(512) |
 | `Core.Benchmarks/Debugger/DebuggerPipelineBench.cpp` | ClearFrameEvents + ExprEval benchmarks |
+| `Core/SMS/SmsFmAudio.cpp` | _samplesToPlay.reserve(2048) |
+| `Core/PCE/CdRom/PceCdAudioPlayer.cpp` | _samplesToPlay.reserve(1200) |
+| `Core/PCE/CdRom/PceAdpcm.cpp` | reserve(2048) + emplace_back |
+| `Core/SNES/Debugger/TraceLogger/NecDspTraceLogger.cpp` | Stack buffer for 6-flag string |
+| `Core/SNES/Debugger/TraceLogger/Cx4TraceLogger.cpp` | Stack buffer for 4-flag string |
+| `Core/Shared/ShortcutKeyHandler.cpp` | move() for _lastPressedKeys |
+| `Core/Debugger/StepBackManager.cpp` | emplace_back replaces push_back+back() |
+| `Core/Shared/Movies/MovieRecorder.h/cpp` | WriteString/WriteInt/WriteBool const string& |
+| `Core/Shared/Movies/NexenMovie.h/cpp` | LoadInt/LoadBool/LoadString const string& |
+| `Core/Shared/Video/SystemHud.cpp` | snprintf replaces stringstream in ShowGameTimer |
+| `Core/Shared/Video/DebugStats.cpp` | stringstream buffer reuse (ss.str(""); ss.clear()) |
