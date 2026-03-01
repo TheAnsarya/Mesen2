@@ -79,6 +79,8 @@ private:
 
 	RenderSurfaceInfo _aviRecorderSurface = {};
 	RecordAviOptions _recorderOptions = {};
+	unique_ptr<DebugHud> _aviDebugHud;    ///< Persistent HUD for AVI recording (avoids per-frame alloc)
+	unique_ptr<InputHud> _aviInputHud;    ///< Persistent input HUD for AVI recording (avoids per-frame alloc)
 
 	RenderSurfaceInfo _emuHudSurface = {};
 	RenderSurfaceInfo _scriptHudSurface = {};

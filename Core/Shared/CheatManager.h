@@ -77,8 +77,8 @@ private:
 	/// <summary>RAM cheats to refresh each frame (per CPU)</summary>
 	vector<InternalCheatCode> _ramRefreshCheats[CpuTypeUtilities::GetCpuTypeCount()];
 
-	/// <summary>Address-indexed cheat lookup (per CPU)</summary>
-	unordered_map<uint32_t, InternalCheatCode> _cheatsByAddress[CpuTypeUtilities::GetCpuTypeCount()];
+	/// <summary>Address-indexed cheat lookup (per CPU) — sorted by address for cache-friendly binary search</summary>
+	vector<std::pair<uint32_t, InternalCheatCode>> _cheatsByAddress[CpuTypeUtilities::GetCpuTypeCount()];
 
 	/// <summary>Try to convert external cheat code to internal format</summary>
 	optional<InternalCheatCode> TryConvertCode(CheatCode code);

@@ -57,7 +57,11 @@ bool CheatManager::AddCheat(CheatCode code) {
 	if (convertedCode->IsRamCode) {
 		_ramRefreshCheats[cpuIndex].push_back(convertedCode.value());
 	} else {
-		_cheatsByAddress[cpuIndex].emplace(convertedCode->Address, convertedCode.value());
+		// Insert into sorted vector for cache-friendly binary search in ApplyCheat
+		auto& vec = _cheatsByAddress[cpuIndex];
+		auto it = std::lower_bound(vec.begin(), vec.end(), convertedCode->Address,
+			[](const std::pair<uint32_t, InternalCheatCode>& p, uint32_t addr) { return p.first < addr; });
+		vec.emplace(it, convertedCode->Address, convertedCode.value());
 		_hasCheats[cpuIndex] = true;
 		_bankHasCheats[cpuIndex][convertedCode->Address >> GetBankShift(convertedCode->Cpu)] = true;
 	}
@@ -454,11 +458,15 @@ void CheatManager::RefreshRamCheats(CpuType cpuType) {
 template <CpuType cpuType>
 void CheatManager::ApplyCheat(uint32_t addr, uint8_t& value) {
 	if (_bankHasCheats[(int)cpuType][addr >> GetBankShift(cpuType)]) {
-		auto result = _cheatsByAddress[(int)cpuType].find(addr);
-		if (result != _cheatsByAddress[(int)cpuType].end()) {
-			if (result->second.Compare == -1 || result->second.Compare == value) {
-				value = result->second.Value;
-				_emu->GetConsoleUnsafe()->ProcessCheatCode(result->second, addr, value);
+		// Binary search through sorted contiguous vector — cache-friendly, O(log N)
+		// Typical cheat count is 1-10, so this is faster than unordered_map hash + pointer chasing
+		auto& vec = _cheatsByAddress[(int)cpuType];
+		auto it = std::lower_bound(vec.begin(), vec.end(), addr,
+			[](const std::pair<uint32_t, InternalCheatCode>& p, uint32_t a) { return p.first < a; });
+		if (it != vec.end() && it->first == addr) {
+			if (it->second.Compare == -1 || it->second.Compare == value) {
+				value = it->second.Value;
+				_emu->GetConsoleUnsafe()->ProcessCheatCode(it->second, addr, value);
 			}
 		}
 	}

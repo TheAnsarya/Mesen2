@@ -220,9 +220,10 @@ bool SaveStateManager::GetVideoData(vector<uint8_t>& out, RenderedFrame& frame, 
 	_decompressBuffer.resize(frameBufferSize);
 	unsigned long decompSize = frameBufferSize;
 	if (uncompress(_decompressBuffer.data(), &decompSize, _compressedReadBuffer.data(), (unsigned long)_compressedReadBuffer.size()) == MZ_OK) {
-		out = std::move(_decompressBuffer);
-		// Reset persistent buffer so next call allocates fresh
-		// (the moved-from vector is in a valid but empty state)
+		// Copy into output instead of moving — preserves _decompressBuffer allocation
+		// across calls (especially important during rewind: ~1 state load/sec)
+		out.resize(frameBufferSize);
+		memcpy(out.data(), _decompressBuffer.data(), frameBufferSize);
 		return true;
 	}
 	return false;

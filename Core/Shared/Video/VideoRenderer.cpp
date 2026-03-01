@@ -19,6 +19,10 @@ VideoRenderer::VideoRenderer(Emulator* emu) {
 	_rendererHud.reset(new DebugHud());
 	_systemHud.reset(new SystemHud(_emu));
 	_inputHud.reset(new InputHud(emu, _rendererHud.get()));
+
+	// Persistent HUD objects for AVI recording — avoids per-frame heap allocation
+	_aviDebugHud.reset(new DebugHud());
+	_aviInputHud.reset(new InputHud(emu, _aviDebugHud.get()));
 }
 
 VideoRenderer::~VideoRenderer() {
@@ -206,18 +210,19 @@ void VideoRenderer::ProcessAviRecording(RenderedFrame& frame) {
 			// Copy the game screen
 			memcpy(_aviRecorderSurface.Buffer.get(), frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
 
-			// Draw the system/input HUDs
-			DebugHud hud;
-			InputHud inputHud(_emu, &hud);
+			// Clear persistent HUD commands from previous frame, reuse allocated buffers
+			_aviDebugHud->ClearScreen();
+
+			// Draw the system/input HUDs using persistent objects (avoids per-frame heap allocation)
 			if (_recorderOptions.RecordSystemHud) {
-				_systemHud->Draw(&hud, scaledFrameSize.Width, scaledFrameSize.Height);
+				_systemHud->Draw(_aviDebugHud.get(), scaledFrameSize.Width, scaledFrameSize.Height);
 			}
 			if (_recorderOptions.RecordInputHud) {
-				inputHud.DrawControllers(scaledFrameSize, frame.InputData);
+				_aviInputHud->DrawControllers(scaledFrameSize, frame.InputData);
 			}
 
 			FrameInfo frameSize = {frame.Width, frame.Height};
-			hud.Draw((uint32_t*)_aviRecorderSurface.Buffer.get(), frameSize, {}, frame.FrameNumber, {scale, scale});
+			_aviDebugHud->Draw((uint32_t*)_aviRecorderSurface.Buffer.get(), frameSize, {}, frame.FrameNumber, {scale, scale});
 
 			// Record the final result
 			if (!recorder->AddFrame(_aviRecorderSurface.Buffer.get(), frame.Width, frame.Height, _emu->GetFps())) {
