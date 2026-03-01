@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 using Nexen.Config;
 using Nexen.Debugger.Labels;
@@ -15,6 +16,8 @@ public static class BackgroundPansyExporter {
 	private static Timer? _autoSaveTimer;
 	private static RomInfo? _currentRomInfo;
 	private static bool _cdlEnabled;
+	/// <summary>Cached ROM CRC32 — computed once at ROM load, never changes during a session.</summary>
+	private static uint _cachedRomCrc32;
 
 	/// <summary>
 	/// Called when a ROM is loaded. Starts background CDL recording if enabled.
@@ -22,6 +25,9 @@ public static class BackgroundPansyExporter {
 	public static void OnRomLoaded(RomInfo romInfo) {
 		Log.Info($"[BackgroundPansy] OnRomLoaded: {romInfo.GetRomName()}");
 		_currentRomInfo = romInfo;
+
+		// Cache ROM CRC32 once at load time — avoids re-hashing the entire ROM on every auto-save
+		_cachedRomCrc32 = PansyExporter.CalculateRomCrc32(romInfo);
 
 		if (!ConfigManager.Config.Debug.Integration.BackgroundCdlRecording) {
 			Log.Info("[BackgroundPansy] Background recording disabled in config");
@@ -45,6 +51,7 @@ public static class BackgroundPansyExporter {
 
 		StopCdlRecording();
 		_currentRomInfo = null;
+		_cachedRomCrc32 = 0;
 	}
 
 	/// <summary>
@@ -108,11 +115,12 @@ public static class BackgroundPansyExporter {
 	}
 
 	/// <summary>
-	/// Timer callback - exports Pansy on UI thread.
+	/// Timer callback - runs Pansy export on threadpool thread (not UI thread).
+	/// File I/O should never block the UI thread.
 	/// </summary>
 	private static void OnAutoSaveTick(object? state) {
 		Log.Info("[BackgroundPansy] Auto-save tick");
-		Dispatcher.UIThread.Post(() => ExportPansy());
+		Task.Run(() => ExportPansy());
 	}
 
 	/// <summary>
@@ -127,7 +135,7 @@ public static class BackgroundPansyExporter {
 		try {
 			var memoryType = _currentRomInfo.ConsoleType.GetMainCpuType().GetPrgRomMemoryType();
 			Log.Info($"[BackgroundPansy] Exporting Pansy for memory type: {memoryType}");
-			PansyExporter.AutoExport(_currentRomInfo, memoryType);
+			PansyExporter.AutoExport(_currentRomInfo, memoryType, _cachedRomCrc32);
 			Log.Info("[BackgroundPansy] Export complete");
 		} catch (Exception ex) {
 			Log.Error(ex, "[BackgroundPansy] Export failed");

@@ -174,7 +174,7 @@ public static class PansyExporter {
 		options ??= new PansyExportOptions();
 
 		try {
-			using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 81920, FileOptions.Asynchronous);
+			using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 81920, FileOptions.SequentialScan);
 			using var writer = new BinaryWriter(stream);
 
 			// Get all the data we need to export
@@ -393,7 +393,7 @@ public static class PansyExporter {
 	/// </summary>
 	/// <param name="romInfo">Current ROM information</param>
 	/// <param name="memoryType">Memory type for CDL</param>
-	public static void AutoExport(RomInfo romInfo, MemoryType memoryType) {
+	public static void AutoExport(RomInfo romInfo, MemoryType memoryType, uint cachedCrc32 = 0) {
 		Log.Info($"[Pansy] AutoExport called - AutoExportPansy={ConfigManager.Config.Debug.Integration.AutoExportPansy}");
 
 		if (!ConfigManager.Config.Debug.Integration.AutoExportPansy) {
@@ -416,8 +416,8 @@ public static class PansyExporter {
 		string pansyPath = GetPansyFilePath(romName);
 		Log.Info($"[Pansy] Target path: {pansyPath}");
 
-		// Calculate current ROM CRC32
-		uint currentCrc = CalculateRomCrc32(romInfo);
+		// Use cached CRC if available, otherwise calculate (first call or manual trigger)
+		uint currentCrc = cachedCrc32 != 0 ? cachedCrc32 : CalculateRomCrc32(romInfo);
 		Log.Info($"[Pansy] Current ROM CRC32: {currentCrc:X8}");
 
 		// Build export options from configuration
