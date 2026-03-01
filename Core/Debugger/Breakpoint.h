@@ -1,13 +1,7 @@
 #pragma once
 #include "pch.h"
-
-enum class CpuType : uint8_t;
-enum class MemoryType;
-struct AddressInfo;
-enum class BreakpointType;
-enum class BreakpointTypeFlags;
-enum class MemoryOperationType;
-struct MemoryOperationInfo;
+#include "Debugger/DebugTypes.h"
+#include "Debugger/DebugUtilities.h"
 
 /// <summary>
 /// Debugger breakpoint with conditional expression support.
@@ -62,7 +56,25 @@ public:
 	/// - 4 bytes: DMA transfers, 32-bit ARM access
 	/// </remarks>
 	template <uint8_t accessWidth = 1>
-	bool Matches(MemoryOperationInfo& opInfo, AddressInfo& info);
+	__forceinline bool Matches(MemoryOperationInfo& operation, AddressInfo& info) {
+		if (operation.MemType == _memoryType && DebugUtilities::IsRelativeMemory(_memoryType)) {
+			for (int i = 0; i < accessWidth; i++) {
+				if ((int32_t)operation.Address + i >= _startAddr && (int32_t)operation.Address + i <= _endAddr) {
+					return true;
+				}
+			}
+			return false;
+		} else if (_memoryType == info.Type) {
+			for (int i = 0; i < accessWidth; i++) {
+				if (info.Address + i >= _startAddr && info.Address + i <= _endAddr) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		return false;
+	}
 
 	/// <summary>
 	/// Check if breakpoint has specific type flag.
