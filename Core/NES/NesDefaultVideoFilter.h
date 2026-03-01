@@ -65,7 +65,8 @@ public:
 
 	/// <summary>Generate full 512-entry palette (64 colors × 8 emphasis).</summary>
 	/// <param name="paletteBuffer">Output palette buffer</param>
-	static void GenerateFullColorPalette(uint32_t paletteBuffer[512]);
+	/// <param name="model">PPU model (affects emphasis behavior)</param>
+	static void GenerateFullColorPalette(uint32_t paletteBuffer[512], PpuModel model = PpuModel::Ppu2C02);
 
 	/// <summary>Get full palette for specific configuration.</summary>
 	/// <param name="palette">Output palette buffer</param>

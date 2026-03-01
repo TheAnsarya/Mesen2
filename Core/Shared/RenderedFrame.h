@@ -13,7 +13,7 @@
 /// - Data: Optional HD texture pack data
 /// - Dimensions: Resolution and scaling factor
 /// - FrameNumber: Monotonic counter for tracking
-/// - VideoPhase: Interlaced video field (0/1) or progressive (0)
+/// - VideoPhaseOffset: NES NTSC video phase offset for dot crawl simulation
 /// - InputData: Controller state for this frame (input display, movie recording)
 ///
 /// Frame buffer format: 32-bit ARGB (0xAARRGGBB)
@@ -41,12 +41,12 @@ struct RenderedFrame {
 	/// <remarks>Used for movie sync, frame skip detection, performance metrics</remarks>
 	uint32_t FrameNumber = 0;
 
-	/// <summary>Video field indicator for interlaced systems (0=even, 1=odd, 0=progressive)</summary>
+	/// <summary>NES NTSC video phase offset for dot crawl simulation</summary>
 	/// <remarks>
-	/// Most systems output progressive video (always 0).
-	/// SNES interlaced mode (512x448) alternates between 0 and 1.
+	/// Used by NES NTSC filters to determine the correct phase offset.
+	/// Value is derived from master clock at frame start.
 	/// </remarks>
-	uint32_t VideoPhase = 0;
+	uint32_t VideoPhaseOffset = 0;
 
 	/// <summary>Controller input state for this frame</summary>
 	/// <remarks>
@@ -88,13 +88,13 @@ struct RenderedFrame {
 	/// <param name="scale">Scaling factor</param>
 	/// <param name="frameNumber">Frame counter value</param>
 	/// <param name="inputData">Controller input state for this frame</param>
-	/// <param name="videoPhase">Interlaced field indicator (default 0=progressive)</param>
-	RenderedFrame(void* buffer, uint32_t width, uint32_t height, double scale, uint32_t frameNumber, const vector<ControllerData>& inputData, uint32_t videoPhase = 0) : FrameBuffer(buffer),
-	                                                                                                                                                                     Data(nullptr),
-	                                                                                                                                                                     Width(width),
-	                                                                                                                                                                     Height(height),
-	                                                                                                                                                                     Scale(scale),
-	                                                                                                                                                                     FrameNumber(frameNumber),
-	                                                                                                                                                                     VideoPhase(videoPhase),
-	                                                                                                                                                                     InputData(inputData) {}
+	/// <param name="videoPhaseOffset">NES NTSC video phase offset (default 0)</param>
+	RenderedFrame(void* buffer, uint32_t width, uint32_t height, double scale, uint32_t frameNumber, const vector<ControllerData>& inputData, uint32_t videoPhaseOffset = 0) : FrameBuffer(buffer),
+	                                                                                                                                                                          Data(nullptr),
+	                                                                                                                                                                          Width(width),
+	                                                                                                                                                                          Height(height),
+	                                                                                                                                                                          Scale(scale),
+	                                                                                                                                                                          FrameNumber(frameNumber),
+	                                                                                                                                                                          VideoPhaseOffset(videoPhaseOffset),
+	                                                                                                                                                                          InputData(inputData) {}
 };

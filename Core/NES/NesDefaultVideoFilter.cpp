@@ -61,7 +61,7 @@ NesDefaultVideoFilter::NesDefaultVideoFilter(Emulator* emu) : BaseVideoFilter(em
 	InitLookupTable();
 }
 
-void NesDefaultVideoFilter::GenerateFullColorPalette(uint32_t paletteBuffer[512]) {
+void NesDefaultVideoFilter::GenerateFullColorPalette(uint32_t paletteBuffer[512], PpuModel model) {
 	for (int i = 0; i < 64; i++) {
 		for (int j = 1; j < 8; j++) {
 			double redColor = (uint8_t)(paletteBuffer[i] >> 16);
@@ -69,20 +69,34 @@ void NesDefaultVideoFilter::GenerateFullColorPalette(uint32_t paletteBuffer[512]
 			double blueColor = (uint8_t)paletteBuffer[i];
 			if ((i & 0x0F) <= 0x0D) {
 				// Emphasis doesn't affect columns $xE and $xF
-				if (j & 0x01) {
-					// Intensify red
-					greenColor *= 0.84;
-					blueColor *= 0.84;
-				}
-				if (j & 0x02) {
-					// Intensify green
-					redColor *= 0.84;
-					blueColor *= 0.84;
-				}
-				if (j & 0x04) {
-					// Intensify blue
-					redColor *= 0.84;
-					greenColor *= 0.84;
+				if (model == PpuModel::Ppu2C02) {
+					// 2C02: emphasis dims other channels by 0.84
+					if (j & 0x01) {
+						// Intensify red
+						greenColor *= 0.84;
+						blueColor *= 0.84;
+					}
+					if (j & 0x02) {
+						// Intensify green
+						redColor *= 0.84;
+						blueColor *= 0.84;
+					}
+					if (j & 0x04) {
+						// Intensify blue
+						redColor *= 0.84;
+						greenColor *= 0.84;
+					}
+				} else {
+					// RGB PPUs: emphasis sets emphasized channel to max
+					if (j & 0x01) {
+						redColor = 0xFF;
+					}
+					if (j & 0x02) {
+						greenColor = 0xFF;
+					}
+					if (j & 0x04) {
+						blueColor = 0xFF;
+					}
 				}
 			}
 
@@ -115,7 +129,7 @@ void NesDefaultVideoFilter::GetFullPalette(uint32_t palette[512], NesConfig& nes
 			}
 		} else {
 			memcpy(palette, _ppuPaletteArgb[(int)model], sizeof(_ppuPaletteArgb[(int)_ppuModel]));
-			GenerateFullColorPalette(palette);
+			GenerateFullColorPalette(palette, model);
 		}
 	}
 }

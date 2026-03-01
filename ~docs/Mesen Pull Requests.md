@@ -1,6 +1,6 @@
 # Mesen2 Open Pull Requests — Evaluation & Tracking
 
-> **Last Updated:** 2026-03-01
+> **Last Updated:** 2026-03-02
 > **Source:** [SourMesen/Mesen2 Pull Requests](https://github.com/SourMesen/Mesen2/pulls)
 > **Total Open PRs Evaluated:** 24
 > **Scope:** All open PRs as of 2026-03-01. Closed/merged PRs are not tracked (assumed already incorporated or irrelevant).
@@ -11,9 +11,9 @@
 
 | Priority | Count | Description |
 |----------|-------|-------------|
-| 🔴 HIGH | 6 | Emulation accuracy fixes — must evaluate and apply |
-| 🟡 MEDIUM | 5 | Features & stability — evaluate for adoption |
-| 🟢 LOW | 13 | Build system, minor UI, stale — skip or defer |
+| 🔴 HIGH | 6 | Emulation accuracy fixes — all applied |
+| 🟡 MEDIUM | 5 | Features & stability — 2 applied, 3 deferred |
+| 🟢 LOW | 13 | Build system, minor UI, stale — all skipped or deferred |
 
 ---
 
@@ -105,7 +105,7 @@
 - **Mesen2 PR:** [#31](https://github.com/SourMesen/Mesen2/pull/31)
 - **Author:** Gumball2415 (Persune)
 - **Nexen Issue:** #513
-- **Status:** ⏳ In Progress
+- **Status:** ✅ Applied
 - **Category:** NES Video Accuracy
 - **Risk:** Medium — touches multiple video subsystems
 
@@ -116,7 +116,12 @@
 
 **Mesen2 Fix:** 10 files changed. Adds `_masterClockFrameStart` tracking, replaces hardcoded phase offsets with `GetVideoPhaseOffset()`, updates Bisqwit NTSC matrix to standard RGB-YIQ values, fixes RGB PPU emphasis.
 
-**Nexen Assessment:** Large PR with many video changes. Needs careful per-change evaluation since our NES PPU code has diverged. Will implement individually after thorough review.
+**Nexen Implementation:** Re-implemented all three fixes across 10 files:
+1. Added `_masterClockFrameStart` to `BaseNesPpu.h`, captured at scanline 0 cycle 1 in `NesPpu.cpp`, used for phase calculation (`(_masterClockFrameStart % 6) * 2`)
+2. Renamed `VideoPhase` → `VideoPhaseOffset` through entire chain (`RenderedFrame.h`, `BaseVideoFilter.h/.cpp`, `VideoDecoder.cpp`)
+3. Updated `NesNtscFilter.cpp` and `BisqwitNtscFilter.cpp` to use new `GetVideoPhaseOffset()` with correct phase math
+4. Replaced Bisqwit IQ coefficients with standard RGB-YIQ matrix values
+5. Added `PpuModel` parameter to `GenerateFullColorPalette()` — 2C02 uses 0.84 dimming, RGB PPUs set emphasized channel to 0xFF
 
 ---
 
@@ -330,10 +335,11 @@
 
 | Date | PR | Action | Commit |
 |------|----|--------|--------|
-| 2026-03-01 | #87 | Applied DMA overflow fix | TBD |
-| 2026-03-01 | #82 | Applied internal open bus fix | TBD |
-| 2026-03-01 | #86 | Applied CX4 timing fixes | TBD |
-| 2026-03-01 | #80 | Applied hi-res blending fix | TBD |
-| 2026-03-01 | #74 | Applied ExLoRom mapping support | TBD |
-| 2026-03-01 | #85 | Applied typeface caching | TBD |
-| 2026-03-01 | #76 | Applied Lua crash fix | TBD |
+| 2026-03-01 | #87 | Applied DMA overflow fix | b193f0c5 |
+| 2026-03-01 | #82 | Applied internal open bus fix | b193f0c5 |
+| 2026-03-01 | #86 | Applied CX4 timing fixes | b193f0c5 |
+| 2026-03-01 | #80 | Applied hi-res blending fix | b193f0c5 |
+| 2026-03-01 | #74 | Applied ExLoRom mapping support | b193f0c5 |
+| 2026-03-01 | #85 | Applied typeface caching | b193f0c5 |
+| 2026-03-01 | #76 | Applied Lua crash fix | b193f0c5 |
+| 2026-03-02 | #31 | Applied NES NTSC filter + PPU palette fixes | TBD |

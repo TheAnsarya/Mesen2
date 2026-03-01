@@ -64,7 +64,7 @@ BisqwitNtscFilter::BisqwitNtscFilter(Emulator* emu) : BaseVideoFilter(emu) {
 			int scale = 8 / _resDivider;
 			outputBuffer += frameInfo.Width * ((120 - GetOverscan().Top) * scale);
 
-			DecodeFrame(120, 239 - GetOverscan().Bottom, _ppuOutputBuffer, outputBuffer, (GetVideoPhase() * 4) + 327360);
+			DecodeFrame(120, 239 - GetOverscan().Bottom, _ppuOutputBuffer, outputBuffer, GetVideoPhaseOffset() + 120 * 341 * _signalsPerPixel);
 
 			_workDone = true;
 		}
@@ -86,7 +86,7 @@ void BisqwitNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer) {
 
 	_workDone = false;
 	_waitWork.Signal();
-	DecodeFrame(GetOverscan().Top, 120, ppuOutputBuffer, GetOutputBuffer(), (GetVideoPhase() * 4) + GetOverscan().Top * 341 * 8);
+	DecodeFrame(GetOverscan().Top, 120, ppuOutputBuffer, GetOutputBuffer(), GetVideoPhaseOffset() + GetOverscan().Top * 341 * _signalsPerPixel);
 	while (!_workDone) {}
 }
 
@@ -139,14 +139,16 @@ void BisqwitNtscFilter::OnBeforeApplyFilter() {
 
 	_y = contrast / _yWidth;
 
-	_ir = (int)(contrast * 1.994681e-6 * saturation / _iWidth);
-	_qr = (int)(contrast * 9.915742e-7 * saturation / _qWidth);
+	double saturationFactor = (167941.0 * 144044.0) / (12.0 * 2000.0);
 
-	_ig = (int)(contrast * 9.151351e-8 * saturation / _iWidth);
-	_qg = (int)(contrast * -6.334805e-7 * saturation / _qWidth);
+	_ir = (int)(contrast * 0.956084 * saturation / saturationFactor / _iWidth);
+	_qr = (int)(contrast * 0.620888 * saturation / saturationFactor / _qWidth);
 
-	_ib = (int)(contrast * -1.012984e-6 * saturation / _iWidth);
-	_qb = (int)(contrast * 1.667217e-6 * saturation / _qWidth);
+	_ig = (int)(contrast * -0.272281 * saturation / saturationFactor / _iWidth);
+	_qg = (int)(contrast * -0.646901 * saturation / saturationFactor / _qWidth);
+
+	_ib = (int)(contrast * -1.105617 * saturation / saturationFactor / _iWidth);
+	_qb = (int)(contrast * 1.702501 * saturation / saturationFactor / _qWidth);
 }
 
 void BisqwitNtscFilter::RecursiveBlend(int iterationCount, uint64_t* output, uint64_t* currentLine, uint64_t* nextLine, int pixelsPerCycle, bool verticalBlend) {
