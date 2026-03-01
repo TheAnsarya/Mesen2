@@ -66,7 +66,7 @@ public:
 	~ScriptingContext();
 	bool LoadScript(string scriptName, string path, string scriptContent, Debugger* debugger);
 
-	void Log(string message);
+	void Log(const string& message);
 	string GetLog();
 
 	Debugger* GetDebugger();

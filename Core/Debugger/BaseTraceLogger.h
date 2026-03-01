@@ -166,14 +166,17 @@ protected:
 	unique_ptr<ExpressionEvaluator> _expEvaluator;
 	ExpressionData _conditionData;
 
+	string _rowBuffer;      ///< Persistent buffer for AddRow (avoids per-instruction alloc)
+	string _byteCodeBuffer; ///< Persistent buffer for WriteByteCode (avoids per-instruction alloc)
+
 	void WriteByteCode(DisassemblyInfo& info, RowPart& rowPart, string& output) {
-		string byteCode;
-		info.GetByteCode(byteCode);
+		_byteCodeBuffer.clear();
+		info.GetByteCode(_byteCodeBuffer);
 		if (!rowPart.DisplayInHex) {
 			// Remove $ marks if not in "hex" mode (but still display the bytes as hex)
-			byteCode.erase(std::remove(byteCode.begin(), byteCode.end(), '$'), byteCode.end());
+			_byteCodeBuffer.erase(std::remove(_byteCodeBuffer.begin(), _byteCodeBuffer.end(), '$'), _byteCodeBuffer.end());
 		}
-		WriteStringValue(output, byteCode, rowPart);
+		WriteStringValue(output, _byteCodeBuffer, rowPart);
 	}
 
 	void WriteDisassembly(DisassemblyInfo& info, RowPart& rowPart, uint8_t sp, uint32_t pc, string& output) {
@@ -269,7 +272,7 @@ protected:
 		output += str;
 	}
 
-	void WriteStringValue(string& output, string value, RowPart& rowPart) {
+	void WriteStringValue(string& output, const string& value, RowPart& rowPart) {
 		output += value;
 		if (rowPart.MinWidth > (int)value.size()) {
 			output += std::string(rowPart.MinWidth - value.size(), ' ');
@@ -287,18 +290,17 @@ protected:
 		_pendingLog = false;
 
 		if (_debugger->GetTraceLogFileSaver()->IsEnabled()) {
-			string row;
-			row.reserve(300);
+			_rowBuffer.clear();
 
 			// Display PC
 			RowPart rowPart = {};
 			rowPart.DisplayInHex = true;
 			rowPart.MinWidth = DebugUtilities::GetProgramCounterSize(_cpuType);
-			WriteIntValue(row, ((TraceLoggerType*)this)->GetProgramCounter(cpuState), rowPart);
-			row += "  ";
+			WriteIntValue(_rowBuffer, ((TraceLoggerType*)this)->GetProgramCounter(cpuState), rowPart);
+			_rowBuffer += "  ";
 
-			((TraceLoggerType*)this)->GetTraceRow(row, cpuState, _ppuState[_currentPos], disassemblyInfo);
-			_debugger->GetTraceLogFileSaver()->Log(row);
+			((TraceLoggerType*)this)->GetTraceRow(_rowBuffer, cpuState, _ppuState[_currentPos], disassemblyInfo);
+			_debugger->GetTraceLogFileSaver()->Log(_rowBuffer);
 		}
 
 		_currentPos = (_currentPos + 1) % ExecutionLogSize;
