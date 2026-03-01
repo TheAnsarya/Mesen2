@@ -8,7 +8,12 @@ private:
 	int32_t _startFrame = 0;
 
 protected:
-	unordered_map<uint32_t, uint32_t>* _drawnPixels = nullptr;
+	// Flat pixel buffer (width*height) for O(1) indexed pixel tracking.
+	// nullptr when drawing directly to argbBuffer (non-clearAndUpdate path).
+	uint32_t* _drawnPixels = nullptr;
+	uint32_t _drawnPixelsSize = 0;
+	// Dirty index list — tracks which offsets were written for fast diff
+	vector<uint32_t>* _dirtyIndices = nullptr;
 	uint32_t* _argbBuffer = nullptr;
 	FrameInfo _frameInfo = {};
 	OverscanDimensions _overscan = {};
@@ -20,21 +25,29 @@ protected:
 	virtual void InternalDraw() = 0;
 
 	__forceinline void InternalDrawPixel(int32_t offset, int color, uint32_t alpha) {
-		if (_drawnPixels) {
-			// Log modified pixels
+		if (_drawnPixels && (uint32_t)offset < _drawnPixelsSize) {
+			// Flat buffer path — O(1) indexed access, no hash overhead
 			if (alpha != 0xFF000000) {
-				if (_drawnPixels->find(offset) == _drawnPixels->end() || _overwritePixels) {
+				if (_drawnPixels[offset] == 0 || _overwritePixels) {
 					// When drawing on an empty background, premultiply channels & preserve alpha value
 					// This is needed for hardware blending between the HUD and the game screen
-					(*_drawnPixels)[offset] = 0;
-					BlendColors((uint8_t*)&(*_drawnPixels)[offset], (uint8_t*)&color, true);
+					bool wasEmpty = (_drawnPixels[offset] == 0);
+					_drawnPixels[offset] = 0;
+					BlendColors((uint8_t*)&_drawnPixels[offset], (uint8_t*)&color, true);
+					if (wasEmpty && _dirtyIndices) {
+						_dirtyIndices->push_back((uint32_t)offset);
+					}
 				} else {
-					BlendColors((uint8_t*)&(*_drawnPixels)[offset], (uint8_t*)&color);
+					BlendColors((uint8_t*)&_drawnPixels[offset], (uint8_t*)&color);
 				}
 			} else {
-				(*_drawnPixels)[offset] = color;
+				bool wasEmpty = (_drawnPixels[offset] == 0);
+				_drawnPixels[offset] = color;
+				if (wasEmpty && _dirtyIndices) {
+					_dirtyIndices->push_back((uint32_t)offset);
+				}
 			}
-		} else {
+		} else if (!_drawnPixels) {
 			// Draw pixels directly to the buffer
 			if (alpha != 0xFF000000) {
 				if (_overwritePixels) {
@@ -119,7 +132,7 @@ public:
 	virtual ~DrawCommand() {
 	}
 
-	void Draw(unordered_map<uint32_t, uint32_t>* drawnPixels, uint32_t* argbBuffer, FrameInfo frameInfo, OverscanDimensions& overscan, uint32_t frameNumber, HudScaleFactors& scaleFactors) {
+	void Draw(uint32_t* drawnPixels, uint32_t drawnPixelsSize, vector<uint32_t>* dirtyIndices, uint32_t* argbBuffer, FrameInfo frameInfo, OverscanDimensions& overscan, uint32_t frameNumber, HudScaleFactors& scaleFactors) {
 		if (_startFrame < 0) {
 			// When no start frame was specified, start on the next drawn frame
 			_startFrame = frameNumber;
@@ -128,6 +141,8 @@ public:
 		if (_startFrame <= (int32_t)frameNumber) {
 			_argbBuffer = argbBuffer;
 			_drawnPixels = drawnPixels;
+			_drawnPixelsSize = drawnPixelsSize;
+			_dirtyIndices = dirtyIndices;
 			_frameInfo = frameInfo;
 			_overscan = overscan;
 

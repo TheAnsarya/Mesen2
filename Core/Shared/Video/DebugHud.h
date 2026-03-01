@@ -10,7 +10,13 @@ private:
 	vector<unique_ptr<DrawCommand>> _commands;
 	atomic<uint32_t> _commandCount;
 	SimpleLock _commandLock;
-	unordered_map<uint32_t, uint32_t> _drawPixels;
+
+	// Flat pixel buffer (width*height) replaces unordered_map for O(1) indexed access.
+	// Value 0 = no pixel drawn (transparent), nonzero = drawn ARGB color.
+	vector<uint32_t> _drawPixels;
+	vector<uint32_t> _prevDrawPixels;
+	// Dirty pixel indices for fast diff/clear without scanning the full buffer
+	vector<uint32_t> _dirtyIndices;
 
 public:
 	DebugHud();

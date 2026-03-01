@@ -21,46 +21,51 @@ void DebugHud::ClearScreen() {
 	auto lock = _commandLock.AcquireSafe();
 	_commands.clear();
 	_drawPixels.clear();
+	_prevDrawPixels.clear();
+	_dirtyIndices.clear();
 }
 
 bool DebugHud::Draw(uint32_t* argbBuffer, FrameInfo frameInfo, OverscanDimensions overscan, uint32_t frameNumber, HudScaleFactors scaleFactors, bool clearAndUpdate) {
 	auto lock = _commandLock.AcquireSafe();
 
 	bool isDirty = false;
+	uint32_t bufferSize = frameInfo.Height * frameInfo.Width;
+
 	if (clearAndUpdate) {
-		unordered_map<uint32_t, uint32_t> drawPixels;
-		drawPixels.reserve(1000);
-		for (unique_ptr<DrawCommand>& command : _commands) {
-			command->Draw(&drawPixels, argbBuffer, frameInfo, overscan, frameNumber, scaleFactors);
+		// Ensure flat buffers are sized for this frame
+		if ((uint32_t)_drawPixels.size() != bufferSize) {
+			_drawPixels.assign(bufferSize, 0);
+			_prevDrawPixels.assign(bufferSize, 0);
+			_dirtyIndices.clear();
+		} else {
+			// Clear only previously-dirty pixels (O(k) vs O(n) memset)
+			for (uint32_t idx : _dirtyIndices) {
+				_drawPixels[idx] = 0;
+			}
+			_dirtyIndices.clear();
 		}
 
-		isDirty = drawPixels.size() != _drawPixels.size();
-		if (!isDirty) {
-			for (auto keyValue : drawPixels) {
-				auto match = _drawPixels.find(keyValue.first);
-				if (match != _drawPixels.end()) {
-					if (keyValue.second != match->second) {
-						isDirty = true;
-						break;
-					}
-				} else {
-					isDirty = true;
-					break;
-				}
-			}
+		// Draw all commands into the flat buffer — O(1) per pixel vs O(1) amortized hash
+		for (unique_ptr<DrawCommand>& command : _commands) {
+			command->Draw(_drawPixels.data(), bufferSize, &_dirtyIndices, argbBuffer, frameInfo, overscan, frameNumber, scaleFactors);
 		}
+
+		// Fast diff: compare only dirty pixel positions against previous frame
+		// Also need to detect pixels that were in prev but not in current
+		isDirty = (memcmp(_drawPixels.data(), _prevDrawPixels.data(), bufferSize * sizeof(uint32_t)) != 0);
 
 		if (isDirty) {
-			memset(argbBuffer, 0, frameInfo.Height * frameInfo.Width * sizeof(uint32_t));
-			for (auto keyValue : drawPixels) {
-				argbBuffer[keyValue.first] = keyValue.second;
+			memset(argbBuffer, 0, bufferSize * sizeof(uint32_t));
+			for (uint32_t idx : _dirtyIndices) {
+				argbBuffer[idx] = _drawPixels[idx];
 			}
-			_drawPixels = drawPixels;
+			// Swap current → previous for next frame comparison
+			std::swap(_prevDrawPixels, _drawPixels);
 		}
 	} else {
 		isDirty = true;
 		for (unique_ptr<DrawCommand>& command : _commands) {
-			command->Draw(nullptr, argbBuffer, frameInfo, overscan, frameNumber, scaleFactors);
+			command->Draw(nullptr, 0, nullptr, argbBuffer, frameInfo, overscan, frameNumber, scaleFactors);
 		}
 	}
 
