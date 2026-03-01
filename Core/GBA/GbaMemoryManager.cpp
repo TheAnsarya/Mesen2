@@ -134,7 +134,9 @@ void GbaMemoryManager::ProcessPendingUpdates(bool allowStartDma) {
 		for (int i = (int)_pendingIrqs.size() - 1; i >= 0; i--) {
 			if (_pendingIrqs[i].Delay && --_pendingIrqs[i].Delay == 0) {
 				_state.NewIF |= (int)_pendingIrqs[i].Source;
-				_pendingIrqs.erase(_pendingIrqs.begin() + i);
+				// Swap-and-pop: O(1) removal since order doesn't matter and we iterate in reverse
+				_pendingIrqs[i] = _pendingIrqs.back();
+				_pendingIrqs.pop_back();
 				TriggerIrqUpdate();
 			}
 		}
