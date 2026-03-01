@@ -138,7 +138,7 @@ string MessageManager::Localize(const string& key) {
 	return string(key);
 }
 
-void MessageManager::DisplayMessage(string title, string message, string param1, string param2) {
+void MessageManager::DisplayMessage(string title, string message, const string& param1, const string& param2) {
 	if (MessageManager::_messageManager) {
 		auto lock = _messageLock.AcquireSafe();
 		if (!MessageManager::_messageManager) {

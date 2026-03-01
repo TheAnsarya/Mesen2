@@ -120,7 +120,7 @@ void CheatManager::ClearCheats(bool showMessage) {
 	}
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromNesGameGenie(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromNesGameGenie(const string& code) {
 	static regex _validator = regex("^([APZLGITYEOXUKSVN]{6})|([APZLGITYEOXUKSVN]{8})$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -165,7 +165,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromNesGameGenie(string code) {
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromNesProActionRocky(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromNesProActionRocky(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{8}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -204,7 +204,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromNesProActionRocky(string co
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromNesCustomCode(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromNesCustomCode(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{4}:[a-f0-9]{2}(:[a-f0-9]{2}){0,1}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -224,7 +224,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromNesCustomCode(string code) 
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromGbGameGenie(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromGbGameGenie(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{3}-[a-f0-9]{3}(-[a-f0-9]{3}){0,1}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -249,7 +249,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromGbGameGenie(string code) {
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromGbGameShark(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromGbGameShark(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{8}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -298,7 +298,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromGbGameShark(string code) {
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromSnesProActionReplay(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromSnesProActionReplay(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{8}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -322,7 +322,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromSnesProActionReplay(string 
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromSnesGameGenie(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromSnesGameGenie(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{4}-[a-f0-9]{4}$", std::regex_constants::icase);
 	static string _convertTable = "DF4709156BC8A23E";
 
@@ -354,7 +354,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromSnesGameGenie(string code) 
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromPceRaw(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromPceRaw(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{6}:[a-f0-9]{2}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -368,7 +368,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromPceRaw(string code) {
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromPceAddress(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromPceAddress(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{6}:[a-f0-9]{2}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -383,7 +383,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromPceAddress(string code) {
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromSmsGameGenie(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromSmsGameGenie(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{3}-[a-f0-9]{3}(-[a-f0-9]{3}){0,1}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;
@@ -408,7 +408,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromSmsGameGenie(string code) {
 	return cheat;
 }
 
-optional<InternalCheatCode> CheatManager::ConvertFromSmsProActionReplay(string code) {
+optional<InternalCheatCode> CheatManager::ConvertFromSmsProActionReplay(const string& code) {
 	static regex _validator = regex("^[a-f0-9]{8}$", std::regex_constants::icase);
 	if (!std::regex_match(code, _validator)) {
 		return std::nullopt;

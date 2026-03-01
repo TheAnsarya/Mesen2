@@ -263,6 +263,9 @@ void CdReader::LoadSubcodeFile(VirtualFile& cueFile, DiscInfo& disc) {
 	if (subFile.IsValid()) {
 		vector<uint8_t>& subCode = disc.DecodedSubCode;
 		subFile.ReadFile(subCode);
+		// Pre-allocate: each 96-byte sector produces 2 + 12*8 = 98 bytes of subchannel data
+		size_t sectorCount = disc.DecodedSubCode.size() / 96;
+		disc.SubCode.reserve(sectorCount * 98);
 		for (int i = 0; i < disc.DecodedSubCode.size() / 96; i++) {
 			disc.SubCode.push_back(0x00);
 			disc.SubCode.push_back(0x80);

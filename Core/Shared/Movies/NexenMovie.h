@@ -39,7 +39,7 @@ private:
 	string LoadString(std::unordered_map<string, string>& settings, const string& name);
 
 	void LoadCheats();
-	bool LoadCheat(string cheatData, CheatCode& code);
+	bool LoadCheat(const string& cheatData, CheatCode& code);
 
 public:
 	NexenMovie(Emulator* emu, bool silent);
@@ -52,7 +52,7 @@ public:
 	bool IsPlaying() override;
 
 	// Inherited via IBatteryProvider
-	vector<uint8_t> LoadBattery(string extension) override;
+	vector<uint8_t> LoadBattery(const string& extension) override;
 
 	// Inherited via INotificationListener
 	void ProcessNotification(ConsoleNotificationType type, void* parameter) override;

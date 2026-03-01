@@ -45,11 +45,11 @@ private:
 	void PushWord(uint16_t operand, vector<int16_t>& output, uint32_t& address);
 	void ProcessOperand(OpCodeEntry& opEntry, ParamEntry& entry, string operand, vector<int16_t>& output, uint32_t& address, unordered_map<string, uint16_t>& localLabels, bool firstPass);
 
-	void RunPass(vector<int16_t>& output, string code, uint32_t address, int16_t* assembledCode, bool firstPass, unordered_map<string, uint16_t>& localLabels);
+	void RunPass(vector<int16_t>& output, const string& code, uint32_t address, int16_t* assembledCode, bool firstPass, unordered_map<string, uint16_t>& localLabels);
 
 public:
 	SmsAssembler(LabelManager* labelManager);
 	virtual ~SmsAssembler();
 
-	uint32_t AssembleCode(string code, uint32_t startAddress, int16_t* assembledCode);
+	uint32_t AssembleCode(const string& code, uint32_t startAddress, int16_t* assembledCode);
 };

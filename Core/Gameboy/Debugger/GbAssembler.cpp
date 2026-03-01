@@ -263,7 +263,7 @@ void GbAssembler::ProcessOperand(ParamEntry& entry, string operand, vector<int16
 	}
 }
 
-void GbAssembler::RunPass(vector<int16_t>& output, string code, uint32_t address, int16_t* assembledCode, bool firstPass, unordered_map<string, uint16_t>& localLabels) {
+void GbAssembler::RunPass(vector<int16_t>& output, const string& code, uint32_t address, int16_t* assembledCode, bool firstPass, unordered_map<string, uint16_t>& localLabels) {
 	unordered_set<string> currentPassLabels;
 	for (string line : StringUtilities::Split(code, '\n')) {
 		// Remove comment
@@ -404,7 +404,7 @@ void GbAssembler::RunPass(vector<int16_t>& output, string code, uint32_t address
 	}
 }
 
-uint32_t GbAssembler::AssembleCode(string code, uint32_t address, int16_t* assembledCode) {
+uint32_t GbAssembler::AssembleCode(const string& code, uint32_t address, int16_t* assembledCode) {
 	vector<int16_t> output;
 	unordered_map<string, uint16_t> localLabels;
 

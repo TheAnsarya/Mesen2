@@ -82,7 +82,7 @@ bool NexenMovie::IsPlaying() {
 	return _playing;
 }
 
-vector<uint8_t> NexenMovie::LoadBattery(string extension) {
+vector<uint8_t> NexenMovie::LoadBattery(const string& extension) {
 	vector<uint8_t> batteryData;
 	_reader->ExtractFile("Battery" + extension, batteryData);
 	return batteryData;
@@ -274,7 +274,7 @@ string NexenMovie::LoadString(std::unordered_map<string, string>& settings, cons
 
 void NexenMovie::LoadCheats() {
 	vector<CheatCode> cheats;
-	for (string cheatData : _cheats) {
+	for (const string& cheatData : _cheats) {
 		CheatCode code;
 		if (LoadCheat(cheatData, code)) {
 			cheats.push_back(code);
@@ -283,7 +283,7 @@ void NexenMovie::LoadCheats() {
 	_emu->GetCheatManager()->SetCheats(cheats);
 }
 
-bool NexenMovie::LoadCheat(string cheatData, CheatCode& code) {
+bool NexenMovie::LoadCheat(const string& cheatData, CheatCode& code) {
 	vector<string> data = StringUtilities::Split(cheatData, ' ');
 
 	if (data.size() == 2) {

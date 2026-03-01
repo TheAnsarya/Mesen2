@@ -651,7 +651,8 @@ void ExpressionEvaluator::GetTokenList(char* tokenList) {
 
 	int pos = 0;
 	if (availableTokens) {
-		for (auto entry : *availableTokens) {
+		entries.reserve(availableTokens->size());
+		for (const auto& entry : *availableTokens) {
 			entries.push_back(entry);
 		}
 	}
@@ -660,7 +661,7 @@ void ExpressionEvaluator::GetTokenList(char* tokenList) {
 		return a.second < b.second;
 	});
 
-	for (auto entry : entries) {
+	for (const auto& entry : entries) {
 		if (pos + entry.first.size() + 1 >= 1000) {
 			break;
 		}

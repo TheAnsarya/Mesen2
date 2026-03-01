@@ -333,7 +333,7 @@ bool SaveStateManager::LoadState(int stateIndex) {
 	return false;
 }
 
-void SaveStateManager::SaveRecentGame(string romName, string romPath, string patchPath) {
+void SaveStateManager::SaveRecentGame(const string& romName, const string& romPath, const string& patchPath) {
 	if (_emu->GetSettings()->CheckFlag(EmulationFlags::ConsoleMode) || _emu->GetSettings()->CheckFlag(EmulationFlags::TestMode)) {
 		// Skip saving the recent game file when running in testrunner/CLI console mode
 		return;
@@ -366,7 +366,7 @@ void SaveStateManager::SaveRecentGame(string romName, string romPath, string pat
 	writer.Save();
 }
 
-void SaveStateManager::LoadRecentGame(string filename, bool resetGame) {
+void SaveStateManager::LoadRecentGame(const string& filename, bool resetGame) {
 	VirtualFile file(filename);
 	if (!file.IsValid()) {
 		MessageManager::DisplayMessage("Error", "CouldNotLoadFile", file.GetFileName());

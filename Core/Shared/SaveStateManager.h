@@ -217,14 +217,14 @@ public:
 	/// <param name="romName">ROM name</param>
 	/// <param name="romPath">ROM file path</param>
 	/// <param name="patchPath">Patch file path (if any)</param>
-	void SaveRecentGame(string romName, string romPath, string patchPath);
+	void SaveRecentGame(const string& romName, const string& romPath, const string& patchPath);
 
 	/// <summary>
 	/// Load recent game.
 	/// </summary>
 	/// <param name="filename">Recent game filename</param>
 	/// <param name="resetGame">Reset game after loading if true</param>
-	void LoadRecentGame(string filename, bool resetGame);
+	void LoadRecentGame(const string& filename, bool resetGame);
 
 	/// <summary>
 	/// Get save state screenshot preview.

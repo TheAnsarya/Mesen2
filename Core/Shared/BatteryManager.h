@@ -11,7 +11,7 @@ public:
 	/// </summary>
 	/// <param name="extension">File extension (e.g., ".sav", ".srm")</param>
 	/// <returns>Battery file contents as byte vector, or empty vector if not found</returns>
-	virtual vector<uint8_t> LoadBattery(string extension) = 0;
+	virtual vector<uint8_t> LoadBattery(const string& extension) = 0;
 };
 
 /// <summary>
@@ -24,7 +24,7 @@ public:
 	/// </summary>
 	/// <param name="extension">File extension that was loaded</param>
 	/// <param name="batteryData">Loaded battery data contents</param>
-	virtual void OnLoadBattery(string extension, vector<uint8_t> batteryData) = 0;
+	virtual void OnLoadBattery(const string& extension, vector<uint8_t> batteryData) = 0;
 };
 
 /// <summary>
@@ -50,7 +50,7 @@ private:
 	/// </summary>
 	/// <param name="extension">File extension (including dot)</param>
 	/// <returns>Full path to battery file</returns>
-	string GetBasePath(string& extension);
+	string GetBasePath(const string& extension);
 
 public:
 	/// <summary>
@@ -58,7 +58,7 @@ public:
 	/// </summary>
 	/// <param name="romName">Name of ROM file (without path or extension)</param>
 	/// <param name="setBatteryFlag">If true, sets internal battery flag (for games with save support)</param>
-	void Initialize(string romName, bool setBatteryFlag = false);
+	void Initialize(const string& romName, bool setBatteryFlag = false);
 
 	/// <summary>
 	/// Check if battery-backed save support is enabled.
@@ -97,14 +97,14 @@ public:
 	/// Uses const qualifier to prevent accidental modification.
 	/// C++20 feature for modern zero-cost abstraction.
 	/// </remarks>
-	void SaveBattery(string extension, std::span<const uint8_t> data);
+	void SaveBattery(const string& extension, std::span<const uint8_t> data);
 
 	/// <summary>
 	/// Load battery data from file into new vector.
 	/// </summary>
 	/// <param name="extension">File extension to load</param>
 	/// <returns>Vector containing loaded battery data, or empty vector if file not found</returns>
-	vector<uint8_t> LoadBattery(string extension);
+	vector<uint8_t> LoadBattery(const string& extension);
 
 	/// <summary>
 	/// Load battery data directly into existing buffer using std::span.
@@ -116,14 +116,14 @@ public:
 	/// Buffer size must match file size (or file will be truncated/padded).
 	/// More efficient than vector-returning variant when destination buffer pre-allocated.
 	/// </remarks>
-	void LoadBattery(string extension, std::span<uint8_t> data);
+	void LoadBattery(const string& extension, std::span<uint8_t> data);
 
 	/// <summary>
 	/// Get size of battery file without loading contents.
 	/// </summary>
 	/// <param name="extension">File extension to check</param>
 	/// <returns>File size in bytes, or 0 if file does not exist</returns>
-	uint32_t GetBatteryFileSize(string extension);
+	uint32_t GetBatteryFileSize(const string& extension);
 
 	/// <summary>
 	/// Set per-ROM save directory override for battery files.

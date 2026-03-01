@@ -9,7 +9,7 @@
 
 class RomFinder {
 private:
-	static string FindMatchingRom(Emulator* emu, string romName, uint32_t crc32) {
+	static string FindMatchingRom(Emulator* emu, const string& romName, uint32_t crc32) {
 		if (emu->IsRunning() && emu->GetCrc32() == crc32) {
 			// Current game matches
 			return emu->GetRomInfo().RomFile;
@@ -26,13 +26,13 @@ private:
 		}
 
 		unordered_set<string> checkedFolders;
-		for (string folder : folders) {
+		for (const string& folder : folders) {
 			if (!checkedFolders.emplace(folder).second) {
 				// Already checked this folder
 				continue;
 			}
 
-			for (string romFilename : FolderUtilities::GetFilesInFolder(folder, VirtualFile::RomExtensions, true)) {
+			for (const string& romFilename : FolderUtilities::GetFilesInFolder(folder, VirtualFile::RomExtensions, true)) {
 				string lcRomFile = romFilename;
 				std::transform(lcRomFile.begin(), lcRomFile.end(), lcRomFile.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
@@ -48,7 +48,7 @@ private:
 	}
 
 public:
-	static bool LoadMatchingRom(Emulator* emu, string romName, uint32_t crc32) {
+	static bool LoadMatchingRom(Emulator* emu, const string& romName, uint32_t crc32) {
 		if (emu->IsRunning() && emu->GetCrc32() == crc32) {
 			// Current game matches
 			return true;

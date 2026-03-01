@@ -4,12 +4,12 @@
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/StringUtilities.h"
 
-void BatteryManager::Initialize(string romName, bool setBatteryFlag) {
+void BatteryManager::Initialize(const string& romName, bool setBatteryFlag) {
 	_romName = romName;
 	_hasBattery = setBatteryFlag;
 }
 
-string BatteryManager::GetBasePath(string& extension) {
+string BatteryManager::GetBasePath(const string& extension) {
 	string folder;
 	if (!_perRomSaveDir.empty()) {
 		FolderUtilities::CreateFolder(_perRomSaveDir);
@@ -33,7 +33,7 @@ void BatteryManager::SetBatteryRecorder(shared_ptr<IBatteryRecorder> recorder) {
 	_recorder = recorder;
 }
 
-void BatteryManager::SaveBattery(string extension, std::span<const uint8_t> data) {
+void BatteryManager::SaveBattery(const string& extension, std::span<const uint8_t> data) {
 	if (_romName.empty()) {
 		// Battery saves are disabled (used by history viewer)
 		return;
@@ -46,7 +46,7 @@ void BatteryManager::SaveBattery(string extension, std::span<const uint8_t> data
 	}
 }
 
-vector<uint8_t> BatteryManager::LoadBattery(string extension) {
+vector<uint8_t> BatteryManager::LoadBattery(const string& extension) {
 	if (_romName.empty()) {
 		// Battery saves are disabled (used by history viewer)
 		return {};
@@ -77,13 +77,13 @@ vector<uint8_t> BatteryManager::LoadBattery(string extension) {
 	return batteryData;
 }
 
-void BatteryManager::LoadBattery(string extension, std::span<uint8_t> data) {
+void BatteryManager::LoadBattery(const string& extension, std::span<uint8_t> data) {
 	vector<uint8_t> batteryData = LoadBattery(extension);
 	size_t copySize = std::min(batteryData.size(), data.size());
 	std::copy_n(batteryData.begin(), copySize, data.begin());
 }
 
-uint32_t BatteryManager::GetBatteryFileSize(string extension) {
+uint32_t BatteryManager::GetBatteryFileSize(const string& extension) {
 	return (uint32_t)LoadBattery(extension).size();
 }
 

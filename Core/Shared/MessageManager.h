@@ -92,7 +92,7 @@ public:
 	/// Message strings can contain {0}, {1} placeholders for param1, param2.
 	/// Example: "CheatsApplied" = "{0} cheats loaded"
 	/// </remarks>
-	static void DisplayMessage(string title, string message, string param1 = "", string param2 = "");
+	static void DisplayMessage(string title, string message, const string& param1 = "", const string& param2 = "");
 
 	/// <summary>
 	/// Log message to memory buffer and optionally stdout.

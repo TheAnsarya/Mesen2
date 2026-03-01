@@ -283,7 +283,7 @@ bool BaseControlDevice::HasControllerType(ControllerType type) {
 	return _type == type;
 }
 
-void BaseControlDevice::SwapButtons(shared_ptr<BaseControlDevice> state1, uint8_t button1, shared_ptr<BaseControlDevice> state2, uint8_t button2) {
+void BaseControlDevice::SwapButtons(const shared_ptr<BaseControlDevice>& state1, uint8_t button1, const shared_ptr<BaseControlDevice>& state2, uint8_t button2) {
 	bool pressed1 = state1->IsPressed(button1);
 	bool pressed2 = state2->IsPressed(button2);
 

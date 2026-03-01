@@ -15,7 +15,7 @@ public:
 
 	virtual ~WsAssembler() {}
 
-	uint32_t AssembleCode(string code, uint32_t startAddress, int16_t* assembledCode) {
+	uint32_t AssembleCode(const string& code, uint32_t startAddress, int16_t* assembledCode) {
 		// TODOWS
 		return 0;
 	}

@@ -35,7 +35,7 @@ void SmsAssembler::InitAssembler() {
 	    {0xCBFD, HlRegType::IY}
     };
 
-	for (auto opType : opTypes) {
+	for (const auto& opType : opTypes) {
 		for (int i = 0; i < 256; i++) {
 			string op = SmsDisUtils::GetOpTemplate(i, opType.Prefix == 0xCB || opType.Prefix >= 0x1000, opType.Prefix == 0xED);
 			size_t vIndex = op.find('v');
@@ -406,7 +406,7 @@ void SmsAssembler::ProcessOperand(OpCodeEntry& opEntry, ParamEntry& entry, strin
 	}
 }
 
-void SmsAssembler::RunPass(vector<int16_t>& output, string code, uint32_t address, int16_t* assembledCode, bool firstPass, unordered_map<string, uint16_t>& localLabels) {
+void SmsAssembler::RunPass(vector<int16_t>& output, const string& code, uint32_t address, int16_t* assembledCode, bool firstPass, unordered_map<string, uint16_t>& localLabels) {
 	unordered_set<string> currentPassLabels;
 	for (string line : StringUtilities::Split(code, '\n')) {
 		// Remove comment
@@ -555,7 +555,7 @@ void SmsAssembler::RunPass(vector<int16_t>& output, string code, uint32_t addres
 	}
 }
 
-uint32_t SmsAssembler::AssembleCode(string code, uint32_t address, int16_t* assembledCode) {
+uint32_t SmsAssembler::AssembleCode(const string& code, uint32_t address, int16_t* assembledCode) {
 	vector<int16_t> output;
 	unordered_map<string, uint16_t> localLabels;
 

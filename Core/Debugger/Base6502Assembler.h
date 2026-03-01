@@ -87,7 +87,7 @@ public:
 	virtual ~Base6502Assembler() {
 	}
 
-	uint32_t AssembleCode(string code, uint32_t startAddress, int16_t* assembledCode) {
+	uint32_t AssembleCode(const string& code, uint32_t startAddress, int16_t* assembledCode) {
 		for (int i = 0; i < 256; i++) {
 			string opName = StringUtilities::ToUpper(GetOpName(i));
 			if (_availableModesByOpName.find(opName) == _availableModesByOpName.end()) {

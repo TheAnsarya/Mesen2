@@ -41,8 +41,8 @@ public:
 	void RecordInput(const vector<shared_ptr<BaseControlDevice>>& devices) override;
 
 	// Inherited via IBatteryRecorder
-	void OnLoadBattery(string extension, vector<uint8_t> batteryData) override;
-	vector<uint8_t> LoadBattery(string extension) override;
+	void OnLoadBattery(const string& extension, vector<uint8_t> batteryData) override;
+	vector<uint8_t> LoadBattery(const string& extension) override;
 
 	// Inherited via INotificationListener
 	void ProcessNotification(ConsoleNotificationType type, void* parameter) override;

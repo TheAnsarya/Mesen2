@@ -141,7 +141,7 @@ public:
 	/// <param name="str">String to check</param>
 	/// <param name="content">Prefix to look for</param>
 	/// <returns>True if str starts with content</returns>
-	[[nodiscard]] static bool StartsWith(string& str, const char* content) {
+	[[nodiscard]] static bool StartsWith(const string& str, const char* content) {
 		return str.starts_with(content);
 	}
 
@@ -151,7 +151,7 @@ public:
 	/// <param name="str">String to check</param>
 	/// <param name="content">Suffix to look for</param>
 	/// <returns>True if str ends with content</returns>
-	[[nodiscard]] static bool EndsWith(string& str, const char* content) {
+	[[nodiscard]] static bool EndsWith(const string& str, const char* content) {
 		return str.ends_with(content);
 	}
 

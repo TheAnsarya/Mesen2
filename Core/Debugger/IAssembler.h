@@ -50,7 +50,7 @@ public:
 	///   JMP Start
 	/// ```
 	/// </remarks>
-	virtual uint32_t AssembleCode(string code, uint32_t startAddress, int16_t* assembledCode) = 0;
+	virtual uint32_t AssembleCode(const string& code, uint32_t startAddress, int16_t* assembledCode) = 0;
 };
 
 /// <summary>

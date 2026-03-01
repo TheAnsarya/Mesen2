@@ -84,37 +84,37 @@ private:
 	optional<InternalCheatCode> TryConvertCode(CheatCode code);
 
 	/// <summary>Convert SNES Game Genie code</summary>
-	optional<InternalCheatCode> ConvertFromSnesGameGenie(string code);
+	optional<InternalCheatCode> ConvertFromSnesGameGenie(const string& code);
 
 	/// <summary>Convert SNES Pro Action Replay code</summary>
-	optional<InternalCheatCode> ConvertFromSnesProActionReplay(string code);
+	optional<InternalCheatCode> ConvertFromSnesProActionReplay(const string& code);
 
 	/// <summary>Convert Game Boy Game Genie code</summary>
-	optional<InternalCheatCode> ConvertFromGbGameGenie(string code);
+	optional<InternalCheatCode> ConvertFromGbGameGenie(const string& code);
 
 	/// <summary>Convert Game Boy Game Shark code</summary>
-	optional<InternalCheatCode> ConvertFromGbGameShark(string code);
+	optional<InternalCheatCode> ConvertFromGbGameShark(const string& code);
 
 	/// <summary>Convert PC Engine raw format code</summary>
-	optional<InternalCheatCode> ConvertFromPceRaw(string code);
+	optional<InternalCheatCode> ConvertFromPceRaw(const string& code);
 
 	/// <summary>Convert PC Engine address format code</summary>
-	optional<InternalCheatCode> ConvertFromPceAddress(string code);
+	optional<InternalCheatCode> ConvertFromPceAddress(const string& code);
 
 	/// <summary>Convert NES Game Genie code (6 or 8 characters)</summary>
-	optional<InternalCheatCode> ConvertFromNesGameGenie(string code);
+	optional<InternalCheatCode> ConvertFromNesGameGenie(const string& code);
 
 	/// <summary>Convert NES Pro Action Rocky code</summary>
-	optional<InternalCheatCode> ConvertFromNesProActionRocky(string code);
+	optional<InternalCheatCode> ConvertFromNesProActionRocky(const string& code);
 
 	/// <summary>Convert NES custom format (addr:val or addr?cmp:val)</summary>
-	optional<InternalCheatCode> ConvertFromNesCustomCode(string code);
+	optional<InternalCheatCode> ConvertFromNesCustomCode(const string& code);
 
 	/// <summary>Convert SMS Game Genie code</summary>
-	optional<InternalCheatCode> ConvertFromSmsGameGenie(string code);
+	optional<InternalCheatCode> ConvertFromSmsGameGenie(const string& code);
 
 	/// <summary>Convert SMS Pro Action Replay code</summary>
-	optional<InternalCheatCode> ConvertFromSmsProActionReplay(string code);
+	optional<InternalCheatCode> ConvertFromSmsProActionReplay(const string& code);
 
 	/// <summary>
 	/// Get bank shift amount for CPU address space.
