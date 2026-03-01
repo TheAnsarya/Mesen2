@@ -48,6 +48,8 @@ void NesSoundMixer::Reset() {
 
 	_timestamps.clear();
 	_timestamps.reserve(512); // Pre-allocate typical frame capacity to avoid early-frame reallocs
+	memset(_usedTimestamp, 0, sizeof(_usedTimestamp));
+	memset(_channelOutput, 0, sizeof(_channelOutput));
 
 	for (uint32_t i = 0; i < MaxChannelCount; i++) {
 		_volumes[i] = 1.0;
@@ -187,14 +189,17 @@ int16_t NesSoundMixer::GetOutputVolume(bool forRightChannel) {
 }
 void NesSoundMixer::AddDelta(AudioChannel channel, uint32_t time, int16_t delta) {
 	if (delta != 0) {
-		_timestamps.push_back(time);
+		if (!_usedTimestamp[time]) {
+			_usedTimestamp[time] = true;
+			_timestamps.push_back(time);
+		}
 		_channelOutput[(int)channel][time] += delta;
 	}
 }
 
 void NesSoundMixer::EndFrame(uint32_t time) {
 	sort(_timestamps.begin(), _timestamps.end());
-	_timestamps.erase(std::unique(_timestamps.begin(), _timestamps.end()), _timestamps.end());
+	// Timestamps are already unique (deduplicated at insertion via _usedTimestamp)
 
 	for (size_t i = 0, len = _timestamps.size(); i < len; i++) {
 		uint32_t stamp = _timestamps[i];
@@ -218,7 +223,13 @@ void NesSoundMixer::EndFrame(uint32_t time) {
 		blip_end_frame(_blipBufRight, time);
 	}
 
-	// Reset everything
+	// Selectively zero only used entries (vs 220KB full memset)
+	for (size_t i = 0, len = _timestamps.size(); i < len; i++) {
+		uint32_t stamp = _timestamps[i];
+		_usedTimestamp[stamp] = false;
+		for (uint32_t j = 0; j < MaxChannelCount; j++) {
+			_channelOutput[j][stamp] = 0;
+		}
+	}
 	_timestamps.clear();
-	memset(_channelOutput, 0, sizeof(_channelOutput));
 }

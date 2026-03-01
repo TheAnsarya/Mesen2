@@ -34,6 +34,7 @@ private:
 	int16_t _previousOutputRight = 0;
 
 	vector<uint32_t> _timestamps;
+	bool _usedTimestamp[CycleLength] = {};
 	int16_t _channelOutput[MaxChannelCount][CycleLength] = {};
 	int16_t _currentOutput[MaxChannelCount] = {};
 

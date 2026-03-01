@@ -72,6 +72,9 @@
 		<ClCompile Include="NES\NesCpuBench.cpp">
 			<PrecompiledHeader>Use</PrecompiledHeader>
 		</ClCompile>
+		<ClCompile Include="NES\NesSoundMixerBench.cpp">
+			<PrecompiledHeader>Use</PrecompiledHeader>
+		</ClCompile>
 		<ClCompile Include="Shared\ColorUtilitiesBench.cpp">
 			<PrecompiledHeader>Use</PrecompiledHeader>
 		</ClCompile>
