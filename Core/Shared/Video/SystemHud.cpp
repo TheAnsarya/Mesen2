@@ -85,12 +85,10 @@ void SystemHud::ShowGameTimer(DebugHud* hud, uint32_t screenWidth, int lineNumbe
 	uint32_t minutes = (uint32_t)(frameCount / frameRate / 60) % 60;
 	uint32_t hours = (uint32_t)(frameCount / frameRate / 3600);
 
-	std::stringstream ss;
-	ss << std::setw(2) << std::setfill('0') << hours << ":";
-	ss << std::setw(2) << std::setfill('0') << minutes << ":";
-	ss << std::setw(2) << std::setfill('0') << seconds;
+	char buf[9]; // "HH:MM:SS\0"
+	snprintf(buf, sizeof(buf), "%02u:%02u:%02u", hours, minutes, seconds);
 
-	string text = ss.str();
+	string text(buf);
 	uint32_t length = DrawStringCommand::MeasureString(text).X;
 	DrawString(hud, screenWidth, text, screenWidth - 8 - length, yPos);
 }

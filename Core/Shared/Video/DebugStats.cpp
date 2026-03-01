@@ -41,11 +41,11 @@ void DebugStats::DisplayStats(Emulator* emu, double lastFrameTime) {
 		totalDuration += _frameDurations[i];
 	}
 
-	ss = std::stringstream();
+	ss.str(""); ss.clear();
 	ss << "FPS: " << std::fixed << std::setprecision(4) << (1000 / (totalDuration / 60));
 	hud->DrawString(134, 21, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 
-	ss = std::stringstream();
+	ss.str(""); ss.clear();
 	ss << "Last Frame: " << std::fixed << std::setprecision(2) << lastFrameTime << " ms";
 	hud->DrawString(134, 30, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 
@@ -57,11 +57,11 @@ void DebugStats::DisplayStats(Emulator* emu, double lastFrameTime) {
 		_lastFrameMax = 0;
 	}
 
-	ss = std::stringstream();
+	ss.str(""); ss.clear();
 	ss << "Min Delay: " << std::fixed << std::setprecision(2) << ((_lastFrameMin < 9999) ? _lastFrameMin : 0.0) << " ms";
 	hud->DrawString(134, 39, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 
-	ss = std::stringstream();
+	ss.str(""); ss.clear();
 	ss << "Max Delay: " << std::fixed << std::setprecision(2) << _lastFrameMax << " ms";
 	hud->DrawString(134, 48, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 
@@ -93,12 +93,12 @@ void DebugStats::DisplayStats(Emulator* emu, double lastFrameTime) {
 
 	RewindStats rewindStats = emu->GetRewindManager()->GetStats();
 	double memUsage = (double)rewindStats.MemoryUsage / (1024 * 1024);
-	ss = std::stringstream();
+	ss.str(""); ss.clear();
 	ss << "Rewind mem.: " << std::fixed << std::setprecision(2) << memUsage << " MB";
 	hud->DrawString(10, 73, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 
 	if (rewindStats.HistoryDuration > 0) {
-		ss = std::stringstream();
+		ss.str(""); ss.clear();
 		ss << "   Per min.: " << std::fixed << std::setprecision(2) << (memUsage * 60 * 60 / rewindStats.HistoryDuration) << " MB";
 		hud->DrawString(9, 82, ss.str(), 0xFFFFFF, 0xFF000000, 1, startFrame);
 	}
