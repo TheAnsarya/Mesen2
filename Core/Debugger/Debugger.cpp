@@ -817,7 +817,7 @@ void Debugger::GetTokenList(CpuType cpuType, char* tokenList) {
 	expEval.GetTokenList(tokenList);
 }
 
-int64_t Debugger::EvaluateExpression(string expression, CpuType cpuType, EvalResultType& resultType, bool useCache) {
+int64_t Debugger::EvaluateExpression(const string& expression, CpuType cpuType, EvalResultType& resultType, bool useCache) {
 	MemoryOperationInfo operationInfo{0, 0, MemoryOperationType::Read, MemoryType::None};
 	AddressInfo addressInfo = {0, MemoryType::None};
 	if (useCache && _debuggers[(int)cpuType].Evaluator) {

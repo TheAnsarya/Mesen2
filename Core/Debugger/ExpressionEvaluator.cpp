@@ -101,7 +101,7 @@ unordered_map<string, int64_t>* ExpressionEvaluator::GetAvailableTokens() {
 	return nullptr;
 }
 
-bool ExpressionEvaluator::CheckSpecialTokens(string expression, size_t& pos, string& output, ExpressionData& data) {
+bool ExpressionEvaluator::CheckSpecialTokens(const string& expression, size_t& pos, string& output, ExpressionData& data) {
 	string token;
 	size_t initialPos = pos;
 	size_t len = expression.size();
@@ -154,7 +154,7 @@ bool ExpressionEvaluator::CheckSpecialTokens(string expression, size_t& pos, str
 	}
 }
 
-int64_t ExpressionEvaluator::ProcessSharedTokens(string token) {
+int64_t ExpressionEvaluator::ProcessSharedTokens(const string& token) {
 	if (token == "value") {
 		return EvalValues::Value;
 	} else if (token == "address") {
@@ -175,7 +175,7 @@ int64_t ExpressionEvaluator::ProcessSharedTokens(string token) {
 	return -1;
 }
 
-string ExpressionEvaluator::GetNextToken(string expression, size_t& pos, ExpressionData& data, bool& success, bool previousTokenIsOp) {
+string ExpressionEvaluator::GetNextToken(const string& expression, size_t& pos, ExpressionData& data, bool& success, bool previousTokenIsOp) {
 	string output;
 	success = true;
 
@@ -283,7 +283,7 @@ bool ExpressionEvaluator::ProcessSpecialOperator(EvalOperators evalOp, std::stac
 	return true;
 }
 
-bool ExpressionEvaluator::ToRpn(string expression, ExpressionData& data) {
+bool ExpressionEvaluator::ToRpn(const string& expression, ExpressionData& data) {
 	std::stack<EvalOperators> opStack = std::stack<EvalOperators>();
 	std::stack<int> precedenceStack;
 
@@ -634,7 +634,7 @@ bool ExpressionEvaluator::ReturnBool(int64_t value, EvalResultType& resultType) 
 	return value != 0;
 }
 
-ExpressionData ExpressionEvaluator::GetRpnList(string expression, bool& success) {
+ExpressionData ExpressionEvaluator::GetRpnList(const string& expression, bool& success) {
 	ExpressionData* cachedData = PrivateGetRpnList(expression, success);
 	if (cachedData) {
 		return *cachedData;
@@ -672,7 +672,7 @@ void ExpressionEvaluator::GetTokenList(char* tokenList) {
 	}
 }
 
-ExpressionData* ExpressionEvaluator::PrivateGetRpnList(string expression, bool& success) {
+ExpressionData* ExpressionEvaluator::PrivateGetRpnList(const string& expression, bool& success) {
 	ExpressionData* cachedData = nullptr;
 	{
 		LockHandler lock = _cacheLock.AcquireSafe();
@@ -700,7 +700,7 @@ ExpressionData* ExpressionEvaluator::PrivateGetRpnList(string expression, bool& 
 	return cachedData;
 }
 
-int64_t ExpressionEvaluator::PrivateEvaluate(string expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo, bool& success) {
+int64_t ExpressionEvaluator::PrivateEvaluate(const string& expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo, bool& success) {
 	success = true;
 	ExpressionData* cachedData = PrivateGetRpnList(expression, success);
 
@@ -712,7 +712,7 @@ int64_t ExpressionEvaluator::PrivateEvaluate(string expression, EvalResultType& 
 	return Evaluate(*cachedData, resultType, operationInfo, addressInfo);
 }
 
-int64_t ExpressionEvaluator::Evaluate(string expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo) {
+int64_t ExpressionEvaluator::Evaluate(const string& expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo) {
 	try {
 		bool success;
 		int64_t result = PrivateEvaluate(expression, resultType, operationInfo, addressInfo, success);
@@ -725,7 +725,7 @@ int64_t ExpressionEvaluator::Evaluate(string expression, EvalResultType& resultT
 	return 0;
 }
 
-bool ExpressionEvaluator::Validate(string expression) {
+bool ExpressionEvaluator::Validate(const string& expression) {
 	try {
 		EvalResultType type;
 		MemoryOperationInfo operationInfo = {};

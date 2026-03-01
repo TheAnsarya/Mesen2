@@ -192,7 +192,7 @@ public:
 	void ProcessConfigChange();
 
 	void GetTokenList(CpuType cpuType, char* tokenList);
-	int64_t EvaluateExpression(string expression, CpuType cpuType, EvalResultType& resultType, bool useCache);
+	int64_t EvaluateExpression(const string& expression, CpuType cpuType, EvalResultType& resultType, bool useCache);
 
 	void Run();
 	void PauseOnNextFrame();

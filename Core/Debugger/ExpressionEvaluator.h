@@ -349,7 +349,7 @@ private:
 	/// <param name="output">Output token string</param>
 	/// <param name="data">Expression data (labels stored here)</param>
 	/// <returns>True if special token found</returns>
-	bool CheckSpecialTokens(string expression, size_t& pos, string& output, ExpressionData& data);
+	bool CheckSpecialTokens(const string& expression, size_t& pos, string& output, ExpressionData& data);
 
 	// Platform-specific token getters (register names → EvalValues)
 	unordered_map<string, int64_t>& GetSnesTokens();
@@ -392,7 +392,7 @@ private:
 	/// </summary>
 	/// <param name="token">Token string</param>
 	/// <returns>Token value or -1 if not shared token</returns>
-	int64_t ProcessSharedTokens(string token);
+	int64_t ProcessSharedTokens(const string& token);
 
 	/// <summary>
 	/// Tokenize expression and extract next token.
@@ -403,7 +403,7 @@ private:
 	/// <param name="success">Output success flag</param>
 	/// <param name="previousTokenIsOp">True if previous token was operator</param>
 	/// <returns>Next token string</returns>
-	string GetNextToken(string expression, size_t& pos, ExpressionData& data, bool& success, bool previousTokenIsOp);
+	string GetNextToken(const string& expression, size_t& pos, ExpressionData& data, bool& success, bool previousTokenIsOp);
 
 	/// <summary>
 	/// Process special operators (brackets, braces, memory reads).
@@ -430,7 +430,7 @@ private:
 	/// 5. Right paren pops until left paren
 	/// 6. At end, pop all operators to output
 	/// </remarks>
-	bool ToRpn(string expression, ExpressionData& data);
+	bool ToRpn(const string& expression, ExpressionData& data);
 
 	/// <summary>
 	/// Internal evaluation with caching.
@@ -441,7 +441,7 @@ private:
 	/// <param name="addressInfo">Address context</param>
 	/// <param name="success">Output success flag</param>
 	/// <returns>Evaluation result</returns>
-	int64_t PrivateEvaluate(string expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo, bool& success);
+	int64_t PrivateEvaluate(const string& expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo, bool& success);
 
 	/// <summary>
 	/// Get cached RPN or compile new.
@@ -449,7 +449,7 @@ private:
 	/// <param name="expression">Expression string</param>
 	/// <param name="success">Output success flag</param>
 	/// <returns>Compiled RPN data or nullptr if invalid</returns>
-	ExpressionData* PrivateGetRpnList(string expression, bool& success);
+	ExpressionData* PrivateGetRpnList(const string& expression, bool& success);
 
 protected:
 public:
@@ -479,7 +479,7 @@ public:
 	/// <param name="operationInfo">Memory operation context</param>
 	/// <param name="addressInfo">Address context</param>
 	/// <returns>Evaluation result</returns>
-	int64_t Evaluate(string expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo);
+	int64_t Evaluate(const string& expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo);
 
 	/// <summary>
 	/// Get compiled RPN for expression.
@@ -487,7 +487,7 @@ public:
 	/// <param name="expression">Expression string</param>
 	/// <param name="success">Output success flag</param>
 	/// <returns>Compiled RPN data</returns>
-	ExpressionData GetRpnList(string expression, bool& success);
+	ExpressionData GetRpnList(const string& expression, bool& success);
 
 	/// <summary>
 	/// Get all available tokens (registers, operators, etc.) as string list.
@@ -500,7 +500,7 @@ public:
 	/// </summary>
 	/// <param name="expression">Expression string</param>
 	/// <returns>True if expression valid</returns>
-	bool Validate(string expression);
+	bool Validate(const string& expression);
 
 #if _DEBUG
 	/// <summary>
