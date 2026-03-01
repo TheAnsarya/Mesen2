@@ -147,7 +147,7 @@ bool MovieRecorder::Stop() {
 			_writer->AddFile(_saveStateData, "SaveState.nexen-save");
 		}
 
-		for (auto kvp : _batteryData) {
+		for (auto& kvp : _batteryData) {
 			_writer->AddFile(kvp.second, "Battery" + kvp.first);
 		}
 

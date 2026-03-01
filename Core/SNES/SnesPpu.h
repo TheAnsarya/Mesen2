@@ -313,13 +313,13 @@ public:
 	/// <summary>Renders one scanline of video output.</summary>
 	void RenderScanline();
 
-	uint32_t GetFrameCount();
-	uint16_t GetRealScanline();      ///< Actual scanline including vblank
-	uint16_t GetVblankEndScanline(); ///< Last scanline of vblank period
-	uint16_t GetScanline();          ///< Current visible scanline
-	uint16_t GetCycle();             ///< Current H-counter position
-	uint16_t GetNmiScanline();       ///< Scanline that triggers NMI
-	uint16_t GetVblankStart();       ///< First scanline of vblank
+	[[nodiscard]] uint32_t GetFrameCount();
+	[[nodiscard]] uint16_t GetRealScanline();      ///< Actual scanline including vblank
+	[[nodiscard]] uint16_t GetVblankEndScanline(); ///< Last scanline of vblank period
+	[[nodiscard]] uint16_t GetScanline();          ///< Current visible scanline
+	[[nodiscard]] uint16_t GetCycle();             ///< Current H-counter position
+	[[nodiscard]] uint16_t GetNmiScanline();       ///< Scanline that triggers NMI
+	[[nodiscard]] uint16_t GetVblankStart();       ///< First scanline of vblank
 
 	SnesPpuState GetState();
 	SnesPpuState& GetStateRef();
@@ -329,14 +329,14 @@ public:
 	bool IsInOverclockedScanline();
 	void UpdateSpcState();
 	void UpdateNmiScanline();
-	uint16_t GetLastScanline();
+	[[nodiscard]] uint16_t GetLastScanline();
 
-	bool IsHighResOutput();
-	uint16_t* GetScreenBuffer();
-	uint16_t* GetPreviousScreenBuffer();
-	uint8_t* GetVideoRam();
-	uint8_t* GetCgRam();
-	uint8_t* GetSpriteRam();
+	[[nodiscard]] bool IsHighResOutput();
+	[[nodiscard]] uint16_t* GetScreenBuffer();
+	[[nodiscard]] uint16_t* GetPreviousScreenBuffer();
+	[[nodiscard]] uint8_t* GetVideoRam();
+	[[nodiscard]] uint8_t* GetCgRam();
+	[[nodiscard]] uint8_t* GetSpriteRam();
 
 	void DebugSendFrame();
 

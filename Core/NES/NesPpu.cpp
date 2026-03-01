@@ -851,7 +851,7 @@ uint8_t NesPpu<T>::GetPixelColor() {
 		}
 	}
 
-	if (_hasSprite[_cycle] && _cycle > _minimumDrawSpriteCycle) {
+	if (_hasSprite[_cycle] && _cycle > _minimumDrawSpriteCycle) [[unlikely]] {
 		// SpriteMask = true: Hide sprites in leftmost 8 pixels of screen
 		for (uint8_t i = 0; i < _spriteCount; i++) {
 			int32_t shift = (int32_t)_cycle - _spriteTiles[i].SpriteX - 1;

@@ -412,9 +412,9 @@ private:
 
 public:
 	void SetDummyState(SnesCpuState& state);
-	int32_t GetLastOperand();
+	[[nodiscard]] int32_t GetLastOperand();
 
-	uint32_t GetOperationCount();
+	[[nodiscard]] uint32_t GetOperationCount();
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
 #endif
 };

@@ -68,7 +68,7 @@ void HdNesPack<scale>::InitializeFallbackTiles() {
 			}
 		}
 
-		for (auto def : _hdData->FallbackTiles) {
+	for (const auto& def : _hdData->FallbackTiles) {
 			_fallbackTiles[def.TileIndex] = def.FallbackTileIndex;
 		}
 	}

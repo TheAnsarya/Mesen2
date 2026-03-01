@@ -208,13 +208,13 @@ public:
 	void WriteDma(uint32_t addr, uint8_t value, bool forBusA);
 
 	/// <summary>Gets current open bus value.</summary>
-	uint8_t GetOpenBus();
+	[[nodiscard]] uint8_t GetOpenBus();
 
 	/// <summary>Gets master clock value.</summary>
-	uint64_t GetMasterClock();
+	[[nodiscard]] uint64_t GetMasterClock();
 
 	/// <summary>Gets horizontal clock position.</summary>
-	uint16_t GetHClock();
+	[[nodiscard]] uint16_t GetHClock();
 
 	/// <summary>Debug access to Work RAM.</summary>
 	uint8_t* DebugGetWorkRam();
@@ -223,10 +223,10 @@ public:
 	MemoryMappings* GetMemoryMappings();
 
 	/// <summary>Gets CPU speed for address.</summary>
-	uint8_t GetCpuSpeed(uint32_t addr);
+	[[nodiscard]] uint8_t GetCpuSpeed(uint32_t addr);
 
 	/// <summary>Gets current CPU speed.</summary>
-	uint8_t GetCpuSpeed();
+	[[nodiscard]] uint8_t GetCpuSpeed();
 
 	/// <summary>Sets current CPU speed.</summary>
 	void SetCpuSpeed(uint8_t speed);
@@ -241,7 +241,7 @@ public:
 	bool IsWorkRam(uint32_t cpuAddress);
 
 	/// <summary>Gets current WRAM access position.</summary>
-	uint32_t GetWramPosition();
+	[[nodiscard]] uint32_t GetWramPosition();
 
 	/// <summary>Serializes state for save states.</summary>
 	void Serialize(Serializer& s) override;

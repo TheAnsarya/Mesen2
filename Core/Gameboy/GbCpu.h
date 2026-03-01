@@ -228,7 +228,7 @@ private:
 
 public:
 	void SetDummyState(GbCpuState& state);
-	uint32_t GetOperationCount();
+	[[nodiscard]] uint32_t GetOperationCount();
 	void LogMemoryOperation(uint32_t addr, uint8_t value, MemoryOperationType type);
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
 #endif

@@ -642,7 +642,7 @@ void SnesPpu::UpdateNmiScanline() {
 		}
 	}
 
-	SnesConfig snesCfg = _settings->GetSnesConfig();
+	const SnesConfig& snesCfg = _settings->GetSnesConfig();
 	_overclockEnabled = snesCfg.PpuExtraScanlinesBeforeNmi > 0 || snesCfg.PpuExtraScanlinesAfterNmi > 0;
 
 	_adjustedVblankEndScanline = _baseVblankEndScanline + snesCfg.PpuExtraScanlinesBeforeNmi;

@@ -125,7 +125,7 @@ void GbPpu::SetCpuStopState(bool stopped) {
 
 template <bool singleStep>
 void GbPpu::Exec() {
-	if (_lcdDisabled) {
+	if (_lcdDisabled) [[unlikely]] {
 		// LCD is disabled, prevent IRQs, etc.
 		// Not quite correct in terms of frame pacing
 		if (_gameboy->GetApuCycleCount() - _lastFrameTime > 70224) {

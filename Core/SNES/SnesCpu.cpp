@@ -29,7 +29,7 @@ void SnesCpu::Exec() {
 	_immediateMode = false;
 	_readWriteMask = 0xFFFFFF;
 
-	if (_state.StopState == SnesCpuStopState::Running) {
+	if (_state.StopState == SnesCpuStopState::Running) [[likely]] {
 #ifndef DUMMYCPU
 		_emu->ProcessInstruction<CpuType::Snes>(); // Emulator hook for instruction
 #endif

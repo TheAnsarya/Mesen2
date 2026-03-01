@@ -41,8 +41,8 @@ class NesConsole;
 class NesMemoryManager : public ISerializable {
 private:
 	static constexpr int CpuMemorySize = 0x10000;  ///< 64KB address space
-	static const int NesInternalRamSize = 0x800;   ///< Standard 2KB RAM
-	static const int FamicomBoxInternalRamSize = 0x2000;  ///< FamicomBox 8KB RAM
+	static constexpr int NesInternalRamSize = 0x800;   ///< Standard 2KB RAM
+	static constexpr int FamicomBoxInternalRamSize = 0x2000;  ///< FamicomBox 8KB RAM
 
 	Emulator* _emu = nullptr;           ///< Emulator instance
 	CheatManager* _cheatManager = nullptr;  ///< Game Genie/cheat support
@@ -101,7 +101,7 @@ public:
 	void DebugWrite(uint16_t addr, uint8_t value, bool disableSideEffects = true);
 
 	/// <summary>Get pointer to internal RAM.</summary>
-	uint8_t* GetInternalRam();
+	[[nodiscard]] uint8_t* GetInternalRam();
 
 	/// <summary>CPU memory read.</summary>
 	/// <param name="addr">16-bit address</param>
@@ -117,8 +117,8 @@ public:
 
 	/// <summary>Get open bus value (last value on bus).</summary>
 	/// <param name="mask">Bits to return (others are 0)</param>
-	uint8_t GetOpenBus(uint8_t mask = 0xFF);
+	[[nodiscard]] uint8_t GetOpenBus(uint8_t mask = 0xFF);
 
 	/// <summary>Get internal open bus (PPU/APU)</summary>
-	uint8_t GetInternalOpenBus(uint8_t mask = 0xFF);
+	[[nodiscard]] uint8_t GetInternalOpenBus(uint8_t mask = 0xFF);
 };

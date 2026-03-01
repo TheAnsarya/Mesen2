@@ -4,6 +4,7 @@
 void BaseEventManager::FilterEvents() {
 	auto lock = _lock.AcquireSafe();
 	_sentEvents.clear();
+	_sentEvents.reserve(_snapshotPrevFrame.size() + _snapshotCurrentFrame.size());
 
 	if (ShowPreviousFrameEvents() && !_forAutoRefresh) {
 		int offset = GetScanlineOffset();

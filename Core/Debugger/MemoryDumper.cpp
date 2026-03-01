@@ -498,7 +498,7 @@ void MemoryDumper::PerformUndo() {
 	if (!_undoHistory.empty()) {
 		DebugBreakHelper helper(_debugger);
 		UndoBatch& batch = _undoHistory.back();
-		for (auto entry : batch.Entries) {
+		for (auto& entry : batch.Entries) {
 			InternalSetMemoryValues(entry.MemType, entry.StartAddress, entry.OriginalData.data(), (uint32_t)entry.OriginalData.size(), true, false);
 		}
 		_undoHistory.pop_back();

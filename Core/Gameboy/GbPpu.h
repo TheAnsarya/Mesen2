@@ -223,12 +223,12 @@ public:
 
 	void SetCpuStopState(bool stopped);
 
-	uint32_t GetFrameCount();
-	uint8_t GetScanline();
-	uint16_t GetCycle();
-	bool IsLcdEnabled();
-	bool IsCgbEnabled();
-	PpuMode GetMode();
+	[[nodiscard]] uint32_t GetFrameCount();
+	[[nodiscard]] uint8_t GetScanline();
+	[[nodiscard]] uint16_t GetCycle();
+	[[nodiscard]] bool IsLcdEnabled();
+	[[nodiscard]] bool IsCgbEnabled();
+	[[nodiscard]] PpuMode GetMode();
 
 	template <bool singleStep>
 	void Exec();
