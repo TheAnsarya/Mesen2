@@ -289,7 +289,7 @@ uint8_t SnesMemoryManager::Read(uint32_t addr, MemoryOperationType type) {
 
 	uint8_t value;
 	IMemoryHandler* handler = _mappings.GetHandler(addr);
-	if (handler) {
+	if (handler) [[likely]] {
 		value = handler->Read(addr);
 		_memTypeBusA = handler->GetMemoryType();
 		if (handler != _registerHandlerA.get()) {
@@ -314,7 +314,7 @@ uint8_t SnesMemoryManager::ReadDma(uint32_t addr, bool forBusA) {
 
 	uint8_t value;
 	IMemoryHandler* handler = _mappings.GetHandler(addr);
-	if (handler) {
+	if (handler) [[likely]] {
 		if (forBusA && handler == _registerHandlerB.get() && (addr & 0xFF00) == 0x2100) {
 			// Trying to read from bus B using bus A returns open bus
 			value = _openBus;
@@ -338,7 +338,7 @@ uint8_t SnesMemoryManager::ReadDma(uint32_t addr, bool forBusA) {
 		value = _openBus;
 		LogDebug("[Debug] Read - missing handler: $" + HexUtilities::ToHex(addr));
 	}
-	if (_cheatManager->HasCheats<CpuType::Snes>()) {
+	if (_cheatManager->HasCheats<CpuType::Snes>()) [[unlikely]] {
 		_cheatManager->ApplyCheat<CpuType::Snes>(addr, value);
 	}
 	_emu->ProcessMemoryRead<CpuType::Snes>(addr, value, MemoryOperationType::DmaRead);
@@ -362,7 +362,7 @@ void SnesMemoryManager::Write(uint32_t addr, uint8_t value, MemoryOperationType 
 
 	if (_emu->ProcessMemoryWrite<CpuType::Snes>(addr, value, type)) {
 		IMemoryHandler* handler = _mappings.GetHandler(addr);
-		if (handler) {
+		if (handler) [[likely]] {
 			handler->Write(addr, value);
 			_memTypeBusA = handler->GetMemoryType();
 		} else {
@@ -375,7 +375,7 @@ void SnesMemoryManager::WriteDma(uint32_t addr, uint8_t value, bool forBusA) {
 	IncMasterClock4();
 	if (_emu->ProcessMemoryWrite<CpuType::Snes>(addr, value, MemoryOperationType::DmaWrite)) {
 		IMemoryHandler* handler = _mappings.GetHandler(addr);
-		if (handler) {
+		if (handler) [[likely]] {
 			if (forBusA && handler == _registerHandlerB.get() && (addr & 0xFF00) == 0x2100) {
 				// Trying to write to bus B using bus A does nothing
 			} else if (handler == _registerHandlerA.get()) {

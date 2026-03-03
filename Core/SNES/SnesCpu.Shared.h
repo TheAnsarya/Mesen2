@@ -1075,7 +1075,7 @@ void SnesCpu::DetectNmiSignalEdge() {
 		}
 	}
 
-	if (!_state.IrqLock) {
+	if (!_state.IrqLock) [[likely]] {
 		_state.PrevIrqSource = _state.IrqSource != 0 && !CheckFlag(ProcFlags::IrqDisable);
 		if (_state.IrqSource != 0) {
 			// WAI ends even if the I flag is set (but execution won't jump to the IRQ handler)

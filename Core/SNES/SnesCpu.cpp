@@ -45,14 +45,14 @@ void SnesCpu::Exec() {
 void SnesCpu::CheckForInterrupts() {
 #ifndef DUMMYCPU
 	// Use the state of the IRQ/NMI flags on the previous cycle to determine if an IRQ is processed or not
-	if (_state.NeedNmi) {
+	if (_state.NeedNmi) [[unlikely]] {
 		// NMI: clear flag, process interrupt, notify emulator
 		_state.NeedNmi = false;
 		uint32_t originalPc = GetProgramAddress(_state.PC);
 		_emu->GetCheatManager()->RefreshRamCheats(CpuType::Snes);
 		ProcessInterrupt(_state.EmulationMode ? SnesCpu::LegacyNmiVector : SnesCpu::NmiVector, true);
 		_emu->ProcessInterrupt<CpuType::Snes>(originalPc, GetProgramAddress(_state.PC), true);
-	} else if (_state.PrevIrqSource) {
+	} else if (_state.PrevIrqSource) [[unlikely]] {
 		// IRQ: process interrupt, notify emulator
 		uint32_t originalPc = GetProgramAddress(_state.PC);
 		ProcessInterrupt(_state.EmulationMode ? SnesCpu::LegacyIrqVector : SnesCpu::IrqVector, true);

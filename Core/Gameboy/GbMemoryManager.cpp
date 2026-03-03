@@ -174,10 +174,10 @@ uint8_t GbMemoryManager::Read(uint16_t addr) {
 		addr = _dmaController->ProcessOamDmaReadConflict(addr);
 	}
 
-	if (_state.IsReadRegister[addr >> 8]) {
+	if (_state.IsReadRegister[addr >> 8]) [[unlikely]] {
 		_ppu->ProcessOamCorruption<oamCorruptionType>(addr);
 		value = ReadRegister(addr);
-	} else if (_reads[addr >> 8]) {
+	} else if (_reads[addr >> 8]) [[likely]] {
 		value = _reads[addr >> 8][(uint8_t)addr];
 	}
 
@@ -211,15 +211,15 @@ uint8_t GbMemoryManager::ReadDma(uint16_t addr) {
 template <MemoryOperationType type>
 void GbMemoryManager::Write(uint16_t addr, uint8_t value) {
 	if (_emu->ProcessMemoryWrite<CpuType::Gameboy>(addr, value, type)) {
-		if (_dmaController->IsOamDmaRunning() && _dmaController->IsOamDmaConflict(addr)) {
+		if (_dmaController->IsOamDmaRunning() && _dmaController->IsOamDmaConflict(addr)) [[unlikely]] {
 			// DMA conflict, can't write
 			return;
 		}
 
-		if (_state.IsWriteRegister[addr >> 8]) {
+		if (_state.IsWriteRegister[addr >> 8]) [[unlikely]] {
 			_ppu->ProcessOamCorruption<GbOamCorruptionType::Write>(addr);
 			WriteRegister(addr, value);
-		} else if (_writes[addr >> 8]) {
+		} else if (_writes[addr >> 8]) [[likely]] {
 			_writes[addr >> 8][(uint8_t)addr] = value;
 		}
 	}

@@ -321,7 +321,7 @@ public:
 		}
 
 #ifndef DUMMYCPU
-		if (_state.Pipeline.ReloadRequested) {
+		if (_state.Pipeline.ReloadRequested) [[unlikely]] {
 			ReloadPipeline();
 		}
 

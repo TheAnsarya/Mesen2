@@ -689,7 +689,7 @@ void NesPpu<T>::WriteVram(uint16_t addr, uint8_t value) {
 
 template <class T>
 void NesPpu<T>::LoadTileInfo() {
-	if (IsRenderingEnabled()) {
+	if (IsRenderingEnabled()) [[likely]] {
 		switch (_cycle & 0x07) {
 			case 1: {
 				((T*)this)->StoreTileInformation(); // Used by HD packs
@@ -891,7 +891,7 @@ if (i == 0 && spriteBgColor != 0 && _sprite0Visible && _cycle != 256 && _mask.Ba
 template <class T>
 void NesPpu<T>::ProcessScanlineImpl() {
 	// Only called for cycle 1+
-	if (_cycle <= 256) {
+	if (_cycle <= 256) [[likely]] {
 		LoadTileInfo();
 
 		if (_prevRenderingEnabled && (_cycle & 0x07) == 0) {

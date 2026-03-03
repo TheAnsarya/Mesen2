@@ -150,7 +150,7 @@ void GbaCpu::ProcessException(GbaCpuMode mode, GbaCpuVector vector) {
 
 uint32_t GbaCpu::ReadCode(GbaAccessModeVal mode, uint32_t addr) {
 #ifndef DUMMYCPU
-	if (_ldmGlitch) {
+	if (_ldmGlitch) [[unlikely]] {
 		_ldmGlitch--;
 	}
 
@@ -171,7 +171,7 @@ uint32_t GbaCpu::ReadCode(GbaAccessModeVal mode, uint32_t addr) {
 uint32_t GbaCpu::Read(GbaAccessModeVal mode, uint32_t addr) {
 #ifndef DUMMYCPU
 	_state.Pipeline.Mode &= ~GbaAccessMode::Sequential;
-	if (_ldmGlitch) {
+	if (_ldmGlitch) [[unlikely]] {
 		_ldmGlitch--;
 	}
 	uint32_t value = _memoryManager->Read(mode, addr);
@@ -187,7 +187,7 @@ uint32_t GbaCpu::Read(GbaAccessModeVal mode, uint32_t addr) {
 void GbaCpu::Write(GbaAccessModeVal mode, uint32_t addr, uint32_t value) {
 #ifndef DUMMYCPU
 	_state.Pipeline.Mode &= ~GbaAccessMode::Sequential;
-	if (_ldmGlitch) {
+	if (_ldmGlitch) [[unlikely]] {
 		_ldmGlitch--;
 	}
 	_memoryManager->Write(mode, addr, value);
@@ -200,7 +200,7 @@ void GbaCpu::Write(GbaAccessModeVal mode, uint32_t addr, uint32_t value) {
 void GbaCpu::Idle() {
 #ifndef DUMMYCPU
 	_state.Pipeline.Mode &= ~GbaAccessMode::Sequential;
-	if (_ldmGlitch) {
+	if (_ldmGlitch) [[unlikely]] {
 		_ldmGlitch--;
 	}
 	_memoryManager->ProcessIdleCycle();

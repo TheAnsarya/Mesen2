@@ -340,7 +340,7 @@ void NesCpu::StartCpuCycle(bool forRead) {
 }
 
 void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType) {
-	if (!_needHalt) {
+	if (!_needHalt) [[likely]] {
 		return;
 	}
 

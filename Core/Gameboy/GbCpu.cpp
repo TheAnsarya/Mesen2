@@ -109,7 +109,7 @@ void GbCpu::Exec() {
 	}
 #endif
 
-	if (_state.HaltCounter) {
+	if (_state.HaltCounter) [[unlikely]] {
 		if (_state.HaltBug) {
 			ProcessHaltBug();
 		} else {
