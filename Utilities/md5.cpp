@@ -39,6 +39,7 @@
 #include <string.h>
 #include <sstream>
 #include <iomanip>
+#include <format>
 #include "md5.h"
 
 /*
@@ -300,10 +301,10 @@ string GetMd5Sum(void* buffer, size_t size) {
 	unsigned char result[16];
 	GetMd5Sum(result, buffer, (unsigned long)size);
 
-	std::stringstream ss;
-	ss << std::hex << std::uppercase << std::setfill('0');
+	string hex;
+	hex.reserve(32);
 	for (int i = 0; i < 16; i++) {
-		ss << std::setw(2) << (int)result[i];
+		hex += std::format("{:02X}", result[i]);
 	}
-	return ss.str();
+	return hex;
 }

@@ -58,15 +58,9 @@ void NsfLoader::InitializeFromHeader(RomData& romData) {
 	Log("[NSF] Copyright: " + string(header.CopyrightHolder));
 	Log("[NSF] Ripper: " + string(header.RipperName));
 
-	stringstream ss;
-	ss << "[NSF] Load Address: 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << header.LoadAddress;
-	Log(ss.str());
-	ss = stringstream();
-	ss << "[NSF] Init Address: 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << header.InitAddress;
-	Log(ss.str());
-	ss = stringstream();
-	ss << "[NSF] Play Address: 0x" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << header.PlayAddress;
-	Log(ss.str());
+	Log(std::format("[NSF] Load Address: 0x{:04X}", header.LoadAddress));
+	Log(std::format("[NSF] Init Address: 0x{:04X}", header.InitAddress));
+	Log(std::format("[NSF] Play Address: 0x{:04X}", header.PlayAddress));
 
 	vector<string> chips;
 	if (header.SoundChips & 0x01) {
@@ -91,15 +85,15 @@ void NsfLoader::InitializeFromHeader(RomData& romData) {
 		chips.push_back("<none>");
 	}
 
-	ss = stringstream();
+	string chipList;
 	for (size_t i = 0; i < chips.size(); i++) {
 		if (i > 0) {
-			ss << ", ";
+			chipList += ", ";
 		}
-		ss << chips[i];
+		chipList += chips[i];
 	}
 
-	Log("[NSF] Sound Chips: " + ss.str());
+	Log("[NSF] Sound Chips: " + chipList);
 	Log("[NSF] ROM size: " + std::to_string(romData.PrgRom.size() / 1024) + " KB");
 }
 

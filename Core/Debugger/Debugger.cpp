@@ -1300,11 +1300,17 @@ void Debugger::Log(const string& message) {
 
 string Debugger::GetLog() {
 	auto lock = _logLock.AcquireSafe();
-	stringstream ss;
-	for (string& msg : _debuggerLog) {
-		ss << msg << "\n";
+	string result;
+	size_t totalSize = 0;
+	for (const string& msg : _debuggerLog) {
+		totalSize += msg.size() + 1;
 	}
-	return ss.str();
+	result.reserve(totalSize);
+	for (const string& msg : _debuggerLog) {
+		result.append(msg);
+		result += '\n';
+	}
+	return result;
 }
 
 bool Debugger::SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption) {

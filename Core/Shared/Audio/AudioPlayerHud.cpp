@@ -220,6 +220,7 @@ void AudioPlayerHud::ProcessSamples(int16_t* samples, size_t sampleCount, uint32
 		_fft.transform_real(_input, _out);
 
 		_amplitudes.clear();
+		_amplitudes.reserve(N / 2);
 		for (int i = 0; i < N / 2; i++) {
 			std::complex<double> c = _out[i];
 			double amp = sqrt(c.real() * c.real() + c.imag() * c.imag());

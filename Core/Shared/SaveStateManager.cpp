@@ -62,16 +62,11 @@ string SaveStateManager::GetTimestampedFilepath() {
 	localtime_r(&time, &tm);
 #endif
 
-	std::ostringstream oss;
-	oss << romName << "_"
-		<< std::setfill('0') << std::setw(4) << (tm.tm_year + 1900) << "-"
-		<< std::setw(2) << (tm.tm_mon + 1) << "-"
-		<< std::setw(2) << tm.tm_mday << "_"
-		<< std::setw(2) << tm.tm_hour << "-"
-		<< std::setw(2) << tm.tm_min << "-"
-		<< std::setw(2) << tm.tm_sec << ".nexen-save";
+	std::string filename = std::format("{}_{:04d}-{:02d}-{:02d}_{:02d}-{:02d}-{:02d}.nexen-save",
+		romName, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+		tm.tm_hour, tm.tm_min, tm.tm_sec);
 
-	return FolderUtilities::CombinePath(folder, oss.str());
+	return FolderUtilities::CombinePath(folder, filename);
 }
 
 time_t SaveStateManager::ParseTimestampFromFilename(const string& filename) {
@@ -478,12 +473,8 @@ string SaveStateManager::SaveTimestampedState() {
 		localtime_r(&time, &tm);
 #endif
 
-		std::ostringstream oss;
-		oss << std::setfill('0') << std::setw(2) << tm.tm_hour << ":"
-			<< std::setw(2) << tm.tm_min << ":"
-			<< std::setw(2) << tm.tm_sec;
-
-		MessageManager::DisplayMessage("SaveStates", "SaveStateSavedTime", oss.str());
+		MessageManager::DisplayMessage("SaveStates", "SaveStateSavedTime",
+			std::format("{:02d}:{:02d}:{:02d}", tm.tm_hour, tm.tm_min, tm.tm_sec));
 		return filepath;
 	}
 
@@ -589,10 +580,9 @@ string SaveStateManager::GetRecentPlayFilepath(uint32_t slotIndex) {
 	string romName = FolderUtilities::GetFilename(_emu->GetRomInfo().RomFile.GetFileName(), false);
 
 	// Format slot as 2-digit (01-12)
-	std::ostringstream oss;
-	oss << romName << "_recent_" << std::setfill('0') << std::setw(2) << (slotIndex + 1) << ".nexen-save";
+	string filename = std::format("{}_recent_{:02d}.nexen-save", romName, slotIndex + 1);
 
-	return FolderUtilities::CombinePath(folder, oss.str());
+	return FolderUtilities::CombinePath(folder, filename);
 }
 
 string SaveStateManager::GetAutoSaveFilepath() {

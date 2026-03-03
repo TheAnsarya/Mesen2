@@ -189,9 +189,15 @@ void MessageManager::ClearLog() {
 
 string MessageManager::GetLog() {
 	auto lock = _logLock.AcquireSafe();
-	stringstream ss;
+	string result;
+	size_t totalSize = 0;
 	for (const string& msg : _log) {
-		ss << msg << "\n";
+		totalSize += msg.size() + 1;
 	}
-	return ss.str();
+	result.reserve(totalSize);
+	for (const string& msg : _log) {
+		result.append(msg);
+		result += '\n';
+	}
+	return result;
 }

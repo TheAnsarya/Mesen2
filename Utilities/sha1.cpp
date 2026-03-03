@@ -21,6 +21,7 @@
 #include "sha1.h"
 #include <sstream>
 #include <iomanip>
+#include <format>
 #include <fstream>
 
 static const size_t BLOCK_INTS = 16; /* number of 32bit integers per SHA1 block */
@@ -249,16 +250,16 @@ std::string SHA1::final() {
 	transform(digest, block, transforms);
 
 	/* Hex std::string */
-	std::ostringstream result;
+	string hexResult;
+	hexResult.reserve(40);
 	for (size_t i = 0; i < sizeof(digest) / sizeof(digest[0]); i++) {
-		result << std::uppercase << std::hex << std::setfill('0') << std::setw(8);
-		result << digest[i];
+		hexResult += std::format("{:08X}", digest[i]);
 	}
 
 	/* Reset for next run */
 	reset(digest, buffer, transforms);
 
-	return result.str();
+	return hexResult;
 }
 
 std::string SHA1::GetHash(vector<uint8_t>& data) {
