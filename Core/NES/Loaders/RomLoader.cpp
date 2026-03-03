@@ -26,7 +26,7 @@ bool RomLoader::LoadFile(VirtualFile& romFile, RomData& romData, bool databaseEn
 	romData = {};
 
 	vector<uint8_t>& fileData = romData.RawData;
-	romFile.ReadFile(fileData);
+	(void)romFile.ReadFile(fileData);
 	if (fileData.size() < 15) {
 		return false;
 	}

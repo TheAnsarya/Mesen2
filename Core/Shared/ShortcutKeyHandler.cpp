@@ -329,7 +329,7 @@ void ShortcutKeyHandler::ProcessShortcutPressed(EmulatorShortcut shortcut, uint3
 			break;
 
 		case EmulatorShortcut::LoadDesignatedSlot:
-			_emu->GetSaveStateManager()->LoadState(0);
+			(void)_emu->GetSaveStateManager()->LoadState(0);
 			break;
 
 		case EmulatorShortcut::RunSingleFrame:

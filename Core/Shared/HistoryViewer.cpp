@@ -138,7 +138,7 @@ bool HistoryViewer::SaveMovie(const string& movieFile, uint32_t startPosition, u
 	bool result = recorder->CreateMovie(movieFile, _history, startPosition, endPosition, _mainEmu->GetBatteryManager()->HasBattery());
 
 	// Resume the state and resume
-	_emu->Deserialize(state, SaveStateManager::FileFormatVersion, true);
+	(void)_emu->Deserialize(state, SaveStateManager::FileFormatVersion, true);
 	return result;
 }
 

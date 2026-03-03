@@ -37,7 +37,7 @@ public:
 	void LoadState(Emulator* emu) {
 		std::stringstream ss;
 		ss.write((char*)_stateData.data(), _stateData.size());
-		emu->Deserialize(ss, SaveStateManager::FileFormatVersion, true);
+		(void)emu->Deserialize(ss, SaveStateManager::FileFormatVersion, true);
 
 		emu->GetCheatManager()->SetCheats(_activeCheats);
 	}

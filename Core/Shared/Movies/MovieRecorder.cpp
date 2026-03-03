@@ -88,7 +88,7 @@ void MovieRecorder::GetGameSettings(stringstream& out) {
 		WriteString(out, MovieKeys::PatchFile, patchFile.GetFileName());
 		WriteString(out, MovieKeys::PatchFileSha1, patchFile.GetSha1Hash());
 
-		romFile.ApplyPatch(patchFile);
+		(void)romFile.ApplyPatch(patchFile);
 		WriteString(out, MovieKeys::PatchedRomSha1, romFile.GetSha1Hash());
 	}
 

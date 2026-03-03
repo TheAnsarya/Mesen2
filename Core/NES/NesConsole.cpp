@@ -213,7 +213,7 @@ void NesConsole::LoadHdPack(VirtualFile& romFile) {
 			auto result = _hdData->PatchesByHash.find(romFile.GetSha1Hash());
 			if (result != _hdData->PatchesByHash.end()) {
 				VirtualFile patchFile = result->second;
-				romFile.ApplyPatch(patchFile);
+				(void)romFile.ApplyPatch(patchFile);
 			}
 
 			shared_ptr<HdPackData> data = _hdData.lock();
@@ -662,7 +662,7 @@ void NesConsole::StartRecordingHdPack(HdPackBuilderOptions options) {
 	_ppu = std::make_unique<HdBuilderPpu>(this, _hdPackBuilder.get(), options.ChrRamBankSize);
 	_memoryManager->RegisterIODevice(_ppu.get());
 
-	_emu->Deserialize(saveState, SaveStateManager::FileFormatVersion, false);
+	(void)_emu->Deserialize(saveState, SaveStateManager::FileFormatVersion, false);
 	_emu->GetSoundMixer()->StopAudio();
 
 	_emu->GetVideoDecoder()->ForceFilterUpdate();
@@ -686,7 +686,7 @@ void NesConsole::StopRecordingHdPack() {
 		_memoryManager->RegisterIODevice(_ppu.get());
 		_hdPackBuilder.reset();
 
-		_emu->Deserialize(saveState, SaveStateManager::FileFormatVersion, false);
+		(void)_emu->Deserialize(saveState, SaveStateManager::FileFormatVersion, false);
 		_emu->GetSoundMixer()->StopAudio();
 		_emu->GetVideoDecoder()->ForceFilterUpdate();
 	}

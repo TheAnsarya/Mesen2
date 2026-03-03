@@ -389,7 +389,7 @@ void SaveStateManager::LoadRecentGame(const string& filename, bool resetGame) {
 		if (_emu->LoadRom(romPath, patchPath)) {
 			if (!resetGame) {
 				auto lock = _emu->AcquireLock();
-				SaveStateManager::LoadState(stateStream);
+				(void)SaveStateManager::LoadState(stateStream);
 			}
 		}
 	} catch (std::exception&) {

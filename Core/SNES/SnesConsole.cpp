@@ -331,7 +331,7 @@ void SnesConsole::ProcessAudioPlayerAction(AudioPlayerActionParams p) {
 		// Can't do this in the current thread in some contexts (e.g when track reaches end)
 		// because this is called from the emulation thread.
 		thread switchTrackTask([this, i]() {
-			_emu->LoadRom(VirtualFile(_spcPlaylist[i]), VirtualFile());
+			(void)_emu->LoadRom(VirtualFile(_spcPlaylist[i]), VirtualFile());
 		});
 		switchTrackTask.detach();
 	}

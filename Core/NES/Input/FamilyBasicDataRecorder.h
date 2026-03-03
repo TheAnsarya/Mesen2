@@ -64,7 +64,7 @@ public:
 	void LoadFromFile(VirtualFile file) {
 		if (file.IsValid()) {
 			vector<uint8_t> fileData;
-			file.ReadFile(fileData);
+			(void)file.ReadFile(fileData);
 			_fileData = fileData;
 		}
 	}
