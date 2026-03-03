@@ -185,14 +185,14 @@ protected:
 
 		if (_options.IndentCode) {
 			indentLevel = 0xFF - (sp & 0xFF);
-			output += std::string(indentLevel / 2, ' ');
+			output.append(indentLevel / 2, ' ');
 		}
 
 		LabelManager* labelManager = _options.UseLabels ? _labelManager : nullptr;
 		info.GetDisassembly(output, pc, labelManager, _settings);
 
 		if (rowPart.MinWidth > (int)(output.size() - startPos)) {
-			output += std::string(rowPart.MinWidth - (output.size() - startPos), ' ');
+			output.append(rowPart.MinWidth - (output.size() - startPos), ' ');
 		}
 	}
 
@@ -264,9 +264,9 @@ protected:
 		string str = rowPart.DisplayInHex ? HexUtilities::ToHex(value) : std::to_string(value);
 		if (rowPart.MinWidth > (int)str.size()) {
 			if (rowPart.DisplayInHex) {
-				str = std::string(rowPart.MinWidth - str.size(), '0') + str;
+				str.insert(0, rowPart.MinWidth - str.size(), '0');
 			} else {
-				str += std::string(rowPart.MinWidth - str.size(), ' ');
+				str.append(rowPart.MinWidth - str.size(), ' ');
 			}
 		}
 		output += str;
@@ -275,7 +275,7 @@ protected:
 	void WriteStringValue(string& output, const string& value, RowPart& rowPart) {
 		output += value;
 		if (rowPart.MinWidth > (int)value.size()) {
-			output += std::string(rowPart.MinWidth - value.size(), ' ');
+			output.append(rowPart.MinWidth - value.size(), ' ');
 		}
 	}
 

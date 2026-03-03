@@ -375,7 +375,7 @@ void HdNesPack<scale>::BuildAdditionalTileCache(int32_t x, int32_t y, HdPpuTileI
 	}
 
 	// Cache list of additional tiles linked to this sprite
-	_additionalTilesByKey.emplace(tile, additions);
+	_additionalTilesByKey.emplace(tile, std::move(additions));
 }
 
 template <uint32_t scale>

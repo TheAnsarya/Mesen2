@@ -385,7 +385,7 @@ uint8_t SnesDisUtils::OpSize[0x1F] = {
     2, 2, 2, 2, 2, 1, 3, 2, 1, 2,
     2};
 
-string SnesDisUtils::OpName[256] = {
+const char* const SnesDisUtils::OpName[256] = {
     // 0    1      2      3      4      5      6      7      8      9      A      B      C      D      E      F
     "BRK", "ORA", "COP", "ORA", "TSB", "ORA", "ASL", "ORA", "PHP", "ORA", "ASL", "PHD", "TSB", "ORA", "ASL", "ORA", // 0
     "BPL", "ORA", "ORA", "ORA", "TRB", "ORA", "ASL", "ORA", "CLC", "ORA", "INC", "TCS", "TRB", "ORA", "ASL", "ORA", // 1

@@ -180,10 +180,10 @@ void FdsLoader::LoadDiskData(vector<uint8_t>& romFile, vector<vector<uint8_t>>& 
 	}
 
 	for (uint32_t i = 0; i < numberOfSides; i++) {
-		diskData.push_back(vector<uint8_t>());
+		diskData.emplace_back();
 		vector<uint8_t>& fdsDiskImage = diskData.back();
 
-		diskHeaders.push_back(vector<uint8_t>(romFile.data() + fileOffset + 1, romFile.data() + fileOffset + 57));
+		diskHeaders.emplace_back(romFile.data() + fileOffset + 1, romFile.data() + fileOffset + 57);
 
 		AddGaps(fdsDiskImage, &romFile[fileOffset], GetSideCapacity());
 		fileOffset += GetSideCapacity();

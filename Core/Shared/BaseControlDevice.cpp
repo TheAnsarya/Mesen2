@@ -133,7 +133,8 @@ string BaseControlDevice::GetTextState() {
 			_keyNamesCached = true;
 		}
 		const string& keyNames = _cachedKeyNames;
-		string output = "";
+		string output;
+		output.reserve(keyNames.size() + 20);
 
 		if (HasCoordinates()) {
 			MousePosition pos = GetCoordinates();

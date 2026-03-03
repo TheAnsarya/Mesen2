@@ -60,6 +60,7 @@ void GameDatabase::LoadGameDb(const vector<string>& data) {
 
 void GameDatabase::LoadGameDb(std::istream& db) {
 	vector<string> dbData;
+	dbData.reserve(6000);
 	while (db.good()) {
 		string lineContent;
 		std::getline(db, lineContent);
@@ -69,7 +70,7 @@ void GameDatabase::LoadGameDb(std::istream& db) {
 		if (lineContent.empty() || lineContent[0] == '#') {
 			continue;
 		}
-		dbData.push_back(lineContent);
+		dbData.push_back(std::move(lineContent));
 	}
 	LoadGameDb(dbData);
 }
