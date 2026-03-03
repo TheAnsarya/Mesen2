@@ -32,10 +32,10 @@ void GbaApu::Init(Emulator* emu, GbaConsole* console, GbaDmaController* dmaContr
 	_memoryManager = memoryManager;
 
 	// Create all 4 PSG channels (Game Boy compatible)
-	_square1.reset(new GbaSquareChannel(this));   // Channel 1: Square wave with sweep
-	_square2.reset(new GbaSquareChannel(this));   // Channel 2: Square wave
-	_wave.reset(new GbaWaveChannel(this, console)); // Channel 3: Wave playback
-	_noise.reset(new GbaNoiseChannel(this));      // Channel 4: Noise
+	_square1 = std::make_unique<GbaSquareChannel>(this);   // Channel 1: Square wave with sweep
+	_square2 = std::make_unique<GbaSquareChannel>(this);   // Channel 2: Square wave
+	_wave = std::make_unique<GbaWaveChannel>(this, console); // Channel 3: Wave playback
+	_noise = std::make_unique<GbaNoiseChannel>(this);      // Channel 4: Noise
 
 	_sampleCount = 0;
 	_prevClockCount = 0;

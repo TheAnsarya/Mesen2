@@ -34,7 +34,7 @@ shared_ptr<BaseControlDevice> GbControlManager::CreateControllerDevice(Controlle
 			break;
 
 		case ControllerType::GameboyController:
-			device.reset(new GbController(_emu, port, cfg.Controller.Keys));
+			device = std::make_unique<GbController>(_emu, port, cfg.Controller.Keys);
 			break;
 	}
 

@@ -39,7 +39,7 @@ bool AviRecorder::StartRecording(uint32_t width, uint32_t height, uint32_t bpp, 
 		_frameBufferLength = height * width * bpp;
 		_frameBuffer = std::make_unique<uint8_t[]>(_frameBufferLength);
 
-		_aviWriter.reset(new AviWriter());
+		_aviWriter = std::make_unique<AviWriter>();
 		if (!_aviWriter->StartWrite(_outputFile, _codec, width, height, bpp, (uint32_t)(_fps * 1000000), audioSampleRate, _compressionLevel)) {
 			_aviWriter.reset();
 			return false;

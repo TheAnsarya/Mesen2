@@ -150,7 +150,7 @@ public:
 	/// <param name="emu">Emulator instance</param>
 	/// <param name="socket">Connected client socket</param>
 	/// <param name="serverPassword">Server password hash</param>
-	GameServerConnection(GameServer* gameServer, Emulator* emu, unique_ptr<Socket> socket, string serverPassword);
+	GameServerConnection(GameServer* gameServer, Emulator* emu, unique_ptr<Socket> socket, const string& serverPassword);
 	virtual ~GameServerConnection();
 
 	/// <summary>

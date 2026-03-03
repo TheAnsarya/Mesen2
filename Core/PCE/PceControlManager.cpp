@@ -24,17 +24,17 @@ shared_ptr<BaseControlDevice> PceControlManager::CreateControllerDevice(Controll
 			break;
 
 		case ControllerType::PceController:
-			device.reset(new PceController(_emu, port, cfg.Port1.Keys));
+			device = std::make_unique<PceController>(_emu, port, cfg.Port1.Keys);
 			break;
 		case ControllerType::PceAvenuePad6:
-			device.reset(new PceAvenuePad6(_emu, port, cfg.Port1.Keys));
+			device = std::make_unique<PceAvenuePad6>(_emu, port, cfg.Port1.Keys);
 			break;
 
 		case ControllerType::PceTurboTap: {
 			ControllerConfig controllers[5];
 			std::copy(cfg.Port1SubPorts, cfg.Port1SubPorts + 5, controllers);
 			controllers[0].Keys = cfg.Port1.Keys;
-			device.reset(new PceTurboTap(_emu, port, controllers));
+			device = std::make_unique<PceTurboTap>(_emu, port, controllers);
 			break;
 		}
 	}

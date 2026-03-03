@@ -49,21 +49,21 @@ GbDebugger::GbDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()) 
 
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::GbPrgRom, _gameboy->DebugGetMemorySize(MemoryType::GbPrgRom), CpuType::Gameboy, _emu->GetCrc32()));
+	_codeDataLogger = std::make_unique<CodeDataLogger>(debugger, MemoryType::GbPrgRom, _gameboy->DebugGetMemorySize(MemoryType::GbPrgRom), CpuType::Gameboy, _emu->GetCrc32());
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
-	_traceLogger.reset(new GbTraceLogger(debugger, this, _ppu));
-	_ppuTools.reset(new GbPpuTools(debugger, debugger->GetEmulator()));
+	_traceLogger = std::make_unique<GbTraceLogger>(debugger, this, _ppu);
+	_ppuTools = std::make_unique<GbPpuTools>(debugger, debugger->GetEmulator());
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new GbEventManager(debugger, _gameboy->GetCpu(), _ppu));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Gameboy, _eventManager.get()));
-	_step.reset(new StepRequest());
-	_assembler.reset(new GbAssembler(debugger->GetLabelManager()));
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<GbEventManager>(debugger, _gameboy->GetCpu(), _ppu);
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Gameboy, _eventManager.get());
+	_step = std::make_unique<StepRequest>();
+	_assembler = std::make_unique<GbAssembler>(debugger->GetLabelManager());
 
-	_dummyCpu.reset(new DummyGbCpu());
+	_dummyCpu = std::make_unique<DummyGbCpu>();
 	_dummyCpu->Init(_emu, _gameboy, _gameboy->GetMemoryManager());
 }
 
@@ -219,7 +219,7 @@ void GbDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType 
 }
 
 void GbDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void GbDebugger::Step(int32_t stepCount, StepType type) {
@@ -258,7 +258,7 @@ void GbDebugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig GbDebugger::GetStepBackConfig() {

@@ -24,7 +24,7 @@ protected:
 		SelectPrgPage(1, 0x07);
 		SelectChrPage(0, 0);
 
-		_microphone.reset(new BandaiMicrophone(_emu, _emu->GetSettings()->GetNesConfig().Port1.Keys));
+		_microphone = std::make_unique<BandaiMicrophone>(_emu, _emu->GetSettings()->GetNesConfig().Port1.Keys);
 		_console->GetControlManager()->AddSystemControlDevice(_microphone);
 	}
 

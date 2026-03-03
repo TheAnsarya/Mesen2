@@ -22,7 +22,7 @@ protected:
 	bool EnableCpuClockHook() override { return true; }
 
 	void InitMapper() override {
-		_irq.reset(new VrcIrq(_console));
+		_irq = std::make_unique<VrcIrq>(_console);
 
 		_prgMode = GetPowerOnByte() & 0x01;
 		_prgReg0 = GetPowerOnByte() & 0x1F;

@@ -39,7 +39,7 @@ public:
 	/// Start logging to file.
 	/// </summary>
 	/// <param name="filename">Output file path</param>
-	void StartLogging(string filename) {
+	void StartLogging(const string& filename) {
 		_outputBuffer.clear();
 		_outputFile.open(filename, ios::out | ios::binary);
 		_enabled = true;

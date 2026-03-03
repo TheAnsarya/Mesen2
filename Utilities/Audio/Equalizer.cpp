@@ -27,13 +27,13 @@ void Equalizer::UpdateEqualizers(std::span<const double, 20> bandGains, uint32_t
 			2000, 3000, 4000, 5000, 6000, 7000, 10000, 12500, 13000, 13500
 		};
 
-		_eqFrequencyGrid.reset(new orfanidis_eq::freq_grid());
+		_eqFrequencyGrid = std::make_unique<orfanidis_eq::freq_grid>();
 		for (size_t i = 1; i < bands.size() - 1; i++) {
 			_eqFrequencyGrid->add_band((bands[i] + bands[i - 1]) / 2, bands[i], (bands[i + 1] + bands[i]) / 2);
 		}
 
-		_equalizerLeft.reset(new orfanidis_eq::eq1(_eqFrequencyGrid.get(), orfanidis_eq::filter_type::butterworth));
-		_equalizerRight.reset(new orfanidis_eq::eq1(_eqFrequencyGrid.get(), orfanidis_eq::filter_type::butterworth));
+		_equalizerLeft = std::make_unique<orfanidis_eq::eq1>(_eqFrequencyGrid.get(), orfanidis_eq::filter_type::butterworth);
+		_equalizerRight = std::make_unique<orfanidis_eq::eq1>(_eqFrequencyGrid.get(), orfanidis_eq::filter_type::butterworth);
 		_equalizerLeft->set_sample_rate(sampleRate);
 		_equalizerRight->set_sample_rate(sampleRate);
 

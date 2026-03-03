@@ -23,14 +23,14 @@ void GbaCart::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryM
 
 	switch (cartType) {
 		case GbaCartridgeType::TiltSensor:
-			_tiltSensor.reset(new GbaTiltSensor(emu));
+			_tiltSensor = std::make_unique<GbaTiltSensor>(emu);
 			console->GetControlManager()->AddSystemControlDevice(_tiltSensor);
 			break;
 	}
 
 	if (rtcType == GbaRtcType::Enabled) {
-		_rtc.reset(new GbaRtc(emu));
-		_gpio.reset(new GbaGpio(_rtc.get()));
+		_rtc = std::make_unique<GbaRtc>(emu);
+		_gpio = std::make_unique<GbaGpio>(_rtc.get());
 	}
 
 	_prgRom = (uint8_t*)_emu->GetMemory(MemoryType::GbaPrgRom).Memory;
@@ -47,14 +47,14 @@ void GbaCart::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryM
 			bool over16mb = _prgRomSize > 16 * 1024 * 1024;
 			_eepromMask = over16mb ? 0xFFFFF00 : 0xF000000;
 			_eepromAddr = over16mb ? 0xDFFFF00 : 0xD000000;
-			_eeprom.reset(new GbaEeprom(_saveRam, saveType));
+			_eeprom = std::make_unique<GbaEeprom>(_saveRam, saveType);
 			_saveRamSize = 0; // disable access data via banks E/F
 			break;
 		}
 
 		case GbaSaveType::Flash64:
 		case GbaSaveType::Flash128:
-			_flash.reset(new GbaFlash(_emu, _saveRam, _saveRamSize));
+			_flash = std::make_unique<GbaFlash>(_emu, _saveRam, _saveRamSize);
 			break;
 
 		default:

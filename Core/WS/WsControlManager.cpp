@@ -21,7 +21,7 @@ shared_ptr<BaseControlDevice> WsControlManager::CreateControllerDevice(Controlle
 
 		case ControllerType::WsController:
 		case ControllerType::WsControllerVertical:
-			device.reset(new WsController(_emu, _console, port, cfg.ControllerHorizontal.Keys, cfg.ControllerVertical.Keys));
+			device = std::make_unique<WsController>(_emu, _console, port, cfg.ControllerHorizontal.Keys, cfg.ControllerVertical.Keys);
 			break;
 	}
 

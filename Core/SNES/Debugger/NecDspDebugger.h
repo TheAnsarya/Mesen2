@@ -33,6 +33,7 @@ class NecDspDebugger final : public IDebugger {
 
 public:
 	NecDspDebugger(Debugger* debugger);
+	~NecDspDebugger();
 
 	void Reset() override;
 

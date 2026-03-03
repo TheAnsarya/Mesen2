@@ -138,7 +138,7 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile) {
 	if (mapper) {
 		if (!_vsMainConsole && romData.Info.VsType == VsSystemType::VsDualSystem) {
 			// Create 2nd console (sub) dualsystem games
-			_vsSubConsole.reset(new NesConsole(_emu));
+			_vsSubConsole = std::make_unique<NesConsole>(_emu);
 			_vsSubConsole->_vsMainConsole = this;
 			result = _vsSubConsole->LoadRom(romFile);
 			if (result != LoadRomResult::Success) {
@@ -152,24 +152,24 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile) {
 		}
 
 		_mapper.swap(mapper);
-		_mixer.reset(new NesSoundMixer(this));
-		_memoryManager.reset(new NesMemoryManager(this, _mapper.get()));
-		_cpu.reset(new NesCpu(this));
-		_apu.reset(new NesApu(this));
+		_mixer = std::make_unique<NesSoundMixer>(this);
+		_memoryManager = std::make_unique<NesMemoryManager>(this, _mapper.get());
+		_cpu = std::make_unique<NesCpu>(this);
+		_apu = std::make_unique<NesApu>(this);
 
 		if (romData.Info.System == GameSystem::VsSystem) {
-			_controlManager.reset(new VsControlManager(this));
+			_controlManager = std::make_unique<VsControlManager>(this);
 		} else {
-			_controlManager.reset(new NesControlManager(this));
+			_controlManager = std::make_unique<NesControlManager>(this);
 		}
 
 		if (_hdData) {
-			_ppu.reset(new HdNesPpu(this, _hdData.get()));
+			_ppu = std::make_unique<HdNesPpu>(this, _hdData.get());
 		} else if (dynamic_cast<NsfMapper*>(_mapper.get())) {
 			// Disable most of the PPU for NSFs
-			_ppu.reset(new NsfPpu(this));
+			_ppu = std::make_unique<NsfPpu>(this);
 		} else {
-			_ppu.reset(new DefaultNesPpu(this));
+			_ppu = std::make_unique<DefaultNesPpu>(this);
 		}
 
 		_mapper->InitSpecificMapper(romData);
@@ -183,7 +183,7 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile) {
 		_memoryManager->RegisterIODevice(_mapper.get());
 
 		if (_hdData) {
-			_hdAudioDevice.reset(new HdAudioDevice(_emu, _hdData.get()));
+			_hdAudioDevice = std::make_unique<HdAudioDevice>(_emu, _hdData.get());
 			_memoryManager->RegisterIODevice(_hdAudioDevice.get());
 		} else {
 			_hdAudioDevice.reset();
@@ -656,10 +656,10 @@ void NesConsole::StartRecordingHdPack(HdPackBuilderOptions options) {
 	_emu->Serialize(saveState, false, 0);
 
 	_hdPackBuilder.reset();
-	_hdPackBuilder.reset(new HdPackBuilder(_emu, _ppu->GetPpuModel(), !_mapper->HasChrRom(), options));
+	_hdPackBuilder = std::make_unique<HdPackBuilder>(_emu, _ppu->GetPpuModel(), !_mapper->HasChrRom(), options);
 
 	_memoryManager->UnregisterIODevice(_ppu.get());
-	_ppu.reset(new HdBuilderPpu(this, _hdPackBuilder.get(), options.ChrRamBankSize));
+	_ppu = std::make_unique<HdBuilderPpu>(this, _hdPackBuilder.get(), options.ChrRamBankSize);
 	_memoryManager->RegisterIODevice(_ppu.get());
 
 	_emu->Deserialize(saveState, SaveStateManager::FileFormatVersion, false);
@@ -679,9 +679,9 @@ void NesConsole::StopRecordingHdPack() {
 
 		_memoryManager->UnregisterIODevice(_ppu.get());
 		if (_hdData) {
-			_ppu.reset(new HdNesPpu(this, _hdData.get()));
+			_ppu = std::make_unique<HdNesPpu>(this, _hdData.get());
 		} else {
-			_ppu.reset(new DefaultNesPpu(this));
+			_ppu = std::make_unique<DefaultNesPpu>(this);
 		}
 		_memoryManager->RegisterIODevice(_ppu.get());
 		_hdPackBuilder.reset();

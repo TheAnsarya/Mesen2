@@ -90,36 +90,36 @@ DllExport void __stdcall InitializeEmu(const char* homeFolder, void* windowHandl
 
 		if (!noVideo) {
 			if (softwareRenderer) {
-				_renderer.reset(new SoftwareRenderer(_emu.get()));
+				_renderer = std::make_unique<SoftwareRenderer>(_emu.get());
 			} else {
 #ifdef _WIN32
-				_renderer.reset(new Renderer(_emu.get(), (HWND)_viewerHandle));
+				_renderer = std::make_unique<Renderer>(_emu.get(), (HWND)_viewerHandle);
 #elif __APPLE__
-				_renderer.reset(new SoftwareRenderer(_emu.get()));
+				_renderer = std::make_unique<SoftwareRenderer>(_emu.get());
 #else
-				_renderer.reset(new SdlRenderer(_emu.get(), _viewerHandle));
+				_renderer = std::make_unique<SdlRenderer>(_emu.get(), _viewerHandle);
 #endif
 			}
 		}
 
 		if (!noAudio) {
 #ifdef _WIN32
-			_soundManager.reset(new SoundManager(_emu.get(), (HWND)_windowHandle));
+			_soundManager = std::make_unique<SoundManager>(_emu.get(), (HWND)_windowHandle);
 #else
-			_soundManager.reset(new SdlSoundManager(_emu.get()));
+			_soundManager = std::make_unique<SdlSoundManager>(_emu.get());
 #endif
 		}
 
 		if (!noInput) {
 #ifdef _WIN32
-			_keyManager.reset(new WindowsKeyManager(_emu.get(), (HWND)_windowHandle));
-			_mouseManager.reset(new WindowsMouseManager());
+			_keyManager = std::make_unique<WindowsKeyManager>(_emu.get(), (HWND)_windowHandle);
+			_mouseManager = std::make_unique<WindowsMouseManager>();
 #elif __APPLE__
-			_keyManager.reset(new MacOSKeyManager(_emu.get()));
-			_mouseManager.reset(new MacOSMouseManager());
+			_keyManager = std::make_unique<MacOSKeyManager>(_emu.get());
+			_mouseManager = std::make_unique<MacOSMouseManager>();
 #else
-			_keyManager.reset(new LinuxKeyManager(_emu.get()));
-			_mouseManager.reset(new LinuxMouseManager(_windowHandle));
+			_keyManager = std::make_unique<LinuxKeyManager>(_emu.get());
+			_mouseManager = std::make_unique<LinuxMouseManager>(_windowHandle);
 #endif
 
 			KeyManager::RegisterKeyManager(_keyManager.get());

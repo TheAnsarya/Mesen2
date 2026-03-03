@@ -43,15 +43,15 @@ shared_ptr<BaseControlDevice> SnesControlManager::CreateControllerDevice(Control
 			break;
 
 		case ControllerType::SnesController:
-			device.reset(new SnesController(_emu, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
+			device = std::make_unique<SnesController>(_emu, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys);
 			break;
 
 		case ControllerType::SnesMouse:
-			device.reset(new SnesMouse(_emu, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
+			device = std::make_unique<SnesMouse>(_emu, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys);
 			break;
 
 		case ControllerType::SuperScope:
-			device.reset(new SuperScope(_console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
+			device = std::make_unique<SuperScope>(_console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys);
 			break;
 
 		case ControllerType::Multitap: {
@@ -63,12 +63,12 @@ shared_ptr<BaseControlDevice> SnesControlManager::CreateControllerDevice(Control
 				std::ranges::copy(cfg.Port2SubPorts, controllers);
 				controllers[0].Keys = cfg.Port2.Keys;
 			}
-			device.reset(new Multitap(_console, port, controllers));
+			device = std::make_unique<Multitap>(_console, port, controllers);
 			break;
 		}
 
 		case ControllerType::SnesRumbleController:
-			device.reset(new SnesRumbleController(_emu, _console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
+			device = std::make_unique<SnesRumbleController>(_emu, _console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys);
 			break;
 	}
 

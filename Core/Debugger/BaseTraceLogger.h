@@ -441,7 +441,7 @@ public:
 		_cpuType = cpuType;
 		_cpuMemoryType = DebugUtilities::GetCpuMemoryType(cpuType);
 
-		_expEvaluator.reset(new ExpressionEvaluator(debugger, cpuDebugger, cpuType));
+		_expEvaluator = std::make_unique<ExpressionEvaluator>(debugger, cpuDebugger, cpuType);
 	}
 
 	virtual ~BaseTraceLogger() {

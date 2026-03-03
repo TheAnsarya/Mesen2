@@ -18,7 +18,7 @@
 #include "Shared/EmuSettings.h"
 #include "Shared/BaseControlDevice.h"
 
-GameServerConnection::GameServerConnection(GameServer* gameServer, Emulator* emu, unique_ptr<Socket> socket, string serverPassword) : GameConnection(emu, std::move(socket)) {
+GameServerConnection::GameServerConnection(GameServer* gameServer, Emulator* emu, unique_ptr<Socket> socket, const string& serverPassword) : GameConnection(emu, std::move(socket)) {
 	// Server-side connection
 	_server = gameServer;
 	_serverPassword = serverPassword;

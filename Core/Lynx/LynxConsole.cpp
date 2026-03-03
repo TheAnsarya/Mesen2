@@ -133,11 +133,11 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 	MessageManager::Log("------------------------------");
 
 	// Create components
-	_controlManager.reset(new LynxControlManager(_emu, this));
-	_memoryManager.reset(new LynxMemoryManager());
-	_cart.reset(new LynxCart());
-	_mikey.reset(new LynxMikey());
-	_suzy.reset(new LynxSuzy());
+	_controlManager = std::make_unique<LynxControlManager>(_emu, this);
+	_memoryManager = std::make_unique<LynxMemoryManager>();
+	_cart = std::make_unique<LynxCart>();
+	_mikey = std::make_unique<LynxMikey>();
+	_suzy = std::make_unique<LynxSuzy>();
 
 	// Initialize memory manager first (it needs RAM, boot ROM)
 	_memoryManager->Init(_emu, this, _workRam.get(), _bootRom.get(), _bootRomSize);
@@ -200,7 +200,7 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 	_suzy->Init(_emu, this, _memoryManager.get(), _cart.get());
 
 	// Initialize CPU — needs memory manager
-	_cpu.reset(new LynxCpu(_emu, this, _memoryManager.get()));
+	_cpu = std::make_unique<LynxCpu>(_emu, this, _memoryManager.get());
 
 	// Initialize Mikey (timers, display, IRQs) — needs CPU reference for IRQ line
 	// MUST be called before HLE boot state, as Init() zeroes all Mikey state

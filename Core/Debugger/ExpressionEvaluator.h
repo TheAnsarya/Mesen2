@@ -325,7 +325,7 @@ private:
 	/// <param name="precedence">Output operator precedence</param>
 	/// <param name="unaryOperator">True if unary operator</param>
 	/// <returns>True if token is operator</returns>
-	bool IsOperator(string token, int& precedence, bool unaryOperator);
+	[[nodiscard]] bool IsOperator(const string& token, int& precedence, bool unaryOperator);
 
 	/// <summary>
 	/// Get operator enum from token.
@@ -333,7 +333,7 @@ private:
 	/// <param name="token">Operator token</param>
 	/// <param name="unaryOperator">True if unary operator</param>
 	/// <returns>Operator enum</returns>
-	EvalOperators GetOperator(string token, bool unaryOperator);
+	EvalOperators GetOperator(const string& token, bool unaryOperator);
 
 	/// <summary>
 	/// Get available register/value tokens for current CPU.

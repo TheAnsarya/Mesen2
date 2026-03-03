@@ -32,6 +32,7 @@ class GsuDebugger final : public IDebugger {
 
 public:
 	GsuDebugger(Debugger* debugger);
+	~GsuDebugger();
 
 	void Reset() override;
 

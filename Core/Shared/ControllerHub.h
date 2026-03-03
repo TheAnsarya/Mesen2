@@ -109,23 +109,23 @@ public:
 				case ControllerType::FamicomController:
 				case ControllerType::FamicomControllerP2:
 				case ControllerType::NesController:
-					_ports[i].reset(new NesController(emu, controllers[i].Type, 0, controllers[i].Keys));
+					_ports[i] = std::make_unique<NesController>(emu, controllers[i].Type, 0, controllers[i].Keys);
 					break;
 
 				case ControllerType::SnesController:
-					_ports[i].reset(new SnesController(emu, 0, controllers[i].Keys));
+					_ports[i] = std::make_unique<SnesController>(emu, 0, controllers[i].Keys);
 					break;
 
 				case ControllerType::SnesMouse:
-					_ports[i].reset(new SnesMouse(emu, 0, controllers[i].Keys));
+					_ports[i] = std::make_unique<SnesMouse>(emu, 0, controllers[i].Keys);
 					break;
 
 				case ControllerType::PceController:
-					_ports[i].reset(new PceController(emu, 0, controllers[i].Keys));
+					_ports[i] = std::make_unique<PceController>(emu, 0, controllers[i].Keys);
 					break;
 
 				case ControllerType::PceAvenuePad6:
-					_ports[i].reset(new PceAvenuePad6(emu, 0, controllers[i].Keys));
+					_ports[i] = std::make_unique<PceAvenuePad6>(emu, 0, controllers[i].Keys);
 					break;
 			}
 		}

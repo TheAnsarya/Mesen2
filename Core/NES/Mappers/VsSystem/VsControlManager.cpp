@@ -11,7 +11,7 @@
 VsControlManager::VsControlManager(NesConsole* console) : NesControlManager(console) {
 	bool isVsDualSystem = _console->GetVsMainConsole() || _console->GetVsSubConsole();
 
-	_input.reset(new VsInputButtons(_emu, isVsDualSystem));
+	_input = std::make_unique<VsInputButtons>(_emu, isVsDualSystem);
 
 	if (_console->IsVsMainConsole()) {
 		_emu->GetNotificationManager()->RegisterNotificationListener(_input);

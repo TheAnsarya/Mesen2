@@ -116,12 +116,12 @@ LoadRomResult SnesConsole::LoadRom(VirtualFile& romFile) {
 
 		UpdateRegion();
 
-		_internalRegisters.reset(new InternalRegisters());
-		_memoryManager.reset(new SnesMemoryManager());
-		_ppu.reset(new SnesPpu(_emu, this));
-		_controlManager.reset(new SnesControlManager(this));
-		_dmaController.reset(new SnesDmaController(_memoryManager.get()));
-		_spc.reset(new Spc(this));
+		_internalRegisters = std::make_unique<InternalRegisters>();
+		_memoryManager = std::make_unique<SnesMemoryManager>();
+		_ppu = std::make_unique<SnesPpu>(_emu, this);
+		_controlManager = std::make_unique<SnesControlManager>(this);
+		_dmaController = std::make_unique<SnesDmaController>(_memoryManager.get());
+		_spc = std::make_unique<Spc>(this);
 
 		_msu1.reset(Msu1::Init(_emu, romFile, _spc.get()));
 
@@ -131,7 +131,7 @@ LoadRomResult SnesConsole::LoadRom(VirtualFile& romFile) {
 			}
 		}
 
-		_cpu.reset(new SnesCpu(this));
+		_cpu = std::make_unique<SnesCpu>(this);
 		_memoryManager->Initialize(this);
 		_internalRegisters->Initialize(this);
 

@@ -83,7 +83,7 @@ bool CodeDataLogger::SaveCdlFile(const string& cdlFilepath) {
 	return false;
 }
 
-string CodeDataLogger::GetCdlFilePath(string romName) {
+string CodeDataLogger::GetCdlFilePath(const string& romName) {
 	return FolderUtilities::CombinePath(FolderUtilities::GetDebuggerFolder(), FolderUtilities::GetFilename(romName, false) + ".cdl");
 }
 

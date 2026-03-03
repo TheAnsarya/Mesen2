@@ -21,10 +21,10 @@ GbApu::GbApu() {
 // Initialize APU with hardware references and create sound channels
 void GbApu::Init(Emulator* emu, Gameboy* gameboy) {
 	// Create all 4 APU channels
-	_square1.reset(new GbSquareChannel(this));   // Channel 1: Square wave with sweep
-	_square2.reset(new GbSquareChannel(this));   // Channel 2: Square wave
-	_wave.reset(new GbWaveChannel(this, gameboy)); // Channel 3: Wave playback
-	_noise.reset(new GbNoiseChannel(this));      // Channel 4: Noise
+	_square1 = std::make_unique<GbSquareChannel>(this);   // Channel 1: Square wave with sweep
+	_square2 = std::make_unique<GbSquareChannel>(this);   // Channel 2: Square wave
+	_wave = std::make_unique<GbWaveChannel>(this, gameboy); // Channel 3: Wave playback
+	_noise = std::make_unique<GbNoiseChannel>(this);      // Channel 4: Noise
 
 	_prevLeftOutput = 0;
 	_prevRightOutput = 0;

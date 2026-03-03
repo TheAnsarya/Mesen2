@@ -13,11 +13,11 @@ protected:
 
 public:
 	ServerInformationMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
-	ServerInformationMessage(string hashSalt) : NetMessage(MessageType::ServerInformation) {
+	ServerInformationMessage(const string& hashSalt) : NetMessage(MessageType::ServerInformation) {
 		_hashSalt = hashSalt;
 	}
 
-	string GetHashSalt() {
+	[[nodiscard]] string GetHashSalt() {
 		return _hashSalt;
 	}
 };

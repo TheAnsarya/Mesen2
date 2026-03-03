@@ -10,34 +10,34 @@ HdVideoFilter::HdVideoFilter(NesConsole* console, Emulator* emu, HdPackData* hdD
 	_hdData = hdData;
 	switch (hdData->Scale) {
 		case 1:
-			_hdNesPack.reset(new HdNesPack<1>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<1>>(console, emu->GetSettings(), hdData);
 			break;
 		case 2:
-			_hdNesPack.reset(new HdNesPack<2>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<2>>(console, emu->GetSettings(), hdData);
 			break;
 		case 3:
-			_hdNesPack.reset(new HdNesPack<3>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<3>>(console, emu->GetSettings(), hdData);
 			break;
 		case 4:
-			_hdNesPack.reset(new HdNesPack<4>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<4>>(console, emu->GetSettings(), hdData);
 			break;
 		case 5:
-			_hdNesPack.reset(new HdNesPack<5>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<5>>(console, emu->GetSettings(), hdData);
 			break;
 		case 6:
-			_hdNesPack.reset(new HdNesPack<6>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<6>>(console, emu->GetSettings(), hdData);
 			break;
 		case 7:
-			_hdNesPack.reset(new HdNesPack<7>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<7>>(console, emu->GetSettings(), hdData);
 			break;
 		case 8:
-			_hdNesPack.reset(new HdNesPack<8>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<8>>(console, emu->GetSettings(), hdData);
 			break;
 		case 9:
-			_hdNesPack.reset(new HdNesPack<9>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<9>>(console, emu->GetSettings(), hdData);
 			break;
 		case 10:
-			_hdNesPack.reset(new HdNesPack<10>(console, emu->GetSettings(), hdData));
+			_hdNesPack = std::make_unique<HdNesPack<10>>(console, emu->GetSettings(), hdData);
 			break;
 	}
 }

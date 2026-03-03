@@ -86,12 +86,12 @@ void NsfMapper::Reset(bool softReset) {
 		_songNumber = _nsfHeader.StartingSong - 1;
 	}
 
-	_mmc5Audio.reset(new Mmc5Audio(_console));
-	_vrc6Audio.reset(new Vrc6Audio(_console));
-	_vrc7Audio.reset(new Vrc7Audio(_console));
-	_fdsAudio.reset(new FdsAudio(_console));
-	_namcoAudio.reset(new Namco163Audio(_console));
-	_sunsoftAudio.reset(new Sunsoft5bAudio(_console));
+	_mmc5Audio = std::make_unique<Mmc5Audio>(_console);
+	_vrc6Audio = std::make_unique<Vrc6Audio>(_console);
+	_vrc7Audio = std::make_unique<Vrc7Audio>(_console);
+	_fdsAudio = std::make_unique<FdsAudio>(_console);
+	_namcoAudio = std::make_unique<Namco163Audio>(_console);
+	_sunsoftAudio = std::make_unique<Sunsoft5bAudio>(_console);
 }
 
 void NsfMapper::OnAfterResetPowerOn() {

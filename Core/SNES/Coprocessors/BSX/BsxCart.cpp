@@ -21,7 +21,7 @@ BsxCart::BsxCart(SnesConsole* console, BsxMemoryPack* memPack) {
 	mm->RegisterHandler(0x10, 0x1F, 0x5000, 0x5FFF, _console->GetCartridge()->GetSaveRamHandlers());
 
 	// Override regular B-bus handler
-	_satellaview.reset(new BsxSatellaview(console, mm->GetHandler(0x2000)));
+	_satellaview = std::make_unique<BsxSatellaview>(console, mm->GetHandler(0x2000));
 	mm->RegisterHandler(0x00, 0x3F, 0x2000, 0x2FFF, _satellaview.get());
 	mm->RegisterHandler(0x80, 0xBF, 0x2000, 0x2FFF, _satellaview.get());
 
@@ -31,7 +31,7 @@ BsxCart::BsxCart(SnesConsole* console, BsxMemoryPack* memPack) {
 	_console->InitializeRam(_psRam.get(), _psRamSize);
 
 	for (uint32_t i = 0; i < _psRamSize / 0x1000; i++) {
-		_psRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_psRam.get(), i * 0x1000, _psRamSize, MemoryType::BsxPsRam)));
+		_psRamHandlers.push_back(std::make_unique<RamHandler>(_psRam.get(), i * 0x1000, _psRamSize, MemoryType::BsxPsRam));
 	}
 
 	Reset();

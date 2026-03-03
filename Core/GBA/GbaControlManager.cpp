@@ -35,7 +35,7 @@ shared_ptr<BaseControlDevice> GbaControlManager::CreateControllerDevice(Controll
 			break;
 
 		case ControllerType::GbaController:
-			device.reset(new GbaController(_emu, port, cfg.Controller.Keys));
+			device = std::make_unique<GbaController>(_emu, port, cfg.Controller.Keys);
 			break;
 	}
 

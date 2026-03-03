@@ -10,14 +10,14 @@
 
 SmsNtscFilter::SmsNtscFilter(Emulator* emu, SmsConsole* console) : BaseVideoFilter(emu) {
 	_console = console;
-	_ntscData.reset(new sms_ntsc_t());
-	_ntscSetup.reset(new sms_ntsc_setup_t());
+	_ntscData = std::make_unique<sms_ntsc_t>();
+	_ntscSetup = std::make_unique<sms_ntsc_setup_t>();
 	memset(_ntscData.get(), 0, sizeof(sms_ntsc_t));
 	memset(_ntscSetup.get(), 0, sizeof(sms_ntsc_setup_t));
 	sms_ntsc_init(_ntscData.get(), _ntscSetup.get());
 
-	_snesNtscData.reset(new snes_ntsc_t());
-	_snesNtscSetup.reset(new snes_ntsc_setup_t());
+	_snesNtscData = std::make_unique<snes_ntsc_t>();
+	_snesNtscSetup = std::make_unique<snes_ntsc_setup_t>();
 	memset(_snesNtscData.get(), 0, sizeof(snes_ntsc_t));
 	memset(_snesNtscSetup.get(), 0, sizeof(snes_ntsc_setup_t));
 	snes_ntsc_init(_snesNtscData.get(), _snesNtscSetup.get());

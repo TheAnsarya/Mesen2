@@ -31,12 +31,14 @@ Cx4Debugger::Cx4Debugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_memoryManager = console->GetMemoryManager();
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_traceLogger.reset(new Cx4TraceLogger(debugger, this, console->GetPpu(), _memoryManager));
+	_traceLogger = std::make_unique<Cx4TraceLogger>(debugger, this, console->GetPpu(), _memoryManager);
 
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Cx4, debugger->GetEventManager(CpuType::Snes)));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_step.reset(new StepRequest());
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Cx4, debugger->GetEventManager(CpuType::Snes));
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_step = std::make_unique<StepRequest>();
 }
+
+Cx4Debugger::~Cx4Debugger() = default;
 
 void Cx4Debugger::Reset() {
 	_callstackManager->Clear();
@@ -128,7 +130,7 @@ void Cx4Debugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType
 }
 
 void Cx4Debugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void Cx4Debugger::Step(int32_t stepCount, StepType type) {
@@ -159,7 +161,7 @@ void Cx4Debugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 void Cx4Debugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly) {

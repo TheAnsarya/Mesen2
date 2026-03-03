@@ -55,7 +55,7 @@ protected:
 	bool EnableCpuClockHook() override { return true; }
 
 	void InitMapper() override {
-		_audio.reset(new Namco163Audio(_console));
+		_audio = std::make_unique<Namco163Audio>(_console);
 
 		switch (_romInfo.MapperID) {
 			case 19:

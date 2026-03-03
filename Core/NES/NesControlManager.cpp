@@ -83,92 +83,92 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 		case ControllerType::NesController:
 		case ControllerType::FamicomController:
 		case ControllerType::FamicomControllerP2:
-			device.reset(new NesController(_emu, type, port, keys));
+			device = std::make_unique<NesController>(_emu, type, port, keys);
 			break;
 
 		case ControllerType::NesZapper: {
 			RomFormat romFormat = _console->GetRomFormat();
 			if (romFormat == RomFormat::VsSystem || romFormat == RomFormat::VsDualSystem) {
-				device.reset(new VsZapper(_console, port, keys));
+				device = std::make_unique<VsZapper>(_console, port, keys);
 			} else {
-				device.reset(new Zapper(_console, type, port, keys));
+				device = std::make_unique<Zapper>(_console, type, port, keys);
 			}
 			break;
 		}
 
 		case ControllerType::NesArkanoidController:
-			device.reset(new ArkanoidController(_emu, type, port, keys));
+			device = std::make_unique<ArkanoidController>(_emu, type, port, keys);
 			break;
 		case ControllerType::SnesController:
-			device.reset(new SnesController(_emu, port, keys));
+			device = std::make_unique<SnesController>(_emu, port, keys);
 			break;
 
 		case ControllerType::PowerPadSideA:
 		case ControllerType::PowerPadSideB:
-			device.reset(new PowerPad(_emu, type, port, keys));
+			device = std::make_unique<PowerPad>(_emu, type, port, keys);
 			break;
 
 		case ControllerType::SnesMouse:
-			device.reset(new SnesMouse(_emu, port, keys));
+			device = std::make_unique<SnesMouse>(_emu, port, keys);
 			break;
 		case ControllerType::SuborMouse:
-			device.reset(new SuborMouse(_emu, port, keys));
+			device = std::make_unique<SuborMouse>(_emu, port, keys);
 			break;
 		case ControllerType::VirtualBoyController:
-			device.reset(new VirtualBoyController(_emu, port, keys));
+			device = std::make_unique<VirtualBoyController>(_emu, port, keys);
 			break;
 
 		// Exp port devices
 		case ControllerType::FamicomZapper:
-			device.reset(new Zapper(_console, type, BaseControlDevice::ExpDevicePort, keys));
+			device = std::make_unique<Zapper>(_console, type, BaseControlDevice::ExpDevicePort, keys);
 			break;
 		case ControllerType::FamicomArkanoidController:
-			device.reset(new ArkanoidController(_emu, type, BaseControlDevice::ExpDevicePort, keys));
+			device = std::make_unique<ArkanoidController>(_emu, type, BaseControlDevice::ExpDevicePort, keys);
 			break;
 		case ControllerType::OekaKidsTablet:
-			device.reset(new OekaKidsTablet(_emu, keys));
+			device = std::make_unique<OekaKidsTablet>(_emu, keys);
 			break;
 
 		case ControllerType::FamilyTrainerMatSideA:
 		case ControllerType::FamilyTrainerMatSideB:
-			device.reset(new FamilyMatTrainer(_emu, type, keys));
+			device = std::make_unique<FamilyMatTrainer>(_emu, type, keys);
 			break;
 
 		case ControllerType::KonamiHyperShot:
-			device.reset(new KonamiHyperShot(_emu, keys));
+			device = std::make_unique<KonamiHyperShot>(_emu, keys);
 			break;
 		case ControllerType::FamilyBasicKeyboard:
-			device.reset(new FamilyBasicKeyboard(_emu, keys));
+			device = std::make_unique<FamilyBasicKeyboard>(_emu, keys);
 			break;
 		case ControllerType::PartyTap:
-			device.reset(new PartyTap(_emu, keys));
+			device = std::make_unique<PartyTap>(_emu, keys);
 			break;
 		case ControllerType::Pachinko:
-			device.reset(new PachinkoController(_emu, keys));
+			device = std::make_unique<PachinkoController>(_emu, keys);
 			break;
 		case ControllerType::ExcitingBoxing:
-			device.reset(new ExcitingBoxingController(_emu, keys));
+			device = std::make_unique<ExcitingBoxingController>(_emu, keys);
 			break;
 		case ControllerType::JissenMahjong:
-			device.reset(new JissenMahjongController(_emu, keys));
+			device = std::make_unique<JissenMahjongController>(_emu, keys);
 			break;
 		case ControllerType::SuborKeyboard:
-			device.reset(new SuborKeyboard(_emu, keys));
+			device = std::make_unique<SuborKeyboard>(_emu, keys);
 			break;
 		case ControllerType::BarcodeBattler:
-			device.reset(new BarcodeBattlerReader(_emu));
+			device = std::make_unique<BarcodeBattlerReader>(_emu);
 			break;
 		case ControllerType::HoriTrack:
-			device.reset(new HoriTrack(_emu, keys));
+			device = std::make_unique<HoriTrack>(_emu, keys);
 			break;
 		case ControllerType::BandaiHyperShot:
-			device.reset(new BandaiHyperShot(_console, keys));
+			device = std::make_unique<BandaiHyperShot>(_console, keys);
 			break;
 		case ControllerType::AsciiTurboFile:
-			device.reset(new AsciiTurboFile(_console));
+			device = std::make_unique<AsciiTurboFile>(_console);
 			break;
 		case ControllerType::BattleBox:
-			device.reset(new BattleBox(_console));
+			device = std::make_unique<BattleBox>(_console);
 			break;
 
 		case ControllerType::FourScore: {
@@ -176,7 +176,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 			// Use the p1/p2 bindings for the first 2 ports (the UI does this, too)
 			controllers[0].Keys = cfg.Port1.Keys;
 			controllers[1].Keys = cfg.Port2.Keys;
-			device.reset(new FourScore(_emu, type, 0, controllers));
+			device = std::make_unique<FourScore>(_emu, type, 0, controllers);
 			break;
 		}
 
@@ -185,9 +185,9 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 			std::ranges::copy(cfg.ExpPortSubPorts, controllers);
 			controllers[0].Keys = cfg.ExpPort.Keys;
 			if (type == ControllerType::TwoPlayerAdapter) {
-				device.reset(new TwoPlayerAdapter(_emu, type, controllers));
+				device = std::make_unique<TwoPlayerAdapter>(_emu, type, controllers);
 			} else {
-				device.reset(new FourScore(_emu, type, BaseControlDevice::ExpDevicePort, controllers));
+				device = std::make_unique<FourScore>(_emu, type, BaseControlDevice::ExpDevicePort, controllers);
 			}
 			break;
 		}

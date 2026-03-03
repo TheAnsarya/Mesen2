@@ -16,9 +16,9 @@ Rainbow::Rainbow() {
 }
 
 void Rainbow::InitMapper() {
-	_audio.reset(new RainbowAudio(_console));
-	_prgFlash.reset(new FlashS29(_prgRom, _prgSize));
-	_chrFlash.reset(new FlashS29(_chrRom, _chrRomSize));
+	_audio = std::make_unique<RainbowAudio>(_console);
+	_prgFlash = std::make_unique<FlashS29>(_prgRom, _prgSize);
+	_chrFlash = std::make_unique<FlashS29>(_chrRom, _chrRomSize);
 	UpdateState();
 
 	AddRegisterRange(0x6000, 0xFFFF, MemoryOperation::Any);

@@ -105,7 +105,7 @@ protected:
 	bool EnableCpuClockHook() override { return true; }
 
 	void InitMapper() override {
-		_irq.reset(new VrcIrq(_console));
+		_irq = std::make_unique<VrcIrq>(_console);
 		DetectVariant();
 
 		// PRG mode only exists for VRC4+ (so keep it as 0 at all times for VRC2)

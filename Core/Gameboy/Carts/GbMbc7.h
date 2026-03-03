@@ -66,7 +66,7 @@ public:
 	/// </summary>
 	void InitCart() override {
 		// Create accelerometer as a system control device
-		_accelerometer.reset(new GbMbc7Accelerometer(_gameboy->GetEmulator()));
+		_accelerometer = std::make_unique<GbMbc7Accelerometer>(_gameboy->GetEmulator());
 		_gameboy->GetControlManager()->AddSystemControlDevice(_accelerometer);
 
 		// Point EEPROM at cart RAM for storage

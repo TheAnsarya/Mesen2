@@ -46,21 +46,21 @@ GbaDebugger::GbaDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_codeDataLogger.reset(new GbaCodeDataLogger(debugger, MemoryType::GbaPrgRom, _emu->GetMemory(MemoryType::GbaPrgRom).Size, CpuType::Gba, _emu->GetCrc32()));
+	_codeDataLogger = std::make_unique<GbaCodeDataLogger>(debugger, MemoryType::GbaPrgRom, _emu->GetMemory(MemoryType::GbaPrgRom).Size, CpuType::Gba, _emu->GetCrc32());
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
-	_traceLogger.reset(new GbaTraceLogger(debugger, this, _ppu));
-	_ppuTools.reset(new GbaPpuTools(debugger, debugger->GetEmulator()));
+	_traceLogger = std::make_unique<GbaTraceLogger>(debugger, this, _ppu);
+	_ppuTools = std::make_unique<GbaPpuTools>(debugger, debugger->GetEmulator());
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new GbaEventManager(debugger, _console->GetCpu(), _ppu, _memoryManager, _console->GetDmaController()));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Gba, _eventManager.get()));
-	_step.reset(new StepRequest());
-	_assembler.reset(new GbaAssembler(debugger->GetLabelManager()));
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<GbaEventManager>(debugger, _console->GetCpu(), _ppu, _memoryManager, _console->GetDmaController());
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Gba, _eventManager.get());
+	_step = std::make_unique<StepRequest>();
+	_assembler = std::make_unique<GbaAssembler>(debugger->GetLabelManager());
 
-	_dummyCpu.reset(new DummyGbaCpu());
+	_dummyCpu = std::make_unique<DummyGbaCpu>();
 	_dummyCpu->Init(_emu, _memoryManager, nullptr);
 }
 
@@ -219,7 +219,7 @@ void GbaDebugger::ProcessWrite(uint32_t addr, uint32_t value, MemoryOperationTyp
 }
 
 void GbaDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void GbaDebugger::Step(int32_t stepCount, StepType type) {
@@ -255,7 +255,7 @@ void GbaDebugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig GbaDebugger::GetStepBackConfig() {

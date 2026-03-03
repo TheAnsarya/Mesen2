@@ -42,7 +42,7 @@ void Fds::InitMapper() {
 }
 
 void Fds::InitMapper(RomData& romData) {
-	_audio.reset(new FdsAudio(_console));
+	_audio = std::make_unique<FdsAudio>(_console);
 	_fdsDiskSides = romData.FdsDiskData;
 	_fdsDiskHeaders = romData.FdsDiskHeaders;
 	_fdsRawData = romData.RawData;
@@ -56,7 +56,7 @@ void Fds::InitMapper(RomData& romData) {
 	vector<uint8_t> ipsData = _emu->GetBatteryManager()->LoadBattery(".ips");
 	LoadDiskData(ipsData);
 
-	_input.reset(new FdsInputButtons(this, _emu));
+	_input = std::make_unique<FdsInputButtons>(this, _emu);
 	_emu->GetNotificationManager()->RegisterNotificationListener(_input);
 	_console->GetControlManager()->AddSystemControlDevice(_input);
 	if (_settings->FdsAutoLoadDisk) {

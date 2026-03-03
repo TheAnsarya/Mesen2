@@ -227,8 +227,8 @@ bool HdPackLoader::LoadPack() {
 }
 
 bool HdPackLoader::ProcessImgTag(const string& src) {
-	_data->ImageFileData.push_back(unique_ptr<HdPackBitmapInfo>(new HdPackBitmapInfo()));
-	HdPackBitmapInfo& bitmapInfo = *_data->ImageFileData.back().get();
+	_data->ImageFileData.push_back(std::make_unique<HdPackBitmapInfo>());
+	HdPackBitmapInfo& bitmapInfo = *_data->ImageFileData.back();
 
 	if (!LoadFile(src, bitmapInfo.FileData)) {
 		_data->ImageFileData.pop_back();
@@ -422,27 +422,27 @@ void HdPackLoader::ProcessConditionTag(vector<string>& tokens, bool createInvert
 	unique_ptr<HdPackCondition> condition;
 
 	if (tokens[1] == "tileAtPosition") {
-		condition.reset(new HdPackTileAtPositionCondition());
+		condition = std::make_unique<HdPackTileAtPositionCondition>();
 	} else if (tokens[1] == "tileNearby") {
-		condition.reset(new HdPackTileNearbyCondition());
+		condition = std::make_unique<HdPackTileNearbyCondition>();
 	} else if (tokens[1] == "spriteAtPosition") {
-		condition.reset(new HdPackSpriteAtPositionCondition());
+		condition = std::make_unique<HdPackSpriteAtPositionCondition>();
 	} else if (tokens[1] == "spriteNearby") {
-		condition.reset(new HdPackSpriteNearbyCondition());
+		condition = std::make_unique<HdPackSpriteNearbyCondition>();
 	} else if (tokens[1] == "memoryCheck" || tokens[1] == "ppuMemoryCheck") {
-		condition.reset(new HdPackMemoryCheckCondition());
+		condition = std::make_unique<HdPackMemoryCheckCondition>();
 	} else if (tokens[1] == "memoryCheckConstant" || tokens[1] == "ppuMemoryCheckConstant") {
-		condition.reset(new HdPackMemoryCheckConstantCondition());
+		condition = std::make_unique<HdPackMemoryCheckConstantCondition>();
 	} else if (tokens[1] == "frameRange") {
-		condition.reset(new HdPackFrameRangeCondition());
+		condition = std::make_unique<HdPackFrameRangeCondition>();
 	} else if (tokens[1] == "positionCheckX") {
-		condition.reset(new HdPackPositionCheckXCondition());
+		condition = std::make_unique<HdPackPositionCheckXCondition>();
 	} else if (tokens[1] == "positionCheckY") {
-		condition.reset(new HdPackPositionCheckYCondition());
+		condition = std::make_unique<HdPackPositionCheckYCondition>();
 	} else if (tokens[1] == "originPositionCheckX") {
-		condition.reset(new HdPackOriginPositionCheckXCondition());
+		condition = std::make_unique<HdPackOriginPositionCheckXCondition>();
 	} else if (tokens[1] == "originPositionCheckY") {
-		condition.reset(new HdPackOriginPositionCheckYCondition());
+		condition = std::make_unique<HdPackOriginPositionCheckYCondition>();
 	} else {
 		logError("Invalid condition type: " + tokens[1]);
 		return;
@@ -612,7 +612,7 @@ void HdPackLoader::ProcessBackgroundTag(vector<string>& tokens, vector<HdPackCon
 
 	auto result = _backgroundsByName.find(tokens[0]);
 	if (result == _backgroundsByName.end()) {
-		_data->BackgroundFileData.push_back(unique_ptr<HdPackBitmapInfo>(new HdPackBitmapInfo()));
+		_data->BackgroundFileData.push_back(std::make_unique<HdPackBitmapInfo>());
 		bgFileData = _data->BackgroundFileData.back().get();
 		bgFileData->PngName = tokens[0];
 

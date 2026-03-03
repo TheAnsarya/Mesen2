@@ -39,13 +39,13 @@ shared_ptr<BaseControlDevice> SmsControlManager::CreateControllerDevice(Controll
 		case ControllerType::None:
 			break;
 		case ControllerType::SmsController:
-			device.reset(new SmsController(_emu, port, keys));
+			device = std::make_unique<SmsController>(_emu, port, keys);
 			break;
 		case ControllerType::SmsLightPhaser:
-			device.reset(new SmsLightPhaser(_console, port, keys));
+			device = std::make_unique<SmsLightPhaser>(_console, port, keys);
 			break;
 		case ControllerType::ColecoVisionController:
-			device.reset(new ColecoVisionController(_emu, port, keys));
+			device = std::make_unique<ColecoVisionController>(_emu, port, keys);
 			break;
 	}
 

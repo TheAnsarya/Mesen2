@@ -22,26 +22,26 @@ protected:
 public:
 	HandShakeMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
 
-	HandShakeMessage(string hashedPassword, bool spectator, uint32_t emuVersion) : NetMessage(MessageType::HandShake) {
+	HandShakeMessage(const string& hashedPassword, bool spectator, uint32_t emuVersion) : NetMessage(MessageType::HandShake) {
 		_emuVersion = emuVersion;
 		_protocolVersion = HandShakeMessage::CurrentVersion;
 		_hashedPassword = hashedPassword;
 		_spectator = spectator;
 	}
 
-	bool IsValid(uint32_t emuVersion) {
+	[[nodiscard]] bool IsValid(uint32_t emuVersion) {
 		return _protocolVersion == CurrentVersion && _emuVersion == emuVersion;
 	}
 
-	bool CheckPassword(string serverPassword, string connectionHash) {
+	[[nodiscard]] bool CheckPassword(const string& serverPassword, const string& connectionHash) {
 		return GetPasswordHash(serverPassword, connectionHash) == string(_hashedPassword);
 	}
 
-	bool IsSpectator() {
+	[[nodiscard]] bool IsSpectator() {
 		return _spectator;
 	}
 
-	static string GetPasswordHash(string serverPassword, string connectionHash) {
+	[[nodiscard]] static string GetPasswordHash(const string& serverPassword, const string& connectionHash) {
 		string saltedPassword = serverPassword + connectionHash;
 		vector<uint8_t> dataToHash = vector<uint8_t>(saltedPassword.c_str(), saltedPassword.c_str() + saltedPassword.size());
 		return SHA1::GetHash(dataToHash);

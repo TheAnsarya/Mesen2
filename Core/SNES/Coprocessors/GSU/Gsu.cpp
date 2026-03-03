@@ -35,15 +35,15 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize) {
 	_console->InitializeRam(_gsuRam.get(), _gsuRamSize);
 
 	for (uint32_t i = 0; i < _gsuRamSize / 0x1000; i++) {
-		_gsuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_gsuRam.get(), i * 0x1000, _gsuRamSize, MemoryType::GsuWorkRam)));
-		_gsuCpuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRamHandler(_state, _gsuRamHandlers.back().get())));
+		_gsuRamHandlers.push_back(std::make_unique<RamHandler>(_gsuRam.get(), i * 0x1000, _gsuRamSize, MemoryType::GsuWorkRam));
+		_gsuCpuRamHandlers.push_back(std::make_unique<GsuRamHandler>(_state, _gsuRamHandlers.back().get()));
 	}
 
 	// CPU mappings
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 	vector<unique_ptr<IMemoryHandler>>& prgRomHandlers = _console->GetCartridge()->GetPrgRomHandlers();
 	for (unique_ptr<IMemoryHandler>& handler : prgRomHandlers) {
-		_gsuCpuRomHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRomHandler(_state, handler.get())));
+		_gsuCpuRomHandlers.push_back(std::make_unique<GsuRomHandler>(_state, handler.get()));
 	}
 
 	// GSU registers in CPU memory space

@@ -109,7 +109,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile) {
 		_cartEepromData = new uint8_t[_cartEepromSize];
 		memset(_cartEepromData, 0, _cartEepromSize);
 		_emu->RegisterMemory(MemoryType::WsCartEeprom, _cartEepromData, _cartEepromSize);
-		_cartEeprom.reset(new WsEeprom(_emu, this, (WsEepromSize)_cartEepromSize, _cartEepromData, false));
+		_cartEeprom = std::make_unique<WsEeprom>(_emu, this, (WsEepromSize)_cartEepromSize, _cartEepromData, false);
 	}
 
 	_model = _emu->GetSettings()->GetWsConfig().Model;
@@ -135,17 +135,17 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile) {
 	memset(_internalEepromData, 0, _internalEepromSize);
 	_emu->RegisterMemory(MemoryType::WsInternalEeprom, _internalEepromData, _internalEepromSize);
 
-	_internalEeprom.reset(new WsEeprom(_emu, this, (WsEepromSize)_internalEepromSize, _internalEepromData, true));
+	_internalEeprom = std::make_unique<WsEeprom>(_emu, this, (WsEepromSize)_internalEepromSize, _internalEepromData, true);
 
-	_controlManager.reset(new WsControlManager(_emu, this));
-	_memoryManager.reset(new WsMemoryManager());
-	_cpu.reset(new WsCpu(_emu, this, _memoryManager.get()));
-	_timer.reset(new WsTimer());
-	_serial.reset(new WsSerial(this));
-	_dmaController.reset(new WsDmaController());
-	_ppu.reset(new WsPpu(_emu, this, _memoryManager.get(), _timer.get(), _workRam));
-	_apu.reset(new WsApu(_emu, this, _memoryManager.get(), _dmaController.get()));
-	_cart.reset(new WsCart());
+	_controlManager = std::make_unique<WsControlManager>(_emu, this);
+	_memoryManager = std::make_unique<WsMemoryManager>();
+	_cpu = std::make_unique<WsCpu>(_emu, this, _memoryManager.get());
+	_timer = std::make_unique<WsTimer>();
+	_serial = std::make_unique<WsSerial>(this);
+	_dmaController = std::make_unique<WsDmaController>();
+	_ppu = std::make_unique<WsPpu>(_emu, this, _memoryManager.get(), _timer.get(), _workRam);
+	_apu = std::make_unique<WsApu>(_emu, this, _memoryManager.get(), _dmaController.get());
+	_cart = std::make_unique<WsCart>();
 
 	_cart->Init(_memoryManager.get(), _cartEeprom.get());
 	_memoryManager->Init(_emu, this, _cpu.get(), _ppu.get(), _controlManager.get(), _cart.get(), _timer.get(), _dmaController.get(), _internalEeprom.get(), _apu.get(), _serial.get());

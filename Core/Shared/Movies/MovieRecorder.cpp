@@ -32,7 +32,7 @@ bool MovieRecorder::Record(RecordMovieOptions options) {
 	_filename = options.Filename;
 	_author = options.Author;
 	_description = options.Description;
-	_writer.reset(new ZipWriter());
+	_writer = std::make_unique<ZipWriter>();
 	_inputData = stringstream();
 	_saveStateData = stringstream();
 	_hasSaveState = false;
@@ -189,7 +189,7 @@ bool MovieRecorder::CreateMovie(const string& movieFile, deque<RewindData>& data
 	}
 
 	_filename = movieFile;
-	_writer.reset(new ZipWriter());
+	_writer = std::make_unique<ZipWriter>();
 	if (startPosition < data.size() && endPosition <= data.size() && _writer->Initialize(_filename)) {
 		vector<shared_ptr<BaseControlDevice>> devices = console->GetControlManager()->GetControlDevices();
 

@@ -11,9 +11,9 @@ EmulatorLock::EmulatorLock(Emulator* emu, bool allowDebuggerLock) {
 		_emu->Lock();
 	} else {
 		if (allowDebuggerLock) {
-			_debugger.reset(new DebuggerRequest(emu->GetDebugger(false)));
+			_debugger = std::make_unique<DebuggerRequest>(emu->GetDebugger(false));
 			if (_debugger->GetDebugger()) {
-				_breakHelper.reset(new DebugBreakHelper(_debugger->GetDebugger(), true));
+				_breakHelper = std::make_unique<DebugBreakHelper>(_debugger->GetDebugger(), true);
 			} else {
 				_debugger.reset();
 				_emu->Lock();

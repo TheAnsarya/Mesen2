@@ -45,21 +45,21 @@ LynxDebugger::LynxDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::LynxPrgRom,
-		_emu->GetMemory(MemoryType::LynxPrgRom).Size, CpuType::Lynx, _emu->GetCrc32()));
+	_codeDataLogger = std::make_unique<CodeDataLogger>(debugger, MemoryType::LynxPrgRom,
+		_emu->GetMemory(MemoryType::LynxPrgRom).Size, CpuType::Lynx, _emu->GetCrc32());
 
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new LynxEventManager(debugger, console));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Lynx, _eventManager.get()));
-	_traceLogger.reset(new LynxTraceLogger(debugger, this, console->GetMikey()));
-	_assembler.reset(new LynxAssembler(debugger->GetLabelManager()));
-	_ppuTools.reset(new LynxPpuTools(debugger, _emu, console));
-	_dummyCpu.reset(new DummyLynxCpu(_emu, _memoryManager));
-	_step.reset(new StepRequest());
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<LynxEventManager>(debugger, console);
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Lynx, _eventManager.get());
+	_traceLogger = std::make_unique<LynxTraceLogger>(debugger, this, console->GetMikey());
+	_assembler = std::make_unique<LynxAssembler>(debugger->GetLabelManager());
+	_ppuTools = std::make_unique<LynxPpuTools>(debugger, _emu, console);
+	_dummyCpu = std::make_unique<DummyLynxCpu>(_emu, _memoryManager);
+	_step = std::make_unique<StepRequest>();
 }
 
 LynxDebugger::~LynxDebugger() {
@@ -251,7 +251,7 @@ void LynxDebugger::ProcessPpuCycle() {
 }
 
 void LynxDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void LynxDebugger::Step(int32_t stepCount, StepType type) {
@@ -290,7 +290,7 @@ void LynxDebugger::Step(int32_t stepCount, StepType type) {
 			step.BreakScanline = stepCount;
 			break;
 	}
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig LynxDebugger::GetStepBackConfig() {

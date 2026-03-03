@@ -24,12 +24,12 @@ NesApu::NesApu(NesConsole* console) {
 	_settings = _console->GetEmulator()->GetSettings();
 
 	// Create all APU channels
-	_square1.reset(new SquareChannel(AudioChannel::Square1, _console, true));   // Pulse 1 (with sweep negate quirk)
-	_square2.reset(new SquareChannel(AudioChannel::Square2, _console, false));  // Pulse 2
-	_triangle.reset(new TriangleChannel(_console));                              // Triangle
-	_noise.reset(new NoiseChannel(_console));                                    // Noise
-	_dmc.reset(new DeltaModulationChannel(_console));                            // DMC (sample playback)
-	_frameCounter.reset(new ApuFrameCounter(_console));                          // Frame counter (240Hz sequencer)
+	_square1 = std::make_unique<SquareChannel>(AudioChannel::Square1, _console, true);   // Pulse 1 (with sweep negate quirk)
+	_square2 = std::make_unique<SquareChannel>(AudioChannel::Square2, _console, false);  // Pulse 2
+	_triangle = std::make_unique<TriangleChannel>(_console);                              // Triangle
+	_noise = std::make_unique<NoiseChannel>(_console);                                    // Noise
+	_dmc = std::make_unique<DeltaModulationChannel>(_console);                            // DMC (sample playback)
+	_frameCounter = std::make_unique<ApuFrameCounter>(_console);                          // Frame counter (240Hz sequencer)
 
 	// Register all channels as I/O devices for memory-mapped access
 	_console->GetMemoryManager()->RegisterIODevice(_square1.get());

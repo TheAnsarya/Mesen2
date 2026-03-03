@@ -85,7 +85,7 @@ bool GbAssembler::IsRegisterName(string op) {
 	return op == "hl" || op == "af" || op == "bc" || op == "de" || op == "a" || op == "b" || op == "c" || op == "d" || op == "e" || op == "f" || op == "l" || op == "h";
 }
 
-int GbAssembler::ReadValue(string operand, int min, int max, unordered_map<string, uint16_t>& localLabels, bool firstPass) {
+int GbAssembler::ReadValue(const string& operand, int min, int max, unordered_map<string, uint16_t>& localLabels, bool firstPass) {
 	int value = 0;
 	switch (operand[0]) {
 		// Hex

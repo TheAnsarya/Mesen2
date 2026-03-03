@@ -17,7 +17,7 @@ HdAudioDevice::HdAudioDevice(Emulator* emu, HdPackData* hdData) {
 	_sfxVolume = 128;
 	_bgmVolume = 128;
 
-	_oggMixer.reset(new OggMixer());
+	_oggMixer = std::make_unique<OggMixer>();
 	_oggMixer->SetBgmVolume(_bgmVolume);
 	_oggMixer->SetSfxVolume(_sfxVolume);
 	_emu->GetSoundMixer()->RegisterAudioProvider(_oggMixer.get());

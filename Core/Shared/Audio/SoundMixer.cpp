@@ -15,11 +15,11 @@
 SoundMixer::SoundMixer(Emulator* emu) {
 	_emu = emu;
 	_audioDevice = nullptr;
-	_resampler.reset(new SoundResampler(emu));
+	_resampler = std::make_unique<SoundResampler>(emu);
 	_sampleBuffer = std::make_unique<int16_t[]>(0x10000);
 	_pitchAdjustBuffer = std::make_unique<int16_t[]>(0x8000);
-	_reverbFilter.reset(new ReverbFilter());
-	_crossFeedFilter.reset(new CrossFeedFilter());
+	_reverbFilter = std::make_unique<ReverbFilter>();
+	_crossFeedFilter = std::make_unique<CrossFeedFilter>();
 }
 
 SoundMixer::~SoundMixer() {
@@ -165,7 +165,7 @@ void SoundMixer::PlayAudioBuffer(int16_t* samples, uint32_t sampleCount, uint32_
 void SoundMixer::ProcessEqualizer(int16_t* samples, uint32_t sampleCount, uint32_t targetRate) {
 	const AudioConfig& cfg = _emu->GetSettings()->GetAudioConfig();
 	if (!_equalizer) {
-		_equalizer.reset(new Equalizer());
+		_equalizer = std::make_unique<Equalizer>();
 	}
 	// Use std::array instead of vector to avoid heap allocation per audio frame
 	std::array<double, 20> bandGains = {

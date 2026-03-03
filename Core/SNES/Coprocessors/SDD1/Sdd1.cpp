@@ -9,7 +9,7 @@
 
 Sdd1::Sdd1(SnesConsole* console) {
 	// This handler is used to dynamically map the ROM based on the banking registers
-	_sdd1Mmc.reset(new Sdd1Mmc(_state, console->GetCartridge()));
+	_sdd1Mmc = std::make_unique<Sdd1Mmc>(_state, console->GetCartridge());
 
 	MemoryMappings* cpuMappings = console->GetMemoryManager()->GetMemoryMappings();
 	vector<unique_ptr<IMemoryHandler>>& prgRomHandlers = console->GetCartridge()->GetPrgRomHandlers();

@@ -198,7 +198,7 @@ bool SmsAssembler::IsRegisterName(string op) {
 	return op == "hl" || op == "af" || op == "bc" || op == "de" || op == "a" || op == "b" || op == "c" || op == "d" || op == "e" || op == "f" || op == "l" || op == "h" || op == "ix" || op == "iy" || op == "ixl" || op == "ixh" || op == "iyl" || op == "iyh";
 }
 
-int SmsAssembler::ReadValue(string operand, int min, int max, unordered_map<string, uint16_t>& localLabels, bool firstPass, bool isPortValue) {
+int SmsAssembler::ReadValue(const string& operand, int min, int max, unordered_map<string, uint16_t>& localLabels, bool firstPass, bool isPortValue) {
 	int value = 0;
 	switch (operand[0]) {
 		// Hex

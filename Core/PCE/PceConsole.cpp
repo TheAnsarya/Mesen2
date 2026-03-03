@@ -60,7 +60,7 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile) {
 			return LoadRomResult::Failure;
 		}
 
-		_cdrom.reset(new PceCdRom(_emu, this, disc));
+		_cdrom = std::make_unique<PceCdRom>(_emu, this, disc);
 		_romFormat = RomFormat::PceCdRom;
 		cdromUnitEnabled = true;
 	} else {
@@ -87,7 +87,7 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile) {
 		if (cdromUnitEnabled || !cfg.DisableCdRomSaveRamForHuCardGames) {
 			// CD-ROM is used for save ram for non-cd-rom games
 			DiscInfo emptyDisc = {};
-			_cdrom.reset(new PceCdRom(_emu, this, emptyDisc));
+			_cdrom = std::make_unique<PceCdRom>(_emu, this, emptyDisc);
 		}
 
 		_romFormat = RomFormat::Pce;
@@ -96,33 +96,33 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile) {
 	uint32_t cardRamSize = 0;
 	if (_romFormat == RomFormat::PceCdRom) {
 		if (cfg.CdRomType == PceCdRomType::Arcade) {
-			_mapper.reset(new PceArcadeCard(this, _emu));
+			_mapper = std::make_unique<PceArcadeCard>(this, _emu);
 		}
 		if (cfg.CdRomType == PceCdRomType::SuperCdRom || cfg.CdRomType == PceCdRomType::Arcade) {
 			cardRamSize = 0x30000;
 		}
 	} else if (romData.size() > 0x80 * 0x2000) {
 		// For ROMs over 1MB, assume this is the SF2 board
-		_mapper.reset(new PceSf2RomMapper(this));
+		_mapper = std::make_unique<PceSf2RomMapper>(this);
 	} else if (IsPopulousCard(crc32)) {
 		cardRamSize = 0x8000;
 	}
 
-	_controlManager.reset(new PceControlManager(_emu));
-	_vce.reset(new PceVce(_emu, this));
-	_vpc.reset(new PceVpc(_emu, this, _vce.get()));
+	_controlManager = std::make_unique<PceControlManager>(_emu);
+	_vce = std::make_unique<PceVce>(_emu, this);
+	_vpc = std::make_unique<PceVpc>(_emu, this, _vce.get());
 
-	_vdc.reset(new PceVdc(_emu, this, _vpc.get(), _vce.get(), false));
+	_vdc = std::make_unique<PceVdc>(_emu, this, _vpc.get(), _vce.get(), false);
 	if (consoleType == PceConsoleType::SuperGrafx) {
-		_vdc2.reset(new PceVdc(_emu, this, _vpc.get(), _vce.get(), true));
+		_vdc2 = std::make_unique<PceVdc>(_emu, this, _vpc.get(), _vce.get(), true);
 	}
 
 	_vpc->ConnectVdc(_vdc.get(), _vdc2.get());
 
-	_timer.reset(new PceTimer(this));
-	_psg.reset(new PcePsg(_emu, this));
-	_memoryManager.reset(new PceMemoryManager(_emu, this, _vpc.get(), _vce.get(), _controlManager.get(), _psg.get(), _timer.get(), _mapper.get(), _cdrom.get(), romData, cardRamSize, cdromUnitEnabled));
-	_cpu.reset(new PceCpu(_emu, _memoryManager.get()));
+	_timer = std::make_unique<PceTimer>(this);
+	_psg = std::make_unique<PcePsg>(_emu, this);
+	_memoryManager = std::make_unique<PceMemoryManager>(_emu, this, _vpc.get(), _vce.get(), _controlManager.get(), _psg.get(), _timer.get(), _mapper.get(), _cdrom.get(), romData, cardRamSize, cdromUnitEnabled);
+	_cpu = std::make_unique<PceCpu>(_emu, _memoryManager.get());
 
 	if (_hesData) {
 		InitHesPlayback(_hesData->CurrentTrack);

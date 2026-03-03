@@ -26,9 +26,9 @@ void GameClient::Connect(ClientConnectionData& connectionData) {
 	_stop = false;
 	unique_ptr<Socket> socket(new Socket());
 	if (socket->Connect(connectionData.Host.c_str(), connectionData.Port)) {
-		_connection.reset(new GameClientConnection(_emu, std::move(socket), connectionData));
+		_connection = std::make_unique<GameClientConnection>(_emu, std::move(socket), connectionData);
 		_connected = true;
-		_clientThread.reset(new thread(&GameClient::Exec, this));
+		_clientThread = std::make_unique<thread>(&GameClient::Exec, this);
 		_emu->GetNotificationManager()->RegisterNotificationListener(shared_from_this());
 	} else {
 		MessageManager::DisplayMessage("NetPlay", "CouldNotConnect");

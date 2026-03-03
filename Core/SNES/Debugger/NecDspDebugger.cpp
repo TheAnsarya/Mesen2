@@ -27,12 +27,14 @@ NecDspDebugger::NecDspDebugger(Debugger* debugger) : IDebugger(debugger->GetEmul
 	_settings = debugger->GetEmulator()->GetSettings();
 	_memoryManager = console->GetMemoryManager();
 
-	_traceLogger.reset(new NecDspTraceLogger(debugger, this, console->GetPpu(), console->GetMemoryManager()));
-	_callstackManager.reset(new CallstackManager(debugger, this));
+	_traceLogger = std::make_unique<NecDspTraceLogger>(debugger, this, console->GetPpu(), console->GetMemoryManager());
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
 
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::NecDsp, debugger->GetEventManager(CpuType::Snes)));
-	_step.reset(new StepRequest());
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::NecDsp, debugger->GetEventManager(CpuType::Snes));
+	_step = std::make_unique<StepRequest>();
 }
+
+NecDspDebugger::~NecDspDebugger() = default;
 
 void NecDspDebugger::Reset() {
 	_callstackManager->Clear();
@@ -111,7 +113,7 @@ void NecDspDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationT
 }
 
 void NecDspDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void NecDspDebugger::Step(int32_t stepCount, StepType type) {
@@ -142,7 +144,7 @@ void NecDspDebugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 DebuggerFeatures NecDspDebugger::GetSupportedFeatures() {

@@ -3,7 +3,7 @@
 #include "gif.h"
 
 GifRecorder::GifRecorder() {
-	_gif.reset(new GifWriter());
+	_gif = std::make_unique<GifWriter>();
 	_frameCounter = 0;
 }
 

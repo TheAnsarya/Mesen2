@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include <ranges>
 #include "Shared/Movies/NexenMovie.h"
 #include "Shared/Movies/MovieTypes.h"
@@ -104,7 +104,7 @@ bool NexenMovie::Play(VirtualFile& file) {
 	std::stringstream ss;
 	(void)file.ReadFile(ss);
 
-	_reader.reset(new ZipReader());
+	_reader = std::make_unique<ZipReader>();
 	_reader->LoadArchive(ss);
 
 	stringstream settingsData, inputData;

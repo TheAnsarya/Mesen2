@@ -25,7 +25,7 @@ protected:
 	bool AllowRegisterRead() override { return HasBattery(); }
 
 	void InitMapper() override {
-		_flash.reset(new FlashSST39SF040(_prgRom, _prgSize));
+		_flash = std::make_unique<FlashSST39SF040>(_prgRom, _prgSize);
 		SelectPrgPage(0, 0);
 		SelectPrgPage(1, -1);
 

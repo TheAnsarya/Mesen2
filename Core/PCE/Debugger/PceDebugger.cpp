@@ -46,25 +46,25 @@ PceDebugger::PceDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_vpc = console->GetVpc();
 	_memoryManager = console->GetMemoryManager();
 
-	_traceLogger.reset(new PceTraceLogger(debugger, this, _vdc));
-	_ppuTools.reset(new PceVdcTools(debugger, debugger->GetEmulator(), console));
+	_traceLogger = std::make_unique<PceTraceLogger>(debugger, this, _vdc);
+	_ppuTools = std::make_unique<PceVdcTools>(debugger, debugger->GetEmulator(), console);
 	_disassembler = debugger->GetDisassembler();
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_dummyCpu.reset(new DummyPceCpu(_emu, _memoryManager));
+	_dummyCpu = std::make_unique<DummyPceCpu>(_emu, _memoryManager);
 
-	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::PcePrgRom, _emu->GetMemory(MemoryType::PcePrgRom).Size, CpuType::Pce, _emu->GetCrc32()));
+	_codeDataLogger = std::make_unique<CodeDataLogger>(debugger, MemoryType::PcePrgRom, _emu->GetMemory(MemoryType::PcePrgRom).Size, CpuType::Pce, _emu->GetCrc32());
 
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_console->GetRomFormat() == RomFormat::PceCdRom ? "PceCdromBios.cdl" : _emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new PceEventManager(debugger, console));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Pce, _eventManager.get()));
-	_step.reset(new StepRequest());
-	_assembler.reset(new PceAssembler(_debugger->GetLabelManager()));
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<PceEventManager>(debugger, console);
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Pce, _eventManager.get());
+	_step = std::make_unique<StepRequest>();
+	_assembler = std::make_unique<PceAssembler>(_debugger->GetLabelManager());
 }
 
 PceDebugger::~PceDebugger() {
@@ -224,7 +224,7 @@ void PceDebugger::ProcessIdleCycle() {
 }
 
 void PceDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void PceDebugger::Step(int32_t stepCount, StepType type) {
@@ -264,7 +264,7 @@ void PceDebugger::Step(int32_t stepCount, StepType type) {
 			step.BreakScanline = stepCount;
 			break;
 	}
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig PceDebugger::GetStepBackConfig() {

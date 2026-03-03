@@ -36,10 +36,10 @@ private:
 	LabelManager* _labelManager;
 
 	void InitParamEntry(ParamEntry& entry, string param, HlRegType hlRegType);
-	bool IsRegisterName(string op);
+	[[nodiscard]] bool IsRegisterName(string op);
 	void InitAssembler();
-	int ReadValue(string operand, int min, int max, unordered_map<string, uint16_t>& localLabels, bool firstPass, bool isPortValue = false);
-	bool IsMatch(ParamEntry& entry, string operand, uint32_t address, unordered_map<string, uint16_t>& localLabels, bool firstPass);
+	int ReadValue(const string& operand, int min, int max, unordered_map<string, uint16_t>& localLabels, bool firstPass, bool isPortValue = false);
+	[[nodiscard]] bool IsMatch(ParamEntry& entry, string operand, uint32_t address, unordered_map<string, uint16_t>& localLabels, bool firstPass);
 	void PushOp(uint32_t opCode, vector<int16_t>& output, uint32_t& address);
 	void PushByte(uint8_t operand, vector<int16_t>& output, uint32_t& address, bool insertBeforeOpCode = false);
 	void PushWord(uint16_t operand, vector<int16_t>& output, uint32_t& address);

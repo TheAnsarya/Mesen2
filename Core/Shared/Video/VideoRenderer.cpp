@@ -16,13 +16,13 @@ VideoRenderer::VideoRenderer(Emulator* emu) {
 	_emu = emu;
 	_stopFlag = false;
 
-	_rendererHud.reset(new DebugHud());
-	_systemHud.reset(new SystemHud(_emu));
-	_inputHud.reset(new InputHud(emu, _rendererHud.get()));
+	_rendererHud = std::make_unique<DebugHud>();
+	_systemHud = std::make_unique<SystemHud>(_emu);
+	_inputHud = std::make_unique<InputHud>(emu, _rendererHud.get());
 
 	// Persistent HUD objects for AVI recording — avoids per-frame heap allocation
-	_aviDebugHud.reset(new DebugHud());
-	_aviInputHud.reset(new InputHud(emu, _aviDebugHud.get()));
+	_aviDebugHud = std::make_unique<DebugHud>();
+	_aviInputHud = std::make_unique<InputHud>(emu, _aviDebugHud.get());
 }
 
 VideoRenderer::~VideoRenderer() {
@@ -49,7 +49,7 @@ void VideoRenderer::StartThread() {
 			_stopFlag = false;
 			_waitForRender.Reset();
 
-			_renderThread.reset(new std::thread(&VideoRenderer::RenderThread, this));
+			_renderThread = std::make_unique<std::thread>(&VideoRenderer::RenderThread, this);
 		}
 	}
 }
@@ -242,9 +242,9 @@ void VideoRenderer::StartRecording(const string& filename, RecordAviOptions opti
 
 	shared_ptr<IVideoRecorder> recorder;
 	if (options.Codec == VideoCodec::GIF) {
-		recorder.reset(new GifRecorder());
+		recorder = std::make_unique<GifRecorder>();
 	} else {
-		recorder.reset(new AviRecorder(options.Codec, options.CompressionLevel));
+		recorder = std::make_unique<AviRecorder>(options.Codec, options.CompressionLevel);
 	}
 
 	if (recorder->Init(filename)) {

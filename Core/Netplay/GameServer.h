@@ -72,9 +72,9 @@ public:
 
 	void RegisterServerInput();
 
-	void StartServer(uint16_t port, string password);
+	void StartServer(uint16_t port, const string& password);
 	void StopServer();
-	bool Started();
+	[[nodiscard]] bool Started();
 
 	NetplayControllerInfo GetHostControllerPort();
 	void SetHostControllerPort(NetplayControllerInfo controller);

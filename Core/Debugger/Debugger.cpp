@@ -79,66 +79,66 @@ Debugger::Debugger(Emulator* emu, IConsole* console) {
 	_mainCpuType = cpuTypes[0];  // First CPU is always the main CPU
 
 	// Create shared debugging components
-	_labelManager.reset(new LabelManager(this));          // Symbol/label management
-	_memoryDumper.reset(new MemoryDumper(this));          // Memory viewing/editing
-	_disassembler.reset(new Disassembler(console, this)); // Code disassembly
-	_disassemblySearch.reset(new DisassemblySearch(_disassembler.get(), _labelManager.get()));  // Search in disassembly
-	_memoryAccessCounter.reset(new MemoryAccessCounter(this));  // Memory access tracking
-	_scriptManager.reset(new ScriptManager(this));        // Lua scripting
-	_traceLogSaver.reset(new TraceLogFileSaver());        // Trace log file output
-	_cdlManager.reset(new CdlManager(this, _disassembler.get()));  // Code/Data log manager
+	_labelManager = std::make_unique<LabelManager>(this);          // Symbol/label management
+	_memoryDumper = std::make_unique<MemoryDumper>(this);          // Memory viewing/editing
+	_disassembler = std::make_unique<Disassembler>(console, this); // Code disassembly
+	_disassemblySearch = std::make_unique<DisassemblySearch>(_disassembler.get(), _labelManager.get());  // Search in disassembly
+	_memoryAccessCounter = std::make_unique<MemoryAccessCounter>(this);  // Memory access tracking
+	_scriptManager = std::make_unique<ScriptManager>(this);        // Lua scripting
+	_traceLogSaver = std::make_unique<TraceLogFileSaver>();        // Trace log file output
+	_cdlManager = std::make_unique<CdlManager>(this, _disassembler.get());  // Code/Data log manager
 
 	// Use cpuTypes for iteration (ordered), not _cpuTypes (order is important for coprocessors, etc.)
 	for (CpuType type : cpuTypes) {
 		unique_ptr<IDebugger>& debugger = _debuggers[(int)type].Debugger;
 		switch (type) {
 			case CpuType::Snes:
-				debugger.reset(new SnesDebugger(this, CpuType::Snes));
+				debugger = std::make_unique<SnesDebugger>(this, CpuType::Snes);
 				break;
 			case CpuType::Spc:
-				debugger.reset(new SpcDebugger(this));
+				debugger = std::make_unique<SpcDebugger>(this);
 				break;
 			case CpuType::NecDsp:
-				debugger.reset(new NecDspDebugger(this));
+				debugger = std::make_unique<NecDspDebugger>(this);
 				break;
 			case CpuType::Sa1:
-				debugger.reset(new SnesDebugger(this, CpuType::Sa1));
+				debugger = std::make_unique<SnesDebugger>(this, CpuType::Sa1);
 				break;
 			case CpuType::Gsu:
-				debugger.reset(new GsuDebugger(this));
+				debugger = std::make_unique<GsuDebugger>(this);
 				break;
 			case CpuType::Cx4:
-				debugger.reset(new Cx4Debugger(this));
+				debugger = std::make_unique<Cx4Debugger>(this);
 				break;
 			case CpuType::St018:
-				debugger.reset(new St018Debugger(this));
+				debugger = std::make_unique<St018Debugger>(this);
 				break;
 			case CpuType::Gameboy:
-				debugger.reset(new GbDebugger(this));
+				debugger = std::make_unique<GbDebugger>(this);
 				break;
 			case CpuType::Nes:
-				debugger.reset(new NesDebugger(this));
+				debugger = std::make_unique<NesDebugger>(this);
 				break;
 			case CpuType::Pce:
-				debugger.reset(new PceDebugger(this));
+				debugger = std::make_unique<PceDebugger>(this);
 				break;
 			case CpuType::Sms:
-				debugger.reset(new SmsDebugger(this));
+				debugger = std::make_unique<SmsDebugger>(this);
 				break;
 			case CpuType::Gba:
-				debugger.reset(new GbaDebugger(this));
+				debugger = std::make_unique<GbaDebugger>(this);
 				break;
 			case CpuType::Ws:
-				debugger.reset(new WsDebugger(this));
+				debugger = std::make_unique<WsDebugger>(this);
 				break;
 			case CpuType::Lynx:
-				debugger.reset(new LynxDebugger(this));
+				debugger = std::make_unique<LynxDebugger>(this);
 				break;
 			default:
 				[[unlikely]] throw std::runtime_error("Unsupported CPU type");
 		}
 
-		_debuggers[(int)type].Evaluator.reset(new ExpressionEvaluator(this, _debuggers[(int)type].Debugger.get(), type));
+		_debuggers[(int)type].Evaluator = std::make_unique<ExpressionEvaluator>(this, _debuggers[(int)type].Debugger.get(), type);
 	}
 
 	for (CpuType type : _cpuTypes) {

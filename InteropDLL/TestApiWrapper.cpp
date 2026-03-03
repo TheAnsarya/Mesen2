@@ -53,7 +53,7 @@ DllExport uint64_t __stdcall RunTest(char* filename, uint32_t address, MemoryTyp
 }
 
 DllExport void __stdcall RomTestRecord(char* filename, bool reset) {
-	_recordedRomTest.reset(new RecordedRomTest(_emu.get(), false));
+	_recordedRomTest = std::make_unique<RecordedRomTest>(_emu.get(), false);
 	_recordedRomTest->Record(filename, reset);
 }
 

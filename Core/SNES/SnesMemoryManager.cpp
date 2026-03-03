@@ -39,20 +39,20 @@ void SnesMemoryManager::Initialize(SnesConsole* console) {
 	_console->InitializeRam(_workRam.get(), SnesMemoryManager::WorkRamSize);
 
 	// Create register handlers for hardware I/O
-	_registerHandlerA.reset(new RegisterHandlerA(
+	_registerHandlerA = std::make_unique<RegisterHandlerA>(
 	    console->GetDmaController(),
 	    console->GetInternalRegisters(),
-	    (SnesControlManager*)console->GetControlManager()));
+	    (SnesControlManager*)console->GetControlManager());
 
-	_registerHandlerB.reset(new RegisterHandlerB(
+	_registerHandlerB = std::make_unique<RegisterHandlerB>(
 	    _console,
 	    _ppu,
 	    console->GetSpc(),
-	    _workRam.get()));
+	    _workRam.get());
 
 	// Create work RAM handlers (128KB split into 4KB pages)
 	for (uint32_t i = 0; i < 128 * 1024; i += 0x1000) {
-		_workRamHandlers.push_back(unique_ptr<RamHandler>(new RamHandler(_workRam.get(), i, SnesMemoryManager::WorkRamSize, MemoryType::SnesWorkRam)));
+		_workRamHandlers.push_back(std::make_unique<RamHandler>(_workRam.get(), i, SnesMemoryManager::WorkRamSize, MemoryType::SnesWorkRam));
 	}
 
 	// Map work RAM at banks $7E-$7F (full 128KB)

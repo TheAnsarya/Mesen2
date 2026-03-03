@@ -45,21 +45,21 @@ SmsDebugger::SmsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::SmsPrgRom, _emu->GetMemory(MemoryType::SmsPrgRom).Size, CpuType::Sms, _emu->GetCrc32()));
+	_codeDataLogger = std::make_unique<CodeDataLogger>(debugger, MemoryType::SmsPrgRom, _emu->GetMemory(MemoryType::SmsPrgRom).Size, CpuType::Sms, _emu->GetCrc32());
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
-	_traceLogger.reset(new SmsTraceLogger(debugger, this, _vdp));
-	_ppuTools.reset(new SmsVdpTools(debugger, debugger->GetEmulator(), _console));
+	_traceLogger = std::make_unique<SmsTraceLogger>(debugger, this, _vdp);
+	_ppuTools = std::make_unique<SmsVdpTools>(debugger, debugger->GetEmulator(), _console);
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new SmsEventManager(debugger, _console, _cpu, _vdp));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Sms, _eventManager.get()));
-	_step.reset(new StepRequest());
-	_assembler.reset(new SmsAssembler(debugger->GetLabelManager()));
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<SmsEventManager>(debugger, _console, _cpu, _vdp);
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Sms, _eventManager.get());
+	_step = std::make_unique<StepRequest>();
+	_assembler = std::make_unique<SmsAssembler>(debugger->GetLabelManager());
 
-	_dummyCpu.reset(new DummySmsCpu());
+	_dummyCpu = std::make_unique<DummySmsCpu>();
 	_dummyCpu->Init(_emu, _console, _console->GetMemoryManager());
 }
 
@@ -205,7 +205,7 @@ void SmsDebugger::ProcessMemoryAccess(uint32_t addr, uint8_t value, MemoryType m
 }
 
 void SmsDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void SmsDebugger::Step(int32_t stepCount, StepType type) {
@@ -247,7 +247,7 @@ void SmsDebugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig SmsDebugger::GetStepBackConfig() {

@@ -28,7 +28,7 @@ void BreakpointManager::SetBreakpoints(Breakpoint breakpoints[], uint32_t count)
 	_forbidBreakpoints.clear();
 	_forbidRpn.clear();
 
-	_bpExpEval.reset(new ExpressionEvaluator(_debugger, _cpuDebugger, _cpuType));
+	_bpExpEval = std::make_unique<ExpressionEvaluator>(_debugger, _cpuDebugger, _cpuType);
 
 	for (uint32_t j = 0; j < count; j++) {
 		Breakpoint& bp = breakpoints[j];

@@ -39,6 +39,7 @@ class SpcDebugger final : public IDebugger {
 
 public:
 	SpcDebugger(Debugger* debugger);
+	~SpcDebugger();
 
 	void Reset() override;
 

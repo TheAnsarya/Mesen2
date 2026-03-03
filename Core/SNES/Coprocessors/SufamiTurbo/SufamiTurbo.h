@@ -94,7 +94,7 @@ public:
 		BaseCartridge::EnsureValidPrgRomSize(st->_firmwareSize, st->_firmware);
 		emu->RegisterMemory(MemoryType::SufamiTurboFirmware, st->_firmware, st->_firmwareSize);
 		for (uint32_t i = 0; i < st->_firmwareSize; i += 0x1000) {
-			st->_firmwareHandlers.push_back(unique_ptr<RomHandler>(new RomHandler(st->_firmware, i, st->_firmwareSize, MemoryType::SufamiTurboFirmware)));
+			st->_firmwareHandlers.push_back(std::make_unique<RomHandler>(st->_firmware, i, st->_firmwareSize, MemoryType::SufamiTurboFirmware));
 		}
 
 		SufamiTurboFilePromptMessage msg = {};
@@ -120,7 +120,7 @@ public:
 				emu->RegisterMemory(MemoryType::SufamiTurboSecondCart, st->_cartRom, st->_cartRomSize);
 
 				for (uint32_t i = 0; i < st->_cartRomSize; i += 0x1000) {
-					st->_cartRomHandlers.push_back(unique_ptr<RomHandler>(new RomHandler(st->_cartRom, i, st->_cartRomSize, MemoryType::SufamiTurboSecondCart)));
+					st->_cartRomHandlers.push_back(std::make_unique<RomHandler>(st->_cartRom, i, st->_cartRomSize, MemoryType::SufamiTurboSecondCart));
 				}
 
 				st->_cartRamSize = GetSaveRamSize(cart);
@@ -131,7 +131,7 @@ public:
 				emu->GetBatteryManager()->LoadBattery(st->_cartName + ".srm", std::span<uint8_t>(st->_cartRam, st->_cartRamSize));
 
 				for (uint32_t i = 0; i < st->_cartRamSize; i += 0x1000) {
-					st->_cartRamHandlers.push_back(unique_ptr<RamHandler>(new RamHandler(st->_cartRam, i, st->_cartRamSize, MemoryType::SufamiTurboSecondCartRam)));
+					st->_cartRamHandlers.push_back(std::make_unique<RamHandler>(st->_cartRam, i, st->_cartRamSize, MemoryType::SufamiTurboSecondCartRam));
 				}
 			}
 		}

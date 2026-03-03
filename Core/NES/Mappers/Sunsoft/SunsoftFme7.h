@@ -38,7 +38,7 @@ protected:
 	bool EnableCpuClockHook() override { return true; }  ///< Need clock for IRQ counter
 
 	void InitMapper() override {
-		_audio.reset(new Sunsoft5bAudio(_console));
+		_audio = std::make_unique<Sunsoft5bAudio>(_console);
 
 		_command = 0;
 		_workRamValue = 0;

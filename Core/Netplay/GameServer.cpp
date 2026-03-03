@@ -28,7 +28,7 @@ void GameServer::AcceptConnections() {
 	while (true) {
 		unique_ptr<Socket> socket = _listener->Accept();
 		if (!socket->ConnectionError()) {
-			_openConnections.push_back(unique_ptr<GameServerConnection>(new GameServerConnection(this, _emu, std::move(socket), _password)));
+			_openConnections.push_back(std::make_unique<GameServerConnection>(this, _emu, std::move(socket), _password));
 		} else {
 			break;
 		}
@@ -101,7 +101,7 @@ void GameServer::ProcessNotification(ConsoleNotificationType type, void* paramet
 }
 
 void GameServer::Exec() {
-	_listener.reset(new Socket());
+	_listener = std::make_unique<Socket>();
 	_listener->Bind(_port);
 	_listener->Listen(10);
 	_stop = false;
@@ -116,7 +116,7 @@ void GameServer::Exec() {
 	}
 }
 
-void GameServer::StartServer(uint16_t port, string password) {
+void GameServer::StartServer(uint16_t port, const string& password) {
 	_port = port;
 	_password = password;
 
@@ -125,7 +125,7 @@ void GameServer::StartServer(uint16_t port, string password) {
 	// If a game is already running, register ourselves as an input recorder/provider
 	RegisterServerInput();
 
-	_serverThread.reset(new thread(&GameServer::Exec, this));
+	_serverThread = std::make_unique<thread>(&GameServer::Exec, this);
 }
 
 void GameServer::StopServer() {

@@ -47,19 +47,19 @@ NesDebugger::NesDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_mapper = console->GetMapper();
 	_memoryManager = console->GetMemoryManager();
 
-	_traceLogger.reset(new NesTraceLogger(debugger, this, console));
+	_traceLogger = std::make_unique<NesTraceLogger>(debugger, this, console);
 	_disassembler = debugger->GetDisassembler();
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_dummyCpu.reset(new DummyNesCpu(_console));
+	_dummyCpu = std::make_unique<DummyNesCpu>(_console);
 
 	if (_emu->GetMemory(MemoryType::NesChrRom).Size > 0) {
-		_chrRomCdl.reset(new CodeDataLogger(debugger, MemoryType::NesChrRom, _emu->GetMemory(MemoryType::NesChrRom).Size, CpuType::Nes, 0));
+		_chrRomCdl = std::make_unique<CodeDataLogger>(debugger, MemoryType::NesChrRom, _emu->GetMemory(MemoryType::NesChrRom).Size, CpuType::Nes, 0);
 	}
 
 	uint32_t crc32 = CRC32::GetCRC((uint8_t*)_emu->GetMemory(MemoryType::NesPrgRom).Memory, _emu->GetMemory(MemoryType::NesPrgRom).Size);
-	_codeDataLogger.reset(new NesCodeDataLogger(debugger, MemoryType::NesPrgRom, _emu->GetMemory(MemoryType::NesPrgRom).Size, CpuType::Nes, crc32, _chrRomCdl.get()));
+	_codeDataLogger = std::make_unique<NesCodeDataLogger>(debugger, MemoryType::NesPrgRom, _emu->GetMemory(MemoryType::NesPrgRom).Size, CpuType::Nes, crc32, _chrRomCdl.get());
 
 	string cdlFile;
 	switch (_console->GetRomFormat()) {
@@ -76,14 +76,14 @@ NesDebugger::NesDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_cdlFile = _codeDataLogger->GetCdlFilePath(cdlFile);
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
-	_ppuTools.reset(new NesPpuTools(debugger, debugger->GetEmulator(), console));
+	_ppuTools = std::make_unique<NesPpuTools>(debugger, debugger->GetEmulator(), console);
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new NesEventManager(debugger, console));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Nes, _eventManager.get()));
-	_step.reset(new StepRequest());
-	_assembler.reset(new NesAssembler(_debugger->GetLabelManager()));
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<NesEventManager>(debugger, console);
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Nes, _eventManager.get());
+	_step = std::make_unique<StepRequest>();
+	_assembler = std::make_unique<NesAssembler>(_debugger->GetLabelManager());
 }
 
 NesDebugger::~NesDebugger() {
@@ -246,7 +246,7 @@ void NesDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType
 }
 
 void NesDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void NesDebugger::Step(int32_t stepCount, StepType type) {
@@ -287,7 +287,7 @@ void NesDebugger::Step(int32_t stepCount, StepType type) {
 			step.BreakScanline = stepCount;
 			break;
 	}
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig NesDebugger::GetStepBackConfig() {

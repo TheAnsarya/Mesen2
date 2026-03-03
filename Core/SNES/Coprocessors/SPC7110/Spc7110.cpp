@@ -573,9 +573,9 @@ void Spc7110::Reset() {
 
 	UpdateMappings();
 
-	_decomp.reset(new Spc7110Decomp(this));
+	_decomp = std::make_unique<Spc7110Decomp>(this);
 	if (_useRtc) {
-		_rtc.reset(new Rtc4513(_emu));
+		_rtc = std::make_unique<Rtc4513>(_emu);
 	}
 }
 

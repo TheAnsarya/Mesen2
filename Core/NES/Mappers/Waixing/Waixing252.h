@@ -14,7 +14,7 @@ protected:
 	bool EnableCpuClockHook() override { return true; }
 
 	void InitMapper() override {
-		_irq.reset(new VrcIrq(_console));
+		_irq = std::make_unique<VrcIrq>(_console);
 
 		memset(_chrRegs, 0, sizeof(_chrRegs));
 

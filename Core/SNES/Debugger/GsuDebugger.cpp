@@ -30,11 +30,13 @@ GsuDebugger::GsuDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_memoryManager = console->GetMemoryManager();
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_traceLogger.reset(new GsuTraceLogger(debugger, this, console->GetPpu(), _memoryManager));
+	_traceLogger = std::make_unique<GsuTraceLogger>(debugger, this, console->GetPpu(), _memoryManager);
 
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Gsu, debugger->GetEventManager(CpuType::Snes)));
-	_step.reset(new StepRequest());
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Gsu, debugger->GetEventManager(CpuType::Snes));
+	_step = std::make_unique<StepRequest>();
 }
+
+GsuDebugger::~GsuDebugger() = default;
 
 void GsuDebugger::Reset() {
 	_prevOpCode = 0xFF;
@@ -110,7 +112,7 @@ void GsuDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType
 }
 
 void GsuDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void GsuDebugger::Step(int32_t stepCount, StepType type) {
@@ -128,7 +130,7 @@ void GsuDebugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 void GsuDebugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly) {

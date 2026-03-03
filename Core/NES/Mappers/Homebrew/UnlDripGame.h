@@ -27,8 +27,8 @@ protected:
 	bool EnableCustomVramRead() override { return true; }
 
 	void InitMapper() override {
-		_audioChannels[0].reset(new UnlDripGameAudio(_console));
-		_audioChannels[1].reset(new UnlDripGameAudio(_console));
+		_audioChannels[0] = std::make_unique<UnlDripGameAudio>(_console);
+		_audioChannels[1] = std::make_unique<UnlDripGameAudio>(_console);
 
 		_lowByteIrqCounter = 0;
 		_irqCounter = 0;

@@ -25,11 +25,11 @@ WsApu::WsApu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager, 
 	_state.MasterVolume = _console->GetModel() == WsModel::Monochrome ? 2 : 3;
 	_state.InternalMasterVolume = _state.MasterVolume;
 
-	_ch1.reset(new WsApuCh1(this, _state.Ch1));
-	_ch2.reset(new WsApuCh2(this, _state.Ch2));
-	_ch3.reset(new WsApuCh3(this, _state.Ch3));
-	_ch4.reset(new WsApuCh4(this, _state.Ch4));
-	_hyperVoice.reset(new WsHyperVoice(_state.Voice));
+	_ch1 = std::make_unique<WsApuCh1>(this, _state.Ch1);
+	_ch2 = std::make_unique<WsApuCh2>(this, _state.Ch2);
+	_ch3 = std::make_unique<WsApuCh3>(this, _state.Ch3);
+	_ch4 = std::make_unique<WsApuCh4>(this, _state.Ch4);
+	_hyperVoice = std::make_unique<WsHyperVoice>(_state.Voice);
 
 	_soundBuffer = std::make_unique<int16_t[]>(WsApu::MaxSamples * 2);
 	memset(_soundBuffer.get(), 0, WsApu::MaxSamples * 2 * sizeof(int16_t));

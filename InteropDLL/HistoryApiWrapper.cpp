@@ -46,7 +46,7 @@ DllExport void __stdcall HistoryViewerRelease() {
 }
 
 DllExport void __stdcall HistoryViewerInitialize(void* windowHandle, void* viewerHandle) {
-	_historyPlayer.reset(new Emulator());
+	_historyPlayer = std::make_unique<Emulator>();
 	_historyPlayer->Initialize();
 	_historyPlayer->GetSettings()->CopySettings(*_emu->GetSettings());
 
@@ -59,23 +59,23 @@ DllExport void __stdcall HistoryViewerInitialize(void* windowHandle, void* viewe
 	_historyPlayer->GetSettings()->GetEmulationConfig().EmulationSpeed = 100;
 
 	if (_softwareRenderer) {
-		_historyRenderer.reset(new SoftwareRenderer(_historyPlayer.get()));
+		_historyRenderer = std::make_unique<SoftwareRenderer>(_historyPlayer.get());
 	} else {
 #ifdef _WIN32
-		_historyRenderer.reset(new Renderer(_historyPlayer.get(), (HWND)viewerHandle));
+		_historyRenderer = std::make_unique<Renderer>(_historyPlayer.get(), (HWND)viewerHandle);
 #elif __APPLE__
-		_historyRenderer.reset(new SoftwareRenderer(_historyPlayer.get()));
+		_historyRenderer = std::make_unique<SoftwareRenderer>(_historyPlayer.get());
 #else
-		_historyRenderer.reset(new SdlRenderer(_historyPlayer.get(), viewerHandle));
+		_historyRenderer = std::make_unique<SdlRenderer>(_historyPlayer.get(), viewerHandle);
 #endif
 	}
 
 #ifdef _WIN32
-	_historySoundManager.reset(new SoundManager(_historyPlayer.get(), (HWND)windowHandle));
+	_historySoundManager = std::make_unique<SoundManager>(_historyPlayer.get(), (HWND)windowHandle);
 #elif __APPLE__
-	_historySoundManager.reset(new SdlSoundManager(_historyPlayer.get()));
+	_historySoundManager = std::make_unique<SdlSoundManager>(_historyPlayer.get());
 #else
-	_historySoundManager.reset(new SdlSoundManager(_historyPlayer.get()));
+	_historySoundManager = std::make_unique<SdlSoundManager>(_historyPlayer.get());
 #endif
 }
 

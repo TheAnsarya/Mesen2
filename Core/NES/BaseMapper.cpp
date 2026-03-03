@@ -737,7 +737,7 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData) {
 	if (_romInfo.HasEpsm) {
 		vector<uint8_t> adpcmRom;
 		FirmwareHelper::LoadYmf288AdpcmRom(_emu, adpcmRom);
-		_epsm.reset(new Epsm(_emu, _console, adpcmRom));
+		_epsm = std::make_unique<Epsm>(_emu, _console, adpcmRom);
 		_hasCpuClockHook = true;
 	}
 }

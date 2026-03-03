@@ -60,7 +60,7 @@ void SmsMemoryManager::Init(Emulator* emu, SmsConsole* console, vector<uint8_t>&
 		_state.BiosEnabled = true;
 		_emu->RegisterMemory(MemoryType::SmsBootRom, _biosRom, _biosRomSize);
 		if (!isCv) {
-			_biosMapper.reset(new SmsBiosMapper(this));  // SMS BIOS uses a mapper
+			_biosMapper = std::make_unique<SmsBiosMapper>(this);  // SMS BIOS uses a mapper
 		}
 	} else {
 		// No BIOS - start with cartridge enabled

@@ -77,7 +77,7 @@ void VideoDecoder::UpdateVideoFilter() {
 
 	if (screenRotation != 0) {
 		if (!_rotateFilter || _rotateFilter->GetAngle() != screenRotation) {
-			_rotateFilter.reset(new RotateFilter(screenRotation));
+			_rotateFilter = std::make_unique<RotateFilter>(screenRotation);
 		}
 	} else {
 		_rotateFilter.reset();
@@ -211,7 +211,7 @@ void VideoDecoder::StartThread() {
 
 		_emu->GetVideoRenderer()->ClearFrame();
 
-		_decodeThread.reset(new thread(&VideoDecoder::DecodeThread, this));
+		_decodeThread = std::make_unique<thread>(&VideoDecoder::DecodeThread, this);
 	}
 }
 

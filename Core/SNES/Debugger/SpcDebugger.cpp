@@ -27,14 +27,16 @@ SpcDebugger::SpcDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_memoryManager = console->GetMemoryManager();
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_dummyCpu.reset(new DummySpc(_spc->GetSpcRam()));
+	_dummyCpu = std::make_unique<DummySpc>(_spc->GetSpcRam());
 
-	_traceLogger.reset(new SpcTraceLogger(debugger, this, console->GetPpu(), console->GetMemoryManager()));
+	_traceLogger = std::make_unique<SpcTraceLogger>(debugger, this, console->GetPpu(), console->GetMemoryManager());
 
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Spc, debugger->GetEventManager(CpuType::Snes)));
-	_step.reset(new StepRequest());
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Spc, debugger->GetEventManager(CpuType::Snes));
+	_step = std::make_unique<StepRequest>();
 }
+
+SpcDebugger::~SpcDebugger() = default;
 
 void SpcDebugger::Reset() {
 	_callstackManager->Clear();
@@ -172,7 +174,7 @@ void SpcDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType
 }
 
 void SpcDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void SpcDebugger::Step(int32_t stepCount, StepType type) {
@@ -203,7 +205,7 @@ void SpcDebugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 DebuggerFeatures SpcDebugger::GetSupportedFeatures() {

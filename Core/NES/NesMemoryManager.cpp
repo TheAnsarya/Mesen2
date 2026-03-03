@@ -23,11 +23,11 @@ NesMemoryManager::NesMemoryManager(NesConsole* console, BaseMapper* mapper) {
 	// Create appropriate internal RAM handler based on size
 	if (_internalRamSize == NesMemoryManager::NesInternalRamSize) {
 		// Standard NES: 2KB RAM mirrored at $0000-$07FF
-		_internalRamHandler.reset(new InternalRamHandler<0x7FF>());
+		_internalRamHandler = std::make_unique<InternalRamHandler<0x7FF>>();
 		((InternalRamHandler<0x7FF>*)_internalRamHandler.get())->SetInternalRam(_internalRam.get());
 	} else if (_internalRamSize == NesMemoryManager::FamicomBoxInternalRamSize) {
 		// FamicomBox: 8KB RAM at $0000-$1FFF
-		_internalRamHandler.reset(new InternalRamHandler<0x1FFF>());
+		_internalRamHandler = std::make_unique<InternalRamHandler<0x1FFF>>();
 		((InternalRamHandler<0x1FFF>*)_internalRamHandler.get())->SetInternalRam(_internalRam.get());
 	} else [[unlikely]] {
 		throw std::runtime_error("unsupported memory size");

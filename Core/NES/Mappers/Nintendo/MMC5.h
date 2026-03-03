@@ -321,10 +321,10 @@ protected:
 	void InitMapper() override {
 		AddRegisterRange(0xFFFA, 0xFFFB, MemoryOperation::Read);
 
-		_audio.reset(new Mmc5Audio(_console));
+		_audio = std::make_unique<Mmc5Audio>(_console);
 
 		// Override the 2000-2007 registers to catch all writes to the PPU registers (but not their mirrors)
-		_mmc5MemoryHandler.reset(new Mmc5MemoryHandler(_console));
+		_mmc5MemoryHandler = std::make_unique<Mmc5MemoryHandler>(_console);
 
 		_splitTileNumber = 0;
 

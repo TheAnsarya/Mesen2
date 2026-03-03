@@ -24,26 +24,26 @@ protected:
 public:
 	GameInformationMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
 
-	GameInformationMessage(string filepath, uint32_t crc32, NetplayControllerInfo controller, bool paused) : NetMessage(MessageType::GameInformation) {
+	GameInformationMessage(const string& filepath, uint32_t crc32, NetplayControllerInfo controller, bool paused) : NetMessage(MessageType::GameInformation) {
 		_romFilename = FolderUtilities::GetFilename(filepath, true);
 		_crc32 = crc32;
 		_controller = controller;
 		_paused = paused;
 	}
 
-	NetplayControllerInfo GetPort() {
+	[[nodiscard]] NetplayControllerInfo GetPort() {
 		return _controller;
 	}
 
-	string GetRomFilename() {
+	[[nodiscard]] string GetRomFilename() {
 		return _romFilename;
 	}
 
-	uint32_t GetCrc32() {
+	[[nodiscard]] uint32_t GetCrc32() {
 		return _crc32;
 	}
 
-	bool IsPaused() {
+	[[nodiscard]] bool IsPaused() {
 		return _paused;
 	}
 };

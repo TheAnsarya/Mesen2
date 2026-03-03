@@ -16,11 +16,11 @@ protected:
 public:
 	ForceDisconnectMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
 
-	ForceDisconnectMessage(string message) : NetMessage(MessageType::ForceDisconnect) {
+	ForceDisconnectMessage(const string& message) : NetMessage(MessageType::ForceDisconnect) {
 		_disconnectMessage = message;
 	}
 
-	string GetMessage() {
+	[[nodiscard]] string GetMessage() {
 		return _disconnectMessage;
 	}
 };

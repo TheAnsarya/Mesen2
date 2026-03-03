@@ -71,13 +71,13 @@ bool AviWriter::StartWrite(string filename, VideoCodec codec, uint32_t width, ui
 	switch (_codecType) {
 		default:
 		case VideoCodec::None:
-			_codec.reset(new RawCodec());
+			_codec = std::make_unique<RawCodec>();
 			break;
 		case VideoCodec::ZMBV:
-			_codec.reset(new ZmbvCodec());
+			_codec = std::make_unique<ZmbvCodec>();
 			break;
 		case VideoCodec::CSCD:
-			_codec.reset(new CamstudioCodec());
+			_codec = std::make_unique<CamstudioCodec>();
 			break;
 	}
 

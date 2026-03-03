@@ -30,8 +30,8 @@ Sa1::Sa1(SnesConsole* console) {
 
 	_iRam = std::make_unique<uint8_t[]>(Sa1::InternalRamSize);
 	_emu->RegisterMemory(MemoryType::Sa1InternalRam, _iRam.get(), Sa1::InternalRamSize);
-	_iRamHandlerSa1.reset(new Sa1IRamHandler(&_state.Sa1IRamWriteProtect, _iRam.get()));
-	_iRamHandlerCpu.reset(new Sa1IRamHandler(&_state.CpuIRamWriteProtect, _iRam.get()));
+	_iRamHandlerSa1 = std::make_unique<Sa1IRamHandler>(&_state.Sa1IRamWriteProtect, _iRam.get());
+	_iRamHandlerCpu = std::make_unique<Sa1IRamHandler>(&_state.CpuIRamWriteProtect, _iRam.get());
 	_console->InitializeRam(_iRam.get(), 0x800);
 
 	// Register the SA1 in the CPU's memory space ($22xx-$23xx registers)
@@ -48,7 +48,7 @@ Sa1::Sa1(SnesConsole* console) {
 	_mappings.RegisterHandler(0x80, 0xBF, 0x0000, 0x0FFF, _iRamHandlerSa1.get());
 
 	if (_cart->DebugGetSaveRamSize() > 0) {
-		_bwRamHandler.reset(new Sa1BwRamHandler(_cart->DebugGetSaveRam(), _cart->DebugGetSaveRamSize(), &_state));
+		_bwRamHandler = std::make_unique<Sa1BwRamHandler>(_cart->DebugGetSaveRam(), _cart->DebugGetSaveRamSize(), &_state);
 		for (int i = 0; i <= 0x3F; i++) {
 			// SA-1: 00-3F:6000-7FFF + 80-BF:6000-7FFF
 			_mappings.RegisterHandler(i, i, 0x6000, 0x7FFF, _bwRamHandler.get());
@@ -62,12 +62,12 @@ Sa1::Sa1(SnesConsole* console) {
 
 	vector<unique_ptr<IMemoryHandler>>& saveRamHandlers = _cart->GetSaveRamHandlers();
 	for (unique_ptr<IMemoryHandler>& handler : saveRamHandlers) {
-		_cpuBwRamHandlers.push_back(unique_ptr<IMemoryHandler>(new CpuBwRamHandler((RamHandler*)handler.get(), &_state, this)));
+		_cpuBwRamHandlers.push_back(std::make_unique<CpuBwRamHandler>((RamHandler*)handler.get(), &_state, this));
 	}
 	cpuMappings->RegisterHandler(0x40, 0x4F, 0x0000, 0xFFFF, _cpuBwRamHandlers);
 	_mappings.RegisterHandler(0x40, 0x5F, 0x0000, 0xFFFF, _cpuBwRamHandlers);
 
-	_cpu.reset(new Sa1Cpu(this, _emu));
+	_cpu = std::make_unique<Sa1Cpu>(this, _emu);
 	_cpu->PowerOn();
 	Reset();
 }
@@ -720,7 +720,7 @@ void Sa1::UpdatePrgRomMappings() {
 
 void Sa1::UpdateVectorMappings() {
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
-	_cpuVectorHandler.reset(new Sa1VectorHandler(cpuMappings->GetHandler(0xF000), &_state));
+	_cpuVectorHandler = std::make_unique<Sa1VectorHandler>(cpuMappings->GetHandler(0xF000), &_state);
 	cpuMappings->RegisterHandler(0x00, 0x00, 0xF000, 0xFFFF, _cpuVectorHandler.get());
 }
 

@@ -35,6 +35,7 @@ class Cx4Debugger final : public IDebugger {
 
 public:
 	Cx4Debugger(Debugger* debugger);
+	~Cx4Debugger();
 
 	void Reset() override;
 

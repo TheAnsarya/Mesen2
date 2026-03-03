@@ -38,7 +38,7 @@ St018::St018(SnesConsole* console) {
 	_emu->RegisterMemory(MemoryType::St018DataRom, _dataRom.get(), St018::DataRomSize);
 	_emu->RegisterMemory(MemoryType::St018WorkRam, _workRam.get(), St018::WorkRamSize);
 
-	_cpu.reset(new ArmV3Cpu());
+	_cpu = std::make_unique<ArmV3Cpu>();
 	_cpu->Init(_emu, this);
 	_cpu->PowerOn(false);
 }

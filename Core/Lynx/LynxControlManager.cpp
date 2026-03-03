@@ -20,7 +20,7 @@ shared_ptr<BaseControlDevice> LynxControlManager::CreateControllerDevice(Control
 			break;
 
 		case ControllerType::LynxController:
-			device.reset(new LynxController(_emu, port, cfg.Controller.Keys));
+			device = std::make_unique<LynxController>(_emu, port, cfg.Controller.Keys);
 			break;
 	}
 

@@ -34,7 +34,7 @@ GbaMemoryManager::GbaMemoryManager(Emulator* emu, GbaConsole* console, GbaPpu* p
 	_serial = serial;
 	_prefetch = prefetch;  // ROM prefetch buffer for faster sequential reads
 
-	_mgbaLog.reset(new MgbaLogHandler());  // mGBA debug log compatibility
+	_mgbaLog = std::make_unique<MgbaLogHandler>();  // mGBA debug log compatibility
 
 	// Get pointers to all memory regions
 	_prgRom = (uint8_t*)emu->GetMemory(MemoryType::GbaPrgRom).Memory;

@@ -99,17 +99,17 @@ LoadRomResult GbaConsole::LoadRom(VirtualFile& romFile) {
 	InitializeRam(_paletteRam, GbaConsole::PaletteRamSize);
 	_emu->RegisterMemory(MemoryType::GbaPaletteRam, _paletteRam, GbaConsole::PaletteRamSize);
 
-	_cpu.reset(new GbaCpu());
-	_ppu.reset(new GbaPpu());
-	_dmaController.reset(new GbaDmaController());
-	_timer.reset(new GbaTimer());
-	_apu.reset(new GbaApu());
-	_cart.reset(new GbaCart());
-	_serial.reset(new GbaSerial());
-	_controlManager.reset(new GbaControlManager(_emu, this));
-	_prefetch.reset(new GbaRomPrefetch());
+	_cpu = std::make_unique<GbaCpu>();
+	_ppu = std::make_unique<GbaPpu>();
+	_dmaController = std::make_unique<GbaDmaController>();
+	_timer = std::make_unique<GbaTimer>();
+	_apu = std::make_unique<GbaApu>();
+	_cart = std::make_unique<GbaCart>();
+	_serial = std::make_unique<GbaSerial>();
+	_controlManager = std::make_unique<GbaControlManager>(_emu, this);
+	_prefetch = std::make_unique<GbaRomPrefetch>();
 
-	_memoryManager.reset(new GbaMemoryManager(_emu, this, _ppu.get(), _dmaController.get(), _controlManager.get(), _timer.get(), _apu.get(), _cart.get(), _serial.get(), _prefetch.get()));
+	_memoryManager = std::make_unique<GbaMemoryManager>(_emu, this, _ppu.get(), _dmaController.get(), _controlManager.get(), _timer.get(), _apu.get(), _cart.get(), _serial.get(), _prefetch.get());
 
 	_prefetch->Init(_memoryManager->GetWaitStates(), this);
 	_cart->Init(_emu, this, _memoryManager.get(), _saveType, _rtcType, _cartType);

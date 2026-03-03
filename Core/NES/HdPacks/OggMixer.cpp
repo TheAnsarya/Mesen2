@@ -68,7 +68,7 @@ void OggMixer::SetSampleRate(int sampleRate) {
 	}
 }
 
-bool OggMixer::Play(string filename, bool isSfx, uint32_t startOffset, uint32_t loopPosition) {
+bool OggMixer::Play(const string& filename, bool isSfx, uint32_t startOffset, uint32_t loopPosition) {
 	shared_ptr<OggReader> reader(new OggReader());
 	bool loop = !isSfx && (_options & (int)OggPlaybackOptions::Loop) != 0;
 	if (reader->Init(filename, loop, _sampleRate, startOffset, loopPosition)) {

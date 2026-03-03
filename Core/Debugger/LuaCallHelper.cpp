@@ -122,7 +122,7 @@ void LuaCallHelper::Return(uint32_t value) {
 	_returnCount++;
 }
 
-void LuaCallHelper::Return(string value) {
+void LuaCallHelper::Return(const string& value) {
 	lua_pushlstring(_lua, value.c_str(), value.size());
 	_returnCount++;
 }

@@ -56,8 +56,8 @@ SnesDebugger::SnesDebugger(Debugger* debugger, CpuType cpuType) : IDebugger(debu
 	_cart = console->GetCartridge();
 	_spc = console->GetSpc();
 	_ppu = console->GetPpu();
-	_traceLogger.reset(new SnesCpuTraceLogger(debugger, this, cpuType, _ppu, _memoryManager));
-	_ppuTools.reset(new SnesPpuTools(debugger, debugger->GetEmulator()));
+	_traceLogger = std::make_unique<SnesCpuTraceLogger>(debugger, this, cpuType, _ppu, _memoryManager);
+	_ppuTools = std::make_unique<SnesPpuTools>(debugger, debugger->GetEmulator());
 
 	if (_cpuType == CpuType::Snes) {
 		_memoryMappings = _memoryManager->GetMemoryMappings();
@@ -67,7 +67,7 @@ SnesDebugger::SnesDebugger(Debugger* debugger, CpuType cpuType) : IDebugger(debu
 
 	if (cpuType == CpuType::Snes) {
 		uint32_t crc32 = CRC32::GetCRC((uint8_t*)_emu->GetMemory(MemoryType::SnesPrgRom).Memory, _emu->GetMemory(MemoryType::SnesPrgRom).Size);
-		_codeDataLogger.reset(new SnesCodeDataLogger(debugger, MemoryType::SnesPrgRom, console->GetCartridge()->DebugGetPrgRomSize(), CpuType::Snes, crc32));
+		_codeDataLogger = std::make_unique<SnesCodeDataLogger>(debugger, MemoryType::SnesPrgRom, console->GetCartridge()->DebugGetPrgRomSize(), CpuType::Snes, crc32);
 		_cdl = _codeDataLogger.get();
 
 		_cdlFile = _codeDataLogger->GetCdlFilePath(_console->GetCartridge()->GetGameboy() ? "SgbFirmware.cdl" : _emu->GetRomInfo().RomFile.GetFileName());
@@ -76,14 +76,14 @@ SnesDebugger::SnesDebugger(Debugger* debugger, CpuType cpuType) : IDebugger(debu
 		_cdl = (SnesCodeDataLogger*)_debugger->GetCdlManager()->GetCodeDataLogger(MemoryType::SnesPrgRom);
 	}
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new SnesEventManager(debugger, _cpu, console->GetPpu(), _memoryManager, console->GetDmaController()));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, cpuType, _eventManager.get()));
-	_step.reset(new StepRequest());
-	_assembler.reset(new SnesAssembler(_debugger->GetLabelManager()));
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<SnesEventManager>(debugger, _cpu, console->GetPpu(), _memoryManager, console->GetDmaController());
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, cpuType, _eventManager.get());
+	_step = std::make_unique<StepRequest>();
+	_assembler = std::make_unique<SnesAssembler>(_debugger->GetLabelManager());
 
-	_dummyCpu.reset(new DummySnesCpu(_console, _cpuType));
+	_dummyCpu = std::make_unique<DummySnesCpu>(_console, _cpuType);
 }
 
 SnesDebugger::~SnesDebugger() {
@@ -303,7 +303,7 @@ AddressInfo SnesDebugger::GetAbsoluteAddress(uint32_t addr) {
 }
 
 void SnesDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void SnesDebugger::Step(int32_t stepCount, StepType type) {
@@ -344,7 +344,7 @@ void SnesDebugger::Step(int32_t stepCount, StepType type) {
 			step.BreakScanline = stepCount;
 			break;
 	}
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig SnesDebugger::GetStepBackConfig() {

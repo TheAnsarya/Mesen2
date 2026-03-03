@@ -34,7 +34,7 @@ Spc::Spc(SnesConsole* console) {
 
 #ifndef DUMMYSPC
 	// Create DSP (Digital Signal Processor) for audio synthesis
-	_dsp.reset(new Dsp(_emu, console, this));
+	_dsp = std::make_unique<Dsp>(_emu, console, this);
 #endif
 
 	// Initialize SPC700 CPU state

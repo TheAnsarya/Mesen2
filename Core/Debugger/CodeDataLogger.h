@@ -121,7 +121,7 @@ public:
 	/// </summary>
 	/// <param name="romName">ROM name</param>
 	/// <returns>CDL file path</returns>
-	string GetCdlFilePath(string romName);
+	[[nodiscard]] string GetCdlFilePath(const string& romName);
 
 	/// <summary>
 	/// Mark bytes as code (compile-time flags).

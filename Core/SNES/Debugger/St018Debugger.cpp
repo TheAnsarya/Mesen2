@@ -40,13 +40,13 @@ St018Debugger::St018Debugger(Debugger* debugger) : IDebugger(debugger->GetEmulat
 
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_traceLogger.reset(new St018TraceLogger(debugger, this, console->GetPpu()));
+	_traceLogger = std::make_unique<St018TraceLogger>(debugger, this, console->GetPpu());
 
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::St018, debugger->GetEventManager(CpuType::St018)));
-	_step.reset(new StepRequest());
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::St018, debugger->GetEventManager(CpuType::St018));
+	_step = std::make_unique<StepRequest>();
 
-	_dummyCpu.reset(new DummyArmV3Cpu());
+	_dummyCpu = std::make_unique<DummyArmV3Cpu>();
 	_dummyCpu->Init(_emu, _st018);
 }
 
@@ -159,7 +159,7 @@ void St018Debugger::ProcessWrite(uint32_t addr, uint32_t value, MemoryOperationT
 }
 
 void St018Debugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void St018Debugger::Step(int32_t stepCount, StepType type) {
@@ -182,7 +182,7 @@ void St018Debugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 void St018Debugger::ProcessCallStackUpdates(AddressInfo& destAddr, uint32_t destPc) {

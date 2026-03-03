@@ -18,7 +18,7 @@ BsxMemoryPack::BsxMemoryPack(SnesConsole* console, vector<uint8_t>& data, bool p
 	_calculatedSize = std::min<uint8_t>(0x0C, (uint8_t)log2(_dataSize >> 10));
 
 	for (uint32_t i = 0; i < _dataSize / 0x1000; i++) {
-		_handlers.push_back(unique_ptr<BsxMemoryPackHandler>(new BsxMemoryPackHandler(this, i * 0x1000)));
+		_handlers.push_back(std::make_unique<BsxMemoryPackHandler>(this, i * 0x1000));
 	}
 }
 

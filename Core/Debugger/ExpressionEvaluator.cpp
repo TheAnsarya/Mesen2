@@ -29,7 +29,7 @@ const std::unordered_set<string> ExpressionEvaluator::_operators = {
     {"*", "/", "%", "+", "-", "<<", ">>", "<", "<=", ">", ">=", "==", "!=", "&", "^", "|", "&&", "||", "~", "!", "(", ")", "{", "}", "[", "]", ":", "#"}
 };
 
-bool ExpressionEvaluator::IsOperator(string token, int& precedence, bool unaryOperator) {
+bool ExpressionEvaluator::IsOperator(const string& token, int& precedence, bool unaryOperator) {
 	if (unaryOperator) {
 		for (size_t i = 0, len = _unaryOperators.size(); i < len; i++) {
 			if (token.compare(_unaryOperators[i]) == 0) {
@@ -48,7 +48,7 @@ bool ExpressionEvaluator::IsOperator(string token, int& precedence, bool unaryOp
 	return false;
 }
 
-EvalOperators ExpressionEvaluator::GetOperator(string token, bool unaryOperator) {
+EvalOperators ExpressionEvaluator::GetOperator(const string& token, bool unaryOperator) {
 	if (unaryOperator) {
 		for (size_t i = 0, len = _unaryOperators.size(); i < len; i++) {
 			if (token.compare(_unaryOperators[i]) == 0) {

@@ -83,9 +83,9 @@ Emulator::~Emulator() {
 }
 
 void Emulator::Initialize(bool enableShortcuts) {
-	_systemActionManager.reset(new SystemActionManager(this));
+	_systemActionManager = std::make_unique<SystemActionManager>(this);
 	if (enableShortcuts) {
-		_shortcutKeyHandler.reset(new ShortcutKeyHandler(this));
+		_shortcutKeyHandler = std::make_unique<ShortcutKeyHandler>(this);
 		_notificationManager->RegisterNotificationListener(_shortcutKeyHandler);
 	}
 
@@ -124,8 +124,8 @@ void Emulator::Run() {
 	_emulationThreadId = std::this_thread::get_id();
 
 	_frameDelay = GetFrameDelay();
-	_stats.reset(new DebugStats());
-	_frameLimiter.reset(new FrameLimiter(_frameDelay));
+	_stats = std::make_unique<DebugStats>();
+	_frameLimiter = std::make_unique<FrameLimiter>(_frameDelay);
 	_lastFrameTimer.Reset();
 
 	while (!_stopFlag) {
@@ -464,7 +464,7 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 	_rom.DipSwitches = console->GetDipSwitchInfo();
 
 	if (_rom.Format == RomFormat::Spc || _rom.Format == RomFormat::Nsf || _rom.Format == RomFormat::Gbs || _rom.Format == RomFormat::PceHes) {
-		_audioPlayerHud.reset(new AudioPlayerHud(this));
+		_audioPlayerHud = std::make_unique<AudioPlayerHud>(this);
 	} else {
 		_audioPlayerHud.reset();
 	}
@@ -526,7 +526,7 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 
 	if (stopRom) {
 		_stopFlag = false;
-		_emuThread.reset(new thread(&Emulator::Run, this));
+		_emuThread = std::make_unique<thread>(&Emulator::Run, this);
 	}
 
 	return true;
@@ -578,7 +578,7 @@ void Emulator::TryLoadRom(VirtualFile& romFile, LoadRomResult& result, unique_pt
 			bool hasBattery = _batteryManager->HasBattery();
 			_batteryManager->Initialize(FolderUtilities::GetFilename(romFile.GetFileName(), false));
 
-			console.reset(new T(this));
+			console = std::make_unique<T>(this);
 			result = console->LoadRom(romFile);
 
 			if (result != LoadRomResult::Success) {

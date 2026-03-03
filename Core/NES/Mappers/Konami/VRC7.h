@@ -26,8 +26,8 @@ protected:
 	bool EnableCpuClockHook() override { return true; }
 
 	void InitMapper() override {
-		_audio.reset(new Vrc7Audio(_console));
-		_irq.reset(new VrcIrq(_console));
+		_audio = std::make_unique<Vrc7Audio>(_console);
+		_irq = std::make_unique<VrcIrq>(_console);
 
 		_irq->Reset();
 		_controlFlags = 0;

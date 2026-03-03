@@ -61,12 +61,12 @@ LoadRomResult SmsConsole::LoadRom(VirtualFile& romFile) {
 		}
 
 		// Create all hardware components
-		_vdp.reset(new SmsVdp());                             // Video Display Processor (TMS9918 derivative)
-		_memoryManager.reset(new SmsMemoryManager());         // Memory mapper
-		_cpu.reset(new SmsCpu());                             // Zilog Z80 CPU
-		_psg.reset(new SmsPsg(_emu, this));                   // Programmable Sound Generator (SN76489)
-		_fmAudio.reset(new SmsFmAudio(_emu, this));           // YM2413 FM sound (SMS only)
-		_controlManager.reset(new SmsControlManager(_emu, this, _vdp.get()));  // Input controller
+		_vdp = std::make_unique<SmsVdp>();                             // Video Display Processor (TMS9918 derivative)
+		_memoryManager = std::make_unique<SmsMemoryManager>();         // Memory mapper
+		_cpu = std::make_unique<SmsCpu>();                             // Zilog Z80 CPU
+		_psg = std::make_unique<SmsPsg>(_emu, this);                   // Programmable Sound Generator (SN76489)
+		_fmAudio = std::make_unique<SmsFmAudio>(_emu, this);           // YM2413 FM sound (SMS only)
+		_controlManager = std::make_unique<SmsControlManager>(_emu, this, _vdp.get());  // Input controller
 
 		InitCart(romData);
 
@@ -99,7 +99,7 @@ void SmsConsole::InitCart(vector<uint8_t>& romData) {
 	}
 
 	if (isCodemasterMapper) {
-		_cart.reset(new SmsCodemasterCart(_memoryManager.get()));
+		_cart = std::make_unique<SmsCodemasterCart>(_memoryManager.get());
 	} else {
 		uint32_t crc = CRC32::GetCRC(romData);
 		switch (crc) {
@@ -111,18 +111,18 @@ void SmsConsole::InitCart(vector<uint8_t>& romData) {
 			case 0x83F0EEDE: // Street Master
 			case 0x9195C34C: // Super Boy 3
 			case 0xA05258F5: // Wonsiin
-				_cart.reset(new SmsMsxCart(_memoryManager.get()));
+				_cart = std::make_unique<SmsMsxCart>(_memoryManager.get());
 				break;
 
 			case 0xE316C06D: // Nemesis
-				_cart.reset(new SmsNemesisCart(_memoryManager.get(), (uint32_t)romData.size()));
+				_cart = std::make_unique<SmsNemesisCart>(_memoryManager.get(), (uint32_t)romData.size());
 				break;
 
 			case 0x89B79E77: // Dallyeora Pigu-Wang
 			case 0x97D03541: // Samgukji  3
 			case 0x929222C4: // Jang Pung II
 			case 0x18FB98A3: // Jang Pung 3
-				_cart.reset(new SmsKoreanCart(_memoryManager.get()));
+				_cart = std::make_unique<SmsKoreanCart>(_memoryManager.get());
 				break;
 
 				// TODOSMS
@@ -131,9 +131,9 @@ void SmsConsole::InitCart(vector<uint8_t>& romData) {
 			default:
 				if (romData.size() <= 0xC000) {
 					// No mapper (up to 48kb of prg rom)
-					_cart.reset(new SmsCart(_memoryManager.get()));
+					_cart = std::make_unique<SmsCart>(_memoryManager.get());
 				} else {
-					_cart.reset(new SmsSegaCart(_memoryManager.get()));
+					_cart = std::make_unique<SmsSegaCart>(_memoryManager.get());
 				}
 				break;
 		}

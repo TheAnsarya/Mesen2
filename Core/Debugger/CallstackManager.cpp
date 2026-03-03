@@ -9,7 +9,7 @@ CallstackManager::CallstackManager(Debugger* debugger, IDebugger* cpuDebugger) {
 	_debugger = debugger;
 	_callstackHead = 0;
 	_callstackSize = 0;
-	_profiler.reset(new Profiler(debugger, cpuDebugger));
+	_profiler = std::make_unique<Profiler>(debugger, cpuDebugger);
 }
 
 CallstackManager::~CallstackManager() {

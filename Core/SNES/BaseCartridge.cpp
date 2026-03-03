@@ -60,7 +60,7 @@ unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, V
 		string fileExt = FolderUtilities::GetExtension(romFile.GetFileName());
 		if (fileExt == ".bs") {
 			// BS-X Satellaview memory pack
-			cart->_bsxMemPack.reset(new BsxMemoryPack(console, romData, false));
+			cart->_bsxMemPack = std::make_unique<BsxMemoryPack>(console, romData, false);
 			if (!FirmwareHelper::LoadBsxFirmware(cart->_emu, &cart->_prgRom, cart->_prgRomSize)) {
 				return nullptr;
 			}
@@ -422,7 +422,7 @@ void BaseCartridge::Init(MemoryMappings& mm) {
 	_saveRamHandlers.clear();
 
 	for (uint32_t i = 0; i < _prgRomSize; i += 0x1000) {
-		_prgRomHandlers.push_back(unique_ptr<RomHandler>(new RomHandler(_prgRom, i, _prgRomSize, MemoryType::SnesPrgRom)));
+		_prgRomHandlers.push_back(std::make_unique<RomHandler>(_prgRom, i, _prgRomSize, MemoryType::SnesPrgRom));
 	}
 
 	uint32_t power = (uint32_t)std::log2(_prgRomSize);
@@ -434,13 +434,13 @@ void BaseCartridge::Init(MemoryMappings& mm) {
 
 		while (_prgRomHandlers.size() < fullSize / 0x1000) {
 			for (uint32_t i = 0; i < extraHandlers; i += 0x1000) {
-				_prgRomHandlers.push_back(unique_ptr<RomHandler>(new RomHandler(_prgRom, halfSize + i, _prgRomSize, MemoryType::SnesPrgRom)));
+				_prgRomHandlers.push_back(std::make_unique<RomHandler>(_prgRom, halfSize + i, _prgRomSize, MemoryType::SnesPrgRom));
 			}
 		}
 	}
 
 	for (uint32_t i = 0; i < _saveRamSize; i += 0x1000) {
-		_saveRamHandlers.push_back(unique_ptr<RamHandler>(new RamHandler(_saveRam, i, _saveRamSize, MemoryType::SnesSaveRam)));
+		_saveRamHandlers.push_back(std::make_unique<RamHandler>(_saveRam, i, _saveRamSize, MemoryType::SnesSaveRam));
 	}
 
 	RegisterHandlers(mm);
@@ -528,17 +528,17 @@ void BaseCartridge::InitCoprocessor() {
 	_necDsp = dynamic_cast<NecDsp*>(_coprocessor.get());
 
 	if (_coprocessorType == CoprocessorType::SA1) {
-		_coprocessor.reset(new Sa1(_console));
+		_coprocessor = std::make_unique<Sa1>(_console);
 		_sa1 = dynamic_cast<Sa1*>(_coprocessor.get());
 		_needCoprocSync = true;
 	} else if (_coprocessorType == CoprocessorType::GSU) {
-		_coprocessor.reset(new Gsu(_console, _coprocessorRamSize));
+		_coprocessor = std::make_unique<Gsu>(_console, _coprocessorRamSize);
 		_gsu = dynamic_cast<Gsu*>(_coprocessor.get());
 		_needCoprocSync = true;
 	} else if (_coprocessorType == CoprocessorType::SDD1) {
-		_coprocessor.reset(new Sdd1(_console));
+		_coprocessor = std::make_unique<Sdd1>(_console);
 	} else if (_coprocessorType == CoprocessorType::SPC7110) {
-		_coprocessor.reset(new Spc7110(_console, _hasRtc));
+		_coprocessor = std::make_unique<Spc7110>(_console, _hasRtc);
 	} else if (_coprocessorType == CoprocessorType::Satellaview) {
 		// Share save file across all .bs files that use the BS-X bios
 		_emu->GetBatteryManager()->Initialize("BsxBios");
@@ -546,22 +546,22 @@ void BaseCartridge::InitCoprocessor() {
 		if (!_bsxMemPack) {
 			// Create an empty memory pack if the BIOS was loaded directly (instead of a .bs file)
 			vector<uint8_t> emptyMemPack;
-			_bsxMemPack.reset(new BsxMemoryPack(_console, emptyMemPack, false));
+			_bsxMemPack = std::make_unique<BsxMemoryPack>(_console, emptyMemPack, false);
 		}
 
-		_coprocessor.reset(new BsxCart(_console, _bsxMemPack.get()));
+		_coprocessor = std::make_unique<BsxCart>(_console, _bsxMemPack.get());
 		_bsx = dynamic_cast<BsxCart*>(_coprocessor.get());
 	} else if (_coprocessorType == CoprocessorType::CX4) {
-		_coprocessor.reset(new Cx4(_console));
+		_coprocessor = std::make_unique<Cx4>(_console);
 		_cx4 = dynamic_cast<Cx4*>(_coprocessor.get());
 		_needCoprocSync = true;
 	} else if (_coprocessorType == CoprocessorType::ST018) {
-		_coprocessor.reset(new St018(_console));
+		_coprocessor = std::make_unique<St018>(_console);
 		_st018 = dynamic_cast<St018*>(_coprocessor.get());
 	} else if (_coprocessorType == CoprocessorType::OBC1 && _saveRamSize > 0) {
-		_coprocessor.reset(new Obc1(_console, _saveRam, _saveRamSize));
+		_coprocessor = std::make_unique<Obc1>(_console, _saveRam, _saveRamSize);
 	} else if (_coprocessorType == CoprocessorType::SGB) {
-		_coprocessor.reset(new SuperGameboy(_console, _gameboy.get()));
+		_coprocessor = std::make_unique<SuperGameboy>(_console, _gameboy.get());
 		_sgb = dynamic_cast<SuperGameboy*>(_coprocessor.get());
 		_needCoprocSync = true;
 		_gameboy->PowerOn(_sgb);
@@ -612,7 +612,7 @@ void BaseCartridge::MapBsxMemoryPack(MemoryMappings& mm) {
 			// Make a 1 megabyte flash cartridge by default (use $FF for all bytes)
 			saveData.resize(0x100000, 0xFF);
 		}
-		_bsxMemPack.reset(new BsxMemoryPack(_console, saveData, true));
+		_bsxMemPack = std::make_unique<BsxMemoryPack>(_console, saveData, true);
 
 		if (_flags & CartFlags::LoRom) {
 			mm.RegisterHandler(0xC0, 0xEF, 0x0000, 0x7FFF, _bsxMemPack->GetMemoryHandlers());
@@ -656,7 +656,7 @@ RamState BaseCartridge::GetRamPowerOnState() {
 }
 
 void BaseCartridge::LoadSpc() {
-	_spcData.reset(new SpcFileData(_prgRom, _prgRomSize));
+	_spcData = std::make_unique<SpcFileData>(_prgRom, _prgRomSize);
 	SetupCpuHalt();
 }
 
@@ -688,7 +688,7 @@ bool BaseCartridge::LoadGameboy(VirtualFile& romFile) {
 	_headerOffset = Gameboy::HeaderOffset;
 
 	GameboyConfig cfg = _emu->GetSettings()->GetGameboyConfig();
-	_gameboy.reset(new Gameboy(_emu, true));
+	_gameboy = std::make_unique<Gameboy>(_emu, true);
 	bool promptForFirmware = cfg.Model == GameboyModel::AutoFavorSgb || cfg.Model == GameboyModel::SuperGameboy;
 	if (_gameboy->LoadRom(romFile) == LoadRomResult::Success && _gameboy->IsSgb()) {
 		if (FirmwareHelper::LoadSgbFirmware(_emu, &_prgRom, _prgRomSize, cfg.UseSgb2, promptForFirmware)) {

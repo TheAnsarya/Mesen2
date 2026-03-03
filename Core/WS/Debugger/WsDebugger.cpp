@@ -45,21 +45,21 @@ WsDebugger::WsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()) 
 
 	_settings = debugger->GetEmulator()->GetSettings();
 
-	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::WsPrgRom, _emu->GetMemory(MemoryType::WsPrgRom).Size, CpuType::Ws, _emu->GetCrc32()));
+	_codeDataLogger = std::make_unique<CodeDataLogger>(debugger, MemoryType::WsPrgRom, _emu->GetMemory(MemoryType::WsPrgRom).Size, CpuType::Ws, _emu->GetCrc32());
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
 
-	_traceLogger.reset(new WsTraceLogger(debugger, this, _ppu));
-	_ppuTools.reset(new WsPpuTools(debugger, debugger->GetEmulator(), _console));
+	_traceLogger = std::make_unique<WsTraceLogger>(debugger, this, _ppu);
+	_ppuTools = std::make_unique<WsPpuTools>(debugger, debugger->GetEmulator(), _console);
 
-	_stepBackManager.reset(new StepBackManager(_emu, this));
-	_eventManager.reset(new WsEventManager(debugger, _console, _cpu, _ppu));
-	_callstackManager.reset(new CallstackManager(debugger, this));
-	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Ws, _eventManager.get()));
-	_step.reset(new StepRequest());
-	_assembler.reset(new WsAssembler(debugger->GetLabelManager()));
+	_stepBackManager = std::make_unique<StepBackManager>(_emu, this);
+	_eventManager = std::make_unique<WsEventManager>(debugger, _console, _cpu, _ppu);
+	_callstackManager = std::make_unique<CallstackManager>(debugger, this);
+	_breakpointManager = std::make_unique<BreakpointManager>(debugger, this, CpuType::Ws, _eventManager.get());
+	_step = std::make_unique<StepRequest>();
+	_assembler = std::make_unique<WsAssembler>(debugger->GetLabelManager());
 
-	_dummyCpu.reset(new DummyWsCpu(_emu, _console, _memoryManager));
+	_dummyCpu = std::make_unique<DummyWsCpu>(_emu, _console, _memoryManager);
 
 	ResetPrevOpCode();
 }
@@ -230,7 +230,7 @@ void WsDebugger::ProcessMemoryAccess(uint32_t addr, T value, MemoryType memType)
 }
 
 void WsDebugger::Run() {
-	_step.reset(new StepRequest());
+	_step = std::make_unique<StepRequest>();
 }
 
 void WsDebugger::Step(int32_t stepCount, StepType type) {
@@ -278,7 +278,7 @@ void WsDebugger::Step(int32_t stepCount, StepType type) {
 			break;
 	}
 
-	_step.reset(new StepRequest(step));
+	_step = std::make_unique<StepRequest>(step);
 }
 
 StepBackConfig WsDebugger::GetStepBackConfig() {

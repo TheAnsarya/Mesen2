@@ -52,13 +52,13 @@ void Gameboy::Init(GbCart* cart, std::vector<uint8_t>& romData, uint32_t cartRam
 	_cart.reset(cart);
 
 	// Create all hardware components
-	_ppu.reset(new GbPpu());                           // Picture Processing Unit
-	_apu.reset(new GbApu());                           // Audio Processing Unit
-	_cpu.reset(new GbCpu());                           // Sharp LR35902 CPU
-	_memoryManager.reset(new GbMemoryManager());       // Memory mapper
-	_timer.reset(new GbTimer());                       // DIV/TIMA hardware timer
-	_dmaController.reset(new GbDmaController());       // OAM DMA controller
-	_controlManager.reset(new GbControlManager(_emu, this));  // Input controller
+	_ppu = std::make_unique<GbPpu>();                           // Picture Processing Unit
+	_apu = std::make_unique<GbApu>();                           // Audio Processing Unit
+	_cpu = std::make_unique<GbCpu>();                           // Sharp LR35902 CPU
+	_memoryManager = std::make_unique<GbMemoryManager>();       // Memory mapper
+	_timer = std::make_unique<GbTimer>();                       // DIV/TIMA hardware timer
+	_dmaController = std::make_unique<GbDmaController>();       // OAM DMA controller
+	_controlManager = std::make_unique<GbControlManager>(_emu, this);  // Input controller
 
 	// Allocate and copy PRG ROM
 	_prgRomSize = (uint32_t)romData.size();
