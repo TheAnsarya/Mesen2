@@ -73,7 +73,7 @@ public:
 		return _isRecording;
 	}
 
-	void StartRecording(string filePath) {
+	void StartRecording(const string& filePath) {
 		_isPlaying = false;
 		_recordFilePath = filePath;
 		_data.clear();

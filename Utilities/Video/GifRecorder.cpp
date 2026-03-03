@@ -11,7 +11,7 @@ GifRecorder::~GifRecorder() {
 	StopRecording();
 }
 
-bool GifRecorder::Init(string filename) {
+bool GifRecorder::Init(const string& filename) {
 	_outputFile = filename;
 	ofstream fileTest(filename, std::ios::out | std::ios::binary);
 	if (!fileTest) {

@@ -54,7 +54,7 @@ public:
 	virtual ~GifRecorder();
 
 	/// <summary>Initialize with output filename</summary>
-	bool Init(string filename) override;
+	bool Init(const string& filename) override;
 
 	/// <summary>Start recording with video parameters</summary>
 	/// <remarks>audioSampleRate ignored - GIF has no audio support</remarks>

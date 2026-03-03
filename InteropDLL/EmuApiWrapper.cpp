@@ -307,13 +307,13 @@ DllExport void __stdcall SaveState(uint32_t stateIndex) {
 	_emu->GetSaveStateManager()->SaveState(stateIndex);
 }
 DllExport void __stdcall LoadState(uint32_t stateIndex) {
-	_emu->GetSaveStateManager()->LoadState(stateIndex);
+	(void)_emu->GetSaveStateManager()->LoadState(stateIndex);
 }
 DllExport void __stdcall SaveStateFile(char* filepath) {
-	_emu->GetSaveStateManager()->SaveState(filepath);
+	(void)_emu->GetSaveStateManager()->SaveState(filepath);
 }
 DllExport void __stdcall LoadStateFile(char* filepath) {
-	_emu->GetSaveStateManager()->LoadState(filepath);
+	(void)_emu->GetSaveStateManager()->LoadState(filepath);
 }
 
 DllExport int32_t __stdcall SaveStateToMemory(uint8_t* buffer, int32_t maxSize) {
@@ -460,7 +460,7 @@ public:
 
 	vector<uint16_t> GetPressedKeys() { return {}; }
 	string GetKeyName(uint16_t keyCode) { return ""; }
-	uint16_t GetKeyCode(string keyName) { return 0; }
+	uint16_t GetKeyCode(const string& keyName) { return 0; }
 
 	bool SetKeyState(uint16_t scanCode, bool state) { return false; }
 	void ResetKeyState() {}
@@ -496,7 +496,7 @@ DllExport void __stdcall PgoRunTest(vector<string> testRoms, bool enableDebugger
 		pceCfg.Port1.Keys.Mapping1.Start = 10;
 
 		_emu->GetSettings()->SetFlag(EmulationFlags::MaximumSpeed);
-		_emu->LoadRom((VirtualFile)testRoms[i], VirtualFile());
+		(void)_emu->LoadRom((VirtualFile)testRoms[i], VirtualFile());
 
 		if (enableDebugger) {
 			// turn on debugger to profile the debugger's code too

@@ -64,7 +64,7 @@ string KeyManager::GetKeyName(uint16_t keyCode) {
 	return "";
 }
 
-uint16_t KeyManager::GetKeyCode(string keyName) {
+uint16_t KeyManager::GetKeyCode(const string& keyName) {
 	if (_keyManager != nullptr) {
 		return _keyManager->GetKeyCode(keyName);
 	}

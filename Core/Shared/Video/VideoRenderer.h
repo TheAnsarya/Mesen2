@@ -119,7 +119,7 @@ public:
 	void RegisterRenderingDevice(IRenderingDevice* renderer);
 	void UnregisterRenderingDevice(IRenderingDevice* renderer);
 
-	void StartRecording(string filename, RecordAviOptions options);
+	void StartRecording(const string& filename, RecordAviOptions options);
 	void AddRecordingSound(int16_t* soundBuffer, uint32_t sampleCount, uint32_t sampleRate);
 	void StopRecording();
 	bool IsRecording();

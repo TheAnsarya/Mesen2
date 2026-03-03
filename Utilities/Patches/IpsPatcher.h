@@ -31,7 +31,7 @@ public:
 	/// <param name="input">Original ROM data</param>
 	/// <param name="output">Patched ROM data (output)</param>
 	/// <returns>True if patch applied successfully</returns>
-	static bool PatchBuffer(string ipsFilepath, vector<uint8_t>& input, vector<uint8_t>& output);
+	static bool PatchBuffer(const string& ipsFilepath, vector<uint8_t>& input, vector<uint8_t>& output);
 
 	/// <summary>
 	/// Apply IPS patch from memory buffer.

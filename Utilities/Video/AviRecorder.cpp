@@ -19,7 +19,7 @@ AviRecorder::~AviRecorder() {
 	_frameBuffer.reset();
 }
 
-bool AviRecorder::Init(string filename) {
+bool AviRecorder::Init(const string& filename) {
 	_outputFile = filename;
 
 	ofstream fileTest(filename, std::ios::out | std::ios::binary);

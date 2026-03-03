@@ -133,7 +133,7 @@ private:
 	/// 3. Prompt user for ROM location
 	/// 4. Fail if no match found
 	/// </remarks>
-	bool AttemptLoadGame(string filename, uint32_t crc32);
+	bool AttemptLoadGame(const string& filename, uint32_t crc32);
 
 protected:
 	/// <summary>

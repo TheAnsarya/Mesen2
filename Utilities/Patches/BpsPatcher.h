@@ -59,5 +59,5 @@ public:
 	/// <param name="input">Original ROM data</param>
 	/// <param name="output">Patched ROM data (output)</param>
 	/// <returns>True if patch applied and validated successfully</returns>
-	static bool PatchBuffer(string bpsFilepath, vector<uint8_t>& input, vector<uint8_t>& output);
+	static bool PatchBuffer(const string& bpsFilepath, vector<uint8_t>& input, vector<uint8_t>& output);
 };

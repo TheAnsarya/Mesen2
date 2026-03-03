@@ -34,7 +34,7 @@ public:
 	PcmReader();
 	~PcmReader();
 
-	bool Init(string filename, bool loop, uint32_t startOffset = 0);
+	bool Init(const string& filename, bool loop, uint32_t startOffset = 0);
 	bool IsPlaybackOver();
 	void SetSampleRate(uint32_t sampleRate);
 	void SetLoopFlag(bool loop);

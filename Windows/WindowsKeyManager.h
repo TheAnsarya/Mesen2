@@ -43,7 +43,7 @@ public:
 	bool IsMouseButtonPressed(MouseButton button) override;
 	vector<uint16_t> GetPressedKeys() override;
 	string GetKeyName(uint16_t key) override;
-	uint16_t GetKeyCode(string keyName) override;
+	uint16_t GetKeyCode(const string& keyName) override;
 
 	bool SetKeyState(uint16_t scanCode, bool state) override;
 	void ResetKeyState() override;

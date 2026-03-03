@@ -18,7 +18,7 @@ public:
 	void ProcessEndOfFrame();
 
 	string GetAvailableDevices();
-	void SetAudioDevice(string deviceName);
+	void SetAudioDevice(const string& deviceName);
 
 private:
 	vector<string> GetAvailableDeviceInfo();

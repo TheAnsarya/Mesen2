@@ -82,7 +82,7 @@ public:
 	AudioStatistics GetStatistics();
 	double GetRateAdjustment();
 
-	void StartRecording(string filepath);
+	void StartRecording(const string& filepath);
 	void StopRecording();
 	bool IsRecording();
 	void GetLastSamples(int16_t& left, int16_t& right);

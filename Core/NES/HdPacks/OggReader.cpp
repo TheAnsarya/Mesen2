@@ -14,7 +14,7 @@ OggReader::~OggReader() {
 	}
 }
 
-bool OggReader::Init(string filename, bool loop, uint32_t sampleRate, uint32_t startOffset, uint32_t loopPosition) {
+bool OggReader::Init(const string& filename, bool loop, uint32_t sampleRate, uint32_t startOffset, uint32_t loopPosition) {
 	int error;
 	VirtualFile file = filename;
 	_fileData = vector<uint8_t>(100000);

@@ -123,7 +123,7 @@ public:
 	/// </summary>
 	/// <param name="keyName">Key name</param>
 	/// <returns>Key code or 0 if not found</returns>
-	virtual uint16_t GetKeyCode(string keyName) = 0;
+	virtual uint16_t GetKeyCode(const string& keyName) = 0;
 
 	/// <summary>
 	/// Override key state (for scripting/replay).

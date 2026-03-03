@@ -19,7 +19,7 @@ public:
 	int GetScriptId();
 	string GetLog();
 
-	bool LoadScript(string scriptName, string path, string scriptContent, Debugger* debugger);
+	bool LoadScript(const string& scriptName, const string& path, const string& scriptContent, Debugger* debugger);
 	void RefreshMemoryCallbackFlags() { _context->RefreshMemoryCallbackFlags(); }
 
 	void ProcessEvent(EventType eventType, CpuType cpuType);

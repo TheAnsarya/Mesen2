@@ -24,7 +24,7 @@ int64_t UpsPatcher::ReadBase128Number(std::istream& file) {
 	return result;
 }
 
-bool UpsPatcher::PatchBuffer(string upsFilepath, vector<uint8_t>& input, vector<uint8_t>& output) {
+bool UpsPatcher::PatchBuffer(const string& upsFilepath, vector<uint8_t>& input, vector<uint8_t>& output) {
 	ifstream upsFile(upsFilepath, std::ios::in | std::ios::binary);
 	if (upsFile) {
 		return PatchBuffer(upsFile, input, output);

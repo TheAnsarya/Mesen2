@@ -182,7 +182,7 @@ double SoundMixer::GetRateAdjustment() {
 	return _resampler->GetRateAdjustment();
 }
 
-void SoundMixer::StartRecording(string filepath) {
+void SoundMixer::StartRecording(const string& filepath) {
 	_waveRecorder.reset(new WaveRecorder(filepath, _emu->GetSettings()->GetAudioConfig().SampleRate, true));
 }
 

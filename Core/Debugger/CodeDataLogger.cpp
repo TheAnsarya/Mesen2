@@ -38,7 +38,7 @@ MemoryType CodeDataLogger::GetMemoryType() {
 	return _memType;
 }
 
-bool CodeDataLogger::LoadCdlFile(string cdlFilepath, bool autoResetCdl) {
+bool CodeDataLogger::LoadCdlFile(const string& cdlFilepath, bool autoResetCdl) {
 	VirtualFile cdlFile = cdlFilepath;
 	if (cdlFile.IsValid()) {
 		vector<uint8_t>& cdlData = cdlFile.GetData();
@@ -67,7 +67,7 @@ bool CodeDataLogger::LoadCdlFile(string cdlFilepath, bool autoResetCdl) {
 	return false;
 }
 
-bool CodeDataLogger::SaveCdlFile(string cdlFilepath) {
+bool CodeDataLogger::SaveCdlFile(const string& cdlFilepath) {
 	ofstream cdlFile(cdlFilepath, ios::out | ios::binary);
 	if (cdlFile) {
 		cdlFile.write("CDLv2", 5);

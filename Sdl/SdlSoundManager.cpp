@@ -109,7 +109,7 @@ vector<string> SdlSoundManager::GetAvailableDeviceInfo()
 	return deviceList;
 }
 
-void SdlSoundManager::SetAudioDevice(string deviceName)
+void SdlSoundManager::SetAudioDevice(const string& deviceName)
 {
 	if(deviceName.compare(_deviceName) != 0) {
 		_deviceName = deviceName;

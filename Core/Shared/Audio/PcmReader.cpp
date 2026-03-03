@@ -11,7 +11,7 @@ PcmReader::PcmReader() {
 
 PcmReader::~PcmReader() = default;
 
-bool PcmReader::Init(string filename, bool loop, uint32_t startOffset) {
+bool PcmReader::Init(const string& filename, bool loop, uint32_t startOffset) {
 	if (_file) {
 		_file.close();
 	}

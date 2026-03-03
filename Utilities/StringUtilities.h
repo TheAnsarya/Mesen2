@@ -25,11 +25,11 @@ public:
 		size_t index = 0;
 		size_t lastIndex = 0;
 		while ((index = input.find(delimiter, index)) != string_view::npos) {
-			result.push_back(string(input.substr(lastIndex, index - lastIndex)));
+			result.emplace_back(input.substr(lastIndex, index - lastIndex));
 			index++;
 			lastIndex = index;
 		}
-		result.push_back(string(input.substr(lastIndex)));
+		result.emplace_back(input.substr(lastIndex));
 		return result;
 	}
 

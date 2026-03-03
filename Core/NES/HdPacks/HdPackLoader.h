@@ -8,7 +8,7 @@ enum class HdPackConditionOperator;
 
 class HdPackLoader {
 public:
-	static bool LoadHdNesPack(string definitionFile, HdPackData& outData);
+	static bool LoadHdNesPack(const string& definitionFile, HdPackData& outData);
 	static bool LoadHdNesPack(VirtualFile& romFile, HdPackData& outData);
 
 private:
@@ -25,8 +25,8 @@ private:
 	HdPackLoader();
 
 	bool InitializeLoader(VirtualFile& romPath, HdPackData* data);
-	bool LoadFile(string filename, vector<uint8_t>& fileData);
-	bool CheckFile(string filename);
+	bool LoadFile(const string& filename, vector<uint8_t>& fileData);
+	bool CheckFile(const string& filename);
 
 	bool LoadPack();
 	void InitializeHdPack();
@@ -35,11 +35,11 @@ private:
 	void ReadTileData(HdTileKey& key, string& tileData, string& palData);
 
 	template <typename T>
-	void AddGlobalCondition(string name);
+	void AddGlobalCondition(const string& name);
 	void InitializeGlobalConditions();
 
 	// Video
-	bool ProcessImgTag(string src);
+	bool ProcessImgTag(const string& src);
 	void ProcessPatchTag(vector<string>& tokens);
 	void ProcessOverscanTag(vector<string>& tokens);
 	void ProcessConditionTag(vector<string>& tokens, bool createInvertedCondition);
@@ -51,10 +51,10 @@ private:
 	void ProcessOptionTag(vector<string>& tokens);
 
 	// Audio
-	int ProcessSoundTrack(string albumString, string trackString, string filename);
+	int ProcessSoundTrack(const string& albumString, const string& trackString, const string& filename);
 	void ProcessBgmTag(vector<string>& tokens);
 	void ProcessSfxTag(vector<string>& tokens);
 
-	vector<HdPackCondition*> ParseConditionString(string conditionString);
-	bool ParseBooleanValue(string value);
+	vector<HdPackCondition*> ParseConditionString(const string& conditionString);
+	bool ParseBooleanValue(const string& value);
 };

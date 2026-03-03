@@ -114,7 +114,7 @@ private:
 	/// - Kicked by host
 	/// - Server shutdown
 	/// </remarks>
-	void SendForceDisconnectMessage(string disconnectMessage);
+	void SendForceDisconnectMessage(const string& disconnectMessage);
 
 	/// <summary>
 	/// Process client handshake response.

@@ -134,12 +134,13 @@ bool UnifLoader::ReadChunk(uint8_t*& data, uint8_t* dataEnd, RomData& romData) {
 	return true;
 }
 
-int32_t UnifLoader::GetMapperID(string mapperName) {
-	if (mapperName.starts_with("NES-") || mapperName.starts_with("UNL-") || mapperName.starts_with("HVC-") || mapperName.starts_with("BTL-") || mapperName.starts_with("BMC-")) {
-		mapperName = mapperName.substr(4);
+int32_t UnifLoader::GetMapperID(const string& mapperName) {
+	string name = mapperName;
+	if (name.starts_with("NES-") || name.starts_with("UNL-") || name.starts_with("HVC-") || name.starts_with("BTL-") || name.starts_with("BMC-")) {
+		name = name.substr(4);
 	}
 
-	auto result = _boardMappings.find(mapperName);
+	auto result = _boardMappings.find(name);
 	if (result != _boardMappings.end()) {
 		return result->second;
 	}

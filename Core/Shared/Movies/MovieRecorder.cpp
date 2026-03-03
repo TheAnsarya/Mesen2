@@ -182,7 +182,7 @@ void MovieRecorder::ProcessNotification(ConsoleNotificationType type, void* para
 	}
 }
 
-bool MovieRecorder::CreateMovie(string movieFile, deque<RewindData>& data, uint32_t startPosition, uint32_t endPosition, bool hasBattery) {
+bool MovieRecorder::CreateMovie(const string& movieFile, deque<RewindData>& data, uint32_t startPosition, uint32_t endPosition, bool hasBattery) {
 	shared_ptr<IConsole> console = _emu->GetConsole();
 	if (!console) {
 		return false;

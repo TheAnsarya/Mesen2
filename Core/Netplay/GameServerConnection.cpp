@@ -63,7 +63,7 @@ void GameServerConnection::SendMovieData(uint8_t port, ControlDeviceState state)
 	}
 }
 
-void GameServerConnection::SendForceDisconnectMessage(string disconnectMessage) {
+void GameServerConnection::SendForceDisconnectMessage(const string& disconnectMessage) {
 	ForceDisconnectMessage message(disconnectMessage);
 	SendNetMessage(message);
 	Disconnect();

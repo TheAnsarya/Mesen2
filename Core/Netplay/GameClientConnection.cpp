@@ -128,7 +128,7 @@ void GameClientConnection::ProcessMessage(NetMessage* message) {
 	}
 }
 
-bool GameClientConnection::AttemptLoadGame(string filename, uint32_t crc32) {
+bool GameClientConnection::AttemptLoadGame(const string& filename, uint32_t crc32) {
 	if (filename.size() > 0) {
 		if (!RomFinder::LoadMatchingRom(_emu, filename, crc32)) {
 			MessageManager::DisplayMessage("NetPlay", "CouldNotFindRom", filename);

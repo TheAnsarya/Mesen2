@@ -94,7 +94,7 @@ public:
 	/// <param name="content">Script source code</param>
 	/// <param name="scriptId">Script ID (0 for new script, >0 to replace)</param>
 	/// <returns>Script ID</returns>
-	int32_t LoadScript(string name, string path, string content, int32_t scriptId);
+	int32_t LoadScript(const string& name, const string& path, const string& content, int32_t scriptId);
 
 	/// <summary>
 	/// Remove and unload script.

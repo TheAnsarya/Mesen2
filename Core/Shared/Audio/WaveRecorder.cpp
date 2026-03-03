@@ -2,7 +2,7 @@
 #include "Shared/Audio/WaveRecorder.h"
 #include "Shared/MessageManager.h"
 
-WaveRecorder::WaveRecorder(string outputFile, uint32_t sampleRate, bool isStereo) {
+WaveRecorder::WaveRecorder(const string& outputFile, uint32_t sampleRate, bool isStereo) {
 	_stream = ofstream(outputFile, ios::out | ios::binary);
 	_outputFile = outputFile;
 	_streamSize = 0;

@@ -28,7 +28,7 @@ public:
 	OggReader();
 	~OggReader();
 
-	bool Init(string filename, bool loop, uint32_t sampleRate, uint32_t startOffset = 0, uint32_t loopPosition = 0);
+	bool Init(const string& filename, bool loop, uint32_t sampleRate, uint32_t startOffset = 0, uint32_t loopPosition = 0);
 	bool IsPlaybackOver();
 	void SetSampleRate(int sampleRate);
 	void SetLoopFlag(bool loop);

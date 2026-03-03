@@ -18,7 +18,7 @@ ScriptManager::~ScriptManager() {
 	_debugger->GetEmulator()->GetScriptHud()->ClearScreen();
 }
 
-int ScriptManager::LoadScript(string name, string path, string content, int32_t scriptId) {
+int ScriptManager::LoadScript(const string& name, const string& path, const string& content, int32_t scriptId) {
 	DebugBreakHelper helper(_debugger);
 	auto lock = _scriptLock.AcquireSafe();
 

@@ -306,7 +306,7 @@ protected:
 		_currentPos = (_currentPos + 1) % ExecutionLogSize;
 	}
 
-	void ParseFormatString(string format) {
+	void ParseFormatString(const string& format) {
 		_rowParts.clear();
 
 		std::regex formatRegex = std::regex("(\\[\\s*([^[]*?)\\s*(,\\s*([\\d]*)\\s*(h){0,1}){0,1}\\s*\\])|([^[]*)", std::regex_constants::icase);

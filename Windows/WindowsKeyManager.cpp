@@ -184,7 +184,7 @@ string WindowsKeyManager::GetKeyName(uint16_t keyCode) {
 	return "";
 }
 
-uint16_t WindowsKeyManager::GetKeyCode(string keyName) {
+uint16_t WindowsKeyManager::GetKeyCode(const string& keyName) {
 	auto keyDef = _keyCodes.find(keyName);
 	if (keyDef != _keyCodes.end()) {
 		return keyDef->second;

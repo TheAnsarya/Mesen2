@@ -24,7 +24,7 @@ int64_t BpsPatcher::ReadBase128Number(std::istream& file) {
 	return result;
 }
 
-bool BpsPatcher::PatchBuffer(string bpsFilepath, vector<uint8_t>& input, vector<uint8_t>& output) {
+bool BpsPatcher::PatchBuffer(const string& bpsFilepath, vector<uint8_t>& input, vector<uint8_t>& output) {
 	ifstream bpsFile(bpsFilepath, std::ios::in | std::ios::binary);
 	if (bpsFile) {
 		return PatchBuffer(bpsFile, input, output);

@@ -206,5 +206,7 @@ build-*.log
 build-*.txt
 build-output.txt
 build-err*.txt
+rebuild-*.txt
+warnings-to-fix.txt
 test-*.log
 terminal-*.txt

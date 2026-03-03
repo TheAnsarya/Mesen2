@@ -93,7 +93,7 @@ public:
 	/// Select audio output device.
 	/// </summary>
 	/// <param name="deviceName">Device name from GetAvailableDevices()</param>
-	virtual void SetAudioDevice(string deviceName) = 0;
+	virtual void SetAudioDevice(const string& deviceName) = 0;
 
 	/// <summary>
 	/// Get audio playback statistics.

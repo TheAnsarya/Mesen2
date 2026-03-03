@@ -57,12 +57,12 @@ private:
 
 	LabelManager* _labelManager;
 	void ProcessLine(string code, uint32_t& instructionAddress, vector<int16_t>& output, unordered_map<string, uint32_t>& labels, bool firstPass, unordered_map<string, uint32_t>& currentPassLabels);
-	AssemblerSpecialCodes ParseOperand(AssemblerLineData& lineData, string operand, bool firstPass, unordered_map<string, uint32_t>& labels);
+	AssemblerSpecialCodes ParseOperand(AssemblerLineData& lineData, const string& operand, bool firstPass, unordered_map<string, uint32_t>& labels);
 	void AssembleInstruction(AssemblerLineData& lineData, uint32_t& instructionAddress, vector<int16_t>& output, bool firstPass);
 
 protected:
-	bool IsOpModeAvailable(string& opCode, T mode);
-	int16_t GetOpByteCode(string& opCode, T addrMode);
+	bool IsOpModeAvailable(const string& opCode, T mode);
+	int16_t GetOpByteCode(const string& opCode, T addrMode);
 
 	virtual string GetOpName(uint8_t opcode) = 0;
 	virtual T GetOpMode(uint8_t opcode) = 0;

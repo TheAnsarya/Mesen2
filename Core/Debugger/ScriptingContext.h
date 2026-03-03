@@ -64,7 +64,7 @@ protected:
 public:
 	ScriptingContext(Debugger* debugger);
 	~ScriptingContext();
-	bool LoadScript(string scriptName, string path, string scriptContent, Debugger* debugger);
+	bool LoadScript(const string& scriptName, const string& path, const string& scriptContent, Debugger* debugger);
 
 	void Log(const string& message);
 	string GetLog();

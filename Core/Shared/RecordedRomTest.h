@@ -122,14 +122,14 @@ public:
 	/// </summary>
 	/// <param name="filename">Output test filename</param>
 	/// <param name="reset">Reset emulator before recording if true</param>
-	void Record(string filename, bool reset);
+	void Record(const string& filename, bool reset);
 
 	/// <summary>
 	/// Run validation test.
 	/// </summary>
 	/// <param name="filename">Test file to validate against</param>
 	/// <returns>Test result (Passed/Failed/PassedWithWarnings)</returns>
-	RomTestResult Run(string filename);
+	RomTestResult Run(const string& filename);
 
 	/// <summary>Stop recording or testing</summary>
 	void Stop();

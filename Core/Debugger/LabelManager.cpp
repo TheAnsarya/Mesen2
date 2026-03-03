@@ -109,11 +109,11 @@ bool LabelManager::GetLabelAndComment(AddressInfo address, LabelInfo& labelInfo)
 	return false;
 }
 
-bool LabelManager::ContainsLabel(string& label) {
+bool LabelManager::ContainsLabel(const string& label) {
 	return _codeLabelReverseLookup.find(label) != _codeLabelReverseLookup.end();
 }
 
-AddressInfo LabelManager::GetLabelAbsoluteAddress(string& label) {
+AddressInfo LabelManager::GetLabelAbsoluteAddress(const string& label) {
 	AddressInfo addr = {-1, MemoryType::None};
 	auto result = _codeLabelReverseLookup.find(label);
 	if (result != _codeLabelReverseLookup.end()) {
@@ -124,7 +124,7 @@ AddressInfo LabelManager::GetLabelAbsoluteAddress(string& label) {
 	return addr;
 }
 
-int32_t LabelManager::GetLabelRelativeAddress(string& label, CpuType cpuType) {
+int32_t LabelManager::GetLabelRelativeAddress(const string& label, CpuType cpuType) {
 	auto result = _codeLabelReverseLookup.find(label);
 	if (result == _codeLabelReverseLookup.end()) {
 		// Label doesn't exist, try to find a matching multi-byte label

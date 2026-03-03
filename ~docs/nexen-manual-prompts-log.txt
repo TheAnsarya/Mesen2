@@ -360,6 +360,15 @@ only do the open PRS, old closed prs don't matter; continue working;
 
 [Nexen] continue making issues for each open PR and analyzing them and implementing new fixes; continue;
 
+[Nexen] continue implementing `~docs\Mesen Pull Requests.md` and all the issues and mark as closed those we will not make changes for and update the doc to indicate their fate; continue;
+
+[Nexen] release another version of Nexen to github, updating the minor version number; Make an announcement `discord` post ***with formatting*** for this Nexen release, with all the differences since we forked from Mesen and why we did and save it in an `md` dicumentation file and show me this file; work performance improvements, and work on Atari Lynx, then work on performance again; always benchmarks, always tests (unit/integration/system/acceptance/etc); continue;
+
+[Nexen] continue working issues and make new ones; continue;
+
+[Nexen] git commit everything; continue working issues and make new ones and docs and plans and code-plans and test every real change and benchmark so performance is good; continue;
+
+[Nexen] remember: never screw up emulation accuracy ever; and test performance of code changes, and find performance improvements, especially in hot paths and fix them (test & benchmark before and after); git commit everything; update issues; continue working issues and make new ones and docs and plans and code-plans and test every real change and benchmark so performance is good; continue;
 
 
 
@@ -368,7 +377,6 @@ only do the open PRS, old closed prs don't matter; continue working;
 
 
 
-[Nexen] show me a giant list of warnings (from compilers and linters, etc) in a text file so I can delete the warnings I don't care about and then tell you to fix all the ones in the file after I edit it; git commit everything, and then release another version of Nexen to github, updating the minor version number; Make an announcement `discord` post ***with formatting*** for this Nexen release, with all the differences since we forked from Mesen and why we did and save it in an `md` dicumentation file and show me this file; work performance improvements, and work on Atari Lynx, then work on performance again; always benchmarks, always tests (unit/integration/system/acceptance/etc); continue; 
 
 
 fix as many warnings as you can; continue;

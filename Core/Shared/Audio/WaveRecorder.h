@@ -33,7 +33,7 @@ private:
 	void CloseFile();
 
 public:
-	WaveRecorder(string outputFile, uint32_t sampleRate, bool isStereo);
+	WaveRecorder(const string& outputFile, uint32_t sampleRate, bool isStereo);
 	~WaveRecorder();
 
 	bool WriteSamples(int16_t* samples, uint32_t sampleCount, uint32_t sampleRate, bool isStereo);

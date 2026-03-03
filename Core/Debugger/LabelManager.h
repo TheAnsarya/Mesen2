@@ -136,7 +136,7 @@ public:
 	/// </summary>
 	/// <param name="label">Label to lookup</param>
 	/// <returns>Address info or invalid address if not found</returns>
-	AddressInfo GetLabelAbsoluteAddress(string& label);
+	AddressInfo GetLabelAbsoluteAddress(const string& label);
 
 	/// <summary>
 	/// Get CPU-relative address for label.
@@ -144,7 +144,7 @@ public:
 	/// <param name="label">Label to lookup</param>
 	/// <param name="cpuType">Target CPU type</param>
 	/// <returns>Relative address or -1 if not found</returns>
-	int32_t GetLabelRelativeAddress(string& label, CpuType cpuType);
+	int32_t GetLabelRelativeAddress(const string& label, CpuType cpuType);
 
 	/// <summary>
 	/// Get label for address.
@@ -179,7 +179,7 @@ public:
 	/// </summary>
 	/// <param name="label">Label to check</param>
 	/// <returns>True if label defined</returns>
-	bool ContainsLabel(string& label);
+	bool ContainsLabel(const string& label);
 
 	/// <summary>
 	/// Check if address has label or comment.

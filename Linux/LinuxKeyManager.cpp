@@ -119,7 +119,7 @@ string LinuxKeyManager::GetKeyName(uint16_t key)
 	return "";
 }
 
-uint16_t LinuxKeyManager::GetKeyCode(string keyName)
+uint16_t LinuxKeyManager::GetKeyCode(const string& keyName)
 {
 	auto keyDef = _keyCodes.find(keyName);
 	if(keyDef != _keyCodes.end()) {

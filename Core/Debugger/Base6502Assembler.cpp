@@ -87,7 +87,7 @@ void Base6502Assembler<T>::ProcessLine(string code, uint32_t& instructionAddress
 }
 
 template <class T>
-AssemblerSpecialCodes Base6502Assembler<T>::ParseOperand(AssemblerLineData& lineData, string operandStr, bool firstPass, unordered_map<string, uint32_t>& labels) {
+AssemblerSpecialCodes Base6502Assembler<T>::ParseOperand(AssemblerLineData& lineData, const string& operandStr, bool firstPass, unordered_map<string, uint32_t>& labels) {
 	AssemblerOperand& operand = lineData.Operands[lineData.OperandCount];
 
 	if (operandStr.empty()) {
@@ -235,12 +235,12 @@ AssemblerSpecialCodes Base6502Assembler<T>::ParseOperand(AssemblerLineData& line
 }
 
 template <class T>
-bool Base6502Assembler<T>::IsOpModeAvailable(string& opCode, T addrMode) {
+bool Base6502Assembler<T>::IsOpModeAvailable(const string& opCode, T addrMode) {
 	return _availableModesByOpName[opCode].find(addrMode) != _availableModesByOpName[opCode].end();
 }
 
 template <class T>
-int16_t Base6502Assembler<T>::GetOpByteCode(string& opCode, T addrMode) {
+int16_t Base6502Assembler<T>::GetOpByteCode(const string& opCode, T addrMode) {
 	auto nameResult = _availableModesByOpName.find(opCode);
 	if (nameResult != _availableModesByOpName.end()) {
 		auto modeResult = nameResult->second.find(addrMode);
@@ -284,16 +284,16 @@ void Base6502Assembler<T>::AssembleInstruction(AssemblerLineData& op, uint32_t& 
 
 enum class SnesAddrMode : uint8_t;
 template void Base6502Assembler<SnesAddrMode>::ProcessLine(string code, uint32_t& instructionAddress, vector<int16_t>& output, unordered_map<string, uint32_t>& labels, bool firstPass, unordered_map<string, uint32_t>& currentPassLabels);
-template bool Base6502Assembler<SnesAddrMode>::IsOpModeAvailable(string& opcode, SnesAddrMode mode);
+template bool Base6502Assembler<SnesAddrMode>::IsOpModeAvailable(const string& opcode, SnesAddrMode mode);
 
 enum class NesAddrMode;
 template void Base6502Assembler<NesAddrMode>::ProcessLine(string code, uint32_t& instructionAddress, vector<int16_t>& output, unordered_map<string, uint32_t>& labels, bool firstPass, unordered_map<string, uint32_t>& currentPassLabels);
-template bool Base6502Assembler<NesAddrMode>::IsOpModeAvailable(string& opcode, NesAddrMode mode);
+template bool Base6502Assembler<NesAddrMode>::IsOpModeAvailable(const string& opcode, NesAddrMode mode);
 
 enum class PceAddrMode;
 template void Base6502Assembler<PceAddrMode>::ProcessLine(string code, uint32_t& instructionAddress, vector<int16_t>& output, unordered_map<string, uint32_t>& labels, bool firstPass, unordered_map<string, uint32_t>& currentPassLabels);
-template bool Base6502Assembler<PceAddrMode>::IsOpModeAvailable(string& opcode, PceAddrMode mode);
+template bool Base6502Assembler<PceAddrMode>::IsOpModeAvailable(const string& opcode, PceAddrMode mode);
 
 enum class LynxAddrMode : uint8_t;
 template void Base6502Assembler<LynxAddrMode>::ProcessLine(string code, uint32_t& instructionAddress, vector<int16_t>& output, unordered_map<string, uint32_t>& labels, bool firstPass, unordered_map<string, uint32_t>& currentPassLabels);
-template bool Base6502Assembler<LynxAddrMode>::IsOpModeAvailable(string& opcode, LynxAddrMode mode);
+template bool Base6502Assembler<LynxAddrMode>::IsOpModeAvailable(const string& opcode, LynxAddrMode mode);

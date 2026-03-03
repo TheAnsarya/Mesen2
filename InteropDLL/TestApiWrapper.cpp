@@ -28,7 +28,7 @@ DllExport uint64_t __stdcall RunTest(char* filename, uint32_t address, MemoryTyp
 	emu->GetSettings()->SetFlag(EmulationFlags::TestMode);
 	emu->GetSettings()->GetGameboyConfig().Model = GameboyModel::Gameboy;
 	emu->GetSettings()->GetGameboyConfig().RamPowerOnState = RamState::AllZeros;
-	emu->LoadRom((VirtualFile)filename, VirtualFile());
+	(void)emu->LoadRom((VirtualFile)filename, VirtualFile());
 	emu->GetSettings()->SetFlag(EmulationFlags::MaximumSpeed);
 
 	while (emu->GetFrameCount() < 500) {

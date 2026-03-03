@@ -103,7 +103,7 @@ void RecordedRomTest::Reset() {
 	_badFrameCount = 0;
 }
 
-void RecordedRomTest::Record(string filename, bool reset) {
+void RecordedRomTest::Record(const string& filename, bool reset) {
 	_emu->GetNotificationManager()->RegisterNotificationListener(shared_from_this());
 	_filename = filename;
 
@@ -143,7 +143,7 @@ void RecordedRomTest::Record(string filename, bool reset) {
 	}
 }
 
-RomTestResult RecordedRomTest::Run(string filename) {
+RomTestResult RecordedRomTest::Run(const string& filename) {
 	RomTestResult result = {};
 	_emu->GetNotificationManager()->RegisterNotificationListener(shared_from_this());
 

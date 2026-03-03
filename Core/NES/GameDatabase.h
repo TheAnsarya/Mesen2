@@ -14,15 +14,15 @@ private:
 	static SimpleLock _loadLock;
 
 	template <typename T>
-	static T ToInt(string value);
+	static T ToInt(const string& value);
 
-	static BusConflictType GetBusConflictType(string busConflictSetting);
-	static GameSystem GetGameSystem(string system);
+	static BusConflictType GetBusConflictType(const string& busConflictSetting);
+	static GameSystem GetGameSystem(const string& system);
 	static uint8_t GetSubMapper(GameInfo& info);
 
 	static void InitDatabase();
 	static void UpdateRomData(GameInfo& info, RomData& romData);
-	static void LoadGameDb(vector<string> data);
+	static void LoadGameDb(const vector<string>& data);
 
 public:
 	static void LoadGameDb(std::istream& db);

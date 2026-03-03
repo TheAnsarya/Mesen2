@@ -13,7 +13,7 @@ class Emulator;
 
 class MovieRecorder final : public INotificationListener, public IInputRecorder, public IBatteryRecorder, public IBatteryProvider, public std::enable_shared_from_this<MovieRecorder> {
 private:
-	static const uint32_t MovieFormatVersion = 2;
+	static constexpr uint32_t MovieFormatVersion = 2;
 
 	Emulator* _emu;
 	string _filename;
@@ -47,5 +47,5 @@ public:
 	// Inherited via INotificationListener
 	void ProcessNotification(ConsoleNotificationType type, void* parameter) override;
 
-	bool CreateMovie(string movieFile, deque<RewindData>& data, uint32_t startPosition, uint32_t endPosition, bool hasBattery);
+	bool CreateMovie(const string& movieFile, deque<RewindData>& data, uint32_t startPosition, uint32_t endPosition, bool hasBattery);
 };

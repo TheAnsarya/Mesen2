@@ -36,5 +36,5 @@ public:
 	/// - Emulation typically paused while message is displayed
 	/// - Critical errors should block until user acknowledges
 	/// </remarks>
-	virtual void DisplayMessage(string title, string message) = 0;
+	virtual void DisplayMessage(const string& title, const string& message) = 0;
 };

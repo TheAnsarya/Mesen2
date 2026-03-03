@@ -102,7 +102,7 @@ void HistoryViewer::SeekTo(uint32_t seekPosition) {
 	}
 }
 
-bool HistoryViewer::CreateSaveState(string outputFile, uint32_t position) {
+bool HistoryViewer::CreateSaveState(const string& outputFile, uint32_t position) {
 	if (_history.empty()) {
 		return false;
 	}
@@ -123,7 +123,7 @@ bool HistoryViewer::CreateSaveState(string outputFile, uint32_t position) {
 	return false;
 }
 
-bool HistoryViewer::SaveMovie(string movieFile, uint32_t startPosition, uint32_t endPosition) {
+bool HistoryViewer::SaveMovie(const string& movieFile, uint32_t startPosition, uint32_t endPosition) {
 	startPosition /= RewindManager::BufferSize;
 	endPosition /= RewindManager::BufferSize;
 

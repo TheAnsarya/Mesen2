@@ -59,7 +59,7 @@ public:
 	}
 };
 
-bool IpsPatcher::PatchBuffer(string ipsFilepath, vector<uint8_t>& input, vector<uint8_t>& output) {
+bool IpsPatcher::PatchBuffer(const string& ipsFilepath, vector<uint8_t>& input, vector<uint8_t>& output) {
 	ifstream ipsFile(ipsFilepath, std::ios::in | std::ios::binary);
 	if (ipsFile) {
 		return PatchBuffer(ipsFile, input, output);

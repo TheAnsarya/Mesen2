@@ -237,7 +237,7 @@ void VideoRenderer::ProcessAviRecording(RenderedFrame& frame) {
 	}
 }
 
-void VideoRenderer::StartRecording(string filename, RecordAviOptions options) {
+void VideoRenderer::StartRecording(const string& filename, RecordAviOptions options) {
 	_recorderOptions = options;
 
 	shared_ptr<IVideoRecorder> recorder;

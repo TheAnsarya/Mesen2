@@ -51,15 +51,15 @@ vector<SoundDeviceInfo> SoundManager::GetAvailableDeviceInfo() {
 
 string SoundManager::GetAvailableDevices() {
 	string deviceString;
-	for (SoundDeviceInfo device : GetAvailableDeviceInfo()) {
+	for (const SoundDeviceInfo& device : GetAvailableDeviceInfo()) {
 		deviceString += device.description + "||"s;
 	}
 	return deviceString;
 }
 
-void SoundManager::SetAudioDevice(string deviceName) {
+void SoundManager::SetAudioDevice(const string& deviceName) {
 	if (_audioDeviceName != deviceName) {
-		for (SoundDeviceInfo device : GetAvailableDeviceInfo()) {
+		for (const SoundDeviceInfo& device : GetAvailableDeviceInfo()) {
 			if (device.description.compare(deviceName) == 0) {
 				_audioDeviceName = deviceName;
 				if (memcmp(&_audioDeviceID, &device.guid, 16) != 0) {

@@ -23,7 +23,7 @@ public:
 	void Stop();
 
 	string GetAvailableDevices();
-	void SetAudioDevice(string deviceName);
+	void SetAudioDevice(const string& deviceName);
 
 private:
 	vector<SoundDeviceInfo> GetAvailableDeviceInfo();

@@ -88,7 +88,7 @@ public:
 
 	uint32_t* GetOutputBuffer();
 	FrameInfo SendFrame(uint16_t* ppuOutputBuffer, uint32_t frameNumber, uint32_t videoPhaseOffset, void* frameData, bool enableOverscan = true);
-	void TakeScreenshot(string romName, VideoFilterType filterType);
+	void TakeScreenshot(const string& romName, VideoFilterType filterType);
 	void TakeScreenshot(VideoFilterType filterType, string filename, std::stringstream* stream = nullptr);
 
 	virtual HudScaleFactors GetScaleFactor() { return {1.0, 1.0}; }

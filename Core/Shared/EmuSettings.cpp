@@ -363,11 +363,11 @@ void EmuSettings::SetShortcutKey(EmulatorShortcut shortcut, KeyCombination keyCo
 	}
 }
 
-void EmuSettings::SetShortcutKeys(vector<ShortcutKeyInfo> shortcuts) {
+void EmuSettings::SetShortcutKeys(const vector<ShortcutKeyInfo>& shortcuts) {
 	auto lock = _updateShortcutsLock.AcquireSafe();
 	ClearShortcutKeys();
 
-	for (ShortcutKeyInfo& shortcut : shortcuts) {
+	for (const ShortcutKeyInfo& shortcut : shortcuts) {
 		if (_emulatorKeys[0][(uint32_t)shortcut.Shortcut].GetKeys().empty()) {
 			SetShortcutKey(shortcut.Shortcut, shortcut.Keys, 0);
 		} else {

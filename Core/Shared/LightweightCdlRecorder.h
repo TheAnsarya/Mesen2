@@ -108,10 +108,10 @@ public:
 	CdlStatistics GetStatistics();
 
 	/// <summary>Load CDL data from file.</summary>
-	bool LoadCdlFile(string cdlFilepath);
+	bool LoadCdlFile(const string& cdlFilepath);
 
 	/// <summary>Save CDL data to file.</summary>
-	bool SaveCdlFile(string cdlFilepath);
+	bool SaveCdlFile(const string& cdlFilepath);
 
 	/// <summary>Get CDL data for a range.</summary>
 	void GetCdlData(uint32_t offset, uint32_t length, uint8_t* cdlData);

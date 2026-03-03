@@ -15,15 +15,15 @@ bool GameDatabase::_initialized = false;
 SimpleLock GameDatabase::_loadLock;
 
 template <typename T>
-T GameDatabase::ToInt(string value) {
+T GameDatabase::ToInt(const string& value) {
 	if (value.empty()) {
 		return 0;
 	}
 	return std::stoi(value);
 }
 
-void GameDatabase::LoadGameDb(vector<string> data) {
-	for (string& row : data) {
+void GameDatabase::LoadGameDb(const vector<string>& data) {
+	for (const string& row : data) {
 		vector<string> values = StringUtilities::Split(row, ',');
 		if (values.size() >= 16) {
 			GameInfo gameInfo;
@@ -86,7 +86,7 @@ void GameDatabase::InitDatabase() {
 	}
 }
 
-BusConflictType GameDatabase::GetBusConflictType(string busConflictSetting) {
+BusConflictType GameDatabase::GetBusConflictType(const string& busConflictSetting) {
 	if (busConflictSetting.compare("Y") == 0) {
 		return BusConflictType::Yes;
 	} else if (busConflictSetting.compare("N") == 0) {
@@ -95,7 +95,7 @@ BusConflictType GameDatabase::GetBusConflictType(string busConflictSetting) {
 	return BusConflictType::Default;
 }
 
-GameSystem GameDatabase::GetGameSystem(string system) {
+GameSystem GameDatabase::GetGameSystem(const string& system) {
 	if (system.compare("NesNtsc") == 0) {
 		return GameSystem::NesNtsc;
 	} else if (system.compare("NesPal") == 0) {

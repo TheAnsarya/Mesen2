@@ -48,7 +48,7 @@ CdlStatistics LightweightCdlRecorder::GetStatistics() {
 	return stats;
 }
 
-bool LightweightCdlRecorder::LoadCdlFile(string cdlFilepath) {
+bool LightweightCdlRecorder::LoadCdlFile(const string& cdlFilepath) {
 	VirtualFile cdlFile = cdlFilepath;
 	if (cdlFile.IsValid()) {
 		vector<uint8_t>& cdlData = cdlFile.GetData();
@@ -74,7 +74,7 @@ bool LightweightCdlRecorder::LoadCdlFile(string cdlFilepath) {
 	return false;
 }
 
-bool LightweightCdlRecorder::SaveCdlFile(string cdlFilepath) {
+bool LightweightCdlRecorder::SaveCdlFile(const string& cdlFilepath) {
 	ofstream cdlFile(cdlFilepath, ios::out | ios::binary);
 	if (cdlFile) {
 		cdlFile.write("CDLv2", 5);

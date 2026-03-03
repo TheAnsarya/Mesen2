@@ -90,7 +90,7 @@ public:
 	/// </summary>
 	/// <param name="keyName">Key name (e.g., "Space", "Enter")</param>
 	/// <returns>Platform-specific key code</returns>
-	static uint16_t GetKeyCode(string keyName);
+	static uint16_t GetKeyCode(const string& keyName);
 
 	/// <summary>Update connected device list (gamepads, etc.)</summary>
 	static void UpdateDevices();

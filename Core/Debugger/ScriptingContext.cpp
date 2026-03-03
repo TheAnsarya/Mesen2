@@ -50,7 +50,7 @@ ScriptingContext::~ScriptingContext() {
 	}
 }
 
-bool ScriptingContext::LoadScript(string scriptName, string path, string scriptContent, Debugger* debugger) {
+bool ScriptingContext::LoadScript(const string& scriptName, const string& path, const string& scriptContent, Debugger* debugger) {
 	_scriptName = scriptName;
 
 	int iErr = 0;
@@ -77,11 +77,11 @@ bool ScriptingContext::LoadScript(string scriptName, string path, string scriptC
 	if (allowIoOsAccess) {
 		// Escape backslashes
 		std::regex r("\\\\");
-		path = std::regex_replace(path, r, "\\\\");
+		string escapedPath = std::regex_replace(path, r, "\\\\\\\\");
 
 		// Add path for the current Lua script to package.path to allow
 		// using require() without specifying an absolute path, etc.
-		string cmd = "package.path = package.path .. ';" + path + "?.lua'";
+		string cmd = "package.path = package.path .. ';" + escapedPath + "?.lua'";
 		luaL_dostring(_lua, cmd.c_str());
 	}
 

@@ -183,7 +183,7 @@ public:
 	/// </summary>
 	/// <param name="filepath">Output file path</param>
 	/// <param name="showSuccessMessage">Display success message if true</param>
-	[[nodiscard]] bool SaveState(string filepath, bool showSuccessMessage = true);
+	[[nodiscard]] bool SaveState(const string& filepath, bool showSuccessMessage = true);
 
 	/// <summary>
 	/// Save state to numbered slot.
@@ -203,7 +203,7 @@ public:
 	/// </summary>
 	/// <param name="filepath">Input file path</param>
 	/// <param name="showSuccessMessage">Display success message if true</param>
-	[[nodiscard]] bool LoadState(string filepath, bool showSuccessMessage = true);
+	[[nodiscard]] bool LoadState(const string& filepath, bool showSuccessMessage = true);
 
 	/// <summary>
 	/// Load state from numbered slot.
@@ -232,7 +232,7 @@ public:
 	/// <param name="saveStatePath">Save state file path</param>
 	/// <param name="pngData">Output PNG data buffer</param>
 	/// <returns>PNG data size in bytes, or -1 on error</returns>
-	int32_t GetSaveStatePreview(string saveStatePath, uint8_t* pngData);
+	int32_t GetSaveStatePreview(const string& saveStatePath, uint8_t* pngData);
 
 	/// <summary>
 	/// Select save state slot for next save/load.

@@ -107,7 +107,7 @@ public:
 	/// <param name="outputFile">Save state filename</param>
 	/// <param name="position">Frame position</param>
 	/// <returns>True if save state created successfully</returns>
-	bool CreateSaveState(string outputFile, uint32_t position);
+	bool CreateSaveState(const string& outputFile, uint32_t position);
 
 	/// <summary>
 	/// Save movie file for frame range.
@@ -116,7 +116,7 @@ public:
 	/// <param name="startPosition">Start frame</param>
 	/// <param name="endPosition">End frame (inclusive)</param>
 	/// <returns>True if movie saved successfully</returns>
-	bool SaveMovie(string movieFile, uint32_t startPosition, uint32_t endPosition);
+	bool SaveMovie(const string& movieFile, uint32_t startPosition, uint32_t endPosition);
 
 	/// <summary>
 	/// Resume gameplay in main emulator from history position.

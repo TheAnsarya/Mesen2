@@ -189,7 +189,7 @@ void BaseVideoFilter::TakeScreenshot(VideoFilterType filterType, string filename
 	}
 }
 
-void BaseVideoFilter::TakeScreenshot(string romName, VideoFilterType filterType) {
+void BaseVideoFilter::TakeScreenshot(const string& romName, VideoFilterType filterType) {
 	string romFilename = FolderUtilities::GetFilename(romName, false);
 
 	int counter = 0;

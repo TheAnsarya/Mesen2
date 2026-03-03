@@ -139,7 +139,7 @@ public:
 	void SetDebugConfig(DebugConfig& config);
 	DebugConfig& GetDebugConfig();
 
-	void SetShortcutKeys(vector<ShortcutKeyInfo> shortcuts);
+	void SetShortcutKeys(const vector<ShortcutKeyInfo>& shortcuts);
 	KeyCombination GetShortcutKey(EmulatorShortcut shortcut, int keySetIndex);
 	vector<KeyCombination> GetShortcutSupersets(EmulatorShortcut shortcut, int keySetIndex);
 

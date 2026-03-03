@@ -131,7 +131,7 @@ void SystemHud::DrawCounters(DebugHud* hud, uint32_t screenWidth) const {
 	}
 }
 
-void SystemHud::DisplayMessage(string title, string message) {
+void SystemHud::DisplayMessage(const string& title, const string& message) {
 	auto lock = _msgLock.AcquireSafe();
 	_messages.push_front(std::make_unique<MessageInfo>(title, message, 3000));
 }

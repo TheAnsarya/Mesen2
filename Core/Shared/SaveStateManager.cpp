@@ -150,7 +150,7 @@ void SaveStateManager::SaveState(ostream& stream) {
 	_emu->Serialize(stream, false);
 }
 
-bool SaveStateManager::SaveState(string filepath, bool showSuccessMessage) {
+bool SaveStateManager::SaveState(const string& filepath, bool showSuccessMessage) {
 	ofstream file(filepath, ios::out | ios::binary);
 
 	if (file) {
@@ -298,7 +298,7 @@ bool SaveStateManager::LoadState(istream& stream) {
 	return false;
 }
 
-bool SaveStateManager::LoadState(string filepath, bool showSuccessMessage) {
+bool SaveStateManager::LoadState(const string& filepath, bool showSuccessMessage) {
 	ifstream file(filepath, ios::in | ios::binary);
 	bool result = false;
 
@@ -397,7 +397,7 @@ void SaveStateManager::LoadRecentGame(const string& filename, bool resetGame) {
 	}
 }
 
-int32_t SaveStateManager::GetSaveStatePreview(string saveStatePath, uint8_t* pngData) {
+int32_t SaveStateManager::GetSaveStatePreview(const string& saveStatePath, uint8_t* pngData) {
 	ifstream stream(saveStatePath, ios::binary);
 
 	if (!stream) {

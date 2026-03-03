@@ -33,7 +33,7 @@ public:
 	/// </summary>
 	/// <param name="filename">Output file path</param>
 	/// <returns>True if initialization succeeded</returns>
-	virtual bool Init(string filename) = 0;
+	virtual bool Init(const string& filename) = 0;
 
 	/// <summary>
 	/// Start recording with specified parameters.

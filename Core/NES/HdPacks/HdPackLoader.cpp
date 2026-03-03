@@ -53,7 +53,7 @@ bool HdPackLoader::InitializeLoader(VirtualFile& romFile, HdPackData* data) {
 	return false;
 }
 
-bool HdPackLoader::LoadHdNesPack(string definitionFile, HdPackData& outData) {
+bool HdPackLoader::LoadHdNesPack(const string& definitionFile, HdPackData& outData) {
 	HdPackLoader loader;
 	if (ifstream(definitionFile)) {
 		loader._data = &outData;
@@ -72,7 +72,7 @@ bool HdPackLoader::LoadHdNesPack(VirtualFile& romFile, HdPackData& outData) {
 	return false;
 }
 
-bool HdPackLoader::CheckFile(string filename) {
+bool HdPackLoader::CheckFile(const string& filename) {
 	if (_loadFromZip) {
 		return _reader.CheckFile(filename);
 	} else {
@@ -85,7 +85,7 @@ bool HdPackLoader::CheckFile(string filename) {
 	return false;
 }
 
-bool HdPackLoader::LoadFile(string filename, vector<uint8_t>& fileData) {
+bool HdPackLoader::LoadFile(const string& filename, vector<uint8_t>& fileData) {
 	fileData.clear();
 
 	if (_loadFromZip) {
@@ -226,7 +226,7 @@ bool HdPackLoader::LoadPack() {
 	}
 }
 
-bool HdPackLoader::ProcessImgTag(string src) {
+bool HdPackLoader::ProcessImgTag(const string& src) {
 	_data->ImageFileData.push_back(unique_ptr<HdPackBitmapInfo>(new HdPackBitmapInfo()));
 	HdPackBitmapInfo& bitmapInfo = *_data->ImageFileData.back().get();
 
@@ -240,17 +240,17 @@ bool HdPackLoader::ProcessImgTag(string src) {
 }
 
 template <typename T>
-void HdPackLoader::AddGlobalCondition(string name) {
+void HdPackLoader::AddGlobalCondition(const string& name) {
 	T* cond = new T();
 	cond->Name = name;
 	_data->Conditions.push_back(unique_ptr<HdPackCondition>(cond));
 	_conditionsByName[name] = cond;
 
-	name = "!" + name;
+	string negatedName = "!" + name;
 	cond = new T();
-	cond->Name = name;
+	cond->Name = negatedName;
 	_data->Conditions.push_back(unique_ptr<HdPackCondition>(cond));
-	_conditionsByName[name] = cond;
+	_conditionsByName[negatedName] = cond;
 }
 
 void HdPackLoader::InitializeGlobalConditions() {
@@ -724,7 +724,7 @@ void HdPackLoader::ProcessFallbackTag(vector<string>& tokens) {
 	_data->FallbackTiles.push_back({HexUtilities::FromHex(tokens[0]), HexUtilities::FromHex(tokens[1])});
 }
 
-int HdPackLoader::ProcessSoundTrack(string albumString, string trackString, string filename) {
+int HdPackLoader::ProcessSoundTrack(const string& albumString, const string& trackString, const string& filename) {
 	int album = std::stoi(albumString);
 	if (album < 0 || album > 255) {
 		logError("Invalid album value: " + albumString);
@@ -780,7 +780,7 @@ void HdPackLoader::ProcessSfxTag(vector<string>& tokens) {
 	}
 }
 
-vector<HdPackCondition*> HdPackLoader::ParseConditionString(string conditionString) {
+vector<HdPackCondition*> HdPackLoader::ParseConditionString(const string& conditionString) {
 	FastString conditionName;
 	vector<HdPackCondition*> conditions;
 	conditions.reserve(3);
@@ -811,7 +811,7 @@ vector<HdPackCondition*> HdPackLoader::ParseConditionString(string conditionStri
 	return conditions;
 }
 
-bool HdPackLoader::ParseBooleanValue(string value) {
+bool HdPackLoader::ParseBooleanValue(const string& value) {
 	if (value != "Y" && value != "N") {
 		logError("Invalid boolean value: " + value);
 	}

@@ -89,7 +89,7 @@ public:
 	/// </summary>
 	/// <param name="mapperName">UNIF board name (e.g., "NES-CNROM").</param>
 	/// <returns>Mapper ID, or -1 if unknown.</returns>
-	static int32_t GetMapperID(string mapperName);
+	static int32_t GetMapperID(const string& mapperName);
 
 	/// <summary>
 	/// Loads a UNIF ROM file.
