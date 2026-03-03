@@ -41,7 +41,7 @@ public:
 	/// </summary>
 	/// <param name="filename">Output ZIP file path</param>
 	/// <returns>True if initialization succeeded</returns>
-	bool Initialize(string filename);
+	bool Initialize(const string& filename);
 
 	/// <summary>
 	/// Finalize and save ZIP archive to disk.
@@ -55,19 +55,19 @@ public:
 	/// </summary>
 	/// <param name="filepath">Source file path to read</param>
 	/// <param name="zipFilename">Path within ZIP archive</param>
-	void AddFile(string filepath, string zipFilename);
+	void AddFile(const string& filepath, const string& zipFilename);
 
 	/// <summary>
 	/// Add file from memory vector to ZIP.
 	/// </summary>
 	/// <param name="fileData">File data to compress</param>
 	/// <param name="zipFilename">Path within ZIP archive</param>
-	void AddFile(vector<uint8_t>& fileData, string zipFilename);
+	void AddFile(vector<uint8_t>& fileData, const string& zipFilename);
 
 	/// <summary>
 	/// Add file from stringstream to ZIP.
 	/// </summary>
 	/// <param name="filestream">Stream containing file data</param>
 	/// <param name="zipFilename">Path within ZIP archive</param>
-	void AddFile(std::stringstream& filestream, string zipFilename);
+	void AddFile(std::stringstream& filestream, const string& zipFilename);
 };

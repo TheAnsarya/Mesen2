@@ -28,7 +28,7 @@ bool SZReader::InternalLoadArchive(void* buffer, size_t size) {
 	return !SzArEx_Open(&_archive, &_lookStream.s, &allocImp, &allocTempImp);
 }
 
-bool SZReader::ExtractFile(string filename, vector<uint8_t>& output) {
+bool SZReader::ExtractFile(const string& filename, vector<uint8_t>& output) {
 	bool result = false;
 	if (_initialized) {
 		char16_t* utf16Filename = (char16_t*)SzAlloc(nullptr, 2000);

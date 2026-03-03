@@ -424,7 +424,7 @@ PpuTools* PceDebugger::GetPpuTools() {
 	return _ppuTools.get();
 }
 
-bool PceDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption) {
+bool PceDebugger::SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption) {
 	vector<uint8_t> output;
 
 	uint8_t* prgRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::PcePrgRom);
@@ -433,7 +433,7 @@ bool PceDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption 
 
 	if (saveAsIps) {
 		vector<uint8_t> originalRom;
-		_emu->GetRomInfo().RomFile.ReadFile(originalRom);
+		(void)_emu->GetRomInfo().RomFile.ReadFile(originalRom);
 
 		output = IpsPatcher::CreatePatch(originalRom, rom);
 	} else {

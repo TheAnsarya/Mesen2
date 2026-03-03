@@ -23,7 +23,7 @@ string FolderUtilities::_firmwareFolderOverride = "";
 string FolderUtilities::_screenshotFolderOverride = "";
 vector<string> FolderUtilities::_gameFolders = vector<string>();
 
-void FolderUtilities::SetHomeFolder(string homeFolder) {
+void FolderUtilities::SetHomeFolder(const string& homeFolder) {
 	_homeFolder = homeFolder;
 	CreateFolder(homeFolder);
 }
@@ -35,7 +35,7 @@ string FolderUtilities::GetHomeFolder() {
 	return _homeFolder;
 }
 
-void FolderUtilities::AddKnownGameFolder(string gameFolder) {
+void FolderUtilities::AddKnownGameFolder(const string& gameFolder) {
 	bool alreadyExists = false;
 	string lowerCaseFolder = gameFolder;
 	std::ranges::transform(lowerCaseFolder, lowerCaseFolder.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
@@ -58,7 +58,7 @@ vector<string> FolderUtilities::GetKnownGameFolders() {
 	return _gameFolders;
 }
 
-void FolderUtilities::SetFolderOverrides(string saveFolder, string saveStateFolder, string screenshotFolder, string firmwareFolder) {
+void FolderUtilities::SetFolderOverrides(const string& saveFolder, const string& saveStateFolder, const string& screenshotFolder, const string& firmwareFolder) {
 	_saveFolderOverride = saveFolder;
 	_saveStateFolderOverride = saveStateFolder;
 	_screenshotFolderOverride = screenshotFolder;

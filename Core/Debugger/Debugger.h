@@ -197,10 +197,10 @@ public:
 	void Run();
 	void PauseOnNextFrame();
 	void Step(CpuType cpuType, int32_t stepCount, StepType type, BreakSource source = BreakSource::Unspecified);
-	bool IsPaused();
-	bool IsExecutionStopped();
+	[[nodiscard]] bool IsPaused();
+	[[nodiscard]] bool IsExecutionStopped();
 
-	bool HasBreakRequest();
+	[[nodiscard]] bool HasBreakRequest();
 	void BreakRequest(bool release);
 	void ResetSuspendCounter();
 	void SuspendDebugger(bool release);
@@ -223,16 +223,16 @@ public:
 
 	void GetConsoleState(BaseState& state, ConsoleType consoleType);
 
-	DebuggerFeatures GetDebuggerFeatures(CpuType cpuType);
-	uint32_t GetProgramCounter(CpuType cpuType, bool forInstStart);
-	uint8_t GetCpuFlags(CpuType cpuType, uint32_t addr);
-	CpuInstructionProgress GetInstructionProgress(CpuType cpuType);
+	[[nodiscard]] DebuggerFeatures GetDebuggerFeatures(CpuType cpuType);
+	[[nodiscard]] uint32_t GetProgramCounter(CpuType cpuType, bool forInstStart);
+	[[nodiscard]] uint8_t GetCpuFlags(CpuType cpuType, uint32_t addr);
+	[[nodiscard]] CpuInstructionProgress GetInstructionProgress(CpuType cpuType);
 	void SetProgramCounter(CpuType cpuType, uint32_t addr);
 
-	AddressInfo GetAbsoluteAddress(AddressInfo relAddress);
-	AddressInfo GetRelativeAddress(AddressInfo absAddress, CpuType cpuType);
+	[[nodiscard]] AddressInfo GetAbsoluteAddress(AddressInfo relAddress);
+	[[nodiscard]] AddressInfo GetRelativeAddress(AddressInfo absAddress, CpuType cpuType);
 
-	bool HasCpuType(CpuType cpuType);
+	[[nodiscard]] bool HasCpuType(CpuType cpuType);
 
 	void SetBreakpoints(Breakpoint breakpoints[], uint32_t length);
 
@@ -240,14 +240,14 @@ public:
 	void GetAvailableInputOverrides(uint8_t* availableIndexes);
 
 	void Log(const string& message);
-	string GetLog();
+	[[nodiscard]] string GetLog();
 
-	bool SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption);
+	[[nodiscard]] bool SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption);
 
 	void ClearExecutionTrace();
-	uint32_t GetExecutionTrace(TraceRow output[], uint32_t startOffset, uint32_t maxLineCount);
+	[[nodiscard]] uint32_t GetExecutionTrace(TraceRow output[], uint32_t startOffset, uint32_t maxLineCount);
 
-	CpuType GetMainCpuType() { return _mainCpuType; }
+	[[nodiscard]] CpuType GetMainCpuType() { return _mainCpuType; }
 	IDebugger* GetMainDebugger();
 
 	TraceLogFileSaver* GetTraceLogFileSaver() { return _traceLogSaver.get(); }

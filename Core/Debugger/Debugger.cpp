@@ -1307,7 +1307,7 @@ string Debugger::GetLog() {
 	return ss.str();
 }
 
-bool Debugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption) {
+bool Debugger::SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption) {
 	switch (_mainCpuType) {
 		case CpuType::Snes:
 			if (_debuggers[(int)CpuType::Gameboy].Debugger) {

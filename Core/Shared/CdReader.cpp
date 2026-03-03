@@ -32,7 +32,7 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc) {
 	vector<CueFileEntry> files;
 
 	stringstream ss;
-	cueFile.ReadFile(ss);
+	(void)cueFile.ReadFile(ss);
 
 	string line;
 	while (std::getline(ss, line)) {
@@ -262,7 +262,7 @@ void CdReader::LoadSubcodeFile(VirtualFile& cueFile, DiscInfo& disc) {
 	VirtualFile subFile = FolderUtilities::CombinePath(FolderUtilities::GetFolderName(cueFile.GetFilePath()), FolderUtilities::GetFilename(cueFile.GetFileName(), false)) + ".sub";
 	if (subFile.IsValid()) {
 		vector<uint8_t>& subCode = disc.DecodedSubCode;
-		subFile.ReadFile(subCode);
+		(void)subFile.ReadFile(subCode);
 		// Pre-allocate: each 96-byte sector produces 2 + 12*8 = 98 bytes of subchannel data
 		size_t sectorCount = disc.DecodedSubCode.size() / 96;
 		disc.SubCode.reserve(sectorCount * 98);

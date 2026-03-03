@@ -85,7 +85,7 @@ public:
 	/// <param name="output">Output vector for file data (resized automatically)</param>
 	/// <returns>True if file found and extracted</returns>
 	/// <remarks>Pure virtual - must be implemented by derived classes</remarks>
-	virtual bool ExtractFile(string filename, vector<uint8_t>& output) = 0;
+	virtual bool ExtractFile(const string& filename, vector<uint8_t>& output) = 0;
 
 	/// <summary>
 	/// Factory method: auto-detect archive format and create reader.

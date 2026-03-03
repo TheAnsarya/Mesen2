@@ -215,7 +215,7 @@ public:
 	void Resume();
 
 	/// <summary>Check if emulation paused</summary>
-	bool IsPaused();
+	[[nodiscard]] bool IsPaused();
 
 	/// <summary>
 	/// Prepare for pause (clear audio buffer, etc.).
@@ -237,40 +237,40 @@ public:
 	/// <param name="stopRom">Stop current ROM if true</param>
 	/// <param name="forPowerCycle">Loading for power cycle if true</param>
 	/// <returns>True if ROM loaded successfully</returns>
-	bool LoadRom(VirtualFile romFile, VirtualFile patchFile, bool stopRom = true, bool forPowerCycle = false);
+	[[nodiscard]] bool LoadRom(VirtualFile romFile, VirtualFile patchFile, bool stopRom = true, bool forPowerCycle = false);
 
 	/// <summary>Get loaded ROM information</summary>
 	RomInfo& GetRomInfo() { return _rom; }
 
 	/// <summary>Get ROM hash (SHA1 or SHA1 for cheat code lookup)</summary>
-	string GetHash(HashType type);
+	[[nodiscard]] string GetHash(HashType type);
 
 	/// <summary>Get ROM CRC32 checksum</summary>
-	uint32_t GetCrc32();
+	[[nodiscard]] uint32_t GetCrc32();
 
 	/// <summary>Get current PPU frame info</summary>
-	PpuFrameInfo GetPpuFrame();
+	[[nodiscard]] PpuFrameInfo GetPpuFrame();
 
 	/// <summary>Get console region (NTSC/PAL/Dendy)</summary>
-	ConsoleRegion GetRegion();
+	[[nodiscard]] ConsoleRegion GetRegion();
 
 	/// <summary>Get active console (thread-safe shared_ptr)</summary>
-	shared_ptr<IConsole> GetConsole();
+	[[nodiscard]] shared_ptr<IConsole> GetConsole();
 
 	/// <summary>Get active console (unsafe raw pointer - faster, use with EmulatorLock)</summary>
-	IConsole* GetConsoleUnsafe();
+	[[nodiscard]] IConsole* GetConsoleUnsafe();
 
 	/// <summary>Get active console type</summary>
-	ConsoleType GetConsoleType();
+	[[nodiscard]] ConsoleType GetConsoleType();
 
 	/// <summary>Get list of CPU types for active console</summary>
-	vector<CpuType> GetCpuTypes();
+	[[nodiscard]] vector<CpuType> GetCpuTypes();
 
 	/// <summary>Get master clock cycle count</summary>
-	uint64_t GetMasterClock();
+	[[nodiscard]] uint64_t GetMasterClock();
 
 	/// <summary>Get master clock rate in Hz</summary>
-	uint32_t GetMasterClockRate();
+	[[nodiscard]] uint32_t GetMasterClockRate();
 
 	/// <summary>
 	/// Acquire RAII emulator lock for safe state access.
@@ -286,7 +286,7 @@ public:
 	void Unlock();
 
 	/// <summary>Check if emulation thread currently paused</summary>
-	bool IsThreadPaused();
+	[[nodiscard]] bool IsThreadPaused();
 
 	/// <summary>Check if debugger requests blocked</summary>
 	[[nodiscard]] bool IsDebuggerBlocked() { return _blockDebuggerRequestCount > 0; }
@@ -314,7 +314,7 @@ public:
 	/// <param name="consoleType">Expected console type (for validation)</param>
 	/// <param name="sendNotification">Send StateLoaded notification if true</param>
 	/// <returns>Deserialization result</returns>
-	DeserializeResult Deserialize(istream& in, uint32_t fileFormatVersion, bool includeSettings, optional<ConsoleType> consoleType = std::nullopt, bool sendNotification = true);
+	[[nodiscard]] DeserializeResult Deserialize(istream& in, uint32_t fileFormatVersion, bool includeSettings, optional<ConsoleType> consoleType = std::nullopt, bool sendNotification = true);
 
 	// Subsystem accessors (getters return raw pointers for performance)
 
@@ -392,7 +392,7 @@ public:
 	ShortcutState IsShortcutAllowed(EmulatorShortcut shortcut, uint32_t shortcutParam);
 
 	/// <summary>Check if keyboard connected to console (for on-screen keyboard)</summary>
-	bool IsKeyboardConnected();
+	[[nodiscard]] bool IsKeyboardConnected();
 
 	/// <summary>Initialize debugger subsystem</summary>
 	void InitDebugger();
@@ -430,7 +430,7 @@ public:
 	thread::id GetEmulationThreadId() { return _emulationThreadId; }
 
 	/// <summary>Check if current thread is emulation thread</summary>
-	bool IsEmulationThread();
+	[[nodiscard]] bool IsEmulationThread();
 
 	/// <summary>Get emulator stop code (reason for stopping)</summary>
 	[[nodiscard]] int32_t GetStopCode() { return _stopCode; }
@@ -447,10 +447,10 @@ public:
 	void RegisterMemory(MemoryType type, void* memory, uint32_t size);
 
 	/// <summary>Get registered memory region</summary>
-	ConsoleMemoryInfo GetMemory(MemoryType type);
+	[[nodiscard]] ConsoleMemoryInfo GetMemory(MemoryType type);
 
 	/// <summary>Get audio player track info (for NSF/SPC/etc.)</summary>
-	AudioTrackInfo GetAudioTrackInfo();
+	[[nodiscard]] AudioTrackInfo GetAudioTrackInfo();
 
 	/// <summary>Process audio player action (play/pause/next/prev track)</summary>
 	void ProcessAudioPlayerAction(AudioPlayerActionParams p);
@@ -468,16 +468,16 @@ public:
 	TimingInfo GetTimingInfo(CpuType cpuType);
 
 	/// <summary>Get current frame number</summary>
-	uint32_t GetFrameCount();
+	[[nodiscard]] uint32_t GetFrameCount();
 
 	/// <summary>Get lag frame counter</summary>
-	uint32_t GetLagCounter();
+	[[nodiscard]] uint32_t GetLagCounter();
 
 	/// <summary>Reset lag frame counter</summary>
 	void ResetLagCounter();
 
 	/// <summary>Check if controller type connected</summary>
-	bool HasControlDevice(ControllerType type);
+	[[nodiscard]] bool HasControlDevice(ControllerType type);
 
 	/// <summary>Register input recorder (for movies, netplay)</summary>
 	void RegisterInputRecorder(IInputRecorder* recorder);
@@ -493,7 +493,7 @@ public:
 
 	/// <summary>Get current FPS (frames per second)</summary>
 	/// <summary>Get current FPS (frames per second)</summary>
-	double GetFps();
+	[[nodiscard]] double GetFps();
 
 	// Debugger hooks - templated for zero-cost abstraction when debugger disabled
 	// These are __forceinline and check if(_debugger) before calling, so they compile to nothing when not debugging

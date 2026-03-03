@@ -79,7 +79,7 @@ struct MissingFirmwareMessage {
 /// </remarks>
 class FirmwareHelper {
 private:
-	static bool AttemptLoadDspFirmware(string combinedFilename, string splitFilenameProgram, string splitFilenameData, vector<uint8_t>& programRom, vector<uint8_t>& dataRom, uint32_t programSize, uint32_t dataSize) {
+	static bool AttemptLoadDspFirmware(const string& combinedFilename, const string& splitFilenameProgram, const string& splitFilenameData, vector<uint8_t>& programRom, vector<uint8_t>& dataRom, uint32_t programSize, uint32_t dataSize) {
 		VirtualFile combinedFirmware(FolderUtilities::CombinePath(FolderUtilities::GetFirmwareFolder(), combinedFilename));
 		if (combinedFirmware.GetSize() == programSize + dataSize) {
 			vector<uint8_t> firmwareData;
@@ -112,7 +112,7 @@ private:
 		return false;
 	}
 
-	static bool AttemptLoadFirmware(uint8_t** out, string filename, uint32_t size, string altFilename = "") {
+	static bool AttemptLoadFirmware(uint8_t** out, const string& filename, uint32_t size, const string& altFilename = "") {
 		string path = FolderUtilities::CombinePath(FolderUtilities::GetFirmwareFolder(), filename);
 		VirtualFile firmware(path);
 		if ((!firmware.IsValid() || firmware.GetSize() != size) && !altFilename.empty()) {
@@ -129,7 +129,7 @@ private:
 		return false;
 	}
 
-	static bool AttemptLoadFirmware(vector<uint8_t>& out, string filename, uint32_t size, string altFilename = "") {
+	static bool AttemptLoadFirmware(vector<uint8_t>& out, const string& filename, uint32_t size, const string& altFilename = "") {
 		string path = FolderUtilities::CombinePath(FolderUtilities::GetFirmwareFolder(), filename);
 		VirtualFile firmware(path);
 		if ((!firmware.IsValid() || firmware.GetSize() != size) && !altFilename.empty()) {
@@ -146,7 +146,7 @@ private:
 	}
 
 public:
-	static bool LoadDspFirmware(Emulator* emu, FirmwareType type, string combinedFilename, string splitFilenameProgram, string splitFilenameData, vector<uint8_t>& programRom, vector<uint8_t>& dataRom, vector<uint8_t>& embeddedFirmware, uint32_t programSize = 0x1800, uint32_t dataSize = 0x800) {
+	static bool LoadDspFirmware(Emulator* emu, FirmwareType type, const string& combinedFilename, const string& splitFilenameProgram, const string& splitFilenameData, vector<uint8_t>& programRom, vector<uint8_t>& dataRom, vector<uint8_t>& embeddedFirmware, uint32_t programSize = 0x1800, uint32_t dataSize = 0x800) {
 		if (embeddedFirmware.size() == programSize + dataSize) {
 			programRom.insert(programRom.end(), embeddedFirmware.begin(), embeddedFirmware.begin() + programSize);
 			dataRom.insert(dataRom.end(), embeddedFirmware.begin() + programSize, embeddedFirmware.end());

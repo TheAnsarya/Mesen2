@@ -138,30 +138,30 @@ string MessageManager::Localize(const string& key) {
 	return string(key);
 }
 
-void MessageManager::DisplayMessage(string title, string message, const string& param1, const string& param2) {
+void MessageManager::DisplayMessage(const string& title, const string& message, const string& param1, const string& param2) {
 	if (MessageManager::_messageManager) {
 		auto lock = _messageLock.AcquireSafe();
 		if (!MessageManager::_messageManager) {
 			return;
 		}
 
-		title = Localize(title);
-		message = Localize(message);
+		string localTitle = Localize(title);
+		string localMessage = Localize(message);
 
-		size_t startPos = message.find("%1");
+		size_t startPos = localMessage.find("%1");
 		if (startPos != std::string::npos) {
-			message.replace(startPos, 2, param1);
+			localMessage.replace(startPos, 2, param1);
 		}
 
-		startPos = message.find("%2");
+		startPos = localMessage.find("%2");
 		if (startPos != std::string::npos) {
-			message.replace(startPos, 2, param2);
+			localMessage.replace(startPos, 2, param2);
 		}
 
 		if (_osdEnabled) {
-			MessageManager::_messageManager->DisplayMessage(title, message);
+			MessageManager::_messageManager->DisplayMessage(localTitle, localMessage);
 		} else {
-			MessageManager::Log("[" + title + "] " + message);
+			MessageManager::Log("[" + localTitle + "] " + localMessage);
 		}
 	}
 }

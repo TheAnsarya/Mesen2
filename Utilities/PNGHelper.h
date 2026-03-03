@@ -57,7 +57,7 @@ public:
 	/// <param name="ySize">Image height in pixels</param>
 	/// <param name="bitsPerPixel">Bits per pixel (24=RGB, 32=RGBA, default 24)</param>
 	/// <returns>True if write succeeded, false on error</returns>
-	static bool WritePNG(string filename, uint32_t* buffer, uint32_t xSize, uint32_t ySize, uint32_t bitsPerPixel = 24);
+	static bool WritePNG(const string& filename, uint32_t* buffer, uint32_t xSize, uint32_t ySize, uint32_t bitsPerPixel = 24);
 
 	/// <summary>
 	/// Read PNG file and decode to raw pixel data.
@@ -67,7 +67,7 @@ public:
 	/// <param name="pngWidth">Image width in pixels (output)</param>
 	/// <param name="pngHeight">Image height in pixels (output)</param>
 	/// <returns>True if read/decode succeeded, false on error</returns>
-	static bool ReadPNG(string filename, vector<uint8_t>& pngData, uint32_t& pngWidth, uint32_t& pngHeight);
+	static bool ReadPNG(const string& filename, vector<uint8_t>& pngData, uint32_t& pngWidth, uint32_t& pngHeight);
 
 	/// <summary>
 	/// Decode PNG data from memory buffer.

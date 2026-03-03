@@ -467,7 +467,7 @@ PpuTools* NesDebugger::GetPpuTools() {
 	return _ppuTools.get();
 }
 
-bool NesDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption) {
+bool NesDebugger::SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption) {
 	vector<uint8_t> output;
 
 	uint8_t* prgRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::NesPrgRom);
@@ -485,7 +485,7 @@ bool NesDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption 
 
 	if (saveAsIps) {
 		vector<uint8_t> originalRom;
-		_emu->GetRomInfo().RomFile.ReadFile(originalRom);
+		(void)_emu->GetRomInfo().RomFile.ReadFile(originalRom);
 
 		output = IpsPatcher::CreatePatch(originalRom, rom);
 	} else {

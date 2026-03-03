@@ -41,5 +41,5 @@ public:
 	/// <param name="filename">File path within archive</param>
 	/// <param name="output">Output vector for decompressed data</param>
 	/// <returns>True if file found and extracted</returns>
-	bool ExtractFile(string filename, vector<uint8_t>& output);
+	bool ExtractFile(const string& filename, vector<uint8_t>& output);
 };

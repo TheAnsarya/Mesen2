@@ -32,7 +32,7 @@ private:
 
 public:
 	/// <summary>Set NEXEN home folder (root for all data)</summary>
-	static void SetHomeFolder(string homeFolder);
+	static void SetHomeFolder(const string& homeFolder);
 
 	/// <summary>Get current home folder path</summary>
 	[[nodiscard]] static string GetHomeFolder();
@@ -44,10 +44,10 @@ public:
 	/// <param name="saveStateFolder">Custom save state folder</param>
 	/// <param name="screenshotFolder">Custom screenshot folder</param>
 	/// <param name="firmwareFolder">Custom firmware/BIOS folder</param>
-	static void SetFolderOverrides(string saveFolder, string saveStateFolder, string screenshotFolder, string firmwareFolder);
+	static void SetFolderOverrides(const string& saveFolder, const string& saveStateFolder, const string& screenshotFolder, const string& firmwareFolder);
 
 	/// <summary>Add folder to known game directory list</summary>
-	static void AddKnownGameFolder(string gameFolder);
+	static void AddKnownGameFolder(const string& gameFolder);
 
 	/// <summary>Get list of all known game directories</summary>
 	[[nodiscard]] static vector<string> GetKnownGameFolders();

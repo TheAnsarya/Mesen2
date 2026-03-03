@@ -53,7 +53,7 @@ bool StepBackManager::CheckStepBack() {
 				_cache.pop_back();
 				if (_cache.size()) {
 					// If cache isn't empty, load the last state
-					_emu->Deserialize(_cache.back().SaveState, SaveStateManager::FileFormatVersion, true, std::nullopt, false);
+					(void)_emu->Deserialize(_cache.back().SaveState, SaveStateManager::FileFormatVersion, true, std::nullopt, false);
 
 					_emu->GetRewindManager()->StopRewinding(true, true);
 					_active = false;
@@ -82,7 +82,7 @@ bool StepBackManager::CheckStepBack() {
 	if (clock >= _targetClock) {
 		// If the CPU is back to where it was before step back, check if the cache contains data
 		if (_cache.size() > 0) {
-			_emu->Deserialize(_cache.back().SaveState, SaveStateManager::FileFormatVersion, true, std::nullopt, false);
+			(void)_emu->Deserialize(_cache.back().SaveState, SaveStateManager::FileFormatVersion, true, std::nullopt, false);
 			_rewindManager->StopRewinding(true, true);
 		} else if (_allowRetry && clock > _prevClock && (clock - _prevClock) > StepBackManager::DefaultClockLimit) {
 			// Cache is empty, this can happen when a single instruction takes more than X clocks (e.g block transfers, dma)

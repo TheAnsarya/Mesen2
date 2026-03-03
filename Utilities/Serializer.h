@@ -237,8 +237,8 @@ public:
 	bool HasError() { return _hasError; }
 
 	bool IsValid() { return _values.size() > 0; }
-	void AddKeyPrefix(string prefix);
-	void RemoveKeyPrefix(string prefix);
+	void AddKeyPrefix(const string& prefix);
+	void RemoveKeyPrefix(const string& prefix);
 	void RemoveKeys(vector<string>& keys);
 
 	template <class T>

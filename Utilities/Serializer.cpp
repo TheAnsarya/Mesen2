@@ -44,7 +44,7 @@ void Serializer::ResetForFastLoad() {
 	_readPos = 0;
 }
 
-void Serializer::AddKeyPrefix(string prefix) {
+void Serializer::AddKeyPrefix(const string& prefix) {
 	vector<string> keys;
 	for (auto& kvp : _values) {
 		keys.push_back(kvp.first);
@@ -56,7 +56,7 @@ void Serializer::AddKeyPrefix(string prefix) {
 	}
 }
 
-void Serializer::RemoveKeyPrefix(string prefix) {
+void Serializer::RemoveKeyPrefix(const string& prefix) {
 	vector<string> keys;
 	vector<string> keysToRemove;
 

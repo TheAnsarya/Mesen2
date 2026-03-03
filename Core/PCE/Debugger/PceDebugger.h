@@ -93,7 +93,7 @@ public:
 	BreakpointManager* GetBreakpointManager() override;
 	ITraceLogger* GetTraceLogger() override;
 	PpuTools* GetPpuTools() override;
-	bool SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption);
+	bool SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption);
 	void ProcessInputOverrides(DebugControllerState inputOverrides[8]) override;
 	CallstackManager* GetCallstackManager() override;
 	IAssembler* GetAssembler() override;

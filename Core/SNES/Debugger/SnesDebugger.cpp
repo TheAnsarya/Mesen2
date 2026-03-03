@@ -532,7 +532,7 @@ void SnesDebugger::SetPpuState(BaseState& srcState) {
 	dstState = (SnesPpuState&)srcState;
 }
 
-bool SnesDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption) {
+bool SnesDebugger::SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption) {
 	vector<uint8_t> output;
 
 	uint8_t* prgRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::SnesPrgRom);
@@ -541,7 +541,7 @@ bool SnesDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption
 
 	if (saveAsIps) {
 		vector<uint8_t> originalRom;
-		_emu->GetRomInfo().RomFile.ReadFile(originalRom);
+		(void)_emu->GetRomInfo().RomFile.ReadFile(originalRom);
 
 		output = IpsPatcher::CreatePatch(originalRom, rom);
 	} else {

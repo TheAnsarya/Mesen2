@@ -61,7 +61,7 @@ vector<uint8_t> BatteryManager::LoadBattery(const string& extension) {
 	} else {
 		VirtualFile file = GetBasePath(extension);
 		if (file.IsValid()) {
-			file.ReadFile(batteryData);
+			(void)file.ReadFile(batteryData);
 		}
 	}
 

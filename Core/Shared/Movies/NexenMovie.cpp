@@ -102,7 +102,7 @@ bool NexenMovie::Play(VirtualFile& file) {
 	_movieFile = file;
 
 	std::stringstream ss;
-	file.ReadFile(ss);
+	(void)file.ReadFile(ss);
 
 	_reader.reset(new ZipReader());
 	_reader->LoadArchive(ss);

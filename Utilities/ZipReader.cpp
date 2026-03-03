@@ -38,7 +38,7 @@ vector<string> ZipReader::InternalGetFileList() {
 	return fileList;
 }
 
-bool ZipReader::ExtractFile(string filename, vector<uint8_t>& output) {
+bool ZipReader::ExtractFile(const string& filename, vector<uint8_t>& output) {
 	if (_initialized) {
 		size_t uncompSize;
 		void* p = mz_zip_reader_extract_file_to_heap(&_zipArchive, filename.c_str(), &uncompSize, 0);

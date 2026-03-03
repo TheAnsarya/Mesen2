@@ -41,7 +41,7 @@ bool PNGHelper::WritePNG(std::stringstream& stream, uint32_t* buffer, uint32_t x
 	}
 }
 
-bool PNGHelper::WritePNG(string filename, uint32_t* buffer, uint32_t xSize, uint32_t ySize, uint32_t bitsPerPixel) {
+bool PNGHelper::WritePNG(const string& filename, uint32_t* buffer, uint32_t xSize, uint32_t ySize, uint32_t bitsPerPixel) {
 	std::stringstream stream;
 	if (WritePNG(stream, buffer, xSize, ySize, bitsPerPixel)) {
 		ofstream file(filename, std::ios::out | std::ios::binary);
@@ -77,7 +77,7 @@ bool PNGHelper::ReadPNG(vector<uint8_t> input, vector<T>& output, uint32_t& pngW
 	}
 }
 
-bool PNGHelper::ReadPNG(string filename, vector<uint8_t>& pngData, uint32_t& pngWidth, uint32_t& pngHeight) {
+bool PNGHelper::ReadPNG(const string& filename, vector<uint8_t>& pngData, uint32_t& pngWidth, uint32_t& pngHeight) {
 	pngWidth = 0;
 	pngHeight = 0;
 

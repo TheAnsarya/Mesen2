@@ -65,14 +65,14 @@ public:
 	/// </summary>
 	/// <param name="str">String to trim</param>
 	/// <returns>String with leading whitespace removed</returns>
-	[[nodiscard]] static string TrimLeft(const string& str) {
+	[[nodiscard]] static string TrimLeft(string_view str) {
 		size_t startIndex = str.find_first_not_of("\t ");
-		if (startIndex == string::npos) {
+		if (startIndex == string_view::npos) {
 			return "";
 		} else if (startIndex > 0) {
-			return str.substr(startIndex);
+			return string(str.substr(startIndex));
 		}
-		return str;
+		return string(str);
 	}
 
 	/// <summary>
@@ -80,14 +80,14 @@ public:
 	/// </summary>
 	/// <param name="str">String to trim</param>
 	/// <returns>String with trailing whitespace removed</returns>
-	[[nodiscard]] static string TrimRight(const string& str) {
+	[[nodiscard]] static string TrimRight(string_view str) {
 		size_t endIndex = str.find_last_not_of("\t\r\n ");
-		if (endIndex == string::npos) {
+		if (endIndex == string_view::npos) {
 			return "";
 		} else if (endIndex > 0) {
-			return str.substr(0, endIndex + 1);
+			return string(str.substr(0, endIndex + 1));
 		}
-		return str;
+		return string(str);
 	}
 
 	/// <summary>
@@ -95,7 +95,7 @@ public:
 	/// </summary>
 	/// <param name="str">String to trim</param>
 	/// <returns>String with leading and trailing whitespace removed</returns>
-	[[nodiscard]] static string Trim(const string& str) {
+	[[nodiscard]] static string Trim(string_view str) {
 		return TrimLeft(TrimRight(str));
 	}
 
@@ -131,8 +131,8 @@ public:
 	/// Does not null-terminate. Copies min(str.size(), maxSize) bytes.
 	/// Caller is responsible for ensuring buffer is large enough.
 	/// </remarks>
-	static void CopyToBuffer(const string& str, char* outBuffer, uint32_t maxSize) {
-		memcpy(outBuffer, str.c_str(), std::min<uint32_t>((uint32_t)str.size(), maxSize));
+	static void CopyToBuffer(string_view str, char* outBuffer, uint32_t maxSize) {
+		memcpy(outBuffer, str.data(), std::min<uint32_t>((uint32_t)str.size(), maxSize));
 	}
 
 	/// <summary>
@@ -141,7 +141,7 @@ public:
 	/// <param name="str">String to check</param>
 	/// <param name="content">Prefix to look for</param>
 	/// <returns>True if str starts with content</returns>
-	[[nodiscard]] static bool StartsWith(const string& str, const char* content) {
+	[[nodiscard]] static bool StartsWith(string_view str, string_view content) {
 		return str.starts_with(content);
 	}
 
@@ -151,7 +151,7 @@ public:
 	/// <param name="str">String to check</param>
 	/// <param name="content">Suffix to look for</param>
 	/// <returns>True if str ends with content</returns>
-	[[nodiscard]] static bool EndsWith(const string& str, const char* content) {
+	[[nodiscard]] static bool EndsWith(string_view str, string_view content) {
 		return str.ends_with(content);
 	}
 
@@ -161,7 +161,7 @@ public:
 	/// <param name="str">String to search in</param>
 	/// <param name="content">Substring to look for</param>
 	/// <returns>True if str contains content</returns>
-	[[nodiscard]] static bool Contains(const string& str, const char* content) {
+	[[nodiscard]] static bool Contains(const string& str, string_view content) {
 		return str.contains(content);
 	}
 

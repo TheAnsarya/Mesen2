@@ -277,7 +277,7 @@ bool VirtualFile::ApplyPatch(VirtualFile& patch) {
 		if (patch._data.size() >= 5) {
 			vector<uint8_t> patchedData;
 			std::stringstream ss;
-			patch.ReadFile(ss);
+			(void)patch.ReadFile(ss);
 
 			if (memcmp(patch._data.data(), "PATCH", 5) == 0) {
 				result = IpsPatcher::PatchBuffer(ss, _data, patchedData);

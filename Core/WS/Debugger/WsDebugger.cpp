@@ -439,7 +439,7 @@ PpuTools* WsDebugger::GetPpuTools() {
 	return _ppuTools.get();
 }
 
-bool WsDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption) {
+bool WsDebugger::SaveRomToDisk(const string& filename, bool saveAsIps, CdlStripOption stripOption) {
 	vector<uint8_t> output;
 
 	uint8_t* prgRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::WsPrgRom);
@@ -448,7 +448,7 @@ bool WsDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption s
 
 	if (saveAsIps) {
 		vector<uint8_t> originalRom;
-		_emu->GetRomInfo().RomFile.ReadFile(originalRom);
+		(void)_emu->GetRomInfo().RomFile.ReadFile(originalRom);
 
 		output = IpsPatcher::CreatePatch(originalRom, rom);
 	} else {
