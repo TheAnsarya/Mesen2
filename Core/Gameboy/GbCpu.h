@@ -56,7 +56,7 @@ class Emulator;
 class GbCpu : public ISerializable {
 private:
 	GbCpuState _state = {};  ///< CPU registers (A, F, B, C, D, E, H, L, SP, PC)
-	
+
 	// Register pair wrappers for 16-bit access
 	Register16 _regAF = Register16(&_state.A, &_state.Flags);  ///< Accumulator + Flags
 	Register16 _regBC = Register16(&_state.B, &_state.C);      ///< BC pair
