@@ -235,10 +235,10 @@ public:
 	MemoryType GetMemoryTypeBusA();
 
 	/// <summary>Checks if address is a register.</summary>
-	bool IsRegister(uint32_t cpuAddress);
+	[[nodiscard]] bool IsRegister(uint32_t cpuAddress);
 
 	/// <summary>Checks if address is Work RAM.</summary>
-	bool IsWorkRam(uint32_t cpuAddress);
+	[[nodiscard]] bool IsWorkRam(uint32_t cpuAddress);
 
 	/// <summary>Gets current WRAM access position.</summary>
 	[[nodiscard]] uint32_t GetWramPosition();

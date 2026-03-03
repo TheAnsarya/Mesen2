@@ -854,11 +854,11 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value) {
 
 vector<MapperStateEntry> Rainbow::GetMapperStateEntries() {
 	vector<MapperStateEntry> entries;
-	entries.push_back(MapperStateEntry("", "CPU Mappings"));
-	entries.push_back(MapperStateEntry("$4100.0-2", "ROM Mode (8000-FFFF)", _highMode, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4100.7", "RAM Mode (6000-7FFF)", _lowMode, MapperStateValueType::Number8));
+	entries.emplace_back("", "CPU Mappings");
+	entries.emplace_back("$4100.0-2", "ROM Mode (8000-FFFF)", _highMode, MapperStateValueType::Number8);
+	entries.emplace_back("$4100.7", "RAM Mode (6000-7FFF)", _lowMode, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("$4106/16", "RAM Bank 0", _lowBanks[0] & 0x7FFF, MapperStateValueType::Number16));
+	entries.emplace_back("$4106/16", "RAM Bank 0", _lowBanks[0] & 0x7FFF, MapperStateValueType::Number16);
 	string source;
 	switch ((_lowBanks[0] & 0xC000) >> 14) {
 		case 0:
@@ -872,9 +872,9 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries() {
 			source = "FPGA RAM";
 			break;
 	}
-	entries.push_back(MapperStateEntry("$4116.6-7", "PRG-RAM Bank 0 Source", source));
+	entries.emplace_back("$4116.6-7", "PRG-RAM Bank 0 Source", source);
 
-	entries.push_back(MapperStateEntry("$4107/17", "PRG-RAM Bank 1", _lowBanks[1], MapperStateValueType::Number16));
+	entries.emplace_back("$4107/17", "PRG-RAM Bank 1", _lowBanks[1], MapperStateValueType::Number16);
 	switch ((_lowBanks[0] & 0xC000) >> 14) {
 		case 0:
 		case 1:
@@ -887,39 +887,39 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries() {
 			source = "FPGA RAM";
 			break;
 	}
-	entries.push_back(MapperStateEntry("$4117.6-7", "PRG-RAM Bank 1 Source", source));
+	entries.emplace_back("$4117.6-7", "PRG-RAM Bank 1 Source", source);
 
 	for (int i = 0; i < 8; i++) {
-		entries.push_back(MapperStateEntry(
+		entries.emplace_back(
 		    "$" + HexUtilities::ToHex(0x4108 + i) + "/" + HexUtilities::ToHex(0x4118 + i) + ".0-14",
 		    "ROM Bank " + std::to_string(i),
 		    _highBanks[i] & 0x7FFF,
-		    MapperStateValueType::Number16));
+		    MapperStateValueType::Number16);
 
-		entries.push_back(MapperStateEntry(
+		entries.emplace_back(
 		    HexUtilities::ToHex(0x4118 + i) + ".7",
 		    "ROM Bank " + std::to_string(i) + " Source",
-		    (string)((_highBanks[i] & 0x8000) ? "RAM" : "ROM")));
+		    (string)((_highBanks[i] & 0x8000) ? "RAM" : "ROM"));
 	}
 
-	entries.push_back(MapperStateEntry("$4115.0", "FPGA RAM Bank", _fpgaRamBank, MapperStateValueType::Number8));
+	entries.emplace_back("$4115.0", "FPGA RAM Bank", _fpgaRamBank, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("", "PPU Config"));
-	entries.push_back(MapperStateEntry("$4120.0-2", "CHR Banking Mode", _chrMode, MapperStateValueType::Number16));
-	entries.push_back(MapperStateEntry("$4120.4", "Window Split Mode", _windowEnabled));
-	entries.push_back(MapperStateEntry("$4120.5", "Sprite Extended Mode", _spriteExtMode));
-	entries.push_back(MapperStateEntry("$4120.6-7", "CHR Source", string(_chrSource ? "RAM" : "ROM"), _chrSource));
-	entries.push_back(MapperStateEntry("$4121.0-5", "Extended BG CHR Bank", _bgExtModeOffset, MapperStateValueType::Number8));
+	entries.emplace_back("", "PPU Config");
+	entries.emplace_back("$4120.0-2", "CHR Banking Mode", _chrMode, MapperStateValueType::Number16);
+	entries.emplace_back("$4120.4", "Window Split Mode", _windowEnabled);
+	entries.emplace_back("$4120.5", "Sprite Extended Mode", _spriteExtMode);
+	entries.emplace_back("$4120.6-7", "CHR Source", string(_chrSource ? "RAM" : "ROM"), _chrSource);
+	entries.emplace_back("$4121.0-5", "Extended BG CHR Bank", _bgExtModeOffset, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("", "Fill Mode"));
-	entries.push_back(MapperStateEntry("$4124", "Tile Index", _fillModeTileIndex, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4125.0-1", "Attribute Index", _fillModeAttrIndex, MapperStateValueType::Number8));
+	entries.emplace_back("", "Fill Mode");
+	entries.emplace_back("$4124", "Tile Index", _fillModeTileIndex, MapperStateValueType::Number8);
+	entries.emplace_back("$4125.0-1", "Attribute Index", _fillModeAttrIndex, MapperStateValueType::Number8);
 
 	auto processNtControl = [&](uint16_t addr, NtControl& ctrl) {
-		entries.push_back(MapperStateEntry("$" + HexUtilities::ToHex(addr) + ".0", "Attribute Ext. Mode", ctrl.AttrExtMode));
-		entries.push_back(MapperStateEntry("$" + HexUtilities::ToHex(addr) + ".1", "BG Ext. Mode", ctrl.BgExtMode));
-		entries.push_back(MapperStateEntry("$" + HexUtilities::ToHex(addr) + ".2-3", "Ext. Mode FPGA RAM Source", "$" + HexUtilities::ToHex(ctrl.FpgaRamSrc * 0x400), ctrl.FpgaRamSrc));
-		entries.push_back(MapperStateEntry("$" + HexUtilities::ToHex(addr) + ".5", "Fill Mode", ctrl.FillMode));
+		entries.emplace_back("$" + HexUtilities::ToHex(addr) + ".0", "Attribute Ext. Mode", ctrl.AttrExtMode);
+		entries.emplace_back("$" + HexUtilities::ToHex(addr) + ".1", "BG Ext. Mode", ctrl.BgExtMode);
+		entries.emplace_back("$" + HexUtilities::ToHex(addr) + ".2-3", "Ext. Mode FPGA RAM Source", "$" + HexUtilities::ToHex(ctrl.FpgaRamSrc * 0x400), ctrl.FpgaRamSrc);
+		entries.emplace_back("$" + HexUtilities::ToHex(addr) + ".5", "Fill Mode", ctrl.FillMode);
 
 		string src;
 		switch (ctrl.Source) {
@@ -936,83 +936,83 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries() {
 				src = "CHR ROM";
 				break;
 		}
-		entries.push_back(MapperStateEntry("$412A.6-7", "Source", src, ctrl.Source));
+		entries.emplace_back("$412A.6-7", "Source", src, ctrl.Source);
 	};
 
 	for (int i = 0; i < 4; i++) {
-		entries.push_back(MapperStateEntry("$" + HexUtilities::ToHex(0x4126 + i) + "/" + HexUtilities::ToHex(0x412A + i).substr(3, 1), "Nametable " + std::to_string(i) + " ($" + HexUtilities::ToHex(0x2000 + i * 0x400) + ")"));
-		entries.push_back(MapperStateEntry("$" + HexUtilities::ToHex(0x4126 + i), "Selected Bank", _ntBanks[i], MapperStateValueType::Number8));
+		entries.emplace_back("$" + HexUtilities::ToHex(0x4126 + i) + "/" + HexUtilities::ToHex(0x412A + i).substr(3, 1), "Nametable " + std::to_string(i) + " ($" + HexUtilities::ToHex(0x2000 + i * 0x400) + ")");
+		entries.emplace_back("$" + HexUtilities::ToHex(0x4126 + i), "Selected Bank", _ntBanks[i], MapperStateValueType::Number8);
 		processNtControl(0x412A + i, _ntControl[i]);
 	}
 
-	entries.push_back(MapperStateEntry("", "Window"));
-	entries.push_back(MapperStateEntry("$412E", "Window Bank", _windowBank, MapperStateValueType::Number8));
+	entries.emplace_back("", "Window");
+	entries.emplace_back("$412E", "Window Bank", _windowBank, MapperStateValueType::Number8);
 	processNtControl(0x412F, _windowControl);
 
-	entries.push_back(MapperStateEntry("", "PPU Mappings"));
+	entries.emplace_back("", "PPU Mappings");
 	for (int i = 0; i < 16; i++) {
-		entries.push_back(MapperStateEntry(
+		entries.emplace_back(
 		    "$" + HexUtilities::ToHex(0x4130 + i) + "/" + HexUtilities::ToHex(0x4140 + i),
 		    "CHR Bank " + std::to_string(i),
 		    _chrBanks[i],
-		    MapperStateValueType::Number16));
+		    MapperStateValueType::Number16);
 	}
 
-	entries.push_back(MapperStateEntry("", "Scanline IRQ"));
-	entries.push_back(MapperStateEntry("$4150", "Target Scanline", _slIrqScanline, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4151/2", "Enabled", _slIrqEnabled));
-	entries.push_back(MapperStateEntry("$4153", "Cycle Offset", _slIrqOffset, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4154", "Jitter Counter", _jitterCounter, MapperStateValueType::Number8));
+	entries.emplace_back("", "Scanline IRQ");
+	entries.emplace_back("$4150", "Target Scanline", _slIrqScanline, MapperStateValueType::Number8);
+	entries.emplace_back("$4151/2", "Enabled", _slIrqEnabled);
+	entries.emplace_back("$4153", "Cycle Offset", _slIrqOffset, MapperStateValueType::Number8);
+	entries.emplace_back("$4154", "Jitter Counter", _jitterCounter, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("", "CPU IRQ"));
-	entries.push_back(MapperStateEntry("$4158/9", "Reload Value", _cpuIrqReloadValue, MapperStateValueType::Number16));
-	entries.push_back(MapperStateEntry("$415A.0", "Enabled", _cpuIrqEnabled));
-	entries.push_back(MapperStateEntry("$415A.1", "Enable after Ack", _cpuIrqEnableAfterAck));
-	entries.push_back(MapperStateEntry("$415A.2", "Ack after $4011 read", _cpuIrqAckOn4011));
-	entries.push_back(MapperStateEntry("", "Counter", _cpuIrqCounter, MapperStateValueType::Number16));
+	entries.emplace_back("", "CPU IRQ");
+	entries.emplace_back("$4158/9", "Reload Value", _cpuIrqReloadValue, MapperStateValueType::Number16);
+	entries.emplace_back("$415A.0", "Enabled", _cpuIrqEnabled);
+	entries.emplace_back("$415A.1", "Enable after Ack", _cpuIrqEnableAfterAck);
+	entries.emplace_back("$415A.2", "Ack after $4011 read", _cpuIrqAckOn4011);
+	entries.emplace_back("", "Counter", _cpuIrqCounter, MapperStateValueType::Number16);
 
-	entries.push_back(MapperStateEntry("", "FPGA RAM"));
-	entries.push_back(MapperStateEntry("$415C/D", "Address", _fpgaRamAddr, MapperStateValueType::Number16));
-	entries.push_back(MapperStateEntry("$415E", "Increment", _fpgaRamInc, MapperStateValueType::Number8));
+	entries.emplace_back("", "FPGA RAM");
+	entries.emplace_back("$415C/D", "Address", _fpgaRamAddr, MapperStateValueType::Number16);
+	entries.emplace_back("$415E", "Increment", _fpgaRamInc, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("$4160", "Mapper Version", 0x20, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4161.0", "Wi-Fi IRQ Pending", _wifiIrqPending));
-	entries.push_back(MapperStateEntry("$4161.6", "CPU IRQ Pending", _cpuIrqPending));
-	entries.push_back(MapperStateEntry("$4161.7", "Scanline IRQ Pending", _slIrqPending));
+	entries.emplace_back("$4160", "Mapper Version", 0x20, MapperStateValueType::Number8);
+	entries.emplace_back("$4161.0", "Wi-Fi IRQ Pending", _wifiIrqPending);
+	entries.emplace_back("$4161.6", "CPU IRQ Pending", _cpuIrqPending);
+	entries.emplace_back("$4161.7", "Scanline IRQ Pending", _slIrqPending);
 
-	entries.push_back(MapperStateEntry("", "IRQ/NMI Vectors"));
-	entries.push_back(MapperStateEntry("$416B.0", "NMI Redirection Enabled", _nmiVectorEnabled));
-	entries.push_back(MapperStateEntry("$416B.1", "IRQ Redirection Enabled", _irqVectorEnabled));
-	entries.push_back(MapperStateEntry("$416C/D", "NMI Vector", _nmiVectorAddr, MapperStateValueType::Number16));
-	entries.push_back(MapperStateEntry("$416E/F", "IRQ Vector", _irqVectorAddr, MapperStateValueType::Number16));
+	entries.emplace_back("", "IRQ/NMI Vectors");
+	entries.emplace_back("$416B.0", "NMI Redirection Enabled", _nmiVectorEnabled);
+	entries.emplace_back("$416B.1", "IRQ Redirection Enabled", _irqVectorEnabled);
+	entries.emplace_back("$416C/D", "NMI Vector", _nmiVectorAddr, MapperStateValueType::Number16);
+	entries.emplace_back("$416E/F", "IRQ Vector", _irqVectorAddr, MapperStateValueType::Number16);
 
-	entries.push_back(MapperStateEntry("", "Window Split Config"));
-	entries.push_back(MapperStateEntry("$4170.0-4", "Start Column", _windowX1, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4171.0-4", "End Column", _windowX2, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4172", "Start Scanline", _windowY1, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4173", "End Scanline", _windowY2, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4174.0-4", "Scroll X", _windowScrollX, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4175", "Scroll Y", _windowScrollX, MapperStateValueType::Number8));
+	entries.emplace_back("", "Window Split Config");
+	entries.emplace_back("$4170.0-4", "Start Column", _windowX1, MapperStateValueType::Number8);
+	entries.emplace_back("$4171.0-4", "End Column", _windowX2, MapperStateValueType::Number8);
+	entries.emplace_back("$4172", "Start Scanline", _windowY1, MapperStateValueType::Number8);
+	entries.emplace_back("$4173", "End Scanline", _windowY2, MapperStateValueType::Number8);
+	entries.emplace_back("$4174.0-4", "Scroll X", _windowScrollX, MapperStateValueType::Number8);
+	entries.emplace_back("$4175", "Scroll Y", _windowScrollX, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("", "Wi-Fi"));
-	entries.push_back(MapperStateEntry("$4190.0", "ESP Enabled", _espEnabled));
-	entries.push_back(MapperStateEntry("$4190.1", "Wi-Fi IRQ Enabled", _wifiIrqEnabled));
+	entries.emplace_back("", "Wi-Fi");
+	entries.emplace_back("$4190.0", "ESP Enabled", _espEnabled);
+	entries.emplace_back("$4190.1", "Wi-Fi IRQ Enabled", _wifiIrqEnabled);
 
-	entries.push_back(MapperStateEntry("$4191.6", "Data Ready", _dataReady));
-	entries.push_back(MapperStateEntry("$4191.7", "Data Received", _dataReceived));
-	entries.push_back(MapperStateEntry("$4192.7", "Data Sent", _dataSent));
-	entries.push_back(MapperStateEntry("$4193", "Receive Destination Page", _recvDstAddr, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4194", "Send Source Page", _sendSrcAddr, MapperStateValueType::Number8));
+	entries.emplace_back("$4191.6", "Data Ready", _dataReady);
+	entries.emplace_back("$4191.7", "Data Received", _dataReceived);
+	entries.emplace_back("$4192.7", "Data Sent", _dataSent);
+	entries.emplace_back("$4193", "Receive Destination Page", _recvDstAddr, MapperStateValueType::Number8);
+	entries.emplace_back("$4194", "Send Source Page", _sendSrcAddr, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("", "Sprite Extended Data"));
+	entries.emplace_back("", "Sprite Extended Data");
 	for (int i = 0; i < 64; i++) {
-		entries.push_back(MapperStateEntry("$" + HexUtilities::ToHex(0x4200 + i), "Sprite #" + std::to_string(i), _spriteExtData[i], MapperStateValueType::Number8));
+		entries.emplace_back("$" + HexUtilities::ToHex(0x4200 + i), "Sprite #" + std::to_string(i), _spriteExtData[i], MapperStateValueType::Number8);
 	}
-	entries.push_back(MapperStateEntry("$4240", "Sprite Extended Bank", _spriteExtBank, MapperStateValueType::Number8));
+	entries.emplace_back("$4240", "Sprite Extended Bank", _spriteExtBank, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("", "OAM Functions"));
-	entries.push_back(MapperStateEntry("$4241", "OAM Update Page", _oamSlowUpdatePage, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4242", "OAM Ext. Update Page", _oamExtUpdatePage, MapperStateValueType::Number8));
+	entries.emplace_back("", "OAM Functions");
+	entries.emplace_back("$4241", "OAM Update Page", _oamSlowUpdatePage, MapperStateValueType::Number8);
+	entries.emplace_back("$4242", "OAM Ext. Update Page", _oamExtUpdatePage, MapperStateValueType::Number8);
 
 	// todo audio?
 

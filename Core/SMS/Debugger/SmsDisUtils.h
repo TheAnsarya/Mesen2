@@ -31,10 +31,10 @@ public:
 
 	static uint8_t GetOpSize(uint8_t opCode, uint32_t cpuAddress, MemoryType memType, MemoryDumper* memoryDumper);
 
-	static bool IsJumpToSub(uint8_t opCode);
-	static bool IsReturnInstruction(uint16_t opCode);
-	static bool IsUnconditionalJump(uint8_t opCode);
-	static bool IsConditionalJump(uint8_t opCode);
+	[[nodiscard]] static bool IsJumpToSub(uint8_t opCode);
+	[[nodiscard]] static bool IsReturnInstruction(uint16_t opCode);
+	[[nodiscard]] static bool IsUnconditionalJump(uint8_t opCode);
+	[[nodiscard]] static bool IsConditionalJump(uint8_t opCode);
 	static CdlFlags::CdlFlags GetOpFlags(uint8_t opCode, uint16_t pc, uint16_t prevPc);
 	static string GetOpTemplate(uint8_t op, bool cbPrefix, bool edPrefix);
 };

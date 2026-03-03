@@ -15,7 +15,7 @@ private:
 	static uint32_t GetOperandAddress(DisassemblyInfo& info, uint32_t memoryAddr);
 	static uint8_t GetOpSize(SnesAddrMode addrMode, uint8_t flags);
 
-	static bool HasEffectiveAddress(SnesAddrMode addrMode);
+	[[nodiscard]] static bool HasEffectiveAddress(SnesAddrMode addrMode);
 
 public:
 	static string OpName[256];
@@ -23,14 +23,14 @@ public:
 
 	static void GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings);
 	static uint8_t GetOpSize(uint8_t opCode, uint8_t flags);
-	static bool IsUnconditionalJump(uint8_t opCode);
-	static bool IsConditionalJump(uint8_t opCode);
+	[[nodiscard]] static bool IsUnconditionalJump(uint8_t opCode);
+	[[nodiscard]] static bool IsConditionalJump(uint8_t opCode);
 	static CdlFlags::CdlFlags GetOpFlags(uint8_t opCode, uint32_t pc, uint32_t prevPc);
-	static bool IsJumpToSub(uint8_t opCode);
-	static bool IsReturnInstruction(uint8_t opCode);
+	[[nodiscard]] static bool IsJumpToSub(uint8_t opCode);
+	[[nodiscard]] static bool IsReturnInstruction(uint8_t opCode);
 	static EffectiveAddressInfo GetEffectiveAddress(DisassemblyInfo& info, SnesConsole* console, SnesCpuState& state, CpuType type);
 
-	static bool CanDisassembleNextOp(uint8_t opCode);
+	[[nodiscard]] static bool CanDisassembleNextOp(uint8_t opCode);
 	static void UpdateCpuFlags(uint8_t opCode, uint8_t* byteCode, uint8_t& cpuFlags);
 };
 

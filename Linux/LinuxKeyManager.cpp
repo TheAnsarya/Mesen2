@@ -13,13 +13,13 @@ LinuxKeyManager::LinuxKeyManager(Emulator* emu)
 
 	_keyDefinitions = KeyDefinition::GetSharedKeyDefinitions();
 
-	vector<string> buttonNames = { 
-		"A", "B", "C", "X", "Y", "Z", "L1", "R1", "L2", "R2", "Select", "Start", "L3", "R3", 
-		"X+", "X-", "Y+", "Y-", "Z+", "Z-", 
-		"X2+", "X2-", "Y2+", "Y2-", "Z2+", "Z2-", 
-		"Right", "Left", "Down", "Up", 
-		"Right 2", "Left 2", "Down 2", "Up 2", 
-		"Right 3", "Left 3", "Down 3", "Up 3", 
+	vector<string> buttonNames = {
+		"A", "B", "C", "X", "Y", "Z", "L1", "R1", "L2", "R2", "Select", "Start", "L3", "R3",
+		"X+", "X-", "Y+", "Y-", "Z+", "Z-",
+		"X2+", "X2-", "Y2+", "Y2-", "Z2+", "Z2-",
+		"Right", "Left", "Down", "Up",
+		"Right 2", "Left 2", "Down 2", "Up 2",
+		"Right 3", "Left 3", "Down 3", "Up 3",
 		"Right 4", "Left 4", "Down 4", "Up 4",
 		"Trigger", "Thumb", "Thumb2", "Top", "Top2",
 		"Pinkie", "Base", "Base2", "Base3", "Base4",
@@ -42,7 +42,7 @@ LinuxKeyManager::LinuxKeyManager(Emulator* emu)
 
 	_disableAllKeys = false;
 	_stopUpdateDeviceThread = false;
-	StartUpdateDeviceThread();	
+	StartUpdateDeviceThread();
 }
 
 LinuxKeyManager::~LinuxKeyManager()
@@ -136,7 +136,7 @@ void LinuxKeyManager::UpdateDevices()
 
 void LinuxKeyManager::CheckForGamepads(bool logInformation)
 {
-	vector<int> connectedIDs; 
+	vector<int> connectedIDs;
 	for(int i = _controllers.size() - 1; i >= 0; i--) {
 		if(!_controllers[i]->IsDisconnected()) {
 			connectedIDs.push_back(_controllers[i]->GetDeviceID());
@@ -169,7 +169,7 @@ void LinuxKeyManager::StartUpdateDeviceThread()
 	_updateDeviceThread = std::thread([=]() {
 		while(!_stopUpdateDeviceThread) {
 			//Check for newly plugged in controllers every 5 secs
-			vector<shared_ptr<LinuxGameController>> controllersToAdd; 
+			vector<shared_ptr<LinuxGameController>> controllersToAdd;
 			vector<int> indexesToRemove;
 			for(int i = _controllers.size() - 1; i >= 0; i--) {
 				if(_controllers[i]->IsDisconnected()) {
@@ -186,14 +186,14 @@ void LinuxKeyManager::StartUpdateDeviceThread()
 				}
 				for(std::shared_ptr<LinuxGameController> controller : controllersToAdd) {
 					_controllers.push_back(controller);
-				} 
+				}
 				_emu->Resume();
 			}
 
 			_stopSignal.Wait(5000);
 		}
 	});
-}	
+}
 
 bool LinuxKeyManager::SetKeyState(uint16_t scanCode, bool state)
 {

@@ -148,14 +148,14 @@ private:
 	template <CpuType type, typename T>
 	void ProcessScripts(uint32_t addr, T& value, MemoryType memType, MemoryOperationType opType);
 
-	bool IsDebugWindowOpened(CpuType cpuType);
-	bool IsBreakOptionEnabled(BreakSource src);
+	[[nodiscard]] bool IsDebugWindowOpened(CpuType cpuType);
+	[[nodiscard]] bool IsBreakOptionEnabled(BreakSource src);
 	template <CpuType type>
 	void SleepOnBreakRequest();
 
 	void ClearPendingBreakExceptions();
 
-	bool IsBreakpointForbidden(BreakSource source, CpuType sourceCpu, MemoryOperationInfo* operation);
+	[[nodiscard]] bool IsBreakpointForbidden(BreakSource source, CpuType sourceCpu, MemoryOperationInfo* operation);
 
 public:
 	Debugger(Emulator* emu, IConsole* console);

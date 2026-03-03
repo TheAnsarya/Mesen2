@@ -39,7 +39,7 @@ void BreakpointManager::SetBreakpoints(Breakpoint breakpoints[], uint32_t count)
 					ExpressionData data = _bpExpEval->GetRpnList(bp.GetCondition(), success);
 					_forbidRpn.push_back(success ? data : ExpressionData());
 				} else {
-					_forbidRpn.push_back(ExpressionData());
+					_forbidRpn.emplace_back();
 				}
 				_forbidBreakpoints.push_back(bp);
 			}
@@ -63,7 +63,7 @@ void BreakpointManager::SetBreakpoints(Breakpoint breakpoints[], uint32_t count)
 					ExpressionData data = _bpExpEval->GetRpnList(bp.GetCondition(), success);
 					_rpnList[i].push_back(success ? data : ExpressionData());
 				} else {
-					_rpnList[i].push_back(ExpressionData());
+					_rpnList[i].emplace_back();
 				}
 
 				_hasBreakpoint = true;

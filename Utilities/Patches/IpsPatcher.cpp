@@ -105,7 +105,7 @@ bool IpsPatcher::PatchBuffer(std::istream& ipsFile, vector<uint8_t>& input, vect
 	output.resize(maxOutputSize);
 	std::ranges::copy(input, output.begin());
 
-	for (IpsRecord record : records) {
+	for (const IpsRecord& record : records) {
 		if (record.Length == 0) {
 			std::fill(&output[record.Address], &output[record.Address] + record.RepeatCount, record.Value);
 		} else {

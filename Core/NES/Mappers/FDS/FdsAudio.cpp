@@ -149,38 +149,38 @@ void FdsAudio::WriteRegister(uint16_t addr, uint8_t value) {
 }
 
 void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries) {
-	entries.push_back(MapperStateEntry("", "Audio"));
-	entries.push_back(MapperStateEntry("$4080-$4083", "Volume"));
-	entries.push_back(MapperStateEntry("$4080.0-5", "Envelope Speed", _volume.GetSpeed(), MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4080.6", "Envelope Direction", _volume.GetVolumeIncreaseFlag() ? "Increase" : "Decrease", _volume.GetVolumeIncreaseFlag()));
-	entries.push_back(MapperStateEntry("$4080.7", "Envelope Disabled", _volume.IsEnvelopeDisabled(), MapperStateValueType::Bool));
-	entries.push_back(MapperStateEntry("$4082/3.0-11", "Frequency", _volume.GetFrequency(), MapperStateValueType::Number16));
-	entries.push_back(MapperStateEntry("$4083.6", "Volume/Mod Envelopes Disabled", _disableEnvelopes, MapperStateValueType::Bool));
-	entries.push_back(MapperStateEntry("$4083.7", "Halt Waveform", _haltWaveform, MapperStateValueType::Bool));
-	entries.push_back(MapperStateEntry("", "Waveform position", _wavePosition, MapperStateValueType::Number8));
+	entries.emplace_back("", "Audio");
+	entries.emplace_back("$4080-$4083", "Volume");
+	entries.emplace_back("$4080.0-5", "Envelope Speed", _volume.GetSpeed(), MapperStateValueType::Number8);
+	entries.emplace_back("$4080.6", "Envelope Direction", _volume.GetVolumeIncreaseFlag() ? "Increase" : "Decrease", _volume.GetVolumeIncreaseFlag());
+	entries.emplace_back("$4080.7", "Envelope Disabled", _volume.IsEnvelopeDisabled(), MapperStateValueType::Bool);
+	entries.emplace_back("$4082/3.0-11", "Frequency", _volume.GetFrequency(), MapperStateValueType::Number16);
+	entries.emplace_back("$4083.6", "Volume/Mod Envelopes Disabled", _disableEnvelopes, MapperStateValueType::Bool);
+	entries.emplace_back("$4083.7", "Halt Waveform", _haltWaveform, MapperStateValueType::Bool);
+	entries.emplace_back("", "Waveform position", _wavePosition, MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("", "Gain", _volume.GetGain(), MapperStateValueType::Number8));
+	entries.emplace_back("", "Gain", _volume.GetGain(), MapperStateValueType::Number8);
 
-	entries.push_back(MapperStateEntry("$4084-$4088", "Modulation"));
-	entries.push_back(MapperStateEntry("$4084.0-5", "Envelope Speed", _mod.GetSpeed(), MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4084.6", "Envelope Direction", _mod.GetVolumeIncreaseFlag() ? "Increase" : "Decrease", _mod.GetVolumeIncreaseFlag()));
-	entries.push_back(MapperStateEntry("$4084.7", "Envelope Disabled", _mod.IsEnvelopeDisabled(), MapperStateValueType::Bool));
+	entries.emplace_back("$4084-$4088", "Modulation");
+	entries.emplace_back("$4084.0-5", "Envelope Speed", _mod.GetSpeed(), MapperStateValueType::Number8);
+	entries.emplace_back("$4084.6", "Envelope Direction", _mod.GetVolumeIncreaseFlag() ? "Increase" : "Decrease", _mod.GetVolumeIncreaseFlag());
+	entries.emplace_back("$4084.7", "Envelope Disabled", _mod.IsEnvelopeDisabled(), MapperStateValueType::Bool);
 
 	int8_t modCounter = _mod.GetCounter();
-	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), modCounter < 0 ? (modCounter + 128) : modCounter));
+	entries.emplace_back("$4085.0-6", "Counter", std::to_string(modCounter), modCounter < 0 ? (modCounter + 128) : modCounter);
 
-	entries.push_back(MapperStateEntry("$4086/7.0-11", "Frequency", _mod.GetFrequency(), MapperStateValueType::Number16));
+	entries.emplace_back("$4086/7.0-11", "Frequency", _mod.GetFrequency(), MapperStateValueType::Number16);
 
 	// todo emulation logic + this based on new info
-	// entries.push_back(MapperStateEntry("$4087.6", "???", false, MapperStateValueType::Bool));
+	// entries.emplace_back("$4087.6", "???", false, MapperStateValueType::Bool);
 
-	entries.push_back(MapperStateEntry("$4087.7", "Disabled", _mod.IsModulationDisabled(), MapperStateValueType::Bool));
-	entries.push_back(MapperStateEntry("", "Gain", _mod.GetGain(), MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("", "Mod Output", std::to_string(_mod.GetOutput())));
+	entries.emplace_back("$4087.7", "Disabled", _mod.IsModulationDisabled(), MapperStateValueType::Bool);
+	entries.emplace_back("", "Gain", _mod.GetGain(), MapperStateValueType::Number8);
+	entries.emplace_back("", "Mod Output", std::to_string(_mod.GetOutput()));
 
-	entries.push_back(MapperStateEntry("$4089-$408A", "Misc. Audio"));
-	entries.push_back(MapperStateEntry("$4089.0-2", "Master Volume", _masterVolume, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4089.7", "Wave Write Enabled", _waveWriteEnabled, MapperStateValueType::Bool));
+	entries.emplace_back("$4089-$408A", "Misc. Audio");
+	entries.emplace_back("$4089.0-2", "Master Volume", _masterVolume, MapperStateValueType::Number8);
+	entries.emplace_back("$4089.7", "Wave Write Enabled", _waveWriteEnabled, MapperStateValueType::Bool);
 
-	entries.push_back(MapperStateEntry("$408A", "Envelope Speed Multiplier", _volume.GetMasterSpeed(), MapperStateValueType::Number8));
+	entries.emplace_back("$408A", "Envelope Speed Multiplier", _volume.GetMasterSpeed(), MapperStateValueType::Number8);
 }

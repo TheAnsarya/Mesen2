@@ -98,12 +98,12 @@ protected:
 				mirValue = 1;
 				break;
 		}
-		entries.push_back(MapperStateEntry("$A000.0-3", "PRG Bank", _prgPage, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$B000.0-4", "CHR Bank ($0000) ($FD)", _leftChrPage[0], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$C000.0-4", "CHR Bank ($0000) ($FE)", _leftChrPage[1], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$D000.0-4", "CHR Bank ($1000) ($FD)", _rightChrPage[0], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$E000.0-4", "CHR Bank ($1000) ($FE)", _rightChrPage[1], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$F000.0", "Mirroring", mirroringType, mirValue));
+		entries.emplace_back("$A000.0-3", "PRG Bank", _prgPage, MapperStateValueType::Number8);
+		entries.emplace_back("$B000.0-4", "CHR Bank ($0000) ($FD)", _leftChrPage[0], MapperStateValueType::Number8);
+		entries.emplace_back("$C000.0-4", "CHR Bank ($0000) ($FE)", _leftChrPage[1], MapperStateValueType::Number8);
+		entries.emplace_back("$D000.0-4", "CHR Bank ($1000) ($FD)", _rightChrPage[0], MapperStateValueType::Number8);
+		entries.emplace_back("$E000.0-4", "CHR Bank ($1000) ($FE)", _rightChrPage[1], MapperStateValueType::Number8);
+		entries.emplace_back("$F000.0", "Mirroring", mirroringType, mirValue);
 		return entries;
 	}
 

@@ -44,8 +44,8 @@ public:
 	DisassemblyInfo(uint32_t cpuAddress, uint8_t cpuFlags, CpuType cpuType, MemoryType memType, MemoryDumper* memoryDumper);
 
 	void Initialize(uint32_t cpuAddress, uint8_t cpuFlags, CpuType cpuType, MemoryType memType, MemoryDumper* memoryDumper);
-	bool IsInitialized();
-	bool IsValid(uint8_t cpuFlags);
+	[[nodiscard]] bool IsInitialized();
+	[[nodiscard]] bool IsValid(uint8_t cpuFlags);
 	void Reset();
 
 	void GetDisassembly(string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings);
@@ -60,13 +60,13 @@ public:
 	void GetByteCode(string& out);
 
 	static uint8_t GetOpSize(uint32_t opCode, uint8_t flags, CpuType type, uint32_t cpuAddress, MemoryType memType, MemoryDumper* memoryDumper);
-	bool IsJumpToSub();
-	bool IsReturnInstruction();
+	[[nodiscard]] bool IsJumpToSub();
+	[[nodiscard]] bool IsReturnInstruction();
 
-	bool CanDisassembleNextOp();
+	[[nodiscard]] bool CanDisassembleNextOp();
 
-	bool IsUnconditionalJump();
-	bool IsJump();
+	[[nodiscard]] bool IsUnconditionalJump();
+	[[nodiscard]] bool IsJump();
 	void UpdateCpuFlags(uint8_t& cpuFlags);
 
 	EffectiveAddressInfo GetEffectiveAddress(Debugger* debugger, void* cpuState, CpuType type);

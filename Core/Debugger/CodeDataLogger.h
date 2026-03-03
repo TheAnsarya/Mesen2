@@ -185,28 +185,28 @@ public:
 	/// </summary>
 	/// <param name="absoluteAddr">Absolute address</param>
 	/// <returns>True if code</returns>
-	bool IsCode(uint32_t absoluteAddr);
+	[[nodiscard]] bool IsCode(uint32_t absoluteAddr);
 
 	/// <summary>
 	/// Check if byte is jump target.
 	/// </summary>
 	/// <param name="absoluteAddr">Absolute address</param>
 	/// <returns>True if jump target</returns>
-	bool IsJumpTarget(uint32_t absoluteAddr);
+	[[nodiscard]] bool IsJumpTarget(uint32_t absoluteAddr);
 
 	/// <summary>
 	/// Check if byte is subroutine entry point.
 	/// </summary>
 	/// <param name="absoluteAddr">Absolute address</param>
 	/// <returns>True if sub entry</returns>
-	bool IsSubEntryPoint(uint32_t absoluteAddr);
+	[[nodiscard]] bool IsSubEntryPoint(uint32_t absoluteAddr);
 
 	/// <summary>
 	/// Check if byte is marked as data.
 	/// </summary>
 	/// <param name="absoluteAddr">Absolute address</param>
 	/// <returns>True if data</returns>
-	bool IsData(uint32_t absoluteAddr);
+	[[nodiscard]] bool IsData(uint32_t absoluteAddr);
 
 	/// <summary>
 	/// Set CDL data from buffer.

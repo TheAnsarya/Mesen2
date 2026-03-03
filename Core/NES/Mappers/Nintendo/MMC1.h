@@ -115,17 +115,17 @@ protected:
 				mirValue = 0;
 				break;
 		}
-		entries.push_back(MapperStateEntry("$8000.0-1", "Mirroring", mirroringType, mirValue));
-		entries.push_back(MapperStateEntry("$8000.2-3", "PRG Mode", ((uint8_t)_prgMode << 1) | (uint8_t)_slotSelect, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$8000.4", "CHR Mode", _chrMode, MapperStateValueType::Number8));
+		entries.emplace_back("$8000.0-1", "Mirroring", mirroringType, mirValue);
+		entries.emplace_back("$8000.2-3", "PRG Mode", ((uint8_t)_prgMode << 1) | (uint8_t)_slotSelect, MapperStateValueType::Number8);
+		entries.emplace_back("$8000.4", "CHR Mode", _chrMode, MapperStateValueType::Number8);
 
-		entries.push_back(MapperStateEntry("$A000.0-4", "CHR Bank ($0000)", _chrReg0, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$C000.0-4", "CHR Bank ($1000)", _chrReg1, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$E000.0-3", "PRG Bank", _prgReg, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$E000.4", "WRAM Disabled", _wramDisable));
+		entries.emplace_back("$A000.0-4", "CHR Bank ($0000)", _chrReg0, MapperStateValueType::Number8);
+		entries.emplace_back("$C000.0-4", "CHR Bank ($1000)", _chrReg1, MapperStateValueType::Number8);
+		entries.emplace_back("$E000.0-3", "PRG Bank", _prgReg, MapperStateValueType::Number8);
+		entries.emplace_back("$E000.4", "WRAM Disabled", _wramDisable);
 
-		entries.push_back(MapperStateEntry("", "Shift Register", _writeBuffer, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "Write Count", _shiftCount, MapperStateValueType::Number8));
+		entries.emplace_back("", "Shift Register", _writeBuffer, MapperStateValueType::Number8);
+		entries.emplace_back("", "Write Count", _shiftCount, MapperStateValueType::Number8);
 		return entries;
 	}
 

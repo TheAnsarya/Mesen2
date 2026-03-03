@@ -45,15 +45,15 @@ private:
 
 	/// <summary>Checks if RTC is in reset state.</summary>
 	/// <returns>True if reset bit is set.</returns>
-	bool IsReset() { return (_regs[0xF] & 0x01) != 0; }
+	[[nodiscard]] bool IsReset() { return (_regs[0xF] & 0x01) != 0; }
 
 	/// <summary>Checks if RTC counter is stopped.</summary>
 	/// <returns>True if stop bit is set.</returns>
-	bool IsStop() { return (_regs[0xF] & 0x02) != 0; }
+	[[nodiscard]] bool IsStop() { return (_regs[0xF] & 0x02) != 0; }
 
 	/// <summary>Checks if time output is held (frozen for reading).</summary>
 	/// <returns>True if hold bit is set.</returns>
-	bool IsHold() { return (_regs[0xD] & 0x01) != 0; }
+	[[nodiscard]] bool IsHold() { return (_regs[0xD] & 0x01) != 0; }
 
 	/// <summary>Gets current seconds (0-59) from registers.</summary>
 	/// <returns>Seconds value.</returns>

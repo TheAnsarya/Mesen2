@@ -370,6 +370,22 @@ only do the open PRS, old closed prs don't matter; continue working;
 
 [Nexen] remember: never screw up emulation accuracy ever; and test performance of code changes, and find performance improvements, especially in hot paths and fix them (test & benchmark before and after); git commit everything; update issues; continue working issues and make new ones and docs and plans and code-plans and test every real change and benchmark so performance is good; continue;
 
+[Nexen] git commit everything; continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

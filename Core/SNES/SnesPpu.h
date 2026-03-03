@@ -228,7 +228,7 @@ private:
 	__forceinline uint16_t GetRgbColor(uint8_t paletteIndex, uint8_t colorIndex);
 
 	/// <summary>Checks if layer rendering is needed (enabled and visible).</summary>
-	__forceinline bool IsRenderRequired(uint8_t layerIndex);
+	[[nodiscard]] __forceinline bool IsRenderRequired(uint8_t layerIndex);
 
 	/// <summary>Extracts pixel color from character data bitplanes.</summary>
 	template <uint8_t bpp>
@@ -279,11 +279,11 @@ private:
 	/// <summary>Sends completed frame to video output.</summary>
 	void SendFrame();
 
-	bool IsDoubleHeight();  ///< True when interlaced (478 lines)
-	bool IsDoubleWidth();   ///< True when hi-res (512 pixels)
+	[[nodiscard]] bool IsDoubleHeight();  ///< True when interlaced (478 lines)
+	[[nodiscard]] bool IsDoubleWidth();   ///< True when hi-res (512 pixels)
 
-	bool CanAccessCgram();  ///< True when CGRAM is accessible (during vblank/fblank)
-	bool CanAccessVram();   ///< True when VRAM is accessible
+	[[nodiscard]] bool CanAccessCgram();  ///< True when CGRAM is accessible (during vblank/fblank)
+	[[nodiscard]] bool CanAccessVram();   ///< True when VRAM is accessible
 
 	/// <summary>Evaluates which sprites appear on the next scanline.</summary>
 	void EvaluateNextLineSprites();
@@ -326,7 +326,7 @@ public:
 	void GetState(SnesPpuState& state, bool returnPartialState);
 
 	bool ProcessEndOfScanline(uint16_t& hClock);
-	bool IsInOverclockedScanline();
+	[[nodiscard]] bool IsInOverclockedScanline();
 	void UpdateSpcState();
 	void UpdateNmiScanline();
 	[[nodiscard]] uint16_t GetLastScanline();

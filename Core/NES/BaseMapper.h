@@ -130,7 +130,7 @@ protected:
 	/// Get CHR page size for bank switching (typically 1KB, 2KB, or 8KB)
 	virtual uint16_t GetChrPageSize() = 0;
 
-	bool IsNes20();
+	[[nodiscard]] bool IsNes20();
 
 	virtual uint16_t GetChrRamPageSize() { return GetChrPageSize(); }
 
@@ -161,7 +161,7 @@ protected:
 	virtual uint32_t GetDipSwitchCount() { return 0; }
 	virtual uint32_t GetNametableCount() { return 0; }
 
-	virtual bool HasBusConflicts() { return false; }
+	[[nodiscard]] virtual bool HasBusConflicts() { return false; }
 
 	uint8_t InternalReadRam(uint16_t addr);
 
@@ -185,7 +185,7 @@ protected:
 	void SetPpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint8_t* sourceMemory, uint32_t sourceOffset, uint32_t sourceSize, int8_t accessType = -1);
 	void RemovePpuMemoryMapping(uint16_t startAddr, uint16_t endAddr);
 
-	bool HasBattery();
+	[[nodiscard]] bool HasBattery();
 	virtual void LoadBattery();
 	string GetBatteryFilename();
 
@@ -247,14 +247,14 @@ public:
 
 	Epsm* GetEpsm() { return _epsm.get(); }
 
-	bool HasDefaultWorkRam();
+	[[nodiscard]] bool HasDefaultWorkRam();
 
 	void SetRegion(ConsoleRegion region);
 
-	__forceinline bool HasCpuClockHook() { return _hasCpuClockHook; }
+	[[nodiscard]] __forceinline bool HasCpuClockHook() { return _hasCpuClockHook; }
 	virtual void ProcessCpuClock();
 
-	__forceinline bool HasVramAddressHook() { return _hasVramAddressHook; }
+	[[nodiscard]] __forceinline bool HasVramAddressHook() { return _hasVramAddressHook; }
 	virtual void NotifyVramAddressChange(uint16_t addr);
 
 	virtual void GetMemoryRanges(MemoryRanges& ranges) override;
@@ -294,8 +294,8 @@ public:
 	void CopyChrTile(uint32_t address, uint8_t* dest);
 
 	// Debugger Helper Functions
-	bool HasChrRam();
-	bool HasChrRom();
+	[[nodiscard]] bool HasChrRam();
+	[[nodiscard]] bool HasChrRom();
 	uint32_t GetChrRomSize() { return _chrRomSize; }
 
 	CartridgeState GetState();
@@ -306,15 +306,15 @@ public:
 	AddressInfo GetRelativeAddress(AddressInfo& addr);
 	int32_t GetPpuRelativeAddress(AddressInfo& addr);
 
-	bool IsWriteRegister(uint16_t addr);
-	bool IsReadRegister(uint16_t addr);
+	[[nodiscard]] bool IsWriteRegister(uint16_t addr);
+	[[nodiscard]] bool IsReadRegister(uint16_t addr);
 
 	void GetRomFileData(vector<uint8_t>& out, bool asIpsFile, uint8_t* header);
 
 	vector<uint8_t> GetPrgChrCopy();
 	void RestorePrgChrBackup(vector<uint8_t>& backupData);
 	void RevertPrgChrChanges();
-	bool HasPrgChrChanges();
+	[[nodiscard]] bool HasPrgChrChanges();
 	void CopyPrgChrRom(BaseMapper* mapper);
 	void SwapMemoryAccess(BaseMapper* sub, bool mainHasAccess);
 };

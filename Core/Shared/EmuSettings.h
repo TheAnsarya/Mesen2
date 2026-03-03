@@ -150,21 +150,21 @@ public:
 	void SetFlag(EmulationFlags flag);
 	void SetFlagState(EmulationFlags flag, bool enabled);
 	void ClearFlag(EmulationFlags flag);
-	bool CheckFlag(EmulationFlags flag);
+	[[nodiscard]] bool CheckFlag(EmulationFlags flag);
 
 	void SetDebuggerFlag(DebuggerFlags flag, bool enabled);
-	bool CheckDebuggerFlag(DebuggerFlags flags);
+	[[nodiscard]] bool CheckDebuggerFlag(DebuggerFlags flags);
 
-	bool HasRandomPowerOnState(ConsoleType consoleType);
+	[[nodiscard]] bool HasRandomPowerOnState(ConsoleType consoleType);
 	int GetRandomValue(int maxValue);
-	bool GetRandomBool();
+	[[nodiscard]] bool GetRandomBool();
 	void InitializeRam(RamState state, void* data, uint32_t length);
 
-	bool IsInputEnabled();
+	[[nodiscard]] bool IsInputEnabled();
 	double GetControllerDeadzoneRatio();
 
 	template <typename T>
-	bool IsEqual(T& prevCfg, T& newCfg) {
+	[[nodiscard]] bool IsEqual(T& prevCfg, T& newCfg) {
 		if (memcmp(&prevCfg, &newCfg, sizeof(T)) == 0) {
 			return true;
 		}

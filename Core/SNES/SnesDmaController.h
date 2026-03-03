@@ -76,7 +76,7 @@ private:
 	/// <summary>Checks if this is the last active HDMA channel in priority order.</summary>
 	/// <param name="channel">Channel number to check.</param>
 	/// <returns>True if this is the last active HDMA channel.</returns>
-	bool IsLastActiveHdmaChannel(uint8_t channel);
+	[[nodiscard]] bool IsLastActiveHdmaChannel(uint8_t channel);
 
 	/// <summary>Initializes HDMA channels at start of frame.</summary>
 	/// <returns>True if any HDMA channels were initialized.</returns>
@@ -93,7 +93,7 @@ private:
 
 	/// <summary>Checks if any DMA channel has pending transfer.</summary>
 	/// <returns>True if any channel is actively transferring.</returns>
-	bool HasActiveDmaChannel();
+	[[nodiscard]] bool HasActiveDmaChannel();
 
 public:
 	/// <summary>Constructs the DMA controller.</summary>
@@ -115,7 +115,7 @@ public:
 
 	/// <summary>Checks if there are pending DMA/HDMA transfers.</summary>
 	/// <returns>True if transfers are pending.</returns>
-	__forceinline bool HasPendingTransfer() { return _needToProcess; }
+	[[nodiscard]] __forceinline bool HasPendingTransfer() { return _needToProcess; }
 
 	/// <summary>Processes all pending DMA and HDMA transfers.</summary>
 	/// <returns>True if any transfers were processed.</returns>

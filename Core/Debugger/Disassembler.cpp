@@ -150,7 +150,7 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 			}
 
 			results[results.size() - 1].SetByteCount(bytesPerRow - byteCounter + 1);
-			results.push_back(DisassemblyResult(prevAddrInfo, relAddress.Address - 1, flags));
+			results.emplace_back(prevAddrInfo, relAddress.Address - 1, flags);
 			inUnknownBlock = false;
 			inVerifiedBlock = false;
 			byteCounter = 0;
@@ -166,9 +166,9 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 
 	auto pushUnmappedBlock = [&]() {
 		int32_t prevAddress = results.size() > 0 ? results[results.size() - 1].CpuAddress + 1 : bankStart;
-		results.push_back(DisassemblyResult(prevAddress, LineFlags::BlockStart | LineFlags::UnmappedMemory));
-		results.push_back(DisassemblyResult(prevAddress, LineFlags::UnmappedMemory | LineFlags::Empty));
-		results.push_back(DisassemblyResult(relAddress.Address - 1, LineFlags::BlockEnd | LineFlags::UnmappedMemory));
+		results.emplace_back(prevAddress, LineFlags::BlockStart | LineFlags::UnmappedMemory);
+		results.emplace_back(prevAddress, LineFlags::UnmappedMemory | LineFlags::Empty);
+		results.emplace_back(relAddress.Address - 1, LineFlags::BlockEnd | LineFlags::UnmappedMemory);
 		inUnmappedBlock = false;
 	};
 
@@ -205,7 +205,7 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 			pushEndBlock();
 
 			if (cdl && cdl->IsSubEntryPoint(addrInfo.Address)) {
-				results.push_back(DisassemblyResult(addrInfo, i, LineFlags::SubStart | LineFlags::BlockStart | LineFlags::VerifiedCode | LineFlags::Empty));
+				results.emplace_back(addrInfo, i, LineFlags::SubStart | LineFlags::BlockStart | LineFlags::VerifiedCode | LineFlags::Empty);
 			}
 
 			if (_labelManager->GetLabelAndComment(addrInfo, labelInfo)) {
@@ -214,34 +214,34 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 					int16_t lineCount = 0;
 					for (char c : labelInfo.Comment) {
 						if (c == '\n') {
-							results.push_back(DisassemblyResult(addrInfo, i, LineFlags::Comment, lineCount));
+							results.emplace_back(addrInfo, i, LineFlags::Comment, lineCount);
 							lineCount++;
 						}
 					}
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::Comment, lineCount));
+					results.emplace_back(addrInfo, i, LineFlags::Comment, lineCount);
 				}
 
 				if (labelInfo.Label.size()) {
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::Label));
+					results.emplace_back(addrInfo, i, LineFlags::Label);
 				} else if (showJumpLabels && cdl && (cdl->IsJumpTarget(addrInfo.Address) || cdl->IsSubEntryPoint(addrInfo.Address))) {
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::Label));
+					results.emplace_back(addrInfo, i, LineFlags::Label);
 				}
 
 				if (!hasMultipleComment && labelInfo.Comment.size()) {
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::Comment));
+					results.emplace_back(addrInfo, i, LineFlags::Comment);
 				} else {
-					results.push_back(DisassemblyResult(addrInfo, i));
+					results.emplace_back(addrInfo, i);
 				}
 			} else if (showJumpLabels && cdl && (cdl->IsJumpTarget(addrInfo.Address) || cdl->IsSubEntryPoint(addrInfo.Address))) {
-				results.push_back(DisassemblyResult(addrInfo, i, LineFlags::Label));
-				results.push_back(DisassemblyResult(addrInfo, i));
+				results.emplace_back(addrInfo, i, LineFlags::Label);
+				results.emplace_back(addrInfo, i);
 			} else {
-				results.push_back(DisassemblyResult(addrInfo, i));
+				results.emplace_back(addrInfo, i);
 			}
 
 			if (disassemblyInfo.IsReturnInstruction()) {
 				// End of function
-				results.push_back(DisassemblyResult(i, LineFlags::VerifiedCode | LineFlags::BlockEnd | LineFlags::Empty));
+				results.emplace_back(i, LineFlags::VerifiedCode | LineFlags::BlockEnd | LineFlags::Empty);
 			}
 
 			// Move to the end of the instruction (but realign disassembly if another valid instruction is found)
@@ -268,7 +268,7 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 				byteCounter--;
 				if (byteCounter == 0) {
 					results[results.size() - 1].SetByteCount(bytesPerRow);
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::ShowAsData | (isData ? LineFlags::VerifiedData : 0), bytesPerRow));
+					results.emplace_back(addrInfo, i, LineFlags::ShowAsData | (isData ? LineFlags::VerifiedData : 0), bytesPerRow);
 					byteCounter = bytesPerRow;
 				}
 			} else if (!inUnknownBlock && !inVerifiedBlock) {
@@ -276,19 +276,19 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 				bool showAsData = (isData && showData) || ((!isData && !isCode) && showUnident);
 				if (isData) {
 					inVerifiedBlock = true;
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::BlockStart | LineFlags::VerifiedData | (showAsData ? LineFlags::ShowAsData : 0)));
+					results.emplace_back(addrInfo, i, LineFlags::BlockStart | LineFlags::VerifiedData | (showAsData ? LineFlags::ShowAsData : 0));
 				} else {
 					inUnknownBlock = true;
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::BlockStart | (showAsData ? LineFlags::ShowAsData : 0)));
+					results.emplace_back(addrInfo, i, LineFlags::BlockStart | (showAsData ? LineFlags::ShowAsData : 0));
 				}
 
 				if (showAsData) {
 					// If showing data as hex, add the first row of the block
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::ShowAsData | (isData ? LineFlags::VerifiedData : 0)));
+					results.emplace_back(addrInfo, i, LineFlags::ShowAsData | (isData ? LineFlags::VerifiedData : 0));
 					byteCounter = bytesPerRow;
 				} else {
 					// If not showing the data at all, display 1 empty line
-					results.push_back(DisassemblyResult(addrInfo, i, LineFlags::Empty | (isData ? LineFlags::VerifiedData : 0)));
+					results.emplace_back(addrInfo, i, LineFlags::Empty | (isData ? LineFlags::VerifiedData : 0));
 				}
 			}
 			prevAddrInfo = addrInfo;

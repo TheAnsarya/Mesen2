@@ -80,7 +80,7 @@ public:
 	/// Check if breakpoint has specific type flag.
 	/// </summary>
 	/// <param name="type">Breakpoint type to check</param>
-	bool HasBreakpointType(BreakpointType type);
+	[[nodiscard]] bool HasBreakpointType(BreakpointType type);
 
 	/// <summary>
 	/// Get conditional expression string.
@@ -90,7 +90,7 @@ public:
 	/// <summary>
 	/// Check if breakpoint has condition.
 	/// </summary>
-	bool HasCondition();
+	[[nodiscard]] bool HasCondition();
 
 	/// <summary>
 	/// Get unique breakpoint ID.
@@ -105,18 +105,18 @@ public:
 	/// <summary>
 	/// Check if breakpoint enabled.
 	/// </summary>
-	bool IsEnabled();
+	[[nodiscard]] bool IsEnabled();
 
 	/// <summary>
 	/// Check if breakpoint marks events (doesn't break).
 	/// </summary>
-	bool IsMarked();
+	[[nodiscard]] bool IsMarked();
 
 	/// <summary>
 	/// Check if breakpoint allowed for operation type.
 	/// </summary>
 	/// <param name="opType">Memory operation type</param>
-	bool IsAllowedForOpType(MemoryOperationType opType);
+	[[nodiscard]] bool IsAllowedForOpType(MemoryOperationType opType);
 
 private:
 	uint32_t _id;                ///< Unique ID

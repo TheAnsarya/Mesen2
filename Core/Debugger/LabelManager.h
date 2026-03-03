@@ -172,19 +172,19 @@ public:
 	/// <param name="address">Address info</param>
 	/// <param name="label">Output label info</param>
 	/// <returns>True if label or comment found</returns>
-	bool GetLabelAndComment(AddressInfo address, LabelInfo& label);
+	[[nodiscard]] bool GetLabelAndComment(AddressInfo address, LabelInfo& label);
 
 	/// <summary>
 	/// Check if label exists.
 	/// </summary>
 	/// <param name="label">Label to check</param>
 	/// <returns>True if label defined</returns>
-	bool ContainsLabel(const string& label);
+	[[nodiscard]] bool ContainsLabel(const string& label);
 
 	/// <summary>
 	/// Check if address has label or comment.
 	/// </summary>
 	/// <param name="address">Address info</param>
 	/// <returns>True if label or comment exists</returns>
-	bool HasLabelOrComment(AddressInfo address);
+	[[nodiscard]] bool HasLabelOrComment(AddressInfo address);
 };
