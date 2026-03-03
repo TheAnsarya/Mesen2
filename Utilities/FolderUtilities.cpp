@@ -164,7 +164,7 @@ vector<string> FolderUtilities::GetFolders(const string& rootFolder) {
 	return folders;
 }
 
-vector<string> FolderUtilities::GetFilesInFolder(const string& rootFolder, std::unordered_set<string> extensions, bool recursive) {
+vector<string> FolderUtilities::GetFilesInFolder(const string& rootFolder, const std::unordered_set<string>& extensions, bool recursive) {
 	vector<string> files;
 	vector<string> folders = {{rootFolder}};
 

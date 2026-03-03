@@ -85,7 +85,7 @@ public:
 	/// <param name="extensions">Set of file extensions to match (e.g., {".nes", ".sfc"})</param>
 	/// <param name="recursive">Recursively scan subdirectories if true</param>
 	/// <returns>List of matching file paths</returns>
-	[[nodiscard]] static vector<string> GetFilesInFolder(const string& rootFolder, std::unordered_set<string> extensions, bool recursive);
+	[[nodiscard]] static vector<string> GetFilesInFolder(const string& rootFolder, const std::unordered_set<string>& extensions, bool recursive);
 
 	/// <summary>Extract filename from full path</summary>
 	/// <param name="filepath">Full file path</param>

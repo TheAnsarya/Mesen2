@@ -104,7 +104,7 @@ public:
 	/// <param name="signatures">List of signature strings to check</param>
 	/// <param name="loadArchives">If true, load archive contents before checking</param>
 	/// <returns>True if file starts with any signature</returns>
-	[[nodiscard]] bool CheckFileSignature(vector<string> signatures, bool loadArchives = false);
+	[[nodiscard]] bool CheckFileSignature(const vector<string>& signatures, bool loadArchives = false);
 
 	/// <summary>Enable chunked reading mode for large files (>256KB)</summary>
 	void InitChunks();

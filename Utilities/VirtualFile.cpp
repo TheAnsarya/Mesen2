@@ -177,7 +177,7 @@ size_t VirtualFile::GetSize() {
 	}
 }
 
-bool VirtualFile::CheckFileSignature(vector<string> signatures, bool loadArchives) {
+bool VirtualFile::CheckFileSignature(const vector<string>& signatures, bool loadArchives) {
 	vector<uint8_t> partialData;
 
 	if (_data.empty()) {

@@ -11,7 +11,7 @@ struct MapperStateEntry;
 
 class FdsAudio : public BaseExpansionAudio {
 private:
-	const uint32_t WaveVolumeTable[4] = {36, 24, 17, 14};
+	static constexpr uint32_t WaveVolumeTable[4] = {36, 24, 17, 14};
 
 	// Register values
 	uint8_t _waveTable[64] = {};
