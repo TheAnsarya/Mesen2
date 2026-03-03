@@ -22,14 +22,14 @@ MemoryAccessCounter::MemoryAccessCounter(Debugger* debugger) {
 
 template <uint8_t accessWidth>
 ReadResult MemoryAccessCounter::ProcessMemoryRead(AddressInfo& addressInfo, uint64_t masterClock) {
-	if (addressInfo.Address < 0) {
+	if (addressInfo.Address < 0) [[unlikely]] {
 		return ReadResult::Normal;
 	}
 
 	ReadResult result = ReadResult::Normal;
 	for (int i = 0; i < accessWidth; i++) {
 		AddressCounters& counts = _counters[(int)addressInfo.Type][addressInfo.Address + i];
-		if (_enableBreakOnUninitRead && counts.WriteStamp == 0 && DebugUtilities::IsVolatileRam(addressInfo.Type)) {
+		if (_enableBreakOnUninitRead && counts.WriteStamp == 0 && DebugUtilities::IsVolatileRam(addressInfo.Type)) [[unlikely]] {
 			result = (ReadResult)((int)result | (int)(counts.ReadStamp == 0 ? ReadResult::FirstUninitRead : ReadResult::UninitRead));
 		}
 		counts.ReadStamp = masterClock;
@@ -40,7 +40,7 @@ ReadResult MemoryAccessCounter::ProcessMemoryRead(AddressInfo& addressInfo, uint
 
 template <uint8_t accessWidth>
 void MemoryAccessCounter::ProcessMemoryWrite(AddressInfo& addressInfo, uint64_t masterClock) {
-	if (addressInfo.Address < 0) {
+	if (addressInfo.Address < 0) [[unlikely]] {
 		return;
 	}
 
@@ -53,7 +53,7 @@ void MemoryAccessCounter::ProcessMemoryWrite(AddressInfo& addressInfo, uint64_t 
 
 template <uint8_t accessWidth>
 void MemoryAccessCounter::ProcessMemoryExec(AddressInfo& addressInfo, uint64_t masterClock) {
-	if (addressInfo.Address < 0) {
+	if (addressInfo.Address < 0) [[unlikely]] {
 		return;
 	}
 

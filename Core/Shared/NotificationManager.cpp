@@ -8,7 +8,7 @@ void NotificationManager::RegisterNotificationListener(shared_ptr<INotificationL
 	// Cleanup expired listeners on registration (rare) instead of every SendNotification (per-frame)
 	CleanupNotificationListeners();
 
-	for (weak_ptr<INotificationListener> listener : _listeners) {
+	for (const weak_ptr<INotificationListener>& listener : _listeners) {
 		if (listener.lock() == notificationListener) {
 			// This listener is already registered, do nothing
 			return;
@@ -31,11 +31,16 @@ void NotificationManager::CleanupNotificationListeners() {
 }
 
 void NotificationManager::SendNotification(ConsoleNotificationType type, void* parameter) {
-	// Iterate under lock — ProcessNotification is fast and non-blocking.
-	// Avoids per-frame vector copy + cleanup scan overhead.
-	auto lock = _lock.AcquireSafe();
-	for (size_t i = 0; i < _listeners.size(); i++) {
-		shared_ptr<INotificationListener> listener = _listeners[i].lock();
+	// Snapshot listener list under lock, then iterate outside lock.
+	// This minimizes lock hold time — callbacks execute without contention.
+	vector<weak_ptr<INotificationListener>> snapshot;
+	{
+		auto lock = _lock.AcquireSafe();
+		snapshot = _listeners;
+	}
+
+	for (size_t i = 0; i < snapshot.size(); i++) {
+		shared_ptr<INotificationListener> listener = snapshot[i].lock();
 		if (listener) {
 			listener->ProcessNotification(type, parameter);
 		}

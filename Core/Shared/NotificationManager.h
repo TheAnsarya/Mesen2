@@ -64,7 +64,8 @@ public:
 	/// <param name="parameter">Optional event-specific data pointer</param>
 	/// <remarks>
 	/// Calls ProcessNotification() on each live listener.
-	/// Automatically cleans up dead listeners before broadcasting.
+	/// Takes a snapshot of the listener list under lock, then iterates
+	/// outside the lock to minimize contention during callbacks.
 	/// Thread-safe - can be called from any thread.
 	/// </remarks>
 	void SendNotification(ConsoleNotificationType type, void* parameter = nullptr);
