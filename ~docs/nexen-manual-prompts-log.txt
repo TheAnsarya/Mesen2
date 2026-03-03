@@ -372,10 +372,9 @@ only do the open PRS, old closed prs don't matter; continue working;
 
 [Nexen] git commit everything; continue
 
+[Nexen] work through the issues in github; test performance of code changes, and find performance improvements, especially in hot paths and fix them (test & benchmark before and after); git commit everything; update issues; continue working issues and make new ones and docs and plans and code-plans and test every real change and benchmark so performance is good; continue;
 
-
-
-
+[Nexen] git commit everything, and then release another version of Nexen to github, updating the minor version number; Make an announcement `discord` post ***with formatting*** for this Nexen release, with all the differences since we forked from Mesen and why we did and save it in an `md` dicumentation file and show me this file; find issues with the pansy implementation and make sure I am recording all relevant information in the pansy file (update the format if we need extra information, evaluate the `pansy` project [pansy] and make sure it's fully tested and benchmarked and also contains all the good info); make tests and benchmarks for pansy usage; update issues, and benchmarks and tests and docs; research pansy format and what should be tracked for disassembly and add thast or tweak that; continue;
 
 
 
