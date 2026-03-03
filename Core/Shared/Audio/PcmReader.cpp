@@ -80,6 +80,8 @@ void PcmReader::ReadSample(int16_t& left, int16_t& right) {
 void PcmReader::LoadSamples(uint32_t samplesToLoad) {
 	uint32_t samplesRead = 0;
 
+	_pcmBuffer.reserve(_pcmBuffer.size() + samplesToLoad * 2);
+
 	int16_t left = 0;
 	int16_t right = 0;
 	for (uint32_t i = _fileOffset; i < _fileSize && samplesRead < samplesToLoad; i += 4) {

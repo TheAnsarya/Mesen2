@@ -300,7 +300,8 @@ void Serializer::UpdatePrefix() {
 	_prefix.clear();
 	for (string& prefix : _prefixes) {
 		if (prefix.size()) {
-			_prefix += prefix + ".";
+			_prefix.append(prefix);
+			_prefix += '.';
 		}
 	}
 }
