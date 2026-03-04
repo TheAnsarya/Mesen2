@@ -121,7 +121,7 @@ void GbCpu::Exec() {
 #endif
 		}
 	} else {
-		if (_state.EiPending) {
+		if (_state.EiPending) [[unlikely]] {
 			_state.EiPending = false;
 			_state.IME = true;
 		}
@@ -140,7 +140,7 @@ void GbCpu::PowerOn() {
 }
 
 void GbCpu::ProcessNextCycleStart() {
-	if (_state.HaltCounter) {
+	if (_state.HaltCounter) [[unlikely]] {
 		// When halted, the timing at which the CPU checks the IRQ state seems
 		// to differ from the timing for other instructions.
 		// This is needed to make various tests pass.

@@ -670,7 +670,7 @@ uint16_t NesPpu<T>::GetAttributeAddr() {
 template <class T>
 void NesPpu<T>::SetBusAddress(uint16_t addr) {
 	_ppuBusAddress = addr;
-	if (_mapper->HasVramAddressHook()) {
+	if (_mapper->HasVramAddressHook()) [[unlikely]] {
 		_mapper->NotifyVramAddressChange(addr);
 	}
 }
@@ -1361,11 +1361,11 @@ void NesPpu<T>::ProcessOamCorruption() {
 
 template <class T>
 void NesPpu<T>::Exec() {
-	if (_cycle < 340) {
+	if (_cycle < 340) [[likely]] {
 		// Process cycles 1 to 340
 		_cycle++;
 
-		if (_scanline < 240) {
+		if (_scanline < 240) [[likely]] {
 			((T*)this)->ProcessScanline();
 		} else if (_cycle == 1 && _scanline == _nmiScanline) {
 			if (!_preventVblFlag) {

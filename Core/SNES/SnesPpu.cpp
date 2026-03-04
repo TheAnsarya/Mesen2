@@ -959,7 +959,7 @@ void SnesPpu::RenderScanline() {
 
 		PrecomputeWindowMasks();
 
-		if (_state.ForcedBlank) {
+		if (_state.ForcedBlank) [[unlikely]] {
 			// Forced blank, output black
 			memset(_mainScreenBuffer + _drawStartX, 0, (_drawEndX - _drawStartX + 1) * 2);
 			memset(_subScreenBuffer + _drawStartX, 0, (_drawEndX - _drawStartX + 1) * 2);

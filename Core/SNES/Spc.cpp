@@ -162,7 +162,7 @@ void Spc::IncCycleCount(int32_t addr) {
 	static constexpr uint8_t timerMultiplier[4] = {2, 4, 8, 16};
 
 	uint8_t speedSelect;
-	if (addr < 0 || ((addr & 0xFFF0) == 0x00F0) || (addr >= 0xFFC0 && _state.RomEnabled)) {
+	if (addr < 0 || ((addr & 0xFFF0) == 0x00F0) || (addr >= 0xFFC0 && _state.RomEnabled)) [[unlikely]] {
 		// Use internal speed (bits 4-5) for idle cycles, register access or IPL rom access
 		speedSelect = _state.InternalSpeed;
 	} else {
@@ -241,7 +241,7 @@ uint8_t Spc::Read(uint16_t addr, MemoryOperationType type) {
 	IncCycleCount(addr);
 
 	uint8_t value;
-	if (addr >= 0xFFC0 && _state.RomEnabled) {
+	if (addr >= 0xFFC0 && _state.RomEnabled) [[unlikely]] {
 		value = _spcBios[addr & 0x3F];
 	} else {
 		switch (addr) {
