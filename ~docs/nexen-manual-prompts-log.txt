@@ -380,6 +380,32 @@ only do the open PRS, old closed prs don't matter; continue working;
 
 [pansy] update the copilot instructions to match Nexen's, always format, always tabs not spaces, K&R braces, always do before/after performance benchmarks, always do before/after testing suite & correcteness tests, always update issues and git commit and tie commits to issues, format (and lint) before every commit, and make and update issues for all work efforts, make documentation and plans and issues and code-plans before you implement, ***add all of this to the copilot instructions, and then also use these instructions for this and all fututure work***; and work through all the issues and other planned changes (document, make issues, test and benchmark before/after all code changes and find the most efficient data structures); continue;
 
+[Nexen] (pansy) make sure the pansy file is fully implemeneted in Nexen (DRAWN, READ, INDIRECT ?), and find any performance issues for implementing and create performance benchmarks and tests and find stuff to improve; continue; [Pansy] git commit everything; update the documentation snf file format and continue; [poppy & peony] use the expanded `pansy` file format to do your work better; copy/merge the `copilot instructions` from `pansy`, add tests and benchmarks for everything, make and find new issues and work through current issues; continue;
+
+continue working on this;
+
+You crashed or stopped responding or something; Work on issues for Nexen, Pansy, Peony, and Poppy! ; continue;
+
+resume work;
+
+[Nexen] You are spiraling and wasting resources, stop that; build me a Nexen version to test, the current one doesn't show the loading save states or Menus, the menubar menu labels are displayed but they don't open a menu. so we can't do anything in the app; forget about the reported crash issue for now until we can even use the open menu; continue;
+
+[Nexen] Opening NES roms like DW4 works fine, opening `C:\~reference-roms\Donkey Kong (JU) (V1.0) [S][!].gb` for the GameBoy crashes Nexen immediately. Menus are opening. Focus on the gameboy angle and that particular file for why things crash; continue;
+
+[Nexen] the C# code has logging, does the c++ code actually log to a file? make it log to a file if not, so those debug messages can be seen by the AI and we can find the reqal problem instead of spiraling; continue;
+
+[Nexen] if you can't solve this problem immediately, by looking at c++ logs after building and running the emulator/rom, then document all your work for future development and then switch to working through current Nexen github issues; continue;
+
+it worked! continue;
+
+[Nexen] git commit everything, create all the documents and updates and `readme.md` changes for `1.3.1` but don't release it yet, build and run so I can make sure it's ok, then wait for me to tell you to release the `1.3.1` version to github;
+
+[Nexen] release `1.3.1` to github and add a comment to `https://github.com/TheAnsarya/Nexen/issues/548` about the release; continue working on issues; continue;
+
+Nexen is not running! [Nexen] git commit everything, create all the documents and updates and `readme.md` changes for `1.3.1` but don't release it yet, build and run so I can make sure it's ok, then wait for me to tell you to release the `1.3.1` version to github;
+
+[Nexen] git commit all the files in all projects in workspace; release `1.3.1` to github; update docs and `readme.md` and plans and update `https://github.com/TheAnsarya/Nexen/issues/548` with a comment about the release and how you can now play `Donkey Kong` and ask if there are any other problems to fix or enhancements they would like; continue working issues;
+
 
 
 
