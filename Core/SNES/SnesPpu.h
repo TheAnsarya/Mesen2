@@ -264,7 +264,11 @@ private:
 	/// Used for transparency, shadows, and special effects.
 	/// </summary>
 	void ApplyColorMath();
-	void ApplyColorMathToPixel(uint16_t& pixelA, uint16_t pixelB, int x, bool isInsideWindow);
+
+	__forceinline void ApplyColorMathToPixel(
+		uint16_t& pixelA, uint16_t pixelB, int x, bool isInsideWindow,
+		ColorWindowMode clipMode, ColorWindowMode preventMode,
+		bool subtractMode, bool addSubscreen, uint16_t fixedColor, uint8_t baseHalfShift);
 
 	/// <summary>Applies master brightness to all pixels ($2100 setting).</summary>
 	template <bool forMainScreen>

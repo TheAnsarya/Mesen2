@@ -1338,6 +1338,15 @@ void SnesPpu::ApplyColorMath() {
 		DebugProcessMainSubScreenViews();
 	}
 
+	// Hoist all mode reads out of the per-pixel loop — these are constant
+	// within a single RenderScanline() call (HDMA only changes between calls)
+	ColorWindowMode clipMode = _state.ColorMathClipMode;
+	ColorWindowMode preventMode = _state.ColorMathPreventMode;
+	bool subtractMode = _state.ColorMathSubtractMode;
+	bool addSubscreen = _state.ColorMathAddSubscreen;
+	uint16_t fixedColor = _state.FixedColor;
+	uint8_t baseHalfShift = (uint8_t)_state.ColorMathHalveResult;
+
 	bool hiResMode = _state.HiResMode || _state.BgMode == 5 || _state.BgMode == 6;
 
 	if (hiResMode) {
@@ -1349,23 +1358,30 @@ void SnesPpu::ApplyColorMath() {
 			// Apply the color math based on the previous main pixel
 			uint16_t prevMainPixel = x > 0 ? _mainScreenBuffer[x - 1] : 0;
 			int prevX = x > 0 ? x - 1 : 0;
-			ApplyColorMathToPixel(_subScreenBuffer[x], prevMainPixel, prevX, isInsideWindow);
+			ApplyColorMathToPixel(_subScreenBuffer[x], prevMainPixel, prevX, isInsideWindow,
+				clipMode, preventMode, subtractMode, addSubscreen, fixedColor, baseHalfShift);
 
-			ApplyColorMathToPixel(_mainScreenBuffer[x], subPixel, x, isInsideWindow);
+			ApplyColorMathToPixel(_mainScreenBuffer[x], subPixel, x, isInsideWindow,
+				clipMode, preventMode, subtractMode, addSubscreen, fixedColor, baseHalfShift);
 		}
 	} else {
 		for (int x = _drawStartX; x <= _drawEndX; x++) {
 			bool isInsideWindow = _windowMask[SnesPpu::ColorWindowIndex][x];
-			ApplyColorMathToPixel(_mainScreenBuffer[x], _subScreenBuffer[x], x, isInsideWindow);
+			ApplyColorMathToPixel(_mainScreenBuffer[x], _subScreenBuffer[x], x, isInsideWindow,
+				clipMode, preventMode, subtractMode, addSubscreen, fixedColor, baseHalfShift);
 		}
 	}
 }
 
-void SnesPpu::ApplyColorMathToPixel(uint16_t& pixelA, uint16_t pixelB, int x, bool isInsideWindow) {
-	uint8_t halfShift = (uint8_t)_state.ColorMathHalveResult;
+void SnesPpu::ApplyColorMathToPixel(
+	uint16_t& pixelA, uint16_t pixelB, int x, bool isInsideWindow,
+	ColorWindowMode clipMode, ColorWindowMode preventMode,
+	bool subtractMode, bool addSubscreen, uint16_t fixedColor, uint8_t baseHalfShift) {
+
+	uint8_t halfShift = baseHalfShift;
 
 	// Set color to black as needed based on clip mode
-	switch (_state.ColorMathClipMode) {
+	switch (clipMode) {
 		default:
 		case ColorWindowMode::Never:
 			break;
@@ -1395,7 +1411,7 @@ void SnesPpu::ApplyColorMathToPixel(uint16_t& pixelA, uint16_t pixelB, int x, bo
 	}
 
 	// Prevent color math as needed based on mode
-	switch (_state.ColorMathPreventMode) {
+	switch (preventMode) {
 		default:
 		case ColorWindowMode::Never:
 			break;
@@ -1417,20 +1433,20 @@ void SnesPpu::ApplyColorMathToPixel(uint16_t& pixelA, uint16_t pixelB, int x, bo
 	}
 
 	uint16_t otherPixel;
-	if (_state.ColorMathAddSubscreen) {
+	if (addSubscreen) {
 		if (_subScreenPriority[x] > 0) {
 			otherPixel = pixelB;
 		} else {
 			// there's nothing in the subscreen at this pixel, use the fixed color and disable halve operation
-			otherPixel = _state.FixedColor;
+			otherPixel = fixedColor;
 			halfShift = 0;
 		}
 	} else {
-		otherPixel = _state.FixedColor;
+		otherPixel = fixedColor;
 	}
 
 	constexpr unsigned int mask = 0x1F;
-	if (_state.ColorMathSubtractMode) {
+	if (subtractMode) {
 		uint16_t r = std::max((int)((pixelA & mask) - (otherPixel & mask)), 0) >> halfShift;
 		uint16_t g = std::max((int)(((pixelA >> 5U) & mask) - ((otherPixel >> 5U) & mask)), 0) >> halfShift;
 		uint16_t b = std::max((int)(((pixelA >> 10U) & mask) - ((otherPixel >> 10U) & mask)), 0) >> halfShift;
