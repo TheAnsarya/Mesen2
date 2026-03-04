@@ -15,6 +15,8 @@
 Rainbow::Rainbow() {
 }
 
+Rainbow::~Rainbow() = default;
+
 void Rainbow::InitMapper() {
 	_audio = std::make_unique<RainbowAudio>(_console);
 	_prgFlash = std::make_unique<FlashS29>(_prgRom, _prgSize);

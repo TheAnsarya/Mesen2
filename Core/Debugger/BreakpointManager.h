@@ -89,6 +89,11 @@ public:
 	BreakpointManager(Debugger* debugger, IDebugger* cpuDebugger, CpuType cpuType, BaseEventManager* eventManager);
 
 	/// <summary>
+	/// Destructor defined out-of-line where ExpressionEvaluator is complete.
+	/// </summary>
+	~BreakpointManager();
+
+	/// <summary>
 	/// Set breakpoint list (replaces all existing).
 	/// </summary>
 	/// <param name="breakpoints">New breakpoint array</param>

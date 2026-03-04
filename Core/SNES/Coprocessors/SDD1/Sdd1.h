@@ -39,6 +39,12 @@ public:
 	Sdd1(SnesConsole* console);
 
 	/// <summary>
+	/// Destructor defined out-of-line in .cpp where Sdd1Mmc is complete,
+	/// required for unique_ptr<Sdd1Mmc> with forward-declared type.
+	/// </summary>
+	~Sdd1();
+
+	/// <summary>
 	/// Serializes S-DD1 state for save states.
 	/// </summary>
 	/// <param name="s">Serializer instance.</param>

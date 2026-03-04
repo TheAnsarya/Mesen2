@@ -8,6 +8,8 @@
 #include "Debugger/BaseEventManager.h"
 #include "Shared/MemoryOperationType.h"
 
+BreakpointManager::~BreakpointManager() = default;
+
 BreakpointManager::BreakpointManager(Debugger* debugger, IDebugger* cpuDebugger, CpuType cpuType, BaseEventManager* eventManager) {
 	_debugger = debugger;
 	_cpuDebugger = cpuDebugger;

@@ -157,6 +157,11 @@ protected:
 public:
 	Rainbow();
 
+	/// <summary>
+	/// Destructor defined out-of-line where RainbowAudio and FlashS29 are complete.
+	/// </summary>
+	~Rainbow();
+
 	void WriteRam(uint16_t addr, uint8_t value) override;
 	uint8_t ReadRam(uint16_t addr) override;
 
