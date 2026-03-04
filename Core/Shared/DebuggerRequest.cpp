@@ -12,8 +12,10 @@ DebuggerRequest::DebuggerRequest(Emulator* emu) {
 
 DebuggerRequest::DebuggerRequest(const DebuggerRequest& copy) {
 	_emu = copy._emu;
-	_debugger = copy._emu->_debugger.lock();
-	_emu->_debugRequestCount++;
+	if (_emu) {
+		_debugger = _emu->_debugger.lock();
+		_emu->_debugRequestCount++;
+	}
 }
 
 DebuggerRequest::~DebuggerRequest() {
