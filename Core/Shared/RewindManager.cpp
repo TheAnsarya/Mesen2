@@ -322,8 +322,24 @@ void RewindManager::ProcessEndOfFrame() {
 				_currentHistory = _historyBackup.front();
 			}
 		}
-	} else if (_currentHistory.FrameCount >= RewindManager::BufferSize) {
-		AddHistoryBlock();
+	} else {
+		// Scale rewind recording interval with emulation speed.
+		// At normal speed, record every 30 frames (~0.5s at 60fps).
+		// At 2x, every 60 frames; at 3x, every 90, etc.
+		// This keeps approximate real-time recording frequency constant,
+		// avoiding the proportional overhead increase at high speed.
+		int32_t threshold = BufferSize;
+		uint32_t speed = _settings->GetEmulationSpeed();
+		if (speed == 0) {
+			// Max speed (unlimited): record every 300 frames (~5s at 60fps)
+			threshold = BufferSize * 10;
+		} else if (speed > 100) {
+			threshold = BufferSize * static_cast<int32_t>(speed) / 100;
+		}
+
+		if (_currentHistory.FrameCount >= threshold) {
+			AddHistoryBlock();
+		}
 	}
 }
 
