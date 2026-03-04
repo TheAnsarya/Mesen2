@@ -52,6 +52,9 @@ public:
 	/// <summary>Read the next byte from cart (CARTDATA access)</summary>
 	[[nodiscard]] uint8_t ReadData();
 
+	/// <summary>Write a byte to cart bus (SRAM-equipped carts only, auto-increments)</summary>
+	void WriteData(uint8_t value);
+
 	/// <summary>Peek at current cart data byte without advancing counter</summary>
 	[[nodiscard]] uint8_t PeekData() const;
 

@@ -104,5 +104,7 @@ public:
 	[[nodiscard]] uint32_t GetWorkRamSize() { return _workRamSize; }
 	[[nodiscard]] uint8_t* GetPrgRom() { return _prgRom.get(); }
 	[[nodiscard]] uint32_t GetPrgRomSize() { return _prgRomSize; }
+	[[nodiscard]] uint8_t* GetSaveRam() { return _saveRam.get(); }
+	[[nodiscard]] uint32_t GetSaveRamSize() { return _saveRamSize; }
 	[[nodiscard]] uint32_t* GetFrameBuffer() { return _frameBuffer; }
 };

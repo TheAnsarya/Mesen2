@@ -754,9 +754,17 @@ void LynxMikey::WriteRegister(uint8_t addr, uint8_t value) {
 			return;
 		}
 
-		// SYSCTL1 ($FD87)
+		// SYSCTL1 ($FD87) — System Control 1
 		case 0x87:
-			// TODO: system control (power off, cart power, etc.)
+			// Bit 1: Cart address strobe — directly selects CART0 (bank 0) or CART1 (bank 1)
+			// When bit 1 changes, it drives the CART0/CART1 accent line on the cart bus.
+			// Handy: mCartAddressStrobe = (value & 0x02) != 0
+			if (_cart) {
+				_cart->SelectBank((value & 0x02) ? 1 : 0);
+			}
+			// Bit 0: Power off — puts the Lynx into standby mode (hardware sleep)
+			// Bit 2: Cart power — enables/disables cartridge power rail
+			// These are physical hardware signals with no emulation effect.
 			return;
 
 		default:

@@ -206,6 +206,9 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 	// MUST be called before HLE boot state, as Init() zeroes all Mikey state
 	_mikey->Init(_emu, this, _cpu.get(), _memoryManager.get());
 
+	// Wire cart to Mikey for SYSCTL1 bank strobe
+	_mikey->SetCart(_cart.get());
+
 	// Initialize APU (audio channels, integrated into Mikey)
 	_apu = std::make_unique<LynxApu>(_emu, this);
 	_apu->Init();

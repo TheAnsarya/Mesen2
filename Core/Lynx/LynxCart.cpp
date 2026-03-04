@@ -51,6 +51,22 @@ uint8_t LynxCart::ReadData() {
 	return value;
 }
 
+void LynxCart::WriteData(uint8_t value) {
+	// Write to cart bus — used by games with writable cart SRAM (homebrew/multicarts).
+	// The EEPROM is accessed via Mikey I/O pins, NOT through this path.
+	// On hardware, this drives the data bus toward the cart and strobes WE.
+	// We write into SaveRAM if available, otherwise the write is ignored.
+	uint8_t* saveRam = _console->GetSaveRam();
+	uint32_t saveRamSize = _console->GetSaveRamSize();
+	if (saveRam && saveRamSize > 0) {
+		uint32_t addr = _state.AddressCounter;
+		if (addr < saveRamSize) {
+			saveRam[addr] = value;
+		}
+	}
+	_state.AddressCounter++;
+}
+
 uint8_t LynxCart::PeekData() const {
 	uint32_t addr = GetCurrentRomAddress();
 	if (addr < _romSize) {

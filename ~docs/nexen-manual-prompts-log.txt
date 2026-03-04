@@ -406,7 +406,69 @@ Nexen is not running! [Nexen] git commit everything, create all the documents an
 
 [Nexen] git commit all the files in all projects in workspace; release `1.3.1` to github; update docs and `readme.md` and plans and update `https://github.com/TheAnsarya/Nexen/issues/548` with a comment about the release and how you can now play `Donkey Kong` and ask if there are any other problems to fix or enhancements they would like; continue working issues;
 
+[Nexen] Work through github issues, and research, update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; make tests and benchmarks and issues for all work and changes; continue for a long time; continue;
 
+[Nexen] (Atari Lynx) Playing games requires a firmare ROM, but of the ones I have (`D:\Roms\TOSEC\Atari\Lynx\Firmware\*.bin`) were said to not be the correct firmware, find online/(or in the computer) the correct lynx bios roms and then include them in the Nexen emulator because nobody gives a shit about copyright for the Atari Lynx, put them in a firmware folder and auto-load them and include them in the build; continue;
+
+[Nexen] (Atari Lynx/Other) Work through github issues, and research, update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; make tests and benchmarks and issues for all work and changes; If the work effort seems too large to do in one session, so you need several to complete the issue, then make plans and subissues and code-plans, and tons of documents, and benchmarks and tests, and even more docs; continue for a long time; continue;
+
+[Nexen] (Atari Lynx/Other) Work through github issues, and research, update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; make tests and benchmarks and issues for all work and changes; If the work effort seems too large to do in one session, so you need several to complete the issue, then make plans and subissues and code-plans, and tons of documents, and benchmarks and tests, and even more docs; continue for a long time; continue;
+
+[Nexen/Poppy/Pansy/Peony] Work through issues; continue; [Peony] Create (multiple sessions if needed) a giant `*.md` markdown documentation with multiple subfiles if needed, for: Describe how the the Peony dissaembler works and how it uses cdl and pansy files and the architecture used and the flow and describe/document everything, we need to know how the app disassembles the game so we can correct and improve it; continue;
+
+--- stop
+
+[Nexen] (Atari Lynx/Other) Work through github issues, and research, update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; make tests and benchmarks and issues for all work and changes; If the work effort seems too large to do in one session, so you need several to complete the issue, then make plans and subissues and code-plans, and tons of documents, and benchmarks and tests, and even more docs; continue for a long time; continue;
+
+
+
+
+
+[Nexen/Poppy/Pansy/Peony] Work through issues; continue; [Peony] Create (multiple sessions if needed) a giant `*.md` markdown documentation with multiple subfiles if needed, for: Describe how the the Peony dissaembler works and how it uses cdl and pansy files and the architecture used and the flow and describe/document everything, we need to know how the app disassembles the game so we can correct and improve it; continue;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[Nexen] 
 
 
 

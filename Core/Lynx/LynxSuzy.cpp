@@ -1116,14 +1116,13 @@ void LynxSuzy::WriteRegister(uint8_t addr, uint8_t value) {
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f: break;
 
 		// Cart access registers (FCB2-FCB3) — write path
-		// In Handy, writes to RCART0/RCART1 call Poke0/Poke1 which write to
-		// cart memory (for EEPROM save) at the current address and increment
-		// the counter. This is needed for games that save to EEPROM.
-		// TODO: Implement EEPROM write support — requires writable EEPROM
-		// buffer, EEPROM protocol emulation (93C46/93C66/93C86), and
-		// persistence to disk. See #499.
+		// Writes to RCART0/RCART1 push data into the cartridge at the current
+		// address counter and auto-increment. Bank selection is handled via
+		// SYSCTL1 bit 1 in Mikey. The cart WriteData method writes to SaveRAM
+		// when available, enabling EEPROM/SRAM save persistence.
 		case 0xb2:
 		case 0xb3:
+			_cart->WriteData(value);
 			break;
 
 		default:

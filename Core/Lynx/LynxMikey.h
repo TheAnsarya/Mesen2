@@ -194,6 +194,9 @@ public:
 	/// <summary>Set EEPROM reference (deferred initialization).</summary>
 	void SetEeprom(LynxEeprom* eeprom) { _eeprom = eeprom; }
 
+	/// <summary>Set Cart reference (needed for SYSCTL1 bank strobe).</summary>
+	void SetCart(LynxCart* cart) { _cart = cart; }
+
 	/// <summary>Read a Mikey register.
 	/// Handles timers ($FD00–$FD1F), audio ($FD20–$FD4F), interrupts ($FD80–$FD81),
 	/// display ($FD92–$FD95), palette ($FDA0–$FDBF), serial ($FD8C–$FD8D),
