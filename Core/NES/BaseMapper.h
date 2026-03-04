@@ -70,6 +70,7 @@ private:
 	bool _hasBusConflicts = false;      ///< ROM has bus conflict behavior
 	bool _hasDefaultWorkRam = false;    ///< Mapper has default work RAM at $6000
 
+	bool _hasCustomReadRam = false;     ///< Uses custom CPU ReadRam logic (FDS, Rainbow)
 	bool _hasCustomReadVram = false;    ///< Uses custom VRAM read logic
 	bool _hasCpuClockHook = false;      ///< Requires CPU clock notification
 	bool _hasVramAddressHook = false;   ///< Requires VRAM address change notification
@@ -155,6 +156,7 @@ protected:
 	virtual bool AllowRegisterRead() { return false; }
 
 	virtual bool EnableCpuClockHook() { return false; }
+	virtual bool EnableCustomReadRam() { return false; }
 	virtual bool EnableCustomVramRead() { return false; }
 	virtual bool EnableVramAddressHook() { return false; }
 
@@ -250,6 +252,29 @@ public:
 	[[nodiscard]] bool HasDefaultWorkRam();
 
 	void SetRegion(ConsoleRegion region);
+
+	[[nodiscard]] __forceinline bool HasCustomReadRam() { return _hasCustomReadRam; }
+
+	/// <summary>
+	/// Fast-path CPU read for the common case where ReadRam is not overridden.
+	/// Inlines the page table lookup to avoid virtual dispatch overhead.
+	/// Mirrors the ReadVram/InternalReadVram pattern for VRAM reads.
+	/// </summary>
+	__forceinline uint8_t ReadRamFast(uint16_t addr) {
+		if (!_hasCustomReadRam) [[likely]] {
+			if (_allowRegisterRead && _isReadRegisterAddr[addr]) [[unlikely]] {
+				return ReadRegister(addr);
+			}
+			if (_prgMemoryAccess[addr >> 8] & MemoryAccessType::Read) [[likely]] {
+				return _prgPages[addr >> 8][(uint8_t)addr];
+			}
+			// Open bus fallback: use qualified (non-virtual) call to avoid
+			// repeating NesMemoryManager::GetOpenBus() header dependency.
+			return BaseMapper::ReadRam(addr);
+		} else {
+			return ReadRam(addr);
+		}
+	}
 
 	[[nodiscard]] __forceinline bool HasCpuClockHook() { return _hasCpuClockHook; }
 	virtual void ProcessCpuClock();

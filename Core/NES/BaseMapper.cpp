@@ -625,6 +625,7 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData) {
 	}
 
 	_allowRegisterRead = AllowRegisterRead();
+	_hasCustomReadRam = EnableCustomReadRam();
 	_hasCpuClockHook = EnableCpuClockHook();
 	_hasCustomReadVram = EnableCustomVramRead();
 	_hasVramAddressHook = EnableVramAddressHook();

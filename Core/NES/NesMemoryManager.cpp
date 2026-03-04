@@ -116,7 +116,16 @@ uint16_t NesMemoryManager::DebugReadWord(uint16_t addr) {
 }
 
 uint8_t NesMemoryManager::Read(uint16_t addr, MemoryOperationType operationType) {
-	uint8_t value = _ramReadHandlers[addr]->ReadRam(addr);
+	INesMemoryHandler* handler = _ramReadHandlers[addr];
+	uint8_t value;
+	if (handler == _mapper) [[likely]] {
+		// Fast path: ~60% of reads hit the mapper (PRG ROM).
+		// ReadRamFast inlines the page table lookup, avoiding virtual dispatch.
+		value = _mapper->ReadRamFast(addr);
+	} else {
+		value = handler->ReadRam(addr);
+	}
+
 	if (_cheatManager->HasCheats<CpuType::Nes>()) [[unlikely]] {
 		_cheatManager->ApplyCheat<CpuType::Nes>(addr, value);
 	}

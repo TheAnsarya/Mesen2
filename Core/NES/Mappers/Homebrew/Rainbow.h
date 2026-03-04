@@ -164,6 +164,7 @@ public:
 
 	void WriteRam(uint16_t addr, uint8_t value) override;
 	uint8_t ReadRam(uint16_t addr) override;
+	bool EnableCustomReadRam() override { return true; }
 
 	void ProcessCpuClock() override;
 
