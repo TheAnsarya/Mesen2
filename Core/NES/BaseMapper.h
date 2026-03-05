@@ -125,7 +125,7 @@ protected:
 	/// Initialize mapper state (called after ROM load)
 	virtual void InitMapper() = 0;
 	virtual void InitMapper(RomData& romData);
-	
+
 	/// Get PRG page size for bank switching (typically 8KB, 16KB, or 32KB)
 	virtual uint16_t GetPrgPageSize() = 0;
 	/// Get CHR page size for bank switching (typically 1KB, 2KB, or 8KB)
