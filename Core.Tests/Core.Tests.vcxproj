@@ -175,6 +175,9 @@
 		<ClCompile Include="Lynx\LynxUartTests.cpp">
 			<PrecompiledHeader>Use</PrecompiledHeader>
 		</ClCompile>
+		<ClCompile Include="Lynx\AtariLynxFormatTests.cpp">
+			<PrecompiledHeader>Use</PrecompiledHeader>
+		</ClCompile>
 		<ClCompile Include="Lynx\LynxApuTests.cpp">
 			<PrecompiledHeader>Use</PrecompiledHeader>
 		</ClCompile>
