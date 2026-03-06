@@ -10,6 +10,7 @@
 #include "Lynx/LynxApu.h"
 #include "Lynx/LynxEeprom.h"
 #include "Lynx/LynxGameDatabase.h"
+#include "Lynx/AtariLynxFormat.h"
 #include "Utilities/CRC32.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
@@ -31,17 +32,52 @@ LynxConsole::~LynxConsole() {
 LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 
 	vector<uint8_t> romData;
-	if (!romFile.ReadFile(romData) || romData.size() < 64) {
+	if (!romFile.ReadFile(romData) || romData.size() < 32) {
 		return LoadRomResult::Failure;
 	}
 
-	// Check for LNX header: magic bytes "LYNX" at offset 0
-	bool hasLnxHeader = (romData[0] == 'L' && romData[1] == 'Y' && romData[2] == 'N' && romData[3] == 'X');
-	uint32_t romOffset = 0;
-
 	MessageManager::Log("------------------------------");
 
-	if (hasLnxHeader) {
+	// Detect format and extract ROM data + metadata
+	// Three supported formats: .atari-lynx (LYNXROM magic), LNX (LYNX magic), raw (LYX/O)
+	bool hasLnxHeader = false;
+	bool hasAtariLynxHeader = false;
+	uint32_t romOffset = 0;
+	AtariLynxMetadata atariLynxMeta;
+	bool hasAtariLynxMeta = false;
+
+	if (AtariLynxFormat::IsAtariLynxFormat(romData.data(), romData.size())) {
+		// .atari-lynx format — parse with the format reader
+		hasAtariLynxHeader = true;
+		auto result = AtariLynxFormat::Load(romData.data(), romData.size());
+		if (!result.Success) {
+			MessageManager::Log(std::format("Failed to load .atari-lynx file: {}", result.Error));
+			return LoadRomResult::Failure;
+		}
+
+		// Replace romData with extracted ROM data for the rest of the pipeline
+		romData = std::move(result.RomData);
+		romOffset = 0;
+		atariLynxMeta = std::move(result.Metadata);
+		hasAtariLynxMeta = result.HasMetadata;
+
+		// Apply rotation from metadata
+		switch (atariLynxMeta.Rotation) {
+			case 1: _rotation = LynxRotation::Left; break;
+			case 2: _rotation = LynxRotation::Right; break;
+			default: _rotation = LynxRotation::None; break;
+		}
+
+		MessageManager::Log(".atari-lynx format:");
+		if (hasAtariLynxMeta && !atariLynxMeta.CartName.empty()) {
+			MessageManager::Log(std::format("  Cart Name: {}", atariLynxMeta.CartName));
+		}
+		if (hasAtariLynxMeta && !atariLynxMeta.Manufacturer.empty()) {
+			MessageManager::Log(std::format("  Manufacturer: {}", atariLynxMeta.Manufacturer));
+		}
+	} else if (AtariLynxFormat::IsLnxFormat(romData.data(), romData.size())) {
+		// LNX format — 64-byte header
+		hasLnxHeader = true;
 		// LNX header is 64 bytes
 		// Bytes 0-3: "LYNX" magic
 		// Bytes 4-5: Bank 0 page size (little-endian, in 256-byte pages)
@@ -145,7 +181,21 @@ LoadRomResult LynxConsole::LoadRom(VirtualFile& romFile) {
 
 	// Initialize cart
 	LynxCartInfo cartInfo = {};
-	if (hasLnxHeader) {
+	if (hasAtariLynxHeader && hasAtariLynxMeta) {
+		// .atari-lynx format — populate from parsed metadata
+		cartInfo.PageSizeBank0 = atariLynxMeta.Bank0PageSize;
+		cartInfo.PageSizeBank1 = atariLynxMeta.Bank1PageSize;
+		cartInfo.RomSize = _prgRomSize;
+		strncpy(cartInfo.Name, atariLynxMeta.CartName.c_str(), 32);
+		cartInfo.Name[32] = '\0';
+		strncpy(cartInfo.Manufacturer, atariLynxMeta.Manufacturer.c_str(), 16);
+		cartInfo.Manufacturer[16] = '\0';
+		cartInfo.Rotation = static_cast<LynxRotation>(atariLynxMeta.Rotation);
+		if (atariLynxMeta.EepromType >= 1 && atariLynxMeta.EepromType <= 5) {
+			cartInfo.HasEeprom = true;
+			cartInfo.EepromType = static_cast<LynxEepromType>(atariLynxMeta.EepromType);
+		}
+	} else if (hasLnxHeader) {
 		uint16_t bank0Pages = romData[4] | (romData[5] << 8);
 		uint16_t bank1Pages = romData[6] | (romData[7] << 8);
 		cartInfo.PageSizeBank0 = bank0Pages;

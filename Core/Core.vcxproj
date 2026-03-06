@@ -803,6 +803,7 @@
     <ClInclude Include="WS\WsSerial.h" />
     <ClInclude Include="WS\WsTimer.h" />
     <ClInclude Include="WS\WsTypes.h" />
+    <ClInclude Include="Lynx\AtariLynxFormat.h" />
     <ClInclude Include="Lynx\LynxCart.h" />
     <ClInclude Include="Lynx\LynxConsole.h" />
     <ClInclude Include="Lynx\LynxController.h" />
@@ -1122,6 +1123,7 @@
     <ClCompile Include="WS\Debugger\WsEventManager.cpp" />
     <ClCompile Include="WS\Debugger\WsPpuTools.cpp" />
     <ClCompile Include="WS\Debugger\WsTraceLogger.cpp" />
+    <ClCompile Include="Lynx\AtariLynxFormat.cpp" />
     <ClCompile Include="Lynx\LynxCart.cpp" />
     <ClCompile Include="Lynx\LynxConsole.cpp" />
     <ClCompile Include="Lynx\LynxControlManager.cpp" />
