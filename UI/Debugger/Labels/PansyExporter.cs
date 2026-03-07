@@ -587,19 +587,16 @@ public static class PansyExporter {
 			0xfffe, 0xffff, // IRQ/BRK vector
 		};
 
-		// Estimate ~20 bytes per symbol (4+1+1+1+1+2+avg10 name)
-		using var ms = new MemoryStream((count * 20) + 4);
+		// Pansy spec: No count prefix. Per entry: Address(4)+Type(1)+Flags(1)+NameLen(2)+Name+ValueLen(2)
+		using var ms = new MemoryStream(count * 18);
 		using var writer = new BinaryWriter(ms);
-
-		writer.Write((uint)count);
 
 		// Optimized: Direct iteration instead of LINQ Where().ToList()
 		foreach (var label in labels) {
 			if (string.IsNullOrEmpty(label.Label)) continue;
 
 			// Address (4 bytes)
-			uint addressWithFlags = (uint)label.Address;
-			writer.Write(addressWithFlags);
+			writer.Write((uint)label.Address);
 
 			// Type (1 byte): Detect symbol type from context
 			byte symbolType = DetectSymbolType(label, functionSet, interruptVectors);
@@ -608,16 +605,13 @@ public static class PansyExporter {
 			// Flags (1 byte)
 			writer.Write((byte)0);
 
-			// Memory type (1 byte) - encode as custom byte
-			writer.Write((byte)label.MemoryType);
-
-			// Reserved (1 byte)
-			writer.Write((byte)0);
-
 			// Name length + name
 			byte[] nameBytes = Encoding.UTF8.GetBytes(label.Label);
 			writer.Write((ushort)nameBytes.Length);
 			writer.Write(nameBytes);
+
+			// Value length (2 bytes) - no value for labels
+			writer.Write((ushort)0);
 		}
 
 		return ms.ToArray();
@@ -630,11 +624,9 @@ public static class PansyExporter {
 			if (!string.IsNullOrEmpty(label.Comment)) count++;
 		}
 
-		// Estimate ~30 bytes per comment (4+1+1+2+2+avg20 comment)
-		using var ms = new MemoryStream((count * 30) + 4);
+		// Pansy spec: No count prefix. Per entry: Address(4)+Type(1)+TextLen(2)+Text
+		using var ms = new MemoryStream(count * 27);
 		using var writer = new BinaryWriter(ms);
-
-		writer.Write((uint)count);
 
 		// Optimized: Direct iteration instead of LINQ Where().ToList()
 		foreach (var label in labels) {
@@ -646,12 +638,6 @@ public static class PansyExporter {
 			// Type (1 byte): Detect comment type
 			byte commentType = DetectCommentType(label.Comment);
 			writer.Write(commentType);
-
-			// Memory type (1 byte)
-			writer.Write((byte)label.MemoryType);
-
-			// Reserved (2 bytes)
-			writer.Write((ushort)0);
 
 			// Comment length + text
 			byte[] commentBytes = Encoding.UTF8.GetBytes(label.Comment);
@@ -690,8 +676,8 @@ public static class PansyExporter {
 
 		// Memory regions are labels with length > 1
 		var regions = labels.Where(l => l.Length > 1 && !string.IsNullOrEmpty(l.Label)).ToList();
-		writer.Write((uint)regions.Count);
 
+		// Pansy spec: No count prefix. Per region: Start(4)+End(4)+Type(1)+Bank(1)+Flags(2)+NameLen(2)+Name
 		foreach (var region in regions) {
 			// Start address (4 bytes)
 			writer.Write((uint)region.Address);
@@ -703,8 +689,8 @@ public static class PansyExporter {
 			byte regionType = region.MemoryType.IsRomMemory() ? (byte)MemoryRegionType.Rom : (byte)MemoryRegionType.Ram;
 			writer.Write(regionType);
 
-			// Memory type (1 byte)
-			writer.Write((byte)region.MemoryType);
+			// Bank (1 byte)
+			writer.Write((byte)0);
 
 			// Flags (2 bytes)
 			writer.Write((ushort)0);
@@ -746,17 +732,16 @@ public static class PansyExporter {
 		allRegions.Sort((a, b) => a.Start.CompareTo(b.Start));
 
 		// Estimate ~20 bytes per region
-		using var ms = new MemoryStream((allRegions.Count * 20) + 4);
+		// Pansy spec: No count prefix. Per region: Start(4)+End(4)+Type(1)+Bank(1)+Flags(2)+NameLen(2)+Name
+		using var ms = new MemoryStream(allRegions.Count * 20);
 		using var writer = new BinaryWriter(ms);
 
-		writer.Write((uint)allRegions.Count);
-
 		foreach (var region in allRegions) {
-			writer.Write(region.Start);        // Start address (4 bytes)
-			writer.Write(region.End);            // End address (4 bytes)
-			writer.Write((byte)region.Type);      // Type (1 byte)
-			writer.Write(region.MemType);        // Memory type (1 byte)
-			writer.Write((ushort)0);              // Flags (2 bytes)
+			writer.Write(region.Start);           // Start address (4 bytes)
+			writer.Write(region.End);             // End address (4 bytes)
+			writer.Write((byte)region.Type);      // Type (1 byte) - MemoryRegionType
+			writer.Write((byte)0);                // Bank (1 byte)
+			writer.Write((ushort)0);              // Flags (2 bytes reserved)
 
 			byte[] nameBytes = Encoding.UTF8.GetBytes(region.Name);
 			writer.Write((ushort)nameBytes.Length);
@@ -908,17 +893,11 @@ public static class PansyExporter {
 		// Future: Could query actual disassembly for JSR/JMP/branch targets
 		List<(uint From, uint To, byte Type)> xrefs = [];
 
-		// Placeholder - in a full implementation, we would scan the disassembly
-		// for instructions that reference labeled addresses
-		writer.Write((uint)xrefs.Count);
-
+		// Pansy spec: No count prefix. Per xref: From(4)+To(4)+Type(1)
 		foreach (var xref in xrefs) {
 			writer.Write(xref.From);    // Source address (4 bytes)
-			writer.Write(xref.To);    // Target address (4 bytes)
-			writer.Write(xref.Type);    // Type: 1=Call, 2=Jump, 3=Read, 4=Write
-			writer.Write((byte)0);    // Memory type from
-			writer.Write((byte)0);    // Memory type to
-			writer.Write((byte)0);    // Flags
+			writer.Write(xref.To);      // Target address (4 bytes)
+			writer.Write(xref.Type);    // Type: 1=Jsr, 2=Jmp, 3=Branch, 4=Read, 5=Write
 		}
 
 		return ms.ToArray();
@@ -931,11 +910,8 @@ public static class PansyExporter {
 	/// </summary>
 	private static byte[] BuildEnhancedCrossRefsSection(List<CodeLabel> labels, byte[]? cdlData, uint[] functions, uint[] jumpTargets, CpuType cpuType, MemoryType memType) {
 		if (cdlData is null or { Length: 0 }) {
-			// Return minimal section with zero count
-			using var empty = new MemoryStream(4);
-			using var emptyWriter = new BinaryWriter(empty);
-			emptyWriter.Write((uint)0);
-			return empty.ToArray();
+			// Return empty section (no count prefix per Pansy spec)
+			return [];
 		}
 
 		// Optimized: Use HashSet for O(1) deduplication during collection
@@ -996,19 +972,14 @@ public static class PansyExporter {
 		}
 
 		// Write xrefs - already deduplicated
-		// Optimized: Pre-sized MemoryStream (12 bytes per xref + 4 byte count)
-		using var ms = new MemoryStream((xrefs.Count * 12) + 4);
+		// Pansy spec: No count prefix. Per xref: From(4)+To(4)+Type(1) = 9 bytes each
+		using var ms = new MemoryStream(xrefs.Count * 9);
 		using var writer = new BinaryWriter(ms);
 
-		writer.Write((uint)xrefs.Count);
-
 		foreach (var xref in xrefs) {
-			writer.Write(xref.From);                 // Source address (4 bytes)
+			writer.Write(xref.From);               // Source address (4 bytes)
 			writer.Write(xref.To);                 // Target address (4 bytes)
-			writer.Write((byte)xref.Type);         // Type (1 byte)
-			writer.Write(xref.MemTypeFrom);       // Memory type from (1 byte)
-			writer.Write(xref.MemTypeTo);           // Memory type to (1 byte)
-			writer.Write((byte)0);                 // Flags (1 byte)
+			writer.Write((byte)xref.Type);         // Type (1 byte) - CrossRefType
 		}
 
 		return ms.ToArray();
