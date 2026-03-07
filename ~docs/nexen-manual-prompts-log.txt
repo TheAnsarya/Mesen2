@@ -446,6 +446,30 @@ Are you doing pattern matching bullshit? I told you DO NOT WORK ON THIS unless I
 
 [Peony] don't use percentages to figure out code, use static analysis and the cdl and label and pansy files and the rom and knowlege of the assembly instructions and poppy, etc, and the vscode extension that is code formatting/coloring/intellisense/etc; figure out how to connect to the Nexen emulator so you can review VRAM, etc; [Nexen/Poppy/Pansy/Peony] Work through github issues, and research, update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; make tests and benchmarks and issues for all work and changes; If the work effort seems too large to do in one session, so you need several to complete the issue, then make plans and subissues and code-plans, and tons of documents, and benchmarks and tests, and even more docs; continue for a long time; implement; continue;
 
+[Nexen/pansy] complete all issues and expand with new issues, make sure Nexen updates every field, collection, info block, in the pansy files and update pansy with any new issues/plans/docs/etc for what it tracks, and on [pansy] start at the `readme.md` and make sure all documentation is linked from the readme and update ALL documentation; continue; and make tests and benchmarks for all pansy code to test performance and correctness and find new ways to be more efficient; make issues and pland and docs; go!; continue;
+
+--- stop, add streamhash to workspace
+
+for all hashing an crc32 usage etc use the streamhash repos
+
+[Nexen/pansy] complete all issues and expand with new issues, make sure Nexen updates every field, collection, info block, in the pansy files and update pansy with any new issues/plans/docs/etc for what it tracks, and on [pansy] start at the `readme.md` and make sure all documentation is linked from the readme and update ALL documentation; continue; and make tests and benchmarks for all pansy code to test performance and correctness and find new ways to be more efficient; make issues and plans and docs; go!; continue;
+
+[peony/pansy] create/update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; incorporate pansy with the static code decompilation in peony to generate disassembled code projects; focus on using all available resources for creating disassemblies and asset extractions, etc, and DO NOT use those percentages garbage methods; especially all the new pansy updgrades like code maps and jump analysis, etc.; continue;
+
+[peony/pansy] create/update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; incorporate pansy with the static code decompilation in peony to generate disassembled code projects; focus on using all available resources for creating disassemblies and asset extractions, etc, and DO NOT use those percentages garbage methods as we don't have any data to properly decide what is what, instead use real information; especially all the new pansy updgrades like code maps and jump analysis, etc.; continue;
+
+[peony/pansy] continue working all issues and make new issues for future work, plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc, organize peony (make me a document with the current structure of how we disassemble a rom using peony, make me `*.md` step by step instructions, and then let's streamline this process and output a `*.peony` file that is a zip and has all of the analysis files and input files and outputfiles; make docs and issues ans subissues and plans and chat/session logs, and peony creates a folder with everything disassembled and converts assets and also makes a comprehensive project file, that we can update and then compile/build using (poppy); continue;
+
+[peony/pansy] make sure all pansy data is being used in peony disassemblies, especially the new stuff; make sure Nexen is filling all of the pansy file format when making them, and add more pansy tracking data if and only if it is helpful and easily addable and Nexen can easily do it; go; continue; issues, etc!; continue; [peony/pansy/diz/Nexen] is there information in `*.diz` diztinGUIsh files that is not tracked in pansy files? If so add it to the pansy file format (plans, issues, docs, implement), and then update Nexen to track those new items (issues, docs, plans, benchmarks, tests, performance improvements), and then use those items in peony from pansy instead of diz; continue; in Nexen create performance issues, tests, benchmarks for everything (all new work and recent work, and hot paths) while never endangering emulation accuracy, to make sure pansy saving and tracking does not slow down emulation, etc; continue;
+
+[Pansy/Nexen] Pansy issue #53 `Add CPU State section (0x0009) to Pansy format` this information helps describe code and disassembly but it might slow down emulation; can you add this to pansy (issues, etc) and then add this to Nexen, making tons of tests for correctness and benchmarks for performance; we do not want to be slower after adding this feature; definitely remove diz usage directly, we convert diz to pansy content and then use pansy; continue;
+
+Create elaborate plans and github issues (epics and sub-issues) and documents and git-commits and todos and readmes and code-plans and chat/session logs and pansy and peony and poppy and Nexen should all work together in an integrated pipeline of playing, debugging, disassembly, editing, documentation, building, playing, and debugging again; create/update plans/issues/docs/(chat/session logs)/git-commits/todos/code-plans/readmes/docs/etc; continue;
+
+--- steer
+you mentioned "Cross-Project Gaps" use `game-garden` repos for cross project scripts and meta pipeline stuff; continue;
+
+[Nexen/Poppy/Pansy/Peony/game-garden] continue working issues and update all the supporting docs; continue;
 
 
 
@@ -462,18 +486,7 @@ Are you doing pattern matching bullshit? I told you DO NOT WORK ON THIS unless I
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+Update all four projects (Nexen, poppy, pansy, peony) to dotnet 11 and c#15 and update github CI/CD config to install the sdk (see instructions listed at: https://copilot.microsoft.com/chats/Rkj5Q5ydHbfRjVV36XhGr) 
 
 
 
