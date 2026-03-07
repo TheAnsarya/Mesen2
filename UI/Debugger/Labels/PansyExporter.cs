@@ -50,6 +50,8 @@ public static class PansyExporter {
 
 	// Compression flag in header (PansyFlags.Compressed)
 	private const ushort FLAG_COMPRESSED = 0x0001;
+	// HasCrossRefs flag (bit 2) - indicates cross-reference section present
+	private const ushort FLAG_HAS_CROSS_REFS = 0x0004;
 
 	// Performance: Reusable ArrayPool for CDL conversion (avoids GC pressure)
 	// Benchmark showed 23x speedup and zero allocations vs naive loop
@@ -310,6 +312,10 @@ public static class PansyExporter {
 		// Set HAS_CPU_STATE (bit 4) if CPU state section is present
 		if (cpuStateBytes.Length > 0) {
 			flags |= 0x0010; // HAS_CPU_STATE
+		}
+		// Set HAS_CROSS_REFS (bit 2) if cross-references section is present
+		if (sections.Any(s => s.Type == SECTION_CROSS_REFS)) {
+			flags |= FLAG_HAS_CROSS_REFS;
 		}
 		writer.Write(Encoding.ASCII.GetBytes(MAGIC)); // 8 bytes (offset 0)
 		writer.Write(VERSION);                         // 2 bytes (offset 8)
@@ -671,61 +677,7 @@ public static class PansyExporter {
 		return ms.ToArray();
 	}
 
-	/// <summary>
-	/// Build address list section (jump targets, subroutine entry points).
-	/// Optimized: Pre-sized MemoryStream, bulk write via MemoryMarshal.
-	/// </summary>
-	private static byte[] BuildAddressListSection(uint[] addresses) {
-		// Optimized: Pre-size stream (4 bytes count + 4 bytes per address)
-		using var ms = new MemoryStream((addresses.Length * 4) + 4);
-		using var writer = new BinaryWriter(ms);
 
-		writer.Write((uint)addresses.Length);
-
-		// Optimized: Bulk write using span
-		ReadOnlySpan<byte> addressBytes = MemoryMarshal.AsBytes(addresses.AsSpan());
-		writer.Write(addressBytes);
-
-		return ms.ToArray();
-	}
-
-	/// <summary>
-	/// Build memory regions section from labels with length > 1.
-	/// Phase 3: Enhanced data export.
-	/// </summary>
-	private static byte[] BuildMemoryRegionsSection(List<CodeLabel> labels, MemoryType memType) {
-		using var ms = new MemoryStream();
-		using var writer = new BinaryWriter(ms);
-
-		// Memory regions are labels with length > 1
-		var regions = labels.Where(l => l.Length > 1 && !string.IsNullOrEmpty(l.Label)).ToList();
-
-		// Pansy spec: No count prefix. Per region: Start(4)+End(4)+Type(1)+Bank(1)+Flags(2)+NameLen(2)+Name
-		foreach (var region in regions) {
-			// Start address (4 bytes)
-			writer.Write((uint)region.Address);
-
-			// End address (4 bytes)
-			writer.Write((uint)(region.Address + region.Length - 1));
-
-			// Type (1 byte): Pansy spec MemoryRegionType
-			byte regionType = region.MemoryType.IsRomMemory() ? (byte)PansyMemoryRegionType.ROM : (byte)PansyMemoryRegionType.RAM;
-			writer.Write(regionType);
-
-			// Bank (1 byte)
-			writer.Write((byte)0);
-
-			// Flags (2 bytes)
-			writer.Write((ushort)0);
-
-			// Name length + name
-			byte[] nameBytes = Encoding.UTF8.GetBytes(region.Label);
-			writer.Write((ushort)nameBytes.Length);
-			writer.Write(nameBytes);
-		}
-
-		return ms.ToArray();
-	}
 
 	/// <summary>
 	/// Build enhanced memory regions section including system memory maps.
@@ -851,60 +803,6 @@ public static class PansyExporter {
 	}
 
 	/// <summary>
-	/// Build data blocks section from CDL data.
-	/// Phase 3: Enhanced data export - identifies contiguous data regions.
-	/// Optimized: Inline filtering, pre-sized list, no LINQ.
-	/// </summary>
-	private static byte[] BuildDataBlocksSection(byte[]? cdlData) {
-		if (cdlData is null or { Length: 0 }) {
-			using var empty = new MemoryStream(4);
-			using var emptyWriter = new BinaryWriter(empty);
-			emptyWriter.Write((uint)0);
-			return empty.ToArray();
-		}
-
-		// Find contiguous data blocks with inline size filtering (CDL flag 0x02 = Data)
-		var blocks = new List<(uint Start, uint End)>(128);
-		int? blockStart = null;
-
-		for (int i = 0; i < cdlData.Length; i++) {
-			bool isData = (cdlData[i] & 0x02) != 0 && (cdlData[i] & 0x01) == 0; // Data flag, not code
-
-			if (isData && blockStart is null) {
-				blockStart = i;
-			} else if (!isData && blockStart is not null) {
-				// Optimized: Inline filter - only add blocks >= 4 bytes
-				if (i - 1 - blockStart.Value >= 4) {
-					blocks.Add(((uint)blockStart.Value, (uint)(i - 1)));
-				}
-
-				blockStart = null;
-			}
-		}
-
-		// Handle final block with inline filter
-		if (blockStart is not null && cdlData.Length - 1 - blockStart.Value >= 4) {
-			blocks.Add(((uint)blockStart.Value, (uint)(cdlData.Length - 1)));
-		}
-
-		// Optimized: Pre-sized MemoryStream
-		using var ms = new MemoryStream((blocks.Count * 12) + 4);
-		using var writer = new BinaryWriter(ms);
-
-		writer.Write((uint)blocks.Count);
-
-		foreach (var (Start, End) in blocks) {
-			writer.Write(Start);  // Start address (4 bytes)
-			writer.Write(End);  // End address (4 bytes)
-			writer.Write((byte)2);    // Type: Data
-			writer.Write((byte)0);    // Flags
-			writer.Write((ushort)0);    // Reserved
-		}
-
-		return ms.ToArray();
-	}
-
-	/// <summary>
 	/// Build Data Types section (0x0005) from labels with Length and CDL data blocks.
 	/// Derives structured data annotations from:
 	/// - Labels with Length > 1 (user-annotated multi-byte data regions)
@@ -996,27 +894,7 @@ public static class PansyExporter {
 		return count > 0 ? ms.ToArray() : [];
 	}
 
-	/// <summary>
-	/// Build cross-references section from label data.
-	/// Phase 3: Enhanced data export - tracks who references whom.
-	/// </summary>
-	private static byte[] BuildCrossRefsSection(List<CodeLabel> labels) {
-		using var ms = new MemoryStream();
-		using var writer = new BinaryWriter(ms);
 
-		// For now, create cross-refs for labeled subroutines
-		// Future: Could query actual disassembly for JSR/JMP/branch targets
-		List<(uint From, uint To, byte Type)> xrefs = [];
-
-		// Pansy spec: No count prefix. Per xref: From(4)+To(4)+Type(1)
-		foreach (var xref in xrefs) {
-			writer.Write(xref.From);    // Source address (4 bytes)
-			writer.Write(xref.To);      // Target address (4 bytes)
-			writer.Write(xref.Type);    // Type: 1=Jsr, 2=Jmp, 3=Branch, 4=Read, 5=Write
-		}
-
-		return ms.ToArray();
-	}
 
 	/// <summary>
 	/// Build enhanced cross-references section by analyzing CDL and disassembly.
