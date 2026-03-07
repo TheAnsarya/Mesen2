@@ -5,6 +5,51 @@ All notable changes to Nexen are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-07-24
+
+### Added
+
+- **Pansy.Core Library Integration** — Full integration with shared Pansy.Core NuGet library (#586)
+	- PansyExporter uses `Pansy.Core` enum types (`SymbolType`, `CommentType`, `CrossRefType`, `MemoryRegionType`)
+	- `LabelMergeEngine` integrated for intelligent label deduplication and conflict resolution
+	- PansyImporter rewritten to use `PansyLoader` for spec-compliant file reading
+- **Pansy CPU State Section** — Export per-address CPU mode flags (#578, #579, #580)
+	- SNES: IndexMode8/MemoryMode8 from CDL flags per code byte
+	- GBA: Thumb mode from CDL flags per code byte
+	- 9-byte entry format: Address(4) + Flags(1) + DataBank(1) + DirectPage(2) + CpuMode(1)
+	- 21 correctness tests and benchmarks (SpanWrite: 2.1x faster, 50% less memory)
+- **Pansy Data Types Section** — Export structured data annotations from labels and CDL (#582, #584)
+- **Pansy Hot Reload** — Automatic re-import of Pansy files when changed on disk (#582)
+- **Atari Lynx File Format** — `.atari-lynx` format reader/writer with auto-detection (#571-#577)
+	- Full format specification, 50 unit tests
+	- Cart address shift protocol and HLE boot support
+	- ROM file format conversion libraries (.lnx/.lyx/.o/.atari-lynx)
+- **TAS Infrastructure Tests** — 57 undo/redo and clipboard operation tests (#563)
+- **Save State Manager Benchmarks** — GreenzoneManager capture/lookup/invalidation benchmarks (#564)
+
+### Changed
+
+- **PansyExporter cleanup** — Removed 128 lines of dead code (4 superseded methods), added `FLAG_HAS_CROSS_REFS` (#587)
+- **Pansy spec alignment** — Removed count prefixes and extra bytes from section builders (#47)
+
+### Performance
+
+- **NES memory read fast-path** — Avoids virtual dispatch (1.84x faster) (#556)
+- **Async save state writes** — Background thread for save state compression (#557-#560)
+- **SnesPpuState field reordering** — Cache locality optimization (#525)
+- **Rewind interval scaling** — Scale recording interval with emulation speed (#423)
+- **Branch prediction hints** — `[[likely]]`/`[[unlikely]]` on hottest unannotated paths (#553)
+- **Constexpr expansion** — Pure computation functions marked constexpr (#554)
+- **`[[nodiscard]]` attributes** — Applied to critical query methods (#555)
+
+### Fixed
+
+- **Lynx sprite viewer** — Fixed packed mode and tilemap flip mode (#504, #505)
+- **Lynx Timer 7 cascade** — Implemented Timer 7 → Audio Channel 0 cascade link (#496)
+- **Lynx SYSCTL1 bank strobe** — Implemented bank strobe and cart write path (#499)
+
+---
+
 ## [1.3.1] - 2026-03-04
 
 ### Fixed
