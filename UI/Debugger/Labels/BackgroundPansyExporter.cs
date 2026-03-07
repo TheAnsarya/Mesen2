@@ -29,6 +29,9 @@ public static class BackgroundPansyExporter {
 		// Cache ROM CRC32 once at load time — avoids re-hashing the entire ROM on every auto-save
 		_cachedRomCrc32 = PansyExporter.CalculateRomCrc32(romInfo);
 
+		// Start Pansy file watching for hot reload
+		PansyFileWatcher.StartWatching(romInfo);
+
 		if (!ConfigManager.Config.Debug.Integration.BackgroundCdlRecording) {
 			Log.Info("[BackgroundPansy] Background recording disabled in config");
 			return;
@@ -44,6 +47,9 @@ public static class BackgroundPansyExporter {
 	public static void OnRomUnloaded() {
 		Log.Info("[BackgroundPansy] OnRomUnloaded");
 		StopAutoSaveTimer();
+
+		// Stop Pansy file watching
+		PansyFileWatcher.StopWatching();
 
 		if (_currentRomInfo is not null && ConfigManager.Config.Debug.Integration.SavePansyOnRomUnload) {
 			ExportPansy();

@@ -471,8 +471,13 @@ you mentioned "Cross-Project Gaps" use `game-garden` repos for cross project scr
 
 [Nexen/Poppy/Pansy/Peony/game-garden] continue working issues and update all the supporting docs; continue;
 
+[Nexen/Poppy/Pansy/Peony/game-garden] continue working issues, and make new issues for work we find, and update all the supporting docs; update the pansy nuget package and update it and use it in the other repos; continue;
 
+continue;
 
+continue;
+
+continue;
 
 
 

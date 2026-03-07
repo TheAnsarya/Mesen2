@@ -264,6 +264,20 @@ public static class PansyExporter {
 			}
 		}
 
+		// Section 5: DATA_TYPES (derived from labels with Length and CDL data blocks)
+		if (options.IncludeDataBlocks) {
+			var dataTypes = BuildDataTypesSection(labels, cdlData);
+			if (dataTypes.Length > 0) {
+				var data = options.UseCompression ? CompressData(dataTypes) : dataTypes;
+				sections.Add(new SectionInfo {
+					Type = SECTION_DATA_TYPES,
+					CompressedSize = (uint)data.Length,
+					UncompressedSize = (uint)dataTypes.Length
+				});
+				sectionData.Add(data);
+			}
+		}
+
 		// Section 6: CROSS_REFS
 		if (options.IncludeCrossReferences) {
 			var crossRefs = BuildEnhancedCrossRefsSection(labels, cdlData, functions, jumpTargets, cpuType, memoryType);
@@ -901,6 +915,98 @@ public static class PansyExporter {
 		}
 
 		return ms.ToArray();
+	}
+
+	/// <summary>
+	/// Build Data Types section (0x0005) from labels with Length and CDL data blocks.
+	/// Derives structured data annotations from:
+	/// - Labels with Length > 1 (user-annotated multi-byte data regions)
+	/// - Contiguous DATA-flagged CDL regions >= 4 bytes
+	/// Follows Pansy spec: Address(4) + Length(4) + ElementSize(2) + ElementCount(2) + Type(1) + NameLen(2) + Name
+	/// </summary>
+	private static byte[] BuildDataTypesSection(List<CodeLabel> labels, byte[]? cdlData) {
+		using var ms = new MemoryStream();
+		using var writer = new BinaryWriter(ms);
+		int count = 0;
+
+		// 1. Labels with Length > 1 → typed data entries
+		foreach (var label in labels) {
+			if (label.Length <= 1 || string.IsNullOrEmpty(label.Label)) {
+				continue;
+			}
+
+			byte elementType = label.Length switch {
+				2 => 2,    // Word
+				3 or 4 => 4, // Pointer
+				_ => 1    // Byte (array)
+			};
+
+			ushort elementSize = label.Length switch {
+				2 => 2,
+				3 => 3,
+				4 => 4,
+				_ => 1
+			};
+
+			ushort elementCount = (ushort)(label.Length / elementSize);
+
+			writer.Write(label.Address);            // Address (4 bytes)
+			writer.Write(label.Length);              // Total length (4 bytes)
+			writer.Write(elementSize);               // Element size (2 bytes)
+			writer.Write(elementCount);              // Element count (2 bytes)
+			writer.Write(elementType);               // DataElementType (1 byte)
+
+			byte[] nameBytes = System.Text.Encoding.UTF8.GetBytes(label.Label);
+			writer.Write((ushort)nameBytes.Length);  // Name length (2 bytes)
+			writer.Write(nameBytes);                 // Name
+
+			count++;
+		}
+
+		// 2. CDL data blocks >= 8 bytes (contiguous DATA regions without labels)
+		if (cdlData is { Length: > 0 }) {
+			var labelAddresses = new HashSet<uint>(labels.Where(l => l.Length > 1).Select(l => l.Address));
+			int? blockStart = null;
+
+			for (int i = 0; i < cdlData.Length; i++) {
+				bool isData = (cdlData[i] & 0x02) != 0 && (cdlData[i] & 0x01) == 0;
+
+				if (isData && blockStart is null) {
+					blockStart = i;
+				} else if (!isData && blockStart is not null) {
+					uint start = (uint)blockStart.Value;
+					uint length = (uint)(i - blockStart.Value);
+
+					if (length >= 8 && !labelAddresses.Contains(start)) {
+						writer.Write(start);              // Address
+						writer.Write(length);             // Total length
+						writer.Write((ushort)1);          // Element size (byte)
+						writer.Write((ushort)length);     // Element count
+						writer.Write((byte)1);            // DataElementType.Byte
+						writer.Write((ushort)0);          // No name
+						count++;
+					}
+
+					blockStart = null;
+				}
+			}
+
+			if (blockStart is not null) {
+				uint start = (uint)blockStart.Value;
+				uint length = (uint)(cdlData.Length - blockStart.Value);
+				if (length >= 8 && !labelAddresses.Contains(start)) {
+					writer.Write(start);
+					writer.Write(length);
+					writer.Write((ushort)1);
+					writer.Write((ushort)length);
+					writer.Write((byte)1);
+					writer.Write((ushort)0);
+					count++;
+				}
+			}
+		}
+
+		return count > 0 ? ms.ToArray() : [];
 	}
 
 	/// <summary>
