@@ -491,12 +491,20 @@ Update the `readme.md` and linked documentation to be comprehensive and accurate
 
 [all repos] git commit everything, add to copilot instructions that we always fix markdownlinter warnings like MD022, MD032, etc and fix them in all `*.md` files now and generate markdown files with the appropriate extra newlines in the future; continue working and making issues for all work, find improvements and performance issues and implement fixes; add to copilot instructions: every markdown file or documentation should be accessible from the main readme file through the link-tree; continue; 
 
+--- [all repos] Why are there still references to Mesen or other emulators in code outside of converters? like in `SymbolExporter` `public static string ExportMesen(DisassemblyResult result) {` everything should be using Nexen, not Mesen, update all code and documents and make a github issue for this work; continue;
+--- might just be exporters?
+
+[all repos] did you make benchmarks and tests for all of the work you just did? do it! make more benchmarks and tests and make more issues and implement them; continue;
 
 
 
 
 
-https://github.com/TheAnsarya/Nexen/releases
+
+
+
+
+
 
 
 

@@ -511,8 +511,7 @@ public abstract class DbgImporter : ISymbolProvider {
 	}
 
 	private int GetSymbolSize(SymbolInfo symbol) {
-		if (symbol.SegmentID is not null && _segments.ContainsKey(symbol.SegmentID.Value)) {
-			SegmentInfo segment = _segments[symbol.SegmentID.Value];
+		if (symbol.SegmentID is not null && _segments.TryGetValue(symbol.SegmentID.Value, out var segment)) {
 			SpanInfo? defSpan = null;
 			if (!segment.IsRam) {
 				defSpan = GetSymbolDefinitionSpan(symbol);
@@ -564,8 +563,7 @@ public abstract class DbgImporter : ISymbolProvider {
 					continue;
 				}
 
-				if (_segments.ContainsKey(symbol.SegmentID.Value)) {
-					SegmentInfo segment = _segments[symbol.SegmentID.Value];
+				if (_segments.TryGetValue(symbol.SegmentID.Value, out var segment)) {
 
 					int count = 2;
 					string orgSymbolName = symbol.Name;

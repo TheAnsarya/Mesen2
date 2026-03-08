@@ -254,6 +254,20 @@ dotnet publish -c Release UI/UI.csproj
 
 See [COMPILING.md](COMPILING.md) for detailed instructions.
 
+## Markdown Quality Automation
+
+Use these scripts to validate and benchmark markdown structure policy checks (`MD022`, `MD031`, `MD032`, `MD047`):
+
+- `scripts/test-markdown-policy.ps1`
+- `scripts/benchmark-markdown-policy.ps1`
+
+Example:
+
+```powershell
+pwsh -File scripts/test-markdown-policy.ps1
+pwsh -File scripts/benchmark-markdown-policy.ps1 -Runs 5
+```
+
 ## 📜 License
 
 Nexen is dual-licensed:
