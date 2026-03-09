@@ -449,4 +449,209 @@ public class UndoableActionTests {
 	}
 
 	#endregion
+
+	#region ClearInputAction Tests
+
+	[Fact]
+	public void ClearInputAction_Execute_ClearsAllButtons() {
+		var frame = new InputFrame(0) {
+			Controllers = [new ControllerInput { A = true, B = true, Up = true, Start = true }]
+		};
+
+		var action = new ClearInputAction(frame, 0);
+		action.Execute();
+
+		Assert.False(frame.Controllers[0].A);
+		Assert.False(frame.Controllers[0].B);
+		Assert.False(frame.Controllers[0].Up);
+		Assert.False(frame.Controllers[0].Start);
+	}
+
+	[Fact]
+	public void ClearInputAction_Undo_RestoresAllOriginalButtons() {
+		var frame = new InputFrame(0) {
+			Controllers = [new ControllerInput { A = true, B = true, L = true, R = true, X = true, Y = true }]
+		};
+
+		var action = new ClearInputAction(frame, 0);
+		action.Execute();
+
+		Assert.False(frame.Controllers[0].A);
+
+		action.Undo();
+
+		Assert.True(frame.Controllers[0].A);
+		Assert.True(frame.Controllers[0].B);
+		Assert.True(frame.Controllers[0].L);
+		Assert.True(frame.Controllers[0].R);
+		Assert.True(frame.Controllers[0].X);
+		Assert.True(frame.Controllers[0].Y);
+	}
+
+	[Fact]
+	public void ClearInputAction_MultiController_ClearsAll() {
+		var frame = new InputFrame(0) {
+			Controllers = [
+				new ControllerInput { A = true, B = true },
+				new ControllerInput { Up = true, Down = true }
+			]
+		};
+
+		var action = new ClearInputAction(frame, 0);
+		action.Execute();
+
+		Assert.False(frame.Controllers[0].A);
+		Assert.False(frame.Controllers[0].B);
+		Assert.False(frame.Controllers[1].Up);
+		Assert.False(frame.Controllers[1].Down);
+
+		action.Undo();
+
+		Assert.True(frame.Controllers[0].A);
+		Assert.True(frame.Controllers[1].Up);
+	}
+
+	#endregion
+
+	#region PaintInputAction Tests
+
+	[Fact]
+	public void PaintInputAction_Execute_SetsButtonAcrossFrames() {
+		var movie = CreateTestMovie(10);
+		var indices = new List<int> { 0, 2, 4, 6, 8 };
+		var oldInputs = indices.Select(i => new ControllerInput {
+			A = movie.InputFrames[i].Controllers[0].A,
+			B = movie.InputFrames[i].Controllers[0].B
+		}).ToList();
+
+		var action = new PaintInputAction(movie, indices, 0, "B", true, oldInputs);
+		action.Execute();
+
+		foreach (int i in indices) {
+			Assert.True(movie.InputFrames[i].Controllers[0].B);
+		}
+	}
+
+	[Fact]
+	public void PaintInputAction_Undo_RestoresOriginalButtons() {
+		var movie = CreateTestMovie(10);
+		var indices = new List<int> { 1, 3, 5 };
+		var oldInputs = indices.Select(i => new ControllerInput {
+			A = movie.InputFrames[i].Controllers[0].A,
+			B = movie.InputFrames[i].Controllers[0].B,
+			Up = movie.InputFrames[i].Controllers[0].Up
+		}).ToList();
+
+		// Save original states
+		bool[] originalA = indices.Select(i => movie.InputFrames[i].Controllers[0].A).ToArray();
+
+		var action = new PaintInputAction(movie, indices, 0, "A", true, oldInputs);
+		action.Execute();
+
+		foreach (int i in indices) {
+			Assert.True(movie.InputFrames[i].Controllers[0].A);
+		}
+
+		action.Undo();
+
+		for (int j = 0; j < indices.Count; j++) {
+			Assert.Equal(originalA[j], movie.InputFrames[indices[j]].Controllers[0].A);
+		}
+	}
+
+	[Fact]
+	public void PaintInputAction_AllButtons_WorkCorrectly() {
+		var movie = CreateTestMovie(5);
+		var indices = new List<int> { 0 };
+		string[] buttons = ["A", "B", "X", "Y", "L", "R", "Up", "Down", "Left", "Right", "Start", "Select"];
+
+		foreach (var button in buttons) {
+			var oldInputs = new List<ControllerInput> { new() };
+			var action = new PaintInputAction(movie, indices, 0, button, true, oldInputs);
+			action.Execute();
+		}
+
+		var ctrl = movie.InputFrames[0].Controllers[0];
+		Assert.True(ctrl.A);
+		Assert.True(ctrl.B);
+		Assert.True(ctrl.X);
+		Assert.True(ctrl.Y);
+		Assert.True(ctrl.L);
+		Assert.True(ctrl.R);
+		Assert.True(ctrl.Up);
+		Assert.True(ctrl.Down);
+		Assert.True(ctrl.Left);
+		Assert.True(ctrl.Right);
+		Assert.True(ctrl.Start);
+		Assert.True(ctrl.Select);
+	}
+
+	[Fact]
+	public void PaintInputAction_Description_IncludesFrameCount() {
+		var movie = CreateTestMovie(5);
+		var action = new PaintInputAction(movie, [0, 1, 2], 0, "A", true, [new(), new(), new()]);
+		Assert.Equal("Paint 3 frame(s)", action.Description);
+	}
+
+	#endregion
+
+	#region Multi-Action Chain Tests
+
+	[Fact]
+	public void MultiActionChain_InsertModifyPaintDelete_FullUndoCycle() {
+		var movie = CreateTestMovie(10);
+		var undoStack = new Stack<UndoableAction>();
+
+		// 1. Insert 2 frames at position 5
+		var insertFrames = new List<InputFrame> {
+			new(50) { Controllers = [new ControllerInput()] },
+			new(51) { Controllers = [new ControllerInput()] }
+		};
+		var insertAction = new InsertFramesAction(movie, 5, insertFrames);
+		insertAction.Execute();
+		undoStack.Push(insertAction);
+		Assert.Equal(12, movie.InputFrames.Count);
+
+		// 2. Modify frame 5 (one of the inserted frames)
+		var newInput = new ControllerInput { A = true, Start = true };
+		var modifyAction = new ModifyInputAction(movie.InputFrames[5], 5, 0, newInput);
+		modifyAction.Execute();
+		undoStack.Push(modifyAction);
+		Assert.True(movie.InputFrames[5].Controllers[0].A);
+
+		// 3. Paint B across frames 5-7
+		var paintIndices = new List<int> { 5, 6, 7 };
+		var paintOldInputs = paintIndices.Select(i => new ControllerInput {
+			A = movie.InputFrames[i].Controllers[0].A,
+			B = movie.InputFrames[i].Controllers[0].B
+		}).ToList();
+		var paintAction = new PaintInputAction(movie, paintIndices, 0, "B", true, paintOldInputs);
+		paintAction.Execute();
+		undoStack.Push(paintAction);
+		Assert.True(movie.InputFrames[5].Controllers[0].B);
+		Assert.True(movie.InputFrames[6].Controllers[0].B);
+		Assert.True(movie.InputFrames[7].Controllers[0].B);
+
+		// 4. Delete frame 0
+		var deleteAction = new DeleteFramesAction(movie, 0, 1);
+		deleteAction.Execute();
+		undoStack.Push(deleteAction);
+		Assert.Equal(11, movie.InputFrames.Count);
+
+		// Undo all in reverse order
+		undoStack.Pop().Undo(); // Undo delete
+		Assert.Equal(12, movie.InputFrames.Count);
+
+		undoStack.Pop().Undo(); // Undo paint
+		// Frame 6 B should be restored to original
+		Assert.False(movie.InputFrames[6].Controllers[0].B);
+
+		undoStack.Pop().Undo(); // Undo modify
+		Assert.False(movie.InputFrames[5].Controllers[0].A);
+
+		undoStack.Pop().Undo(); // Undo insert
+		Assert.Equal(10, movie.InputFrames.Count);
+	}
+
+	#endregion
 }
