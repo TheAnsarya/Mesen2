@@ -291,3 +291,83 @@ movie.nexen-movie (ZIP archive)
 - [Core/Shared/Movies/MovieRecorder.cpp](../../Core/Shared/Movies/MovieRecorder.cpp) — Writing ZIP
 - [Core/Shared/Movies/NexenMovie.cpp](../../Core/Shared/Movies/NexenMovie.cpp) — Reading ZIP
 - [MovieConverter/Converters/NexenMovieConverter.cs](../../MovieConverter/Converters/NexenMovieConverter.cs) — C# read/write
+
+---
+
+## 8. Converter StringBuilder Pooling
+
+### Purpose
+
+Eliminate per-frame `StringBuilder` and temporary `List<string>` allocations during movie format conversion.
+
+### Problem
+
+Each converter (FM2, LSMV, BK2) created a new `StringBuilder` per frame during write operations. For a 200K-frame movie, that's 200K+ `StringBuilder` allocations. Similarly, `InputFrame.ToNexenLogLine()` allocated a `List<string>` and called `string.Join()` per frame.
+
+### Solution
+
+- **Hoisted StringBuilder:** Allocate once before the loop, call `Clear()` per iteration
+- **Shared SB parameter:** Format methods accept a `StringBuilder` parameter instead of returning strings
+- **Direct StringBuilder in ToNexenLogLine:** Replace `List<string>` + `string.Join("|", ...)` with direct `StringBuilder.Append()` calls
+
+### Complexity
+
+- **Before:** O(n) allocations for n frames
+- **After:** O(1) allocation (single reused StringBuilder)
+
+### Files
+
+- [MovieConverter/Converters/Fm2MovieConverter.cs](../../MovieConverter/Converters/Fm2MovieConverter.cs) — Hoisted SB + shared SB pattern
+- [MovieConverter/Converters/LsmvMovieConverter.cs](../../MovieConverter/Converters/LsmvMovieConverter.cs) — Hoisted SB
+- [MovieConverter/Converters/Bk2MovieConverter.cs](../../MovieConverter/Converters/Bk2MovieConverter.cs) — Hoisted SB + void format method
+- [MovieConverter/InputFrame.cs](../../MovieConverter/InputFrame.cs) — StringBuilder-based ToNexenLogLine
+
+---
+
+## 9. CRC32 Batched Buffer Calculation
+
+### Purpose
+
+Reduce API call overhead when computing CRC32 of movie input data.
+
+### Problem
+
+`CalculateInputCrc32()` called `Crc32.Append()` with a 2-byte buffer for every controller on every frame. For 200K frames with 2 controllers: 400K API calls with 2-byte payloads.
+
+### Solution
+
+Use a 4KB `stackalloc` buffer. Fill it with serialized controller data, flush to `Crc32.Append()` when full. Reduces 400K calls to ~200 calls.
+
+### Complexity
+
+- **Before:** O(n * controllers) `Append()` calls
+- **After:** O(n * controllers * 2 / 4096) calls — ~2000x fewer
+
+### Files
+
+- [MovieConverter/MovieData.cs](../../MovieConverter/MovieData.cs) — `CalculateInputCrc32()`
+
+---
+
+## 10. Clone Skip-Init Optimization
+
+### Purpose
+
+Avoid wasted `ControllerInput` allocations during deep copy of `InputFrame`.
+
+### Problem
+
+`InputFrame.Clone()` called `new InputFrame(frameNumber)` → `this()` which created 8 default `ControllerInput` objects. Then the clone loop immediately replaced all 8 with cloned copies. For 200K frames: 1.6M wasted allocations.
+
+### Solution
+
+Private constructor `InputFrame(int frameNumber, bool _)` skips the initialization loop. Clone uses this constructor and fills controllers directly from the source. Handles partial `Controllers` arrays (length < 8) by creating defaults only for missing indices.
+
+### Complexity
+
+- **Before:** 8 + 8 = 16 `ControllerInput` allocations per Clone (8 wasted + 8 cloned)
+- **After:** 8 allocations per Clone (only the cloned copies)
+
+### Files
+
+- [MovieConverter/InputFrame.cs](../../MovieConverter/InputFrame.cs) — `Clone()` and private constructor
