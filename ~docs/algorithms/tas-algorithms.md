@@ -371,3 +371,75 @@ Private constructor `InputFrame(int frameNumber, bool _)` skips the initializati
 ### Files
 
 - [MovieConverter/InputFrame.cs](../../MovieConverter/InputFrame.cs) — `Clone()` and private constructor
+
+---
+
+## 11. Incremental ObservableCollection Updates
+
+### Problem
+
+`UpdateFrames()` clears the entire `ObservableCollection<TasFrameViewModel>` and rebuilds it from scratch.
+For a 200K-frame movie, this creates 200K new objects and fires 200K+ change notifications per operation.
+Operations like Paste, Fork/Truncate, and Undo/Redo all triggered this full rebuild.
+
+### Solution
+
+Batch helper methods that make targeted modifications:
+
+- **InsertFrameViewModels(index, count):** Inserts `count` new VMs at `index`, then renumbers the tail once. O(count + tail).
+- **RemoveFrameViewModels(index, count):** Removes `count` VMs by iterating backward from end of range. O(count + tail) for renumbering.
+- **TruncateFrameViewModels(startIndex):** Removes all VMs from `startIndex` to end by reverse iteration. O(removed), no renumber needed.
+
+### Call Site Mapping
+
+| Operation | Before | After |
+|-----------|--------|-------|
+| Paste | `UpdateFrames()` — O(n) | `InsertFrameViewModels` — O(k + tail) |
+| Fork/Truncate | `UpdateFrames()` — O(n) | `TruncateFrameViewModels` — O(removed) |
+| Undo (Insert) | `UpdateFrames()` — O(n) | `RemoveFrameViewModels` — O(k + tail) |
+| Undo (Delete) | `UpdateFrames()` — O(n) | `InsertFrameViewModels` — O(k + tail) |
+| Redo (Insert) | `UpdateFrames()` — O(n) | `InsertFrameViewModels` — O(k + tail) |
+| Redo (Delete) | `UpdateFrames()` — O(n) | `RemoveFrameViewModels` — O(k + tail) |
+| Undo/Redo (Modify) | `UpdateFrames()` — O(n) | `RefreshFromFrame()` — O(1) |
+
+### Files
+
+- [UI/ViewModels/TasEditorViewModel.cs](../../UI/ViewModels/TasEditorViewModel.cs) — Batch helpers and updated call sites
+
+---
+
+## 12. Undo/Redo Incremental Dispatch
+
+### Problem
+
+Every Undo/Redo unconditionally called `UpdateFrames()` regardless of what the action modified.
+`ModifyInputAction` (editing a single cell) triggered a full 200K rebuild just to update one frame.
+
+### Solution
+
+`ApplyIncrementalUpdate(UndoableAction, bool isUndo)` pattern-matches on the concrete action type:
+
+- **InsertFramesAction:** Uses `Index` and `Count` properties to dispatch to `InsertFrameViewModels` or `RemoveFrameViewModels`.
+- **DeleteFramesAction:** Uses `Index` and `Count` properties — inverse of insert logic.
+- **ModifyInputAction:** Uses `FrameRef` to find the affected VM by reference equality, then calls `RefreshFromFrame()` — O(n) scan worst case, but typically the frame is near the scroll position.
+- **Unknown action types:** Fall back to `UpdateFrames()` for safety.
+
+### Files
+
+- [UI/ViewModels/TasEditorViewModel.cs](../../UI/ViewModels/TasEditorViewModel.cs) — `ApplyIncrementalUpdate` dispatcher
+
+---
+
+## 13. PianoRoll Zero-Alloc Cache Eviction
+
+### Problem
+
+Frame number cache eviction in the render path used LINQ `.Where().ToList()`, allocating a `List<int>` + LINQ iterator on every eviction. While eviction only triggers every ~200 scroll events, it's still an allocation inside `Render()`.
+
+### Solution
+
+Replaced with a reusable `_evictionKeys` field (`List<int>`) that is `.Clear()`ed and reused on each eviction. Manual `foreach` loop replaces the LINQ query. Zero allocations in the render path.
+
+### Files
+
+- [UI/Controls/PianoRollControl.cs](../../UI/Controls/PianoRollControl.cs) — `_evictionKeys` field and manual eviction loop
