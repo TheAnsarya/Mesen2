@@ -66,6 +66,15 @@ public sealed class InputFrame : IEquatable<InputFrame> {
 	}
 
 	/// <summary>
+	/// Private constructor for Clone — skips ControllerInput initialization
+	/// since Clone immediately overwrites all controllers.
+	/// Saves 8 * FrameCount allocations during deep copy.
+	/// </summary>
+	private InputFrame(int frameNumber, bool _) {
+		FrameNumber = frameNumber;
+	}
+
+	/// <summary>
 	/// Get input for a specific port
 	/// </summary>
 	/// <param name="port">Port index (0-based)</param>
@@ -188,7 +197,7 @@ public sealed class InputFrame : IEquatable<InputFrame> {
 	/// Create a deep copy of this frame
 	/// </summary>
 	public InputFrame Clone() {
-		var clone = new InputFrame(FrameNumber) {
+		var clone = new InputFrame(FrameNumber, false) {
 			Command = Command,
 			IsLagFrame = IsLagFrame,
 			Comment = Comment,
@@ -196,8 +205,11 @@ public sealed class InputFrame : IEquatable<InputFrame> {
 			FdsDiskSide = FdsDiskSide
 		};
 
-		for (int i = 0; i < Controllers.Length; i++) {
-			clone.Controllers[i] = Controllers[i].Clone();
+		int sourceLen = Controllers.Length;
+		for (int i = 0; i < clone.Controllers.Length; i++) {
+			clone.Controllers[i] = i < sourceLen
+				? Controllers[i].Clone()
+				: new ControllerInput();
 		}
 
 		return clone;

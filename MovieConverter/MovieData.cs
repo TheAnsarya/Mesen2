@@ -280,15 +280,25 @@ public sealed class MovieData {
 	/// </summary>
 	public uint CalculateInputCrc32() {
 		var crc = new Crc32();
-		Span<byte> buffer = stackalloc byte[2];
+		const int bufferSize = 4096;
+		Span<byte> buffer = stackalloc byte[bufferSize];
+		int offset = 0;
 
 		foreach (InputFrame frame in InputFrames) {
 			for (int i = 0; i < ControllerCount; i++) {
+				if (offset + 2 > bufferSize) {
+					crc.Append(buffer[..offset]);
+					offset = 0;
+				}
+
 				ushort smv = frame.Controllers[i].ToSmvFormat();
-				buffer[0] = (byte)(smv & 0xff);
-				buffer[1] = (byte)(smv >> 8);
-				crc.Append(buffer);
+				buffer[offset++] = (byte)(smv & 0xff);
+				buffer[offset++] = (byte)(smv >> 8);
 			}
+		}
+
+		if (offset > 0) {
+			crc.Append(buffer[..offset]);
 		}
 
 		return crc.GetCurrentHashAsUInt32();
