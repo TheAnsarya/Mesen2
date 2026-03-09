@@ -717,7 +717,7 @@ void GbaMemoryManager::TriggerObjEnableUpdate() {
 }
 
 void GbaMemoryManager::SetDelayedIrqSource(GbaIrqSource source, uint8_t delay) {
-	_pendingIrqs.push_back({source, delay});
+	_pendingIrqs.emplace_back(source, delay);
 	SetPendingUpdateFlag();
 }
 

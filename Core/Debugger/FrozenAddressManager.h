@@ -67,7 +67,7 @@ public:
 	/// <param name="outState">Output boolean array (frozen state per address)</param>
 	void GetFrozenState(uint32_t start, uint32_t end, bool* outState) {
 		for (uint32_t i = start; i <= end; i++) {
-			outState[i - start] = _frozenAddresses.find(i) != _frozenAddresses.end();
+			outState[i - start] = _frozenAddresses.contains(i);
 		}
 	}
 };

@@ -53,12 +53,14 @@ public:
 		}
 
 		if (operation == MemoryOperation::Read || operation == MemoryOperation::Any) {
+			_ramReadAddresses.reserve(_ramReadAddresses.size() + (end - start + 1));
 			for (uint32_t i = start; i <= end; i++) {
 				_ramReadAddresses.push_back((uint16_t)i);
 			}
 		}
 
 		if (operation == MemoryOperation::Write || operation == MemoryOperation::Any) {
+			_ramWriteAddresses.reserve(_ramWriteAddresses.size() + (end - start + 1));
 			for (uint32_t i = start; i <= end; i++) {
 				_ramWriteAddresses.push_back((uint16_t)i);
 			}

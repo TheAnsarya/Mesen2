@@ -110,7 +110,7 @@ bool LabelManager::GetLabelAndComment(AddressInfo address, LabelInfo& labelInfo)
 }
 
 bool LabelManager::ContainsLabel(const string& label) {
-	return _codeLabelReverseLookup.find(label) != _codeLabelReverseLookup.end();
+	return _codeLabelReverseLookup.contains(label);
 }
 
 AddressInfo LabelManager::GetLabelAbsoluteAddress(const string& label) {

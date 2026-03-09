@@ -384,14 +384,14 @@ void SaveStateManager::SaveRecentGame(const string& romName, const string& romPa
 	writer.AddFile(stateStream, "Savestate.mss");
 
 	std::stringstream romInfoStream;
-	romInfoStream << romName << std::endl;
-	romInfoStream << romPath << std::endl;
-	romInfoStream << patchPath << std::endl;
+	romInfoStream << romName << '\n';
+	romInfoStream << romPath << '\n';
+	romInfoStream << patchPath << '\n';
 
 	FrameInfo baseFrameSize = _emu->GetVideoDecoder()->GetBaseFrameInfo(true);
 	double aspectRatio = _emu->GetSettings()->GetAspectRatio(_emu->GetRegion(), baseFrameSize);
 	if (aspectRatio > 0) {
-		romInfoStream << "aspectratio=" << aspectRatio << std::endl;
+		romInfoStream << "aspectratio=" << aspectRatio << '\n';
 	}
 
 	writer.AddFile(romInfoStream, "RomInfo.txt");

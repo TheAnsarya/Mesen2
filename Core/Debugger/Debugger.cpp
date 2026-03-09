@@ -1264,7 +1264,7 @@ AddressInfo Debugger::GetRelativeAddress(AddressInfo absAddress, CpuType cpuType
 }
 
 bool Debugger::HasCpuType(CpuType cpuType) {
-	return _cpuTypes.find(cpuType) != _cpuTypes.end();
+	return _cpuTypes.contains(cpuType);
 }
 
 void Debugger::SetBreakpoints(Breakpoint breakpoints[], uint32_t length) {

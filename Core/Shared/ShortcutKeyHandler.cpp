@@ -86,7 +86,7 @@ bool ShortcutKeyHandler::IsKeyPressed(uint16_t keyCode, bool mergeCtrlAltShift, 
 
 bool ShortcutKeyHandler::DetectKeyPress(EmulatorShortcut shortcut) {
 	if (IsKeyPressed(shortcut)) {
-		bool newlyPressed = _prevKeysDown[_keySetIndex].find((uint32_t)shortcut) == _prevKeysDown[_keySetIndex].end();
+		bool newlyPressed = !_prevKeysDown[_keySetIndex].contains((uint32_t)shortcut);
 		_keysDown[_keySetIndex].emplace((uint32_t)shortcut);
 
 		if (newlyPressed && !_isKeyUp) {
@@ -98,7 +98,7 @@ bool ShortcutKeyHandler::DetectKeyPress(EmulatorShortcut shortcut) {
 
 bool ShortcutKeyHandler::DetectKeyRelease(EmulatorShortcut shortcut) {
 	if (!IsKeyPressed(shortcut)) {
-		if (_prevKeysDown[_keySetIndex].find((uint32_t)shortcut) != _prevKeysDown[_keySetIndex].end()) {
+		if (_prevKeysDown[_keySetIndex].contains((uint32_t)shortcut)) {
 			return true;
 		}
 	}
