@@ -56,11 +56,12 @@ public class CheatDatabaseWindow : NexenWindow {
 	protected override void OnKeyDown(KeyEventArgs e) {
 		if (e.Key is Key.Down or Key.Up) {
 			if (_searchBox.IsKeyboardFocusWithin) {
-				if (_model.FilteredEntries.Count() > 1) {
-					_model.SelectionModel.SelectedItem = _model.FilteredEntries.ElementAt(1);
+				var firstTwo = _model.FilteredEntries.Take(2).ToList();
+				if (firstTwo.Count > 1) {
+					_model.SelectionModel.SelectedItem = firstTwo[1];
 					_listBox.ContainerFromIndex(1)?.Focus();
-				} else {
-					_model.SelectionModel.SelectedItem = _model.FilteredEntries.ElementAt(0);
+				} else if (firstTwo.Count > 0) {
+					_model.SelectionModel.SelectedItem = firstTwo[0];
 					_listBox.ContainerFromIndex(1)?.Focus();
 				}
 			}

@@ -553,10 +553,11 @@ public partial class HexEditor {
 				double y = 0;
 				int row = 0;
 				double drawOffsetY = _highDensityMode ? -_rowHeight * 0.1 : -_rowHeight * 0.2;
+				string headerFormat = "X" + _headerCharLength;
 
 				//Draw row headers for each row
 				while (y < Bounds.Height && headerByte < dataLength) {
-					string rowText = headerByte.ToString("X" + _headerCharLength);
+					string rowText = headerByte.ToString(headerFormat);
 					int count = font.CountGlyphs(rowText);
 					var buffer = builder.AllocateRun(font, count, (float)xOffset, (float)((row * _rowHeight) + drawOffsetY));
 					font.GetGlyphs(rowText, buffer.Glyphs);

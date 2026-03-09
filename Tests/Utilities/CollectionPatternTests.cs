@@ -49,9 +49,9 @@ public class CollectionPatternTests {
 
 		Assert.Equal(source.Count, frozen.Count);
 		foreach (int item in source) {
-			Assert.Contains(item, frozen);
+			Assert.Contains(item, (IReadOnlySet<int>)frozen);
 		}
-		Assert.DoesNotContain(99, frozen);
+		Assert.DoesNotContain(99, (IReadOnlySet<int>)frozen);
 	}
 
 	[Fact]
@@ -61,10 +61,10 @@ public class CollectionPatternTests {
 		};
 		var frozen = source.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
-		Assert.Contains("nes", frozen);
-		Assert.Contains("Snes", frozen);
-		Assert.Contains("GB", frozen);
-		Assert.DoesNotContain("Genesis", frozen);
+		Assert.Contains("nes", (IReadOnlySet<string>)frozen);
+		Assert.Contains("Snes", (IReadOnlySet<string>)frozen);
+		Assert.Contains("GB", (IReadOnlySet<string>)frozen);
+		Assert.DoesNotContain("Genesis", (IReadOnlySet<string>)frozen);
 	}
 
 	// ===== TryGetValue replaces ContainsKey+indexer =====

@@ -51,11 +51,12 @@ public partial class SelectRomWindow : NexenWindow {
 		if (DataContext is SelectRomViewModel model) {
 			if (e.Key is Key.Down or Key.Up) {
 				if (_searchBox.IsKeyboardFocusWithin) {
-					if (model.FilteredEntries.Count() > 1) {
-						model.SelectedEntry = model.FilteredEntries.ElementAt(1);
+					var firstTwo = model.FilteredEntries.Take(2).ToList();
+					if (firstTwo.Count > 1) {
+						model.SelectedEntry = firstTwo[1];
 						_listBox.ContainerFromIndex(1)?.Focus();
-					} else {
-						model.SelectedEntry = model.FilteredEntries.ElementAt(0);
+					} else if (firstTwo.Count > 0) {
+						model.SelectedEntry = firstTwo[0];
 						_listBox.ContainerFromIndex(1)?.Focus();
 					}
 				}
