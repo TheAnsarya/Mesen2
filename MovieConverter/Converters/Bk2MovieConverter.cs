@@ -598,8 +598,11 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 			writer.WriteLine("[Input]");
 
 			// Write frames
+			var sb = new StringBuilder(64);
 			foreach (InputFrame frame in movie.InputFrames) {
-				writer.WriteLine(FormatBk2InputLine(frame, movie.SystemType, movie.ControllerCount));
+				sb.Clear();
+				FormatBk2InputLine(sb, frame, movie.SystemType, movie.ControllerCount);
+				writer.WriteLine(sb.ToString());
 			}
 		}
 
@@ -646,8 +649,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		};
 	}
 
-	private static string FormatBk2InputLine(InputFrame frame, SystemType system, int controllerCount) {
-		var sb = new StringBuilder();
+	private static void FormatBk2InputLine(StringBuilder sb, InputFrame frame, SystemType system, int controllerCount) {
 		sb.Append('|');
 
 		// Command column
@@ -669,8 +671,6 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 			sb.Append(FormatBk2Controller(input, system));
 			sb.Append('|');
 		}
-
-		return sb.ToString();
 	}
 
 	private static string FormatBk2Controller(ControllerInput input, SystemType system) {

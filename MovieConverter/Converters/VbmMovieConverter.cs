@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Numerics;
 using System.Text;
 
 namespace Nexen.MovieConverter.Converters;
@@ -290,15 +291,8 @@ public sealed class VbmMovieConverter : MovieConverterBase {
 	/// <summary>
 	/// Count set bits in a byte
 	/// </summary>
-	private static int CountSetBits(int value) {
-		int count = 0;
-		while (value != 0) {
-			count += value & 1;
-			value >>= 1;
-		}
-
-		return count;
-	}
+	private static int CountSetBits(int value) =>
+		BitOperations.PopCount((uint)value);
 
 	/// <inheritdoc/>
 	public override void Write(MovieData movie, Stream stream) {

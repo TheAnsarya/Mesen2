@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Nexen.MovieConverter;
 
@@ -98,29 +99,35 @@ public sealed class InputFrame : IEquatable<InputFrame> {
 	/// <param name="portCount">Number of ports to include</param>
 	/// <returns>Single line for input log</returns>
 	public string ToNexenLogLine(int portCount = 2) {
-		var parts = new List<string>(portCount + 3);
+		var sb = new StringBuilder(portCount * 14 + 16);
 
 		// Command prefix (if any)
 		if (Command != FrameCommand.None) {
-			parts.Add(GetCommandPrefix());
+			sb.Append(GetCommandPrefix());
+			sb.Append('|');
 		}
 
 		// Controller inputs
 		for (int i = 0; i < portCount && i < Controllers.Length; i++) {
-			parts.Add(Controllers[i].ToNexenFormat());
+			if (i > 0) {
+				sb.Append('|');
+			}
+
+			sb.Append(Controllers[i].ToNexenFormat());
 		}
 
 		// Lag frame marker
 		if (IsLagFrame) {
-			parts.Add("LAG");
+			sb.Append("|LAG");
 		}
 
 		// Comment (if any)
 		if (!string.IsNullOrEmpty(Comment)) {
-			parts.Add($"# {Comment}");
+			sb.Append("|# ");
+			sb.Append(Comment);
 		}
 
-		return string.Join("|", parts);
+		return sb.ToString();
 	}
 
 	/// <summary>

@@ -37,6 +37,7 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 
 		bool inHeader = true;
 		int frameNumber = 0;
+		StringBuilder? descriptionBuilder = null;
 
 		while (reader.ReadLine() is { } line) {
 			// Skip empty lines
@@ -46,11 +47,12 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 
 			// Skip comments
 			if (line.StartsWith("comment ", StringComparison.OrdinalIgnoreCase)) {
-				if (!string.IsNullOrEmpty(movie.Description)) {
-					movie.Description += "\n";
+				descriptionBuilder ??= new StringBuilder();
+				if (descriptionBuilder.Length > 0) {
+					descriptionBuilder.Append('\n');
 				}
 
-				movie.Description += line[8..];
+				descriptionBuilder.Append(line.AsSpan(8));
 				continue;
 			}
 
@@ -67,6 +69,10 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 				movie.InputFrames.Add(frame);
 				frameNumber++;
 			}
+		}
+
+		if (descriptionBuilder != null) {
+			movie.Description = descriptionBuilder.ToString();
 		}
 
 		return movie;
@@ -312,16 +318,18 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 		}
 
 		// Write input frames
+		var sb = new StringBuilder(32);
 		foreach (InputFrame frame in movie.InputFrames) {
-			writer.WriteLine(FormatFm2InputLine(frame, movie.ControllerCount));
+			sb.Clear();
+			FormatFm2InputLine(sb, frame, movie.ControllerCount);
+			writer.WriteLine(sb.ToString());
 		}
 	}
 
 	/// <summary>
-	/// Format frame as FM2 input line
+	/// Format frame as FM2 input line into shared StringBuilder
 	/// </summary>
-	private static string FormatFm2InputLine(InputFrame frame, int controllerCount) {
-		var sb = new StringBuilder(32);
+	private static void FormatFm2InputLine(StringBuilder sb, InputFrame frame, int controllerCount) {
 		sb.Append('|');
 
 		// Command byte
@@ -356,7 +364,5 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 			sb.Append(input.A ? 'A' : '.');
 			sb.Append('|');
 		}
-
-		return sb.ToString();
 	}
 }

@@ -729,19 +729,19 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 
 		var controller = frame.Controllers[port];
-		switch (button.ToUpperInvariant()) {
-			case "A": controller.A = !controller.A; break;
-			case "B": controller.B = !controller.B; break;
-			case "X": controller.X = !controller.X; break;
-			case "Y": controller.Y = !controller.Y; break;
-			case "L": controller.L = !controller.L; break;
-			case "R": controller.R = !controller.R; break;
-			case "UP": controller.Up = !controller.Up; break;
-			case "DOWN": controller.Down = !controller.Down; break;
-			case "LEFT": controller.Left = !controller.Left; break;
-			case "RIGHT": controller.Right = !controller.Right; break;
-			case "START": controller.Start = !controller.Start; break;
-			case "SELECT": controller.Select = !controller.Select; break;
+		switch (button) {
+			case "A" or "a": controller.A = !controller.A; break;
+			case "B" or "b": controller.B = !controller.B; break;
+			case "X" or "x": controller.X = !controller.X; break;
+			case "Y" or "y": controller.Y = !controller.Y; break;
+			case "L" or "l": controller.L = !controller.L; break;
+			case "R" or "r": controller.R = !controller.R; break;
+			case "UP" or "Up" or "up": controller.Up = !controller.Up; break;
+			case "DOWN" or "Down" or "down": controller.Down = !controller.Down; break;
+			case "LEFT" or "Left" or "left": controller.Left = !controller.Left; break;
+			case "RIGHT" or "Right" or "right": controller.Right = !controller.Right; break;
+			case "START" or "Start" or "start": controller.Start = !controller.Start; break;
+			case "SELECT" or "Select" or "select": controller.Select = !controller.Select; break;
 		}
 
 		RefreshFrameAt(SelectedFrameIndex);
@@ -770,19 +770,19 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 
 		var controller = frame.Controllers[port];
-		switch (button.ToUpperInvariant()) {
-			case "A": controller.A = state; break;
-			case "B": controller.B = state; break;
-			case "X": controller.X = state; break;
-			case "Y": controller.Y = state; break;
-			case "L": controller.L = state; break;
-			case "R": controller.R = state; break;
-			case "UP": controller.Up = state; break;
-			case "DOWN": controller.Down = state; break;
-			case "LEFT": controller.Left = state; break;
-			case "RIGHT": controller.Right = state; break;
-			case "START": controller.Start = state; break;
-			case "SELECT": controller.Select = state; break;
+		switch (button) {
+			case "A" or "a": controller.A = state; break;
+			case "B" or "b": controller.B = state; break;
+			case "X" or "x": controller.X = state; break;
+			case "Y" or "y": controller.Y = state; break;
+			case "L" or "l": controller.L = state; break;
+			case "R" or "r": controller.R = state; break;
+			case "UP" or "Up" or "up": controller.Up = state; break;
+			case "DOWN" or "Down" or "down": controller.Down = state; break;
+			case "LEFT" or "Left" or "left": controller.Left = state; break;
+			case "RIGHT" or "Right" or "right": controller.Right = state; break;
+			case "START" or "Start" or "start": controller.Start = state; break;
+			case "SELECT" or "Select" or "select": controller.Select = state; break;
 		}
 
 		HasUnsavedChanges = true;
@@ -963,7 +963,10 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 
 		int insertAt = Math.Max(0, SelectedFrameIndex >= 0 ? SelectedFrameIndex + 1 : Movie.InputFrames.Count);
-		var clonedFrames = _clipboard.Select(f => f.Clone()).ToList();
+		var clonedFrames = new List<InputFrame>(_clipboard.Count);
+		foreach (var f in _clipboard) {
+			clonedFrames.Add(f.Clone());
+		}
 
 		ExecuteAction(new InsertFramesAction(Movie, insertAt, clonedFrames));
 		UpdateFrames();

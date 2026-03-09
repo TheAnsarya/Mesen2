@@ -372,8 +372,9 @@ public sealed class LsmvMovieConverter : MovieConverterBase {
 		var entry = archive.CreateEntry("input");
 		using var writer = new StreamWriter(entry.Open(), Encoding.UTF8);
 
+		var sb = new StringBuilder(64);
 		foreach (var frame in movie.InputFrames) {
-			var sb = new StringBuilder();
+			sb.Clear();
 
 			// Frame marker with reset
 			sb.Append('F');
