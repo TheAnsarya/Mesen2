@@ -182,7 +182,7 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		Recorder.RecordingStopped += (_, e) => {
 			IsRecording = false;
 			StatusMessage = $"Recording stopped. {e.FramesRecorded} frames recorded.";
-			UpdateFrames();
+			SyncNewFrames();
 		};
 
 		Recorder.FrameRecorded += (_, e) => {
@@ -872,6 +872,25 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 	}
 
 	/// <summary>
+	/// Removes a range of frame ViewModels at the specified index. O(count + tail) for renumbering.
+	/// </summary>
+	private void RemoveFrameViewModels(int startIndex, int count) {
+		if (startIndex < 0 || count <= 0 || startIndex + count > Frames.Count) {
+			return;
+		}
+
+		// Remove from end of range backward to avoid shifting during removal
+		for (int i = startIndex + count - 1; i >= startIndex; i--) {
+			Frames.RemoveAt(i);
+		}
+
+		// Renumber everything after the removed block
+		for (int i = startIndex; i < Frames.Count; i++) {
+			Frames[i].FrameNumber = i + 1;
+		}
+	}
+
+	/// <summary>
 	/// Removes frame ViewModels from startIndex to the end. O(count) removals, no renumbering needed.
 	/// </summary>
 	private void TruncateFrameViewModels(int startIndex) {
@@ -916,7 +935,7 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		_redoStack.Push(action);
 
 		UpdateUndoRedoState();
-		UpdateFrames();
+		ApplyIncrementalUpdate(action, isUndo: true);
 		HasUnsavedChanges = true;
 		StatusMessage = $"Undid: {action.Description}";
 	}
@@ -934,9 +953,49 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		_undoStack.Push(action);
 
 		UpdateUndoRedoState();
-		UpdateFrames();
+		ApplyIncrementalUpdate(action, isUndo: false);
 		HasUnsavedChanges = true;
 		StatusMessage = $"Redid: {action.Description}";
+	}
+
+	/// <summary>
+	/// Dispatches incremental ObservableCollection updates based on the action type,
+	/// avoiding full UpdateFrames() rebuild for known action types.
+	/// </summary>
+	private void ApplyIncrementalUpdate(UndoableAction action, bool isUndo) {
+		switch (action) {
+			case InsertFramesAction insert:
+				if (isUndo) {
+					// Undo of insert = frames were removed
+					RemoveFrameViewModels(insert.Index, insert.Count);
+				} else {
+					// Redo of insert = frames were inserted
+					InsertFrameViewModels(insert.Index, insert.Count);
+				}
+				break;
+			case DeleteFramesAction delete:
+				if (isUndo) {
+					// Undo of delete = frames were inserted back
+					InsertFrameViewModels(delete.Index, delete.Count);
+				} else {
+					// Redo of delete = frames were removed
+					RemoveFrameViewModels(delete.Index, delete.Count);
+				}
+				break;
+			case ModifyInputAction modify:
+				// No structural change — just refresh the affected VM
+				for (int i = 0; i < Frames.Count; i++) {
+					if (ReferenceEquals(Frames[i].Frame, modify.FrameRef)) {
+						Frames[i].RefreshFromFrame();
+						break;
+					}
+				}
+				break;
+			default:
+				// Unknown action type — fall back to full rebuild
+				UpdateFrames();
+				break;
+		}
 	}
 
 	/// <summary>
@@ -1261,7 +1320,7 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 
 		Recorder.StopRecording();
-		UpdateFrames();
+		SyncNewFrames();
 		HasUnsavedChanges = true;
 	}
 
@@ -2004,6 +2063,9 @@ public sealed class InsertFramesAction : UndoableAction {
 	private readonly int _index;
 	private readonly List<InputFrame> _frames;
 
+	public int Index => _index;
+	public int Count => _frames.Count;
+
 	public override string Description => $"Insert {_frames.Count} frame(s)";
 
 	public InsertFramesAction(MovieData movie, int index, List<InputFrame> frames) {
@@ -2028,6 +2090,9 @@ public sealed class DeleteFramesAction : UndoableAction {
 	private readonly MovieData _movie;
 	private readonly int _index;
 	private readonly List<InputFrame> _deletedFrames;
+
+	public int Index => _index;
+	public int Count => _deletedFrames.Count;
 
 	public override string Description => $"Delete {_deletedFrames.Count} frame(s)";
 
@@ -2054,6 +2119,8 @@ public sealed class ModifyInputAction : UndoableAction {
 	private readonly int _port;
 	private readonly ControllerInput _oldInput;
 	private readonly ControllerInput _newInput;
+
+	public InputFrame FrameRef => _frame;
 
 	public override string Description => "Modify input";
 
