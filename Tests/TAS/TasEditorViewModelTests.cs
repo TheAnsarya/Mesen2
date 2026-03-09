@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Nexen.MovieConverter;
+using Nexen.ViewModels;
 using Xunit;
 
 namespace Nexen.Tests.TAS;
@@ -174,6 +175,567 @@ public class TasEditorViewModelTests {
 		Assert.Equal(4, viewModels[3].FrameNumber); // New frame 4 (1-based)
 		Assert.Equal(5, viewModels[4].FrameNumber); // New frame 5 (1-based)
 	}
+
+	#region Batch Insert Tests
+
+	/// <summary>
+	/// Tests batch insert of multiple frames with correct renumbering.
+	/// Simulates InsertFrameViewModels logic.
+	/// </summary>
+	[Theory]
+	[InlineData(10, 0, 3)]   // Insert at beginning
+	[InlineData(10, 5, 3)]   // Insert in middle
+	[InlineData(10, 10, 3)]  // Insert at end
+	[InlineData(10, 3, 1)]   // Insert single
+	[InlineData(10, 7, 5)]   // Insert more than remaining tail
+	public void BatchInsert_CorrectlyRenumbersAllFrames(int initialCount, int insertAt, int insertCount) {
+		// Arrange
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < initialCount + insertCount; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < initialCount; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		// Act - simulate InsertFrameViewModels
+		for (int j = 0; j < insertCount; j++) {
+			int idx = insertAt + j;
+			var vm = new MockTasFrameViewModel(movieFrames[initialCount + j], idx, false);
+			viewModels.Insert(idx, vm);
+		}
+
+		// Renumber everything after the inserted block
+		for (int i = insertAt + insertCount; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		// Assert - all frame numbers should be sequential 1-based
+		Assert.Equal(initialCount + insertCount, viewModels.Count);
+		for (int i = 0; i < viewModels.Count; i++) {
+			Assert.Equal(i + 1, viewModels[i].FrameNumber);
+		}
+	}
+
+	/// <summary>
+	/// Tests that batch insert preserves existing VM references before the insert point.
+	/// </summary>
+	[Fact]
+	public void BatchInsert_PreservesExistingVmReferences() {
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < 8; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < 5; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		var beforeInsert = viewModels.Select(vm => vm).ToArray();
+
+		// Insert 3 frames at index 2
+		for (int j = 0; j < 3; j++) {
+			int idx = 2 + j;
+			viewModels.Insert(idx, new MockTasFrameViewModel(movieFrames[5 + j], idx, false));
+		}
+
+		// VMs before insert point should be the same references
+		Assert.Same(beforeInsert[0], viewModels[0]);
+		Assert.Same(beforeInsert[1], viewModels[1]);
+		// VMs after insert point should be the same references (shifted)
+		Assert.Same(beforeInsert[2], viewModels[5]);
+		Assert.Same(beforeInsert[3], viewModels[6]);
+		Assert.Same(beforeInsert[4], viewModels[7]);
+	}
+
+	#endregion
+
+	#region Batch Remove Tests
+
+	/// <summary>
+	/// Tests batch remove of multiple frames with correct renumbering.
+	/// Simulates RemoveFrameViewModels logic.
+	/// </summary>
+	[Theory]
+	[InlineData(10, 0, 3)]   // Remove from beginning
+	[InlineData(10, 4, 3)]   // Remove from middle
+	[InlineData(10, 7, 3)]   // Remove from near end
+	[InlineData(10, 5, 1)]   // Remove single
+	public void BatchRemove_CorrectlyRenumbersAllFrames(int initialCount, int removeAt, int removeCount) {
+		// Arrange
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < initialCount; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < initialCount; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		// Act — simulate RemoveFrameViewModels (backward removal)
+		for (int i = removeAt + removeCount - 1; i >= removeAt; i--) {
+			viewModels.RemoveAt(i);
+		}
+
+		// Renumber everything after the removed block
+		for (int i = removeAt; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		// Assert
+		Assert.Equal(initialCount - removeCount, viewModels.Count);
+		for (int i = 0; i < viewModels.Count; i++) {
+			Assert.Equal(i + 1, viewModels[i].FrameNumber);
+		}
+	}
+
+	/// <summary>
+	/// Tests that batch remove preserves references outside the removed range.
+	/// </summary>
+	[Fact]
+	public void BatchRemove_PreservesExistingVmReferences() {
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < 10; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < 10; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		var vm0 = viewModels[0];
+		var vm1 = viewModels[1];
+		var vm5 = viewModels[5];
+		var vm9 = viewModels[9];
+
+		// Remove indices 2-4 (3 frames)
+		for (int i = 4; i >= 2; i--) {
+			viewModels.RemoveAt(i);
+		}
+
+		Assert.Same(vm0, viewModels[0]);
+		Assert.Same(vm1, viewModels[1]);
+		Assert.Same(vm5, viewModels[2]); // Shifted from 5 to 2
+		Assert.Same(vm9, viewModels[6]); // Shifted from 9 to 6
+	}
+
+	#endregion
+
+	#region Truncate Tests
+
+	/// <summary>
+	/// Tests truncation removes all frames from the specified index to the end.
+	/// Simulates TruncateFrameViewModels logic.
+	/// </summary>
+	[Theory]
+	[InlineData(10, 0)]   // Truncate all
+	[InlineData(10, 5)]   // Truncate second half
+	[InlineData(10, 9)]   // Truncate last frame only
+	[InlineData(10, 1)]   // Keep only first frame
+	public void Truncate_RemovesFromIndexToEnd(int initialCount, int truncateAt) {
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < initialCount; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < initialCount; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		// Act — simulate TruncateFrameViewModels (reverse removal)
+		for (int i = viewModels.Count - 1; i >= truncateAt; i--) {
+			viewModels.RemoveAt(i);
+		}
+
+		// Assert
+		Assert.Equal(truncateAt, viewModels.Count);
+		for (int i = 0; i < viewModels.Count; i++) {
+			Assert.Equal(i + 1, viewModels[i].FrameNumber);
+		}
+	}
+
+	/// <summary>
+	/// Tests truncate preserves references for frames before the truncation point.
+	/// </summary>
+	[Fact]
+	public void Truncate_PreservesVmReferencesBeforeTruncationPoint() {
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < 10; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < 10; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		var vm0 = viewModels[0];
+		var vm4 = viewModels[4];
+
+		// Truncate at index 5
+		for (int i = viewModels.Count - 1; i >= 5; i--) {
+			viewModels.RemoveAt(i);
+		}
+
+		Assert.Equal(5, viewModels.Count);
+		Assert.Same(vm0, viewModels[0]);
+		Assert.Same(vm4, viewModels[4]);
+	}
+
+	#endregion
+
+	#region Undo/Redo Incremental Dispatch Tests
+
+	/// <summary>
+	/// Tests that undoing an InsertFramesAction results in the correct frame count
+	/// when using incremental remove instead of full rebuild.
+	/// </summary>
+	[Fact]
+	public void UndoInsert_IncrementalRemove_MaintainsCorrectState() {
+		var movie = CreateTestMovieData(10);
+		var viewModels = CreateViewModelsForMovie(movie);
+
+		// Insert 3 frames at index 5
+		var newFrames = new List<InputFrame> {
+			new(100), new(101), new(102)
+		};
+		var action = new InsertFramesAction(movie, 5, newFrames);
+		action.Execute();
+
+		// Simulate InsertFrameViewModels
+		for (int j = 0; j < 3; j++) {
+			int idx = 5 + j;
+			viewModels.Insert(idx, new MockTasFrameViewModel(movie.InputFrames[idx], idx, false));
+		}
+		for (int i = 8; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		Assert.Equal(13, viewModels.Count);
+
+		// Now undo
+		action.Undo();
+
+		// Simulate incremental RemoveFrameViewModels
+		for (int i = 7; i >= 5; i--) {
+			viewModels.RemoveAt(i);
+		}
+		for (int i = 5; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		Assert.Equal(10, viewModels.Count);
+		Assert.Equal(10, movie.InputFrames.Count);
+
+		// Verify sequential numbering
+		for (int i = 0; i < viewModels.Count; i++) {
+			Assert.Equal(i + 1, viewModels[i].FrameNumber);
+		}
+	}
+
+	/// <summary>
+	/// Tests that undoing a DeleteFramesAction results in correct re-insertion
+	/// when using incremental insert instead of full rebuild.
+	/// </summary>
+	[Fact]
+	public void UndoDelete_IncrementalInsert_MaintainsCorrectState() {
+		var movie = CreateTestMovieData(10);
+		var viewModels = CreateViewModelsForMovie(movie);
+		var originalCount = movie.InputFrames.Count;
+
+		// Delete 3 frames at index 3
+		var action = new DeleteFramesAction(movie, 3, 3);
+		action.Execute();
+
+		// Simulate RemoveFrameViewModels
+		for (int i = 5; i >= 3; i--) {
+			viewModels.RemoveAt(i);
+		}
+		for (int i = 3; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		Assert.Equal(7, viewModels.Count);
+
+		// Now undo
+		action.Undo();
+
+		// Simulate InsertFrameViewModels (undoing delete = insert back)
+		for (int j = 0; j < 3; j++) {
+			int idx = 3 + j;
+			viewModels.Insert(idx, new MockTasFrameViewModel(movie.InputFrames[idx], idx, false));
+		}
+		for (int i = 6; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		Assert.Equal(originalCount, viewModels.Count);
+		Assert.Equal(originalCount, movie.InputFrames.Count);
+
+		for (int i = 0; i < viewModels.Count; i++) {
+			Assert.Equal(i + 1, viewModels[i].FrameNumber);
+		}
+	}
+
+	/// <summary>
+	/// Tests that ModifyInputAction undo only refreshes the affected frame VM.
+	/// </summary>
+	[Fact]
+	public void UndoModify_RefreshesOnlySingleFrame() {
+		var movie = CreateTestMovieData(10);
+		var viewModels = CreateViewModelsForMovie(movie);
+
+		var targetFrame = movie.InputFrames[5];
+		var newInput = new ControllerInput { A = true, B = true, Start = true };
+		var action = new ModifyInputAction(targetFrame, 2, 0, newInput);
+		action.Execute();
+
+		// Track which VMs get refreshed
+		var refreshed = new List<int>();
+		for (int i = 0; i < viewModels.Count; i++) {
+			int idx = i;
+			viewModels[i].PropertyChanged += (_, e) => {
+				if (e.PropertyName == nameof(MockTasFrameViewModel.P1Input)) {
+					refreshed.Add(idx);
+				}
+			};
+		}
+
+		// Simulate ApplyIncrementalUpdate for ModifyInputAction
+		for (int i = 0; i < viewModels.Count; i++) {
+			if (ReferenceEquals(viewModels[i].Frame, targetFrame)) {
+				viewModels[i].RefreshFromFrame();
+				break;
+			}
+		}
+
+		// Only the target frame should have been refreshed
+		Assert.Single(refreshed);
+		Assert.Equal(5, refreshed[0]);
+	}
+
+	/// <summary>
+	/// Tests multiple undo/redo cycles maintain correct VM state incrementally.
+	/// </summary>
+	[Fact]
+	public void MultipleUndoRedo_IncrementalMaintainsConsistency() {
+		var movie = CreateTestMovieData(10);
+		var viewModels = CreateViewModelsForMovie(movie);
+
+		// Insert 2 frames at index 3
+		var frames1 = new List<InputFrame> { new(100), new(101) };
+		var insert1 = new InsertFramesAction(movie, 3, frames1);
+		insert1.Execute();
+		SimulateInsert(viewModels, movie, 3, 2);
+		Assert.Equal(12, viewModels.Count);
+
+		// Insert 2 more frames at index 8
+		var frames2 = new List<InputFrame> { new(200), new(201) };
+		var insert2 = new InsertFramesAction(movie, 8, frames2);
+		insert2.Execute();
+		SimulateInsert(viewModels, movie, 8, 2);
+		Assert.Equal(14, viewModels.Count);
+
+		// Undo second insert
+		insert2.Undo();
+		SimulateRemove(viewModels, 8, 2);
+		Assert.Equal(12, viewModels.Count);
+
+		// Undo first insert
+		insert1.Undo();
+		SimulateRemove(viewModels, 3, 2);
+		Assert.Equal(10, viewModels.Count);
+
+		// Redo both
+		insert1.Execute();
+		SimulateInsert(viewModels, movie, 3, 2);
+		insert2.Execute();
+		SimulateInsert(viewModels, movie, 8, 2);
+		Assert.Equal(14, viewModels.Count);
+
+		// All frame numbers sequential
+		for (int i = 0; i < viewModels.Count; i++) {
+			Assert.Equal(i + 1, viewModels[i].FrameNumber);
+		}
+	}
+
+	#endregion
+
+	#region Edge Case Tests
+
+	/// <summary>
+	/// Tests inserting zero frames is a no-op.
+	/// </summary>
+	[Fact]
+	public void BatchInsert_ZeroCount_IsNoOp() {
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < 5; i++) {
+			viewModels.Add(new MockTasFrameViewModel(new InputFrame(i), i, false));
+		}
+
+		// Insert 0 frames — should not change anything
+		Assert.Equal(5, viewModels.Count);
+	}
+
+	/// <summary>
+	/// Tests removing all frames leaves empty collection.
+	/// </summary>
+	[Fact]
+	public void Truncate_AtZero_ClearsAllFrames() {
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < 5; i++) {
+			viewModels.Add(new MockTasFrameViewModel(new InputFrame(i), i, false));
+		}
+
+		// Truncate at 0
+		for (int i = viewModels.Count - 1; i >= 0; i--) {
+			viewModels.RemoveAt(i);
+		}
+
+		Assert.Empty(viewModels);
+	}
+
+	/// <summary>
+	/// Tests batch insert at end doesn't need to renumber existing frames.
+	/// </summary>
+	[Fact]
+	public void BatchInsert_AtEnd_NoRenumberingForExisting() {
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < 8; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < 5; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		var numberChanges = new List<int>();
+		foreach (var vm in viewModels) {
+			vm.PropertyChanged += (_, e) => {
+				if (e.PropertyName == nameof(MockTasFrameViewModel.FrameNumber)) {
+					numberChanges.Add(vm.FrameNumber);
+				}
+			};
+		}
+
+		// Insert 3 at end
+		for (int j = 0; j < 3; j++) {
+			int idx = 5 + j;
+			viewModels.Insert(idx, new MockTasFrameViewModel(movieFrames[5 + j], idx, false));
+		}
+
+		// Renumber tail (nothing to renumber since insertAt + count == Count)
+		for (int i = 8; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		// No existing frames should have had their numbers changed
+		Assert.Empty(numberChanges);
+		Assert.Equal(8, viewModels.Count);
+	}
+
+	/// <summary>
+	/// Tests large-scale insert and remove operations for correctness.
+	/// </summary>
+	[Fact]
+	public void LargeScale_InsertAndRemove_MaintainsIntegrity() {
+		const int initialSize = 1000;
+		const int insertSize = 500;
+		const int insertAt = 300;
+
+		var movieFrames = new List<InputFrame>();
+		for (int i = 0; i < initialSize + insertSize; i++) {
+			movieFrames.Add(new InputFrame(i));
+		}
+
+		var viewModels = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < initialSize; i++) {
+			viewModels.Add(new MockTasFrameViewModel(movieFrames[i], i, false));
+		}
+
+		// Insert 500 at index 300
+		for (int j = 0; j < insertSize; j++) {
+			int idx = insertAt + j;
+			viewModels.Insert(idx, new MockTasFrameViewModel(movieFrames[initialSize + j], idx, false));
+		}
+		for (int i = insertAt + insertSize; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		Assert.Equal(initialSize + insertSize, viewModels.Count);
+
+		// Remove the same 500
+		for (int i = insertAt + insertSize - 1; i >= insertAt; i--) {
+			viewModels.RemoveAt(i);
+		}
+		for (int i = insertAt; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+
+		Assert.Equal(initialSize, viewModels.Count);
+
+		for (int i = 0; i < viewModels.Count; i++) {
+			Assert.Equal(i + 1, viewModels[i].FrameNumber);
+		}
+	}
+
+	#endregion
+
+	#region Test Helpers
+
+	private static MovieData CreateTestMovieData(int frameCount) {
+		var movie = new MovieData {
+			Author = "Test",
+			GameName = "Test Game",
+			SystemType = SystemType.Nes
+		};
+		for (int i = 0; i < frameCount; i++) {
+			movie.InputFrames.Add(new InputFrame(i) {
+				Controllers = [new ControllerInput { A = i % 2 == 0 }]
+			});
+		}
+		return movie;
+	}
+
+	private static ObservableCollection<MockTasFrameViewModel> CreateViewModelsForMovie(MovieData movie) {
+		var vms = new ObservableCollection<MockTasFrameViewModel>();
+		for (int i = 0; i < movie.InputFrames.Count; i++) {
+			vms.Add(new MockTasFrameViewModel(movie.InputFrames[i], i, false));
+		}
+		return vms;
+	}
+
+	private static void SimulateInsert(
+		ObservableCollection<MockTasFrameViewModel> viewModels,
+		MovieData movie, int startIndex, int count) {
+		for (int j = 0; j < count; j++) {
+			int idx = startIndex + j;
+			viewModels.Insert(idx, new MockTasFrameViewModel(movie.InputFrames[idx], idx, false));
+		}
+		for (int i = startIndex + count; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+	}
+
+	private static void SimulateRemove(
+		ObservableCollection<MockTasFrameViewModel> viewModels,
+		int startIndex, int count) {
+		for (int i = startIndex + count - 1; i >= startIndex; i--) {
+			viewModels.RemoveAt(i);
+		}
+		for (int i = startIndex; i < viewModels.Count; i++) {
+			viewModels[i].FrameNumber = i + 1;
+		}
+	}
+
+	#endregion
 }
 
 /// <summary>

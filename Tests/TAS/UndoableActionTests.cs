@@ -230,7 +230,7 @@ public class UndoableActionTests {
 		var frame = movie.InputFrames[2];
 		var newInput = new ControllerInput { A = true, B = true, Up = true };
 
-		var action = new ModifyInputAction(frame, 0, newInput);
+		var action = new ModifyInputAction(frame, 2, 0, newInput);
 		action.Execute();
 
 		Assert.True(frame.Controllers[0].A);
@@ -246,7 +246,7 @@ public class UndoableActionTests {
 		bool originalB = frame.Controllers[0].B;
 
 		var newInput = new ControllerInput { A = !originalA, B = !originalB };
-		var action = new ModifyInputAction(frame, 0, newInput);
+		var action = new ModifyInputAction(frame, 2, 0, newInput);
 
 		action.Execute();
 		Assert.Equal(!originalA, frame.Controllers[0].A);
@@ -262,7 +262,7 @@ public class UndoableActionTests {
 		var frame = movie.InputFrames[0];
 		var newInput = new ControllerInput { Start = true, Select = true };
 
-		var action = new ModifyInputAction(frame, 0, newInput);
+		var action = new ModifyInputAction(frame, 0, 0, newInput);
 
 		action.Execute();
 		Assert.True(frame.Controllers[0].Start);
@@ -280,7 +280,7 @@ public class UndoableActionTests {
 		var frame = new InputFrame(0) {
 			Controllers = [new ControllerInput()]
 		};
-		var action = new ModifyInputAction(frame, 0, new ControllerInput());
+		var action = new ModifyInputAction(frame, 0, 0, new ControllerInput());
 		Assert.Equal("Modify input", action.Description);
 	}
 
@@ -292,7 +292,7 @@ public class UndoableActionTests {
 
 		// Only change A, leaving original L/R/X/Y
 		var newInput = new ControllerInput { A = true };
-		var action = new ModifyInputAction(frame, 0, newInput);
+		var action = new ModifyInputAction(frame, 0, 0, newInput);
 
 		action.Execute();
 		Assert.True(frame.Controllers[0].A);

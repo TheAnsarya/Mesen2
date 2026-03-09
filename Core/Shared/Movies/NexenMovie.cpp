@@ -117,25 +117,18 @@ bool NexenMovie::Play(VirtualFile& file) {
 		return false;
 	}
 
-	// Count input lines first to pre-allocate (avoids repeated reallocations for large movies)
+	// Pre-allocate using fast newline count from raw data (avoids double-pass getline)
 	{
-		size_t lineCount = 0;
-		string line;
-		while (std::getline(inputData, line)) {
-			if (line.starts_with("|")) {
-				lineCount++;
-			}
-		}
-		_inputData.reserve(lineCount);
-		inputData.clear();
-		inputData.seekg(0, ios::beg);
+		const string& rawInput = inputData.str();
+		size_t lineEstimate = std::ranges::count(rawInput, '\n') + 1;
+		_inputData.reserve(lineEstimate);
 	}
 
 	while (inputData) {
 		string line;
 		std::getline(inputData, line);
 		if (line.starts_with("|")) {
-			_inputData.push_back(StringUtilities::Split(line.substr(1), '|'));
+			_inputData.push_back(StringUtilities::Split(string_view(line).substr(1), '|'));
 		}
 	}
 

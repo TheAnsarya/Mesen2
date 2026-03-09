@@ -653,9 +653,8 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 
 		int deleteAt = SelectedFrameIndex;
-		Movie.InputFrames.RemoveAt(deleteAt);
+		ExecuteAction(new DeleteFramesAction(Movie, deleteAt, 1));
 		RemoveFrameViewModel(deleteAt);
-		HasUnsavedChanges = true;
 		StatusMessage = $"Deleted frame {deleteAt}";
 
 		// Adjust selection
@@ -673,12 +672,8 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 
 		var frame = Movie.InputFrames[SelectedFrameIndex];
-		for (int i = 0; i < frame.Controllers.Length; i++) {
-			frame.Controllers[i] = new ControllerInput();
-		}
-
+		ExecuteAction(new ClearInputAction(frame, SelectedFrameIndex));
 		RefreshFrameAt(SelectedFrameIndex);
-		HasUnsavedChanges = true;
 		StatusMessage = $"Cleared input on frame {SelectedFrameIndex}";
 	}
 
@@ -728,31 +723,56 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 			return;
 		}
 
-		var controller = frame.Controllers[port];
+		var newInput = CloneControllerInput(frame.Controllers[port]);
 		switch (button) {
-			case "A" or "a": controller.A = !controller.A; break;
-			case "B" or "b": controller.B = !controller.B; break;
-			case "X" or "x": controller.X = !controller.X; break;
-			case "Y" or "y": controller.Y = !controller.Y; break;
-			case "L" or "l": controller.L = !controller.L; break;
-			case "R" or "r": controller.R = !controller.R; break;
-			case "UP" or "Up" or "up": controller.Up = !controller.Up; break;
-			case "DOWN" or "Down" or "down": controller.Down = !controller.Down; break;
-			case "LEFT" or "Left" or "left": controller.Left = !controller.Left; break;
-			case "RIGHT" or "Right" or "right": controller.Right = !controller.Right; break;
-			case "START" or "Start" or "start": controller.Start = !controller.Start; break;
-			case "SELECT" or "Select" or "select": controller.Select = !controller.Select; break;
+			case "A" or "a": newInput.A = !newInput.A; break;
+			case "B" or "b": newInput.B = !newInput.B; break;
+			case "X" or "x": newInput.X = !newInput.X; break;
+			case "Y" or "y": newInput.Y = !newInput.Y; break;
+			case "L" or "l": newInput.L = !newInput.L; break;
+			case "R" or "r": newInput.R = !newInput.R; break;
+			case "UP" or "Up" or "up": newInput.Up = !newInput.Up; break;
+			case "DOWN" or "Down" or "down": newInput.Down = !newInput.Down; break;
+			case "LEFT" or "Left" or "left": newInput.Left = !newInput.Left; break;
+			case "RIGHT" or "Right" or "right": newInput.Right = !newInput.Right; break;
+			case "START" or "Start" or "start": newInput.Start = !newInput.Start; break;
+			case "SELECT" or "Select" or "select": newInput.Select = !newInput.Select; break;
 		}
 
+		ExecuteAction(new ModifyInputAction(frame, SelectedFrameIndex, port, newInput));
 		RefreshFrameAt(SelectedFrameIndex);
-		HasUnsavedChanges = true;
 	}
 
 	/// <summary>
-	/// Toggles a button at a specific frame (used by piano roll).
+	/// Toggles a button at a specific frame (used by piano roll). Undoable.
 	/// </summary>
 	public void ToggleButtonAtFrame(int frameIndex, int port, string button, bool newState) {
-		SetButtonAtFrame(frameIndex, port, button, newState);
+		if (Movie is null || frameIndex < 0 || frameIndex >= Movie.InputFrames.Count) {
+			return;
+		}
+
+		var frame = Movie.InputFrames[frameIndex];
+		if (port < 0 || port >= frame.Controllers.Length) {
+			return;
+		}
+
+		var newInput = CloneControllerInput(frame.Controllers[port]);
+		switch (button) {
+			case "A" or "a": newInput.A = newState; break;
+			case "B" or "b": newInput.B = newState; break;
+			case "X" or "x": newInput.X = newState; break;
+			case "Y" or "y": newInput.Y = newState; break;
+			case "L" or "l": newInput.L = newState; break;
+			case "R" or "r": newInput.R = newState; break;
+			case "UP" or "Up" or "up": newInput.Up = newState; break;
+			case "DOWN" or "Down" or "down": newInput.Down = newState; break;
+			case "LEFT" or "Left" or "left": newInput.Left = newState; break;
+			case "RIGHT" or "Right" or "right": newInput.Right = newState; break;
+			case "START" or "Start" or "start": newInput.Start = newState; break;
+			case "SELECT" or "Select" or "select": newInput.Select = newState; break;
+		}
+
+		ExecuteAction(new ModifyInputAction(frame, frameIndex, port, newInput));
 		RefreshFrameAt(frameIndex);
 	}
 
@@ -815,6 +835,13 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 			Frames[index].RefreshFromFrame();
 		}
 	}
+
+	private static ControllerInput CloneControllerInput(ControllerInput src) => new() {
+		A = src.A, B = src.B, X = src.X, Y = src.Y,
+		L = src.L, R = src.R,
+		Up = src.Up, Down = src.Down, Left = src.Left, Right = src.Right,
+		Start = src.Start, Select = src.Select
+	};
 
 	/// <summary>
 	/// Inserts a frame ViewModel at the specified index and updates subsequent frame numbers. O(n) for renumbering but avoids full collection rebuild.
@@ -983,13 +1010,12 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 				}
 				break;
 			case ModifyInputAction modify:
-				// No structural change — just refresh the affected VM
-				for (int i = 0; i < Frames.Count; i++) {
-					if (ReferenceEquals(Frames[i].Frame, modify.FrameRef)) {
-						Frames[i].RefreshFromFrame();
-						break;
-					}
-				}
+				// No structural change — O(1) refresh using stored index
+				RefreshFrameAt(modify.FrameIndex);
+				break;
+			case ClearInputAction clear:
+				// No structural change — O(1) refresh using stored index
+				RefreshFrameAt(clear.FrameIndex);
 				break;
 			default:
 				// Unknown action type — fall back to full rebuild
@@ -2116,16 +2142,19 @@ public sealed class DeleteFramesAction : UndoableAction {
 /// </summary>
 public sealed class ModifyInputAction : UndoableAction {
 	private readonly InputFrame _frame;
+	private readonly int _frameIndex;
 	private readonly int _port;
 	private readonly ControllerInput _oldInput;
 	private readonly ControllerInput _newInput;
 
 	public InputFrame FrameRef => _frame;
+	public int FrameIndex => _frameIndex;
 
 	public override string Description => "Modify input";
 
-	public ModifyInputAction(InputFrame frame, int port, ControllerInput newInput) {
+	public ModifyInputAction(InputFrame frame, int frameIndex, int port, ControllerInput newInput) {
 		_frame = frame;
+		_frameIndex = frameIndex;
 		_port = port;
 		_oldInput = CloneInput(frame.Controllers[port]);
 		_newInput = newInput;
@@ -2152,6 +2181,47 @@ public sealed class ModifyInputAction : UndoableAction {
 		Right = src.Right,
 		Start = src.Start,
 		Select = src.Select
+	};
+}
+
+/// <summary>
+/// Action for clearing all controller inputs on a frame.
+/// </summary>
+public sealed class ClearInputAction : UndoableAction {
+	private readonly InputFrame _frame;
+	private readonly int _frameIndex;
+	private readonly ControllerInput[] _oldInputs;
+
+	public int FrameIndex => _frameIndex;
+
+	public override string Description => "Clear input";
+
+	public ClearInputAction(InputFrame frame, int frameIndex) {
+		_frame = frame;
+		_frameIndex = frameIndex;
+		_oldInputs = new ControllerInput[frame.Controllers.Length];
+		for (int i = 0; i < frame.Controllers.Length; i++) {
+			_oldInputs[i] = CloneInput(frame.Controllers[i]);
+		}
+	}
+
+	public override void Execute() {
+		for (int i = 0; i < _frame.Controllers.Length; i++) {
+			_frame.Controllers[i] = new ControllerInput();
+		}
+	}
+
+	public override void Undo() {
+		for (int i = 0; i < _oldInputs.Length && i < _frame.Controllers.Length; i++) {
+			_frame.Controllers[i] = _oldInputs[i];
+		}
+	}
+
+	private static ControllerInput CloneInput(ControllerInput src) => new() {
+		A = src.A, B = src.B, X = src.X, Y = src.Y,
+		L = src.L, R = src.R,
+		Up = src.Up, Down = src.Down, Left = src.Left, Right = src.Right,
+		Start = src.Start, Select = src.Select
 	};
 }
 
