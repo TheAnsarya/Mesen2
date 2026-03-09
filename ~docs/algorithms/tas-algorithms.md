@@ -549,3 +549,41 @@ Single-pass approach:
 ### Files
 
 - [Core/Shared/Movies/NexenMovie.cpp](../../Core/Shared/Movies/NexenMovie.cpp) — `Play()` input parsing
+
+---
+
+## 17. Batch Paint with Single Undo Action
+
+### Problem
+
+Piano roll drag-to-paint (`OnPianoRollCellsPainted`) had two critical issues:
+
+1. Used `SetButtonAtFrame()` which directly mutated controller input without creating an undo action — all paint operations were permanently not undoable
+2. After the paint loop, called `RefreshFrames()` which triggers full O(n) `UpdateFrames()` rebuild
+
+For painting 50 frames on a 10K-frame movie: 50 direct mutations + 1 full rebuild of all 10K ViewModels.
+
+### Solution
+
+New `PaintInputAction` class captures all old controller states at construction, applies the button state change on `Execute()`, and restores all old states on `Undo()`. A single action covers the entire paint stroke.
+
+New `PaintButton()` method on TasEditorViewModel:
+
+1. Validate all frame indices
+2. Clone old controller inputs for each frame
+3. Create single `PaintInputAction`
+4. `ExecuteAction(action)` — applies to undo stack
+5. `RefreshFrameAt(idx)` for each painted frame only — O(k) not O(n)
+
+`ApplyIncrementalUpdate` handles `PaintInputAction` by refreshing only the painted frames on undo/redo.
+
+### Complexity
+
+- **Before:** O(n) full rebuild after O(k) direct mutations, no undo support
+- **After:** O(k) incremental refresh, full undo/redo support
+- **For 50 painted frames on 10K-frame movie:** 50 refreshes instead of 10,000 rebuilds
+
+### Files
+
+- [UI/ViewModels/TasEditorViewModel.cs](../../UI/ViewModels/TasEditorViewModel.cs) — `PaintButton`, `PaintInputAction`, `ApplyIncrementalUpdate`
+- [UI/Windows/TasEditorWindow.axaml.cs](../../UI/Windows/TasEditorWindow.axaml.cs) — Updated `OnPianoRollCellsPainted` handler
