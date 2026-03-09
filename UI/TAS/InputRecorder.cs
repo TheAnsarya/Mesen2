@@ -242,12 +242,17 @@ public sealed class InputRecorder : IDisposable {
 			throw new InvalidOperationException("No movie loaded.");
 		}
 
+		var frames = new List<InputFrame>(_movie.InputFrames.Count);
+		foreach (var f in _movie.InputFrames) {
+			frames.Add(f.Clone());
+		}
+
 		var branch = new BranchData {
 			Name = name ?? $"Branch {DateTime.Now:HH:mm:ss}",
 			CreatedAt = DateTime.UtcNow,
 			FrameCount = _movie.InputFrames.Count,
 			RerecordCount = RerecordCount,
-			Frames = _movie.InputFrames.Select(f => f.Clone()).ToList()
+			Frames = frames
 		};
 
 		return branch;

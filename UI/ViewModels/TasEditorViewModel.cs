@@ -831,6 +831,14 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		}
 	}
 
+	/// <summary>
+	/// Refreshes the frame at the current playback position. O(1).
+	/// Used after state load where movie data hasn't changed, only the emulator position.
+	/// </summary>
+	public void RefreshFrameAtPlayback() {
+		RefreshFrameAt(PlaybackFrame);
+	}
+
 	internal static ControllerInput CloneControllerInput(ControllerInput src) => new() {
 		A = src.A, B = src.B, X = src.X, Y = src.Y,
 		L = src.L, R = src.R,
@@ -2052,15 +2060,11 @@ public sealed class TasFrameViewModel : ViewModelBase {
 	/// <summary>
 	/// Raises property changed for all computed properties that depend on the underlying frame data.
 	/// Call this after modifying the underlying InputFrame.
+	/// Uses empty property name to signal "all properties changed" in a single notification
+	/// instead of 7 separate RaisePropertyChanged calls.
 	/// </summary>
 	public void RefreshFromFrame() {
-		this.RaisePropertyChanged(nameof(P1Input));
-		this.RaisePropertyChanged(nameof(P2Input));
-		this.RaisePropertyChanged(nameof(MarkerText));
-		this.RaisePropertyChanged(nameof(CommentText));
-		this.RaisePropertyChanged(nameof(IsLagFrame));
-		this.RaisePropertyChanged(nameof(HasMarker));
-		this.RaisePropertyChanged(nameof(Background));
+		this.RaisePropertyChanged(string.Empty);
 	}
 }
 

@@ -2,6 +2,7 @@ using Xunit;
 using System;
 using System.Collections.Generic;
 using Nexen.MovieConverter;
+using Nexen.TAS;
 
 namespace Nexen.Tests.TAS;
 
@@ -138,6 +139,52 @@ public class InputRecorderTests {
 				movie2.InputFrames[i].Controllers[0].A
 			);
 		}
+	}
+
+	#endregion
+
+	#region Branch Tests
+
+	[Fact]
+	public void CreateBranch_ClonesAllFrames_WithCorrectCapacity() {
+		// Arrange
+		var movie = CreateTestMovie(200);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie };
+
+		// Act
+		var branch = recorder.CreateBranch("Test Branch");
+
+		// Assert
+		Assert.Equal(200, branch.Frames.Count);
+		Assert.Equal("Test Branch", branch.Name);
+
+		// Verify deep clone — mutating original shouldn't affect branch
+		movie.InputFrames[0].Controllers[0].A = !movie.InputFrames[0].Controllers[0].A;
+		Assert.NotEqual(movie.InputFrames[0].Controllers[0].A, branch.Frames[0].Controllers[0].A);
+	}
+
+	[Fact]
+	public void LoadBranch_ReplacesAllFrames_WithDeepClone() {
+		// Arrange
+		var movie = CreateTestMovie(50);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie };
+		var branch = recorder.CreateBranch("Saved");
+
+		// Modify original
+		movie.InputFrames.Clear();
+		Assert.Empty(movie.InputFrames);
+
+		// Act
+		recorder.LoadBranch(branch);
+
+		// Assert
+		Assert.Equal(50, movie.InputFrames.Count);
+
+		// Verify deep clone — mutating loaded frames shouldn't affect branch
+		movie.InputFrames[0].Controllers[0].B = true;
+		Assert.False(branch.Frames[0].Controllers[0].B);
 	}
 
 	#endregion

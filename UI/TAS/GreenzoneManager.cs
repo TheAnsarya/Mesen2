@@ -268,7 +268,11 @@ public sealed class GreenzoneManager : IDisposable {
 			if (_frameIndex.Count == 0 || _frameIndex.Max < fromFrame) {
 				framesToRemove = [];
 			} else {
-				framesToRemove = _frameIndex.GetViewBetween(fromFrame, _frameIndex.Max).ToList();
+				var view = _frameIndex.GetViewBetween(fromFrame, _frameIndex.Max);
+				framesToRemove = new List<int>(view.Count);
+				foreach (var f in view) {
+					framesToRemove.Add(f);
+				}
 			}
 
 			foreach (var frame in framesToRemove) {

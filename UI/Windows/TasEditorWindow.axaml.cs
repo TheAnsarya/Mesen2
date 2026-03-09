@@ -104,8 +104,9 @@ public class TasEditorWindow : NexenWindow, IDisposable {
 
 			case ConsoleNotificationType.StateLoaded:
 				Dispatcher.UIThread.Post(() => {
-					// Update frame position after state load
-					ViewModel?.RefreshFrames();
+					// Refresh only the current frame's display — state load doesn't change movie data,
+					// just the playback position. Avoids full O(n) rebuild.
+					ViewModel?.RefreshFrameAtPlayback();
 				});
 				break;
 		}
