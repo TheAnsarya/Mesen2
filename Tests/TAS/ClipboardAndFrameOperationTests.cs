@@ -1,4 +1,5 @@
 using Nexen.MovieConverter;
+using Nexen.ViewModels;
 using Xunit;
 
 namespace Nexen.Tests.TAS;
@@ -381,6 +382,240 @@ public class ClipboardAndFrameOperationTests {
 		// Set A to false
 		frame.Controllers[0].A = false;
 		Assert.False(frame.Controllers[0].A);
+	}
+
+	#endregion
+
+	#region CloneControllerInput Tests
+
+	[Fact]
+	public void CloneControllerInput_CopiesAllButtons() {
+		var src = new ControllerInput {
+			A = true, B = true, X = true, Y = true,
+			L = true, R = true,
+			Up = true, Down = true, Left = true, Right = true,
+			Start = true, Select = true
+		};
+
+		var clone = TasEditorViewModel.CloneControllerInput(src);
+
+		Assert.True(clone.A);
+		Assert.True(clone.B);
+		Assert.True(clone.X);
+		Assert.True(clone.Y);
+		Assert.True(clone.L);
+		Assert.True(clone.R);
+		Assert.True(clone.Up);
+		Assert.True(clone.Down);
+		Assert.True(clone.Left);
+		Assert.True(clone.Right);
+		Assert.True(clone.Start);
+		Assert.True(clone.Select);
+	}
+
+	[Fact]
+	public void CloneControllerInput_EmptyInput_AllFalse() {
+		var src = new ControllerInput();
+		var clone = TasEditorViewModel.CloneControllerInput(src);
+
+		Assert.False(clone.A);
+		Assert.False(clone.B);
+		Assert.False(clone.X);
+		Assert.False(clone.Y);
+		Assert.False(clone.L);
+		Assert.False(clone.R);
+		Assert.False(clone.Up);
+		Assert.False(clone.Down);
+		Assert.False(clone.Left);
+		Assert.False(clone.Right);
+		Assert.False(clone.Start);
+		Assert.False(clone.Select);
+	}
+
+	[Fact]
+	public void CloneControllerInput_IsIndependentCopy() {
+		var src = new ControllerInput { A = true, B = false };
+		var clone = TasEditorViewModel.CloneControllerInput(src);
+
+		// Mutate clone
+		clone.A = false;
+		clone.B = true;
+
+		// Source unchanged
+		Assert.True(src.A);
+		Assert.False(src.B);
+	}
+
+	[Fact]
+	public void CloneControllerInput_PartialButtons_PreservesExactState() {
+		var src = new ControllerInput {
+			A = true, B = false, X = true, Y = false,
+			Up = true, Down = false
+		};
+
+		var clone = TasEditorViewModel.CloneControllerInput(src);
+
+		Assert.True(clone.A);
+		Assert.False(clone.B);
+		Assert.True(clone.X);
+		Assert.False(clone.Y);
+		Assert.True(clone.Up);
+		Assert.False(clone.Down);
+	}
+
+	#endregion
+
+	#region Multi-Frame Range Copy/Paste Tests
+
+	[Fact]
+	public void CopyRange_ClonesAllFramesInRange() {
+		var movie = CreateTestMovie(10);
+		int startIndex = 3;
+		int count = 4;
+
+		var clipboard = movie.InputFrames.GetRange(startIndex, count)
+			.Select(f => f.Clone())
+			.ToList();
+
+		Assert.Equal(4, clipboard.Count);
+		for (int i = 0; i < count; i++) {
+			Assert.NotSame(movie.InputFrames[startIndex + i], clipboard[i]);
+			Assert.Equal(
+				movie.InputFrames[startIndex + i].Controllers[0].A,
+				clipboard[i].Controllers[0].A);
+		}
+	}
+
+	[Fact]
+	public void PasteRange_InsertsMultipleFrames() {
+		var movie = CreateTestMovie(5);
+		var clipboard = new List<InputFrame> {
+			new(0) { Controllers = [new ControllerInput { A = true }] },
+			new(1) { Controllers = [new ControllerInput { B = true }] },
+			new(2) { Controllers = [new ControllerInput { X = true }] }
+		};
+
+		int insertAt = 2;
+		var clonedForPaste = clipboard.Select(f => f.Clone()).ToList();
+		movie.InputFrames.InsertRange(insertAt, clonedForPaste);
+
+		Assert.Equal(8, movie.InputFrames.Count);
+		Assert.True(movie.InputFrames[2].Controllers[0].A);
+		Assert.True(movie.InputFrames[3].Controllers[0].B);
+		Assert.True(movie.InputFrames[4].Controllers[0].X);
+	}
+
+	[Fact]
+	public void CutRange_CopiesAndRemovesMultipleFrames() {
+		var movie = CreateTestMovie(10);
+		int cutStart = 3;
+		int cutCount = 3;
+
+		// Copy range
+		var clipboard = movie.InputFrames.GetRange(cutStart, cutCount)
+			.Select(f => f.Clone())
+			.ToList();
+
+		// Delete range
+		movie.InputFrames.RemoveRange(cutStart, cutCount);
+
+		Assert.Equal(7, movie.InputFrames.Count);
+		Assert.Equal(3, clipboard.Count);
+	}
+
+	[Fact]
+	public void CopyPasteRange_RoundTrip_PreservesData() {
+		var movie = CreateTestMovie(10);
+		// Set distinctive data on frames 2-4
+		movie.InputFrames[2].Controllers[0] = new ControllerInput { Start = true, Select = true };
+		movie.InputFrames[3].Controllers[0] = new ControllerInput { L = true, R = true };
+		movie.InputFrames[4].Controllers[0] = new ControllerInput { Up = true, Down = true };
+
+		// Copy range 2-4
+		var clipboard = movie.InputFrames.GetRange(2, 3).Select(f => f.Clone()).ToList();
+
+		// Paste at end
+		var cloned = clipboard.Select(f => f.Clone()).ToList();
+		movie.InputFrames.InsertRange(movie.InputFrames.Count, cloned);
+
+		Assert.Equal(13, movie.InputFrames.Count);
+		Assert.True(movie.InputFrames[10].Controllers[0].Start);
+		Assert.True(movie.InputFrames[10].Controllers[0].Select);
+		Assert.True(movie.InputFrames[11].Controllers[0].L);
+		Assert.True(movie.InputFrames[11].Controllers[0].R);
+		Assert.True(movie.InputFrames[12].Controllers[0].Up);
+		Assert.True(movie.InputFrames[12].Controllers[0].Down);
+	}
+
+	#endregion
+
+	#region Frame Comment Tests
+
+	[Fact]
+	public void Comment_EmptyString_TreatedDifferentlyFromNull() {
+		var frame = new InputFrame(0);
+		Assert.Null(frame.Comment);
+
+		frame.Comment = "";
+		Assert.Equal("", frame.Comment);
+
+		frame.Comment = null;
+		Assert.Null(frame.Comment);
+	}
+
+	[Fact]
+	public void Comment_UnicodeContent_Preserved() {
+		var frame = new InputFrame(0);
+		frame.Comment = "🎮 TAS breakpoint — sync check ✓";
+
+		Assert.Equal("🎮 TAS breakpoint — sync check ✓", frame.Comment);
+	}
+
+	[Fact]
+	public void Comment_SurvivedClone() {
+		var frame = new InputFrame(0) { Comment = "Important marker" };
+		var clone = frame.Clone();
+
+		Assert.Equal("Important marker", clone.Comment);
+		Assert.NotSame(frame, clone);
+	}
+
+	#endregion
+
+	#region InputFrame Clone Tests
+
+	[Fact]
+	public void InputFrame_Clone_CopiesAllProperties() {
+		var frame = new InputFrame(42) {
+			Comment = "Test frame",
+			IsLagFrame = true,
+		};
+		frame.Controllers[0] = new ControllerInput { A = true, B = true, Up = true };
+		frame.Controllers[1] = new ControllerInput { Start = true, Select = true };
+
+		var clone = frame.Clone();
+
+		Assert.Equal(42, clone.FrameNumber);
+		Assert.Equal("Test frame", clone.Comment);
+		Assert.True(clone.IsLagFrame);
+		Assert.Equal(InputFrame.MaxPorts, clone.Controllers.Length);
+		Assert.True(clone.Controllers[0].A);
+		Assert.True(clone.Controllers[0].B);
+		Assert.True(clone.Controllers[0].Up);
+		Assert.True(clone.Controllers[1].Start);
+		Assert.True(clone.Controllers[1].Select);
+	}
+
+	[Fact]
+	public void InputFrame_Clone_IsDeepCopy() {
+		var frame = new InputFrame(0) {
+			Controllers = [new ControllerInput { A = true }]
+		};
+
+		var clone = frame.Clone();
+		clone.Controllers[0].A = false;
+
+		Assert.True(frame.Controllers[0].A); // Original unchanged
 	}
 
 	#endregion

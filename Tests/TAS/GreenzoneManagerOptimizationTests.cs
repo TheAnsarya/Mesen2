@@ -372,4 +372,134 @@ public class GreenzoneManagerOptimizationTests : IDisposable {
 	}
 
 	#endregion
+
+	#region GetSavestateInfo Tests
+
+	[Fact]
+	public void GetSavestateInfo_Empty_ReturnsEmptyList() {
+		var info = _greenzone.GetSavestateInfo();
+		Assert.Empty(info);
+	}
+
+	[Fact]
+	public void GetSavestateInfo_ReturnsCorrectFrameAndSize() {
+		_greenzone.CaptureState(100, new byte[1024], forceCapture: true);
+		_greenzone.CaptureState(200, new byte[2048], forceCapture: true);
+
+		var info = _greenzone.GetSavestateInfo();
+
+		Assert.Equal(2, info.Count);
+		Assert.Equal(100, info[0].Frame);
+		Assert.Equal(1024, info[0].Size);
+		Assert.Equal(200, info[1].Frame);
+		Assert.Equal(2048, info[1].Size);
+	}
+
+	[Fact]
+	public void GetSavestateInfo_ReturnedInFrameOrder() {
+		// Insert out of order
+		_greenzone.CaptureState(500, new byte[64], forceCapture: true);
+		_greenzone.CaptureState(100, new byte[64], forceCapture: true);
+		_greenzone.CaptureState(300, new byte[64], forceCapture: true);
+
+		var info = _greenzone.GetSavestateInfo();
+
+		Assert.Equal(3, info.Count);
+		Assert.Equal(100, info[0].Frame);
+		Assert.Equal(300, info[1].Frame);
+		Assert.Equal(500, info[2].Frame);
+	}
+
+	[Fact]
+	public void GetSavestateInfo_AfterInvalidation_ExcludesRemoved() {
+		_greenzone.CaptureState(100, new byte[64], forceCapture: true);
+		_greenzone.CaptureState(200, new byte[64], forceCapture: true);
+		_greenzone.CaptureState(300, new byte[64], forceCapture: true);
+
+		_greenzone.InvalidateFrom(200);
+
+		var info = _greenzone.GetSavestateInfo();
+
+		Assert.Single(info);
+		Assert.Equal(100, info[0].Frame);
+	}
+
+	#endregion
+
+	#region CaptureInterval Tests
+
+	[Fact]
+	public void CaptureState_WithoutForce_RespectsInterval() {
+		_greenzone.CaptureInterval = 60;
+
+		// Frame 60 is on the interval
+		_greenzone.CaptureState(60, new byte[64]);
+		Assert.True(_greenzone.HasState(60));
+
+		// Frame 30 is NOT on the interval
+		_greenzone.CaptureState(30, new byte[64]);
+		Assert.False(_greenzone.HasState(30));
+	}
+
+	[Fact]
+	public void CaptureState_Frame0_AlwaysCapturedByInterval() {
+		_greenzone.CaptureInterval = 60;
+
+		// Frame 0: 0 % 60 == 0, so it should be captured
+		_greenzone.CaptureState(0, new byte[64]);
+		Assert.True(_greenzone.HasState(0));
+	}
+
+	[Fact]
+	public void CaptureState_ForceCapture_IgnoresInterval() {
+		_greenzone.CaptureInterval = 60;
+
+		// Frame 37 is NOT on interval, but forceCapture overrides
+		_greenzone.CaptureState(37, new byte[64], forceCapture: true);
+		Assert.True(_greenzone.HasState(37));
+	}
+
+	#endregion
+
+	#region MaxSavestates Pruning Tests
+
+	[Fact]
+	public void CaptureState_OverLimit_PrunesSavestates() {
+		_greenzone.MaxSavestates = 10;
+
+		for (int i = 0; i < 20; i++) {
+			_greenzone.CaptureState(i, new byte[64], forceCapture: true);
+		}
+
+		// Should have pruned back to or below MaxSavestates
+		Assert.True(_greenzone.SavestateCount <= _greenzone.MaxSavestates + 1);
+	}
+
+	#endregion
+
+	#region Dispose Tests
+
+	[Fact]
+	public void CaptureState_AfterDispose_IsNoOp() {
+		var gz = new GreenzoneManager();
+		gz.CaptureState(100, new byte[64], forceCapture: true);
+		Assert.True(gz.HasState(100));
+
+		gz.Dispose();
+
+		// Capture after dispose should be silently ignored
+		gz.CaptureState(200, new byte[64], forceCapture: true);
+		Assert.False(gz.HasState(200));
+	}
+
+	[Fact]
+	public void Dispose_MultipleCallsDoNotThrow() {
+		var gz = new GreenzoneManager();
+		gz.CaptureState(100, new byte[64], forceCapture: true);
+
+		gz.Dispose();
+		gz.Dispose(); // No exception
+	}
+
+	#endregion
 }
