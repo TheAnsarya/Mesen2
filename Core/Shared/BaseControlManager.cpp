@@ -36,8 +36,7 @@ void BaseControlManager::RegisterInputProvider(IInputProvider* provider) {
 
 void BaseControlManager::UnregisterInputProvider(IInputProvider* provider) {
 	auto lock = _deviceLock.AcquireSafe();
-	vector<IInputProvider*>& vec = _inputProviders;
-	vec.erase(std::remove(vec.begin(), vec.end(), provider), vec.end());
+	std::erase(_inputProviders, provider);
 }
 
 void BaseControlManager::RegisterInputRecorder(IInputRecorder* provider) {
@@ -47,8 +46,7 @@ void BaseControlManager::RegisterInputRecorder(IInputRecorder* provider) {
 
 void BaseControlManager::UnregisterInputRecorder(IInputRecorder* provider) {
 	auto lock = _deviceLock.AcquireSafe();
-	vector<IInputRecorder*>& vec = _inputRecorders;
-	vec.erase(std::remove(vec.begin(), vec.end(), provider), vec.end());
+	std::erase(_inputRecorders, provider);
 }
 
 const vector<ControllerData>& BaseControlManager::GetPortStates() {
