@@ -1,6 +1,7 @@
 using Xunit;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Nexen.MovieConverter;
 using Nexen.TAS;
 
@@ -29,6 +30,22 @@ public class InputRecorderTests {
 		}
 
 		return movie;
+	}
+
+	/// <summary>
+	/// Sets the internal recording state via reflection to avoid EmuApi native interop calls.
+	/// </summary>
+	private static void SetRecordingState(InputRecorder recorder, RecordingMode mode, int insertPosition = -1) {
+		var type = typeof(InputRecorder);
+		type.GetField("_isRecording", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(recorder, true);
+		type.GetField("_mode", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(recorder, mode);
+
+		var movie = (MovieData)type.GetProperty("Movie")!.GetValue(recorder)!;
+		int pos = insertPosition >= 0 ? insertPosition : movie.InputFrames.Count;
+		type.GetField("_insertPosition", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(recorder, pos);
+		int startFrame = mode == RecordingMode.Append ? movie.InputFrames.Count : pos;
+		type.GetField("_recordStartFrame", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(recorder, startFrame);
+		type.GetProperty("FramesRecorded")!.SetValue(recorder, 0);
 	}
 
 	#endregion
@@ -150,7 +167,7 @@ public class InputRecorderTests {
 		// Arrange
 		var movie = CreateTestMovie(200);
 		var greenzone = new GreenzoneManager();
-		var recorder = new InputRecorder(greenzone) { Movie = movie };
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
 
 		// Act
 		var branch = recorder.CreateBranch("Test Branch");
@@ -169,7 +186,7 @@ public class InputRecorderTests {
 		// Arrange
 		var movie = CreateTestMovie(50);
 		var greenzone = new GreenzoneManager();
-		var recorder = new InputRecorder(greenzone) { Movie = movie };
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
 		var branch = recorder.CreateBranch("Saved");
 
 		// Modify original
@@ -185,6 +202,132 @@ public class InputRecorderTests {
 		// Verify deep clone — mutating loaded frames shouldn't affect branch
 		movie.InputFrames[0].Controllers[0].B = true;
 		Assert.False(branch.Frames[0].Controllers[0].B);
+	}
+
+	#endregion
+
+	#region Recording Mode Tests
+
+	[Fact]
+	public void RecordFrame_AppendMode_AppendsToEnd() {
+		var movie = CreateTestMovie(5);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		SetRecordingState(recorder, RecordingMode.Append);
+
+		var input = new[] { new ControllerInput { A = true, B = true } };
+		recorder.RecordFrame(input);
+		recorder.RecordFrame(input);
+
+		Assert.Equal(7, movie.InputFrames.Count);
+		Assert.True(movie.InputFrames[5].Controllers[0].A);
+		Assert.True(movie.InputFrames[6].Controllers[0].A);
+		Assert.Equal(2, recorder.FramesRecorded);
+	}
+
+	[Fact]
+	public void RecordFrame_InsertMode_InsertsAtPosition() {
+		var movie = CreateTestMovie(5);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		SetRecordingState(recorder, RecordingMode.Insert, insertPosition: 2);
+
+		var input = new[] { new ControllerInput { B = true } };
+		recorder.RecordFrame(input);
+		recorder.RecordFrame(input);
+
+		Assert.Equal(7, movie.InputFrames.Count);
+		Assert.True(movie.InputFrames[2].Controllers[0].B);
+		Assert.True(movie.InputFrames[3].Controllers[0].B);
+	}
+
+	[Fact]
+	public void RecordFrame_OverwriteMode_ReplacesExistingFrames() {
+		var movie = CreateTestMovie(10);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		SetRecordingState(recorder, RecordingMode.Overwrite, insertPosition: 3);
+
+		var input = new[] { new ControllerInput { Start = true } };
+		recorder.RecordFrame(input);
+		recorder.RecordFrame(input);
+
+		Assert.Equal(10, movie.InputFrames.Count);
+		Assert.True(movie.InputFrames[3].Controllers[0].Start);
+		Assert.True(movie.InputFrames[4].Controllers[0].Start);
+	}
+
+	[Fact]
+	public void RecordFrame_OverwriteMode_AppendsBeyondEnd() {
+		var movie = CreateTestMovie(5);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		SetRecordingState(recorder, RecordingMode.Overwrite, insertPosition: 4);
+
+		var input = new[] { new ControllerInput { A = true } };
+		recorder.RecordFrame(input);
+		recorder.RecordFrame(input);
+
+		Assert.Equal(6, movie.InputFrames.Count);
+	}
+
+	[Fact]
+	public void RecordFrame_NotRecording_IsNoOp() {
+		var movie = CreateTestMovie(5);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		var input = new[] { new ControllerInput { A = true } };
+		recorder.RecordFrame(input);
+
+		Assert.Equal(5, movie.InputFrames.Count);
+		Assert.Equal(0, recorder.FramesRecorded);
+	}
+
+	[Fact]
+	public void Recording_MultipleAppendFrames_PreservesRecordedCount() {
+		var movie = CreateTestMovie(5);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		SetRecordingState(recorder, RecordingMode.Append);
+		recorder.RecordFrame([new ControllerInput()]);
+		recorder.RecordFrame([new ControllerInput()]);
+		Assert.Equal(2, recorder.FramesRecorded);
+	}
+
+	[Fact]
+	public void RecordFrame_InsertMode_ShiftsExistingFrames() {
+		var movie = CreateTestMovie(5);
+		// Save the original frame at index 2
+		bool originalA = movie.InputFrames[2].Controllers[0].A;
+
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		SetRecordingState(recorder, RecordingMode.Insert, insertPosition: 2);
+		recorder.RecordFrame([new ControllerInput { L = true }]);
+
+		Assert.Equal(6, movie.InputFrames.Count);
+		Assert.True(movie.InputFrames[2].Controllers[0].L);
+		// Original frame 2 should now be at index 3
+		Assert.Equal(originalA, movie.InputFrames[3].Controllers[0].A);
+	}
+
+	[Fact]
+	public void RecordFrame_LagFrame_IsPreserved() {
+		var movie = CreateTestMovie(5);
+		var greenzone = new GreenzoneManager();
+		var recorder = new InputRecorder(greenzone) { Movie = movie, CaptureSavestates = false };
+
+		SetRecordingState(recorder, RecordingMode.Append);
+		recorder.RecordFrame([new ControllerInput()], isLagFrame: true);
+
+		Assert.True(movie.InputFrames[^1].IsLagFrame);
 	}
 
 	#endregion

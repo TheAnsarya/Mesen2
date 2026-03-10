@@ -654,4 +654,168 @@ public class UndoableActionTests {
 	}
 
 	#endregion
+
+	#region Undo/Redo State Machine Tests
+
+	[Fact]
+	public void UndoRedoStateMachine_InitialState_NothingAvailable() {
+		var undoStack = new Stack<UndoableAction>();
+		var redoStack = new Stack<UndoableAction>();
+
+		Assert.Empty(undoStack);
+		Assert.Empty(redoStack);
+	}
+
+	[Fact]
+	public void UndoRedoStateMachine_AfterExecute_CanUndoButNotRedo() {
+		var movie = CreateTestMovie(5);
+		var undoStack = new Stack<UndoableAction>();
+		var redoStack = new Stack<UndoableAction>();
+
+		var action = new InsertFramesAction(movie, 0, [new InputFrame(50)]);
+		action.Execute();
+		undoStack.Push(action);
+		redoStack.Clear();
+
+		Assert.NotEmpty(undoStack);
+		Assert.Empty(redoStack);
+	}
+
+	[Fact]
+	public void UndoRedoStateMachine_AfterUndo_CanRedoButNotUndo() {
+		var movie = CreateTestMovie(5);
+		var undoStack = new Stack<UndoableAction>();
+		var redoStack = new Stack<UndoableAction>();
+
+		var action = new InsertFramesAction(movie, 0, [new InputFrame(50)]);
+		action.Execute();
+		undoStack.Push(action);
+
+		// Undo
+		var undone = undoStack.Pop();
+		undone.Undo();
+		redoStack.Push(undone);
+
+		Assert.Empty(undoStack);
+		Assert.NotEmpty(redoStack);
+	}
+
+	[Fact]
+	public void UndoRedoStateMachine_NewActionAfterUndo_ClearsRedo() {
+		var movie = CreateTestMovie(5);
+		var undoStack = new Stack<UndoableAction>();
+		var redoStack = new Stack<UndoableAction>();
+
+		// Execute and undo
+		var action1 = new InsertFramesAction(movie, 0, [new InputFrame(50)]);
+		action1.Execute();
+		undoStack.Push(action1);
+		var undone = undoStack.Pop();
+		undone.Undo();
+		redoStack.Push(undone);
+
+		Assert.Single(redoStack);
+
+		// Execute new action - should clear redo
+		var action2 = new InsertFramesAction(movie, 0, [new InputFrame(60)]);
+		action2.Execute();
+		undoStack.Push(action2);
+		redoStack.Clear();
+
+		Assert.Single(undoStack);
+		Assert.Empty(redoStack);
+	}
+
+	[Fact]
+	public void UndoRedoStateMachine_MultipleUndoRedo_MaintainsConsistency() {
+		var movie = CreateTestMovie(5);
+		var undoStack = new Stack<UndoableAction>();
+		var redoStack = new Stack<UndoableAction>();
+
+		// Execute 3 actions
+		for (int i = 0; i < 3; i++) {
+			var action = new InsertFramesAction(movie, 0, [new InputFrame(100 + i)]);
+			action.Execute();
+			undoStack.Push(action);
+			redoStack.Clear();
+		}
+		Assert.Equal(8, movie.InputFrames.Count);
+		Assert.Equal(3, undoStack.Count);
+
+		// Undo 2
+		for (int i = 0; i < 2; i++) {
+			var undone = undoStack.Pop();
+			undone.Undo();
+			redoStack.Push(undone);
+		}
+		Assert.Equal(6, movie.InputFrames.Count);
+		Assert.Single(undoStack);
+		Assert.Equal(2, redoStack.Count);
+
+		// Redo 1
+		var redone = redoStack.Pop();
+		redone.Execute();
+		undoStack.Push(redone);
+		Assert.Equal(7, movie.InputFrames.Count);
+		Assert.Equal(2, undoStack.Count);
+		Assert.Single(redoStack);
+
+		// New action invalidates remaining redo
+		var fresh = new DeleteFramesAction(movie, 0, 1);
+		fresh.Execute();
+		undoStack.Push(fresh);
+		redoStack.Clear();
+		Assert.Equal(6, movie.InputFrames.Count);
+		Assert.Equal(3, undoStack.Count);
+		Assert.Empty(redoStack);
+	}
+
+	[Fact]
+	public void UndoRedoStateMachine_FullCycle_RestoresOriginalState() {
+		var movie = CreateTestMovie(10);
+		var undoStack = new Stack<UndoableAction>();
+		var redoStack = new Stack<UndoableAction>();
+
+		// Snapshot original
+		int originalCount = movie.InputFrames.Count;
+		bool[] originalA = movie.InputFrames.Select(f => f.Controllers[0].A).ToArray();
+
+		// Execute insert, modify, delete
+		var insert = new InsertFramesAction(movie, 3, [new InputFrame(99) { Controllers = [new ControllerInput()] }]);
+		insert.Execute();
+		undoStack.Push(insert);
+
+		var modify = new ModifyInputAction(movie.InputFrames[0], 0, 0, new ControllerInput { A = true, B = true });
+		modify.Execute();
+		undoStack.Push(modify);
+
+		var delete = new DeleteFramesAction(movie, 5, 2);
+		delete.Execute();
+		undoStack.Push(delete);
+
+		// Undo all
+		while (undoStack.Count > 0) {
+			var action = undoStack.Pop();
+			action.Undo();
+			redoStack.Push(action);
+		}
+
+		// Verify original state
+		Assert.Equal(originalCount, movie.InputFrames.Count);
+		for (int i = 0; i < originalCount; i++) {
+			Assert.Equal(originalA[i], movie.InputFrames[i].Controllers[0].A);
+		}
+
+		// Redo all
+		while (redoStack.Count > 0) {
+			var action = redoStack.Pop();
+			action.Execute();
+			undoStack.Push(action);
+		}
+
+		// Verify modified state
+		Assert.Equal(originalCount + 1 - 2, movie.InputFrames.Count);
+	}
+
+	#endregion
 }
