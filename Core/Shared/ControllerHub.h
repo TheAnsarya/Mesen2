@@ -156,14 +156,19 @@ public:
 	/// Set state from text format (e.g., "RLDU:A:B:START").
 	/// Colon-separated for each sub-port.
 	/// </summary>
-	void SetTextState(string state) override {
-		vector<string> portStates = StringUtilities::Split(state, ':');
+	void SetTextState(string_view state) override {
 		int i = 0;
-		for (string& portState : portStates) {
+		size_t start = 0;
+		while (start <= state.size() && i < HubPortCount) {
+			size_t end = state.find(':', start);
+			if (end == string_view::npos) {
+				end = state.size();
+			}
 			if (_ports[i]) {
-				_ports[i]->SetTextState(portState);
+				_ports[i]->SetTextState(state.substr(start, end - start));
 			}
 			i++;
+			start = end + 1;
 		}
 
 		UpdateStateFromPorts();

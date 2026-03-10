@@ -112,7 +112,7 @@ public:
 	void InvertBit(uint8_t bit);
 	void SetBitValue(uint8_t bit, bool set);
 
-	virtual void SetTextState(string state);
+	virtual void SetTextState(string_view state);
 	virtual string GetTextState();
 
 	void SetStateFromInput();

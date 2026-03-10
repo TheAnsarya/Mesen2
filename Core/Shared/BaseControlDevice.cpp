@@ -87,7 +87,7 @@ void BaseControlDevice::SetRawState(ControlDeviceState state) {
 	_state = state;
 }
 
-void BaseControlDevice::SetTextState(string textState) {
+void BaseControlDevice::SetTextState(string_view textState) {
 	auto lock = _stateLock.AcquireSafe();
 	ClearState();
 
@@ -96,16 +96,20 @@ void BaseControlDevice::SetTextState(string textState) {
 	} else {
 		if (HasCoordinates()) {
 			size_t space1 = textState.find(' ');
-			if (space1 != string::npos) {
+			if (space1 != string_view::npos) {
 				size_t space2 = textState.find(' ', space1 + 1);
-				if (space2 != string::npos) {
+				if (space2 != string_view::npos) {
 					MousePosition pos;
-					try {
-						pos.X = (int16_t)std::stoi(textState.substr(0, space1));
-						pos.Y = (int16_t)std::stoi(textState.substr(space1 + 1, space2 - space1 - 1));
-					} catch (std::exception&) {
-						pos.X = -1;
-						pos.Y = -1;
+					pos.X = -1;
+					pos.Y = -1;
+					string_view xPart = textState.substr(0, space1);
+					string_view yPart = textState.substr(space1 + 1, space2 - space1 - 1);
+					int xVal, yVal;
+					auto [xPtr, xEc] = std::from_chars(xPart.data(), xPart.data() + xPart.size(), xVal);
+					auto [yPtr, yEc] = std::from_chars(yPart.data(), yPart.data() + yPart.size(), yVal);
+					if (xEc == std::errc() && yEc == std::errc()) {
+						pos.X = (int16_t)xVal;
+						pos.Y = (int16_t)yVal;
 					}
 					SetCoordinates(pos);
 					textState = textState.substr(space2 + 1);
