@@ -34,7 +34,7 @@ public:
 	MovieRecorder(Emulator* emu);
 	virtual ~MovieRecorder();
 
-	bool Record(RecordMovieOptions options);
+	[[nodiscard]] bool Record(RecordMovieOptions options);
 	bool Stop();
 
 	// Inherited via IInputRecorder
@@ -47,5 +47,5 @@ public:
 	// Inherited via INotificationListener
 	void ProcessNotification(ConsoleNotificationType type, void* parameter) override;
 
-	bool CreateMovie(const string& movieFile, deque<RewindData>& data, uint32_t startPosition, uint32_t endPosition, bool hasBattery);
+	[[nodiscard]] bool CreateMovie(const string& movieFile, deque<RewindData>& data, uint32_t startPosition, uint32_t endPosition, bool hasBattery);
 };

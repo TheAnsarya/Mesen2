@@ -36,5 +36,5 @@ public:
 	/// Return false to allow input from lower-priority sources (e.g., user input).
 	/// Return true to override all other input sources.
 	/// </remarks>
-	virtual bool SetInput(BaseControlDevice* device) = 0;
+	[[nodiscard]] virtual bool SetInput(BaseControlDevice* device) = 0;
 };

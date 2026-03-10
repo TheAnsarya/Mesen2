@@ -22,13 +22,13 @@ public:
 	/// </summary>
 	/// <param name="file">Movie file to play</param>
 	/// <returns>True if movie loaded successfully</returns>
-	virtual bool Play(VirtualFile& file) = 0;
+	[[nodiscard]] virtual bool Play(VirtualFile& file) = 0;
 
 	/// <summary>Stop movie playback</summary>
 	virtual void Stop() = 0;
 
 	/// <summary>Check if movie currently playing</summary>
-	virtual bool IsPlaying() = 0;
+	[[nodiscard]] virtual bool IsPlaying() = 0;
 };
 
 /// <summary>
@@ -87,8 +87,8 @@ public:
 	void Stop();
 
 	/// <summary>Check if movie currently playing</summary>
-	bool Playing();
+	[[nodiscard]] bool Playing();
 
 	/// <summary>Check if movie currently recording</summary>
-	bool Recording();
+	[[nodiscard]] bool Recording();
 };

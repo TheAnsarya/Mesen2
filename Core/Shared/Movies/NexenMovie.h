@@ -45,11 +45,11 @@ public:
 	NexenMovie(Emulator* emu, bool silent);
 	virtual ~NexenMovie();
 
-	bool Play(VirtualFile& file) override;
+	[[nodiscard]] bool Play(VirtualFile& file) override;
 	void Stop() override;
 
-	bool SetInput(BaseControlDevice* device) override;
-	bool IsPlaying() override;
+	[[nodiscard]] bool SetInput(BaseControlDevice* device) override;
+	[[nodiscard]] bool IsPlaying() override;
 
 	// Inherited via IBatteryProvider
 	vector<uint8_t> LoadBattery(const string& extension) override;

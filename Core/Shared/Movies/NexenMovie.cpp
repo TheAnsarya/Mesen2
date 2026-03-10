@@ -243,12 +243,13 @@ bool NexenMovie::ApplySettings(istream& settingsData) {
 uint32_t NexenMovie::LoadInt(std::unordered_map<string, string>& settings, const string& name, uint32_t defaultValue) {
 	auto result = settings.find(name);
 	if (result != settings.end()) {
-		try {
-			return (uint32_t)std::stoul(result->second);
-		} catch (std::exception&) {
-			MessageManager::Log("[Movies] Invalid value for tag: " + name);
-			return defaultValue;
+		uint32_t value;
+		auto [ptr, ec] = std::from_chars(result->second.data(), result->second.data() + result->second.size(), value);
+		if (ec == std::errc()) {
+			return value;
 		}
+		MessageManager::Log("[Movies] Invalid value for tag: " + name);
+		return defaultValue;
 	} else {
 		return defaultValue;
 	}

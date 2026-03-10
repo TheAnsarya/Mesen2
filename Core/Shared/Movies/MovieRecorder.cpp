@@ -112,7 +112,7 @@ void MovieRecorder::WriteString(stringstream& out, const string& name, const str
 }
 
 void MovieRecorder::WriteInt(stringstream& out, const string& name, uint32_t value) {
-	out << name << " " << std::to_string(value) << "\n";
+	out << name << " " << value << "\n";
 }
 
 void MovieRecorder::WriteBool(stringstream& out, const string& name, bool enabled) {
@@ -169,7 +169,7 @@ void MovieRecorder::RecordInput(const vector<shared_ptr<BaseControlDevice>>& dev
 }
 
 void MovieRecorder::OnLoadBattery(const string& extension, vector<uint8_t> batteryData) {
-	_batteryData[extension] = batteryData;
+	_batteryData[extension] = std::move(batteryData);
 }
 
 vector<uint8_t> MovieRecorder::LoadBattery(const string& extension) {
