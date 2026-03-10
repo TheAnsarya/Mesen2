@@ -280,12 +280,14 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 			return frame;
 		}
 
-		string[] parts = line.Split('|', StringSplitOptions.None);
+		ReadOnlySpan<char> span = line.AsSpan();
+		Span<Range> ranges = stackalloc Range[16];
+		int count = span.Split(ranges, '|');
 		int portIndex = 0;
 
-		for (int i = 1; i < parts.Length - 1; i++) // Skip first and last empty segments
+		for (int i = 1; i < count - 1; i++) // Skip first and last empty segments
 		{
-			string segment = parts[i];
+			ReadOnlySpan<char> segment = span[ranges[i]];
 
 			// Check for command segments
 			if (segment.Equals("r", StringComparison.OrdinalIgnoreCase) ||
@@ -313,7 +315,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 	/// <summary>
 	/// Parse BK2 controller button string
 	/// </summary>
-	private static ControllerInput ParseBk2ControllerInput(string segment, SystemType system) {
+	private static ControllerInput ParseBk2ControllerInput(ReadOnlySpan<char> segment, SystemType system) {
 		var input = new ControllerInput();
 
 		// BK2 uses different button orders for different systems
@@ -356,7 +358,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		return input;
 	}
 
-	private static void ParseNesInput(string s, ControllerInput input) {
+	private static void ParseNesInput(ReadOnlySpan<char> s, ControllerInput input) {
 		// NES: RLDUTSBA (8 chars)
 		if (s.Length < 8) {
 			return;
@@ -372,7 +374,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		input.A = s[7] != '.';
 	}
 
-	private static void ParseSnesInput(string s, ControllerInput input) {
+	private static void ParseSnesInput(ReadOnlySpan<char> s, ControllerInput input) {
 		// SNES: BYsSUDLRAXlr (12 chars)
 		if (s.Length < 12) {
 			return;
@@ -392,7 +394,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		input.R = s[11] != '.';
 	}
 
-	private static void ParseGenesisInput(string s, ControllerInput input) {
+	private static void ParseGenesisInput(ReadOnlySpan<char> s, ControllerInput input) {
 		// Genesis 3-button: UDLRSABC (8 chars)
 		// Genesis 6-button: UDLRSABCxyzm (12 chars)
 		if (s.Length < 8) {
@@ -416,11 +418,11 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		}
 	}
 
-	private static void ParseGbInput(string s, ControllerInput input) =>
+	private static void ParseGbInput(ReadOnlySpan<char> s, ControllerInput input) =>
 		// GB: RLDUTSBA (8 chars, same as NES)
 		ParseNesInput(s, input);
 
-	private static void ParseGbaInput(string s, ControllerInput input) {
+	private static void ParseGbaInput(ReadOnlySpan<char> s, ControllerInput input) {
 		// GBA: RLDUSTBALR (10 chars)
 		if (s.Length < 10) {
 			return;
@@ -438,7 +440,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		input.R = s[9] != '.';
 	}
 
-	private static void ParseLynxInput(string s, ControllerInput input) {
+	private static void ParseLynxInput(ReadOnlySpan<char> s, ControllerInput input) {
 		// Lynx: UDLRABOoP (9 chars)
 		// U=Up, D=Down, L=Left, R=Right, A=A, B=B, O=Option1, o=Option2, P=Pause
 		if (s.Length < 9) {
@@ -456,7 +458,7 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		input.Start = s[8] != '.'; // Pause -> Start
 	}
 
-	private static void ParseGenericInput(string s, ControllerInput input) {
+	private static void ParseGenericInput(ReadOnlySpan<char> s, ControllerInput input) {
 		// Try to detect any pressed buttons by non-dot characters
 		foreach (char c in s) {
 			switch (char.ToUpperInvariant(c)) {

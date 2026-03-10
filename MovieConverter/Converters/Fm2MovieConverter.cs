@@ -206,12 +206,14 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 
 		// FM2 format: |command|P1|P2|...|
 		// NES buttons: RLDUTSBA
-		string[] parts = line.Split('|');
+		ReadOnlySpan<char> span = line.AsSpan();
+		Span<Range> ranges = stackalloc Range[16];
+		int count = span.Split(ranges, '|');
 
-		if (parts.Length >= 2) {
+		if (count >= 2) {
 			// Parse command byte
-			string cmd = parts[1];
-			if (!string.IsNullOrEmpty(cmd)) {
+			ReadOnlySpan<char> cmd = span[ranges[1]];
+			if (!cmd.IsEmpty) {
 				foreach (char c in cmd) {
 					switch (c) {
 						case '1': // Reset
@@ -235,9 +237,9 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 		}
 
 		// Parse controller inputs
-		for (int port = 0; port < Math.Min(parts.Length - 2, InputFrame.MaxPorts); port++) {
-			string buttonStr = parts[port + 2];
-			if (string.IsNullOrEmpty(buttonStr) || buttonStr.Length < 8) {
+		for (int port = 0; port < Math.Min(count - 2, InputFrame.MaxPorts); port++) {
+			ReadOnlySpan<char> buttonStr = span[ranges[port + 2]];
+			if (buttonStr.IsEmpty || buttonStr.Length < 8) {
 				continue;
 			}
 

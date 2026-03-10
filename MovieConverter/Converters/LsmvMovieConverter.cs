@@ -233,6 +233,7 @@ public sealed class LsmvMovieConverter : MovieConverterBase {
 	private static void ParseInputLog(StreamReader reader, MovieData movie) {
 		int frameNumber = 0;
 		string? line;
+		Span<Range> ranges = stackalloc Range[16];
 
 		while ((line = reader.ReadLine()) is not null) {
 			if (string.IsNullOrWhiteSpace(line)) continue;
@@ -263,11 +264,12 @@ public sealed class LsmvMovieConverter : MovieConverterBase {
 				continue;
 			}
 
-			var parts = line[(pipeIndex + 1)..].Split('|');
+			ReadOnlySpan<char> inputSpan = line.AsSpan()[(pipeIndex + 1)..];
+			int count = inputSpan.Split(ranges, '|');
 
-			for (int port = 0; port < Math.Min(parts.Length, InputFrame.MaxPorts); port++) {
-				var portData = parts[port].Trim();
-				if (string.IsNullOrEmpty(portData)) continue;
+			for (int port = 0; port < Math.Min(count, InputFrame.MaxPorts); port++) {
+				ReadOnlySpan<char> portData = inputSpan[ranges[port]].Trim();
+				if (portData.IsEmpty) continue;
 
 				ParseLsmvPortInput(portData, frame.Controllers[port], movie.SystemType);
 			}
@@ -276,7 +278,7 @@ public sealed class LsmvMovieConverter : MovieConverterBase {
 		}
 	}
 
-	private static void ParseLsmvPortInput(string portData, ControllerInput input, SystemType system) {
+	private static void ParseLsmvPortInput(ReadOnlySpan<char> portData, ControllerInput input, SystemType system) {
 		// SNES gamepad format: BYsSudlrAXLR (12 chars)
 		// GB format: ABsSudlr (8 chars)
 		// Dots mean not pressed, letters mean pressed
