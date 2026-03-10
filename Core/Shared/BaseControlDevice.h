@@ -63,6 +63,9 @@ protected:
 	void EnsureCapacityUnsafe(int32_t minBitCount);
 	bool IsPressedUnsafe(uint8_t bit);
 	MousePosition GetCoordinatesUnsafe();
+	void ClearStateUnsafe();
+	void SetBitUnsafe(uint8_t bit);
+	void ClearBitUnsafe(uint8_t bit);
 	uint32_t GetByteIndex(uint8_t bit);
 	virtual bool HasCoordinates();
 	virtual bool IsRawString();

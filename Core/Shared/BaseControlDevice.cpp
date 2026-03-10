@@ -57,16 +57,17 @@ void BaseControlDevice::StrobeProcessWrite(uint8_t value) {
 	}
 }
 
-void BaseControlDevice::ClearState() {
-	auto lock = _stateLock.AcquireSafe();
+void BaseControlDevice::ClearStateUnsafe() {
 	if (IsRawString()) [[unlikely]] {
-		// Raw string devices (tape/barcode) need full reset since data is variable-length
 		_state.State.clear();
 	} else {
-		// Standard button devices: zero-fill existing buffer to avoid heap
-		// dealloc/realloc of the state vector every frame per controller
 		std::fill(_state.State.begin(), _state.State.end(), 0);
 	}
+}
+
+void BaseControlDevice::ClearState() {
+	auto lock = _stateLock.AcquireSafe();
+	ClearStateUnsafe();
 }
 
 ControlDeviceState BaseControlDevice::GetRawState() {
@@ -89,7 +90,7 @@ void BaseControlDevice::SetRawState(ControlDeviceState state) {
 
 void BaseControlDevice::SetTextState(string_view textState) {
 	auto lock = _stateLock.AcquireSafe();
-	ClearState();
+	ClearStateUnsafe();
 
 	if (IsRawString()) {
 		_state.State.insert(_state.State.end(), textState.begin(), textState.end());
@@ -120,9 +121,8 @@ void BaseControlDevice::SetTextState(string_view textState) {
 		int i = 0;
 		for (char c : textState) {
 			if (c != ':') {
-				// Ignore colons (used by multitap to separate inputs)
 				if (c != '.') {
-					SetBit(i);
+					SetBitUnsafe(i);
 				}
 				i++;
 			}
@@ -213,25 +213,34 @@ void BaseControlDevice::SetBitValue(uint8_t bit, bool set) {
 	}
 }
 
-void BaseControlDevice::SetBit(uint8_t bit) {
-	auto lock = _stateLock.AcquireSafe();
-	EnsureCapacity(bit);
+void BaseControlDevice::SetBitUnsafe(uint8_t bit) {
+	EnsureCapacityUnsafe(bit);
 	uint8_t bitMask = 1 << (bit % 8);
 	_state.State[GetByteIndex(bit)] |= bitMask;
 }
 
-void BaseControlDevice::ClearBit(uint8_t bit) {
-	auto lock = _stateLock.AcquireSafe();
-	EnsureCapacity(bit);
+void BaseControlDevice::ClearBitUnsafe(uint8_t bit) {
+	EnsureCapacityUnsafe(bit);
 	uint8_t bitMask = 1 << (bit % 8);
 	_state.State[GetByteIndex(bit)] &= ~bitMask;
 }
 
+void BaseControlDevice::SetBit(uint8_t bit) {
+	auto lock = _stateLock.AcquireSafe();
+	SetBitUnsafe(bit);
+}
+
+void BaseControlDevice::ClearBit(uint8_t bit) {
+	auto lock = _stateLock.AcquireSafe();
+	ClearBitUnsafe(bit);
+}
+
 void BaseControlDevice::InvertBit(uint8_t bit) {
-	if (IsPressed(bit)) {
-		ClearBit(bit);
+	auto lock = _stateLock.AcquireSafe();
+	if (IsPressedUnsafe(bit)) {
+		ClearBitUnsafe(bit);
 	} else {
-		SetBit(bit);
+		SetBitUnsafe(bit);
 	}
 }
 
