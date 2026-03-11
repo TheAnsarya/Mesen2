@@ -32,6 +32,14 @@ public class RoundTripTests {
 			frame.Controllers[0].Start = i == 0;
 			frame.Controllers[0].Select = i == frameCount - 1;
 
+			// SNES-specific buttons (X, Y, L, R)
+			if (system is SystemType.Snes or SystemType.Gba) {
+				frame.Controllers[0].X = i % 4 == 0;
+				frame.Controllers[0].Y = i % 6 == 0;
+				frame.Controllers[0].L = i % 9 == 0;
+				frame.Controllers[0].R = i % 10 == 0;
+			}
+
 			// P2 input on some frames
 			if (i % 4 == 0) {
 				frame.Controllers[1].A = true;
@@ -162,6 +170,19 @@ public class RoundTripTests {
 		Assert.Equal(0, loaded.TotalFrames);
 	}
 
+	[Fact]
+	public void Fm2Converter_RoundTrip_AllButtonsPreserved() {
+		var movie = CreateTestMovie(SystemType.Nes);
+		var converter = new Converters.Fm2MovieConverter();
+
+		using var stream = new MemoryStream();
+		converter.Write(movie, stream);
+		stream.Position = 0;
+		var loaded = converter.Read(stream, "test.fm2");
+
+		AssertFramesMatch(movie, loaded, 2);
+	}
+
 	#endregion
 
 	#region BK2 Round-Trip
@@ -213,6 +234,19 @@ public class RoundTripTests {
 		Assert.Equal(movie.TotalFrames, loaded.TotalFrames);
 	}
 
+	[Fact]
+	public void Bk2Converter_RoundTrip_AllButtonsPreserved() {
+		var movie = CreateTestMovie(SystemType.Snes);
+		var converter = new Converters.Bk2MovieConverter();
+
+		using var stream = new MemoryStream();
+		converter.Write(movie, stream);
+		stream.Position = 0;
+		var loaded = converter.Read(stream, "test.bk2");
+
+		AssertFramesMatch(movie, loaded, 2);
+	}
+
 	#endregion
 
 	#region SMV Round-Trip
@@ -255,6 +289,19 @@ public class RoundTripTests {
 		Assert.Equal(12345UL, loaded.RerecordCount);
 	}
 
+	[Fact]
+	public void SmvConverter_RoundTrip_AllButtonsPreserved() {
+		var movie = CreateTestMovie(SystemType.Snes);
+		var converter = new Converters.SmvMovieConverter();
+
+		using var stream = new MemoryStream();
+		converter.Write(movie, stream);
+		stream.Position = 0;
+		var loaded = converter.Read(stream, "test.smv");
+
+		AssertFramesMatch(movie, loaded, 2);
+	}
+
 	#endregion
 
 	#region LSMV Round-Trip
@@ -285,6 +332,19 @@ public class RoundTripTests {
 		var loaded = converter.Read(stream, "test.lsmv");
 
 		Assert.Equal(movie.Author, loaded.Author);
+	}
+
+	[Fact]
+	public void LsmvConverter_RoundTrip_AllButtonsPreserved() {
+		var movie = CreateTestMovie(SystemType.Snes);
+		var converter = new Converters.LsmvMovieConverter();
+
+		using var stream = new MemoryStream();
+		converter.Write(movie, stream);
+		stream.Position = 0;
+		var loaded = converter.Read(stream, "test.lsmv");
+
+		AssertFramesMatch(movie, loaded, 2);
 	}
 
 	#endregion

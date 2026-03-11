@@ -193,18 +193,6 @@ public sealed class GmvMovieConverter : MovieConverterBase {
 		return input;
 	}
 
-	/// <summary>
-	/// Read a null-terminated string from a byte span
-	/// </summary>
-	private static string ReadNullTerminatedString(ReadOnlySpan<byte> bytes) {
-		int nullIndex = bytes.IndexOf((byte)0);
-		if (nullIndex >= 0) {
-			bytes = bytes[..nullIndex];
-		}
-
-		return Encoding.ASCII.GetString(bytes).Trim();
-	}
-
 	/// <inheritdoc/>
 	public override void Write(MovieData movie, Stream stream) {
 		throw new NotSupportedException("GMV writing is not yet implemented");

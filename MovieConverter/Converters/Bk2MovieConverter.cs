@@ -285,22 +285,21 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 		int count = span.Split(ranges, '|');
 		int portIndex = 0;
 
-		for (int i = 1; i < count - 1; i++) // Skip first and last empty segments
-		{
-			ReadOnlySpan<char> segment = span[ranges[i]];
-
-			// Check for command segments
-			if (segment.Equals("r", StringComparison.OrdinalIgnoreCase) ||
-				segment.Contains("Reset", StringComparison.OrdinalIgnoreCase)) {
+		// Segment 1 is always the command column
+		if (count > 2) {
+			ReadOnlySpan<char> cmdSegment = span[ranges[1]];
+			if (cmdSegment.Equals("r", StringComparison.OrdinalIgnoreCase) ||
+				cmdSegment.Contains("Reset", StringComparison.OrdinalIgnoreCase)) {
 				frame.Command |= FrameCommand.Reset;
-				continue;
-			}
-
-			if (segment.Equals("P", StringComparison.OrdinalIgnoreCase) ||
-				segment.Contains("Power", StringComparison.OrdinalIgnoreCase)) {
+			} else if (cmdSegment.Equals("P", StringComparison.OrdinalIgnoreCase) ||
+				cmdSegment.Contains("Power", StringComparison.OrdinalIgnoreCase)) {
 				frame.Command |= FrameCommand.Power;
-				continue;
 			}
+		}
+
+		// Segments 2..count-2 are controller ports
+		for (int i = 2; i < count - 1; i++) {
+			ReadOnlySpan<char> segment = span[ranges[i]];
 
 			// Parse controller input
 			if (portIndex < InputFrame.MaxPorts) {
@@ -604,7 +603,8 @@ public sealed class Bk2MovieConverter : MovieConverterBase {
 			foreach (InputFrame frame in movie.InputFrames) {
 				sb.Clear();
 				FormatBk2InputLine(sb, frame, movie.SystemType, movie.ControllerCount);
-				writer.WriteLine(sb.ToString());
+				writer.Write(sb);
+				writer.WriteLine();
 			}
 		}
 

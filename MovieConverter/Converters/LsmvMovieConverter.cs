@@ -69,7 +69,8 @@ public sealed class LsmvMovieConverter : MovieConverterBase {
 		if (savestateEntry is not null) {
 			movie.StartType = StartType.Savestate;
 			using var ms = new MemoryStream();
-			savestateEntry.Open().CopyTo(ms);
+			using var ssStream = savestateEntry.Open();
+			ssStream.CopyTo(ms);
 			movie.InitialState = ms.ToArray();
 		}
 
@@ -77,7 +78,8 @@ public sealed class LsmvMovieConverter : MovieConverterBase {
 		var sramEntry = archive.GetEntry("moviesram");
 		if (sramEntry is not null) {
 			using var ms = new MemoryStream();
-			sramEntry.Open().CopyTo(ms);
+			using var sramStream = sramEntry.Open();
+			sramStream.CopyTo(ms);
 			movie.InitialSram = ms.ToArray();
 		}
 
@@ -395,7 +397,8 @@ public sealed class LsmvMovieConverter : MovieConverterBase {
 			}
 
 			sb.Append('|');
-			writer.WriteLine(sb.ToString());
+			writer.Write(sb);
+			writer.WriteLine();
 		}
 	}
 

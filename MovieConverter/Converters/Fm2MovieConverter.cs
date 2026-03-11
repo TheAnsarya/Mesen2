@@ -324,7 +324,8 @@ public sealed class Fm2MovieConverter : MovieConverterBase {
 		foreach (InputFrame frame in movie.InputFrames) {
 			sb.Clear();
 			FormatFm2InputLine(sb, frame, movie.ControllerCount);
-			writer.WriteLine(sb.ToString());
+			writer.Write(sb);
+			writer.WriteLine();
 		}
 	}
 

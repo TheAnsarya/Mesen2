@@ -1,5 +1,4 @@
 using System.Buffers.Binary;
-using System.Numerics;
 using System.Text;
 
 namespace Nexen.MovieConverter.Converters;
@@ -275,24 +274,6 @@ public sealed class VbmMovieConverter : MovieConverterBase {
 
 		return input;
 	}
-
-	/// <summary>
-	/// Read a null-terminated string from a byte span
-	/// </summary>
-	private static string ReadNullTerminatedString(ReadOnlySpan<byte> bytes) {
-		int nullIndex = bytes.IndexOf((byte)0);
-		if (nullIndex >= 0) {
-			bytes = bytes[..nullIndex];
-		}
-
-		return Encoding.ASCII.GetString(bytes).Trim();
-	}
-
-	/// <summary>
-	/// Count set bits in a byte
-	/// </summary>
-	private static int CountSetBits(int value) =>
-		BitOperations.PopCount((uint)value);
 
 	/// <inheritdoc/>
 	public override void Write(MovieData movie, Stream stream) {

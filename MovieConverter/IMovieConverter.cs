@@ -1,3 +1,6 @@
+using System.Numerics;
+using System.Text;
+
 namespace Nexen.MovieConverter;
 
 /// <summary>
@@ -248,6 +251,25 @@ public abstract class MovieConverterBase : IMovieConverter {
 
 		return [.. lines];
 	}
+
+	/// <summary>
+	/// Read a null-terminated ASCII string from a byte span.
+	/// Trims the result.
+	/// </summary>
+	protected static string ReadNullTerminatedString(ReadOnlySpan<byte> bytes) {
+		int nullIndex = bytes.IndexOf((byte)0);
+		if (nullIndex >= 0) {
+			bytes = bytes[..nullIndex];
+		}
+
+		return Encoding.ASCII.GetString(bytes).Trim();
+	}
+
+	/// <summary>
+	/// Count set bits (population count) in an integer value.
+	/// </summary>
+	protected static int CountSetBits(int value) =>
+		BitOperations.PopCount((uint)value);
 }
 
 /// <summary>
