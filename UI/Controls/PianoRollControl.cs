@@ -148,6 +148,7 @@ public sealed class PianoRollControl : Control {
 	private int _paintButton;
 	private int _paintStartFrame;
 	private readonly HashSet<(int frame, int button)> _paintedCells = new();
+	private readonly List<int> _paintFrameBuffer = new();
 
 	#endregion
 
@@ -525,8 +526,12 @@ public sealed class PianoRollControl : Control {
 
 		if (_isPainting && _paintedCells.Count > 1) {
 			// Raise paint event for multiple cells
+			_paintFrameBuffer.Clear();
+			foreach (var (frame, _) in _paintedCells) {
+				_paintFrameBuffer.Add(frame);
+			}
 			CellsPainted?.Invoke(this, new PianoRollPaintEventArgs(
-				_paintedCells.Select(c => c.frame).ToList(),
+				_paintFrameBuffer,
 				_paintButton,
 				_paintValue
 			));
