@@ -61,6 +61,42 @@ public:
 	}
 
 	/// <summary>
+	/// Extracts the Nth segment from a delimited string as a string_view (zero-copy).
+	/// </summary>
+	/// <param name="input">String to search (must outlive the returned view)</param>
+	/// <param name="delimiter">Character to split on</param>
+	/// <param name="n">Zero-based index of the segment to retrieve</param>
+	/// <returns>View of the Nth segment, or empty view if n exceeds the number of segments</returns>
+	[[nodiscard]] static string_view GetNthSegmentView(string_view input, char delimiter, size_t n) {
+		size_t start = 0;
+		for (size_t i = 0; i < n; i++) {
+			size_t pos = input.find(delimiter, start);
+			if (pos == string_view::npos) {
+				return {};
+			}
+			start = pos + 1;
+		}
+		size_t end = input.find(delimiter, start);
+		if (end == string_view::npos) {
+			return input.substr(start);
+		}
+		return input.substr(start, end - start);
+	}
+
+	/// <summary>
+	/// Counts the number of segments in a delimited string without splitting.
+	/// </summary>
+	/// <param name="input">String to search</param>
+	/// <param name="delimiter">Character to count</param>
+	/// <returns>Number of segments (delimiter count + 1, or 0 for empty input)</returns>
+	[[nodiscard]] static size_t CountSegments(string_view input, char delimiter) {
+		if (input.empty()) {
+			return 0;
+		}
+		return std::ranges::count(input, delimiter) + 1;
+	}
+
+	/// <summary>
 	/// Removes leading whitespace (tabs and spaces) from a string.
 	/// </summary>
 	/// <param name="str">String to trim</param>

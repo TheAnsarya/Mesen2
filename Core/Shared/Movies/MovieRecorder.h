@@ -34,7 +34,7 @@ public:
 	MovieRecorder(Emulator* emu);
 	virtual ~MovieRecorder();
 
-	[[nodiscard]] bool Record(RecordMovieOptions options);
+	[[nodiscard]] bool Record(const RecordMovieOptions& options);
 	bool Stop();
 
 	// Inherited via IInputRecorder

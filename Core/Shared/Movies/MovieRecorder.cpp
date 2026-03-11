@@ -28,7 +28,7 @@ MovieRecorder::~MovieRecorder() {
 	Stop();
 }
 
-bool MovieRecorder::Record(RecordMovieOptions options) {
+bool MovieRecorder::Record(const RecordMovieOptions& options) {
 	_filename = options.Filename;
 	_author = options.Author;
 	_description = options.Description;
@@ -97,13 +97,10 @@ void MovieRecorder::GetGameSettings(stringstream& out) {
 	s.Stream(consoleType, "emu.consoleType", -1);
 	s.Stream(*settings, "", -1);
 
-	std::stringstream settingsOut;
-	s.SaveTo(settingsOut, 0);
-
-	out << settingsOut.str();
+	s.SaveTo(out, 0);
 
 	for (CheatCode& code : _emu->GetCheatManager()->GetCheats()) {
-		out << "Cheat " << magic_enum::enum_name(code.Type) << " " << string(code.Code) << "\n";
+		out << "Cheat " << magic_enum::enum_name(code.Type) << " " << code.Code << "\n";
 	}
 }
 

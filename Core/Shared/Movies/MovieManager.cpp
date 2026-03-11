@@ -16,7 +16,7 @@ void MovieManager::Record(RecordMovieOptions options) {
 	// Stop any active recording/playback before starting playback for this movie
 	Stop();
 
-	shared_ptr<MovieRecorder> recorder(new MovieRecorder(_emu));
+	auto recorder = std::make_shared<MovieRecorder>(_emu);
 	if (recorder->Record(options)) {
 		_recorder.reset(recorder);
 	}

@@ -22,8 +22,8 @@ private:
 	bool _playing = false;
 	size_t _deviceIndex = 0;
 	uint32_t _lastPollCounter = 0;
-	vector<vector<string>> _inputData;
-	vector<string> _cheats;
+	vector<string> _inputData;
+	size_t _deviceCount = 0;	vector<string> _cheats;
 	vector<CheatCode> _originalCheats;
 	stringstream _emuSettingsBackup;
 	unordered_map<string, string> _settings;

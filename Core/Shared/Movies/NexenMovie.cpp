@@ -63,11 +63,11 @@ bool NexenMovie::SetInput(BaseControlDevice* device) {
 		_deviceIndex = 0;
 	}
 
-	if (_inputData.size() > inputRowIndex && _inputData[inputRowIndex].size() > _deviceIndex) {
-		device->SetTextState(_inputData[inputRowIndex][_deviceIndex]);
+	if (_inputData.size() > inputRowIndex && _deviceCount > _deviceIndex) {
+		device->SetTextState(StringUtilities::GetNthSegmentView(_inputData[inputRowIndex], '|', _deviceIndex));
 
 		_deviceIndex++;
-		if (_deviceIndex >= _inputData[inputRowIndex].size()) {
+		if (_deviceIndex >= _deviceCount) {
 			// Move to the next frame's data
 			_deviceIndex = 0;
 		}
@@ -127,7 +127,13 @@ bool NexenMovie::Play(VirtualFile& file) {
 	string line;
 	while (std::getline(inputData, line)) {
 		if (line.starts_with("|")) {
-			_inputData.push_back(StringUtilities::Split(string_view(line).substr(1), '|'));
+			// Store the frame line (minus leading '|') as a single flat string:
+			// e.g. "UDLRSsBA|UDLRSsBA" for a 2-controller NES game
+			string_view frameData = string_view(line).substr(1);
+			if (_deviceCount == 0) {
+				_deviceCount = StringUtilities::CountSegments(frameData, '|');
+			}
+			_inputData.emplace_back(frameData);
 		}
 	}
 
@@ -196,7 +202,7 @@ void NexenMovie::ParseSettings(stringstream& data) {
 	string line;
 	while (std::getline(data, line)) {
 		if (!line.empty()) {
-			size_t index = line.find_first_of(' ');
+			size_t index = line.find(' ');
 			if (index != string::npos) {
 				string name = line.substr(0, index);
 				string value = line.substr(index + 1);
@@ -289,13 +295,15 @@ void NexenMovie::LoadCheats() {
 }
 
 bool NexenMovie::LoadCheat(const string& cheatData, CheatCode& code) {
-	vector<string> data = StringUtilities::Split(cheatData, ' ');
+	if (StringUtilities::CountSegments(cheatData, ' ') == 2) {
+		string_view typeStr = StringUtilities::GetNthSegmentView(cheatData, ' ', 0);
+		string_view codeStr = StringUtilities::GetNthSegmentView(cheatData, ' ', 1);
 
-	if (data.size() == 2) {
-		auto cheatType = magic_enum::enum_cast<CheatType>(data[0]);
-		if (cheatType.has_value() && data[1].size() <= 15) {
+		auto cheatType = magic_enum::enum_cast<CheatType>(typeStr);
+		if (cheatType.has_value() && codeStr.size() <= 15) {
 			code.Type = cheatType.value();
-			memcpy(code.Code, data[1].c_str(), data[1].size() + 1);
+			memcpy(code.Code, codeStr.data(), codeStr.size());
+			code.Code[codeStr.size()] = '\0';
 			return true;
 		}
 	}
