@@ -117,6 +117,12 @@ private:
 	/// <summary>Persistent buffer for reading compressed video data (avoids ~150KB alloc per load/rewind)</summary>
 	vector<uint8_t> _compressedReadBuffer;
 
+	/// <summary>Persistent compression buffer for background frame writes (single-threaded, no lock needed)</summary>
+	vector<uint8_t> _bgCompressFrameBuffer;
+
+	/// <summary>Persistent compression buffer for background state writes (single-threaded, no lock needed)</summary>
+	vector<uint8_t> _bgCompressStateBuffer;
+
 	// ========== Async Write Infrastructure ==========
 	std::jthread _writeThread;
 	std::queue<SaveStateSnapshot> _writeQueue;

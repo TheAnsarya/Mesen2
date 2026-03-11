@@ -467,10 +467,10 @@ int32_t SaveStateManager::GetSaveStatePreview(const string& saveStatePath, uint8
 			std::stringstream pngStream;
 			PNGHelper::WritePNG(pngStream, filter->GetOutputBuffer(), frameInfo.Width, frameInfo.Height);
 
-			string data = pngStream.str();
-			memcpy(pngData, data.c_str(), data.size());
+			auto pngView = pngStream.view();
+			memcpy(pngData, pngView.data(), pngView.size());
 
-			return (int32_t)frameData.size();
+			return (int32_t)pngView.size();
 		}
 	}
 	return -1;
@@ -538,12 +538,12 @@ vector<SaveStateInfo> SaveStateManager::GetSaveStateList() {
 
 			string filename = entry.path().filename().string();
 
-		// Check if it's a save state file (.nexen-save or legacy .mss)
-		bool isNexenSave = filename.size() > 11 && filename.substr(filename.size() - 11) == ".nexen-save";
-		bool isMesenSave = filename.size() > 4 && filename.substr(filename.size() - 4) == ".mss";
-		if (!isNexenSave && !isMesenSave) {
-			continue;
-		}
+			// Check if it's a save state file (.nexen-save or legacy .mss)
+			bool isNexenSave = filename.ends_with(".nexen-save");
+			bool isMesenSave = filename.ends_with(".mss");
+			if (!isNexenSave && !isMesenSave) {
+				continue;
+			}
 
 			// Check if it starts with the ROM name
 			if (filename.find(romName) != 0) {
@@ -765,11 +765,11 @@ void SaveStateManager::WriteSnapshotToDisk(SaveStateSnapshot& snapshot) {
 	WriteValue(file, snapshot.frameScale100);
 
 	unsigned long compressedSize = compressBound(snapshot.frameBufferSize);
-	vector<uint8_t> compressedFrame(compressedSize);
-	compress2(compressedFrame.data(), &compressedSize, snapshot.frameBuffer.data(), snapshot.frameBufferSize, MZ_BEST_SPEED);
+	_bgCompressFrameBuffer.resize(compressedSize);
+	compress2(_bgCompressFrameBuffer.data(), &compressedSize, snapshot.frameBuffer.data(), snapshot.frameBufferSize, MZ_BEST_SPEED);
 
 	WriteValue(file, (uint32_t)compressedSize);
-	file.write((char*)compressedFrame.data(), (uint32_t)compressedSize);
+	file.write((char*)_bgCompressFrameBuffer.data(), (uint32_t)compressedSize);
 
 	// Write ROM name
 	WriteValue(file, (uint32_t)snapshot.romName.size());
@@ -780,14 +780,14 @@ void SaveStateManager::WriteSnapshotToDisk(SaveStateSnapshot& snapshot) {
 	file.put((char)isCompressed);
 
 	unsigned long stateCompSize = compressBound((unsigned long)snapshot.stateData.size());
-	vector<uint8_t> compressedState(stateCompSize);
-	compress2(compressedState.data(), &stateCompSize, snapshot.stateData.data(), (unsigned long)snapshot.stateData.size(), 1);
+	_bgCompressStateBuffer.resize(stateCompSize);
+	compress2(_bgCompressStateBuffer.data(), &stateCompSize, snapshot.stateData.data(), (unsigned long)snapshot.stateData.size(), 1);
 
 	uint32_t originalSize = (uint32_t)snapshot.stateData.size();
 	uint32_t compSize = (uint32_t)stateCompSize;
 	file.write((char*)&originalSize, sizeof(uint32_t));
 	file.write((char*)&compSize, sizeof(uint32_t));
-	file.write((char*)compressedState.data(), compSize);
+	file.write((char*)_bgCompressStateBuffer.data(), compSize);
 
 	file.close();
 

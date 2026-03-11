@@ -69,12 +69,12 @@ bool CheatManager::AddCheat(CheatCode code) {
 	return true;
 }
 
-void CheatManager::SetCheats(vector<CheatCode>& codes) {
+void CheatManager::SetCheats(const vector<CheatCode>& codes) {
 	auto lock = _emu->AcquireLock();
 
 	bool hasCheats = !_cheats.empty();
 	ClearCheats(false);
-	for (CheatCode& code : codes) {
+	for (const CheatCode& code : codes) {
 		if (!AddCheat(code)) {
 			MessageManager::DisplayMessage("Cheats", "Invalid cheat: " + string(code.Code));
 		}

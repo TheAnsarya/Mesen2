@@ -156,7 +156,7 @@ public:
 	void InternalClearCheats();
 
 	/// <summary>Replace all cheats with new set (vector)</summary>
-	void SetCheats(vector<CheatCode>& codes);
+	void SetCheats(const vector<CheatCode>& codes);
 
 	/// <summary>Replace all cheats with new set (array)</summary>
 	void SetCheats(CheatCode codes[], uint32_t length);
