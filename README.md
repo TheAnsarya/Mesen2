@@ -27,23 +27,26 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 
 | Build | Download | Notes |
 |-------|----------|-------|
-| **Standard** | [Nexen-Windows-x64-v1.4.0.exe](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.0/Nexen-Windows-x64-v1.4.0.exe) | Single-file, recommended |
-| **Native AOT** | [Nexen-Windows-x64-AoT-v1.4.0.exe](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.0/Nexen-Windows-x64-AoT-v1.4.0.exe) | Faster startup |
+| **Standard** | [Nexen-Windows-x64-v1.4.1.exe](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Windows-x64-v1.4.1.exe) | Single-file, recommended |
+| **Native AOT** | [Nexen-Windows-x64-AoT-v1.4.1.exe](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Windows-x64-AoT-v1.4.1.exe) | Faster startup |
 
 ### Linux
 
 | Build | Download | Notes |
 |-------|----------|-------|
-| **AppImage x64** | [Nexen-Linux-x64-v1.4.0.AppImage](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.0/Nexen-Linux-x64-v1.4.0.AppImage) | Recommended |
-| **AppImage ARM64** | [Nexen-Linux-ARM64-v1.4.0.AppImage](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.0/Nexen-Linux-ARM64-v1.4.0.AppImage) | Raspberry Pi, etc. |
-| Binary x64 | [Nexen-Linux-x64-v1.4.0.tar.gz](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.0/Nexen-Linux-x64-v1.4.0.tar.gz) | Tarball, requires SDL2 |
-| Binary ARM64 | [Nexen-Linux-ARM64-v1.4.0.tar.gz](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.0/Nexen-Linux-ARM64-v1.4.0.tar.gz) | Tarball, requires SDL2 |
+| **AppImage x64** | [Nexen-Linux-x64-v1.4.1.AppImage](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Linux-x64-v1.4.1.AppImage) | Recommended |
+| **AppImage ARM64** | [Nexen-Linux-ARM64-v1.4.1.AppImage](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Linux-ARM64-v1.4.1.AppImage) | Raspberry Pi, etc. |
+| Binary x64 (clang) | [Nexen-Linux-x64-v1.4.1.tar.gz](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Linux-x64-v1.4.1.tar.gz) | Tarball, requires SDL2 |
+| Binary x64 (gcc) | [Nexen-Linux-x64-gcc-v1.4.1.tar.gz](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Linux-x64-gcc-v1.4.1.tar.gz) | Tarball, requires SDL2 |
+| Binary ARM64 (clang) | [Nexen-Linux-ARM64-v1.4.1.tar.gz](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Linux-ARM64-v1.4.1.tar.gz) | Tarball, requires SDL2 |
+| Binary ARM64 (gcc) | [Nexen-Linux-ARM64-gcc-v1.4.1.tar.gz](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Linux-ARM64-gcc-v1.4.1.tar.gz) | Tarball, requires SDL2 |
+| Native AOT x64 | [Nexen-Linux-x64-AoT-v1.4.1.tar.gz](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-Linux-x64-AoT-v1.4.1.tar.gz) | Faster startup |
 
 ### macOS (Apple Silicon)
 
 | Build | Download | Notes |
 |-------|----------|-------|
-| **Standard** | [Nexen-macOS-ARM64-v1.4.0.zip](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.0/Nexen-macOS-ARM64-v1.4.0.zip) | App bundle |
+| **Standard** | [Nexen-macOS-ARM64-v1.4.1.zip](https://github.com/TheAnsarya/Nexen/releases/download/v1.4.1/Nexen-macOS-ARM64-v1.4.1.zip) | App bundle |
 | ~~Native AOT~~ | *Temporarily unavailable* | .NET 10 ILC compiler bug |
 
 > ℹ️ **Notes:**
@@ -52,7 +55,7 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 > - macOS: Right-click → Open on first launch to bypass Gatekeeper
 > - macOS Intel (x64) builds are no longer provided
 > - macOS Native AOT is disabled due to a [.NET 10 ILC compiler crash](https://github.com/TheAnsarya/Nexen/issues/238)
-> - **Download links point to v1.4.0** — Updated on each release
+> - **Download links point to v1.4.1** — Updated on each release
 
 ---
 
@@ -88,6 +91,13 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 - **Auto-Save** - Periodic quick saves and recent play saves
 - **Per-Game Organization** - Saves organized by ROM
 
+### 🎬 Movie System
+
+- **Nexen Movie Format (.nexen-movie)** - ZIP-based format with JSON metadata, input log, savestate, and SRAM
+- **Movie Recording & Playback** - Record/replay inputs frame-by-frame with rerecording support
+- **Multi-Format Import/Export** - BK2 (BizHawk), FM2 (FCEUX), SMV (Snes9x), LSMV (lsnes), VBM (VisualBoyAdvance), GMV (Gens)
+- **Multi-System TAS** - Full TAS support for NES, SNES, GB, GBA, SMS, PCE, WS, and Lynx
+
 ### 🎮 TAS Editor
 
 - **Piano Roll View** - Visual timeline for frame-by-frame editing with batch paint
@@ -96,7 +106,6 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 - **O(1) Incremental Updates** - Single-frame refresh instead of full rebuild
 - **Input Recording** - Capture, insert, and overwrite modes with branch support
 - **Branches** - Fork, compare, and load alternate strategies
-- **Multi-Format Import/Export** - BK2, FM2, SMV, LSMV, VBM, GMV, NMV
 - **Lua Scripting** - Automate TAS workflows with full undo integration
 
 ### 🔧 Debugging
@@ -125,21 +134,21 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 
 ### Windows
 
-1. Download `Nexen-Windows-x64-v1.4.0.exe` from [Releases](https://github.com/TheAnsarya/Nexen/releases/tag/v1.4.0)
+1. Download `Nexen-Windows-x64-v1.4.1.exe` from [Releases](https://github.com/TheAnsarya/Nexen/releases/tag/v1.4.1)
 2. Run the executable (no installation needed)
 3. **File → Open** to load a ROM
 
 ### Linux
 
-1. Download `Nexen-Linux-x64-v1.4.0.AppImage`
-2. Make executable: `chmod +x Nexen-Linux-x64-v1.4.0.AppImage`
-3. Run: `./Nexen-Linux-x64-v1.4.0.AppImage`
+1. Download `Nexen-Linux-x64-v1.4.1.AppImage`
+2. Make executable: `chmod +x Nexen-Linux-x64-v1.4.1.AppImage`
+3. Run: `./Nexen-Linux-x64-v1.4.1.AppImage`
 
 > For non-AppImage builds, install SDL2 first: `sudo apt install libsdl2-2.0-0`
 
 ### macOS
 
-1. Download `Nexen-macOS-ARM64-v1.4.0.zip`
+1. Download `Nexen-macOS-ARM64-v1.4.1.zip`
 2. Extract and move `Nexen.app` to Applications
 3. Right-click → Open (first launch only, to bypass Gatekeeper)
 
@@ -149,8 +158,11 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 | ---------- | ------------- |
 | [Compiling](COMPILING.md) | Build from source |
 | [TAS Editor Manual](docs/TAS-Editor-Manual.md) | Complete TAS workflow guide |
-| [TAS Developer Guide](docs/TAS-Developer-Guide.md) | TAS system architecture |
-| [Movie Format](docs/NEXEN_MOVIE_FORMAT.md) | NMV file format specification |
+| [TAS Developer Guide](docs/TAS-Developer-Guide.md) | TAS system internals and extension |
+| [TAS/Movie Architecture](docs/TAS_ARCHITECTURE.md) | Movie recording, playback, and TAS architecture |
+| [Movie Format (.nexen-movie)](docs/NEXEN_MOVIE_FORMAT.md) | ZIP-based movie file format specification |
+| [Debugger Performance](docs/DEBUGGER-PERFORMANCE.md) | Debugger optimization techniques |
+| [Atari Lynx ROM Format](docs/ATARI-LYNX-FORMAT.md) | .atari-lynx file format specification |
 | [Release Guide](docs/RELEASE.md) | Creating releases |
 | [API Documentation](docs/README.md) | Generated API docs |
 
@@ -169,9 +181,28 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 | ---------- | ------------- |
 | [Architecture Overview](~docs/ARCHITECTURE-OVERVIEW.md) | System design |
 | [C++ Development Guide](~docs/CPP-DEVELOPMENT-GUIDE.md) | Coding standards |
-| [Pansy Integration](~docs/pansy-export-index.md) | Metadata export system |
+| [Code Documentation Style](~docs/CODE-DOCUMENTATION-STYLE.md) | C++ documentation style guide |
+| [Build and Run](~docs/BUILD-AND-RUN.md) | Building and running Nexen |
 | [Profiling Guide](~docs/PROFILING-GUIDE.md) | Performance profiling |
+| [ASan Guide](~docs/ASAN-GUIDE.md) | AddressSanitizer configuration |
+| [Movie & TAS Subsystem](~docs/MOVIE-TAS.md) | Movie recording and TAS internals |
 | [TAS Algorithm Reference](~docs/algorithms/tas-algorithms.md) | TAS data structure and undo system design |
+| [Audio Subsystem](~docs/AUDIO-SUBSYSTEM.md) | Audio processing and resampling |
+| [Video Rendering](~docs/VIDEO-RENDERING.md) | Video rendering pipeline |
+| [Input Subsystem](~docs/INPUT-SUBSYSTEM.md) | Input and controller handling |
+| [Debugger Subsystem](~docs/DEBUGGER.md) | Debugger internals |
+| [Utilities Library](~docs/UTILITIES-LIBRARY.md) | Shared utility library |
+| [Pansy Integration](~docs/pansy-export-index.md) | Metadata export system |
+
+### Emulation Core Documentation
+
+| Document | Description |
+| ---------- | ------------- |
+| [NES Core](~docs/NES-CORE.md) | NES/Famicom emulation core |
+| [SNES Core](~docs/SNES-CORE.md) | SNES/Super Famicom emulation core |
+| [GB/GBA Core](~docs/GB-GBA-CORE.md) | Game Boy & GBA emulation core |
+| [SMS/PCE/WS Core](~docs/SMS-PCE-WS-CORE.md) | SMS, PC Engine, and WonderSwan cores |
+| [Lynx Core](~docs/LYNX-CORE.md) | Atari Lynx emulation core |
 
 ## ⌨️ Keyboard Shortcuts
 
