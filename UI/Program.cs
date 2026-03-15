@@ -134,6 +134,12 @@ class Program {
 				}
 			}
 
+			// Prefer local build directory (dev workflow) over HomeFolder
+			string localPath = Path.Combine(AppContext.BaseDirectory, libraryName);
+			if (File.Exists(localPath)) {
+				return NativeLibrary.Load(localPath);
+			}
+
 			return NativeLibrary.Load(Path.Combine(ConfigManager.HomeFolder, libraryName));
 		}
 

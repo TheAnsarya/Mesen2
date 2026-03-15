@@ -411,10 +411,13 @@ public class MainWindow : NexenWindow {
 				Dispatcher.UIThread.Post(() => ProcessResolutionChange());
 				break;
 
-			case ConsoleNotificationType.ExecuteShortcut:
+			case ConsoleNotificationType.ExecuteShortcut: {
 				ExecuteShortcutParams p = Marshal.PtrToStructure<ExecuteShortcutParams>(e.Parameter);
-				Dispatcher.UIThread.Post(() => _shortcutHandler.ExecuteShortcut(p.Shortcut));
+				Dispatcher.UIThread.Post(() => {
+					_shortcutHandler.ExecuteShortcut(p.Shortcut);
+				});
 				break;
+			}
 
 			case ConsoleNotificationType.MissingFirmware: {
 					MissingFirmwareMessage msg = Marshal.PtrToStructure<MissingFirmwareMessage>(e.Parameter);

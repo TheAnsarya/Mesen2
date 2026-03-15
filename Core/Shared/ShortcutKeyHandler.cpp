@@ -138,8 +138,10 @@ bool ShortcutKeyHandler::IsShortcutAllowed(EmulatorShortcut shortcut, uint32_t s
 		case EmulatorShortcut::PowerCycle:
 		case EmulatorShortcut::ExecPowerCycle:
 		case EmulatorShortcut::ReloadRom:
-		case EmulatorShortcut::ExecReloadRom:
-			return isRunning && !isNetplayClient && !isMoviePlaying;
+		case EmulatorShortcut::ExecReloadRom: {
+			bool result = isRunning && !isNetplayClient && !isMoviePlaying;
+			return result;
+		}
 
 		case EmulatorShortcut::PowerOff:
 		case EmulatorShortcut::ExecPowerOff:

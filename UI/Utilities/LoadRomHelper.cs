@@ -188,7 +188,11 @@ public static class LoadRomHelper {
 		}
 	}
 
-	public static void Reset() { Task.Run(() => EmuApi.ExecuteShortcut(new ExecuteShortcutParams() { Shortcut = EmulatorShortcut.ExecReset })); }
+	public static void Reset() {
+		Task.Run(() => {
+			EmuApi.ExecuteShortcut(new ExecuteShortcutParams() { Shortcut = EmulatorShortcut.ExecReset });
+		});
+	}
 	public static void PowerCycle() { RunReloadShortcut(EmulatorShortcut.ExecPowerCycle); }
 	public static void PowerOff() { RunReloadShortcut(EmulatorShortcut.ExecPowerOff); }
 	public static void ReloadRom() { RunReloadShortcut(EmulatorShortcut.ExecReloadRom); }

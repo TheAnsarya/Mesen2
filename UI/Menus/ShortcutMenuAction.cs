@@ -63,10 +63,12 @@ public sealed class ShortcutMenuAction : MenuActionBase {
 		};
 
 		// Set up the click handler to execute the shortcut
-		OnClick = () => Task.Run(() => EmuApi.ExecuteShortcut(new ExecuteShortcutParams {
-			Shortcut = shortcut,
-			Param = ShortcutParam
-		}));
+		OnClick = () => Task.Run(() => {
+			EmuApi.ExecuteShortcut(new ExecuteShortcutParams {
+				Shortcut = shortcut,
+				Param = ShortcutParam
+			});
+		});
 	}
 
 	/// <inheritdoc/>

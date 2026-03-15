@@ -32,6 +32,9 @@ void Profiler::StackFunction(AddressInfo& addr, StackFrameFlags stackFlag) {
 
 		UpdateCycles();
 
+		// Don't push null onto stacks — can happen during reset window
+		if (!_currentFunctionPtr) return;
+
 		// Push current function onto stack (key + cached pointer)
 		_stackFlags.push_back(stackFlag);
 		_cycleCountStack.push_back(_currentCycleCount);
@@ -59,6 +62,8 @@ void Profiler::StackFunction(AddressInfo& addr, StackFrameFlags stackFlag) {
 }
 
 void Profiler::UpdateCycles() {
+	if (!_currentFunctionPtr) return;
+
 	uint64_t masterClock = _cpuDebugger->GetCpuCycleCount(true);
 
 	// Use cached pointer instead of hash lookup (5.7-9.6× faster, see benchmarks)
@@ -71,6 +76,7 @@ void Profiler::UpdateCycles() {
 	// This avoids hash lookup per stack level (the main bottleneck before optimization)
 	int32_t len = (int32_t)_functionPtrStack.size();
 	for (int32_t i = len - 1; i >= 0; i--) {
+		if (!_functionPtrStack[i]) break;
 		_functionPtrStack[i]->InclusiveCycles += clockGap;
 		if (_stackFlags[i] != StackFrameFlags::None) {
 			// Don't apply inclusive times to stack frames before an IRQ/NMI
@@ -85,6 +91,8 @@ void Profiler::UpdateCycles() {
 void Profiler::UnstackFunction() {
 	if (!_functionStack.empty()) {
 		UpdateCycles();
+
+		if (!_currentFunctionPtr) return;
 
 		// Return to the previous function — use cached pointer for min/max update
 		ProfiledFunction& func = *_currentFunctionPtr;
@@ -121,15 +129,22 @@ void Profiler::ResetState() {
 }
 
 void Profiler::InternalReset() {
+	// Clear all cached pointers FIRST before invalidating them via _functions.clear()
+	// This prevents dangling pointer access if UpdateCycles runs concurrently
+	_currentFunctionPtr = nullptr;
+	_functionPtrStack.clear();
+	_functionStack.clear();
+	_stackFlags.clear();
+	_cycleCountStack.clear();
+
 	_functions.clear();
 	_functions[ResetFunctionIndex] = ProfiledFunction();
 	_functions[ResetFunctionIndex].Address = {ResetFunctionIndex, MemoryType::None};
 
-	// ResetState clears stacks and sets _currentFunction = ResetFunctionIndex
-	ResetState();
-
-	// Cache pointer to the reset function entry (must be after _functions is populated)
-	_currentFunctionPtr = &_functions[ResetFunctionIndex];
+	_prevMasterClock = _cpuDebugger->GetCpuCycleCount(true);
+	_currentCycleCount = 0;
+	_currentFunction = ResetFunctionIndex;
+	_currentFunctionPtr = &_functions[_currentFunction];
 }
 
 void Profiler::GetProfilerData(ProfiledFunction* profilerData, uint32_t& functionCount) {

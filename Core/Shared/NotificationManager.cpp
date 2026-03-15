@@ -59,7 +59,7 @@ void NotificationManager::SendNotification(ConsoleNotificationType type, void* p
 		_listeners.erase(writeIt, _listeners.end());
 	}
 
-	for (const shared_ptr<INotificationListener>& listener : snapshot) {
-		listener->ProcessNotification(type, parameter);
+	for (size_t i = 0; i < snapshot.size(); i++) {
+		snapshot[i]->ProcessNotification(type, parameter);
 	}
 }

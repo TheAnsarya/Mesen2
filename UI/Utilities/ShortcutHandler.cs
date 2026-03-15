@@ -34,8 +34,8 @@ public sealed class ShortcutHandler {
 		switch (shortcut) {
 			case EmulatorShortcut.Reset: Reset(); break;
 			case EmulatorShortcut.PowerCycle: PowerCycle(); break;
-			case EmulatorShortcut.ReloadRom: ReloadRom(); break;
-			case EmulatorShortcut.PowerOff: PowerOff(); break;
+				case EmulatorShortcut.ReloadRom: ReloadRom(); break;
+				case EmulatorShortcut.PowerOff: PowerOff(); break;
 			case EmulatorShortcut.Exit: _mainWindow.Close(); break;
 
 			case EmulatorShortcut.ToggleAudio: ToggleAudio(); break;

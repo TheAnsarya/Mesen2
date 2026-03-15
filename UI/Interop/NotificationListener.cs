@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 
-namespace Nexen.Interop; 
+namespace Nexen.Interop;
 public sealed class NotificationListener : IDisposable {
 	public delegate void NotificationCallback(int type, IntPtr parameter);
 	public delegate void NotificationEventHandler(NotificationEventArgs e);
