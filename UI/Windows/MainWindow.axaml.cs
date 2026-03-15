@@ -392,16 +392,13 @@ public class MainWindow : NexenWindow {
 				Dispatcher.UIThread.Post(() => UpdateInputConfiguration());
 				break;
 
-			case ConsoleNotificationType.EmulationStopped:
-				// Save Recent Play state before stopping (if ROM was loaded)
-				if (_model.RomInfo.Format != RomFormat.Unknown) {
-					EmuApi.SaveRecentPlayState();
-				}
-
-				// Save final Pansy file before stopping
+			case ConsoleNotificationType.BeforeEmulationStop:
+				// Save final Pansy file while console is still alive
 				BackgroundPansyExporter.OnRomUnloaded();
+				break;
 
-				// Update global emulator state
+			case ConsoleNotificationType.EmulationStopped:
+				// Update global emulator state (console is destroyed at this point)
 				Dispatcher.UIThread.Post(() => Services.EmulatorState.Instance.OnRomChanged(new RomInfo()));
 
 				Dispatcher.UIThread.Post(() => {

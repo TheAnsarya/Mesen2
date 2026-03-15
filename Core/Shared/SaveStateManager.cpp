@@ -159,6 +159,10 @@ void SaveStateManager::SaveState(ostream& stream) {
 }
 
 bool SaveStateManager::SaveState(const string& filepath, bool showSuccessMessage) {
+	if (!_emu->IsRunning()) {
+		return false;
+	}
+
 	SaveStateSnapshot snapshot;
 
 	{

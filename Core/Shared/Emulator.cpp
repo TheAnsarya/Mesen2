@@ -291,6 +291,11 @@ void Emulator::Stop(bool sendNotification, bool preventRecentGameSave, bool save
 		_saveStateManager->SaveRecentGame(romInfo.RomFile.GetFileName(), romInfo.RomFile, romInfo.PatchFile);
 	}
 
+	// Save recent play state while console is still alive (before destruction below)
+	if (_console) {
+		_saveStateManager->SaveRecentPlayState();
+	}
+
 	if (sendNotification) {
 		_notificationManager->SendNotification(ConsoleNotificationType::BeforeEmulationStop);
 	}
@@ -314,6 +319,11 @@ void Emulator::Stop(bool sendNotification, bool preventRecentGameSave, bool save
 
 void Emulator::Reset() {
 	Lock();
+
+	if (!_console) {
+		Unlock();
+		return;
+	}
 
 	_console->Reset();
 
