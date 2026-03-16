@@ -42,6 +42,12 @@ These are long-term goals only — no implementation in the near term.
 - RIOT: Low
 - Mappers: Medium (many simple variants)
 
+Detailed planning and issue breakdown:
+
+- [Atari 2600 Feasibility and Test Harness Plan](atari-2600-feasibility-and-harness-plan.md)
+- [#695](https://github.com/TheAnsarya/Nexen/issues/695) parent spike issue
+- [#697](https://github.com/TheAnsarya/Nexen/issues/697), [#698](https://github.com/TheAnsarya/Nexen/issues/698), [#699](https://github.com/TheAnsarya/Nexen/issues/699) follow-up implementation issues
+
 ## Sega Genesis / Mega Drive (Feasibility: Hard)
 
 ### CPU: Motorola 68000 (primary) + Zilog Z80 (sound)

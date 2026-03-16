@@ -9,8 +9,14 @@ The current expansion effort is tracked under GitHub Epic [#673](https://github.
 | Track | Scope | Primary Issue | Supporting Plan |
 |---|---|---|---|
 | Documentation and execution index | Publish roadmap docs, tutorials, and contributor execution flow | [#694](https://github.com/TheAnsarya/Nexen/issues/694) | [Q2 Program Plan](../~docs/plans/future-work-program-2026-q2.md) |
-| Atari 2600 feasibility spike | Define architecture constraints, test harness, and validation strategy | [#695](https://github.com/TheAnsarya/Nexen/issues/695) | [Long-Term Missing Platforms](../~docs/plans/long-term-missing-platforms.md) |
+| Atari 2600 feasibility spike | Define architecture constraints, test harness, and validation strategy | [#695](https://github.com/TheAnsarya/Nexen/issues/695) | [Atari 2600 Feasibility Plan](../~docs/plans/atari-2600-feasibility-and-harness-plan.md) |
 | Sega Genesis feasibility spike | Define M68000 and VDP strategy, risks, and phased implementation path | [#696](https://github.com/TheAnsarya/Nexen/issues/696) | [Long-Term Missing Platforms](../~docs/plans/long-term-missing-platforms.md) |
+
+Atari 2600 follow-up implementation issues:
+
+- [#697](https://github.com/TheAnsarya/Nexen/issues/697): CPU/RIOT bring-up skeleton
+- [#698](https://github.com/TheAnsarya/Nexen/issues/698): TIA timing spike and smoke-test harness
+- [#699](https://github.com/TheAnsarya/Nexen/issues/699): Bankswitching order and regression matrix
 
 ## Near-Term Improvement Tracks
 
