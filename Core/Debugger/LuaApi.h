@@ -17,7 +17,7 @@ public:
 	static void SetContext(ScriptingContext* context);
 	static int GetLibrary(lua_State* lua);
 
-	static void LuaPushIntValue(lua_State* lua, string name, int value);
+	static void LuaPushIntValue(lua_State* lua, const string& name, int value);
 
 	static DebugHud* GetHud();
 
@@ -101,5 +101,5 @@ private:
 
 	static std::pair<unique_ptr<BaseVideoFilter>, FrameInfo> GetRenderedFrame();
 	template <typename T>
-	static void GenerateEnumDefinition(lua_State* lua, string enumName, unordered_set<T> excludedValues = {});
+	static void GenerateEnumDefinition(lua_State* lua, const string& enumName, unordered_set<T> excludedValues = {});
 };

@@ -3,33 +3,32 @@
 #include "NES/NesTypes.h"
 #include "NES/Debugger/NesDebugger.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetNesTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"a",	          EvalValues::RegA             },
-	    {"x",	          EvalValues::RegX             },
-	    {"y",	          EvalValues::RegY             },
-	    {"ps",             EvalValues::RegPS            },
-	    {"sp",             EvalValues::RegSP            },
-	    {"pc",             EvalValues::RegPC            },
-	    {"irq",            EvalValues::Irq              },
-	    {"nmi",            EvalValues::Nmi              },
-	    {"frame",          EvalValues::PpuFrameCount    },
-	    {"cycle",          EvalValues::PpuCycle         },
-	    {"scanline",       EvalValues::PpuScanline      },
-	    {"v",	          EvalValues::PpuVramAddress   },
-	    {"t",	          EvalValues::PpuTmpVramAddress},
-	    {"sprite0hit",     EvalValues::Sprite0Hit       },
-	    {"verticalblank",  EvalValues::VerticalBlank    },
-	    {"spriteoverflow", EvalValues::SpriteOverflow   },
-	    {"pscarry",        EvalValues::RegPS_Carry      },
-	    {"pszero",         EvalValues::RegPS_Zero       },
-	    {"psinterrupt",    EvalValues::RegPS_Interrupt  },
-	    {"psdecimal",      EvalValues::RegPS_Decimal    },
-	    {"psoverflow",     EvalValues::RegPS_Overflow   },
-	    {"psnegative",     EvalValues::RegPS_Negative   },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetNesTokens() {
+	static constexpr std::array<TokenEntry, 22> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"cycle",                  EvalValues::PpuCycle},
+		{"frame",                  EvalValues::PpuFrameCount},
+		{"irq",                    EvalValues::Irq},
+		{"nmi",                    EvalValues::Nmi},
+		{"pc",                     EvalValues::RegPC},
+		{"ps",                     EvalValues::RegPS},
+		{"pscarry",                EvalValues::RegPS_Carry},
+		{"psdecimal",              EvalValues::RegPS_Decimal},
+		{"psinterrupt",            EvalValues::RegPS_Interrupt},
+		{"psnegative",             EvalValues::RegPS_Negative},
+		{"psoverflow",             EvalValues::RegPS_Overflow},
+		{"pszero",                 EvalValues::RegPS_Zero},
+		{"scanline",               EvalValues::PpuScanline},
+		{"sp",                     EvalValues::RegSP},
+		{"sprite0hit",             EvalValues::Sprite0Hit},
+		{"spriteoverflow",         EvalValues::SpriteOverflow},
+		{"t",                      EvalValues::PpuTmpVramAddress},
+		{"v",                      EvalValues::PpuVramAddress},
+		{"verticalblank",          EvalValues::VerticalBlank},
+		{"x",                      EvalValues::RegX},
+		{"y",                      EvalValues::RegY},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetNesTokenValue(int64_t token, EvalResultType& resultType) {

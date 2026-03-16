@@ -5,37 +5,36 @@
 #include "PCE/PcePsg.h"
 #include "PCE/Debugger/PceDebugger.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetPceTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"a",	            EvalValues::RegA                  },
-	    {"x",	            EvalValues::RegX                  },
-	    {"y",	            EvalValues::RegY                  },
-	    {"ps",	           EvalValues::RegPS                 },
-	    {"sp",	           EvalValues::RegSP                 },
-	    {"pc",	           EvalValues::RegPC                 },
-	    {"irq",              EvalValues::Irq                   },
-	    {"frame",            EvalValues::PpuFrameCount         },
-	    {"cycle",            EvalValues::PpuCycle              },
-	    {"scanline",         EvalValues::PpuScanline           },
-	    {"sprite0hit",       EvalValues::Sprite0Hit            },
-	    {"verticalblank",    EvalValues::VerticalBlank         },
-	    {"spriteoverflow",   EvalValues::SpriteOverflow        },
-	    {"pscarry",          EvalValues::RegPS_Carry           },
-	    {"pszero",           EvalValues::RegPS_Zero            },
-	    {"psinterrupt",      EvalValues::RegPS_Interrupt       },
-	    {"psdecimal",        EvalValues::RegPS_Decimal         },
-	    {"psmemory",         EvalValues::RegPS_Memory          },
-	    {"psoverflow",       EvalValues::RegPS_Overflow        },
-	    {"psnegative",       EvalValues::RegPS_Negative        },
-	    {"vramtransferdone", EvalValues::PceVramTransferDone   },
-	    {"satbtransferdone", EvalValues::PceSatbTransferDone   },
-	    {"scanlinedetected", EvalValues::PceScanlineDetected   },
-	    {"irqvdc2",          EvalValues::PceIrqVdc2            },
-	    {"psgchannel",       EvalValues::PceSelectedPsgChannel },
-	    {"vdcreg",           EvalValues::PceSelectedVdcRegister}
-    };
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetPceTokens() {
+	static constexpr std::array<TokenEntry, 26> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"cycle",                  EvalValues::PpuCycle},
+		{"frame",                  EvalValues::PpuFrameCount},
+		{"irq",                    EvalValues::Irq},
+		{"irqvdc2",                EvalValues::PceIrqVdc2},
+		{"pc",                     EvalValues::RegPC},
+		{"ps",                     EvalValues::RegPS},
+		{"pscarry",                EvalValues::RegPS_Carry},
+		{"psdecimal",              EvalValues::RegPS_Decimal},
+		{"psgchannel",             EvalValues::PceSelectedPsgChannel},
+		{"psinterrupt",            EvalValues::RegPS_Interrupt},
+		{"psmemory",               EvalValues::RegPS_Memory},
+		{"psnegative",             EvalValues::RegPS_Negative},
+		{"psoverflow",             EvalValues::RegPS_Overflow},
+		{"pszero",                 EvalValues::RegPS_Zero},
+		{"satbtransferdone",       EvalValues::PceSatbTransferDone},
+		{"scanline",               EvalValues::PpuScanline},
+		{"scanlinedetected",       EvalValues::PceScanlineDetected},
+		{"sp",                     EvalValues::RegSP},
+		{"sprite0hit",             EvalValues::Sprite0Hit},
+		{"spriteoverflow",         EvalValues::SpriteOverflow},
+		{"vdcreg",                 EvalValues::PceSelectedVdcRegister},
+		{"verticalblank",          EvalValues::VerticalBlank},
+		{"vramtransferdone",       EvalValues::PceVramTransferDone},
+		{"x",                      EvalValues::RegX},
+		{"y",                      EvalValues::RegY},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetPceTokenValue(int64_t token, EvalResultType& resultType) {

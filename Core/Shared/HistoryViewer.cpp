@@ -45,6 +45,7 @@ bool HistoryViewer::Initialize(Emulator* mainEmu) {
 
 	// Cache segment boundaries (immutable after init)
 	_segmentFrames.clear();
+	_segmentFrames.reserve(_history.size());
 	for (size_t i = 0; i < _history.size(); i++) {
 		if (_history[i].EndOfSegment || i == _history.size() - 1) {
 			_segmentFrames.push_back((uint32_t)i * RewindManager::BufferSize);

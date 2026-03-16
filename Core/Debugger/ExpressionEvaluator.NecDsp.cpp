@@ -3,25 +3,24 @@
 #include "SNES/Coprocessors/DSP/NecDspTypes.h"
 #include "SNES/Debugger/NecDspDebugger.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetNecDspTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"a",   EvalValues::RegA  },
-	    {"b",   EvalValues::RegB  },
-	    {"tr",  EvalValues::RegTR },
-	    {"trb", EvalValues::RegTRB},
-	    {"rp",  EvalValues::RegRP },
-	    {"dp",  EvalValues::RegDP },
-	    {"dr",  EvalValues::RegDR },
-	    {"sr",  EvalValues::RegSR },
-	    {"k",   EvalValues::RegK  },
-	    {"l",   EvalValues::RegL  },
-	    {"m",   EvalValues::RegM  },
-	    {"n",   EvalValues::RegN  },
-	    {"sp",  EvalValues::RegSP },
-	    {"pc",  EvalValues::RegPC },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetNecDspTokens() {
+	static constexpr std::array<TokenEntry, 14> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"b",                      EvalValues::RegB},
+		{"dp",                     EvalValues::RegDP},
+		{"dr",                     EvalValues::RegDR},
+		{"k",                      EvalValues::RegK},
+		{"l",                      EvalValues::RegL},
+		{"m",                      EvalValues::RegM},
+		{"n",                      EvalValues::RegN},
+		{"pc",                     EvalValues::RegPC},
+		{"rp",                     EvalValues::RegRP},
+		{"sp",                     EvalValues::RegSP},
+		{"sr",                     EvalValues::RegSR},
+		{"tr",                     EvalValues::RegTR},
+		{"trb",                    EvalValues::RegTRB},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetNecDspTokenValue(int64_t token, EvalResultType& resultType) {

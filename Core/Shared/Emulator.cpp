@@ -958,7 +958,7 @@ void Emulator::InputBarcode(uint64_t barcode, uint32_t digitCount) {
 	}
 }
 
-void Emulator::ProcessTapeRecorderAction(TapeRecorderAction action, string filename) {
+void Emulator::ProcessTapeRecorderAction(TapeRecorderAction action, const string& filename) {
 	shared_ptr<IConsole> console = GetConsole();
 	if (console) {
 		shared_ptr<ITapeRecorder> recorder = console->GetControlManager()->GetControlDevice<ITapeRecorder>();

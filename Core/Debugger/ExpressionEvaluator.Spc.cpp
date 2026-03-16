@@ -3,18 +3,17 @@
 #include "SNES/SpcTypes.h"
 #include "SNES/Debugger/SpcDebugger.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetSpcTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"a",      EvalValues::RegA     },
-	    {"x",      EvalValues::RegX     },
-	    {"y",      EvalValues::RegY     },
-	    {"ps",     EvalValues::RegPS    },
-	    {"sp",     EvalValues::RegSP    },
-	    {"pc",     EvalValues::RegPC    },
-	    {"dspreg", EvalValues::SpcDspReg},
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetSpcTokens() {
+	static constexpr std::array<TokenEntry, 7> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"dspreg",                 EvalValues::SpcDspReg},
+		{"pc",                     EvalValues::RegPC},
+		{"ps",                     EvalValues::RegPS},
+		{"sp",                     EvalValues::RegSP},
+		{"x",                      EvalValues::RegX},
+		{"y",                      EvalValues::RegY},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetSpcTokenValue(int64_t token, EvalResultType& resultType) {

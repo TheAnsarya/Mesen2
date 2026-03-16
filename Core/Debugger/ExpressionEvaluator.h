@@ -2,10 +2,17 @@
 #include "pch.h"
 #include <stack>
 #include <deque>
+#include <span>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 #include "Debugger/DebugTypes.h"
 #include "Utilities/SimpleLock.h"
+
+/// Token entry: string_view key → int64_t value (sorted by key for binary search)
+using TokenEntry = std::pair<std::string_view, int64_t>;
+/// Span over a sorted array of token entries
+using TokenSpan = std::span<const TokenEntry>;
 
 class Debugger;
 class LabelManager;
@@ -338,8 +345,8 @@ private:
 	/// <summary>
 	/// Get available register/value tokens for current CPU.
 	/// </summary>
-	/// <returns>Map of token name → EvalValues enum</returns>
-	unordered_map<string, int64_t>* GetAvailableTokens();
+	/// <returns>Span of sorted token entries (key → EvalValues enum)</returns>
+	TokenSpan GetAvailableTokens();
 
 	/// <summary>
 	/// Check for special tokens (labels, hex/binary literals).
@@ -352,18 +359,18 @@ private:
 	bool CheckSpecialTokens(const string& expression, size_t& pos, string& output, ExpressionData& data);
 
 	// Platform-specific token getters (register names → EvalValues)
-	unordered_map<string, int64_t>& GetSnesTokens();
-	unordered_map<string, int64_t>& GetSpcTokens();
-	unordered_map<string, int64_t>& GetGsuTokens();
-	unordered_map<string, int64_t>& GetCx4Tokens();
-	unordered_map<string, int64_t>& GetNecDspTokens();
-	unordered_map<string, int64_t>& GetSt018Tokens();
-	unordered_map<string, int64_t>& GetGameboyTokens();
-	unordered_map<string, int64_t>& GetNesTokens();
-	unordered_map<string, int64_t>& GetPceTokens();
-	unordered_map<string, int64_t>& GetSmsTokens();
-	unordered_map<string, int64_t>& GetGbaTokens();
-	unordered_map<string, int64_t>& GetWsTokens();
+	TokenSpan GetSnesTokens();
+	TokenSpan GetSpcTokens();
+	TokenSpan GetGsuTokens();
+	TokenSpan GetCx4Tokens();
+	TokenSpan GetNecDspTokens();
+	TokenSpan GetSt018Tokens();
+	TokenSpan GetGameboyTokens();
+	TokenSpan GetNesTokens();
+	TokenSpan GetPceTokens();
+	TokenSpan GetSmsTokens();
+	TokenSpan GetGbaTokens();
+	TokenSpan GetWsTokens();
 
 	// Platform-specific value getters (EvalValues → current register value)
 	int64_t GetSnesTokenValue(int64_t token, EvalResultType& resultType);

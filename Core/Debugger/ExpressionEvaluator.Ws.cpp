@@ -3,44 +3,36 @@
 #include "WS/Debugger/WsDebugger.h"
 #include "WS/WsTypes.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetWsTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"ax",       EvalValues::RegAX        },
-	    {"bx",       EvalValues::RegBX        },
-	    {"cx",       EvalValues::RegCX        },
-	    {"dx",       EvalValues::RegDX        },
-
-	    {"al",       EvalValues::RegAL        },
-	    {"bl",       EvalValues::RegBL        },
-	    {"cl",       EvalValues::RegCL        },
-	    {"dl",       EvalValues::RegDL        },
-
-	    {"ah",       EvalValues::RegAH        },
-	    {"bh",       EvalValues::RegBH        },
-	    {"ch",       EvalValues::RegCH        },
-	    {"dh",       EvalValues::RegDH        },
-
-	    {"cs",       EvalValues::RegCS        },
-	    {"ds",       EvalValues::RegDS        },
-	    {"es",       EvalValues::RegES        },
-	    {"ss",       EvalValues::RegSS        },
-
-	    {"si",       EvalValues::RegSI        },
-	    {"di",       EvalValues::RegDI        },
-	    {"bp",       EvalValues::RegBP        },
-	    {"ip",       EvalValues::RegIP        },
-
-	    {"f",        EvalValues::RegF         },
-
-	    {"sp",       EvalValues::RegSP        },
-	    {"pc",       EvalValues::RegPC        },
-
-	    {"frame",    EvalValues::PpuFrameCount},
-	    {"cycle",    EvalValues::PpuCycle     },
-	    {"scanline", EvalValues::PpuScanline  },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetWsTokens() {
+	static constexpr std::array<TokenEntry, 26> tokens = {{
+		{"ah",                     EvalValues::RegAH},
+		{"al",                     EvalValues::RegAL},
+		{"ax",                     EvalValues::RegAX},
+		{"bh",                     EvalValues::RegBH},
+		{"bl",                     EvalValues::RegBL},
+		{"bp",                     EvalValues::RegBP},
+		{"bx",                     EvalValues::RegBX},
+		{"ch",                     EvalValues::RegCH},
+		{"cl",                     EvalValues::RegCL},
+		{"cs",                     EvalValues::RegCS},
+		{"cx",                     EvalValues::RegCX},
+		{"cycle",                  EvalValues::PpuCycle},
+		{"dh",                     EvalValues::RegDH},
+		{"di",                     EvalValues::RegDI},
+		{"dl",                     EvalValues::RegDL},
+		{"ds",                     EvalValues::RegDS},
+		{"dx",                     EvalValues::RegDX},
+		{"es",                     EvalValues::RegES},
+		{"f",                      EvalValues::RegF},
+		{"frame",                  EvalValues::PpuFrameCount},
+		{"ip",                     EvalValues::RegIP},
+		{"pc",                     EvalValues::RegPC},
+		{"scanline",               EvalValues::PpuScanline},
+		{"si",                     EvalValues::RegSI},
+		{"sp",                     EvalValues::RegSP},
+		{"ss",                     EvalValues::RegSS},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetWsTokenValue(int64_t token, EvalResultType& resultType) {

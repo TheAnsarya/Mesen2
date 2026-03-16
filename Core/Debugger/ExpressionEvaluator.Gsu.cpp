@@ -3,33 +3,32 @@
 #include "SNES/Debugger/GsuDebugger.h"
 #include "SNES/Coprocessors/GSU/GsuTypes.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetGsuTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"r0",     EvalValues::R0    },
-	    {"r1",     EvalValues::R1    },
-	    {"r2",     EvalValues::R2    },
-	    {"r3",     EvalValues::R3    },
-	    {"r4",     EvalValues::R4    },
-	    {"r5",     EvalValues::R5    },
-	    {"r6",     EvalValues::R6    },
-	    {"r7",     EvalValues::R7    },
-	    {"r8",     EvalValues::R8    },
-	    {"r9",     EvalValues::R9    },
-	    {"r10",    EvalValues::R10   },
-	    {"r11",    EvalValues::R11   },
-	    {"r12",    EvalValues::R12   },
-	    {"r13",    EvalValues::R13   },
-	    {"r14",    EvalValues::R14   },
-	    {"r15",    EvalValues::R15   },
-	    {"srcreg", EvalValues::SrcReg},
-	    {"dstreg", EvalValues::DstReg},
-	    {"sfr",    EvalValues::SFR   },
-	    {"pbr",    EvalValues::PBR   },
-	    {"rombr",  EvalValues::RomBR },
-	    {"rambr",  EvalValues::RamBR },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetGsuTokens() {
+	static constexpr std::array<TokenEntry, 22> tokens = {{
+		{"dstreg",                 EvalValues::DstReg},
+		{"pbr",                    EvalValues::PBR},
+		{"r0",                     EvalValues::R0},
+		{"r1",                     EvalValues::R1},
+		{"r10",                    EvalValues::R10},
+		{"r11",                    EvalValues::R11},
+		{"r12",                    EvalValues::R12},
+		{"r13",                    EvalValues::R13},
+		{"r14",                    EvalValues::R14},
+		{"r15",                    EvalValues::R15},
+		{"r2",                     EvalValues::R2},
+		{"r3",                     EvalValues::R3},
+		{"r4",                     EvalValues::R4},
+		{"r5",                     EvalValues::R5},
+		{"r6",                     EvalValues::R6},
+		{"r7",                     EvalValues::R7},
+		{"r8",                     EvalValues::R8},
+		{"r9",                     EvalValues::R9},
+		{"rambr",                  EvalValues::RamBR},
+		{"rombr",                  EvalValues::RomBR},
+		{"sfr",                    EvalValues::SFR},
+		{"srcreg",                 EvalValues::SrcReg},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetGsuTokenValue(int64_t token, EvalResultType& resultType) {

@@ -119,7 +119,7 @@ void LuaApi::SetContext(ScriptingContext* context) {
 	_emu = _debugger->GetEmulator();
 }
 
-void LuaApi::LuaPushIntValue(lua_State* lua, string name, int value) {
+void LuaApi::LuaPushIntValue(lua_State* lua, const string& name, int value) {
 	lua_pushstring(lua, name.c_str());
 	lua_pushinteger(lua, value);
 	lua_settable(lua, -3);
@@ -229,7 +229,7 @@ int LuaApi::GetLibrary(lua_State* lua) {
 }
 
 template <typename T>
-void LuaApi::GenerateEnumDefinition(lua_State* lua, string enumName, unordered_set<T> excludedValues) {
+void LuaApi::GenerateEnumDefinition(lua_State* lua, const string& enumName, unordered_set<T> excludedValues) {
 	lua_pushstring(lua, enumName.c_str());
 	lua_newtable(lua);
 	for (auto& entry : magic_enum::enum_entries<T>()) {

@@ -386,7 +386,7 @@ public:
 	void InputBarcode(uint64_t barcode, uint32_t digitCount);
 
 	/// <summary>Process tape recorder action (for 8-bit computers)</summary>
-	void ProcessTapeRecorderAction(TapeRecorderAction action, string filename);
+	void ProcessTapeRecorderAction(TapeRecorderAction action, const string& filename);
 
 	/// <summary>
 	/// Check if keyboard shortcut allowed.

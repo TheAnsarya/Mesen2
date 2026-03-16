@@ -53,7 +53,7 @@ public:
 	bool LoadArchive(vector<uint8_t>& data);
 
 	/// <summary>Load archive from file path</summary>
-	bool LoadArchive(string filename);
+	bool LoadArchive(const string& filename);
 
 	/// <summary>Load archive from input stream</summary>
 	bool LoadArchive(std::istream& in);
@@ -64,7 +64,7 @@ public:
 	/// <param name="filename">File path within archive</param>
 	/// <param name="stream">Output stream for file data</param>
 	/// <returns>True if file found and extracted</returns>
-	bool GetStream(string filename, std::stringstream& stream);
+	bool GetStream(const string& filename, std::stringstream& stream);
 
 	/// <summary>
 	/// Get list of files with optional extension filtering.
@@ -76,7 +76,7 @@ public:
 	/// <summary>Check if specific file exists in archive</summary>
 	/// <param name="filename">File path to check</param>
 	/// <returns>True if file exists</returns>
-	bool CheckFile(string filename);
+	bool CheckFile(const string& filename);
 
 	/// <summary>
 	/// Extract file from archive to vector.
@@ -96,5 +96,5 @@ public:
 	static unique_ptr<ArchiveReader> GetReader(std::istream& in);
 
 	/// <summary>Factory method: create reader from file path</summary>
-	static unique_ptr<ArchiveReader> GetReader(string filepath);
+	static unique_ptr<ArchiveReader> GetReader(const string& filepath);
 };

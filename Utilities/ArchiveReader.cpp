@@ -13,7 +13,7 @@ ArchiveReader::~ArchiveReader() {
 	_buffer.reset();
 }
 
-bool ArchiveReader::GetStream(string filename, std::stringstream& stream) {
+bool ArchiveReader::GetStream(const string& filename, std::stringstream& stream) {
 	if (_initialized) {
 		vector<uint8_t> fileData;
 		if (ExtractFile(filename, fileData)) {
@@ -45,7 +45,7 @@ vector<string> ArchiveReader::GetFileList(std::initializer_list<string> extensio
 	return filenames;
 }
 
-bool ArchiveReader::CheckFile(string filename) {
+bool ArchiveReader::CheckFile(const string& filename) {
 	vector<string> files = InternalGetFileList();
 	return std::ranges::find(files, filename) != files.end();
 }
@@ -74,7 +74,7 @@ bool ArchiveReader::LoadArchive(void* buffer, size_t size) {
 	return false;
 }
 
-bool ArchiveReader::LoadArchive(string filename) {
+bool ArchiveReader::LoadArchive(const string& filename) {
 	ifstream in(filename, std::ios::binary | std::ios::in);
 	if (in.good()) {
 		LoadArchive(in);
@@ -100,7 +100,7 @@ unique_ptr<ArchiveReader> ArchiveReader::GetReader(std::istream& in) {
 	return reader;
 }
 
-unique_ptr<ArchiveReader> ArchiveReader::GetReader(string filepath) {
+unique_ptr<ArchiveReader> ArchiveReader::GetReader(const string& filepath) {
 	ifstream in(filepath, std::ios::in | std::ios::binary);
 	if (in) {
 		return GetReader(in);

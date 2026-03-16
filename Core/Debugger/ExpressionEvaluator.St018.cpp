@@ -3,31 +3,30 @@
 #include "SNES/Debugger/St018Debugger.h"
 #include "SNES/Coprocessors/ST018/ArmV3Types.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetSt018Tokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"r0",   EvalValues::R0  },
-	    {"r1",   EvalValues::R1  },
-	    {"r2",   EvalValues::R2  },
-	    {"r3",   EvalValues::R3  },
-	    {"r4",   EvalValues::R4  },
-	    {"r5",   EvalValues::R5  },
-	    {"r6",   EvalValues::R6  },
-	    {"r7",   EvalValues::R7  },
-	    {"r8",   EvalValues::R8  },
-	    {"r9",   EvalValues::R9  },
-	    {"r10",  EvalValues::R10 },
-	    {"r11",  EvalValues::R11 },
-	    {"r12",  EvalValues::R12 },
-	    {"r13",  EvalValues::R13 },
-	    {"r14",  EvalValues::R14 },
-	    {"r15",  EvalValues::R15 },
-	    {"sp",   EvalValues::R13 },
-	    {"lr",   EvalValues::R14 },
-	    {"pc",   EvalValues::R15 },
-	    {"cpsr", EvalValues::CPSR}
-    };
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetSt018Tokens() {
+	static constexpr std::array<TokenEntry, 20> tokens = {{
+		{"cpsr",                   EvalValues::CPSR},
+		{"lr",                     EvalValues::R14},
+		{"pc",                     EvalValues::R15},
+		{"r0",                     EvalValues::R0},
+		{"r1",                     EvalValues::R1},
+		{"r10",                    EvalValues::R10},
+		{"r11",                    EvalValues::R11},
+		{"r12",                    EvalValues::R12},
+		{"r13",                    EvalValues::R13},
+		{"r14",                    EvalValues::R14},
+		{"r15",                    EvalValues::R15},
+		{"r2",                     EvalValues::R2},
+		{"r3",                     EvalValues::R3},
+		{"r4",                     EvalValues::R4},
+		{"r5",                     EvalValues::R5},
+		{"r6",                     EvalValues::R6},
+		{"r7",                     EvalValues::R7},
+		{"r8",                     EvalValues::R8},
+		{"r9",                     EvalValues::R9},
+		{"sp",                     EvalValues::R13},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetSt018TokenValue(int64_t token, EvalResultType& resultType) {

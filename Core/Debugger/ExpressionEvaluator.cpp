@@ -65,40 +65,40 @@ EvalOperators ExpressionEvaluator::GetOperator(const string& token, bool unaryOp
 	return EvalOperators::Addition;
 }
 
-unordered_map<string, int64_t>* ExpressionEvaluator::GetAvailableTokens() {
+TokenSpan ExpressionEvaluator::GetAvailableTokens() {
 	switch (_cpuType) {
 		case CpuType::Snes:
-			return &GetSnesTokens();
+			return GetSnesTokens();
 		case CpuType::Spc:
-			return &GetSpcTokens();
+			return GetSpcTokens();
 		case CpuType::NecDsp:
-			return &GetNecDspTokens();
+			return GetNecDspTokens();
 		case CpuType::Sa1:
-			return &GetSnesTokens();
+			return GetSnesTokens();
 		case CpuType::Gsu:
-			return &GetGsuTokens();
+			return GetGsuTokens();
 		case CpuType::Cx4:
-			return &GetCx4Tokens();
+			return GetCx4Tokens();
 		case CpuType::St018:
-			return &GetSt018Tokens();
+			return GetSt018Tokens();
 		case CpuType::Gameboy:
-			return &GetGameboyTokens();
+			return GetGameboyTokens();
 		case CpuType::Nes:
-			return &GetNesTokens();
+			return GetNesTokens();
 		case CpuType::Pce:
-			return &GetPceTokens();
+			return GetPceTokens();
 		case CpuType::Sms:
-			return &GetSmsTokens();
+			return GetSmsTokens();
 		case CpuType::Gba:
-			return &GetGbaTokens();
+			return GetGbaTokens();
 		case CpuType::Ws:
-			return &GetWsTokens();
+			return GetWsTokens();
 		case CpuType::Lynx:
 			// Lynx uses 65C02, reuse NES/PCE token set for registers
-			return &GetNesTokens();
+			return GetNesTokens();
 	}
 
-	return nullptr;
+	return {};
 }
 
 bool ExpressionEvaluator::CheckSpecialTokens(const string& expression, size_t& pos, string& output, ExpressionData& data) {
@@ -118,11 +118,14 @@ bool ExpressionEvaluator::CheckSpecialTokens(const string& expression, size_t& p
 
 	int64_t tokenValue = -1;
 
-	unordered_map<string, int64_t>* availableTokens = GetAvailableTokens();
-	if (availableTokens) {
-		auto result = availableTokens->find(token);
-		if (result != availableTokens->end()) {
-			tokenValue = result->second;
+	TokenSpan availableTokens = GetAvailableTokens();
+	if (!availableTokens.empty()) {
+		auto it = std::lower_bound(
+			availableTokens.begin(), availableTokens.end(), token,
+			[](const TokenEntry& pair, const std::string& k) { return pair.first < k; }
+		);
+		if (it != availableTokens.end() && it->first == token) {
+			tokenValue = it->second;
 		}
 	}
 
@@ -645,14 +648,14 @@ ExpressionData ExpressionEvaluator::GetRpnList(const string& expression, bool& s
 
 void ExpressionEvaluator::GetTokenList(char* tokenList) {
 	// Returns all CPU-specific tokens, sorted by the their EvalValues order
-	unordered_map<string, int64_t>* availableTokens = GetAvailableTokens();
+	TokenSpan availableTokens = GetAvailableTokens();
 
-	vector<std::pair<string, int64_t>> entries;
+	vector<std::pair<std::string_view, int64_t>> entries;
 
 	int pos = 0;
-	if (availableTokens) {
-		entries.reserve(availableTokens->size());
-		for (const auto& entry : *availableTokens) {
+	if (!availableTokens.empty()) {
+		entries.reserve(availableTokens.size());
+		for (const auto& entry : availableTokens) {
 			entries.push_back(entry);
 		}
 	}
@@ -666,7 +669,7 @@ void ExpressionEvaluator::GetTokenList(char* tokenList) {
 			break;
 		}
 
-		memcpy(tokenList + pos, entry.first.c_str(), entry.first.size());
+		memcpy(tokenList + pos, entry.first.data(), entry.first.size());
 		pos += (int)entry.first.size();
 		tokenList[pos] = '|';
 		pos++;

@@ -4,33 +4,32 @@
 #include "SNES/SnesPpuTypes.h"
 #include "SNES/Debugger/SnesDebugger.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetSnesTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"a",           EvalValues::RegA           },
-	    {"x",           EvalValues::RegX           },
-	    {"y",           EvalValues::RegY           },
-	    {"ps",          EvalValues::RegPS          },
-	    {"sp",          EvalValues::RegSP          },
-	    {"pc",          EvalValues::RegPC          },
-	    {"db",          EvalValues::RegDB          },
-	    {"d",           EvalValues::RegD           },
-	    {"irq",         EvalValues::Irq            },
-	    {"nmi",         EvalValues::Nmi            },
-	    {"frame",       EvalValues::PpuFrameCount  },
-	    {"hclock",      EvalValues::PpuHClock      },
-	    {"cycle",       EvalValues::PpuCycle       },
-	    {"scanline",    EvalValues::PpuScanline    },
-	    {"pscarry",     EvalValues::RegPS_Carry    },
-	    {"pszero",      EvalValues::RegPS_Zero     },
-	    {"psinterrupt", EvalValues::RegPS_Interrupt},
-	    {"psindex",     EvalValues::RegPS_Index    },
-	    {"psmemory",    EvalValues::RegPS_Memory   },
-	    {"psdecimal",   EvalValues::RegPS_Decimal  },
-	    {"psoverflow",  EvalValues::RegPS_Overflow },
-	    {"psnegative",  EvalValues::RegPS_Negative },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetSnesTokens() {
+	static constexpr std::array<TokenEntry, 22> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"cycle",                  EvalValues::PpuCycle},
+		{"d",                      EvalValues::RegD},
+		{"db",                     EvalValues::RegDB},
+		{"frame",                  EvalValues::PpuFrameCount},
+		{"hclock",                 EvalValues::PpuHClock},
+		{"irq",                    EvalValues::Irq},
+		{"nmi",                    EvalValues::Nmi},
+		{"pc",                     EvalValues::RegPC},
+		{"ps",                     EvalValues::RegPS},
+		{"pscarry",                EvalValues::RegPS_Carry},
+		{"psdecimal",              EvalValues::RegPS_Decimal},
+		{"psindex",                EvalValues::RegPS_Index},
+		{"psinterrupt",            EvalValues::RegPS_Interrupt},
+		{"psmemory",               EvalValues::RegPS_Memory},
+		{"psnegative",             EvalValues::RegPS_Negative},
+		{"psoverflow",             EvalValues::RegPS_Overflow},
+		{"pszero",                 EvalValues::RegPS_Zero},
+		{"scanline",               EvalValues::PpuScanline},
+		{"sp",                     EvalValues::RegSP},
+		{"x",                      EvalValues::RegX},
+		{"y",                      EvalValues::RegY},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetSnesTokenValue(int64_t token, EvalResultType& resultType) {

@@ -3,34 +3,33 @@
 #include "GBA/Debugger/GbaDebugger.h"
 #include "GBA/GbaTypes.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetGbaTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"r0",       EvalValues::R0           },
-	    {"r1",       EvalValues::R1           },
-	    {"r2",       EvalValues::R2           },
-	    {"r3",       EvalValues::R3           },
-	    {"r4",       EvalValues::R4           },
-	    {"r5",       EvalValues::R5           },
-	    {"r6",       EvalValues::R6           },
-	    {"r7",       EvalValues::R7           },
-	    {"r8",       EvalValues::R8           },
-	    {"r9",       EvalValues::R9           },
-	    {"r10",      EvalValues::R10          },
-	    {"r11",      EvalValues::R11          },
-	    {"r12",      EvalValues::R12          },
-	    {"r13",      EvalValues::R13          },
-	    {"r14",      EvalValues::R14          },
-	    {"r15",      EvalValues::R15          },
-	    {"sp",       EvalValues::R13          },
-	    {"lr",       EvalValues::R14          },
-	    {"pc",       EvalValues::R15          },
-	    {"cpsr",     EvalValues::CPSR         },
-	    {"cycle",    EvalValues::PpuCycle     },
-	    {"scanline", EvalValues::PpuScanline  },
-	    {"frame",    EvalValues::PpuFrameCount},
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetGbaTokens() {
+	static constexpr std::array<TokenEntry, 23> tokens = {{
+		{"cpsr",                   EvalValues::CPSR},
+		{"cycle",                  EvalValues::PpuCycle},
+		{"frame",                  EvalValues::PpuFrameCount},
+		{"lr",                     EvalValues::R14},
+		{"pc",                     EvalValues::R15},
+		{"r0",                     EvalValues::R0},
+		{"r1",                     EvalValues::R1},
+		{"r10",                    EvalValues::R10},
+		{"r11",                    EvalValues::R11},
+		{"r12",                    EvalValues::R12},
+		{"r13",                    EvalValues::R13},
+		{"r14",                    EvalValues::R14},
+		{"r15",                    EvalValues::R15},
+		{"r2",                     EvalValues::R2},
+		{"r3",                     EvalValues::R3},
+		{"r4",                     EvalValues::R4},
+		{"r5",                     EvalValues::R5},
+		{"r6",                     EvalValues::R6},
+		{"r7",                     EvalValues::R7},
+		{"r8",                     EvalValues::R8},
+		{"r9",                     EvalValues::R9},
+		{"scanline",               EvalValues::PpuScanline},
+		{"sp",                     EvalValues::R13},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetGbaTokenValue(int64_t token, EvalResultType& resultType) {

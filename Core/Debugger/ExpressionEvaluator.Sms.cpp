@@ -3,50 +3,47 @@
 #include "SMS/Debugger/SmsDebugger.h"
 #include "SMS/SmsTypes.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetSmsTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"a",	           EvalValues::RegA            },
-	    {"b",	           EvalValues::RegB            },
-	    {"c",	           EvalValues::RegC            },
-	    {"d",	           EvalValues::RegD            },
-	    {"e",	           EvalValues::RegE            },
-	    {"f",	           EvalValues::RegF            },
-	    {"h",	           EvalValues::RegH            },
-	    {"l",	           EvalValues::RegL            },
-	    {"af",              EvalValues::RegAF           },
-	    {"bc",              EvalValues::RegBC           },
-	    {"de",              EvalValues::RegDE           },
-	    {"hl",              EvalValues::RegHL           },
-	    {"a'",              EvalValues::RegAltA         },
-	    {"b'",              EvalValues::RegAltB         },
-	    {"c'",              EvalValues::RegAltC         },
-	    {"d'",              EvalValues::RegAltD         },
-	    {"e'",              EvalValues::RegAltE         },
-	    {"f'",              EvalValues::RegAltF         },
-	    {"h'",              EvalValues::RegAltH         },
-	    {"l'",              EvalValues::RegAltL         },
-	    {"af'",             EvalValues::RegAltAF        },
-	    {"bc'",             EvalValues::RegAltBC        },
-	    {"de'",             EvalValues::RegAltDE        },
-	    {"hl'",             EvalValues::RegAltHL        },
-	    {"i",	           EvalValues::RegI            },
-	    {"r",	           EvalValues::RegR            },
-	    {"ix",              EvalValues::RegIX           },
-	    {"iy",              EvalValues::RegIY           },
-	    {"sp",              EvalValues::RegSP           },
-	    {"pc",              EvalValues::RegPC           },
-
-	    {"addressreg",      EvalValues::SmsVdpAddressReg},
-	    {"codereg",         EvalValues::SmsVdpCodeReg   },
-	    {"spritecollision", EvalValues::SpriteCollision },
-	    {"spriteoverflow",  EvalValues::SpriteOverflow  },
-
-	    {"frame",           EvalValues::PpuFrameCount   },
-	    {"cycle",           EvalValues::PpuCycle        },
-	    {"scanline",        EvalValues::PpuScanline     },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetSmsTokens() {
+	static constexpr std::array<TokenEntry, 37> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"a'",                     EvalValues::RegAltA},
+		{"addressreg",             EvalValues::SmsVdpAddressReg},
+		{"af",                     EvalValues::RegAF},
+		{"af'",                    EvalValues::RegAltAF},
+		{"b",                      EvalValues::RegB},
+		{"b'",                     EvalValues::RegAltB},
+		{"bc",                     EvalValues::RegBC},
+		{"bc'",                    EvalValues::RegAltBC},
+		{"c",                      EvalValues::RegC},
+		{"c'",                     EvalValues::RegAltC},
+		{"codereg",                EvalValues::SmsVdpCodeReg},
+		{"cycle",                  EvalValues::PpuCycle},
+		{"d",                      EvalValues::RegD},
+		{"d'",                     EvalValues::RegAltD},
+		{"de",                     EvalValues::RegDE},
+		{"de'",                    EvalValues::RegAltDE},
+		{"e",                      EvalValues::RegE},
+		{"e'",                     EvalValues::RegAltE},
+		{"f",                      EvalValues::RegF},
+		{"f'",                     EvalValues::RegAltF},
+		{"frame",                  EvalValues::PpuFrameCount},
+		{"h",                      EvalValues::RegH},
+		{"h'",                     EvalValues::RegAltH},
+		{"hl",                     EvalValues::RegHL},
+		{"hl'",                    EvalValues::RegAltHL},
+		{"i",                      EvalValues::RegI},
+		{"ix",                     EvalValues::RegIX},
+		{"iy",                     EvalValues::RegIY},
+		{"l",                      EvalValues::RegL},
+		{"l'",                     EvalValues::RegAltL},
+		{"pc",                     EvalValues::RegPC},
+		{"r",                      EvalValues::RegR},
+		{"scanline",               EvalValues::PpuScanline},
+		{"sp",                     EvalValues::RegSP},
+		{"spritecollision",        EvalValues::SpriteCollision},
+		{"spriteoverflow",         EvalValues::SpriteOverflow},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetSmsTokenValue(int64_t token, EvalResultType& resultType) {

@@ -3,29 +3,27 @@
 #include "Gameboy/Debugger/GbDebugger.h"
 #include "Gameboy/GbTypes.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetGameboyTokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"a",        EvalValues::RegA         },
-	    {"b",        EvalValues::RegB         },
-	    {"c",        EvalValues::RegC         },
-	    {"d",        EvalValues::RegD         },
-	    {"e",        EvalValues::RegE         },
-	    {"f",        EvalValues::RegF         },
-	    {"h",        EvalValues::RegH         },
-	    {"l",        EvalValues::RegL         },
-	    {"af",       EvalValues::RegAF        },
-	    {"bc",       EvalValues::RegBC        },
-	    {"de",       EvalValues::RegDE        },
-	    {"hl",       EvalValues::RegHL        },
-	    {"sp",       EvalValues::RegSP        },
-	    {"pc",       EvalValues::RegPC        },
-
-	    {"frame",    EvalValues::PpuFrameCount},
-	    {"cycle",    EvalValues::PpuCycle     },
-	    {"scanline", EvalValues::PpuScanline  },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetGameboyTokens() {
+	static constexpr std::array<TokenEntry, 17> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"af",                     EvalValues::RegAF},
+		{"b",                      EvalValues::RegB},
+		{"bc",                     EvalValues::RegBC},
+		{"c",                      EvalValues::RegC},
+		{"cycle",                  EvalValues::PpuCycle},
+		{"d",                      EvalValues::RegD},
+		{"de",                     EvalValues::RegDE},
+		{"e",                      EvalValues::RegE},
+		{"f",                      EvalValues::RegF},
+		{"frame",                  EvalValues::PpuFrameCount},
+		{"h",                      EvalValues::RegH},
+		{"hl",                     EvalValues::RegHL},
+		{"l",                      EvalValues::RegL},
+		{"pc",                     EvalValues::RegPC},
+		{"scanline",               EvalValues::PpuScanline},
+		{"sp",                     EvalValues::RegSP},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetGameboyTokenValue(int64_t token, EvalResultType& resultType) {

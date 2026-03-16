@@ -3,41 +3,40 @@
 #include "SNES/Debugger/Cx4Debugger.h"
 #include "SNES/Coprocessors/CX4/Cx4Types.h"
 
-unordered_map<string, int64_t>& ExpressionEvaluator::GetCx4Tokens() {
-	static unordered_map<string, int64_t> supportedTokens = {
-	    {"r0",       EvalValues::R0             },
-	    {"r1",       EvalValues::R1             },
-	    {"r2",       EvalValues::R2             },
-	    {"r3",       EvalValues::R3             },
-	    {"r4",       EvalValues::R4             },
-	    {"r5",       EvalValues::R5             },
-	    {"r6",       EvalValues::R6             },
-	    {"r7",       EvalValues::R7             },
-	    {"r8",       EvalValues::R8             },
-	    {"r9",       EvalValues::R9             },
-	    {"r10",      EvalValues::R10            },
-	    {"r11",      EvalValues::R11            },
-	    {"r12",      EvalValues::R12            },
-	    {"r13",      EvalValues::R13            },
-	    {"r14",      EvalValues::R14            },
-	    {"r15",      EvalValues::R15            },
-	    {"pb",       EvalValues::RegPB          },
-	    {"pc",       EvalValues::RegPC          },
-	    {"a",        EvalValues::RegA           },
-	    {"p",        EvalValues::RegP           },
-	    {"sp",       EvalValues::RegSP          },
-	    {"mult",     EvalValues::RegMult        },
-	    {"negative", EvalValues::RegPS_Negative },
-	    {"zero",     EvalValues::RegPS_Zero     },
-	    {"carry",    EvalValues::RegPS_Carry    },
-	    {"overflow", EvalValues::RegPS_Overflow },
-	    {"irq",      EvalValues::RegPS_Interrupt},
-	    {"mdr",      EvalValues::RegMDR         },
-	    {"mar",      EvalValues::RegMAR         },
-	    {"dpr",      EvalValues::RegDPR         },
-	};
-
-	return supportedTokens;
+TokenSpan ExpressionEvaluator::GetCx4Tokens() {
+	static constexpr std::array<TokenEntry, 30> tokens = {{
+		{"a",                      EvalValues::RegA},
+		{"carry",                  EvalValues::RegPS_Carry},
+		{"dpr",                    EvalValues::RegDPR},
+		{"irq",                    EvalValues::RegPS_Interrupt},
+		{"mar",                    EvalValues::RegMAR},
+		{"mdr",                    EvalValues::RegMDR},
+		{"mult",                   EvalValues::RegMult},
+		{"negative",               EvalValues::RegPS_Negative},
+		{"overflow",               EvalValues::RegPS_Overflow},
+		{"p",                      EvalValues::RegP},
+		{"pb",                     EvalValues::RegPB},
+		{"pc",                     EvalValues::RegPC},
+		{"r0",                     EvalValues::R0},
+		{"r1",                     EvalValues::R1},
+		{"r10",                    EvalValues::R10},
+		{"r11",                    EvalValues::R11},
+		{"r12",                    EvalValues::R12},
+		{"r13",                    EvalValues::R13},
+		{"r14",                    EvalValues::R14},
+		{"r15",                    EvalValues::R15},
+		{"r2",                     EvalValues::R2},
+		{"r3",                     EvalValues::R3},
+		{"r4",                     EvalValues::R4},
+		{"r5",                     EvalValues::R5},
+		{"r6",                     EvalValues::R6},
+		{"r7",                     EvalValues::R7},
+		{"r8",                     EvalValues::R8},
+		{"r9",                     EvalValues::R9},
+		{"sp",                     EvalValues::RegSP},
+		{"zero",                   EvalValues::RegPS_Zero},
+	}};
+	return tokens;
 }
 
 int64_t ExpressionEvaluator::GetCx4TokenValue(int64_t token, EvalResultType& resultType) {
