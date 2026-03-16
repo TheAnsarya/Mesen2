@@ -25,9 +25,6 @@ const vector<string> ExpressionEvaluator::_unaryOperators = {
 const vector<int> ExpressionEvaluator::_unaryPrecedence = {
     {11, 11, 11, 11, 11, 11}
 };
-const std::unordered_set<string> ExpressionEvaluator::_operators = {
-    {"*", "/", "%", "+", "-", "<<", ">>", "<", "<=", ">", ">=", "==", "!=", "&", "^", "|", "&&", "||", "~", "!", "(", ")", "{", "}", "[", "]", ":", "#"}
-};
 
 bool ExpressionEvaluator::IsOperator(const string& token, int& precedence, bool unaryOperator) {
 	if (unaryOperator) {
@@ -244,11 +241,16 @@ string ExpressionEvaluator::GetNextToken(const string& expression, size_t& pos, 
 		}
 	} else if ((c < 'a' || c > 'z') && c != '_' && c != '@' && c != '\'') {
 		// Operators
-		string operatorToken;
+		char opBuf[3] = {};
+		size_t opLen = 0;
 		for (size_t len = expression.size(); pos < len; pos++) {
 			c = static_cast<char>(std::tolower(static_cast<unsigned char>(expression[pos])));
-			operatorToken += c;
-			if (output.empty() || _operators.contains(operatorToken)) {
+			if (opLen < sizeof(opBuf) - 1) {
+				opBuf[opLen] = c;
+				opLen++;
+			}
+			std::string_view operatorToken(opBuf, opLen);
+			if (output.empty() || std::binary_search(_operators.begin(), _operators.end(), operatorToken)) {
 				// If appending the next char results in a valid operator, append it (or if this is the first character)
 				output += c;
 			} else {

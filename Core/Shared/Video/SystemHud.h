@@ -62,7 +62,7 @@ private:
 	}
 
 public:
-	MessageInfo(string title, string message, int displayDuration) {
+	MessageInfo(const string& title, const string& message, int displayDuration) {
 		_title = title;
 		_message = message;
 		_startTime = GetCurrentTime();

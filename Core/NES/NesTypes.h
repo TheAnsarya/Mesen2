@@ -156,24 +156,24 @@ struct MapperStateEntry {
 
 	MapperStateEntry() {}
 
-	MapperStateEntry(string address, string name) {
+	MapperStateEntry(const string& address, const string& name) {
 		memcpy(Address, address.c_str(), std::min<size_t>(MapperStateEntry::MaxLength - 1, address.size()));
 		memcpy(Name, name.c_str(), std::min<size_t>(MapperStateEntry::MaxLength - 1, name.size()));
 		Type = MapperStateValueType::None;
 	}
 
-	MapperStateEntry(string address, string name, string value, int64_t rawValue = INT64_MIN) : MapperStateEntry(address, name) {
+	MapperStateEntry(const string& address, const string& name, const string& value, int64_t rawValue = INT64_MIN) : MapperStateEntry(address, name) {
 		memcpy(Value, value.c_str(), std::min<size_t>(MapperStateEntry::MaxLength - 1, value.size()));
 		RawValue = rawValue;
 		Type = MapperStateValueType::String;
 	}
 
-	MapperStateEntry(string address, string name, bool value) : MapperStateEntry(address, name) {
+	MapperStateEntry(const string& address, const string& name, bool value) : MapperStateEntry(address, name) {
 		Value[0] = value;
 		Type = MapperStateValueType::Bool;
 	}
 
-	MapperStateEntry(string address, string name, int64_t value, MapperStateValueType length) : MapperStateEntry(address, name) {
+	MapperStateEntry(const string& address, const string& name, int64_t value, MapperStateValueType length) : MapperStateEntry(address, name) {
 		for (int i = 0; i < 8; i++) {
 			Value[i] = value & 0xFF;
 			value >>= 8;

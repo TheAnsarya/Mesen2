@@ -43,7 +43,7 @@ private:
 	void PushOp(uint32_t opCode, vector<int16_t>& output, uint32_t& address);
 	void PushByte(uint8_t operand, vector<int16_t>& output, uint32_t& address, bool insertBeforeOpCode = false);
 	void PushWord(uint16_t operand, vector<int16_t>& output, uint32_t& address);
-	void ProcessOperand(OpCodeEntry& opEntry, ParamEntry& entry, string operand, vector<int16_t>& output, uint32_t& address, unordered_map<string, uint16_t>& localLabels, bool firstPass);
+	void ProcessOperand(OpCodeEntry& opEntry, ParamEntry& entry, const string& operand, vector<int16_t>& output, uint32_t& address, unordered_map<string, uint16_t>& localLabels, bool firstPass);
 
 	void RunPass(vector<int16_t>& output, const string& code, uint32_t address, int16_t* assembledCode, bool firstPass, unordered_map<string, uint16_t>& localLabels);
 

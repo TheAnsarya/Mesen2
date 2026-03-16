@@ -1,11 +1,11 @@
 #pragma once
 #include "pch.h"
+#include <array>
 #include <stack>
 #include <deque>
 #include <span>
 #include <string_view>
 #include <unordered_map>
-#include <unordered_set>
 #include "Debugger/DebugTypes.h"
 #include "Utilities/SimpleLock.h"
 
@@ -314,7 +314,10 @@ private:
 	static const vector<int> _binaryPrecedence;    ///< Binary operator precedence (1-10)
 	static const vector<string> _unaryOperators;   ///< Unary operator strings ("-", "+", "~", "!")
 	static const vector<int> _unaryPrecedence;     ///< Unary operator precedence
-	static const unordered_set<string> _operators; ///< All valid operator strings
+	static constexpr std::array<std::string_view, 28> _operators = {{ ///< All valid operator strings (sorted)
+		"!", "!=", "#", "%", "&", "&&", "(", ")", "*", "+", "-", "/", ":",
+		"<", "<<", "<=", "==", ">", ">=", ">>", "[", "]", "^", "{", "|", "||", "}", "~"
+	}};
 
 	unordered_map<string, ExpressionData, StringHasher> _cache; ///< RPN cache (expression → compiled data)
 	SimpleLock _cacheLock;                                      ///< Cache access lock

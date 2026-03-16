@@ -360,7 +360,7 @@ void SmsAssembler::PushWord(uint16_t operand, vector<int16_t>& output, uint32_t&
 	address += 2;
 }
 
-void SmsAssembler::ProcessOperand(OpCodeEntry& opEntry, ParamEntry& entry, string operand, vector<int16_t>& output, uint32_t& address, unordered_map<string, uint16_t>& localLabels, bool firstPass) {
+void SmsAssembler::ProcessOperand(OpCodeEntry& opEntry, ParamEntry& entry, const string& operand, vector<int16_t>& output, uint32_t& address, unordered_map<string, uint16_t>& localLabels, bool firstPass) {
 	switch (entry.Type) {
 		default:
 			break;

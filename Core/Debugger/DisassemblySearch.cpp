@@ -92,9 +92,12 @@ uint32_t DisassemblySearch::SearchDisassembly(CpuType cpuType, const char* searc
 			if (lineData.EffectiveAddress.ShowAddress && lineData.EffectiveAddress.Address >= 0) {
 				txt = _labelManager->GetLabel({(int32_t)lineData.EffectiveAddress.Address, lineData.EffectiveAddress.Type});
 				if (txt.empty()) {
-					txt = "[$" + DebugUtilities::AddressToHex(lineData.LineCpuType, lineData.EffectiveAddress.Address) + "]";
+					txt.assign("[$");
+					txt.append(DebugUtilities::AddressToHex(lineData.LineCpuType, lineData.EffectiveAddress.Address));
+					txt.push_back(']');
 				} else {
-					txt = "[" + txt + "]";
+					txt.insert(0, "[");
+					txt.push_back(']');
 				}
 
 				if (TextContains(searchStr, txt.c_str(), (int)txt.size(), options)) {
@@ -107,7 +110,8 @@ uint32_t DisassemblySearch::SearchDisassembly(CpuType cpuType, const char* searc
 			}
 
 			if (maxResultCount == 1 && lineData.EffectiveAddress.ValueSize > 0) {
-				txt = "$" + (lineData.EffectiveAddress.ValueSize == 2 ? HexUtilities::ToHex((uint16_t)lineData.Value) : HexUtilities::ToHex((uint8_t)lineData.Value));
+				txt.assign("$");
+				txt.append(lineData.EffectiveAddress.ValueSize == 2 ? HexUtilities::ToHex((uint16_t)lineData.Value) : HexUtilities::ToHex((uint8_t)lineData.Value));
 				if (TextContains(searchStr, txt.c_str(), (int)txt.size(), options)) {
 					searchResults[resultCount] = lineData;
 					if (maxResultCount == ++resultCount) {

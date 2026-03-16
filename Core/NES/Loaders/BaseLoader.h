@@ -4,7 +4,7 @@
 
 class BaseLoader {
 protected:
-	void Log(string message) {
+	void Log(const string& message) {
 		MessageManager::Log(message);
 	}
 
