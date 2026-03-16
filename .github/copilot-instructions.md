@@ -342,6 +342,8 @@ Release assets include version numbers in filenames:
 - Session logs: `~docs/session-logs/YYYY-MM-DD-session-NN.md`
 - Plans: `~docs/plans/`
 - Modernization tracking: `~docs/modernization/`
+- `~docs/nexen-manual-prompts-log.txt` is user-maintained and write-protected for Copilot workflows: **never edit, rewrite, format, or truncate this file**.
+- If `~docs/nexen-manual-prompts-log.txt` has user-authored changes in the working tree, **include it in commits as-is** (no content modifications by Copilot).
 
 ## Problem-Solving Philosophy
 
