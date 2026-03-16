@@ -549,6 +549,9 @@ in the `readme.md` move the `Screenshot Capture Checklist` from user guides into
 
 I think the issues mentioned in `https://github.com/TheAnsarya/Nexen/blob/master/%7Edocs/phase-7.5-pansy-sync.md` have already been done, but if not fix them and then mark them as complete or remove nonsense; continue;
 
+The user-only manual prompt file `~docs\nexen-manual-prompts-log.txt`, thank you for respecting it and not updating it ever, but it should still be git-commited, add that to copilot instructions, never touch or change it, but commit it to source control since it probably has the prompt that kicked off your current work; continue;
+
+[Nexen] continue completeing github issues `https://github.com/TheAnsarya/Nexen/issues` and make new issues as we find them, all work should have an issue; make plans, issues, docs, chat/sesssion logs, readmes, instructions and tutorials, come up with our future work; continue;
 
 
 

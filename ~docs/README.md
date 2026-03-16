@@ -77,6 +77,9 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 | ---------- | ------------- |
 | [GitHub Issues](github-issues.md) | Issue tracking notes |
 | [Keyboard Shortcuts](keyboard-shortcuts-save-states.md) | Save state shortcut design |
+| [Q2 Future Work Program](plans/future-work-program-2026-q2.md) | Milestone-driven execution plan for Epic #673 and sub-issues |
+| [User Future Work Index](../docs/FUTURE-WORK.md) | Public roadmap entry for active and upcoming tracks |
+| [User Tutorials Index](../docs/TUTORIALS.md) | Step-by-step user and contributor workflow tutorials |
 
 ## 📊 Current Status
 

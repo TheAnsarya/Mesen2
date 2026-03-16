@@ -12,6 +12,8 @@ This directory contains user-facing documentation for Nexen.
 | [Debugging Guide](Debugging.md) | Disassembler, memory viewer, breakpoints, trace, and CDL usage |
 | [Video and Audio Guide](Video-Audio.md) | Rendering and audio configuration workflows |
 | [TAS Editor Manual](TAS-Editor-Manual.md) | Complete TAS workflow guide |
+| [Tutorials](TUTORIALS.md) | Step-by-step user and contributor workflows |
+| [Future Work Index](FUTURE-WORK.md) | Active roadmap tracks and planned improvement programs |
 | [TAS Developer Guide](TAS-Developer-Guide.md) | Technical internals for TAS extensions |
 | [TAS Architecture](TAS_ARCHITECTURE.md) | TAS and movie system architecture |
 | [Movie Format Spec](NEXEN_MOVIE_FORMAT.md) | .nexen-movie file format specification |
@@ -32,6 +34,7 @@ This directory contains user-facing documentation for Nexen.
 | [TAS UI Comprehensive Plan](../~docs/plans/tas-ui-comprehensive-plan.md) | TAS editor and workflow modernization roadmap |
 | [UI Modernization Plan](../~docs/plans/ui-modernization-plan.md) | Broader UI modernization and consistency tasks |
 | [Documentation Restructure Plan](../~docs/plans/documentation-restructure-plan.md) | Documentation hierarchy and feature-first navigation roadmap |
+| [Q2 2026 Future Work Program](../~docs/plans/future-work-program-2026-q2.md) | Milestones and acceptance criteria for platform-parity planning and execution |
 
 ## Systems Documentation
 
