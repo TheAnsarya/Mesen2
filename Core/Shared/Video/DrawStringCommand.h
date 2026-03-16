@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <array>
 #include "Shared/Video/DrawCommand.h"
 
 class DrawStringCommand : public DrawCommand {
@@ -11,7 +12,9 @@ private:
 	// Taken from FCEUX's LUA code
 	static constexpr int _tabSpace = 4;
 
-	static unordered_map<int, char const*> _jpFont;
+	/// Sorted array of Japanese font glyph data (6880 entries, binary search lookup).
+	/// Keys are 3-byte UTF-8 codes packed into int, values are 12-byte glyph bitmaps.
+	static const std::array<std::pair<int, char const*>, 6880> _jpFont;
 
 	static constexpr uint8_t _font[792] = {
 	    6,
@@ -845,8 +848,11 @@ protected:
 					code |= ((uint8_t)_text[i + 1]) << 8;
 					code |= ((uint8_t)_text[i + 2]) << 16;
 
-					auto res = _jpFont.find(code);
-					if (res != _jpFont.end()) {
+					auto res = std::lower_bound(
+						_jpFont.begin(), _jpFont.end(), code,
+						[](const auto& pair, int k) { return pair.first < k; }
+					);
+					if (res != _jpFont.end() && res->first == code) {
 						lineWidth += 8;
 						if (_maxWidth > 0 && lineWidth > _maxWidth) {
 							newLine();
@@ -937,8 +943,11 @@ public:
 				if (i + 2 < text.size()) {
 					code |= ((uint8_t)text[i + 1]) << 8;
 					code |= ((uint8_t)text[i + 2]) << 16;
-					auto res = _jpFont.find(code);
-					if (res != _jpFont.end()) {
+					auto res = std::lower_bound(
+						_jpFont.begin(), _jpFont.end(), code,
+						[](const auto& pair, int k) { return pair.first < k; }
+					);
+					if (res != _jpFont.end() && res->first == code) {
 						if (maxWidth > 0 && x + 8 > maxWidth) {
 							newLine();
 						}
