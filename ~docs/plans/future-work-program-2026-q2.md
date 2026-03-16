@@ -18,6 +18,15 @@ Q2 focus:
 | [#695](https://github.com/TheAnsarya/Nexen/issues/695) | Atari 2600 feasibility spike | Architecture constraints, test harness plan, phased issue breakdown |
 | [#696](https://github.com/TheAnsarya/Nexen/issues/696) | Sega Genesis feasibility spike | CPU/VDP risk analysis, validation strategy, phased issue breakdown |
 
+Q3 extension issues:
+
+| Issue | Role | Expected Deliverable |
+|---|---|---|
+| [#704](https://github.com/TheAnsarya/Nexen/issues/704) | Atari 2600 research corpus | Source-linked subsystem tree and implementation checklist |
+| [#705](https://github.com/TheAnsarya/Nexen/issues/705) | Genesis comparative research | Emulator code comparison and subsystem integration guidance |
+| [#706](https://github.com/TheAnsarya/Nexen/issues/706) | Compatibility execution planning | Sonic 1 and Jurassic Park milestone-gated path |
+| [#707](https://github.com/TheAnsarya/Nexen/issues/707) | Multi-session research cadence | Repeatable research/tutorial workflow and reporting model |
+
 ## Milestones
 
 ### Milestone 1 - Documentation Foundation
@@ -91,3 +100,9 @@ Acceptance criteria:
 - Update issue status on milestone completion.
 - Add a session log for each meaningful roadmap progress session.
 - Keep [docs/FUTURE-WORK.md](../../docs/FUTURE-WORK.md) synchronized with active issues.
+
+## Q3 Follow-On Plan
+
+Q2 feasibility outputs are extended by the Q3 research plan:
+
+- [Platform Parity Research Program - 2026 Q3](platform-parity-research-program-2026-q3.md)

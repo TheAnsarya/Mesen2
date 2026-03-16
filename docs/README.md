@@ -29,6 +29,10 @@ This directory contains user-facing documentation for Nexen.
 | [Atari 2600 Feasibility and Harness Plan](../~docs/plans/atari-2600-feasibility-and-harness-plan.md) | Detailed spike scope, measurable harness milestones, and issue decomposition for Atari 2600 |
 | [Sega Genesis Emulation Roadmap](../~docs/plans/long-term-missing-platforms.md) | Feasibility, architecture constraints, and implementation staging for Genesis/Mega Drive |
 | [Sega Genesis Architecture and Incremental Plan](../~docs/plans/genesis-architecture-and-incremental-plan.md) | Detailed phase plan, risks, and benchmark/correctness gates for Genesis support |
+| [Platform Parity Research Index](../~docs/research/platform-parity/README.md) | Source-cited Atari 2600 and Genesis research tree with subsystem breakdowns |
+| [Atari 2600 Research Breakdown](../~docs/research/platform-parity/atari-2600/README.md) | Tiny-section Atari 2600 subsystem docs and execution checklist |
+| [Genesis Research Breakdown](../~docs/research/platform-parity/genesis/README.md) | Comparative Genesis subsystem docs with emulator code analysis |
+| [Sonic 1 and Jurassic Park Compatibility Path](../~docs/research/platform-parity/compatibility/sonic1-jurassic-park.md) | Title-targeted compatibility milestones and harness gates |
 | [Performance Improvement Plan](../~docs/plans/performance-improvement-plan.md) | Multi-phase emulation and audio performance optimization roadmap |
 | [Hot Path Optimization Plan](../~docs/plans/hot-path-optimization-plan.md) | CPU/PPU hot-path micro-optimization plan and benchmark strategy |
 | [Debugger Performance Optimization Plan](../~docs/plans/debugger-performance-optimization.md) | Debugger pipeline overhead reduction and benchmark-driven fixes |
@@ -37,6 +41,7 @@ This directory contains user-facing documentation for Nexen.
 | [UI Modernization Plan](../~docs/plans/ui-modernization-plan.md) | Broader UI modernization and consistency tasks |
 | [Documentation Restructure Plan](../~docs/plans/documentation-restructure-plan.md) | Documentation hierarchy and feature-first navigation roadmap |
 | [Q2 2026 Future Work Program](../~docs/plans/future-work-program-2026-q2.md) | Milestones and acceptance criteria for platform-parity planning and execution |
+| [Q3 2026 Platform Parity Research Program](../~docs/plans/platform-parity-research-program-2026-q3.md) | Multi-session research and execution cadence for issues #704-#707 |
 
 ## Systems Documentation
 

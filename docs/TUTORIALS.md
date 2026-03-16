@@ -40,6 +40,14 @@ Reference policy: [Developer Instructions](../.github/copilot-instructions.md).
 4. Link new sub-issues and docs back into the relevant README index.
 5. Record outcomes in [Session Logs](../~docs/session-logs/).
 
+### Tutorial 4: Run a Platform-Parity Research Session
+
+1. Open [Platform Parity Research Index](../~docs/research/platform-parity/README.md).
+2. Pick one subsystem document from Atari 2600 or Genesis research trees.
+3. Add source-linked findings and explicit implementation implications.
+4. Update issue status for [#704](https://github.com/TheAnsarya/Nexen/issues/704), [#705](https://github.com/TheAnsarya/Nexen/issues/705), [#706](https://github.com/TheAnsarya/Nexen/issues/706), or [#707](https://github.com/TheAnsarya/Nexen/issues/707).
+5. Add a new session log entry summarizing completed artifacts and next actions.
+
 ## Related References
 
 | Document | Description |
@@ -47,3 +55,5 @@ Reference policy: [Developer Instructions](../.github/copilot-instructions.md).
 | [Future Work Index](FUTURE-WORK.md) | Roadmap and execution tracks |
 | [Developer Docs Index](../~docs/README.md) | Internal engineering documentation |
 | [Q2 Future Work Program](../~docs/plans/future-work-program-2026-q2.md) | Milestones and acceptance criteria for current roadmap execution |
+| [Q3 Platform Parity Research Program](../~docs/plans/platform-parity-research-program-2026-q3.md) | Multi-session research and execution cadence |
+| [Platform Parity Research Index](../~docs/research/platform-parity/README.md) | Source-cited Atari and Genesis subsystem documentation tree |

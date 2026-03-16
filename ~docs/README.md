@@ -61,6 +61,16 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 | [Roadmap](pansy-roadmap.md) | Future plans and phases |
 | [Phase 7.5 Sync](phase-7.5-pansy-sync.md) | File sync feature design |
 
+## Platform Parity Research
+
+| Document | Description |
+| ---------- | ------------- |
+| [Research Home](research/README.md) | Entry point for deep research artifacts |
+| [Platform Parity Program Index](research/platform-parity/README.md) | Atari 2600 and Genesis research tree with source links |
+| [Atari 2600 Breakdown](research/platform-parity/atari-2600/README.md) | Subsystem-by-subsystem Atari 2600 documentation |
+| [Genesis Breakdown](research/platform-parity/genesis/README.md) | Comparative Genesis emulator architecture research |
+| [Compatibility Path](research/platform-parity/compatibility/sonic1-jurassic-park.md) | Sonic 1 and Jurassic Park execution milestones |
+
 ## 📁 Subfolders
 
 | Folder | Description |
@@ -68,6 +78,7 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 | [modernization/](modernization/) | C++ modernization tracking and roadmaps |
 | [testing/](testing/) | Test plans and benchmarking documentation |
 | [plans/](plans/) | Planning documents for future features |
+| [research/](research/) | Source-cited platform-parity and subsystem research |
 | [session-logs/](session-logs/) | Development session logs |
 | [chat-logs/](chat-logs/) | AI conversation logs |
 
@@ -78,8 +89,10 @@ The Pansy export feature enables exporting and importing debug metadata in a uni
 | [GitHub Issues](github-issues.md) | Issue tracking notes |
 | [Keyboard Shortcuts](keyboard-shortcuts-save-states.md) | Save state shortcut design |
 | [Q2 Future Work Program](plans/future-work-program-2026-q2.md) | Milestone-driven execution plan for Epic #673 and sub-issues |
+| [Q3 Platform Parity Research Program](plans/platform-parity-research-program-2026-q3.md) | Multi-session research and execution plan for #704-#707 |
 | [Atari 2600 Feasibility and Harness Plan](plans/atari-2600-feasibility-and-harness-plan.md) | Spike architecture boundaries, risk register, and harness milestones |
 | [Genesis Architecture and Incremental Plan](plans/genesis-architecture-and-incremental-plan.md) | Phase plan, risk register, and benchmark/correctness gates for Genesis |
+| [Platform Parity Source Index](research/platform-parity/source-index.md) | External hardware and emulator code references used by research docs |
 | [User Future Work Index](../docs/FUTURE-WORK.md) | Public roadmap entry for active and upcoming tracks |
 | [User Tutorials Index](../docs/TUTORIALS.md) | Step-by-step user and contributor workflow tutorials |
 

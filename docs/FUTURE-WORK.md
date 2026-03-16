@@ -11,6 +11,10 @@ The current expansion effort is tracked under GitHub Epic [#673](https://github.
 | Documentation and execution index | Publish roadmap docs, tutorials, and contributor execution flow | [#694](https://github.com/TheAnsarya/Nexen/issues/694) | [Q2 Program Plan](../~docs/plans/future-work-program-2026-q2.md) |
 | Atari 2600 feasibility spike | Define architecture constraints, test harness, and validation strategy | [#695](https://github.com/TheAnsarya/Nexen/issues/695) | [Atari 2600 Feasibility Plan](../~docs/plans/atari-2600-feasibility-and-harness-plan.md) |
 | Sega Genesis feasibility spike | Define M68000 and VDP strategy, risks, and phased implementation path | [#696](https://github.com/TheAnsarya/Nexen/issues/696) | [Genesis Architecture Plan](../~docs/plans/genesis-architecture-and-incremental-plan.md) |
+| Atari 2600 deep research corpus | Publish source-linked subsystem tree for CPU/TIA/RIOT/mappers/timing | [#704](https://github.com/TheAnsarya/Nexen/issues/704) | [Atari 2600 Research Index](../~docs/research/platform-parity/atari-2600/README.md) |
+| Genesis emulator comparative research | Evaluate emulator code architecture and identify best integration patterns | [#705](https://github.com/TheAnsarya/Nexen/issues/705) | [Genesis Research Index](../~docs/research/platform-parity/genesis/README.md) |
+| Sonic 1 and Jurassic Park compatibility execution path | Build title-targeted milestone matrix and harness strategy | [#706](https://github.com/TheAnsarya/Nexen/issues/706) | [Compatibility Path](../~docs/research/platform-parity/compatibility/sonic1-jurassic-park.md) |
+| Multi-session research and tutorial program | Maintain repeatable cadence for parity research and staged delivery | [#707](https://github.com/TheAnsarya/Nexen/issues/707) | [Q3 Program Plan](../~docs/plans/platform-parity-research-program-2026-q3.md) |
 
 Atari 2600 follow-up implementation issues:
 
@@ -24,6 +28,13 @@ Genesis follow-up implementation issues:
 - [#701](https://github.com/TheAnsarya/Nexen/issues/701): VDP timing and DMA milestone plan with harness checkpoints
 - [#702](https://github.com/TheAnsarya/Nexen/issues/702): Z80 and audio subsystem integration staging
 - [#703](https://github.com/TheAnsarya/Nexen/issues/703): Benchmark and correctness gates per phase
+
+Research and compatibility follow-up issues:
+
+- [#704](https://github.com/TheAnsarya/Nexen/issues/704): Atari 2600 subsystem research corpus
+- [#705](https://github.com/TheAnsarya/Nexen/issues/705): Genesis emulator architecture comparison
+- [#706](https://github.com/TheAnsarya/Nexen/issues/706): Sonic 1 and Jurassic Park compatibility path
+- [#707](https://github.com/TheAnsarya/Nexen/issues/707): Multi-session parity research cadence
 
 ## Near-Term Improvement Tracks
 
