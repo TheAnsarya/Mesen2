@@ -11,6 +11,7 @@ This directory contains user-facing documentation for Nexen.
 | [Movie System Guide](Movie-System.md) | Record, playback, import/export, and deterministic movie workflows |
 | [Debugging Guide](Debugging.md) | Disassembler, memory viewer, breakpoints, trace, and CDL usage |
 | [Video and Audio Guide](Video-Audio.md) | Rendering and audio configuration workflows |
+| [Screenshot Capture Checklist](screenshots/CAPTURE-CHECKLIST.md) | Capture plan for all screenshot anchor IDs used in walkthrough guides |
 | [TAS Editor Manual](TAS-Editor-Manual.md) | Complete TAS workflow guide |
 | [TAS Developer Guide](TAS-Developer-Guide.md) | Technical internals for TAS extensions |
 | [TAS Architecture](TAS_ARCHITECTURE.md) | TAS and movie system architecture |

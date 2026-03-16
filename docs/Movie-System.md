@@ -8,10 +8,10 @@ Nexen movies capture deterministic input history and related metadata for playba
 
 ### Record a Movie
 
-1. Start a game and open movie controls.
-2. Begin recording.
+1. Start a game and open Movie Recording Settings.
+2. Select Start Recording.
 3. Play normally or with frame stepping.
-4. Stop and save the movie file.
+4. Select Stop Recording and save the movie file.
 
 ### Playback and Review
 
@@ -34,23 +34,23 @@ Nexen supports import and export for common TAS/movie formats. Use this when sha
 
 ### Walkthrough A: Record and Save a Movie
 
-1. Open movie controls from the main UI while a ROM is loaded.
-2. Start recording.
-3. Perform gameplay input sequence.
-4. Stop recording and save the movie file.
+1. Open Movie Recording Settings from the main UI while a ROM is loaded. Expected result: the Movie Recording Settings window opens.
+2. Select Start Recording. Expected result: recording becomes active and frame/input capture begins.
+3. Perform gameplay input sequence. Expected result: inputs are appended to the active movie timeline.
+4. Select Stop Recording and save the movie file. Expected result: recording stops and the movie file is written to disk.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|
-| 1 | Main Window (Movie Controls Open) | `movie-a-01-controls-open` | `docs/screenshots/movie-system/a-01-controls-open.png` |
-| 2 | Movie Controls (Recording Active) | `movie-a-02-recording-active` | `docs/screenshots/movie-system/a-02-recording-active.png` |
+| 1 | Movie Recording Settings (Open) | `movie-a-01-controls-open` | `docs/screenshots/movie-system/a-01-controls-open.png` |
+| 2 | Movie Recording Settings (Start Recording Active) | `movie-a-02-recording-active` | `docs/screenshots/movie-system/a-02-recording-active.png` |
 | 3 | Save Movie Dialog | `movie-a-03-save-dialog` | `docs/screenshots/movie-system/a-03-save-dialog.png` |
 
 ### Walkthrough B: Playback and TAS Handoff
 
-1. Open an existing movie.
-2. Start playback and pause at target frame.
-3. Open TAS editor and inspect input timeline.
-4. Create a branch and continue testing.
+1. Open an existing movie. Expected result: movie metadata and timeline are loaded for playback.
+2. Start playback and pause at target frame. Expected result: playback halts on the selected verification frame.
+3. Open TAS editor and inspect input timeline. Expected result: the timeline displays recorded inputs for frame-level review.
+4. Create a branch and continue testing. Expected result: a new TAS branch is created without overwriting baseline movie history.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|

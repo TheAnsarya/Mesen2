@@ -535,11 +535,13 @@ ok done
 
 ok
 
+[Nexen,poppy,pansy,peony] git-commit everything from every repos; [Nexen] work on existing issues and make new ones, always test everything and make performance benchmarks so we're getting slimmer and faster all the time; continue;
 
+I've only spent $3.72 of my $36 budget, why am I rate limited?
 
+[Nexen] create a big plan with issue epics and subissues and documents to update the `readme.md` and all the other documentation spreading from there, instead of describing the ways we increased performance for each feature, relegate that to a sub page and instead describe how each feature works and how we should use it, gui instructions and descriptions of how the features work (like TAS/movie and rewind and savestates; Move the `Atari Lynx Documentation` to a subpage, and make a similar doc hierarachy for the other systems; and continue previous documentation efforts; continue;
 
-
-
+Yes please do this: "If you want, next I can continue with a follow-up pass to add screenshot-anchored GUI walkthrough sections (step-by-step panel-by-panel) inside the new feature guides."
 
 
 

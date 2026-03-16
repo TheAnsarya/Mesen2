@@ -27,10 +27,10 @@ Rewind lets you move backward through recent gameplay to retry a section, inspec
 
 ### Walkthrough A: Rewind to a Checkpoint and Retry
 
-1. Pause gameplay with `Escape` in the main emulation window.
-2. Hold or tap `Backspace` to rewind to the desired frame range.
-3. Resume from the rewound position.
-4. Save a new state once the retry route is validated.
+1. Pause gameplay with `Escape` in the main window. Expected result: emulation pauses on the current frame.
+2. Hold or tap `Backspace` to rewind to the desired frame range. Expected result: frame state moves backward and lands near the target retry point.
+3. Resume from the rewound position. Expected result: gameplay continues from the selected rewind frame.
+4. Save a new state once the retry route is validated. Expected result: the validated route is persisted as a reusable save point.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|
@@ -40,9 +40,9 @@ Rewind lets you move backward through recent gameplay to retry a section, inspec
 
 ### Walkthrough B: Frame-Step Validation
 
-1. Pause gameplay.
-2. Use the backtick key to frame-advance while observing timing.
-3. Use rewind to step back if a frame decision is incorrect.
+1. Pause gameplay. Expected result: the frame is locked for deterministic step analysis.
+2. Use the backtick key to frame-advance while observing timing. Expected result: each key press advances exactly one frame.
+3. Use rewind to step back if a frame decision is incorrect. Expected result: you can return to an earlier frame and test an alternate input.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|

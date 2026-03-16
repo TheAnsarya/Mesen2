@@ -18,7 +18,7 @@ Nexen includes configurable rendering and audio options for both play and analys
 
 ## Typical Setup
 
-1. Open settings.
+1. Open Settings.
 2. Select preferred video filter and scaling behavior.
 3. Tune audio channels for clarity.
 4. Save configuration profile for repeat use.
@@ -33,10 +33,10 @@ Nexen includes configurable rendering and audio options for both play and analys
 
 ### Walkthrough A: Video Configuration
 
-1. Open settings and navigate to video options.
-2. Select scaling mode and aspect behavior.
-3. Choose filter or shader preset.
-4. Apply and verify in gameplay view.
+1. Open Settings and navigate to Video options. Expected result: the Video tab is active with rendering controls visible.
+2. Select scaling mode and aspect behavior. Expected result: selected scaling and aspect values are reflected in current options.
+3. Choose filter or shader preset. Expected result: the chosen filter/shader appears as the active selection.
+4. Apply and verify in gameplay view. Expected result: gameplay output reflects the selected video settings.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|
@@ -47,10 +47,10 @@ Nexen includes configurable rendering and audio options for both play and analys
 
 ### Walkthrough B: Audio Configuration and Recording
 
-1. Navigate to audio settings panel.
-2. Adjust per-channel volume and output options.
-3. Start WAV recording.
-4. Stop recording and verify output file.
+1. Navigate to Audio settings panel in Settings. Expected result: Audio controls and device options are visible.
+2. Adjust per-channel volume and output options. Expected result: channel levels update and audio mix changes are audible.
+3. Start WAV recording. Expected result: recording state indicates active audio capture.
+4. Stop recording and verify output file. Expected result: a WAV file is created and playable with captured session audio.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|

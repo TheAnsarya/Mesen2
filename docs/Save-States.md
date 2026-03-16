@@ -2,14 +2,14 @@
 
 ## Overview
 
-Nexen supports quick save workflows, a visual save browser, designated slots, and per-game organization.
+Nexen supports quick save workflows, Open Save State Picker navigation, designated slots, and per-game organization.
 
 ## Common Workflows
 
 ### Quick Save and Quick Load
 
-1. Press `F1` to create a timestamped quick save.
-2. Press `Shift+F1` to open the save browser.
+1. Press `F1` to create a Quick Save (Timestamped).
+2. Press `Shift+F1` to run Open Save State Picker.
 3. Select a state thumbnail and load it.
 
 ### Designated Slot
@@ -19,8 +19,8 @@ Nexen supports quick save workflows, a visual save browser, designated slots, an
 
 ### File-Based States
 
-1. Use `Ctrl+Shift+S` to save state to file.
-2. Use `Ctrl+L` to load state from file.
+1. Use `Ctrl+Shift+S` to run Save State to File.
+2. Use `Ctrl+L` to run Load State from File.
 
 ## GUI Tips
 
@@ -32,22 +32,22 @@ Nexen supports quick save workflows, a visual save browser, designated slots, an
 
 ### Walkthrough A: Quick Save and Visual Browser
 
-1. In the main emulation window, press `F1` to create a quick save.
-2. Press `Shift+F1` to open the Save State Browser panel.
-3. In the browser grid, select a thumbnail with the target timestamp.
-4. Confirm load from the selected entry.
+1. In the main window, press `F1` to create a Quick Save (Timestamped). Expected result: a new timestamped save entry appears for the current ROM session.
+2. Press `Shift+F1` to run Open Save State Picker. Expected result: the save picker opens and displays available save entries.
+3. In the save picker grid, select a thumbnail with the target timestamp. Expected result: the selected entry is highlighted and metadata updates to match selection.
+4. Confirm load from the selected entry. Expected result: emulation resumes from the selected saved frame.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|
 | 1 | Main Emulation Window | `save-states-a-01-main-window` | `docs/screenshots/save-states/a-01-main-window.png` |
-| 2 | Save State Browser (Grid View) | `save-states-a-02-browser-grid` | `docs/screenshots/save-states/a-02-browser-grid.png` |
-| 3 | Save State Browser (Selected Entry) | `save-states-a-03-selected-entry` | `docs/screenshots/save-states/a-03-selected-entry.png` |
+| 2 | Open Save State Picker (Grid View) | `save-states-a-02-browser-grid` | `docs/screenshots/save-states/a-02-browser-grid.png` |
+| 3 | Open Save State Picker (Selected Entry) | `save-states-a-03-selected-entry` | `docs/screenshots/save-states/a-03-selected-entry.png` |
 
 ### Walkthrough B: Designated Slot Workflow
 
-1. Press `Shift+F4` from gameplay to store current state in designated slot.
-2. Continue play, then press `F4` to load the designated slot.
-3. Verify game state returns to the exact checkpoint.
+1. Press `Shift+F4` from gameplay to store current state in the designated slot. Expected result: the designated slot updates to the current frame/state.
+2. Continue play, then press `F4` to load the designated slot. Expected result: the ROM state reloads from the designated slot.
+3. Verify game state returns to the exact checkpoint. Expected result: position, timer, and immediate game context match the saved checkpoint.
 
 | Step | Panel | Screenshot Anchor ID | Capture Target |
 |---|---|---|---|
