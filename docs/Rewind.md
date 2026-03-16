@@ -23,6 +23,32 @@ Rewind lets you move backward through recent gameplay to retry a section, inspec
 - Use rewind before creating a TAS branch to reduce setup time.
 - Use the movie timeline and TAS editor for deterministic revisions.
 
+## Panel Walkthrough (Screenshot Anchors)
+
+### Walkthrough A: Rewind to a Checkpoint and Retry
+
+1. Pause gameplay with `Escape` in the main emulation window.
+2. Hold or tap `Backspace` to rewind to the desired frame range.
+3. Resume from the rewound position.
+4. Save a new state once the retry route is validated.
+
+| Step | Panel | Screenshot Anchor ID | Capture Target |
+|---|---|---|---|
+| 1 | Main Emulation Window (Paused) | `rewind-a-01-paused` | `docs/screenshots/rewind/a-01-paused.png` |
+| 2 | Main Emulation Window (Rewind In Progress) | `rewind-a-02-rewinding` | `docs/screenshots/rewind/a-02-rewinding.png` |
+| 3 | Main Emulation Window (Post-Rewind Resume) | `rewind-a-03-post-rewind` | `docs/screenshots/rewind/a-03-post-rewind.png` |
+
+### Walkthrough B: Frame-Step Validation
+
+1. Pause gameplay.
+2. Use the backtick key to frame-advance while observing timing.
+3. Use rewind to step back if a frame decision is incorrect.
+
+| Step | Panel | Screenshot Anchor ID | Capture Target |
+|---|---|---|---|
+| 1 | Main Emulation Window (Frame Advance) | `rewind-b-01-frame-advance` | `docs/screenshots/rewind/b-01-frame-advance.png` |
+| 2 | Main Emulation Window (Frame Correction) | `rewind-b-02-frame-correction` | `docs/screenshots/rewind/b-02-frame-correction.png` |
+
 ## Related Links
 
 - [Save States Guide](Save-States.md)
