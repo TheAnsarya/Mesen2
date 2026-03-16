@@ -1,15 +1,15 @@
 # Phase 7.5: Pansy Sync & Unified Debug Data Storage
 
 **Created:** 2026-01-27  
-**Status:** Planning → Implementation  
-**Branch:** pansy-export
+**Status:** Audited and reconciled (2026-03-16)  
+**Branch:** master
 
 ## Overview
 
 Create a unified debug data storage system where each ROM has a dedicated folder containing:
 
 1. **Pansy file** (`.pansy`) - Universal metadata format
-2. **Nexen Label file** (`.mlb`) - Native Nexen labels
+2. **Nexen Label file** (`.nexen-labels`, legacy `.mlb` fallback) - Native Nexen labels
 3. **CDL file** (`.cdl`) - Code Data Logger data
 4. **Debug info** (`.dbg`) - Extended debug information
 
@@ -80,7 +80,7 @@ External debug info format - Nexen can import but doesn't export.
 ├── Debug/
 │   ├── [RomName_CRC32]/           # Per-ROM folder
 │   │   ├── metadata.pansy       # Pansy universal format
-│   │   ├── labels.mlb           # Nexen native labels
+│   │   ├── labels.nexen-labels  # Nexen native labels (legacy labels.mlb still supported)
 │   │   ├── coverage.cdl           # Code Data Logger
 │   │   ├── config.json         # Per-ROM config
 │   │   └── history/               # Optional: version history
@@ -152,190 +152,112 @@ Folder name: `{RomBaseName}_{CRC32}`
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## Implementation Plan
+## Audit Results (2026-03-16)
 
-### Issue #11: 📁 Folder-Based Debug Storage - Phase 7.5a
+The original "Issue #11-#15" labels in this document were planning identifiers, not accurate GitHub issue references. They conflicted with real early repository issue numbers and are removed here.
 
-**Estimate:** 6 hours
+### Workstream 7.5a: Folder-Based Debug Storage
 
-**Tasks:**
+Status: Complete
 
-- [ ] Create `DebugFolderManager` class
-- [ ] Implement folder naming convention
-- [ ] Create folder on first save
-- [ ] Migrate existing auto-save to folder structure
-- [ ] Add config option for debug folder location
-- [ ] Handle special characters in ROM names
+- [x] `DebugFolderManager` implemented
+- [x] Folder naming convention implemented (`{RomName}_{CRC32}` via `GameDataManager`)
+- [x] Folder creation on first save implemented
+- [x] Auto-export path uses folder storage when enabled
+- [x] Config option for debug folder location implemented (`DebugFolderPath`)
+- [x] ROM name sanitization for folder safety implemented
 
-**Files:**
+Implemented files:
 
-- NEW: `UI/Debugger/Labels/DebugFolderManager.cs`
-- MOD: `UI/Config/IntegrationConfig.cs`
-- MOD: `UI/Debugger/Labels/BackgroundPansyExporter.cs`
+- `UI/Debugger/Labels/DebugFolderManager.cs`
+- `UI/Config/IntegrationConfig.cs`
+- `UI/Debugger/Labels/BackgroundPansyExporter.cs`
 
-### Issue #12: 🔄 MLB Sync - Phase 7.5b
+### Workstream 7.5b: Label File Sync (.nexen-labels / legacy .mlb)
 
-**Estimate:** 4 hours
+Status: Complete
 
-**Tasks:**
+- [x] Label export alongside Pansy implemented (`labels.nexen-labels`)
+- [x] Legacy `.mlb` fallback import supported
+- [x] Auto-load label import on ROM load implemented
+- [x] External label file change detection path implemented via `SyncManager`
 
-- [ ] Export MLB alongside Pansy file
-- [ ] Import MLB when loading ROM (existing)
-- [ ] Detect MLB changes and update Pansy
-- [ ] Round-trip test: Pansy → MLB → Pansy
-- [ ] Handle label format differences
+Implemented files:
 
-**Files:**
+- `UI/Debugger/Labels/NexenLabelFile.cs`
+- `UI/Debugger/Labels/DebugFolderManager.cs`
+- `UI/Debugger/Labels/SyncManager.cs`
 
-- MOD: `UI/Debugger/Labels/NexenLabelFile.cs`
-- MOD: `UI/Debugger/Labels/PansyExporter.cs`
+### Workstream 7.5c: CDL Sync
 
-### Issue #13: 📊 CDL Sync - Phase 7.5c
+Status: Complete
 
-**Estimate:** 4 hours
+- [x] CDL export alongside Pansy implemented (`coverage.cdl`)
+- [x] Auto-load CDL on ROM load implemented (config-gated)
+- [x] External CDL change import implemented via `SyncManager`
+- [x] ROM-size validation on import implemented
 
-**Tasks:**
+Implemented files:
 
-- [ ] Export CDL alongside Pansy file
-- [ ] Auto-load CDL if config enabled
-- [ ] Sync CDL flags to/from Pansy CODE_DATA_MAP
-- [ ] Handle different ROM sizes
-- [ ] Verify flag mapping accuracy
+- `UI/Debugger/Labels/DebugFolderManager.cs`
+- `UI/Debugger/Labels/SyncManager.cs`
 
-**Files:**
+### Workstream 7.5d: DBG Integration
 
-- NEW: `UI/Debugger/Labels/CdlFileManager.cs`
-- MOD: `UI/Debugger/Labels/PansyExporter.cs`
+Status: Complete
 
-### Issue #14: 📝 DBG Integration - Phase 7.5d
+- [x] DBG importer support implemented
+- [x] Conversion pipeline to Pansy implemented
+- [x] Multiple debug format detection/import paths implemented (`.dbg`, `.sym`, `.elf`, `.cdb`, label files)
 
-**Estimate:** 6 hours
+Implemented files:
 
-**Tasks:**
+- `UI/Debugger/Integration/DbgImporter.cs`
+- `UI/Debugger/Integration/DbgToPansyConverter.cs`
 
-- [ ] Import DBG files to Pansy format
-- [ ] Preserve source file references
-- [ ] Import symbol definitions
-- [ ] Import scope information
-- [ ] Handle assembler-specific formats (ca65, WLA-DX, etc.)
+### Workstream 7.5e: Bidirectional Sync Manager
 
-**Files:**
+Status: Core complete, advanced conflict UX deferred
 
-- MOD: `UI/Debugger/Integration/DbgImporter.cs`
-- NEW: `UI/Debugger/Integration/DbgToPansyConverter.cs`
+- [x] File change detection implemented (`FileSystemWatcher`)
+- [x] Change queue + debounce processing implemented
+- [x] Change notification and sync status events implemented
+- [x] Manual force sync path implemented (`ForceSyncAsync`)
+- [ ] Conflict resolution dialog UI not implemented
+- [ ] Merge-strategy UX (ours/theirs/merge) not implemented
+- [ ] Undo/redo workflow not implemented
 
-### Issue #15: 🔗 Bidirectional Sync Manager - Phase 7.5e
+Implemented files:
 
-**Estimate:** 8 hours
+- `UI/Debugger/Labels/SyncManager.cs`
+- `UI/Debugger/Labels/PansyFileWatcher.cs`
 
-**Tasks:**
+Removed stale planning entry:
 
-- [ ] Detect file changes (FileSystemWatcher)
-- [ ] Conflict resolution UI
-- [ ] Merge strategies (ours, theirs, merge)
-- [ ] Change notification system
-- [ ] Undo/redo support
-- [ ] Sync status indicator in UI
+- `UI/Debugger/Windows/SyncConflictDialog.axaml` (never added in repository)
 
-**Files:**
-
-- NEW: `UI/Debugger/Labels/SyncManager.cs`
-- NEW: `UI/Debugger/Windows/SyncConflictDialog.axaml`
-
-## Configuration
+## Configuration (Current)
 
 ```csharp
-// IntegrationConfig.cs additions
-public class IntegrationConfig : BaseConfig<IntegrationConfig> {
-    // Existing...
-    
-    // Phase 7.5: Sync options
+// IntegrationConfig.cs (current Phase 7.5-related options)
+public sealed class IntegrationConfig : BaseConfig<IntegrationConfig> {
     [Reactive] public bool UseFolderStorage { get; set; } = true;
-    [Reactive] public bool SyncMlbFiles { get; set; } = true;
+    [Reactive] public bool SyncLabelFiles { get; set; } = true;
     [Reactive] public bool SyncCdlFiles { get; set; } = true;
     [Reactive] public bool KeepVersionHistory { get; set; } = false;
     [Reactive] public int MaxHistoryEntries { get; set; } = 10;
-    [Reactive] public string DebugFolderPath { get; set; } = "";  // Empty = default location
+    [Reactive] public string DebugFolderPath { get; set; } = "";
+
+    [Reactive] public bool EnableFileWatching { get; set; } = false;
+    [Reactive] public bool AutoReloadOnExternalChange { get; set; } = true;
 }
 ```
 
-## API Surface
+## Success Criteria (Reconciled)
 
-### DebugFolderManager
-
-```csharp
-public static class DebugFolderManager {
-    // Get the debug folder for a ROM
-    public static string GetRomDebugFolder(RomInfo romInfo);
-    
-    // Ensure folder exists
-    public static void EnsureFolderExists(RomInfo romInfo);
-    
-    // Get paths for specific files
-    public static string GetPansyPath(RomInfo romInfo);
-    public static string GetMlbPath(RomInfo romInfo);
-    public static string GetCdlPath(RomInfo romInfo);
-    
-    // Export all files
-    public static void ExportAllFiles(RomInfo romInfo, MemoryType memType);
-    
-    // Import from folder
-    public static void ImportFromFolder(RomInfo romInfo);
-}
-```
-
-### SyncManager
-
-```csharp
-public class SyncManager : IDisposable {
-    public event EventHandler<SyncEventArgs>? OnSyncRequired;
-    public event EventHandler<ConflictEventArgs>? OnConflictDetected;
-    
-    public void StartWatching(string folderPath);
-    public void StopWatching();
-    
-    public SyncResult SyncToNexen(string pansyPath);
-    public SyncResult SyncFromNexen(string pansyPath);
-    
-    public ConflictResolution ResolveConflict(Conflict conflict);
-}
-```
-
-## Testing Plan
-
-1. **Unit Tests:**
-   - Folder naming sanitization
-   - Path generation for various ROMs
-   - MLB/CDL round-trip accuracy
-
-2. **Integration Tests:**
-   - Full export/import cycle
-   - Multi-ROM folder isolation
-   - Concurrent access handling
-
-3. **Manual Tests:**
-   - Load ROM → Add labels → Close → Reload → Verify
-   - External MLB edit → Sync → Verify in Nexen
-   - Conflict scenario testing
-
-## Timeline
-
-| Task | Estimate | Phase |
-| ------ | ---------- | ------- |
-| Folder Storage | 6h | 7.5a |
-| MLB Sync | 4h | 7.5b |
-| CDL Sync | 4h | 7.5c |
-| DBG Integration | 6h | 7.5d |
-| Sync Manager | 8h | 7.5e |
-| Testing | 4h | 7.5f |
-| **Total** | **32h** |  |
-
-## Success Criteria
-
-1. ✅ Each ROM has dedicated debug folder
-2. ✅ Pansy file contains all MLB data
-3. ✅ Pansy file contains all CDL data
-4. ✅ MLB/CDL files exported alongside Pansy
-5. ✅ Changes to any file sync to others
-6. ✅ No data loss in round-trip
-7. ✅ Works with all Nexen-supported platforms
+1. [x] Each ROM has dedicated debug folder
+2. [x] Pansy metadata export uses folder storage when enabled
+3. [x] Label and CDL companion files export/import with config gates
+4. [x] External file watching and re-import pipeline exists
+5. [x] Legacy `.mlb` compatibility retained while native `.nexen-labels` is primary
+6. [ ] Interactive conflict resolution/merge UI (deferred)
