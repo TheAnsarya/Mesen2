@@ -5,6 +5,30 @@
 #include "Utilities/VirtualFile.h"
 
 namespace {
+	vector<Atari2600BaselineRomCase> CreateBaselineRomSet() {
+		vector<Atari2600BaselineRomCase> romSet;
+
+		Atari2600BaselineRomCase nopRom = {};
+		nopRom.Name = "baseline-nop-fill.a26";
+		nopRom.RomData.assign(4096, 0xEA);
+		romSet.push_back(std::move(nopRom));
+
+		Atari2600BaselineRomCase zeroRom = {};
+		zeroRom.Name = "baseline-zero-fill.a26";
+		zeroRom.RomData.assign(4096, 0x00);
+		romSet.push_back(std::move(zeroRom));
+
+		Atari2600BaselineRomCase rampRom = {};
+		rampRom.Name = "baseline-ramp-pattern.a26";
+		rampRom.RomData.resize(4096);
+		for (size_t i = 0; i < rampRom.RomData.size(); i++) {
+			rampRom.RomData[i] = (uint8_t)(i & 0xFF);
+		}
+		romSet.push_back(std::move(rampRom));
+
+		return romSet;
+	}
+
 	TEST(Atari2600TimingSpikeHarnessTests, RiotSkeletonTracksCpuCycleProgress) {
 		Emulator emu;
 		Atari2600Console console(&emu);
@@ -62,6 +86,45 @@ namespace {
 
 		Atari2600TimingSpikeResult runA = Atari2600SmokeHarness::RunTimingSpike(console, 10);
 		Atari2600TimingSpikeResult runB = Atari2600SmokeHarness::RunTimingSpike(console, 10);
+
+		EXPECT_FALSE(runA.Digest.empty());
+		EXPECT_EQ(runA.Digest, runB.Digest);
+	}
+
+	TEST(Atari2600TimingSpikeHarnessTests, BaselineRomSetProducesPerRomPassFailResults) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		vector<Atari2600BaselineRomCase> romSet = CreateBaselineRomSet();
+
+		Atari2600BaselineRomSetResult result = Atari2600SmokeHarness::RunBaselineRomSet(console, romSet);
+
+		EXPECT_EQ(result.Entries.size(), romSet.size());
+		EXPECT_EQ(result.PassCount, 3);
+		EXPECT_EQ(result.FailCount, 0);
+		EXPECT_FALSE(result.Digest.empty());
+		for (const Atari2600BaselineRomEntry& entry : result.Entries) {
+			EXPECT_TRUE(entry.Pass);
+			EXPECT_EQ(entry.Result.FailCount, 0);
+		}
+
+		bool hasRomResultLine = std::any_of(result.OutputLines.begin(), result.OutputLines.end(), [](const string& line) {
+			return line.starts_with("ROM_RESULT ");
+		});
+		bool hasRomSetSummaryLine = std::any_of(result.OutputLines.begin(), result.OutputLines.end(), [](const string& line) {
+			return line.starts_with("ROM_SET_SUMMARY ");
+		});
+
+		EXPECT_TRUE(hasRomResultLine);
+		EXPECT_TRUE(hasRomSetSummaryLine);
+	}
+
+	TEST(Atari2600TimingSpikeHarnessTests, BaselineRomSetDigestIsDeterministic) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		vector<Atari2600BaselineRomCase> romSet = CreateBaselineRomSet();
+
+		Atari2600BaselineRomSetResult runA = Atari2600SmokeHarness::RunBaselineRomSet(console, romSet);
+		Atari2600BaselineRomSetResult runB = Atari2600SmokeHarness::RunBaselineRomSet(console, romSet);
 
 		EXPECT_FALSE(runA.Digest.empty());
 		EXPECT_EQ(runA.Digest, runB.Digest);

@@ -561,8 +561,9 @@ continue immediately with implementation work for #697 (Atari CPU/RIOT skeleton 
 
 Yes, continue doing that
 
+make a feature branch for this work
 
-
+continue what you were doing; continue for a while, work those issues; continue;
 
 
 

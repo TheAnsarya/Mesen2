@@ -30,6 +30,10 @@ Define and implement a deterministic TIA timing spike with scriptable pass/fail 
 - `CHECKPOINT <id> <PASS|FAIL> <context>`
 - Final summary line:
 - `HARNESS_SUMMARY PASS=<n> FAIL=<n> DIGEST=<hash>`
+- Baseline ROM set line format:
+- `ROM_RESULT <rom-name> <PASS|FAIL> PASS=<n> FAIL=<n> DIGEST=<hash>`
+- Baseline ROM set summary line:
+- `ROM_SET_SUMMARY PASS=<n> FAIL=<n> DIGEST=<hash>`
 
 ## Run Command Templates
 
@@ -42,6 +46,10 @@ Define and implement a deterministic TIA timing spike with scriptable pass/fail 
 ```
 
 ```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter=Atari2600TimingSpikeHarnessTests.BaselineRomSet* --gtest_brief=1
+```
+
+```powershell
 .\bin\win-x64\Release\Core.Tests.exe --gtest_filter=GenesisM68kBoundaryScaffoldTests.*:Atari2600TimingSpikeHarnessTests.* --gtest_brief=1
 ```
 
@@ -50,8 +58,9 @@ Define and implement a deterministic TIA timing spike with scriptable pass/fail 
 - All baseline checkpoints return `PASS`.
 - Digest remains stable across repeated runs on unchanged code.
 - Failing checkpoint reports include cycle/scanline context.
+- Baseline ROM set run emits one `ROM_RESULT` line per ROM and a final `ROM_SET_SUMMARY` line.
 - Current focused run prints:
-	- `[==========] 8 tests from 2 test suites ran.`
+	- `[==========] 10 tests from 2 test suites ran.`
 	- `TIMING_SPIKE SUMMARY STABLE=true DIGEST=<stable-hash>` (from harness output lines)
 
 ## Dependencies

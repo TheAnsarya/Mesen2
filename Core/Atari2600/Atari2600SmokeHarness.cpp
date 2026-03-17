@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Atari2600/Atari2600SmokeHarness.h"
 #include "Atari2600/Atari2600Console.h"
+#include "Utilities/VirtualFile.h"
 
 namespace {
 	string ToHex(uint64_t value) {
@@ -124,5 +125,68 @@ Atari2600TimingSpikeResult Atari2600SmokeHarness::RunTimingSpike(Atari2600Consol
 
 	result.Digest = ToHex(hash);
 	result.OutputLines.push_back(std::format("TIMING_SPIKE SUMMARY STABLE={} DIGEST={}", result.Stable ? "true" : "false", result.Digest));
+	return result;
+}
+
+Atari2600BaselineRomSetResult Atari2600SmokeHarness::RunBaselineRomSet(Atari2600Console& console, const vector<Atari2600BaselineRomCase>& romSet) {
+	Atari2600BaselineRomSetResult result = {};
+	result.Entries.reserve(romSet.size());
+
+	for (const Atari2600BaselineRomCase& romCase : romSet) {
+		Atari2600BaselineRomEntry entry = {};
+		entry.Name = romCase.Name;
+
+		if (romCase.RomData.empty()) {
+			entry.Pass = false;
+			entry.Result.FailCount = 1;
+			entry.Result.OutputLines.push_back("HARNESS_LOAD FAIL empty_rom_data");
+			result.OutputLines.push_back(std::format("ROM_RESULT {} FAIL reason=empty_rom_data", entry.Name));
+			result.FailCount++;
+			result.Entries.push_back(std::move(entry));
+			continue;
+		}
+
+		VirtualFile romFile(romCase.RomData.data(), romCase.RomData.size(), romCase.Name);
+		LoadRomResult loadResult = console.LoadRom(romFile);
+		if (loadResult != LoadRomResult::Success) {
+			entry.Pass = false;
+			entry.Result.FailCount = 1;
+			entry.Result.OutputLines.push_back(std::format("HARNESS_LOAD FAIL load_result={}", (int)loadResult));
+			result.OutputLines.push_back(std::format("ROM_RESULT {} FAIL reason=load_result_{}", entry.Name, (int)loadResult));
+			result.FailCount++;
+			result.Entries.push_back(std::move(entry));
+			continue;
+		}
+
+		entry.Result = RunBaseline(console);
+		entry.Pass = entry.Result.FailCount == 0;
+		if (entry.Pass) {
+			result.PassCount++;
+		} else {
+			result.FailCount++;
+		}
+
+		result.OutputLines.push_back(std::format(
+			"ROM_RESULT {} {} PASS={} FAIL={} DIGEST={}",
+			entry.Name,
+			entry.Pass ? "PASS" : "FAIL",
+			entry.Result.PassCount,
+			entry.Result.FailCount,
+			entry.Result.Digest));
+
+		result.Entries.push_back(std::move(entry));
+	}
+
+	uint64_t hash = 1469598103934665603ull;
+	for (const Atari2600BaselineRomEntry& entry : result.Entries) {
+		string line = std::format("{}:{}:{}:{}", entry.Name, entry.Pass ? "PASS" : "FAIL", entry.Result.PassCount, entry.Result.Digest);
+		for (uint8_t ch : line) {
+			hash ^= ch;
+			hash *= 1099511628211ull;
+		}
+	}
+
+	result.Digest = ToHex(hash);
+	result.OutputLines.push_back(std::format("ROM_SET_SUMMARY PASS={} FAIL={} DIGEST={}", result.PassCount, result.FailCount, result.Digest));
 	return result;
 }

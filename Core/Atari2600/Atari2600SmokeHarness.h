@@ -27,8 +27,28 @@ struct Atari2600TimingSpikeResult {
 	vector<string> OutputLines;
 };
 
+struct Atari2600BaselineRomCase {
+	string Name;
+	vector<uint8_t> RomData;
+};
+
+struct Atari2600BaselineRomEntry {
+	string Name;
+	bool Pass = false;
+	Atari2600HarnessResult Result = {};
+};
+
+struct Atari2600BaselineRomSetResult {
+	vector<Atari2600BaselineRomEntry> Entries;
+	int PassCount = 0;
+	int FailCount = 0;
+	string Digest;
+	vector<string> OutputLines;
+};
+
 class Atari2600SmokeHarness {
 public:
 	static Atari2600HarnessResult RunBaseline(Atari2600Console& console);
 	static Atari2600TimingSpikeResult RunTimingSpike(Atari2600Console& console, uint32_t iterations = 8);
+	static Atari2600BaselineRomSetResult RunBaselineRomSet(Atari2600Console& console, const vector<Atari2600BaselineRomCase>& romSet);
 };
