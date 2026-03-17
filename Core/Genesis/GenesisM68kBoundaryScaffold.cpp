@@ -463,7 +463,20 @@ void GenesisM68kBoundaryScaffold::AdvanceTiming(uint32_t cpuCycles) {
 	while (_timingCycleRemainder >= TimingCyclesPerScanline) {
 		_timingCycleRemainder -= TimingCyclesPerScanline;
 		_timingScanline++;
+
+		if (_hInterruptEnabled && _hInterruptIntervalScanlines > 0 && (_timingScanline % _hInterruptIntervalScanlines) == 0) {
+			_cpu.SetInterrupt(4);
+			_hInterruptCount++;
+			_timingEvents.push_back(std::format("HINT frame={} scanline={} count={}", _timingFrame, _timingScanline, _hInterruptCount));
+		}
+
 		if (_timingScanline >= TimingScanlinesPerFrame) {
+			if (_vInterruptEnabled) {
+				_cpu.SetInterrupt(6);
+				_vInterruptCount++;
+				_timingEvents.push_back(std::format("VINT frame={} count={}", _timingFrame + 1, _vInterruptCount));
+			}
+
 			_timingScanline = 0;
 			_timingFrame++;
 		}
@@ -481,6 +494,19 @@ void GenesisM68kBoundaryScaffold::Startup() {
 	_timingScanline = 0;
 	_timingFrame = 0;
 	_timingCycleRemainder = 0;
+	_hInterruptCount = 0;
+	_vInterruptCount = 0;
+	_timingEvents.clear();
+}
+
+void GenesisM68kBoundaryScaffold::ConfigureInterruptSchedule(bool hInterruptEnabled, uint32_t hInterruptIntervalScanlines, bool vInterruptEnabled) {
+	_hInterruptEnabled = hInterruptEnabled;
+	_hInterruptIntervalScanlines = std::max<uint32_t>(1, hInterruptIntervalScanlines);
+	_vInterruptEnabled = vInterruptEnabled;
+}
+
+void GenesisM68kBoundaryScaffold::ClearTimingEvents() {
+	_timingEvents.clear();
 }
 
 void GenesisM68kBoundaryScaffold::StepFrameScaffold(uint32_t cpuCycles) {

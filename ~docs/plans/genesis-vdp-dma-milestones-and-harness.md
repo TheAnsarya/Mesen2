@@ -151,6 +151,22 @@ Updated validation result after DMA contention scaffold integration:
 - Full native regression: 1695 tests from 132 suites passed.
 - Managed regression: 331 tests passed.
 
+### Issue [#733](https://github.com/TheAnsarya/Nexen/issues/733)
+
+- Added deterministic horizontal/vertical interrupt scheduling controls in `GenesisM68kBoundaryScaffold`.
+- Added scanline/frame event ordering log output (`HINT`/`VINT`) with deterministic counters.
+- Added configurable interrupt schedule controls (`ConfigureInterruptSchedule`) and event-log reset hook (`ClearTimingEvents`).
+- Added focused `GenesisInterruptSchedulingTests` to validate:
+	- horizontal interrupt cadence at configured scanline intervals,
+	- vertical interrupt trigger on frame rollover,
+	- deterministic event ordering when H/V interrupts co-occur.
+
+Updated validation result after H/V interrupt scheduling integration:
+
+- Focused Genesis tests: 25 tests from 8 suites passed.
+- Full native regression: 1698 tests from 133 suites passed.
+- Managed regression: 331 tests passed.
+
 ## Deferred Future-Work Linkage
 
 Status: Future Work only. Do not start these issues until explicitly scheduled.

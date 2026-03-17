@@ -164,6 +164,12 @@ private:
 	uint32_t _timingScanline = 0;
 	uint32_t _timingFrame = 0;
 	uint32_t _timingCycleRemainder = 0;
+	bool _hInterruptEnabled = true;
+	bool _vInterruptEnabled = true;
+	uint32_t _hInterruptIntervalScanlines = 16;
+	uint32_t _hInterruptCount = 0;
+	uint32_t _vInterruptCount = 0;
+	vector<string> _timingEvents;
 
 	void AdvanceTiming(uint32_t cpuCycles);
 
@@ -172,10 +178,15 @@ public:
 	void LoadRom(const vector<uint8_t>& romData);
 	void Startup();
 	void StepFrameScaffold(uint32_t cpuCycles = 12000);
+	void ConfigureInterruptSchedule(bool hInterruptEnabled, uint32_t hInterruptIntervalScanlines, bool vInterruptEnabled);
+	void ClearTimingEvents();
 
 	[[nodiscard]] bool IsStarted() const { return _started; }
 	[[nodiscard]] uint32_t GetTimingScanline() const { return _timingScanline; }
 	[[nodiscard]] uint32_t GetTimingFrame() const { return _timingFrame; }
+	[[nodiscard]] uint32_t GetHorizontalInterruptCount() const { return _hInterruptCount; }
+	[[nodiscard]] uint32_t GetVerticalInterruptCount() const { return _vInterruptCount; }
+	[[nodiscard]] const vector<string>& GetTimingEvents() const { return _timingEvents; }
 	GenesisM68kCpuStub& GetCpu() { return _cpu; }
 	GenesisPlatformBusStub& GetBus() { return _bus; }
 };
