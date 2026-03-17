@@ -111,6 +111,18 @@ GenesisM68kBoundaryScaffold::GenesisM68kBoundaryScaffold() {
 	_cpu.AttachBus(&_bus);
 }
 
+void GenesisM68kBoundaryScaffold::AdvanceTiming(uint32_t cpuCycles) {
+	_timingCycleRemainder += cpuCycles;
+	while (_timingCycleRemainder >= TimingCyclesPerScanline) {
+		_timingCycleRemainder -= TimingCyclesPerScanline;
+		_timingScanline++;
+		if (_timingScanline >= TimingScanlinesPerFrame) {
+			_timingScanline = 0;
+			_timingFrame++;
+		}
+	}
+}
+
 void GenesisM68kBoundaryScaffold::LoadRom(const vector<uint8_t>& romData) {
 	_bus.LoadRom(romData);
 }
@@ -119,6 +131,9 @@ void GenesisM68kBoundaryScaffold::Startup() {
 	_bus.Reset();
 	_cpu.Reset();
 	_started = true;
+	_timingScanline = 0;
+	_timingFrame = 0;
+	_timingCycleRemainder = 0;
 }
 
 void GenesisM68kBoundaryScaffold::StepFrameScaffold(uint32_t cpuCycles) {
@@ -126,4 +141,5 @@ void GenesisM68kBoundaryScaffold::StepFrameScaffold(uint32_t cpuCycles) {
 		Startup();
 	}
 	_cpu.StepCycles(cpuCycles);
+	AdvanceTiming(cpuCycles);
 }

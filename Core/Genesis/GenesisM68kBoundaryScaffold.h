@@ -59,9 +59,17 @@ public:
 
 class GenesisM68kBoundaryScaffold {
 private:
+	static constexpr uint32_t TimingCyclesPerScanline = 488;
+	static constexpr uint32_t TimingScanlinesPerFrame = 262;
+
 	GenesisPlatformBusStub _bus;
 	GenesisM68kCpuStub _cpu;
 	bool _started = false;
+	uint32_t _timingScanline = 0;
+	uint32_t _timingFrame = 0;
+	uint32_t _timingCycleRemainder = 0;
+
+	void AdvanceTiming(uint32_t cpuCycles);
 
 public:
 	GenesisM68kBoundaryScaffold();
@@ -70,6 +78,8 @@ public:
 	void StepFrameScaffold(uint32_t cpuCycles = 12000);
 
 	[[nodiscard]] bool IsStarted() const { return _started; }
+	[[nodiscard]] uint32_t GetTimingScanline() const { return _timingScanline; }
+	[[nodiscard]] uint32_t GetTimingFrame() const { return _timingFrame; }
 	GenesisM68kCpuStub& GetCpu() { return _cpu; }
 	GenesisPlatformBusStub& GetBus() { return _bus; }
 };

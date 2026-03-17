@@ -80,6 +80,22 @@ Observed result snapshot:
 
 - `[==========] 5 tests from 2 test suites ran.`
 
+## Timing Scaffold Evidence
+
+- Added deterministic scanline/frame checkpoint counters to `GenesisM68kBoundaryScaffold`.
+- Timing progression now advances from CPU cycle stepping with explicit scanline and frame rollover behavior.
+- Added focused regression suite: `GenesisVdpTimingScaffoldTests`.
+
+Focused command:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter=GenesisM68kBoundaryScaffoldTests.*:GenesisVdpDmaScaffoldTests.*:GenesisVdpTimingScaffoldTests.* --gtest_brief=1
+```
+
+Observed result snapshot:
+
+- `[==========] 8 tests from 3 test suites ran.`
+
 ## Related Research
 
 - [Genesis VDP Rendering and DMA](../research/platform-parity/genesis/vdp-rendering-dma.md)
