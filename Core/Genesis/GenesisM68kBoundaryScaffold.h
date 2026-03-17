@@ -17,6 +17,12 @@ enum class GenesisBusOwner : uint8_t {
 	OpenBus = 5
 };
 
+enum class GenesisVdpDmaMode : uint8_t {
+	None = 0,
+	Copy = 1,
+	Fill = 2
+};
+
 class GenesisPlatformBusStub final : public IGenesisM68kBus {
 private:
 	vector<uint8_t> _rom;
@@ -40,6 +46,11 @@ private:
 	uint16_t _scrollY = 0;
 	vector<uint8_t> _renderLine;
 	string _renderLineDigest;
+	GenesisVdpDmaMode _dmaMode = GenesisVdpDmaMode::None;
+	uint32_t _dmaTransferWords = 0;
+	uint32_t _dmaActiveCyclesRemaining = 0;
+	uint32_t _dmaContentionCycles = 0;
+	uint32_t _dmaContentionEvents = 0;
 	bool _z80WindowAccessed = false;
 	bool _ioWindowAccessed = false;
 	bool _vdpWindowAccessed = false;
@@ -61,6 +72,7 @@ private:
 	[[nodiscard]] GenesisBusOwner DecodeOwner(uint32_t address) const;
 	void ApplyVdpControlWord(uint16_t controlWord);
 	[[nodiscard]] uint8_t ComposeRenderPixel() const;
+	[[nodiscard]] GenesisVdpDmaMode DecodeDmaModeFromControl(uint8_t registerValue) const;
 
 public:
 	GenesisPlatformBusStub();
@@ -98,6 +110,13 @@ public:
 	void RenderScaffoldLine(uint32_t pixelCount = 64);
 	[[nodiscard]] uint8_t GetRenderLinePixel(uint32_t index) const;
 	[[nodiscard]] const string& GetRenderLineDigest() const { return _renderLineDigest; }
+	void BeginDmaTransfer(GenesisVdpDmaMode mode, uint32_t transferWords);
+	uint32_t ConsumeDmaContention(uint32_t requestedCycles);
+	[[nodiscard]] GenesisVdpDmaMode GetDmaMode() const { return _dmaMode; }
+	[[nodiscard]] uint32_t GetDmaTransferWords() const { return _dmaTransferWords; }
+	[[nodiscard]] uint32_t GetDmaActiveCyclesRemaining() const { return _dmaActiveCyclesRemaining; }
+	[[nodiscard]] uint32_t GetDmaContentionCycles() const { return _dmaContentionCycles; }
+	[[nodiscard]] uint32_t GetDmaContentionEvents() const { return _dmaContentionEvents; }
 };
 
 class GenesisM68kCpuStub {

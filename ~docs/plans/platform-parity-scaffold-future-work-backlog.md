@@ -19,6 +19,7 @@ Promoted and completed from backlog:
 - [#729](https://github.com/TheAnsarya/Nexen/issues/729): Genesis memory map decode and bus ownership rules (completed 2026-03-17).
 - [#730](https://github.com/TheAnsarya/Nexen/issues/730): VDP register file semantics and status behavior (completed 2026-03-17).
 - [#731](https://github.com/TheAnsarya/Nexen/issues/731): VDP background/sprite rendering pipeline scaffold (completed 2026-03-17).
+- [#732](https://github.com/TheAnsarya/Nexen/issues/732): VDP DMA modes and contention timing scaffold (completed 2026-03-17).
 
 ## Purpose
 
@@ -75,7 +76,7 @@ Deferred child issues:
 | [#729](https://github.com/TheAnsarya/Nexen/issues/729) | Full memory-map decode and bus ownership rules (completed; promoted from deferred backlog) |
 | [#730](https://github.com/TheAnsarya/Nexen/issues/730) | VDP register and status semantics (completed; promoted from deferred backlog) |
 | [#731](https://github.com/TheAnsarya/Nexen/issues/731) | VDP background and sprite rendering pipeline (completed; promoted from deferred backlog) |
-| [#732](https://github.com/TheAnsarya/Nexen/issues/732) | VDP DMA modes and contention timing behavior |
+| [#732](https://github.com/TheAnsarya/Nexen/issues/732) | VDP DMA modes and contention timing behavior (completed; promoted from deferred backlog) |
 | [#733](https://github.com/TheAnsarya/Nexen/issues/733) | H/V interrupt scheduling and frame event timing |
 | [#734](https://github.com/TheAnsarya/Nexen/issues/734) | Z80 subsystem bootstrap and shared-bus handoff |
 | [#735](https://github.com/TheAnsarya/Nexen/issues/735) | YM2612 synthesis and timing synchronization |

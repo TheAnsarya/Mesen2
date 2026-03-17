@@ -45,6 +45,10 @@ void GenesisPlatformBusStub::ApplyVdpControlWord(uint16_t controlWord) {
 		uint8_t regValue = (uint8_t)(controlWord & 0xFF);
 		_vdpRegisters[regIndex] = regValue;
 
+		if (regIndex == 23) {
+			_dmaMode = DecodeDmaModeFromControl(regValue);
+		}
+
 		if (regIndex == 1) {
 			if ((regValue & 0x40) != 0) {
 				_vdpStatus |= 0x0008;
@@ -54,6 +58,10 @@ void GenesisPlatformBusStub::ApplyVdpControlWord(uint16_t controlWord) {
 
 			if ((regValue & 0x20) != 0) {
 				_dmaRequested = true;
+				if (_dmaMode == GenesisVdpDmaMode::None) {
+					_dmaMode = GenesisVdpDmaMode::Copy;
+				}
+				BeginDmaTransfer(_dmaMode, 16);
 			}
 		}
 	} else if ((controlWord & 0xC000) == 0x4000) {
@@ -62,6 +70,49 @@ void GenesisPlatformBusStub::ApplyVdpControlWord(uint16_t controlWord) {
 		_vdpStatus = (uint16_t)(_vdpStatus & ~0x0001);
 		_vdpStatus |= 0x0002;
 	}
+}
+
+GenesisVdpDmaMode GenesisPlatformBusStub::DecodeDmaModeFromControl(uint8_t registerValue) const {
+	uint8_t modeBits = (uint8_t)(registerValue & 0xC0);
+	if (modeBits == 0x80) {
+		return GenesisVdpDmaMode::Fill;
+	}
+	if (modeBits == 0xC0) {
+		return GenesisVdpDmaMode::Copy;
+	}
+	return GenesisVdpDmaMode::None;
+}
+
+void GenesisPlatformBusStub::BeginDmaTransfer(GenesisVdpDmaMode mode, uint32_t transferWords) {
+	_dmaMode = mode;
+	_dmaTransferWords = transferWords;
+	_dmaActiveCyclesRemaining = transferWords * 4;
+	if (transferWords > 0) {
+		_dmaRequested = true;
+	}
+}
+
+uint32_t GenesisPlatformBusStub::ConsumeDmaContention(uint32_t requestedCycles) {
+	if (_dmaMode == GenesisVdpDmaMode::None || _dmaActiveCyclesRemaining == 0 || requestedCycles == 0) {
+		return 0;
+	}
+
+	uint32_t penalty = (requestedCycles + 3) / 4;
+	if (penalty > _dmaActiveCyclesRemaining) {
+		penalty = _dmaActiveCyclesRemaining;
+	}
+
+	if (penalty > 0) {
+		_dmaContentionEvents++;
+		_dmaContentionCycles += penalty;
+		_dmaActiveCyclesRemaining -= penalty;
+	}
+
+	if (_dmaActiveCyclesRemaining == 0) {
+		_dmaMode = GenesisVdpDmaMode::None;
+	}
+
+	return penalty;
 }
 
 void GenesisPlatformBusStub::LoadRom(const vector<uint8_t>& romData) {
@@ -92,6 +143,11 @@ void GenesisPlatformBusStub::Reset() {
 	_scrollY = 0;
 	_renderLine.clear();
 	_renderLineDigest.clear();
+	_dmaMode = GenesisVdpDmaMode::None;
+	_dmaTransferWords = 0;
+	_dmaActiveCyclesRemaining = 0;
+	_dmaContentionCycles = 0;
+	_dmaContentionEvents = 0;
 	_z80WindowAccessed = false;
 	_ioWindowAccessed = false;
 	_vdpWindowAccessed = false;
@@ -264,6 +320,12 @@ void GenesisPlatformBusStub::WriteByte(uint32_t address, uint8_t value) {
 			}
 			if (address >= 0xC00004 && address <= 0xC00007 && (value & 0x80) != 0) {
 				_dmaRequested = true;
+				if (_dmaMode == GenesisVdpDmaMode::None) {
+					_dmaMode = GenesisVdpDmaMode::Copy;
+				}
+				if (_dmaActiveCyclesRemaining == 0) {
+					BeginDmaTransfer(_dmaMode, 8);
+				}
 			}
 			return;
 
@@ -425,6 +487,8 @@ void GenesisM68kBoundaryScaffold::StepFrameScaffold(uint32_t cpuCycles) {
 	if (!_started) {
 		Startup();
 	}
-	_cpu.StepCycles(cpuCycles);
+	uint32_t contentionPenalty = _bus.ConsumeDmaContention(cpuCycles);
+	uint32_t executableCycles = cpuCycles > contentionPenalty ? cpuCycles - contentionPenalty : 0;
+	_cpu.StepCycles(executableCycles);
 	AdvanceTiming(cpuCycles);
 }

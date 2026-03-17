@@ -135,6 +135,22 @@ Updated validation result after render-pipeline scaffold integration:
 - Full native regression: 1692 tests from 131 suites passed.
 - Managed regression: 331 tests passed.
 
+### Issue [#732](https://github.com/TheAnsarya/Nexen/issues/732)
+
+- Added deterministic DMA mode scaffold state (`None`, `Copy`, `Fill`) with transfer accounting and active-cycle tracking.
+- Added deterministic CPU/VDP contention penalty model consumed from `GenesisM68kBoundaryScaffold::StepFrameScaffold`.
+- Added transfer start and contention consumption APIs (`BeginDmaTransfer`, `ConsumeDmaContention`) for deterministic gate coverage.
+- Added focused `GenesisVdpDmaContentionTests` to validate:
+	- DMA mode latch behavior from control-register commands,
+	- deterministic contention penalty effect on executable CPU cycles,
+	- deterministic repeatability of contention counters across identical runs.
+
+Updated validation result after DMA contention scaffold integration:
+
+- Focused Genesis tests: 22 tests from 7 suites passed.
+- Full native regression: 1695 tests from 132 suites passed.
+- Managed regression: 331 tests passed.
+
 ## Deferred Future-Work Linkage
 
 Status: Future Work only. Do not start these issues until explicitly scheduled.
