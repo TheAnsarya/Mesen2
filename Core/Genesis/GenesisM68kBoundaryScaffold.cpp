@@ -183,6 +183,45 @@ void GenesisPlatformBusStub::StepYm2612(uint32_t masterCycles) {
 	}
 }
 
+void GenesisPlatformBusStub::PsgWrite(uint8_t value) {
+	if ((value & 0x80) != 0) {
+		_sn76489LatchedRegister = (uint8_t)((value >> 4) & 0x07);
+		_sn76489Registers[_sn76489LatchedRegister] = (uint8_t)((_sn76489Registers[_sn76489LatchedRegister] & 0xF0) | (value & 0x0F));
+	} else {
+		_sn76489Registers[_sn76489LatchedRegister] = (uint8_t)((_sn76489Registers[_sn76489LatchedRegister] & 0x0F) | ((value & 0x3F) << 4));
+	}
+	_sn76489WriteCount++;
+}
+
+void GenesisPlatformBusStub::StepSn76489(uint32_t masterCycles) {
+	_sn76489ClockAccumulator += masterCycles;
+	while (_sn76489ClockAccumulator >= 128) {
+		_sn76489ClockAccumulator -= 128;
+		int32_t mix =
+			(int32_t)_sn76489Registers[0] +
+			(int32_t)_sn76489Registers[1] * 2 +
+			(int32_t)_sn76489Registers[2] * 3 +
+			(int32_t)_sn76489Registers[7] +
+			(int32_t)_sn76489SampleCount;
+		_sn76489LastSample = (int16_t)(((mix * 53) & 0x7FFF) - 0x4000);
+		_sn76489SampleCount++;
+
+		uint64_t hash = _sn76489Digest.empty() ? 1469598103934665603ull : std::stoull(_sn76489Digest, nullptr, 16);
+		hash ^= (uint16_t)_sn76489LastSample;
+		hash *= 1099511628211ull;
+		_sn76489Digest = ToHexDigest(hash);
+	}
+}
+
+void GenesisPlatformBusStub::UpdateMixedSample() {
+	_mixedLastSample = (int16_t)(((int32_t)_ym2612LastSample + (int32_t)_sn76489LastSample) / 2);
+	_mixedSampleCount++;
+	uint64_t hash = _mixedDigest.empty() ? 1469598103934665603ull : std::stoull(_mixedDigest, nullptr, 16);
+	hash ^= (uint16_t)_mixedLastSample;
+	hash *= 1099511628211ull;
+	_mixedDigest = ToHexDigest(hash);
+}
+
 void GenesisPlatformBusStub::LoadRom(const vector<uint8_t>& romData) {
 	_rom = romData;
 	if (_rom.empty()) {
@@ -230,6 +269,16 @@ void GenesisPlatformBusStub::Reset() {
 	_ym2612LastSample = 0;
 	_ym2612WriteCount = 0;
 	_ym2612Digest.clear();
+	std::fill(_sn76489Registers.begin(), _sn76489Registers.end(), 0);
+	_sn76489LatchedRegister = 0;
+	_sn76489ClockAccumulator = 0;
+	_sn76489SampleCount = 0;
+	_sn76489LastSample = 0;
+	_sn76489WriteCount = 0;
+	_sn76489Digest.clear();
+	_mixedLastSample = 0;
+	_mixedSampleCount = 0;
+	_mixedDigest.clear();
 	_z80WindowAccessed = false;
 	_ioWindowAccessed = false;
 	_vdpWindowAccessed = false;
@@ -430,6 +479,9 @@ void GenesisPlatformBusStub::WriteByte(uint32_t address, uint8_t value) {
 			_lastVdpAddress = address;
 			_lastVdpValue = value;
 			_vdpIo[address & 0x1F] = value;
+			if (address == 0xC00011) {
+				PsgWrite(value);
+			}
 			if (address <= 0xC00003) {
 				if ((address & 1) == 0) {
 					_vdpDataPortLatch = (uint16_t)((_vdpDataPortLatch & 0x00FF) | ((uint16_t)value << 8));
@@ -646,5 +698,7 @@ void GenesisM68kBoundaryScaffold::StepFrameScaffold(uint32_t cpuCycles) {
 	_cpu.StepCycles(executableCycles);
 	_bus.StepZ80Cycles(cpuCycles / 2);
 	_bus.StepYm2612(cpuCycles);
+	_bus.StepSn76489(cpuCycles);
+	_bus.UpdateMixedSample();
 	AdvanceTiming(cpuCycles);
 }

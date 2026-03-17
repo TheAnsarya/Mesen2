@@ -65,6 +65,16 @@ private:
 	int16_t _ym2612LastSample = 0;
 	uint32_t _ym2612WriteCount = 0;
 	string _ym2612Digest;
+	std::array<uint8_t, 16> _sn76489Registers = {};
+	uint8_t _sn76489LatchedRegister = 0;
+	uint64_t _sn76489ClockAccumulator = 0;
+	uint32_t _sn76489SampleCount = 0;
+	int16_t _sn76489LastSample = 0;
+	uint32_t _sn76489WriteCount = 0;
+	string _sn76489Digest;
+	int16_t _mixedLastSample = 0;
+	uint32_t _mixedSampleCount = 0;
+	string _mixedDigest;
 	bool _z80WindowAccessed = false;
 	bool _ioWindowAccessed = false;
 	bool _vdpWindowAccessed = false;
@@ -132,6 +142,9 @@ public:
 	void YmWriteAddress(uint8_t port, uint8_t value);
 	void YmWriteData(uint8_t port, uint8_t value);
 	void StepYm2612(uint32_t masterCycles);
+	void PsgWrite(uint8_t value);
+	void StepSn76489(uint32_t masterCycles);
+	void UpdateMixedSample();
 	[[nodiscard]] GenesisVdpDmaMode GetDmaMode() const { return _dmaMode; }
 	[[nodiscard]] uint32_t GetDmaTransferWords() const { return _dmaTransferWords; }
 	[[nodiscard]] uint32_t GetDmaActiveCyclesRemaining() const { return _dmaActiveCyclesRemaining; }
@@ -148,6 +161,14 @@ public:
 	[[nodiscard]] int16_t GetYmLastSample() const { return _ym2612LastSample; }
 	[[nodiscard]] uint32_t GetYmWriteCount() const { return _ym2612WriteCount; }
 	[[nodiscard]] const string& GetYmDigest() const { return _ym2612Digest; }
+	[[nodiscard]] uint8_t GetPsgRegister(uint8_t index) const { return _sn76489Registers[index & 0x0F]; }
+	[[nodiscard]] uint32_t GetPsgSampleCount() const { return _sn76489SampleCount; }
+	[[nodiscard]] int16_t GetPsgLastSample() const { return _sn76489LastSample; }
+	[[nodiscard]] uint32_t GetPsgWriteCount() const { return _sn76489WriteCount; }
+	[[nodiscard]] const string& GetPsgDigest() const { return _sn76489Digest; }
+	[[nodiscard]] int16_t GetMixedLastSample() const { return _mixedLastSample; }
+	[[nodiscard]] uint32_t GetMixedSampleCount() const { return _mixedSampleCount; }
+	[[nodiscard]] const string& GetMixedDigest() const { return _mixedDigest; }
 };
 
 class GenesisM68kCpuStub {
