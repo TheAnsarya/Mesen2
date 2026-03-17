@@ -1,0 +1,107 @@
+#include "pch.h"
+#include "Shared/Emulator.h"
+#include "Atari2600/Atari2600Console.h"
+#include "Atari2600/Atari2600SmokeHarness.h"
+#include "Utilities/VirtualFile.h"
+
+namespace {
+	VirtualFile MakeRomFile(const string& fileName, const vector<uint8_t>& data) {
+		return VirtualFile(data.data(), data.size(), fileName);
+	}
+
+	TEST(Atari2600MapperPhaseBTests, SupportsF4BankSwitching) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		vector<uint8_t> rom32k(32768, 0x30);
+		for (uint8_t bank = 0; bank < 8; bank++) {
+			std::fill(
+				rom32k.begin() + (size_t)bank * 0x1000,
+				rom32k.begin() + ((size_t)bank + 1) * 0x1000,
+				(uint8_t)(0x30 + bank));
+		}
+
+		VirtualFile romFile = MakeRomFile("mapper-f4.a26", rom32k);
+		ASSERT_EQ(console.LoadRom(romFile), LoadRomResult::Success);
+		EXPECT_EQ(console.DebugGetMapperMode(), "f4");
+
+		console.DebugReadCartridge(0x1FF4);
+		EXPECT_EQ(console.DebugGetMapperBankIndex(), 0u);
+		EXPECT_EQ(console.DebugReadCartridge(0x1000), 0x30);
+
+		console.DebugWriteCartridge(0x1FFB, 0x00);
+		EXPECT_EQ(console.DebugGetMapperBankIndex(), 7u);
+		EXPECT_EQ(console.DebugReadCartridge(0x1000), 0x37);
+	}
+
+	TEST(Atari2600MapperPhaseBTests, SupportsFEBankSwitching) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		vector<uint8_t> rom8k(8192, 0xA1);
+		std::fill(rom8k.begin() + 0x1000, rom8k.begin() + 0x2000, 0xB2);
+
+		VirtualFile romFile = MakeRomFile("mapper-fe.a26", rom8k);
+		ASSERT_EQ(console.LoadRom(romFile), LoadRomResult::Success);
+		EXPECT_EQ(console.DebugGetMapperMode(), "fe");
+
+
+		console.DebugReadCartridge(0x1FFF);
+		EXPECT_EQ(console.DebugGetMapperBankIndex(), 1u);
+		EXPECT_EQ(console.DebugReadCartridge(0x1000), 0xB2);
+
+		console.DebugWriteCartridge(0x1FFE, 0x00);
+		EXPECT_EQ(console.DebugGetMapperBankIndex(), 0u);
+		EXPECT_EQ(console.DebugReadCartridge(0x1000), 0xA1);
+	}
+
+	TEST(Atari2600MapperPhaseBTests, SupportsE0SegmentedWindows) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		vector<uint8_t> rom8k(8192, 0x00);
+		for (uint8_t bank = 0; bank < 8; bank++) {
+			std::fill(
+				rom8k.begin() + (size_t)bank * 0x0400,
+				rom8k.begin() + ((size_t)bank + 1) * 0x0400,
+				(uint8_t)(0x10 + bank));
+		}
+
+		VirtualFile romFile = MakeRomFile("mapper-e0.a26", rom8k);
+		ASSERT_EQ(console.LoadRom(romFile), LoadRomResult::Success);
+		EXPECT_EQ(console.DebugGetMapperMode(), "e0");
+		// Initial mapping: segment banks 4/5/6 and fixed bank 7.
+		EXPECT_EQ(console.DebugReadCartridge(0x1000), 0x14);
+		EXPECT_EQ(console.DebugReadCartridge(0x1400), 0x15);
+		EXPECT_EQ(console.DebugReadCartridge(0x1800), 0x16);
+		EXPECT_EQ(console.DebugReadCartridge(0x1C00), 0x17);
+
+		console.DebugReadCartridge(0x1FE2);
+		EXPECT_EQ(console.DebugReadCartridge(0x1000), 0x12);
+
+		console.DebugWriteCartridge(0x1FEB, 0x00);
+		EXPECT_EQ(console.DebugReadCartridge(0x1400), 0x13);
+
+		console.DebugWriteCartridge(0x1FF0, 0x00);
+		EXPECT_EQ(console.DebugReadCartridge(0x1800), 0x10);
+		EXPECT_EQ(console.DebugReadCartridge(0x1C00), 0x17);
+	}
+
+	TEST(Atari2600MapperPhaseBTests, BaselineHarnessDigestStableForPhaseBCorpus) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		vector<Atari2600BaselineRomCase> romSet;
+		romSet.push_back({"phaseb-f4.a26", vector<uint8_t>(32768, 0xEA)});
+		romSet.push_back({"phaseb-fe.a26", vector<uint8_t>(8192, 0xEA)});
+		romSet.push_back({"phaseb-e0.a26", vector<uint8_t>(8192, 0xEA)});
+
+		Atari2600BaselineRomSetResult runA = Atari2600SmokeHarness::RunBaselineRomSet(console, romSet);
+		Atari2600BaselineRomSetResult runB = Atari2600SmokeHarness::RunBaselineRomSet(console, romSet);
+
+		EXPECT_EQ(runA.PassCount, (int)romSet.size());
+		EXPECT_EQ(runA.FailCount, 0);
+		EXPECT_FALSE(runA.Digest.empty());
+		EXPECT_EQ(runA.Digest, runB.Digest);
+	}
+}

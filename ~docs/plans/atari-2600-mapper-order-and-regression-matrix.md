@@ -81,6 +81,22 @@ Observed result snapshot:
 
 - `[==========] 11 tests from 2 test suites ran.`
 
+## Phase B Evidence
+
+- Implemented `F4`, `FE`, and `E0` mapper handling with bankswitch and segmented-window read mapping.
+- Added focused regression tests: `Atari2600MapperPhaseBTests`.
+- Re-ran harness and mapper suites together to validate deterministic behavior under the expanded corpus.
+
+Focused command:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter=Atari2600MapperPhaseATests.*:Atari2600MapperPhaseBTests.*:Atari2600TimingSpikeHarnessTests.* --gtest_brief=1
+```
+
+Observed result snapshot:
+
+- `[==========] 15 tests from 3 test suites ran.`
+
 ## Related Research
 
 - [Atari 2600 Bankswitching and Cartridge Formats](../research/platform-parity/atari-2600/bankswitching.md)
