@@ -90,6 +90,22 @@ dotnet test --no-build -c Release
 
 Result: 28 Genesis tests passed; 1701 native tests passed; 331 managed tests passed.
 
+### Issue [#735](https://github.com/TheAnsarya/Nexen/issues/735)
+
+- Added deterministic YM2612 scaffold register model with address/data sequencing for both ports.
+- Added deterministic YM2612 timing progression and sample synthesis scaffold (`StepYm2612`) synchronized with frame stepping.
+- Added deterministic YM register/write/sample/digest tracking for regression checkpointing.
+- Added focused `GenesisYm2612TimingTests` to validate:
+	- register write sequencing behavior,
+	- deterministic sample generation across identical runs,
+	- sample-count progression tied to cycle stepping thresholds.
+
+Updated validation result after YM2612 timing scaffold integration:
+
+- Focused Genesis tests: 31 tests from 10 suites passed.
+- Full native regression: 1704 tests from 135 suites passed.
+- Managed regression: 331 tests passed.
+
 ## Related Research
 
 - [Genesis Z80 Audio Bus](../research/platform-parity/genesis/z80-audio-bus.md)

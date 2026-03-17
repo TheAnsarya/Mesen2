@@ -20,6 +20,10 @@ GenesisBusOwner GenesisPlatformBusStub::DecodeOwner(uint32_t address) const {
 		return GenesisBusOwner::Rom;
 	}
 
+	if (address >= 0xA04000 && address <= 0xA04003) {
+		return GenesisBusOwner::Io;
+	}
+
 	if (address >= 0xA00000 && address <= 0xA0FFFF) {
 		return GenesisBusOwner::Z80;
 	}
@@ -145,6 +149,40 @@ void GenesisPlatformBusStub::StepZ80Cycles(uint32_t cycles) {
 	}
 }
 
+void GenesisPlatformBusStub::YmWriteAddress(uint8_t port, uint8_t value) {
+	if (port == 0) {
+		_ym2612AddressPort0 = value;
+	} else {
+		_ym2612AddressPort1 = value;
+	}
+}
+
+void GenesisPlatformBusStub::YmWriteData(uint8_t port, uint8_t value) {
+	uint16_t regIndex = (uint16_t)(port == 0 ? _ym2612AddressPort0 : (0x100 | _ym2612AddressPort1));
+	_ym2612Registers[regIndex & 0x1FF] = value;
+	_ym2612WriteCount++;
+}
+
+void GenesisPlatformBusStub::StepYm2612(uint32_t masterCycles) {
+	_ym2612ClockAccumulator += masterCycles;
+	while (_ym2612ClockAccumulator >= 144) {
+		_ym2612ClockAccumulator -= 144;
+		int32_t mix =
+			(int32_t)_ym2612Registers[0x22] +
+			(int32_t)_ym2612Registers[0x27] * 2 +
+			(int32_t)_ym2612Registers[0x28] * 3 +
+			(int32_t)_ym2612Registers[0x130] * 2 +
+			(int32_t)_ym2612SampleCount;
+		_ym2612LastSample = (int16_t)(((mix * 97) & 0x7FFF) - 0x4000);
+		_ym2612SampleCount++;
+
+		uint64_t hash = _ym2612Digest.empty() ? 1469598103934665603ull : std::stoull(_ym2612Digest, nullptr, 16);
+		hash ^= (uint16_t)_ym2612LastSample;
+		hash *= 1099511628211ull;
+		_ym2612Digest = ToHexDigest(hash);
+	}
+}
+
 void GenesisPlatformBusStub::LoadRom(const vector<uint8_t>& romData) {
 	_rom = romData;
 	if (_rom.empty()) {
@@ -184,6 +222,14 @@ void GenesisPlatformBusStub::Reset() {
 	_z80BootstrapCount = 0;
 	_z80HandoffCount = 0;
 	_z80ExecutedCycles = 0;
+	std::fill(_ym2612Registers.begin(), _ym2612Registers.end(), 0);
+	_ym2612AddressPort0 = 0;
+	_ym2612AddressPort1 = 0;
+	_ym2612ClockAccumulator = 0;
+	_ym2612SampleCount = 0;
+	_ym2612LastSample = 0;
+	_ym2612WriteCount = 0;
+	_ym2612Digest.clear();
 	_z80WindowAccessed = false;
 	_ioWindowAccessed = false;
 	_vdpWindowAccessed = false;
@@ -289,6 +335,18 @@ uint8_t GenesisPlatformBusStub::ReadByte(uint32_t address) {
 		case GenesisBusOwner::Io:
 			_ioWindowAccessed = true;
 			_ioReadCount++;
+			if (address == 0xA04000) {
+				return _ym2612AddressPort0;
+			}
+			if (address == 0xA04001) {
+				return _ym2612Registers[_ym2612AddressPort0 & 0x1FF];
+			}
+			if (address == 0xA04002) {
+				return _ym2612AddressPort1;
+			}
+			if (address == 0xA04003) {
+				return _ym2612Registers[(0x100 | _ym2612AddressPort1) & 0x1FF];
+			}
 			if (address == 0xA11100) {
 				return _z80BusRequested ? 0x01 : 0x00;
 			}
@@ -342,6 +400,18 @@ void GenesisPlatformBusStub::WriteByte(uint32_t address, uint8_t value) {
 			_ioWindowAccessed = true;
 			_ioWriteCount++;
 			_io[address & 0x1F] = value;
+			if (address == 0xA04000) {
+				YmWriteAddress(0, value);
+			}
+			if (address == 0xA04001) {
+				YmWriteData(0, value);
+			}
+			if (address == 0xA04002) {
+				YmWriteAddress(1, value);
+			}
+			if (address == 0xA04003) {
+				YmWriteData(1, value);
+			}
 			if (address == 0xA11100) {
 				RequestZ80Bus((value & 0x01) != 0);
 			}
@@ -575,5 +645,6 @@ void GenesisM68kBoundaryScaffold::StepFrameScaffold(uint32_t cpuCycles) {
 	uint32_t executableCycles = cpuCycles > contentionPenalty ? cpuCycles - contentionPenalty : 0;
 	_cpu.StepCycles(executableCycles);
 	_bus.StepZ80Cycles(cpuCycles / 2);
+	_bus.StepYm2612(cpuCycles);
 	AdvanceTiming(cpuCycles);
 }

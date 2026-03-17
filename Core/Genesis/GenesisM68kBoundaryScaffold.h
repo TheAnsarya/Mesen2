@@ -57,6 +57,14 @@ private:
 	uint32_t _z80BootstrapCount = 0;
 	uint32_t _z80HandoffCount = 0;
 	uint64_t _z80ExecutedCycles = 0;
+	std::array<uint8_t, 0x200> _ym2612Registers = {};
+	uint8_t _ym2612AddressPort0 = 0;
+	uint8_t _ym2612AddressPort1 = 0;
+	uint64_t _ym2612ClockAccumulator = 0;
+	uint32_t _ym2612SampleCount = 0;
+	int16_t _ym2612LastSample = 0;
+	uint32_t _ym2612WriteCount = 0;
+	string _ym2612Digest;
 	bool _z80WindowAccessed = false;
 	bool _ioWindowAccessed = false;
 	bool _vdpWindowAccessed = false;
@@ -121,6 +129,9 @@ public:
 	void BootstrapZ80();
 	void RequestZ80Bus(bool requestBusForM68k);
 	void StepZ80Cycles(uint32_t cycles);
+	void YmWriteAddress(uint8_t port, uint8_t value);
+	void YmWriteData(uint8_t port, uint8_t value);
+	void StepYm2612(uint32_t masterCycles);
 	[[nodiscard]] GenesisVdpDmaMode GetDmaMode() const { return _dmaMode; }
 	[[nodiscard]] uint32_t GetDmaTransferWords() const { return _dmaTransferWords; }
 	[[nodiscard]] uint32_t GetDmaActiveCyclesRemaining() const { return _dmaActiveCyclesRemaining; }
@@ -132,6 +143,11 @@ public:
 	[[nodiscard]] uint32_t GetZ80BootstrapCount() const { return _z80BootstrapCount; }
 	[[nodiscard]] uint32_t GetZ80HandoffCount() const { return _z80HandoffCount; }
 	[[nodiscard]] uint64_t GetZ80ExecutedCycles() const { return _z80ExecutedCycles; }
+	[[nodiscard]] uint8_t GetYmRegister(uint16_t index) const { return _ym2612Registers[index & 0x1FF]; }
+	[[nodiscard]] uint32_t GetYmSampleCount() const { return _ym2612SampleCount; }
+	[[nodiscard]] int16_t GetYmLastSample() const { return _ym2612LastSample; }
+	[[nodiscard]] uint32_t GetYmWriteCount() const { return _ym2612WriteCount; }
+	[[nodiscard]] const string& GetYmDigest() const { return _ym2612Digest; }
 };
 
 class GenesisM68kCpuStub {
