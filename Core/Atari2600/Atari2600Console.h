@@ -31,6 +31,10 @@ struct Atari2600TiaState {
 	uint32_t Scanline = 0;
 	uint32_t ColorClock = 0;
 	bool WsyncHold = false;
+	uint32_t WsyncCount = 0;
+	bool HmovePending = false;
+	uint32_t HmoveStrobeCount = 0;
+	uint32_t HmoveApplyCount = 0;
 	uint64_t TotalColorClocks = 0;
 };
 
@@ -92,6 +96,7 @@ public:
 
 	void StepCpuCycles(uint32_t cpuCycles);
 	void RequestWsync();
+	void RequestHmove();
 	Atari2600RiotState GetRiotState() const;
 	Atari2600TiaState GetTiaState() const;
 	Atari2600FrameStepSummary GetLastFrameSummary() const { return _lastFrameSummary; }

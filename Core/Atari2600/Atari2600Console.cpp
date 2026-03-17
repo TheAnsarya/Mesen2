@@ -382,6 +382,7 @@ class Atari2600Riot {
 	class Atari2600Tia {
 	private:
 		Atari2600TiaState _state = {};
+		static constexpr uint32_t HmoveBlankColorClocks = 8;
 
 		void AdvanceScanline() {
 			_state.ColorClock = 0;
@@ -414,11 +415,22 @@ class Atari2600Riot {
 					AdvanceScanline();
 				}
 				StepColorClocks(3);
+				if (_state.HmovePending) {
+					_state.HmovePending = false;
+					_state.HmoveApplyCount++;
+					StepColorClocks(HmoveBlankColorClocks);
+				}
 			}
 		}
 
 		void RequestWsync() {
 			_state.WsyncHold = true;
+			_state.WsyncCount++;
+		}
+
+		void RequestHmove() {
+			_state.HmovePending = true;
+			_state.HmoveStrobeCount++;
 		}
 
 		Atari2600TiaState GetState() const {
@@ -460,8 +472,17 @@ class Atari2600Riot {
 				_riot->WriteRegister(addr, value);
 				return;
 			}
-			if (_tia && ((addr & 0x3F) == 0x02)) {
-				_tia->RequestWsync();
+			if (_tia) {
+				switch (addr & 0x3F) {
+					case 0x02:
+						_tia->RequestWsync();
+						break;
+					case 0x2A:
+						_tia->RequestHmove();
+						break;
+					default:
+						break;
+				}
 			}
 		}
 	};
@@ -799,6 +820,10 @@ void Atari2600Console::RunFrame() {
 
 void Atari2600Console::RequestWsync() {
 	_tia->RequestWsync();
+}
+
+void Atari2600Console::RequestHmove() {
+	_tia->RequestHmove();
 }
 
 Atari2600RiotState Atari2600Console::GetRiotState() const {
