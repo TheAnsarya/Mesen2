@@ -83,6 +83,15 @@ Status: Completed from deferred backlog (2026-03-17)
 - Added AUDC/AUDF/AUDV register read/write behavior and audio metadata integration through console audio API.
 - Added focused tests in `Atari2600AudioPhaseATests` for register semantics, deterministic output, and mixer reset behavior.
 
+### Issue [#725](https://github.com/TheAnsarya/Nexen/issues/725)
+
+- Added a title-targeted compatibility matrix harness path (`RunCompatibilityMatrix`) with deterministic per-title checkpoints.
+- Added machine-readable compatibility output lines:
+	- `COMPAT_CHECK <id> <PASS|FAIL> <context>`
+	- `COMPAT_RESULT <title> <PASS|FAIL> PASS=<n> FAIL=<n> DIGEST=<hash>`
+	- `COMPAT_MATRIX_SUMMARY PASS=<n> FAIL=<n> DIGEST=<hash>`
+- Added focused tests in `Atari2600CompatibilityMatrixTests` covering deterministic digest stability and failure-path behavior for empty ROM entries.
+
 Validation command used for promoted TIA work:
 
 ```powershell
@@ -90,6 +99,14 @@ Validation command used for promoted TIA work:
 ```
 
 Result: 31 tests from 9 suites passed.
+
+Updated validation command after compatibility matrix integration:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter=Atari2600CompatibilityMatrixTests.*:Atari2600MapperPhaseDTests.*:Atari2600AudioPhaseATests.*:Atari2600RenderPhaseATests.*:Atari2600TiaPhaseATests.*:Atari2600RiotPhaseATests.*:Atari2600CpuPhaseATests.*:Atari2600TimingSpikeHarnessTests.*:Atari2600MapperPhaseATests.*:Atari2600MapperPhaseBTests.*:Atari2600MapperPhaseCTests.* --gtest_brief=1
+```
+
+Result: 36 tests from 11 suites passed.
 
 ## Deferred Future-Work Linkage
 
@@ -100,9 +117,9 @@ Completed from this deferred set:
 - TIA timing follow-through: [#721](https://github.com/TheAnsarya/Nexen/issues/721)
 - TIA render follow-through: [#722](https://github.com/TheAnsarya/Nexen/issues/722)
 - TIA audio follow-through: [#723](https://github.com/TheAnsarya/Nexen/issues/723)
+- Compatibility harness expansion: [#725](https://github.com/TheAnsarya/Nexen/issues/725)
 
 - Parent future-work epic: [#717](https://github.com/TheAnsarya/Nexen/issues/717)
-- Compatibility harness expansion: [#725](https://github.com/TheAnsarya/Nexen/issues/725)
 
 ## Dependencies
 

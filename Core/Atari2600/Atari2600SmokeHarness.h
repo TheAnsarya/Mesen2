@@ -46,9 +46,35 @@ struct Atari2600BaselineRomSetResult {
 	vector<string> OutputLines;
 };
 
+struct Atari2600CompatibilityCheckpoint {
+	string Id;
+	bool Pass = false;
+	string Context;
+};
+
+struct Atari2600CompatibilityEntry {
+	string Name;
+	string MapperMode;
+	vector<Atari2600CompatibilityCheckpoint> Checkpoints;
+	bool Pass = false;
+	int PassCount = 0;
+	int FailCount = 0;
+	string Digest;
+	vector<string> OutputLines;
+};
+
+struct Atari2600CompatibilityMatrixResult {
+	vector<Atari2600CompatibilityEntry> Entries;
+	int PassCount = 0;
+	int FailCount = 0;
+	string Digest;
+	vector<string> OutputLines;
+};
+
 class Atari2600SmokeHarness {
 public:
 	static Atari2600HarnessResult RunBaseline(Atari2600Console& console);
 	static Atari2600TimingSpikeResult RunTimingSpike(Atari2600Console& console, uint32_t iterations = 8);
 	static Atari2600BaselineRomSetResult RunBaselineRomSet(Atari2600Console& console, const vector<Atari2600BaselineRomCase>& romSet);
+	static Atari2600CompatibilityMatrixResult RunCompatibilityMatrix(Atari2600Console& console, const vector<Atari2600BaselineRomCase>& romSet);
 };
