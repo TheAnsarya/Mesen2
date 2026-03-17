@@ -97,6 +97,23 @@ Observed result snapshot:
 
 - `[==========] 15 tests from 3 test suites ran.`
 
+## Phase C Evidence
+
+- Implemented `3F` (Tigervision-style) mapper behavior with switchable lower 2K window and fixed upper 2K window.
+- Added deterministic rare/homebrew fallback mode (`fallback`) for non-standard mapper cases.
+- Updated mapper write routing to observe low-address switch writes while keeping prior mapper paths intact.
+- Added dedicated edge-case tests: `Atari2600MapperPhaseCTests`.
+
+Focused command:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter=Atari2600MapperPhaseATests.*:Atari2600MapperPhaseBTests.*:Atari2600MapperPhaseCTests.*:Atari2600TimingSpikeHarnessTests.* --gtest_brief=1
+```
+
+Observed result snapshot:
+
+- `[==========] 18 tests from 4 test suites ran.`
+
 ## Related Research
 
 - [Atari 2600 Bankswitching and Cartridge Formats](../research/platform-parity/atari-2600/bankswitching.md)

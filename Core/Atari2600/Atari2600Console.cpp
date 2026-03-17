@@ -20,6 +20,8 @@ private:
 		F4,
 		FE,
 		E0,
+			Mapper3F,
+			RareFallback,
 		Unknown
 	};
 
@@ -29,6 +31,12 @@ private:
 	uint8_t _activeBank = 0;
 	uint8_t _segmentBanks[3] = {4, 5, 6};
 	uint8_t _fixedSegmentBank = 7;
+		size_t _fallbackBankSize = 0x1000;
+		uint8_t _fallbackBankCount = 1;
+
+	[[nodiscard]] uint8_t ClampBankCount(size_t bankCount) const {
+		return (uint8_t)std::min<size_t>(255, std::max<size_t>(1, bankCount));
+	}
 
 	[[nodiscard]] bool HasHint(std::string_view token) const {
 		return _romName.find(token) != string::npos;
@@ -42,6 +50,8 @@ private:
 			_segmentBanks[1] = 5;
 			_segmentBanks[2] = 6;
 			_fixedSegmentBank = 7;
+			_fallbackBankSize = 0x1000;
+			_fallbackBankCount = 1;
 			return;
 		}
 
@@ -66,6 +76,22 @@ private:
 			return;
 		}
 
+		if (HasHint("-3f") || HasHint("_3f") || HasHint("mapper3f") || HasHint("tigervision")) {
+			_mode = MapperMode::Mapper3F;
+			_activeBank = 0;
+			_fallbackBankSize = 0x0800;
+			_fallbackBankCount = ClampBankCount(_rom.size() / _fallbackBankSize);
+			return;
+		}
+
+		if (HasHint("rare") || HasHint("homebrew") || HasHint("mapper-unknown") || HasHint("mapperunknown")) {
+			_mode = MapperMode::RareFallback;
+			_activeBank = 0;
+			_fallbackBankSize = 0x1000;
+			_fallbackBankCount = ClampBankCount(_rom.size() / _fallbackBankSize);
+			return;
+		}
+
 		size_t size = _rom.size();
 		if (size <= 2048) {
 			_mode = MapperMode::Fixed2K;
@@ -83,8 +109,10 @@ private:
 			_mode = MapperMode::F4;
 			_activeBank = 0;
 		} else {
-			_mode = MapperMode::Unknown;
+			_mode = MapperMode::RareFallback;
 			_activeBank = 0;
+			_fallbackBankSize = 0x1000;
+			_fallbackBankCount = ClampBankCount(_rom.size() / _fallbackBankSize);
 		}
 	}
 
@@ -106,29 +134,34 @@ private:
 				}
 				break;
 
-				case MapperMode::F4:
-					if (addr >= 0x1FF4 && addr <= 0x1FFB) {
-						_activeBank = (uint8_t)(addr - 0x1FF4);
-					}
-					break;
+			case MapperMode::F4:
+				if (addr >= 0x1FF4 && addr <= 0x1FFB) {
+					_activeBank = (uint8_t)(addr - 0x1FF4);
+				}
+				break;
 
-				case MapperMode::FE:
-					if (addr == 0x1FFE) {
-						_activeBank = 0;
-					} else if (addr == 0x1FFF) {
-						_activeBank = 1;
-					}
-					break;
+			case MapperMode::FE:
+				if (addr == 0x1FFE) {
+					_activeBank = 0;
+				} else if (addr == 0x1FFF) {
+					_activeBank = 1;
+				}
+				break;
 
-				case MapperMode::E0:
-					if (addr >= 0x1FE0 && addr <= 0x1FE7) {
-						_segmentBanks[0] = (uint8_t)(addr & 0x07);
-					} else if (addr >= 0x1FE8 && addr <= 0x1FEF) {
-						_segmentBanks[1] = (uint8_t)(addr & 0x07);
-					} else if (addr >= 0x1FF0 && addr <= 0x1FF7) {
-						_segmentBanks[2] = (uint8_t)(addr & 0x07);
-					}
-					break;
+			case MapperMode::E0:
+				if (addr >= 0x1FE0 && addr <= 0x1FE7) {
+					_segmentBanks[0] = (uint8_t)(addr & 0x07);
+				} else if (addr >= 0x1FE8 && addr <= 0x1FEF) {
+					_segmentBanks[1] = (uint8_t)(addr & 0x07);
+				} else if (addr >= 0x1FF0 && addr <= 0x1FF7) {
+					_segmentBanks[2] = (uint8_t)(addr & 0x07);
+				}
+				break;
+
+			case MapperMode::Mapper3F:
+			case MapperMode::RareFallback:
+				// Write-driven modes; read-side hotspots are intentionally ignored.
+				break;
 
 			default:
 				break;
@@ -154,21 +187,33 @@ private:
 			case MapperMode::F6:
 				return ((size_t)_activeBank * 0x1000) + (cartAddr & 0x0FFF);
 
-				case MapperMode::F4:
-					return ((size_t)_activeBank * 0x1000) + (cartAddr & 0x0FFF);
+			case MapperMode::F4:
+				return ((size_t)_activeBank * 0x1000) + (cartAddr & 0x0FFF);
 
-				case MapperMode::FE:
-					return ((size_t)_activeBank * 0x1000) + (cartAddr & 0x0FFF);
+			case MapperMode::FE:
+				return ((size_t)_activeBank * 0x1000) + (cartAddr & 0x0FFF);
 
-				case MapperMode::E0:
-					if (cartAddr < 0x0400) {
-						return ((size_t)_segmentBanks[0] * 0x0400) + (cartAddr & 0x03FF);
-					} else if (cartAddr < 0x0800) {
-						return ((size_t)_segmentBanks[1] * 0x0400) + (cartAddr & 0x03FF);
-					} else if (cartAddr < 0x0C00) {
-						return ((size_t)_segmentBanks[2] * 0x0400) + (cartAddr & 0x03FF);
-					}
-					return ((size_t)_fixedSegmentBank * 0x0400) + (cartAddr & 0x03FF);
+			case MapperMode::E0:
+				if (cartAddr < 0x0400) {
+					return ((size_t)_segmentBanks[0] * 0x0400) + (cartAddr & 0x03FF);
+				} else if (cartAddr < 0x0800) {
+					return ((size_t)_segmentBanks[1] * 0x0400) + (cartAddr & 0x03FF);
+				} else if (cartAddr < 0x0C00) {
+					return ((size_t)_segmentBanks[2] * 0x0400) + (cartAddr & 0x03FF);
+				}
+				return ((size_t)_fixedSegmentBank * 0x0400) + (cartAddr & 0x03FF);
+
+			case MapperMode::Mapper3F: {
+				size_t bankCount = std::max<size_t>(1, _fallbackBankCount);
+				size_t fixedBank = bankCount - 1;
+				if (cartAddr < 0x0800) {
+					return ((size_t)(_activeBank % bankCount) * 0x0800) + (cartAddr & 0x07FF);
+				}
+				return (fixedBank * 0x0800) + (cartAddr & 0x07FF);
+			}
+
+			case MapperMode::RareFallback:
+				return ((size_t)_activeBank * _fallbackBankSize) + (cartAddr & (uint16_t)(_fallbackBankSize - 1));
 
 			case MapperMode::Unknown:
 				return cartAddr % _rom.size();
@@ -203,6 +248,16 @@ public:
 	}
 
 	void Write(uint16_t addr, uint8_t value) {
+		if (_mode == MapperMode::Mapper3F && (addr & 0x1FC0) == 0x0000 && _fallbackBankCount > 0) {
+			_activeBank = (uint8_t)(value % _fallbackBankCount);
+			return;
+		}
+
+		if (_mode == MapperMode::RareFallback && addr >= 0x1000 && addr <= 0x1FFF && _fallbackBankCount > 0) {
+			_activeBank = (uint8_t)(value % _fallbackBankCount);
+			return;
+		}
+
 		(void)value;
 		HandleBankswitch(addr);
 	}
@@ -220,6 +275,8 @@ public:
 			case MapperMode::F4: return "f4";
 			case MapperMode::FE: return "fe";
 			case MapperMode::E0: return "e0";
+				case MapperMode::Mapper3F: return "3f";
+				case MapperMode::RareFallback: return "fallback";
 			case MapperMode::Unknown: return "unknown";
 			default: return "none";
 		}
@@ -353,12 +410,12 @@ class Atari2600Riot {
 
 		void Write(uint16_t addr, uint8_t value) {
 			addr &= 0x1FFF;
+			if (_mapper) {
+				_mapper->Write(addr, value);
+			}
+
 			if ((addr & 0x1080) == 0x0080 && _riot) {
 				_riot->WriteRegister(addr, value);
-				return;
-			}
-			if ((addr & 0x1000) == 0x1000 && _mapper) {
-				_mapper->Write(addr, value);
 				return;
 			}
 			if (_tia && ((addr & 0x3F) == 0x02)) {
