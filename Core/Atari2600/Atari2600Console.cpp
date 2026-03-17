@@ -392,6 +392,49 @@ class Atari2600Riot {
 			_state.RenderRevision++;
 		}
 
+		void MarkAudioDirty() {
+			_state.AudioRevision++;
+		}
+
+		[[nodiscard]] static uint8_t ComputeChannelSample(uint8_t control, uint8_t phase, uint8_t volume) {
+			if (volume == 0) {
+				return 0;
+			}
+
+			uint8_t mode = (uint8_t)(control & 0x03);
+			switch (mode) {
+				case 0:
+					return volume;
+				case 1:
+					return (phase & 0x01) ? volume : 0;
+				case 2:
+					return (phase & 0x03) < 2 ? volume : 0;
+				default:
+					return (phase & 0x07) == 0 ? volume : 0;
+			}
+		}
+
+		void StepAudio() {
+			auto advanceChannel = [](uint16_t& counter, uint8_t frequency, uint8_t& phase, uint8_t control) {
+				if (counter > 0) {
+					counter--;
+				}
+				if (counter == 0) {
+					counter = (uint16_t)(frequency + 1);
+					phase = (uint8_t)((phase + 1 + (control & 0x01)) & 0x0F);
+				}
+			};
+
+			advanceChannel(_state.AudioCounter0, _state.AudioFrequency0, _state.AudioPhase0, _state.AudioControl0);
+			advanceChannel(_state.AudioCounter1, _state.AudioFrequency1, _state.AudioPhase1, _state.AudioControl1);
+
+			uint8_t sample0 = ComputeChannelSample(_state.AudioControl0, _state.AudioPhase0, _state.AudioVolume0);
+			uint8_t sample1 = ComputeChannelSample(_state.AudioControl1, _state.AudioPhase1, _state.AudioVolume1);
+			_state.LastMixedSample = (uint8_t)std::min<uint16_t>(31, (uint16_t)sample0 + sample1);
+			_state.AudioMixAccumulator += _state.LastMixedSample;
+			_state.AudioSampleCount++;
+		}
+
 		void AdvanceScanline() {
 			_state.ColorClock = 0;
 			_state.Scanline++;
@@ -417,6 +460,8 @@ class Atari2600Riot {
 			_state.Player0X = 24;
 			_state.Player1X = 96;
 			_state.BallX = 80;
+			_state.AudioCounter0 = 1;
+			_state.AudioCounter1 = 1;
 		}
 
 		void StepCpuCycles(uint32_t cpuCycles) {
@@ -426,6 +471,7 @@ class Atari2600Riot {
 					AdvanceScanline();
 				}
 				StepColorClocks(3);
+				StepAudio();
 				if (_state.HmovePending) {
 					_state.HmovePending = false;
 					_state.HmoveApplyCount++;
@@ -459,6 +505,12 @@ class Atari2600Riot {
 				case 0x1D: return _state.Missile0Enabled ? 0x02 : 0x00;
 				case 0x1E: return _state.Missile1Enabled ? 0x02 : 0x00;
 				case 0x1F: return _state.BallEnabled ? 0x02 : 0x00;
+				case 0x15: return _state.AudioControl0;
+				case 0x16: return _state.AudioControl1;
+				case 0x17: return _state.AudioFrequency0;
+				case 0x18: return _state.AudioFrequency1;
+				case 0x19: return _state.AudioVolume0;
+				case 0x1A: return _state.AudioVolume1;
 				default: return 0;
 			}
 		}
@@ -528,6 +580,38 @@ class Atari2600Riot {
 					MarkRenderDirty();
 					break;
 
+				case 0x15:
+					_state.AudioControl0 = value;
+					MarkAudioDirty();
+					break;
+
+				case 0x16:
+					_state.AudioControl1 = value;
+					MarkAudioDirty();
+					break;
+
+				case 0x17:
+					_state.AudioFrequency0 = (uint8_t)(value & 0x1F);
+					_state.AudioCounter0 = (uint16_t)(_state.AudioFrequency0 + 1);
+					MarkAudioDirty();
+					break;
+
+				case 0x18:
+					_state.AudioFrequency1 = (uint8_t)(value & 0x1F);
+					_state.AudioCounter1 = (uint16_t)(_state.AudioFrequency1 + 1);
+					MarkAudioDirty();
+					break;
+
+				case 0x19:
+					_state.AudioVolume0 = (uint8_t)(value & 0x0F);
+					MarkAudioDirty();
+					break;
+
+				case 0x1A:
+					_state.AudioVolume1 = (uint8_t)(value & 0x0F);
+					MarkAudioDirty();
+					break;
+
 				case 0x1B:
 					_state.Player0Graphics = value;
 					MarkRenderDirty();
@@ -560,6 +644,16 @@ class Atari2600Riot {
 
 		Atari2600TiaState GetState() const {
 			return _state;
+		}
+
+		void ResetAudioHistory() {
+			_state.AudioCounter0 = (uint16_t)(_state.AudioFrequency0 + 1);
+			_state.AudioCounter1 = (uint16_t)(_state.AudioFrequency1 + 1);
+			_state.AudioPhase0 = 0;
+			_state.AudioPhase1 = 0;
+			_state.LastMixedSample = 0;
+			_state.AudioMixAccumulator = 0;
+			_state.AudioSampleCount = 0;
 		}
 	};
 
@@ -1102,11 +1196,27 @@ RomFormat Atari2600Console::GetRomFormat() {
 }
 
 AudioTrackInfo Atari2600Console::GetAudioTrackInfo() {
-	return {};
+	Atari2600TiaState tiaState = _tia->GetState();
+	AudioTrackInfo info = {};
+	info.GameTitle = "Atari 2600";
+	info.SongTitle = "TIA two-channel mixer";
+	info.Comment = "sample=" + std::to_string(tiaState.LastMixedSample) + ", revision=" + std::to_string(tiaState.AudioRevision);
+	info.Position = (double)tiaState.AudioSampleCount / GetMasterClockRate();
+	info.Length = 0;
+	info.FadeLength = 0;
+	info.TrackNumber = 1;
+	info.TrackCount = 1;
+	return info;
 }
 
 void Atari2600Console::ProcessAudioPlayerAction(AudioPlayerActionParams p) {
-	(void)p;
+	switch (p.Action) {
+		case AudioPlayerAction::NextTrack:
+		case AudioPlayerAction::PrevTrack:
+		case AudioPlayerAction::SelectTrack:
+			_tia->ResetAudioHistory();
+			break;
+	}
 }
 
 AddressInfo Atari2600Console::GetAbsoluteAddress(AddressInfo& relAddress) {

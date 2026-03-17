@@ -571,6 +571,7 @@ switch to the main branch, fix the `MovieConverter System.IO.Hashing CS0234 erro
 
 continue scaffolding and making plans and issues until you are done, and then start working on the new issues; continue;
 
+[Nexen] just keep working and go as long as you can; continue;
 
 
 

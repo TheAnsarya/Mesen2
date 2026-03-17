@@ -52,6 +52,20 @@ struct Atari2600TiaState {
 	uint8_t Player1X = 96;
 	uint8_t BallX = 80;
 	uint32_t RenderRevision = 0;
+	uint8_t AudioControl0 = 0;
+	uint8_t AudioControl1 = 0;
+	uint8_t AudioFrequency0 = 0;
+	uint8_t AudioFrequency1 = 0;
+	uint8_t AudioVolume0 = 0;
+	uint8_t AudioVolume1 = 0;
+	uint16_t AudioCounter0 = 1;
+	uint16_t AudioCounter1 = 1;
+	uint8_t AudioPhase0 = 0;
+	uint8_t AudioPhase1 = 0;
+	uint8_t LastMixedSample = 0;
+	uint64_t AudioMixAccumulator = 0;
+	uint64_t AudioSampleCount = 0;
+	uint32_t AudioRevision = 0;
 	uint64_t TotalColorClocks = 0;
 };
 
