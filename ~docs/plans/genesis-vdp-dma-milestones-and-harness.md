@@ -203,9 +203,26 @@ Updated validation result after save-state determinism integration:
 - Full native regression: 1711 tests from 138 suites passed.
 - Managed regression: 331 tests passed.
 
+### Issue [#739](https://github.com/TheAnsarya/Nexen/issues/739)
+
+- Added deterministic Genesis performance gate harness (`GenesisSmokeHarness::RunPerformanceGate`) with machine-readable output lines:
+	- `GEN_PERF_RESULT <title> <PASS|FAIL> CLASS=<class> ELAPSED_US=<n> BUDGET_US=<n> DIGEST=<hash>`
+	- `GEN_PERF_GATE_SUMMARY PASS=<n> FAIL=<n> BUDGET_US=<n> DIGEST=<hash>`
+- Added deterministic performance-gate digest composition independent of wall-clock timing jitter.
+- Added restore/replay deterministic checkpoint gating inside performance execution path to keep correctness first.
+- Added focused `GenesisPerformanceGateTests` to validate:
+	- deterministic performance-gate digest stability across repeated runs,
+	- strict-budget failure path behavior.
+
+Updated validation result after performance gate integration:
+
+- Focused Genesis tests: 40 tests from 14 suites passed.
+- Full native regression: 1713 tests from 139 suites passed.
+- Managed regression: 331 tests passed.
+
 ## Deferred Future-Work Linkage
 
-Status: Future Work by default. Issue [#738](https://github.com/TheAnsarya/Nexen/issues/738) has been promoted and completed in this execution sprint.
+Status: Future Work by default. Issues [#738](https://github.com/TheAnsarya/Nexen/issues/738) and [#739](https://github.com/TheAnsarya/Nexen/issues/739) have been promoted and completed in this execution sprint.
 
 - Parent future-work epic: [#718](https://github.com/TheAnsarya/Nexen/issues/718)
 - VDP register semantics follow-through: [#730](https://github.com/TheAnsarya/Nexen/issues/730)
@@ -214,6 +231,7 @@ Status: Future Work by default. Issue [#738](https://github.com/TheAnsarya/Nexen
 - H/V interrupt scheduling follow-through: [#733](https://github.com/TheAnsarya/Nexen/issues/733)
 - Sonic/Jurassic compatibility harness execution: [#737](https://github.com/TheAnsarya/Nexen/issues/737)
 - Save-state serialization and replay determinism gates: [#738](https://github.com/TheAnsarya/Nexen/issues/738) (completed)
+- Performance gate execution after correctness stabilization: [#739](https://github.com/TheAnsarya/Nexen/issues/739) (completed)
 
 ## Related Research
 

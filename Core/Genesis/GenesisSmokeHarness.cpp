@@ -130,3 +130,90 @@ GenesisCompatibilityMatrixResult GenesisSmokeHarness::RunCompatibilityMatrix(Gen
 	result.OutputLines.push_back(std::format("GEN_COMPAT_MATRIX_SUMMARY PASS={} FAIL={} DIGEST={}", result.PassCount, result.FailCount, result.Digest));
 	return result;
 }
+
+GenesisPerformanceGateResult GenesisSmokeHarness::RunPerformanceGate(GenesisM68kBoundaryScaffold& scaffold, const vector<GenesisCompatibilityRomCase>& romSet, uint64_t budgetMicros) {
+	GenesisPerformanceGateResult result = {};
+	result.BudgetMicros = budgetMicros;
+	result.Entries.reserve(romSet.size());
+
+	for (const GenesisCompatibilityRomCase& romCase : romSet) {
+		GenesisPerformanceGateEntry entry = {};
+		entry.Name = romCase.Name;
+		entry.TitleClass = InferTitleClass(romCase.Name);
+
+		if (romCase.RomData.empty()) {
+			entry.Pass = false;
+			entry.DeterministicDigest = ToHex(0);
+			result.FailCount++;
+			result.OutputLines.push_back(std::format("GEN_PERF_RESULT {} FAIL CLASS={} ELAPSED_US=0 BUDGET_US={} DIGEST={}", entry.Name, entry.TitleClass, budgetMicros, entry.DeterministicDigest));
+			result.Entries.push_back(std::move(entry));
+			continue;
+		}
+
+		auto start = std::chrono::steady_clock::now();
+
+		GenesisCompatibilityMatrixResult compatibility = RunCompatibilityMatrix(scaffold, {romCase});
+		bool compatibilityPass = compatibility.FailCount == 0 && compatibility.PassCount == 1;
+		string compatibilityDigest = compatibility.Digest;
+
+		scaffold.LoadRom(romCase.RomData);
+		scaffold.Startup();
+		scaffold.StepFrameScaffold(640);
+		GenesisBoundaryScaffoldSaveState baseline = scaffold.SaveState();
+		scaffold.StepFrameScaffold(1440);
+		GenesisBoundaryScaffoldSaveState firstRun = scaffold.SaveState();
+		scaffold.LoadState(baseline);
+		scaffold.StepFrameScaffold(1440);
+		GenesisBoundaryScaffoldSaveState replayRun = scaffold.SaveState();
+		bool replayPass = firstRun == replayRun;
+
+		auto end = std::chrono::steady_clock::now();
+		entry.ElapsedMicros = (uint64_t)std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+		string deterministicInput = std::format(
+			"{}:{}:{}:{}:{}:{}",
+			entry.Name,
+			entry.TitleClass,
+			compatibilityDigest,
+			firstRun.Bus.MixedDigest,
+			replayRun.Bus.MixedDigest,
+			replayPass ? "1" : "0");
+
+		uint64_t hash = 1469598103934665603ull;
+		for (uint8_t ch : deterministicInput) {
+			hash ^= ch;
+			hash *= 1099511628211ull;
+		}
+		entry.DeterministicDigest = ToHex(hash);
+
+		entry.Pass = compatibilityPass && replayPass && entry.ElapsedMicros <= budgetMicros;
+		if (entry.Pass) {
+			result.PassCount++;
+		} else {
+			result.FailCount++;
+		}
+
+		result.OutputLines.push_back(std::format(
+			"GEN_PERF_RESULT {} {} CLASS={} ELAPSED_US={} BUDGET_US={} DIGEST={}",
+			entry.Name,
+			entry.Pass ? "PASS" : "FAIL",
+			entry.TitleClass,
+			entry.ElapsedMicros,
+			budgetMicros,
+			entry.DeterministicDigest));
+		result.Entries.push_back(std::move(entry));
+	}
+
+	uint64_t gateHash = 1469598103934665603ull;
+	for (const GenesisPerformanceGateEntry& entry : result.Entries) {
+		string line = std::format("{}:{}:{}:{}", entry.Name, entry.Pass ? "PASS" : "FAIL", entry.TitleClass, entry.DeterministicDigest);
+		for (uint8_t ch : line) {
+			gateHash ^= ch;
+			gateHash *= 1099511628211ull;
+		}
+	}
+
+	result.Digest = ToHex(gateHash);
+	result.OutputLines.push_back(std::format("GEN_PERF_GATE_SUMMARY PASS={} FAIL={} BUDGET_US={} DIGEST={}", result.PassCount, result.FailCount, result.BudgetMicros, result.Digest));
+	return result;
+}
