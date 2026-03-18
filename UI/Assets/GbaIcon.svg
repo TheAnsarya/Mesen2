@@ -1,1 +1,8 @@
-<svg fill="#1e88e5" xmlns="http://www.w3.org/2000/svg" id="mdi-gamepad-round" viewBox="0 0 24 24"><path transform="translate(12 12) scale(1.08) translate(-12 -12)" d="M4,8H8V4A2,2 0 0,1 10,2H14A2,2 0 0,1 16,4V8H20A2,2 0 0,1 22,10V14A2,2 0 0,1 20,16H16V20A2,2 0 0,1 14,22H10A2,2 0 0,1 8,20V16H4A2,2 0 0,1 2,14V10A2,2 0 0,1 4,8Z" /></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+	<rect x="2" y="7" width="20" height="10" rx="5" fill="#1e88e5"/>
+	<rect x="7" y="8.7" width="10" height="5" rx="1" fill="#0d47a1"/>
+	<rect x="4.5" y="10.8" width="2.4" height="0.9" rx="0.3" fill="#e3f2fd"/>
+	<rect x="5.25" y="10.05" width="0.9" height="2.4" rx="0.3" fill="#e3f2fd"/>
+	<circle cx="18" cy="11" r="0.8" fill="#90caf9"/>
+	<circle cx="19.5" cy="12.5" r="0.8" fill="#90caf9"/>
+</svg>

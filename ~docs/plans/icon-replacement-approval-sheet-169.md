@@ -55,3 +55,4 @@ Reference catalogs:
 - Help B2 uses a slightly smaller white ? on blue.
 - Second pass continues the same ColorBold aesthetic for the next highest-usage icons from inventory.
 - Third pass extends the same ColorBold aesthetic to system/platform icons and frequent utility icons.
+- Third-pass system/platform SVGs were redesigned after feedback to replace generic controller glyphs.

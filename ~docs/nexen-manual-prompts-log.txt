@@ -593,6 +593,7 @@ yes please do that: "continue immediately with a second SVG pass for the next hi
 
 Add a dedicated second-pass tag (similar to the first icon-origin tag) for tighter rollback checkpoints.; Run pass 3 on the next inventory group (system/platform icons and frequent utility icons) with the same ColorBold aesthetic.; continue;
 
+The `Third Pass: System/Platform` icons are all garbage, although the `Frequent Utility` ones seem fine and the Lynx icon is nice; like the snes logo should be a version of the four colored snes icon; find better icons; continue; 
 
 
 
