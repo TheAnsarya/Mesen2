@@ -591,6 +591,7 @@ There was a previous code effort that changed Nexen to use svg icons, reimplemen
 
 yes please do that: "continue immediately with a second SVG pass for the next highest-usage icon group from the inventory and keep the same aesthetic"; continue;
 
+Add a dedicated second-pass tag (similar to the first icon-origin tag) for tighter rollback checkpoints.; Run pass 3 on the next inventory group (system/platform icons and frequent utility icons) with the same ColorBold aesthetic.; continue;
 
 
 

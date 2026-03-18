@@ -45,7 +45,16 @@ $map = @(
 	@{ Current = "Function.png"; Mdi = "function-variant"; Color = "#8e24aa" },
 	@{ Current = "Enum.png"; Mdi = "format-list-numbered"; Color = "#00838f" },
 	@{ Current = "Drive.png"; Mdi = "harddisk"; Color = "#546e7a" },
-	@{ Current = "CheatCode.png"; Mdi = "code-tags"; Color = "#5e35b1" }
+	@{ Current = "CheatCode.png"; Mdi = "code-tags"; Color = "#5e35b1" },
+	@{ Current = "EditLabel.png"; Mdi = "label-outline"; Color = "#5e35b1" },
+	@{ Current = "NesIcon.png"; Mdi = "gamepad-variant"; Color = "#e53935" },
+	@{ Current = "SnesIcon.png"; Mdi = "gamepad-square"; Color = "#8e24aa" },
+	@{ Current = "GameboyIcon.png"; Mdi = "nintendo-game-boy"; Color = "#43a047" },
+	@{ Current = "GbaIcon.png"; Mdi = "gamepad-round"; Color = "#1e88e5" },
+	@{ Current = "PceIcon.png"; Mdi = "chip"; Color = "#00897b" },
+	@{ Current = "SmsIcon.png"; Mdi = "controller-classic"; Color = "#fb8c00" },
+	@{ Current = "WsIcon.png"; Mdi = "cards-playing-outline"; Color = "#546e7a" },
+	@{ Current = "LynxIcon.png"; Mdi = "paw"; Color = "#6d4c41" }
 )
 
 $results = New-Object System.Collections.Generic.List[object]

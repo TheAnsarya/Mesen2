@@ -57,6 +57,26 @@ Source set:
 | <img src="../../UI/Assets/NextArrow.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/NextArrow.svg" width="24" /> | NextArrow.png -> chevron-right | Next blue accent |
 | <img src="../../UI/Assets/PreviousArrow.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/PreviousArrow.svg" width="24" /> | PreviousArrow.png -> chevron-left | Previous blue accent |
 
+## Third Pass: System/Platform + Frequent Utility Group
+
+| Current | Proposed (ColorBold SVG) | Mapping | Color Intent |
+|---|---|---|---|
+| <img src="../../UI/Assets/NesIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/NesIcon.svg" width="24" /> | NesIcon.png -> gamepad-variant | NES red accent |
+| <img src="../../UI/Assets/SnesIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/SnesIcon.svg" width="24" /> | SnesIcon.png -> gamepad-square | SNES purple accent |
+| <img src="../../UI/Assets/GameboyIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/GameboyIcon.svg" width="24" /> | GameboyIcon.png -> nintendo-game-boy | GB green accent |
+| <img src="../../UI/Assets/GbaIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/GbaIcon.svg" width="24" /> | GbaIcon.png -> gamepad-round | GBA blue accent |
+| <img src="../../UI/Assets/PceIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/PceIcon.svg" width="24" /> | PceIcon.png -> chip | PCE teal accent |
+| <img src="../../UI/Assets/SmsIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/SmsIcon.svg" width="24" /> | SmsIcon.png -> controller-classic | SMS amber accent |
+| <img src="../../UI/Assets/WsIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/WsIcon.svg" width="24" /> | WsIcon.png -> cards-playing-outline | WS slate accent |
+| <img src="../../UI/Assets/LynxIcon.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/LynxIcon.svg" width="24" /> | LynxIcon.png -> paw | Lynx brown accent |
+| <img src="../../UI/Assets/EditLabel.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/EditLabel.svg" width="24" /> | EditLabel.png -> label-outline | Label purple accent |
+| <img src="../../UI/Assets/Add.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Add.svg" width="24" /> | Add.png -> plus-thick | Add green accent |
+| <img src="../../UI/Assets/Copy.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Copy.svg" width="24" /> | Copy.png -> content-copy | Copy indigo accent |
+| <img src="../../UI/Assets/Paste.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Paste.svg" width="24" /> | Paste.png -> content-paste | Paste brown accent |
+| <img src="../../UI/Assets/Reload.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Reload.svg" width="24" /> | Reload.png -> reload | Reload blue accent |
+| <img src="../../UI/Assets/SaveFloppy.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/SaveFloppy.svg" width="24" /> | SaveFloppy.png -> content-save | Save blue accent |
+| <img src="../../UI/Assets/Undo.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Undo.svg" width="24" /> | Undo.png -> undo | Undo brown accent |
+
 ## Notes
 
 - Candidate assets only. No production icon references were changed.
@@ -64,4 +84,5 @@ Source set:
 - Help icon uses a white question glyph on blue for better contrast, with a slightly smaller question mark.
 - Batch 2 glyphs are slightly scaled up for better readability, with an extra-bold larger close X.
 - Second-pass icons continue the same ColorBold visual language for additional high-usage assets.
+- Third-pass icons continue the same ColorBold visual language for platform/system and utility assets.
 - If approved, the next step is to replace icon paths in small grouped commits and validate after each group.

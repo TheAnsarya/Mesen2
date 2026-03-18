@@ -32,6 +32,21 @@ Reference catalogs:
 | Function.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
 | NextArrow.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
 | PreviousArrow.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
+| NesIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| SnesIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| GameboyIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| GbaIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| PceIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| SmsIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| WsIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| LynxIcon.png | [ ] | [x] | [ ] | B2 (pass3 system/platform) |
+| EditLabel.png | [ ] | [x] | [ ] | B2 (pass3 utility) |
+| Add.png | [ ] | [x] | [ ] | B2 (pass3 utility) |
+| Copy.png | [ ] | [x] | [ ] | B2 (pass3 utility) |
+| Paste.png | [ ] | [x] | [ ] | B2 (pass3 utility) |
+| Reload.png | [ ] | [x] | [ ] | B2 (pass3 utility) |
+| SaveFloppy.png | [ ] | [x] | [ ] | B2 (pass3 utility) |
+| Undo.png | [ ] | [x] | [ ] | B2 (pass3 utility) |
 
 ## Notes
 
@@ -39,3 +54,4 @@ Reference catalogs:
 - First replacement commit will be limited to this initial set for easy rollback/review.
 - Help B2 uses a slightly smaller white ? on blue.
 - Second pass continues the same ColorBold aesthetic for the next highest-usage icons from inventory.
+- Third pass extends the same ColorBold aesthetic to system/platform icons and frequent utility icons.
