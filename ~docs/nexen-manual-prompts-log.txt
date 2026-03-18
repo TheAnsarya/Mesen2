@@ -577,11 +577,17 @@ continue scaffolding and making plans and issues until you are done, and then st
 
 [Nexen] just keep working and go as long as you can; continue;
 
+can you find scalable icon assets that are equivalent to what we have to replace or at least some of them, so they look good small but also scale up; we need to work through issue #169 as we can to replace icons as we find replacements; always consult me on whether an icon can replace another by showing me both before commiting to the change; continue;
 
+Do not use these icons, they are monochrome and lame; we don't need full color and graphics but we need something bolder and some color is necessary for things like record error warning help etc, and flat black outlines are not good icons; continue;
 
+I do not like Batch 3 icons, Batch 2 icons are mostly great except: record and stop look exactly alike, leave record alone and make stop into a red square, make close a Red X instead of a circle, make play a green triangle instead of in a a green circle, and make pause a yellow || instead of in a circle, make the "?" in help white instea of black, make reset settings bold and a lighter purple, make the debugger bug green; continue;
 
+by "leave record alone" for the record icon, i mean keep the curent batch 2 record icon, not the old mesen one, and make the "?" in the help icon smaller, and make all the icon replacements slightly larger, make close x bold and bigger, continue;
 
+I love these new batch 2 icons, save them! implement them! attack other icons with this same ethos and aesthetic; make a tag for this commit so we know where these icons came from; continue;
 
+There was a previous code effort that changed Nexen to use svg icons, reimplement that so we are using the real icons and not png bs with tiny images, unless this causes a performance hit; avalonia has svg  support and so does Nexen; continue;
 
 
 

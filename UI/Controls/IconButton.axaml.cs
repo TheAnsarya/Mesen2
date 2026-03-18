@@ -20,7 +20,7 @@ public class IconButton : Button {
 	}
 
 	static IconButton() {
-		IconProperty.Changed.AddClassHandler<IconButton>((x, e) => x.GetControl<Image>("IconImage").Source = ImageUtilities.BitmapFromAsset(x.Icon));
+		IconProperty.Changed.AddClassHandler<IconButton>((x, e) => x.GetControl<Image>("IconImage").Source = ImageUtilities.ImageFromAsset(x.Icon));
 	}
 
 	public IconButton() {

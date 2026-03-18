@@ -328,9 +328,9 @@ public class ScriptWindow : NexenWindow, INotificationHandler {
 		public IImage Image {
 			get {
 				if (_enumName != null) {
-					return ImageUtilities.BitmapFromAsset("Assets/Enum.png")!;
+					return ImageUtilities.ImageFromAsset("Assets/Enum.png")!;
 				} else {
-					return ImageUtilities.BitmapFromAsset(CodeCompletionHelper.GetEntry(Text)?.EnumValues.Count > 0 ? "Assets/Enum.png" : "Assets/Function.png")!;
+					return ImageUtilities.ImageFromAsset(CodeCompletionHelper.GetEntry(Text)?.EnumValues.Count > 0 ? "Assets/Enum.png" : "Assets/Function.png")!;
 				}
 			}
 		}

@@ -103,7 +103,7 @@
 			<TabItem Content="{Binding Video}">
 				<TabItem.Header>
 					<StackPanel Orientation="Horizontal">
-						<Image Source="/Assets/VideoOptions.png" Margin="0 0 10 0" />
+						<Image Source="/Assets/VideoOptions.svg" Margin="0 0 10 0" />
 						<TextBlock VerticalAlignment="Center" Text="{l:Translate tabVideo}" />
 					</StackPanel>
 				</TabItem.Header>
@@ -205,7 +205,7 @@
 			<TabItem Content="{Binding Preferences}">
 				<TabItem.Header>
 					<StackPanel Orientation="Horizontal">
-						<Image Source="/Assets/Settings.png" Margin="0 0 10 0" />
+						<Image Source="/Assets/Settings.svg" Margin="0 0 10 0" />
 						<TextBlock VerticalAlignment="Center" Text="{l:Translate tabPreferences}" />
 					</StackPanel>
 				</TabItem.Header>
