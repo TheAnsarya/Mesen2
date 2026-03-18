@@ -25,9 +25,17 @@ Reference catalogs:
 | Close.png | [ ] | [x] | [ ] | B2 (red X, bolder/larger) |
 | Settings.png | [ ] | [x] | [ ] | B2 |
 | Find.png | [ ] | [x] | [ ] | B2 |
+| CheatCode.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
+| Enum.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
+| Edit.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
+| Drive.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
+| Function.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
+| NextArrow.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
+| PreviousArrow.png | [ ] | [x] | [ ] | B2 (pass2 high-usage) |
 
 ## Notes
 
 - I will only apply approved rows.
 - First replacement commit will be limited to this initial set for easy rollback/review.
 - Help B2 uses a slightly smaller white ? on blue.
+- Second pass continues the same ColorBold aesthetic for the next highest-usage icons from inventory.

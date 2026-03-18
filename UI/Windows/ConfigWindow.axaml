@@ -190,7 +190,7 @@
 			<TabItem Content="{Binding OtherConsoles}">
 				<TabItem.Header>
 					<StackPanel Orientation="Horizontal">
-						<Image Source="/Assets/Drive.png" Margin="0 0 10 0" />
+						<Image Source="/Assets/Drive.svg" Margin="0 0 10 0" />
 						<TextBlock VerticalAlignment="Center" Text="{l:Translate tabOtherConsoles}" />
 					</StackPanel>
 				</TabItem.Header>

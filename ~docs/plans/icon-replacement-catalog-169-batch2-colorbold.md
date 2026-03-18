@@ -45,10 +45,23 @@ Source set:
 | <img src="../../UI/Assets/VideoOptions.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/VideoOptions.svg" width="24" /> | VideoOptions.png -> video-outline | Video blue |
 | <img src="../../UI/Assets/Repeat.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Repeat.svg" width="24" /> | Repeat.png -> repeat | Repeat blue |
 
+## Second Pass: Next Highest-Usage Group
+
+| Current | Proposed (ColorBold SVG) | Mapping | Color Intent |
+|---|---|---|---|
+| <img src="../../UI/Assets/CheatCode.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/CheatCode.svg" width="24" /> | CheatCode.png -> code-tags | Cheats purple accent |
+| <img src="../../UI/Assets/Enum.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Enum.svg" width="24" /> | Enum.png -> format-list-numbered | Enum teal accent |
+| <img src="../../UI/Assets/Edit.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Edit.svg" width="24" /> | Edit.png -> pencil | Edit amber accent |
+| <img src="../../UI/Assets/Drive.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Drive.svg" width="24" /> | Drive.png -> harddisk | Drive slate accent |
+| <img src="../../UI/Assets/Function.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Function.svg" width="24" /> | Function.png -> function-variant | Function purple accent |
+| <img src="../../UI/Assets/NextArrow.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/NextArrow.svg" width="24" /> | NextArrow.png -> chevron-right | Next blue accent |
+| <img src="../../UI/Assets/PreviousArrow.png" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/PreviousArrow.svg" width="24" /> | PreviousArrow.png -> chevron-left | Previous blue accent |
+
 ## Notes
 
 - Candidate assets only. No production icon references were changed.
 - This batch intentionally uses stronger fills and color coding versus thin black outlines.
 - Help icon uses a white question glyph on blue for better contrast, with a slightly smaller question mark.
 - Batch 2 glyphs are slightly scaled up for better readability, with an extra-bold larger close X.
+- Second-pass icons continue the same ColorBold visual language for additional high-usage assets.
 - If approved, the next step is to replace icon paths in small grouped commits and validate after each group.
