@@ -605,7 +605,9 @@ gameboy icon is great, could it be slightly larger? snes logo does not need a wh
 
 let's see the new icon reccomendations, make them if necessary, open the document file that contains them for review; then continue with the high value continuation options: Implement #742 next: Atari 2600 deterministic edge-case expansion (RIOT/TIA/mapper interaction depth).; Implement #743 next: Genesis combined DMA/Z80/interrupt interaction tests.; Implement #748 next: CI-friendly focused commands and docs so ongoing parity work is faster to run and review.; continue;
 
+Continue with the next Atari/Genesis sub-issues from #740.
 
+I see a lot of crazy words like "provenance" and "validation checklist integration points for harness and benchmark gates"  and none of this makes sense. Please use plain language as you add a ton of issues for implementing the emulation of sega genesis make epics and subisssues and then implement them all, repeat again and again; continue; make the thing work and implement all of our plans, but don't get stuck in weird meta crap; continue;
 
 
 

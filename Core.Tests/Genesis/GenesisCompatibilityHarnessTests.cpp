@@ -32,5 +32,10 @@ namespace {
 		EXPECT_EQ(result.PassCount, 0);
 		EXPECT_EQ(result.FailCount, 1);
 		EXPECT_FALSE(result.Digest.empty());
+
+		bool hasFailContext = std::any_of(result.OutputLines.begin(), result.OutputLines.end(), [](const string& line) {
+			return line.starts_with("GEN_COMPAT_FAIL_CONTEXT ");
+		});
+		EXPECT_TRUE(hasFailContext);
 	}
 }

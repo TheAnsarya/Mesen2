@@ -51,5 +51,10 @@ namespace {
 		EXPECT_FALSE(result.Digest.empty());
 		EXPECT_FALSE(result.Entries[0].Checkpoints.empty());
 		EXPECT_FALSE(result.Entries[0].Pass);
+
+		bool hasFailContext = std::any_of(result.OutputLines.begin(), result.OutputLines.end(), [](const string& line) {
+			return line.starts_with("COMPAT_FAIL_CONTEXT ");
+		});
+		EXPECT_TRUE(hasFailContext);
 	}
 }

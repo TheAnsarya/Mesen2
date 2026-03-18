@@ -129,4 +129,20 @@ namespace {
 		EXPECT_FALSE(runA.Digest.empty());
 		EXPECT_EQ(runA.Digest, runB.Digest);
 	}
+
+	TEST(Atari2600TimingSpikeHarnessTests, BaselineRomSetFailureIncludesTriageContext) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		vector<Atari2600BaselineRomCase> romSet;
+		romSet.push_back({"broken-empty.a26", {}});
+
+		Atari2600BaselineRomSetResult result = Atari2600SmokeHarness::RunBaselineRomSet(console, romSet);
+		EXPECT_EQ(result.PassCount, 0);
+		EXPECT_EQ(result.FailCount, 1);
+
+		bool hasFailContext = std::any_of(result.OutputLines.begin(), result.OutputLines.end(), [](const string& line) {
+			return line.starts_with("ROM_FAIL_CONTEXT ");
+		});
+		EXPECT_TRUE(hasFailContext);
+	}
 }

@@ -2,11 +2,44 @@
 #include "Atari2600/Atari2600SmokeHarness.h"
 #include "Atari2600/Atari2600Console.h"
 #include "Utilities/VirtualFile.h"
+#include <numeric>
 
 namespace {
 	string ToHex(uint64_t value) {
 		return std::format("{:016x}", value);
 	}
+
+		string BuildFailedHarnessCheckpointIds(const vector<Atari2600HarnessCheckpoint>& checkpoints) {
+			vector<string> failedIds;
+			for (const Atari2600HarnessCheckpoint& checkpoint : checkpoints) {
+				if (!checkpoint.Pass) {
+					failedIds.push_back(checkpoint.Id);
+				}
+			}
+
+			if (failedIds.empty()) {
+				return "none";
+			}
+			return std::accumulate(std::next(failedIds.begin()), failedIds.end(), failedIds.front(), [](const string& left, const string& right) {
+				return left + "," + right;
+			});
+		}
+
+		string BuildFailedCompatibilityCheckpointIds(const vector<Atari2600CompatibilityCheckpoint>& checkpoints) {
+			vector<string> failedIds;
+			for (const Atari2600CompatibilityCheckpoint& checkpoint : checkpoints) {
+				if (!checkpoint.Pass) {
+					failedIds.push_back(checkpoint.Id);
+				}
+			}
+
+			if (failedIds.empty()) {
+				return "none";
+			}
+			return std::accumulate(std::next(failedIds.begin()), failedIds.end(), failedIds.front(), [](const string& left, const string& right) {
+				return left + "," + right;
+			});
+		}
 
 	string BuildDigest(const vector<Atari2600HarnessCheckpoint>& checkpoints) {
 		uint64_t hash = 1469598103934665603ull;
@@ -91,6 +124,9 @@ Atari2600HarnessResult Atari2600SmokeHarness::RunBaseline(Atari2600Console& cons
 			result.FailCount++;
 		}
 		result.OutputLines.push_back(std::format("CHECKPOINT {} {} {}", cp.Id, cp.Pass ? "PASS" : "FAIL", cp.Context));
+			if (!cp.Pass) {
+				result.OutputLines.push_back(std::format("CHECKPOINT_FAIL id={} context={} triage=verify-{}", cp.Id, cp.Context, cp.Id));
+			}
 		result.Checkpoints.push_back(std::move(cp));
 	};
 
@@ -121,6 +157,7 @@ Atari2600HarnessResult Atari2600SmokeHarness::RunBaseline(Atari2600Console& cons
 	addCheckpoint("TIA-CP-04", digestA == digestB, std::format("digestA={} digestB={}", digestA, digestB));
 
 	result.Digest = BuildDigest(result.Checkpoints);
+		result.OutputLines.push_back(std::format("HARNESS_FAIL_CONTEXT failed_ids={}", BuildFailedHarnessCheckpointIds(result.Checkpoints)));
 	result.OutputLines.push_back(std::format("HARNESS_SUMMARY PASS={} FAIL={} DIGEST={}", result.PassCount, result.FailCount, result.Digest));
 	return result;
 }
@@ -196,7 +233,9 @@ Atari2600BaselineRomSetResult Atari2600SmokeHarness::RunBaselineRomSet(Atari2600
 			entry.Pass = false;
 			entry.Result.FailCount = 1;
 			entry.Result.OutputLines.push_back("HARNESS_LOAD FAIL empty_rom_data");
+			entry.Result.OutputLines.push_back("HARNESS_LOAD_TRIAGE reason=empty_rom_data fix=provide_nonempty_rom");
 			result.OutputLines.push_back(std::format("ROM_RESULT {} FAIL reason=empty_rom_data", entry.Name));
+			result.OutputLines.push_back(std::format("ROM_FAIL_CONTEXT {} reason=empty_rom_data size=0", entry.Name));
 			result.FailCount++;
 			result.Entries.push_back(std::move(entry));
 			continue;
@@ -208,7 +247,9 @@ Atari2600BaselineRomSetResult Atari2600SmokeHarness::RunBaselineRomSet(Atari2600
 			entry.Pass = false;
 			entry.Result.FailCount = 1;
 			entry.Result.OutputLines.push_back(std::format("HARNESS_LOAD FAIL load_result={}", (int)loadResult));
+			entry.Result.OutputLines.push_back(std::format("HARNESS_LOAD_TRIAGE reason=load_result_{} fix=check_mapper_or_rom_header", (int)loadResult));
 			result.OutputLines.push_back(std::format("ROM_RESULT {} FAIL reason=load_result_{}", entry.Name, (int)loadResult));
+			result.OutputLines.push_back(std::format("ROM_FAIL_CONTEXT {} reason=load_result_{} size={}", entry.Name, (int)loadResult, romCase.RomData.size()));
 			result.FailCount++;
 			result.Entries.push_back(std::move(entry));
 			continue;
@@ -220,6 +261,7 @@ Atari2600BaselineRomSetResult Atari2600SmokeHarness::RunBaselineRomSet(Atari2600
 			result.PassCount++;
 		} else {
 			result.FailCount++;
+			result.OutputLines.push_back(std::format("ROM_FAIL_CONTEXT {} failed_ids={} digest={}", entry.Name, BuildFailedHarnessCheckpointIds(entry.Result.Checkpoints), entry.Result.Digest));
 		}
 
 		result.OutputLines.push_back(std::format(
@@ -266,6 +308,9 @@ Atari2600CompatibilityMatrixResult Atari2600SmokeHarness::RunCompatibilityMatrix
 				entry.FailCount++;
 			}
 			entry.OutputLines.push_back(std::format("COMPAT_CHECK {} {} {}", cp.Id, cp.Pass ? "PASS" : "FAIL", cp.Context));
+			if (!cp.Pass) {
+				entry.OutputLines.push_back(std::format("COMPAT_CHECK_FAIL id={} context={} triage=inspect-{}", cp.Id, cp.Context, cp.Id));
+			}
 			entry.Checkpoints.push_back(std::move(cp));
 		};
 
@@ -274,6 +319,7 @@ Atari2600CompatibilityMatrixResult Atari2600SmokeHarness::RunCompatibilityMatrix
 			entry.Pass = false;
 			entry.Digest = BuildCompatibilityDigest(entry.Checkpoints);
 			result.FailCount++;
+			result.OutputLines.push_back(std::format("COMPAT_FAIL_CONTEXT {} mapper=unknown failed_ids={} digest={}", entry.Name, BuildFailedCompatibilityCheckpointIds(entry.Checkpoints), entry.Digest));
 			result.OutputLines.push_back(std::format("COMPAT_RESULT {} FAIL PASS={} FAIL={} DIGEST={}", entry.Name, entry.PassCount, entry.FailCount, entry.Digest));
 			result.Entries.push_back(std::move(entry));
 			continue;
@@ -286,6 +332,7 @@ Atari2600CompatibilityMatrixResult Atari2600SmokeHarness::RunCompatibilityMatrix
 			entry.Pass = false;
 			entry.Digest = BuildCompatibilityDigest(entry.Checkpoints);
 			result.FailCount++;
+			result.OutputLines.push_back(std::format("COMPAT_FAIL_CONTEXT {} mapper=unknown failed_ids={} digest={}", entry.Name, BuildFailedCompatibilityCheckpointIds(entry.Checkpoints), entry.Digest));
 			result.OutputLines.push_back(std::format("COMPAT_RESULT {} FAIL PASS={} FAIL={} DIGEST={}", entry.Name, entry.PassCount, entry.FailCount, entry.Digest));
 			result.Entries.push_back(std::move(entry));
 			continue;
@@ -311,6 +358,7 @@ Atari2600CompatibilityMatrixResult Atari2600SmokeHarness::RunCompatibilityMatrix
 			result.PassCount++;
 		} else {
 			result.FailCount++;
+			result.OutputLines.push_back(std::format("COMPAT_FAIL_CONTEXT {} mapper={} failed_ids={} digest={}", entry.Name, entry.MapperMode, BuildFailedCompatibilityCheckpointIds(entry.Checkpoints), entry.Digest));
 		}
 
 		result.OutputLines.push_back(std::format("COMPAT_RESULT {} {} PASS={} FAIL={} DIGEST={}", entry.Name, entry.Pass ? "PASS" : "FAIL", entry.PassCount, entry.FailCount, entry.Digest));
@@ -386,6 +434,15 @@ Atari2600PerformanceGateResult Atari2600SmokeHarness::RunPerformanceGate(Atari26
 			result.PassCount++;
 		} else {
 			result.FailCount++;
+			result.OutputLines.push_back(std::format(
+				"PERF_FAIL_CONTEXT {} mapper={} run_pass={} elapsed_us={} budget_us={} baseline_digest={} timing_digest={}",
+				entry.Name,
+				entry.MapperMode,
+				runPass ? 1 : 0,
+				entry.ElapsedMicros,
+				budgetMicros,
+				baselineDigest,
+				timingDigest));
 		}
 
 		result.OutputLines.push_back(std::format(

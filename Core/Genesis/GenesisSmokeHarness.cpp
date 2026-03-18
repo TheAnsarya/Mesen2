@@ -1,11 +1,28 @@
 #include "pch.h"
 #include "Genesis/GenesisSmokeHarness.h"
 #include "Genesis/GenesisM68kBoundaryScaffold.h"
+#include <numeric>
 
 namespace {
 	string ToHex(uint64_t value) {
 		return std::format("{:016x}", value);
 	}
+
+		string BuildFailedCheckpointIds(const vector<GenesisCompatibilityCheckpoint>& checkpoints) {
+			vector<string> failedIds;
+			for (const GenesisCompatibilityCheckpoint& checkpoint : checkpoints) {
+				if (!checkpoint.Pass) {
+					failedIds.push_back(checkpoint.Id);
+				}
+			}
+
+			if (failedIds.empty()) {
+				return "none";
+			}
+			return std::accumulate(std::next(failedIds.begin()), failedIds.end(), failedIds.front(), [](const string& left, const string& right) {
+				return left + "," + right;
+			});
+		}
 
 	string BuildCheckpointDigest(const vector<GenesisCompatibilityCheckpoint>& checkpoints) {
 		uint64_t hash = 1469598103934665603ull;
@@ -54,6 +71,9 @@ GenesisCompatibilityMatrixResult GenesisSmokeHarness::RunCompatibilityMatrix(Gen
 				entry.FailCount++;
 			}
 			entry.OutputLines.push_back(std::format("GEN_COMPAT_CHECK {} {} {}", checkpoint.Id, checkpoint.Pass ? "PASS" : "FAIL", checkpoint.Context));
+			if (!checkpoint.Pass) {
+				entry.OutputLines.push_back(std::format("GEN_COMPAT_CHECK_FAIL id={} context={} triage=inspect-{}", checkpoint.Id, checkpoint.Context, checkpoint.Id));
+			}
 			entry.Checkpoints.push_back(std::move(checkpoint));
 		};
 
@@ -62,6 +82,12 @@ GenesisCompatibilityMatrixResult GenesisSmokeHarness::RunCompatibilityMatrix(Gen
 			entry.Pass = false;
 			entry.Digest = BuildCheckpointDigest(entry.Checkpoints);
 			result.FailCount++;
+			result.OutputLines.push_back(std::format(
+				"GEN_COMPAT_FAIL_CONTEXT {} class={} failed_ids={} digest={}",
+				entry.Name,
+				InferTitleClass(entry.Name),
+				BuildFailedCheckpointIds(entry.Checkpoints),
+				entry.Digest));
 			result.OutputLines.push_back(std::format("GEN_COMPAT_RESULT {} FAIL PASS={} FAIL={} DIGEST={}", entry.Name, entry.PassCount, entry.FailCount, entry.Digest));
 			result.Entries.push_back(std::move(entry));
 			continue;
@@ -111,6 +137,12 @@ GenesisCompatibilityMatrixResult GenesisSmokeHarness::RunCompatibilityMatrix(Gen
 			result.PassCount++;
 		} else {
 			result.FailCount++;
+			result.OutputLines.push_back(std::format(
+				"GEN_COMPAT_FAIL_CONTEXT {} class={} failed_ids={} digest={}",
+				entry.Name,
+				InferTitleClass(entry.Name),
+				BuildFailedCheckpointIds(entry.Checkpoints),
+				entry.Digest));
 		}
 
 		result.OutputLines.push_back(std::format("GEN_COMPAT_RESULT {} {} PASS={} FAIL={} DIGEST={}", entry.Name, entry.Pass ? "PASS" : "FAIL", entry.PassCount, entry.FailCount, entry.Digest));
@@ -191,6 +223,16 @@ GenesisPerformanceGateResult GenesisSmokeHarness::RunPerformanceGate(GenesisM68k
 			result.PassCount++;
 		} else {
 			result.FailCount++;
+			result.OutputLines.push_back(std::format(
+				"GEN_PERF_FAIL_CONTEXT {} class={} compatibility_pass={} replay_pass={} elapsed_us={} budget_us={} compat_digest={} mixed_digest={}",
+				entry.Name,
+				entry.TitleClass,
+				compatibilityPass ? 1 : 0,
+				replayPass ? 1 : 0,
+				entry.ElapsedMicros,
+				budgetMicros,
+				compatibilityDigest,
+				firstRun.Bus.MixedDigest));
 		}
 
 		result.OutputLines.push_back(std::format(

@@ -39,5 +39,10 @@ namespace {
 		Atari2600PerformanceGateResult result = Atari2600SmokeHarness::RunPerformanceGate(console, corpus, 0);
 		EXPECT_GT(result.FailCount, 0);
 		EXPECT_FALSE(result.Digest.empty());
+
+		bool hasFailContext = std::any_of(result.OutputLines.begin(), result.OutputLines.end(), [](const string& line) {
+			return line.starts_with("PERF_FAIL_CONTEXT ");
+		});
+		EXPECT_TRUE(hasFailContext);
 	}
 }

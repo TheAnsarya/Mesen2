@@ -36,5 +36,10 @@ namespace {
 		GenesisPerformanceGateResult result = GenesisSmokeHarness::RunPerformanceGate(scaffold, corpus, 0);
 		EXPECT_GT(result.FailCount, 0);
 		EXPECT_FALSE(result.Digest.empty());
+
+		bool hasFailContext = std::any_of(result.OutputLines.begin(), result.OutputLines.end(), [](const string& line) {
+			return line.starts_with("GEN_PERF_FAIL_CONTEXT ");
+		});
+		EXPECT_TRUE(hasFailContext);
 	}
 }
