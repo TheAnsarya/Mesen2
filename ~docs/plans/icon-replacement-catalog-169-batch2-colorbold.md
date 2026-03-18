@@ -114,6 +114,29 @@ Priority B (low risk, mostly one-to-one symbol replacements):
 - Fullscreen, SplitView, SwitchView, VerticalLayout, TabContent
 - Camera, Microphone, Network, CommandLine, WebBrowser
 
+## New Recommendation Wave (2026-03-18, Unsigned)
+
+These proposal-only SVGs were generated for the next owner sign-off pass. They are not promoted to production paths yet.
+
+| Current | Proposed (ColorBold SVG) | Mapping | Color Intent |
+|---|---|---|---|
+| <img src="../../UI/Assets/Accept.png" alt="Current Accept icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Accept.svg" alt="Proposed Accept icon" width="24" /> | Accept.png -> check-bold | Confirm green |
+| <img src="../../UI/Assets/Exclamation.png" alt="Current Exclamation icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Exclamation.svg" alt="Proposed Exclamation icon" width="24" /> | Exclamation.png -> alert-circle | Caution yellow |
+| <img src="../../UI/Assets/Expand.png" alt="Current Expand icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Expand.svg" alt="Proposed Expand icon" width="24" /> | Expand.png -> arrow-expand-all | Expand blue |
+| <img src="../../UI/Assets/Export.png" alt="Current Export icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Export.svg" alt="Proposed Export icon" width="24" /> | Export.png -> export | Export teal |
+| <img src="../../UI/Assets/Import.png" alt="Current Import icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Import.svg" alt="Proposed Import icon" width="24" /> | Import.png -> import | Import teal |
+| <img src="../../UI/Assets/SelectAll.png" alt="Current SelectAll icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/SelectAll.svg" alt="Proposed SelectAll icon" width="24" /> | SelectAll.png -> select-all | Selection slate |
+| <img src="../../UI/Assets/Update.png" alt="Current Update icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Update.svg" alt="Proposed Update icon" width="24" /> | Update.png -> update | Update blue |
+| <img src="../../UI/Assets/Camera.png" alt="Current Camera icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Camera.svg" alt="Proposed Camera icon" width="24" /> | Camera.png -> camera | Capture brown |
+| <img src="../../UI/Assets/Microphone.png" alt="Current Microphone icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/Microphone.svg" alt="Proposed Microphone icon" width="24" /> | Microphone.png -> microphone | Audio purple |
+| <img src="../../UI/Assets/WebBrowser.png" alt="Current WebBrowser icon" width="24" /> | <img src="../../UI/Assets/Proposed/ColorBold/WebBrowser.svg" alt="Proposed WebBrowser icon" width="24" /> | WebBrowser.png -> web | Web blue |
+
+Wave summary:
+
+- Generated proposals: 10
+- Generation status: all entries reported `ok`
+- Promotion status: pending owner sign-off
+
 Priority C (defer for custom treatment):
 
 - Controller, Keyboard, ArrowKeys, WasdKeys

@@ -64,3 +64,44 @@ A reusable GitHub issue template is defined at:
 - `.github/ISSUE_TEMPLATE/platform-parity-phase-gate.yml`
 
 Use this template for each new implementation phase to enforce gate evidence and traceability.
+
+## Focused Atari + Genesis Command Set (Issue #748)
+
+Use this set for fast local or CI parity checks specific to Atari 2600 and Genesis.
+
+Quick-run correctness sweep:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter="Atari2600*:Genesis*" --gtest_brief=1
+```
+
+Atari edge-case depth suite (includes deterministic edge coverage):
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter="Atari2600DeterministicEdgeCaseTests.*" --gtest_brief=1
+```
+
+Genesis combined interaction suite (DMA/Z80/interrupt + deterministic replay):
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter="GenesisCombinedInteractionTests.*" --gtest_brief=1
+```
+
+Focused benchmark sweep:
+
+```powershell
+.\bin\win-x64\Release\Core.Benchmarks.exe --benchmark_filter="BM_(Atari2600|Genesis)" --benchmark_repetitions=3
+```
+
+Structured benchmark artifact (CI-friendly):
+
+```powershell
+.\bin\win-x64\Release\Core.Benchmarks.exe --benchmark_filter="BM_(Atari2600|Genesis)" --benchmark_repetitions=3 --benchmark_out=bench-atari-genesis-focused.json --benchmark_out_format=json
+```
+
+Expected artifacts and usage:
+
+- `Core.Tests.exe` output: correctness gate status for focused suites.
+- `bench-atari-genesis-focused.json`: machine-readable benchmark baseline/candidate comparison input.
+- Quick-run mode: use correctness sweep plus one benchmark pass for iteration.
+- Full-run mode: run focused suites, then full platform matrix and full benchmark set.

@@ -603,6 +603,7 @@ gameboy icon is great, could it be slightly larger? snes logo does not need a wh
 
 [Nexen] push all the approved icons to production but don't do the one's I haven't signed off on yet, and update the documentation to show which ones are implemented, then look at other icons that need updating to see if we can find some easy wins (platforms/systems is difficult and will take a while); then focus on atari 2600 & sega genesis emulation and debugging, make a shiton of issues as we planned and discussed and then implement them, make benchmarks and tests for full comprehensive coverage; continuously research additional emulation accuracy and performance and reference other emulators and make our core solid and our debugger environment responsive and useful.; continue;
 
+let's see the new icon reccomendations, make them if necessary, open the document file that contains them for review; then continue with the high value continuation options: Implement #742 next: Atari 2600 deterministic edge-case expansion (RIOT/TIA/mapper interaction depth).; Implement #743 next: Genesis combined DMA/Z80/interrupt interaction tests.; Implement #748 next: CI-friendly focused commands and docs so ongoing parity work is faster to run and review.; continue;
 
 
 
