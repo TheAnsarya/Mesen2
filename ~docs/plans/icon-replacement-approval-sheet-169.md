@@ -50,6 +50,8 @@ Reference catalogs:
 
 ## Notes
 
+- Implementation status (2026-03-18): all currently approved B2 icons in the decision table are implemented in production as SVG files and verified in sync with proposed ColorBold assets.
+
 - I will only apply approved rows.
 - First replacement commit will be limited to this initial set for easy rollback/review.
 - Help B2 uses a slightly smaller white ? on blue.

@@ -601,6 +601,8 @@ gameboy icon is great, could it be slightly larger? snes logo does not need a wh
 
 "If you want, I can do one more micro-pass focused only on SNES geometry (petal tilt, spacing, and overlap) to get even closer visually." Yes, please, and look at the reference snes logos to add the cutouts on the red and blue ones, match the icon svg to the real logo as best you can, this is not a copyright issue as it is a fair use replica; Logos for NES, GBA, PCE, SMS, WS: nope these are still bad; continue;
 
+[Nexen] push all the approved icons to production but don't do the one's I haven't signed off on yet, and update the documentation to show which ones are implemented, then look at other icons that need updating to see if we can find some easy wins (platforms/systems is difficult and will take a while); then focus on atari 2600 & sega genesis emulation and debugging, make a shiton of issues as we planned and discussed and then implement them, make benchmarks and tests for full comprehensive coverage; continuously research additional emulation accuracy and performance and reference other emulators and make our core solid and our debugger environment responsive and useful.; continue;
+
 
 
 

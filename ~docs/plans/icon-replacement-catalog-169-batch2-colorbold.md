@@ -91,4 +91,32 @@ Revised after owner feedback to replace generic gamepad glyphs with platform-spe
 - Latest refinement pass adjusted SNES to a no-background 4-color logo-style mark with corrected color order and revised shape proportions.
 - Latest refinement pass enlarged the Game Boy icon slightly and reworked NES, GBA, PCE, SMS, and WonderSwan for closer system-identity cues.
 - Latest micro-pass added SNES logo cutouts on blue/red petals and further tuned NES, GBA, PCE, SMS, and WonderSwan silhouettes toward more faithful system marks.
+- Implementation status (2026-03-18): all currently approved B2 rows from the approval sheet are implemented in `UI/Assets` and are in sync with `UI/Assets/Proposed/ColorBold`.
 - If approved, the next step is to replace icon paths in small grouped commits and validate after each group.
+
+## Easy-Win Backlog (Unsigned Icons)
+
+The following icons are not yet signed off in Issue #169 and remain PNG-only.
+
+Priority A (high usage, straightforward MDI mappings):
+
+- Breakpoint, BreakpointDisabled, BreakpointEnableDisable, ForbidBreakpoint
+- NextCode, NextData, NextExec, NextRead, NextTrack, NextUnknown, NextWrite
+- PrevCode, PrevData, PrevExec, PrevRead, PrevTrack, PrevUnknown, PrevWrite
+- StepInto, StepOut, StepOver, StepBack, StepBackFrame, StepBackScanline, StepIrq, StepNmi
+- RunCpuCycle, RunPpuCycle, RunPpuFrame, RunPpuScanline
+- EventViewer, PerfTracker, RegisterIcon, VideoFilter, VideoRecorder
+
+Priority B (low risk, mostly one-to-one symbol replacements):
+
+- Accept, Exclamation, Expand, Export, Import, SelectAll, Update
+- MoveUp, MoveDown, RotateLeft, RotateRight, TranslateUp, TranslateDown, TranslateLeft, TranslateRight
+- Fullscreen, SplitView, SwitchView, VerticalLayout, TabContent
+- Camera, Microphone, Network, CommandLine, WebBrowser
+
+Priority C (defer for custom treatment):
+
+- Controller, Keyboard, ArrowKeys, WasdKeys
+- MenuItemChecked, MenuItemCheckedDark
+- Console-specific debugger badges (Cx4Debugger, GsuDebugger, NecDspDebugger, Sa1Debugger, SpcDebugger, St018Debugger, GameboyDebugger, PsIcon, XbIcon)
+- Branding/splash assets (NexenIcon, SplashLogo)
