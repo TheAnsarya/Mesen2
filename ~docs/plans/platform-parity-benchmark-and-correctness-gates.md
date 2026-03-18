@@ -105,3 +105,81 @@ Expected artifacts and usage:
 - `bench-atari-genesis-focused.json`: machine-readable benchmark baseline/candidate comparison input.
 - Quick-run mode: use correctness sweep plus one benchmark pass for iteration.
 - Full-run mode: run focused suites, then full platform matrix and full benchmark set.
+
+## Reference Validation Workflow (Issue #745)
+
+Use this workflow when validating against known-good emulator behavior and hardware expectations.
+
+### Atari 2600 Checklist
+
+- Confirm ROM identity before running checks: filename, mapper expectation, and checksum.
+- Run Atari harness suites and save the full console output.
+- Compare failure-context lines (`ROM_FAIL_CONTEXT`, `COMPAT_FAIL_CONTEXT`, `PERF_FAIL_CONTEXT`) against the current reference output.
+- Compare deterministic digests across repeated runs; any drift is a fail.
+- Compare timing-focused outputs (scanline/frame checkpoint contexts and timing digests) against the stored reference snapshot.
+
+### Genesis Checklist
+
+- Confirm ROM identity before running checks: filename, title-class expectation, and checksum.
+- Run Genesis harness suites and save the full console output.
+- Compare failure-context lines (`GEN_COMPAT_FAIL_CONTEXT`, `GEN_PERF_FAIL_CONTEXT`) against the current reference output.
+- Compare deterministic digests across repeated runs; any drift is a fail.
+- Compare render/audio/timing digest contexts against the stored reference snapshot.
+
+### Reproducible Command Recipes
+
+Build Release x64:
+
+```powershell
+& "C:\Program Files\Microsoft Visual Studio\18\Insiders\MSBuild\Current\Bin\MSBuild.exe" Nexen.sln /p:Configuration=Release /p:Platform=x64 /t:Build /m /nologo /v:m
+```
+
+Atari harness validation:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter="Atari2600TimingSpikeHarnessTests.*:Atari2600CompatibilityMatrixTests.*:Atari2600PerformanceGateTests.*" --gtest_brief=1
+```
+
+Genesis harness validation:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter="GenesisCompatibilityHarnessTests.*:GenesisPerformanceGateTests.*:GenesisCombinedInteractionTests.*" --gtest_brief=1
+```
+
+Debugger responsiveness benchmark pack:
+
+```powershell
+.\bin\win-x64\Release\Core.Benchmarks.exe --benchmark_filter="BM_Debugger_BreakpointPath_UnorderedSetSparse|BM_Debugger_TraceRowFormatting_StdFormat|BM_Debugger_TraceRowFormatting_Append|BM_Debugger_RequestDispatch_Direct|BM_Debugger_RequestDispatch_StdFunction" --benchmark_repetitions=3 --benchmark_report_aggregates_only=true --benchmark_out=bench-debugger-hotpath.json --benchmark_out_format=json
+```
+
+Gap follow-up issues created from this workflow:
+
+- [#751](https://github.com/TheAnsarya/Nexen/issues/751): automate Atari/Genesis reference-trace artifact generation for CI diffs.
+- [#752](https://github.com/TheAnsarya/Nexen/issues/752): build Atari/Genesis reference ROM manifest schema and seed set.
+
+## Genesis-Only Fast CI Command Pack (Issue #765)
+
+Use these commands for quick Genesis-only validation locally or in CI.
+
+Genesis focused tests:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter="GenesisCompatibilityHarnessTests.*:GenesisPerformanceGateTests.*:GenesisCombinedInteractionTests.*" --gtest_brief=1
+```
+
+Genesis debugger smoke tests:
+
+```powershell
+.\bin\win-x64\Release\Core.Tests.exe --gtest_filter="*Debugger*" --gtest_brief=1
+```
+
+Genesis-focused benchmark artifact output:
+
+```powershell
+.\bin\win-x64\Release\Core.Benchmarks.exe --benchmark_filter="BM_Debugger_BreakpointPath_UnorderedSetSparse|BM_Debugger_TraceRowFormatting_StdFormat|BM_Debugger_TraceRowFormatting_Append|BM_Debugger_RequestDispatch_Direct|BM_Debugger_RequestDispatch_StdFunction" --benchmark_repetitions=3 --benchmark_report_aggregates_only=true --benchmark_out=bench-genesis-fast-ci.json --benchmark_out_format=json
+```
+
+Artifact output path:
+
+- `bench-genesis-fast-ci.json` at repository root.
+- Upload this file in CI for benchmark comparison and trend review.
