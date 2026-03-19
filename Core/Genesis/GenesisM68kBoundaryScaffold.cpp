@@ -88,12 +88,23 @@ GenesisVdpDmaMode GenesisPlatformBusStub::DecodeDmaModeFromControl(uint8_t regis
 }
 
 void GenesisPlatformBusStub::BeginDmaTransfer(GenesisVdpDmaMode mode, uint32_t transferWords) {
+	if (transferWords == 0) {
+		_dmaMode = GenesisVdpDmaMode::None;
+		_dmaTransferWords = 0;
+		_dmaActiveCyclesRemaining = 0;
+		_dmaRequested = false;
+		return;
+	}
+
 	_dmaMode = mode;
 	_dmaTransferWords = transferWords;
-	_dmaActiveCyclesRemaining = transferWords * 4;
-	if (transferWords > 0) {
-		_dmaRequested = true;
+	uint64_t totalCycles = (uint64_t)transferWords * 4ull;
+	if (totalCycles > std::numeric_limits<uint32_t>::max()) {
+		_dmaActiveCyclesRemaining = std::numeric_limits<uint32_t>::max();
+	} else {
+		_dmaActiveCyclesRemaining = (uint32_t)totalCycles;
 	}
+	_dmaRequested = true;
 }
 
 uint32_t GenesisPlatformBusStub::ConsumeDmaContention(uint32_t requestedCycles) {

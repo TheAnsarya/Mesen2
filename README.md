@@ -193,6 +193,7 @@ Download pre-built binaries from the [Releases page](https://github.com/TheAnsar
 |---|---|
 | [Architecture Overview](~docs/ARCHITECTURE-OVERVIEW.md) | System design |
 | [C++ Development Guide](~docs/CPP-DEVELOPMENT-GUIDE.md) | Coding standards |
+| [Developer Tasks and Priorities](DEVELOPER-TASKS.md) | What to work on next, with Atari/Genesis support checklist |
 | [Code Documentation Style](~docs/CODE-DOCUMENTATION-STYLE.md) | C++ documentation style guide |
 | [Build and Run](~docs/BUILD-AND-RUN.md) | Building and running Nexen |
 | [Profiling Guide](~docs/PROFILING-GUIDE.md) | Performance profiling |

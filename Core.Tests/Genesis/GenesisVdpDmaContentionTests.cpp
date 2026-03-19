@@ -112,4 +112,39 @@ namespace {
 		EXPECT_EQ(scaffold.GetCpu().GetCycleCount() - cpuBefore, 16u);
 		EXPECT_EQ(scaffold.GetBus().GetDmaContentionCycles(), contentionBefore);
 	}
+
+	TEST(GenesisVdpDmaContentionTests, ZeroLengthDmaTransferDoesNotLatchActiveMode) {
+		GenesisM68kBoundaryScaffold scaffold;
+		scaffold.Startup();
+
+		scaffold.GetBus().BeginDmaTransfer(GenesisVdpDmaMode::Fill, 0);
+
+		EXPECT_EQ(scaffold.GetBus().GetDmaMode(), GenesisVdpDmaMode::None);
+		EXPECT_EQ(scaffold.GetBus().GetDmaTransferWords(), 0u);
+		EXPECT_EQ(scaffold.GetBus().GetDmaActiveCyclesRemaining(), 0u);
+		EXPECT_FALSE(scaffold.GetBus().WasDmaRequested());
+
+		uint64_t cpuBefore = scaffold.GetCpu().GetCycleCount();
+		scaffold.StepFrameScaffold(32);
+		EXPECT_EQ(scaffold.GetCpu().GetCycleCount() - cpuBefore, 32u);
+		EXPECT_EQ(scaffold.GetBus().GetDmaContentionCycles(), 0u);
+		EXPECT_EQ(scaffold.GetBus().GetDmaContentionEvents(), 0u);
+	}
+
+	TEST(GenesisVdpDmaContentionTests, LargeDmaTransferSaturatesActiveCyclesWithoutOverflow) {
+		GenesisM68kBoundaryScaffold scaffold;
+		scaffold.Startup();
+
+		scaffold.GetBus().BeginDmaTransfer(GenesisVdpDmaMode::Copy, 0x40000000u);
+
+		EXPECT_EQ(scaffold.GetBus().GetDmaMode(), GenesisVdpDmaMode::Copy);
+		EXPECT_EQ(scaffold.GetBus().GetDmaTransferWords(), 0x40000000u);
+		EXPECT_EQ(scaffold.GetBus().GetDmaActiveCyclesRemaining(), std::numeric_limits<uint32_t>::max());
+		EXPECT_TRUE(scaffold.GetBus().WasDmaRequested());
+
+		scaffold.StepFrameScaffold(12);
+		EXPECT_EQ(scaffold.GetCpu().GetCycleCount(), 9u);
+		EXPECT_EQ(scaffold.GetBus().GetDmaContentionCycles(), 3u);
+		EXPECT_EQ(scaffold.GetBus().GetDmaActiveCyclesRemaining(), std::numeric_limits<uint32_t>::max() - 3u);
+	}
 }
