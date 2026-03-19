@@ -609,6 +609,9 @@ Continue with the next Atari/Genesis sub-issues from #740.
 
 I see a lot of crazy words like "provenance" and "validation checklist integration points for harness and benchmark gates"  and none of this makes sense. Please use plain language as you add a ton of issues for implementing the emulation of sega genesis make epics and subisssues and then implement them all, repeat again and again; continue; make the thing work and implement all of our plans, but don't get stuck in weird meta crap; continue;
 
+"fail-context tags" and "harnesses"??? I thought we said said plain langauge while we implement genesis emulation!; continue working issues and making new issues to wok; continue;
+
+continue working issues and make new ones, with tests, benchmarks, and docs, chat/session logs, etc; continue;
 
 
 

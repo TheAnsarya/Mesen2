@@ -204,3 +204,24 @@ Machine-parseable summary lines produced by the harness:
 - `GEN_COMPAT_MATRIX_SUMMARY PASS=<n> FAIL=<n> DIGEST=<hash>`
 - `GEN_PERF_RESULT <title> <PASS|FAIL> CLASS=<class> ELAPSED_US=<n> BUDGET_US=<n> DIGEST=<hash>`
 - `GEN_PERF_GATE_SUMMARY PASS=<n> FAIL=<n> BUDGET_US=<n> DIGEST=<hash>`
+
+## Genesis Benchmark Artifact Validation Checks (Issue #768)
+
+Use this command to generate a Genesis benchmark JSON artifact:
+
+```powershell
+.\bin\win-x64\Release\Core.Benchmarks.exe --benchmark_filter="BM_Genesis_AudioCadence_AlternatingYmPsg|BM_Genesis_AudioBusWriteAndMix|BM_Genesis_DmaContention_CopyBurst|BM_Genesis_DmaContention_FillBurst|BM_Genesis_PerformanceGate_Corpus" --benchmark_repetitions=3 --benchmark_report_aggregates_only=true --benchmark_out=bench-genesis-artifact-check.json --benchmark_out_format=json
+```
+
+Use this command to validate that the artifact exists and contains benchmark data:
+
+```powershell
+$artifact = Get-Content .\bench-genesis-artifact-check.json -Raw | ConvertFrom-Json
+if (-not $artifact.benchmarks -or $artifact.benchmarks.Count -eq 0) { throw "No benchmark rows found in artifact." }
+Write-Output ("artifact-ok benchmarks={0}" -f $artifact.benchmarks.Count)
+```
+
+Expected output files:
+
+- `bench-genesis-artifact-check.json` at repository root.
+- Optional CI copy in your artifacts folder (example: `artifacts/benchmarks/bench-genesis-artifact-check.json`).

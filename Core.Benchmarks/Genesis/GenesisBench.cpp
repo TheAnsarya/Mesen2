@@ -57,6 +57,32 @@ static void BM_Genesis_AudioBusWriteAndMix(benchmark::State& state) {
 }
 BENCHMARK(BM_Genesis_AudioBusWriteAndMix);
 
+static void BM_Genesis_AudioCadence_AlternatingYmPsg(benchmark::State& state) {
+	GenesisM68kBoundaryScaffold scaffold;
+	vector<uint8_t> rom = BuildNopRom(0x8000);
+	scaffold.LoadRom(rom);
+	scaffold.Startup();
+
+	uint32_t phase = 0;
+	for (auto _ : state) {
+		scaffold.GetBus().WriteByte(0xA04000, 0x22);
+		scaffold.GetBus().WriteByte(0xA04001, (uint8_t)(0x10 + (phase & 0x1F)));
+		scaffold.GetBus().WriteByte(0xA04002, 0x30);
+		scaffold.GetBus().WriteByte(0xA04003, (uint8_t)(0x08 + (phase & 0x0F)));
+		scaffold.GetBus().WriteByte(0xC00011, (uint8_t)(0x90 | (phase & 0x0F)));
+		scaffold.GetBus().WriteByte(0xC00011, (uint8_t)(0x04 + (phase & 0x07)));
+		scaffold.StepFrameScaffold(128u + (phase % 5u));
+		phase++;
+		benchmark::DoNotOptimize(scaffold.GetBus().GetYmSampleCount());
+		benchmark::DoNotOptimize(scaffold.GetBus().GetPsgSampleCount());
+		benchmark::DoNotOptimize(scaffold.GetBus().GetMixedDigest().data());
+	}
+
+	state.SetItemsProcessed(state.iterations() * 6);
+	state.SetLabel("audio-cadence-alternating");
+}
+BENCHMARK(BM_Genesis_AudioCadence_AlternatingYmPsg);
+
 static void BM_Genesis_CompatibilityMatrix_Corpus(benchmark::State& state) {
 	GenesisM68kBoundaryScaffold scaffold;
 	vector<GenesisCompatibilityRomCase> corpus = BuildCompatibilityCorpus();
