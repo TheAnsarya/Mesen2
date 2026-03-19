@@ -135,6 +135,13 @@ enum class MemoryType {
 	LynxBootRom,      ///< Lynx boot ROM (512 bytes)
 	LynxSaveRam,      ///< Lynx EEPROM save data
 
+	// ===== Sega Genesis memory regions =====
+	GenesisMemory,     ///< Genesis M68000 CPU address space (24-bit, 16MB)
+	GenesisPrgRom,     ///< Genesis program ROM (cartridge, up to 4MB)
+	GenesisWorkRam,    ///< Genesis work RAM (64KB)
+	GenesisVideoRam,   ///< Genesis video RAM (64KB VRAM)
+	GenesisPaletteRam, ///< Genesis palette RAM (128 bytes CRAM)
+
 	/// <summary>Sentinel value for invalid/unspecified memory type</summary>
 	None
 };

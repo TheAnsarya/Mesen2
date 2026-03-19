@@ -819,6 +819,14 @@
     <ClInclude Include="Lynx\LynxSuzy.h" />
     <ClInclude Include="Lynx\LynxTypes.h" />
     <ClInclude Include="Genesis\GenesisM68kBoundaryScaffold.h" />
+    <ClInclude Include="Genesis\GenesisTypes.h" />
+    <ClInclude Include="Genesis\GenesisConsole.h" />
+    <ClInclude Include="Genesis\GenesisM68k.h" />
+    <ClInclude Include="Genesis\GenesisVdp.h" />
+    <ClInclude Include="Genesis\GenesisMemoryManager.h" />
+    <ClInclude Include="Genesis\GenesisControlManager.h" />
+    <ClInclude Include="Genesis\GenesisDefaultVideoFilter.h" />
+    <ClInclude Include="Genesis\Input\GenesisController.h" />
     <ClInclude Include="Lynx\Debugger\LynxDisUtils.h" />
     <ClInclude Include="Lynx\Debugger\LynxDebugger.h" />
     <ClInclude Include="Lynx\Debugger\LynxAssembler.h" />
@@ -1142,6 +1150,11 @@
     <ClCompile Include="Lynx\LynxSuzy.cpp" />
     <ClCompile Include="Genesis\GenesisM68kBoundaryScaffold.cpp" />
     <ClCompile Include="Genesis\GenesisSmokeHarness.cpp" />
+    <ClCompile Include="Genesis\GenesisConsole.cpp" />
+    <ClCompile Include="Genesis\GenesisM68k.cpp" />
+    <ClCompile Include="Genesis\GenesisVdp.cpp" />
+    <ClCompile Include="Genesis\GenesisMemoryManager.cpp" />
+    <ClCompile Include="Genesis\GenesisControlManager.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxDisUtils.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxDebugger.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxAssembler.cpp" />

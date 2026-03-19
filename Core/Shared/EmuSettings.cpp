@@ -154,6 +154,13 @@ void EmuSettings::Serialize(Serializer& s) {
 		case ConsoleType::Atari2600:
 			break;
 
+		case ConsoleType::Genesis:
+			SV(_genesis.RamPowerOnState);
+			SV(_genesis.Port1.Type);
+			SV(_genesis.Port2.Type);
+			SV(_genesis.Region);
+			break;
+
 		default:
 			[[unlikely]] throw std::runtime_error("unsupported console type");
 	}
@@ -285,6 +292,14 @@ void EmuSettings::SetLynxConfig(LynxConfig& config) {
 
 LynxConfig& EmuSettings::GetLynxConfig() {
 	return _lynx;
+}
+
+void EmuSettings::SetGenesisConfig(GenesisConfig& config) {
+	_genesis = config;
+}
+
+GenesisConfig& EmuSettings::GetGenesisConfig() {
+	return _genesis;
 }
 
 void EmuSettings::SetGameConfig(GameConfig& config) {
@@ -440,6 +455,7 @@ OverscanDimensions EmuSettings::GetOverscan() {
 		case ConsoleType::Ws:
 		case ConsoleType::Lynx:
 		case ConsoleType::Atari2600:
+		case ConsoleType::Genesis:
 			break;
 	}
 
@@ -467,7 +483,7 @@ double EmuSettings::GetAspectRatio(ConsoleRegion region, FrameInfo baseFrameSize
 
 		// For auto, ntsc and pal, these are PAR ratios, so multiply them with the base screen's aspect ratio to get the expected screen aspect ratio
 		case VideoAspectRatio::Auto:
-			if (_emu->GetConsoleType() == ConsoleType::Gameboy || _emu->GetConsoleType() == ConsoleType::Gba || _emu->GetConsoleType() == ConsoleType::Ws || _emu->GetConsoleType() == ConsoleType::Lynx || _emu->GetConsoleType() == ConsoleType::Atari2600) {
+			if (_emu->GetConsoleType() == ConsoleType::Gameboy || _emu->GetConsoleType() == ConsoleType::Gba || _emu->GetConsoleType() == ConsoleType::Ws || _emu->GetConsoleType() == ConsoleType::Lynx || _emu->GetConsoleType() == ConsoleType::Atari2600 || _emu->GetConsoleType() == ConsoleType::Genesis) {
 				// GB/GBA/WS/Lynx/Atari2600 shouldn't use NTSC/PAL aspect ratio when in auto mode
 				return screenAspectRatio;
 			} else if (_emu->GetRomInfo().Format == RomFormat::GameGear) {
@@ -553,6 +569,8 @@ bool EmuSettings::HasRandomPowerOnState(ConsoleType consoleType) {
 			return _gba.RamPowerOnState == RamState::Random;
 		case ConsoleType::Atari2600:
 			return false;
+		case ConsoleType::Genesis:
+			return _genesis.RamPowerOnState == RamState::Random;
 	}
 
 	return false;

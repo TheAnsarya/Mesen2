@@ -59,6 +59,7 @@ private:
 	GbaConfig _gba;
 	WsConfig _ws;
 	LynxConfig _lynx;
+	GenesisConfig _genesis;
 
 	atomic<uint32_t> _flags;
 	atomic<uint64_t> _debuggerFlags;
@@ -126,6 +127,9 @@ public:
 
 	void SetLynxConfig(LynxConfig& config);
 	LynxConfig& GetLynxConfig();
+
+	void SetGenesisConfig(GenesisConfig& config);
+	GenesisConfig& GetGenesisConfig();
 
 	void SetGameConfig(GameConfig& config);
 	GameConfig& GetGameConfig();

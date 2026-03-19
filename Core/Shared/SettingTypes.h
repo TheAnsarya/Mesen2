@@ -233,7 +233,10 @@ enum class ControllerType {
 	WsControllerVertical,
 
 	// Lynx
-	LynxController
+	LynxController,
+
+	// Genesis
+	GenesisController
 };
 
 struct KeyMapping {
@@ -349,7 +352,8 @@ enum class ConsoleType {
 	Gba = 5,
 	Ws = 6,
 	Lynx = 7,
-	Atari2600 = 8
+	Atari2600 = 8,
+	Genesis = 9
 };
 
 enum class GameboyModel {
@@ -749,6 +753,20 @@ struct LynxConfig {
 	uint32_t Channel2Vol = 100;
 	uint32_t Channel3Vol = 100;
 	uint32_t Channel4Vol = 100;
+};
+
+struct GenesisConfig {
+	ControllerConfig Port1;
+	ControllerConfig Port2;
+
+	ConsoleRegion Region = ConsoleRegion::Auto;
+	RamState RamPowerOnState = RamState::Random;
+
+	bool RemoveSpriteLimit = false;
+	bool DisableSprites = false;
+	bool DisableBackground = false;
+
+	OverscanDimensions Overscan = {};
 };
 
 struct AudioPlayerConfig {

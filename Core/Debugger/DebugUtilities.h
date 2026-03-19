@@ -67,6 +67,8 @@ public:
 				return MemoryType::WsMemory;
 			case CpuType::Lynx:
 				return MemoryType::LynxMemory;
+			case CpuType::Genesis:
+				return MemoryType::GenesisMemory;
 		}
 
 		[[unlikely]] throw std::runtime_error("Invalid CPU type");
@@ -107,6 +109,8 @@ public:
 				return 5;
 			case CpuType::Lynx:
 				return 4;
+			case CpuType::Genesis:
+				return 6;
 		}
 
 		[[unlikely]] throw std::runtime_error("Invalid CPU type");
@@ -242,6 +246,13 @@ public:
 			case MemoryType::LynxSaveRam:
 				return CpuType::Lynx;
 
+			case MemoryType::GenesisMemory:
+			case MemoryType::GenesisPrgRom:
+			case MemoryType::GenesisWorkRam:
+			case MemoryType::GenesisVideoRam:
+			case MemoryType::GenesisPaletteRam:
+				return CpuType::Genesis;
+
 			[[unlikely]] default:
 				throw std::runtime_error("Invalid CPU type");
 		}
@@ -287,6 +298,8 @@ public:
 				return MemoryType::WsPrgRom;
 			case CpuType::Lynx:
 				return MemoryType::LynxPrgRom;
+			case CpuType::Genesis:
+				return MemoryType::GenesisPrgRom;
 		}
 
 		[[unlikely]] return MemoryType::None;
@@ -335,6 +348,10 @@ public:
 			case MemoryType::GbaPaletteRam:
 				return true;
 
+			case MemoryType::GenesisVideoRam:
+			case MemoryType::GenesisPaletteRam:
+				return true;
+
 			default:
 				return false;
 		}
@@ -365,6 +382,7 @@ public:
 			case MemoryType::WsPrgRom:
 			case MemoryType::LynxPrgRom:
 			case MemoryType::LynxBootRom:
+			case MemoryType::GenesisPrgRom:
 				return true;
 
 			default:
@@ -399,7 +417,7 @@ public:
 	/// Get last CPU type enum value.
 	/// </summary>
 	[[nodiscard]] static constexpr CpuType GetLastCpuType() {
-		return CpuType::Lynx;
+		return CpuType::Genesis;
 	}
 
 	/// <summary>
