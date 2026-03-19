@@ -225,3 +225,44 @@ Expected output files:
 
 - `bench-genesis-artifact-check.json` at repository root.
 - Optional CI copy in your artifacts folder (example: `artifacts/benchmarks/bench-genesis-artifact-check.json`).
+
+## Genesis Benchmark Trend Guard Commands (Issue #774)
+
+Use this process to compare baseline and candidate benchmark artifacts.
+
+Baseline capture command:
+
+```powershell
+.\bin\win-x64\Release\Core.Benchmarks.exe --benchmark_filter="BM_Genesis_AudioCadence_AlternatingYmPsg|BM_Genesis_AudioBusWriteAndMix|BM_Genesis_DmaContention_CopyBurst|BM_Genesis_DmaContention_FillBurst|BM_Genesis_PerformanceGate_Corpus" --benchmark_repetitions=3 --benchmark_report_aggregates_only=true --benchmark_out=bench-genesis-baseline.json --benchmark_out_format=json
+```
+
+Candidate capture command:
+
+```powershell
+.\bin\win-x64\Release\Core.Benchmarks.exe --benchmark_filter="BM_Genesis_AudioCadence_AlternatingYmPsg|BM_Genesis_AudioBusWriteAndMix|BM_Genesis_DmaContention_CopyBurst|BM_Genesis_DmaContention_FillBurst|BM_Genesis_PerformanceGate_Corpus" --benchmark_repetitions=3 --benchmark_report_aggregates_only=true --benchmark_out=bench-genesis-candidate.json --benchmark_out_format=json
+```
+
+Comparison command:
+
+```powershell
+$baseline = Get-Content .\bench-genesis-baseline.json -Raw | ConvertFrom-Json
+$candidate = Get-Content .\bench-genesis-candidate.json -Raw | ConvertFrom-Json
+
+$baselineRows = @{}
+foreach ($row in $baseline.benchmarks) {
+	$baselineRows[$row.name] = $row
+}
+
+foreach ($cand in $candidate.benchmarks) {
+	if ($baselineRows.ContainsKey($cand.name)) {
+		$base = $baselineRows[$cand.name]
+		$delta = [math]::Round((($cand.cpu_time - $base.cpu_time) / $base.cpu_time) * 100.0, 2)
+		Write-Output ("{0} | baseline={1} | candidate={2} | delta={3}%" -f $cand.name, $base.cpu_time, $cand.cpu_time, $delta)
+	}
+}
+```
+
+Trend guard rule:
+
+- Investigate any benchmark with `delta > 5%` slowdown.
+- Keep baseline and candidate JSON files as CI artifacts for review.
