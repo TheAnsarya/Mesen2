@@ -13,6 +13,7 @@ class GenesisConsole;
 class GenesisM68k;
 class GenesisVdp;
 class GenesisControlManager;
+class GenesisPsg;
 
 class GenesisMemoryManager final : public ISerializable {
 private:
@@ -24,12 +25,20 @@ private:
 	GenesisM68k* _cpu = nullptr;
 	GenesisVdp* _vdp = nullptr;
 	GenesisControlManager* _controlManager = nullptr;
+	GenesisPsg* _psg = nullptr;
 
 	uint8_t* _prgRom = nullptr;
 	uint32_t _prgRomSize = 0;
 
 	uint8_t* _workRam = nullptr;
 	uint8_t* _z80Ram = nullptr;
+	uint8_t* _saveRam = nullptr;
+	uint32_t _saveRamSize = 0;
+	uint32_t _sramStart = 0;
+	uint32_t _sramEnd = 0;
+	bool _hasSram = false;
+	bool _sramEvenBytes = true;
+	bool _sramOddBytes = true;
 
 	GenesisIoState _ioState = {};
 
@@ -44,11 +53,16 @@ private:
 	bool _tmssEnabled = false;
 	bool _tmssUnlocked = false;
 
+	bool IsSramAddress(uint32_t addr) const;
+	bool TryGetSramOffset(uint32_t addr, uint32_t& offset) const;
+
 public:
 	GenesisMemoryManager();
 	~GenesisMemoryManager();
 
-	void Init(Emulator* emu, GenesisConsole* console, vector<uint8_t>& romData, GenesisVdp* vdp, GenesisControlManager* controlManager);
+	void Init(Emulator* emu, GenesisConsole* console, vector<uint8_t>& romData, GenesisVdp* vdp, GenesisControlManager* controlManager, GenesisPsg* psg);
+	void LoadBattery();
+	void SaveBattery();
 
 	void SetCpu(GenesisM68k* cpu) { _cpu = cpu; }
 
@@ -77,6 +91,8 @@ public:
 	}
 
 	uint64_t GetMasterClock() const { return _masterClock; }
+	GenesisIoState GetIoState() const { return _ioState; }
+	bool HasSaveRam() const { return _hasSram && _saveRam && _saveRamSize > 0; }
 
 	// Address info
 	AddressInfo GetAbsoluteAddress(uint32_t addr);

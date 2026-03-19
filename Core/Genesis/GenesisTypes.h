@@ -131,10 +131,26 @@ struct GenesisIoState {
 	uint8_t ThState[2] = {};    // Current TH state
 };
 
+// ===== PSG (SN76489) State =====
+
+struct GenesisPsgChannelState {
+	uint16_t ToneCounter = 0;    // 10-bit tone period register
+	uint8_t Volume = 0x0F;       // 4-bit attenuation (0x0F = silent)
+};
+
+struct GenesisPsgState {
+	GenesisPsgChannelState Channels[4] = {};  // 3 tone + 1 noise
+	uint8_t LatchedRegister = 0;              // Currently latched register (0-7)
+	uint8_t NoiseMode = 0;                    // Noise mode (bit 2) + shift rate (bits 0-1)
+	uint16_t NoiseShiftRegister = 0x8000;     // 16-bit LFSR
+	uint32_t WriteCount = 0;                  // Total writes for diagnostics
+};
+
 // ===== Combined State =====
 
 struct GenesisState {
 	GenesisM68kState Cpu;
 	GenesisVdpState Vdp;
 	GenesisIoState Io;
+	GenesisPsgState Psg;
 };

@@ -8,11 +8,11 @@ namespace {
 		Atari2600Console console(&emu);
 
 		console.Reset();
-		console.DebugWriteCartridge(0x0082, 0x0F); // DDRA: low nibble output
-		console.DebugWriteCartridge(0x0080, 0xA5); // SWCHA output latch
+		console.DebugWriteCartridge(0x0282, 0x0F); // DDRA: low nibble output
+		console.DebugWriteCartridge(0x0280, 0xA5); // SWCHA output latch
 
-		EXPECT_EQ(console.DebugReadCartridge(0x0082), 0x0Fu);
-		EXPECT_EQ(console.DebugReadCartridge(0x0080), 0x05u);
+		EXPECT_EQ(console.DebugReadCartridge(0x0282), 0x0Fu);
+		EXPECT_EQ(console.DebugReadCartridge(0x0280), 0x05u);
 
 		Atari2600RiotState riotState = console.GetRiotState();
 		EXPECT_EQ(riotState.PortA, 0xA5u);
@@ -24,7 +24,7 @@ namespace {
 		Atari2600Console console(&emu);
 
 		console.Reset();
-		console.DebugWriteCartridge(0x0084, 0x02); // divider=1, timer=2
+		console.DebugWriteCartridge(0x0284, 0x02); // divider=1, timer=2
 
 		console.StepCpuCycles(3);
 		Atari2600RiotState firstUnderflow = console.GetRiotState();
@@ -37,7 +37,7 @@ namespace {
 		EXPECT_EQ(secondUnderflow.InterruptEdgeCount, 2u);
 
 		console.Reset();
-		console.DebugWriteCartridge(0x0085, 0x01); // divider=8, timer=1
+		console.DebugWriteCartridge(0x0285, 0x01); // divider=8, timer=1
 		console.StepCpuCycles(15);
 		EXPECT_FALSE(console.GetRiotState().TimerUnderflow);
 		console.StepCpuCycles(1);
@@ -49,13 +49,13 @@ namespace {
 		Atari2600Console console(&emu);
 
 		console.Reset();
-		console.DebugWriteCartridge(0x0084, 0x00); // divider=1, timer=0 (underflow on next tick)
+		console.DebugWriteCartridge(0x0284, 0x00); // divider=1, timer=0 (underflow on next tick)
 		console.StepCpuCycles(1);
 
-		EXPECT_EQ(console.DebugReadCartridge(0x0086), 1u);
-		EXPECT_EQ(console.DebugReadCartridge(0x0087), 1u);
-		EXPECT_EQ(console.DebugReadCartridge(0x0086), 1u);
-		EXPECT_EQ(console.DebugReadCartridge(0x0087), 1u);
+		EXPECT_EQ(console.DebugReadCartridge(0x0286), 1u);
+		EXPECT_EQ(console.DebugReadCartridge(0x0287), 1u);
+		EXPECT_EQ(console.DebugReadCartridge(0x0286), 1u);
+		EXPECT_EQ(console.DebugReadCartridge(0x0287), 1u);
 
 		Atari2600RiotState afterReads = console.GetRiotState();
 		EXPECT_TRUE(afterReads.InterruptFlag);
@@ -68,13 +68,13 @@ namespace {
 		Atari2600Console console(&emu);
 
 		console.Reset();
-		console.DebugWriteCartridge(0x0084, 0x00); // underflow on next step
+		console.DebugWriteCartridge(0x0284, 0x00); // underflow on next step
 		console.StepCpuCycles(1);
 
 		// Read status first to lock deterministic read ordering, then reconfigure timer.
-		EXPECT_EQ(console.DebugReadCartridge(0x0086), 1u);
-		EXPECT_EQ(console.DebugReadCartridge(0x0087), 1u);
-		console.DebugWriteCartridge(0x0084, 0x05);
+		EXPECT_EQ(console.DebugReadCartridge(0x0286), 1u);
+		EXPECT_EQ(console.DebugReadCartridge(0x0287), 1u);
+		console.DebugWriteCartridge(0x0284, 0x05);
 
 		Atari2600RiotState state = console.GetRiotState();
 		EXPECT_FALSE(state.InterruptFlag);

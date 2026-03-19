@@ -572,6 +572,8 @@ public enum MemoryType {
 	GbaMemory,
 	WsMemory,
 	LynxMemory,
+	GenesisMemory,
+	Atari2600Memory,
 
 	SnesPrgRom,
 	SnesWorkRam,
@@ -660,6 +662,15 @@ public enum MemoryType {
 	LynxWorkRam,
 	LynxBootRom,
 	LynxSaveRam,
+
+	GenesisPrgRom,
+	GenesisWorkRam,
+	GenesisVideoRam,
+	GenesisPaletteRam,
+
+	Atari2600PrgRom,
+	Atari2600Ram,
+	Atari2600TiaRegisters,
 
 	None,
 }

@@ -3,6 +3,7 @@
 #include "Atari2600/Atari2600DefaultVideoFilter.h"
 #include "Shared/BaseControlManager.h"
 #include "Shared/CpuType.h"
+#include "Shared/Emulator.h"
 #include "Shared/MemoryType.h"
 #include "Utilities/VirtualFile.h"
 #include "Utilities/Serializer.h"
@@ -308,11 +309,20 @@ public:
 			default: return "none";
 		}
 	}
+
+	[[nodiscard]] uint8_t* GetRomData() {
+		return _rom.empty() ? nullptr : _rom.data();
+	}
+
+	[[nodiscard]] uint32_t GetRomSize() const {
+		return (uint32_t)_rom.size();
+	}
 };
 
 class Atari2600Riot {
 	private:
 		Atari2600RiotState _state = {};
+		uint8_t _ram[128] = {};
 
 		void ConfigureTimer(uint8_t value, uint16_t divider) {
 			_state.Timer = value;
@@ -333,6 +343,7 @@ class Atari2600Riot {
 			_state = {};
 			_state.TimerDivider = 1;
 			_state.TimerDividerCounter = 1;
+			memset(_ram, 0, sizeof(_ram));
 		}
 
 		void StepCpuCycles(uint32_t cycles) {
@@ -359,6 +370,9 @@ class Atari2600Riot {
 		}
 
 		uint8_t ReadRegister(uint16_t addr) const {
+			if (!(addr & 0x0200)) {
+				return _ram[addr & 0x7F];
+			}
 			switch (addr & 0x07) {
 				case 0x00: return ReadPortValue(_state.PortA, _state.PortAInput, _state.PortADirection);
 				case 0x01: return ReadPortValue(_state.PortB, _state.PortBInput, _state.PortBDirection);
@@ -373,6 +387,10 @@ class Atari2600Riot {
 		}
 
 		void WriteRegister(uint16_t addr, uint8_t value) {
+			if (!(addr & 0x0200)) {
+				_ram[addr & 0x7F] = value;
+				return;
+			}
 			switch (addr & 0x07) {
 				case 0x00:
 					_state.PortA = value;
@@ -414,6 +432,12 @@ class Atari2600Riot {
 				_state.TimerDividerCounter = _state.TimerDivider;
 			}
 		}
+
+		uint8_t* GetRamData() {
+			return _ram;
+		}
+
+		static constexpr uint32_t RamSize = 128;
 	};
 
 	class Atari2600Tia {
@@ -1061,6 +1085,10 @@ LoadRomResult Atari2600Console::LoadRom(VirtualFile& romFile) {
 	}
 
 	_mapper->LoadRom(romData, romFile.GetFileName());
+
+	_emu->RegisterMemory(MemoryType::Atari2600PrgRom, _mapper->GetRomData(), _mapper->GetRomSize());
+	_emu->RegisterMemory(MemoryType::Atari2600Ram, _riot->GetRamData(), Atari2600Riot::RamSize);
+
 	_romLoaded = true;
 	Reset();
 	return LoadRomResult::Success;
@@ -1293,7 +1321,7 @@ AddressInfo Atari2600Console::GetAbsoluteAddress(AddressInfo& relAddress) {
 }
 
 AddressInfo Atari2600Console::GetPcAbsoluteAddress() {
-	return {(int32_t)_cpu->GetProgramCounter(), MemoryType::None};
+	return {(int32_t)_cpu->GetProgramCounter(), MemoryType::Atari2600PrgRom};
 }
 
 AddressInfo Atari2600Console::GetRelativeAddress(AddressInfo& absAddress, CpuType cpuType) {

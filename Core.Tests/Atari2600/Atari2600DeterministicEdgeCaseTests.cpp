@@ -51,19 +51,19 @@ namespace {
 			Atari2600Console console(&emu);
 
 			console.Reset();
-			console.DebugWriteCartridge(0x0182, 0x0F);
-			console.DebugWriteCartridge(0x0080, 0xA5);
-			console.DebugWriteCartridge(0x0186, 0x01);
+			console.DebugWriteCartridge(0x0282, 0x0F);
+			console.DebugWriteCartridge(0x0280, 0xA5);
+			console.DebugWriteCartridge(0x0286, 0x01);
 
 			console.StepCpuCycles(64);
 			EXPECT_FALSE(console.GetRiotState().TimerUnderflow);
 			console.StepCpuCycles(64);
 
 			Atari2600RiotState state = console.GetRiotState();
-			EXPECT_EQ(console.DebugReadCartridge(0x0180), 0x05u);
-			EXPECT_EQ(console.DebugReadCartridge(0x0082), 0x0Fu);
-			EXPECT_EQ(console.DebugReadCartridge(0x0186), 0x01u);
-			EXPECT_EQ(console.DebugReadCartridge(0x0087), 0x01u);
+			EXPECT_EQ(console.DebugReadCartridge(0x0280), 0x05u);
+			EXPECT_EQ(console.DebugReadCartridge(0x0282), 0x0Fu);
+			EXPECT_EQ(console.DebugReadCartridge(0x0286), 0x01u);
+			EXPECT_EQ(console.DebugReadCartridge(0x0287), 0x01u);
 			return state;
 		};
 

@@ -253,6 +253,12 @@ public:
 			case MemoryType::GenesisPaletteRam:
 				return CpuType::Genesis;
 
+			case MemoryType::Atari2600Memory:
+			case MemoryType::Atari2600PrgRom:
+			case MemoryType::Atari2600Ram:
+			case MemoryType::Atari2600TiaRegisters:
+				return CpuType::Nes;
+
 			[[unlikely]] default:
 				throw std::runtime_error("Invalid CPU type");
 		}
@@ -309,7 +315,7 @@ public:
 	/// Get last CPU memory type enum value.
 	/// </summary>
 	[[nodiscard]] static constexpr MemoryType GetLastCpuMemoryType() {
-		return MemoryType::LynxMemory;
+		return MemoryType::Atari2600Memory;
 	}
 
 	/// <summary>
@@ -383,6 +389,9 @@ public:
 			case MemoryType::LynxPrgRom:
 			case MemoryType::LynxBootRom:
 			case MemoryType::GenesisPrgRom:
+				return true;
+
+			case MemoryType::Atari2600PrgRom:
 				return true;
 
 			default:

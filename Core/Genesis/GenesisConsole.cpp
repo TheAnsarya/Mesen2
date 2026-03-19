@@ -4,6 +4,7 @@
 #include "Genesis/GenesisVdp.h"
 #include "Genesis/GenesisControlManager.h"
 #include "Genesis/GenesisMemoryManager.h"
+#include "Genesis/GenesisPsg.h"
 #include "Genesis/GenesisTypes.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
@@ -68,13 +69,15 @@ LoadRomResult GenesisConsole::LoadRom(VirtualFile& romFile) {
 	_vdp = std::make_unique<GenesisVdp>();
 	_memoryManager = std::make_unique<GenesisMemoryManager>();
 	_controlManager = std::make_unique<GenesisControlManager>(_emu, this);
+	_psg = std::make_unique<GenesisPsg>(_emu, this);
 	_cpu = std::make_unique<GenesisM68k>();
 
-	_memoryManager->Init(_emu, this, romData, _vdp.get(), _controlManager.get());
+	_memoryManager->Init(_emu, this, romData, _vdp.get(), _controlManager.get(), _psg.get());
 	_vdp->Init(_emu, this, _cpu.get(), _memoryManager.get());
 	_memoryManager->SetCpu(_cpu.get());
 	_cpu->Init(_emu, this, _memoryManager.get());
 	_cpu->Reset(false);
+	_memoryManager->LoadBattery();
 
 	_vdp->SetRegion(_region == ConsoleRegion::Pal);
 
@@ -83,6 +86,9 @@ LoadRomResult GenesisConsole::LoadRom(VirtualFile& romFile) {
 
 void GenesisConsole::Reset() {
 	_cpu->Reset(true);
+	if (_psg) {
+		_psg->Reset();
+	}
 }
 
 void GenesisConsole::RunFrame() {
@@ -98,7 +104,9 @@ void GenesisConsole::ProcessEndOfFrame() {
 }
 
 void GenesisConsole::SaveBattery() {
-	// TODO: SRAM save support
+	if (_memoryManager) {
+		_memoryManager->SaveBattery();
+	}
 }
 
 BaseControlManager* GenesisConsole::GetControlManager() {
@@ -174,6 +182,10 @@ GenesisState GenesisConsole::GetState() {
 	GenesisState state;
 	state.Cpu = _cpu->GetState();
 	state.Vdp = _vdp->GetState();
+	state.Io = _memoryManager->GetIoState();
+	if (_psg) {
+		state.Psg = _psg->GetState();
+	}
 	return state;
 }
 
@@ -191,4 +203,5 @@ void GenesisConsole::Serialize(Serializer& s) {
 	SV(_vdp);
 	SV(_controlManager);
 	SV(_memoryManager);
+	SV(_psg);
 }

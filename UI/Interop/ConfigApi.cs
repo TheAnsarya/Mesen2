@@ -10,7 +10,7 @@ using Nexen.Config;
 using Nexen.Config.Shortcuts;
 using Nexen.Utilities;
 
-namespace Nexen.Interop; 
+namespace Nexen.Interop;
 public sealed class ConfigApi {
 	private const string DllPath = EmuApi.DllName;
 
@@ -28,6 +28,8 @@ public sealed class ConfigApi {
 	[DllImport(DllPath)] public static extern void SetCvConfig(InteropCvConfig config);
 	[DllImport(DllPath)] public static extern void SetWsConfig(InteropWsConfig config);
 	[DllImport(DllPath)] public static extern void SetLynxConfig(InteropLynxConfig config);
+	[DllImport(DllPath)] public static extern void SetGenesisConfig(InteropGenesisConfig config);
+	[DllImport(DllPath)] public static extern void SetAtari2600Config(InteropAtari2600Config config);
 
 	[DllImport(DllPath)] public static extern void SetGameConfig(InteropGameConfig config);
 

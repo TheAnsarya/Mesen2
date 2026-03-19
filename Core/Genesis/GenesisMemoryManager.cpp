@@ -4,8 +4,19 @@
 #include "Genesis/GenesisM68k.h"
 #include "Genesis/GenesisVdp.h"
 #include "Genesis/GenesisControlManager.h"
+#include "Genesis/GenesisPsg.h"
 #include "Shared/Emulator.h"
+#include "Shared/BatteryManager.h"
 #include "Utilities/Serializer.h"
+
+namespace {
+	__forceinline uint32_t ReadBe32(const vector<uint8_t>& data, size_t offset) {
+		return ((uint32_t)data[offset] << 24)
+			| ((uint32_t)data[offset + 1] << 16)
+			| ((uint32_t)data[offset + 2] << 8)
+			| (uint32_t)data[offset + 3];
+	}
+}
 
 GenesisMemoryManager::GenesisMemoryManager() {
 }
@@ -13,11 +24,12 @@ GenesisMemoryManager::GenesisMemoryManager() {
 GenesisMemoryManager::~GenesisMemoryManager() {
 }
 
-void GenesisMemoryManager::Init(Emulator* emu, GenesisConsole* console, vector<uint8_t>& romData, GenesisVdp* vdp, GenesisControlManager* controlManager) {
+void GenesisMemoryManager::Init(Emulator* emu, GenesisConsole* console, vector<uint8_t>& romData, GenesisVdp* vdp, GenesisControlManager* controlManager, GenesisPsg* psg) {
 	_emu = emu;
 	_console = console;
 	_vdp = vdp;
 	_controlManager = controlManager;
+	_psg = psg;
 
 	// Register and allocate ROM
 	_prgRomSize = (uint32_t)romData.size();
@@ -42,6 +54,76 @@ void GenesisMemoryManager::Init(Emulator* emu, GenesisConsole* console, vector<u
 
 	_z80BusRequest = false;
 	_z80Reset = true;
+
+	_hasSram = false;
+	_sramStart = 0;
+	_sramEnd = 0;
+	_sramEvenBytes = true;
+	_sramOddBytes = true;
+	_saveRam = nullptr;
+	_saveRamSize = 0;
+
+	if (romData.size() >= 0x1BC && romData[0x1B0] == 'R' && romData[0x1B1] == 'A') {
+		uint32_t start = ReadBe32(romData, 0x1B4) & 0xFFFFFF;
+		uint32_t end = ReadBe32(romData, 0x1B8) & 0xFFFFFF;
+		uint8_t type = romData[0x1B2];
+
+		if (end >= start) {
+			_sramStart = start;
+			_sramEnd = end;
+			_sramEvenBytes = true;
+			_sramOddBytes = true;
+
+			if (type == 0xB0) {
+				_sramOddBytes = false;
+			} else if (type == 0xB8) {
+				_sramEvenBytes = false;
+			}
+
+			if (!_sramEvenBytes && !_sramOddBytes) {
+				_sramEvenBytes = true;
+				_sramOddBytes = true;
+			}
+
+			if (_sramEvenBytes && _sramOddBytes) {
+				_saveRamSize = (_sramEnd - _sramStart) + 1;
+			} else {
+				_saveRamSize = ((_sramEnd - _sramStart) >> 1) + 1;
+			}
+
+			if (_saveRamSize > 0) {
+				_saveRam = new uint8_t[_saveRamSize];
+				memset(_saveRam, 0xFF, _saveRamSize);
+				_hasSram = true;
+			}
+		}
+	}
+}
+
+bool GenesisMemoryManager::IsSramAddress(uint32_t addr) const {
+	return HasSaveRam() && addr >= _sramStart && addr <= _sramEnd;
+}
+
+bool GenesisMemoryManager::TryGetSramOffset(uint32_t addr, uint32_t& offset) const {
+	if (!IsSramAddress(addr)) {
+		return false;
+	}
+
+	if ((addr & 0x01) == 0) {
+		if (!_sramEvenBytes) {
+			return false;
+		}
+	} else if (!_sramOddBytes) {
+		return false;
+	}
+
+	if (_sramEvenBytes && _sramOddBytes) {
+		offset = addr - _sramStart;
+	} else {
+		offset = (addr - _sramStart) >> 1;
+	}
+
+	return offset < _saveRamSize;
 }
 
 // =============================================
@@ -58,6 +140,14 @@ void GenesisMemoryManager::Init(Emulator* emu, GenesisConsole* console, vector<u
 
 uint8_t GenesisMemoryManager::Read8(uint32_t addr) {
 	addr &= 0xFFFFFF;
+	uint32_t sramOffset = 0;
+
+	if (TryGetSramOffset(addr, sramOffset)) {
+		uint8_t value = _saveRam[sramOffset];
+		_emu->ProcessMemoryRead<CpuType::Genesis>(addr, value, MemoryOperationType::Read);
+		_openBus = value;
+		return value;
+	}
 
 	if (addr < 0x400000) {
 		// Cartridge ROM
@@ -109,6 +199,11 @@ uint8_t GenesisMemoryManager::Read8(uint32_t addr) {
 
 uint16_t GenesisMemoryManager::Read16(uint32_t addr) {
 	addr &= 0xFFFFFE;
+	if (HasSaveRam() && addr >= _sramStart && addr <= _sramEnd) {
+		uint8_t hi = Read8(addr);
+		uint8_t lo = Read8(addr + 1);
+		return ((uint16_t)hi << 8) | lo;
+	}
 
 	if (addr < 0x400000) {
 		if (addr + 1 < _prgRomSize) {
@@ -155,6 +250,13 @@ uint16_t GenesisMemoryManager::Read16(uint32_t addr) {
 
 void GenesisMemoryManager::Write8(uint32_t addr, uint8_t value) {
 	addr &= 0xFFFFFF;
+	uint32_t sramOffset = 0;
+
+	if (TryGetSramOffset(addr, sramOffset)) {
+		_emu->ProcessMemoryWrite<CpuType::Genesis>(addr, value, MemoryOperationType::Write);
+		_saveRam[sramOffset] = value;
+		return;
+	}
 
 	if (addr >= 0xFF0000) {
 		uint32_t offset = addr & 0xFFFF;
@@ -197,6 +299,11 @@ void GenesisMemoryManager::Write8(uint32_t addr, uint8_t value) {
 
 void GenesisMemoryManager::Write16(uint32_t addr, uint16_t value) {
 	addr &= 0xFFFFFE;
+	if (HasSaveRam() && addr >= _sramStart && addr <= _sramEnd) {
+		Write8(addr, (uint8_t)(value >> 8));
+		Write8(addr + 1, (uint8_t)(value & 0xFF));
+		return;
+	}
 
 	if (addr >= 0xFF0000) {
 		uint32_t offset = addr & 0xFFFF;
@@ -256,8 +363,10 @@ void GenesisMemoryManager::WriteVdpPort(uint32_t addr, uint16_t value) {
 	} else if (port < 0x08) {
 		_vdp->WriteControlPort(value);
 	} else if (port >= 0x11 && port < 0x14) {
-		// PSG write (top byte)
-		// TODO: implement PSG
+		// PSG write — SN76489 accepts byte writes via top byte of word
+		if (_psg) {
+			_psg->Write((uint8_t)(value >> 8));
+		}
 	}
 }
 
@@ -327,6 +436,14 @@ int32_t GenesisMemoryManager::GetRelativeAddress(AddressInfo& absAddress) {
 void GenesisMemoryManager::Serialize(Serializer& s) {
 	SVArray(_workRam, WorkRamSize);
 	SVArray(_z80Ram, Z80RamSize);
+	SV(_hasSram);
+	SV(_sramStart);
+	SV(_sramEnd);
+	SV(_sramEvenBytes);
+	SV(_sramOddBytes);
+	if (_saveRam && _saveRamSize > 0) {
+		SVArray(_saveRam, _saveRamSize);
+	}
 	SV(_masterClock);
 	SV(_openBus);
 	SV(_z80BusRequest);
@@ -335,4 +452,16 @@ void GenesisMemoryManager::Serialize(Serializer& s) {
 	SV(_tmssUnlocked);
 	SV(_ioState.DataPort[0]); SV(_ioState.DataPort[1]); SV(_ioState.DataPort[2]);
 	SV(_ioState.CtrlPort[0]); SV(_ioState.CtrlPort[1]); SV(_ioState.CtrlPort[2]);
+}
+
+void GenesisMemoryManager::LoadBattery() {
+	if (HasSaveRam()) {
+		_emu->GetBatteryManager()->LoadBattery(".sav", std::span<uint8_t>(_saveRam, _saveRamSize));
+	}
+}
+
+void GenesisMemoryManager::SaveBattery() {
+	if (HasSaveRam()) {
+		_emu->GetBatteryManager()->SaveBattery(".sav", std::span<const uint8_t>(_saveRam, _saveRamSize));
+	}
 }

@@ -694,7 +694,10 @@ add a dozen more issues, and then implement everything; continue; work on issues
 -- switch to claude opus 4.6
 stop doing all these abstract tests, fucking actually implement emulation; stop moving clouds around, build a damn house; concrete not ethereal; make issues not for testing but real implementation of a sega genesis emulator, we'll deal with scaffold structures later; make a sprite be shown on a screen or something; make real issues and implement an actual emulator, not gundgy nonsense that doesn't advance our purpioses of emulating Sonic, I want to play it in perfect emulation with pansy recording and debugging; continue;
 
+Work emulator implementations issues, making new issues, updating epics issues docs plans chat/session-logs benchmarks tests, and implement , focus on implementing, emulator stuff, also add some 2600 implementation issues and work them to, and work for a very long time;
 
+--- chatgpt-codex-5.3
+continue;
 
 
 

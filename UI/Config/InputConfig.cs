@@ -395,6 +395,12 @@ public enum ControllerType {
 
 	//Atari Lynx
 	LynxController,
+
+	//Genesis
+	GenesisController,
+
+	//Atari 2600
+	Atari2600Joystick,
 }
 
 public static class ControllerTypeExtensions {
@@ -416,6 +422,8 @@ public static class ControllerTypeExtensions {
 			case ControllerType.WsController:
 			case ControllerType.WsControllerVertical:
 			case ControllerType.LynxController:
+			case ControllerType.GenesisController:
+			case ControllerType.Atari2600Joystick:
 				return true;
 		}
 
@@ -438,6 +446,8 @@ public static class ControllerTypeExtensions {
 			case ControllerType.BandaiHyperShot:
 			case ControllerType.SmsController:
 			case ControllerType.LynxController:
+			case ControllerType.GenesisController:
+			case ControllerType.Atari2600Joystick:
 				return true;
 		}
 
@@ -484,6 +494,8 @@ public static class ControllerTypeExtensions {
 			case ControllerType.WsController:
 			case ControllerType.WsControllerVertical:
 			case ControllerType.LynxController:
+			case ControllerType.GenesisController:
+			case ControllerType.Atari2600Joystick:
 				return true;
 		}
 
@@ -502,6 +514,7 @@ public static class ControllerTypeExtensions {
 			case ControllerType.SmsController:
 			case ControllerType.WsController:
 			case ControllerType.LynxController:
+			case ControllerType.Atari2600Joystick:
 				return true;
 		}
 

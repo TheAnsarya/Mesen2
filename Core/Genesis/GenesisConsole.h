@@ -12,6 +12,7 @@ class GenesisM68k;
 class GenesisVdp;
 class GenesisControlManager;
 class GenesisMemoryManager;
+class GenesisPsg;
 
 class GenesisConsole final : public IConsole {
 private:
@@ -20,6 +21,7 @@ private:
 	unique_ptr<GenesisVdp> _vdp;
 	unique_ptr<GenesisControlManager> _controlManager;
 	unique_ptr<GenesisMemoryManager> _memoryManager;
+	unique_ptr<GenesisPsg> _psg;
 	ConsoleRegion _region = ConsoleRegion::Ntsc;
 
 public:

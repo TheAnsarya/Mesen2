@@ -32,7 +32,12 @@ void EmuSettings::CopySettings(EmuSettings& src) {
 	SetNesConfig(src._nes);
 	SetPcEngineConfig(src._pce);
 	SetSmsConfig(src._sms);
+	SetCvConfig(src._cv);
 	SetGbaConfig(src._gba);
+	SetWsConfig(src._ws);
+	SetLynxConfig(src._lynx);
+	SetGenesisConfig(src._genesis);
+	SetAtari2600Config(src._atari2600);
 }
 
 void EmuSettings::Serialize(Serializer& s) {
@@ -152,6 +157,12 @@ void EmuSettings::Serialize(Serializer& s) {
 			break;
 
 		case ConsoleType::Atari2600:
+			SV(_atari2600.RamPowerOnState);
+			SV(_atari2600.P0DifficultyB);
+			SV(_atari2600.P1DifficultyB);
+			SV(_atari2600.ColorMode);
+			SV(_atari2600.Port1.Type);
+			SV(_atari2600.Port2.Type);
 			break;
 
 		case ConsoleType::Genesis:
@@ -300,6 +311,14 @@ void EmuSettings::SetGenesisConfig(GenesisConfig& config) {
 
 GenesisConfig& EmuSettings::GetGenesisConfig() {
 	return _genesis;
+}
+
+void EmuSettings::SetAtari2600Config(Atari2600Config& config) {
+	_atari2600 = config;
+}
+
+Atari2600Config& EmuSettings::GetAtari2600Config() {
+	return _atari2600;
 }
 
 void EmuSettings::SetGameConfig(GameConfig& config) {
@@ -568,7 +587,7 @@ bool EmuSettings::HasRandomPowerOnState(ConsoleType consoleType) {
 		case ConsoleType::Gba:
 			return _gba.RamPowerOnState == RamState::Random;
 		case ConsoleType::Atari2600:
-			return false;
+			return _atari2600.RamPowerOnState == RamState::Random;
 		case ConsoleType::Genesis:
 			return _genesis.RamPowerOnState == RamState::Random;
 	}

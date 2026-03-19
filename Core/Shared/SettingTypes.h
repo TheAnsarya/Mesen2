@@ -236,7 +236,10 @@ enum class ControllerType {
 	LynxController,
 
 	// Genesis
-	GenesisController
+	GenesisController,
+
+	// Atari 2600
+	Atari2600Joystick
 };
 
 struct KeyMapping {
@@ -767,6 +770,20 @@ struct GenesisConfig {
 	bool DisableBackground = false;
 
 	OverscanDimensions Overscan = {};
+};
+
+struct Atari2600Config {
+	ControllerConfig Port1;
+	ControllerConfig Port2;
+
+	bool P0DifficultyB = true;
+	bool P1DifficultyB = true;
+	bool ColorMode = true;
+
+	RamState RamPowerOnState = RamState::AllZeros;
+
+	uint32_t Channel0Vol = 100;
+	uint32_t Channel1Vol = 100;
 };
 
 struct AudioPlayerConfig {

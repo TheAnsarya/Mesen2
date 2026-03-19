@@ -824,6 +824,7 @@
     <ClInclude Include="Genesis\GenesisM68k.h" />
     <ClInclude Include="Genesis\GenesisVdp.h" />
     <ClInclude Include="Genesis\GenesisMemoryManager.h" />
+    <ClInclude Include="Genesis\GenesisPsg.h" />
     <ClInclude Include="Genesis\GenesisControlManager.h" />
     <ClInclude Include="Genesis\GenesisDefaultVideoFilter.h" />
     <ClInclude Include="Genesis\Input\GenesisController.h" />
@@ -1154,6 +1155,7 @@
     <ClCompile Include="Genesis\GenesisM68k.cpp" />
     <ClCompile Include="Genesis\GenesisVdp.cpp" />
     <ClCompile Include="Genesis\GenesisMemoryManager.cpp" />
+    <ClCompile Include="Genesis\GenesisPsg.cpp" />
     <ClCompile Include="Genesis\GenesisControlManager.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxDisUtils.cpp" />
     <ClCompile Include="Lynx\Debugger\LynxDebugger.cpp" />
