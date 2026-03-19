@@ -141,4 +141,40 @@ namespace {
 		EXPECT_GT(first.Bus.DmaContentionEvents, 0u);
 		EXPECT_GT(first.Bus.Z80HandoffCount, 0u);
 	}
+
+	TEST(GenesisSaveStateDeterminismTests, LongRunReplayAcrossFrameRolloverKeepsInterruptCountsStable) {
+		auto runTail = [](GenesisM68kBoundaryScaffold& scaffold) {
+			auto& bus = scaffold.GetBus();
+			for (uint32_t i = 0; i < 100; i++) {
+				if ((i % 25) == 0) {
+					bus.BeginDmaTransfer(GenesisVdpDmaMode::Copy, 12);
+				}
+				if ((i % 10) == 0) {
+					bus.WriteByte(0xA04000, 0x22);
+					bus.WriteByte(0xA04001, (uint8_t)(0x10 + (i & 0x1F)));
+					bus.WriteByte(0xC00011, (uint8_t)(0x90 | (i & 0x0F)));
+				}
+				scaffold.StepFrameScaffold(488u);
+			}
+			return scaffold.SaveState();
+		};
+
+		GenesisM68kBoundaryScaffold scaffold;
+		LoadNopRom(scaffold);
+		scaffold.Startup();
+		scaffold.ConfigureInterruptSchedule(true, 8, true);
+		scaffold.StepFrameScaffold(488u * 200u);
+
+		GenesisBoundaryScaffoldSaveState checkpoint = scaffold.SaveState();
+		GenesisBoundaryScaffoldSaveState first = runTail(scaffold);
+
+		scaffold.LoadState(checkpoint);
+		GenesisBoundaryScaffoldSaveState replay = runTail(scaffold);
+
+		EXPECT_EQ(first, replay);
+		EXPECT_GT(first.HInterruptCount, checkpoint.HInterruptCount);
+		EXPECT_GT(first.VInterruptCount, checkpoint.VInterruptCount);
+		EXPECT_GE(first.TimingFrame, checkpoint.TimingFrame + 1u);
+		EXPECT_FALSE(first.Bus.MixedDigest.empty());
+	}
 }
