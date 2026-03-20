@@ -86,6 +86,86 @@ namespace {
 		EXPECT_EQ(console.DebugReadCartridge(0x1000), 0x43);
 	}
 
+	TEST(Atari2600MapperPhaseATests, F8InvalidOrderHotspotSequenceKeepsDeterministicBankState) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		vector<uint8_t> rom8k(8192, 0x11);
+		std::fill(rom8k.begin() + 0x1000, rom8k.begin() + 0x2000, 0x22);
+		VirtualFile romFile = MakeRomFile("mapper-f8-invalid-order.a26", rom8k);
+
+		ASSERT_EQ(console.LoadRom(romFile), LoadRomResult::Success);
+		ASSERT_EQ(console.DebugGetMapperMode(), "f8");
+
+		struct Step {
+			uint16_t Addr;
+			uint8_t ExpectedBank;
+			uint8_t ExpectedValue;
+		};
+
+		const std::array<Step, 6> steps = {{
+			{0x1ff8, 0, 0x11},
+			{0x1ff8, 0, 0x11},
+			{0x1ff7, 0, 0x11},
+			{0x1ff9, 1, 0x22},
+			{0x1ff9, 1, 0x22},
+			{0x1ff6, 1, 0x22},
+		}};
+
+		for (size_t i = 0; i < steps.size(); i++) {
+			const Step& step = steps[i];
+			SCOPED_TRACE(string("mapper=f8;step=") + std::to_string(i)
+				+ ";addr=" + std::to_string(step.Addr));
+
+			console.DebugReadCartridge(step.Addr);
+			uint8_t bank = console.DebugGetMapperBankIndex();
+			uint8_t value = console.DebugReadCartridge(0x1000);
+			EXPECT_EQ(bank, step.ExpectedBank) << "mapper=f8;field=bank;step=" << i;
+			EXPECT_EQ(value, step.ExpectedValue) << "mapper=f8;field=value;step=" << i;
+		}
+	}
+
+	TEST(Atari2600MapperPhaseATests, F6InvalidOrderHotspotSequenceKeepsDeterministicBankState) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		vector<uint8_t> rom16k(16384, 0x40);
+		std::fill(rom16k.begin() + 0x1000, rom16k.begin() + 0x2000, 0x41);
+		std::fill(rom16k.begin() + 0x2000, rom16k.begin() + 0x3000, 0x42);
+		std::fill(rom16k.begin() + 0x3000, rom16k.begin() + 0x4000, 0x43);
+		VirtualFile romFile = MakeRomFile("mapper-f6-invalid-order.a26", rom16k);
+
+		ASSERT_EQ(console.LoadRom(romFile), LoadRomResult::Success);
+		ASSERT_EQ(console.DebugGetMapperMode(), "f6");
+
+		struct Step {
+			uint16_t Addr;
+			uint8_t ExpectedBank;
+			uint8_t ExpectedValue;
+		};
+
+		const std::array<Step, 6> steps = {{
+			{0x1ff9, 3, 0x43},
+			{0x1ff4, 3, 0x43},
+			{0x1ff6, 0, 0x40},
+			{0x1ff8, 2, 0x42},
+			{0x1ff7, 1, 0x41},
+			{0x1ff5, 1, 0x41},
+		}};
+
+		for (size_t i = 0; i < steps.size(); i++) {
+			const Step& step = steps[i];
+			SCOPED_TRACE(string("mapper=f6;step=") + std::to_string(i)
+				+ ";addr=" + std::to_string(step.Addr));
+
+			console.DebugReadCartridge(step.Addr);
+			uint8_t bank = console.DebugGetMapperBankIndex();
+			uint8_t value = console.DebugReadCartridge(0x1000);
+			EXPECT_EQ(bank, step.ExpectedBank) << "mapper=f6;field=bank;step=" << i;
+			EXPECT_EQ(value, step.ExpectedValue) << "mapper=f6;field=value;step=" << i;
+		}
+	}
+
 	TEST(Atari2600MapperPhaseATests, BaselineHarnessDigestStableForPhaseACorpus) {
 		Emulator emu;
 		Atari2600Console console(&emu);

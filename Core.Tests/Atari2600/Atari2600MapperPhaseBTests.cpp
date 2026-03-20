@@ -87,6 +87,54 @@ namespace {
 		EXPECT_EQ(console.DebugReadCartridge(0x1C00), 0x17);
 	}
 
+	TEST(Atari2600MapperPhaseBTests, E0InvalidOrderHotspotSequenceKeepsSegmentStability) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		vector<uint8_t> rom8k(8192, 0x00);
+		for (uint8_t bank = 0; bank < 8; bank++) {
+			std::fill(
+				rom8k.begin() + (size_t)bank * 0x0400,
+				rom8k.begin() + ((size_t)bank + 1) * 0x0400,
+				(uint8_t)(0x10 + bank));
+		}
+
+		VirtualFile romFile = MakeRomFile("mapper-e0-invalid-order.a26", rom8k);
+		ASSERT_EQ(console.LoadRom(romFile), LoadRomResult::Success);
+		ASSERT_EQ(console.DebugGetMapperMode(), "e0");
+
+		struct Step {
+			uint16_t Addr;
+			uint8_t ExpectedLo;
+			uint8_t ExpectedMid;
+			uint8_t ExpectedHi;
+		};
+
+		const std::array<Step, 6> steps = {{
+			{0x1ff7, 0x14, 0x15, 0x17},
+			{0x1fe1, 0x11, 0x15, 0x17},
+			{0x1ff5, 0x11, 0x15, 0x15},
+			{0x1fee, 0x11, 0x16, 0x15},
+			{0x1fe3, 0x13, 0x16, 0x15},
+			{0x1ffa, 0x13, 0x16, 0x15},
+		}};
+
+		for (size_t i = 0; i < steps.size(); i++) {
+			const Step& step = steps[i];
+			SCOPED_TRACE(string("mapper=e0;step=") + std::to_string(i)
+				+ ";addr=" + std::to_string(step.Addr));
+
+			console.DebugReadCartridge(step.Addr);
+			uint8_t lo = console.DebugReadCartridge(0x1000);
+			uint8_t mid = console.DebugReadCartridge(0x1400);
+			uint8_t hi = console.DebugReadCartridge(0x1800);
+
+			EXPECT_EQ(lo, step.ExpectedLo) << "mapper=e0;field=lo;step=" << i;
+			EXPECT_EQ(mid, step.ExpectedMid) << "mapper=e0;field=mid;step=" << i;
+			EXPECT_EQ(hi, step.ExpectedHi) << "mapper=e0;field=hi;step=" << i;
+		}
+	}
+
 	TEST(Atari2600MapperPhaseBTests, BaselineHarnessDigestStableForPhaseBCorpus) {
 		Emulator emu;
 		Atari2600Console console(&emu);
