@@ -56,6 +56,8 @@ Run this first:
 
 ```powershell
 .\scripts\reference-validation-pack.ps1 -SkipBuild
+powershell -File scripts/compare-reference-validation.ps1 -BaselineDir artifacts/reference-validation-baseline -CandidateDir artifacts/reference-validation
+powershell -File scripts/test-reference-validation-compare.ps1
 ```
 
 Expected generated outputs:
@@ -64,6 +66,7 @@ Expected generated outputs:
 - `artifacts/reference-validation/genesis-harness.txt`
 - `artifacts/reference-validation/atari-genesis-benchmarks.json`
 - `artifacts/reference-validation/reference-validation-summary.json`
+- Optional drift report: `artifacts/reference-validation/drift-report.json`
 
 ### How you can directly help parity work
 

@@ -306,8 +306,16 @@ powershell -File scripts/compare-reference-validation.ps1 -BaselineDir artifacts
 Behavior:
 
 - Compares Atari and Genesis summary/digest lines from harness outputs.
+- Validates benchmark JSON schema fields required by CI comparisons (`context.json_schema_version`, `benchmarks[*].name`, `run_name`, `run_type`, `repetitions`, `threads`, `iterations`, `real_time`, `cpu_time`, `time_unit`).
 - Compares benchmark rows and flags absolute CPU-time delta above 5%.
 - Returns exit code `1` on drift by default.
+- Optional: write a machine-readable report with `-ReportPath artifacts/reference-validation/drift-report.json`.
+
+Quick script self-test command:
+
+```powershell
+powershell -File scripts/test-reference-validation-compare.ps1
+```
 
 ## Epic 16 Tracking Docs
 
