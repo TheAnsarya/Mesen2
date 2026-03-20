@@ -34,6 +34,22 @@ namespace {
 		EXPECT_EQ(tiaState.TotalColorClocks, 11u);
 	}
 
+	TEST(Atari2600TiaPhaseATests, HmoveClearStrobeCancelsPendingBurst) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		console.Reset();
+		console.DebugWriteCartridge(0x002A, 0x00);
+		console.DebugWriteCartridge(0x002B, 0x00);
+		EXPECT_FALSE(console.GetTiaState().HmovePending);
+
+		console.StepCpuCycles(1);
+		Atari2600TiaState tiaState = console.GetTiaState();
+		EXPECT_FALSE(tiaState.HmovePending);
+		EXPECT_EQ(tiaState.HmoveApplyCount, 0u);
+		EXPECT_EQ(tiaState.ColorClock, 3u);
+	}
+
 	TEST(Atari2600TiaPhaseATests, HmoveAndWsyncRemainDeterministicAcrossFrames) {
 		Emulator emu;
 		Atari2600Console console(&emu);
@@ -97,5 +113,44 @@ namespace {
 		EXPECT_EQ(tiaState.HmoveStrobeCount, 1u);
 		EXPECT_EQ(tiaState.HmoveApplyCount, 1u);
 		EXPECT_EQ(tiaState.TotalColorClocks, 236u);
+	}
+
+	TEST(Atari2600TiaPhaseATests, HmoveAfterCycle73DefersUntilNextScanline) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		console.Reset();
+		console.StepCpuCycles(74); // color clock 222.
+		console.RequestHmove();
+		console.StepCpuCycles(1);
+
+		Atari2600TiaState deferredState = console.GetTiaState();
+		EXPECT_TRUE(deferredState.HmovePending);
+		EXPECT_EQ(deferredState.HmoveApplyCount, 0u);
+		EXPECT_EQ(deferredState.Scanline, 0u);
+		EXPECT_EQ(deferredState.ColorClock, 225u);
+
+		console.StepCpuCycles(1);
+		Atari2600TiaState appliedState = console.GetTiaState();
+		EXPECT_FALSE(appliedState.HmovePending);
+		EXPECT_EQ(appliedState.HmoveApplyCount, 1u);
+		EXPECT_EQ(appliedState.Scanline, 1u);
+		EXPECT_EQ(appliedState.ColorClock, 8u);
+	}
+
+	TEST(Atari2600TiaPhaseATests, HmoveAtCycle73AppliesImmediately) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		console.Reset();
+		console.StepCpuCycles(73); // color clock 219.
+		console.RequestHmove();
+		console.StepCpuCycles(1);
+
+		Atari2600TiaState tiaState = console.GetTiaState();
+		EXPECT_FALSE(tiaState.HmovePending);
+		EXPECT_EQ(tiaState.HmoveApplyCount, 1u);
+		EXPECT_EQ(tiaState.Scanline, 1u);
+		EXPECT_EQ(tiaState.ColorClock, 2u);
 	}
 }

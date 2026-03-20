@@ -33,6 +33,7 @@ struct Atari2600TiaState {
 	bool WsyncHold = false;
 	uint32_t WsyncCount = 0;
 	bool HmovePending = false;
+	bool HmoveDelayToNextScanline = false;
 	uint32_t HmoveStrobeCount = 0;
 	uint32_t HmoveApplyCount = 0;
 	uint8_t ColorBackground = 0;

@@ -443,7 +443,9 @@ class Atari2600Riot {
 	class Atari2600Tia {
 	private:
 		Atari2600TiaState _state = {};
+		std::array<uint8_t, Atari2600Console::ScreenHeight> _hmoveBlankScanlines = {};
 		static constexpr uint32_t HmoveBlankColorClocks = 8;
+		static constexpr uint32_t HmoveLateCycleThreshold = 73;
 
 		[[nodiscard]] static uint16_t NormalizeRegisterAddress(uint16_t addr) {
 			return addr & 0x3F;
@@ -499,6 +501,7 @@ class Atari2600Riot {
 		void AdvanceScanline() {
 			_state.ColorClock = 0;
 			_state.Scanline++;
+			_state.HmoveDelayToNextScanline = false;
 			if (_state.Scanline >= 262) {
 				_state.Scanline = 0;
 				_state.FrameCount++;
@@ -518,11 +521,16 @@ class Atari2600Riot {
 	public:
 		void Reset() {
 			_state = {};
+			_hmoveBlankScanlines.fill(0);
 			_state.Player0X = 24;
 			_state.Player1X = 96;
 			_state.BallX = 80;
 			_state.AudioCounter0 = 1;
 			_state.AudioCounter1 = 1;
+		}
+
+		void BeginFrameCapture() {
+			_hmoveBlankScanlines.fill(0);
 		}
 
 		void StepCpuCycles(uint32_t cpuCycles) {
@@ -533,9 +541,12 @@ class Atari2600Riot {
 				}
 				StepColorClocks(3);
 				StepAudio();
-				if (_state.HmovePending) {
+				if (_state.HmovePending && !_state.HmoveDelayToNextScanline) {
 					_state.HmovePending = false;
 					_state.HmoveApplyCount++;
+					if (_state.Scanline < Atari2600Console::ScreenHeight) {
+						_hmoveBlankScanlines[_state.Scanline] = 1;
+					}
 					StepColorClocks(HmoveBlankColorClocks);
 				}
 			}
@@ -547,8 +558,22 @@ class Atari2600Riot {
 		}
 
 		void RequestHmove() {
+			uint32_t cpuCycle = _state.ColorClock / 3;
+			_state.HmoveDelayToNextScanline = cpuCycle > HmoveLateCycleThreshold;
 			_state.HmovePending = true;
 			_state.HmoveStrobeCount++;
+		}
+
+		void ClearHmove() {
+			_state.HmovePending = false;
+			_state.HmoveDelayToNextScanline = false;
+		}
+
+		[[nodiscard]] bool IsHmoveBlankScanline(uint32_t scanline) const {
+			if (scanline >= _hmoveBlankScanlines.size()) {
+				return false;
+			}
+			return _hmoveBlankScanlines[scanline] != 0;
 		}
 
 		uint8_t ReadRegister(uint16_t addr) const {
@@ -584,6 +609,10 @@ class Atari2600Riot {
 
 				case 0x2A:
 					RequestHmove();
+					break;
+
+				case 0x2B:
+					ClearHmove();
 					break;
 
 				case 0x06:
@@ -709,6 +738,7 @@ class Atari2600Riot {
 
 		void SetState(const Atari2600TiaState& state) {
 			_state = state;
+			_hmoveBlankScanlines.fill(0);
 			if (_state.AudioCounter0 == 0) {
 				_state.AudioCounter0 = (uint16_t)(_state.AudioFrequency0 + 1);
 			}
@@ -1113,6 +1143,7 @@ void Atari2600Console::RunFrame() {
 		return;
 	}
 
+	_tia->BeginFrameCapture();
 	uint64_t startCycles = _cpu->GetCycleCount();
 	StepCpuCycles(CpuCyclesPerFrame);
 	Atari2600TiaState tiaState = _tia->GetState();
@@ -1202,6 +1233,11 @@ void Atari2600Console::RenderDebugFrame() {
 
 	for (uint32_t y = 0; y < ScreenHeight; y++) {
 		for (uint32_t x = 0; x < ScreenWidth; x++) {
+			if (_tia->IsHmoveBlankScanline(y) && x < 8) {
+				_frameBuffer[y * ScreenWidth + x] = 0;
+				continue;
+			}
+
 			uint16_t pixel = colorBackground;
 
 			uint32_t coarsePixel = (x / 4);
@@ -1395,6 +1431,7 @@ void Atari2600Console::Serialize(Serializer& s) {
 	SV(tiaState.WsyncHold);
 	SV(tiaState.WsyncCount);
 	SV(tiaState.HmovePending);
+	SV(tiaState.HmoveDelayToNextScanline);
 	SV(tiaState.HmoveStrobeCount);
 	SV(tiaState.HmoveApplyCount);
 	SV(tiaState.ColorBackground);

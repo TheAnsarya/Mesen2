@@ -97,4 +97,23 @@ namespace {
 
 		EXPECT_EQ(ballPixels, 4u);
 	}
+
+	TEST(Atari2600RenderPhaseATests, HmoveBlankingDrawsBlackBarOnFirstEightPixels) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "render-hmove-blank.a26");
+
+		console.DebugWriteCartridge(0x0009, 0x0E); // colubk (non-black)
+		console.DebugWriteCartridge(0x002A, 0x00); // hmove
+		console.RunFrame();
+
+		const uint16_t* framePixels = GetFramePixels(console);
+		for (uint32_t x = 0; x < 8; x++) {
+			EXPECT_EQ(framePixels[x], 0u);
+		}
+
+		uint16_t nonBlankReference = framePixels[8];
+		EXPECT_NE(nonBlankReference, 0u);
+		EXPECT_EQ(framePixels[Atari2600Console::ScreenWidth], nonBlankReference);
+	}
 }
