@@ -729,6 +729,18 @@ continue;
 
 Awesome! `If your definition is “fully integrated with debugger/settings/memory viewer UX,” you are one focused milestone away.` create a full spatch of epics and issues and focus intently on getting an atari 2600 emulator fully working with integration wiring and chat/session logs, and dpcs, and plans, and more issues and implement them all until we have a complete emulation solution for atari 2600 from core, to debugging, to TAS/movie and save states and pansy recording and project types, and seetings and memory and vram visualization and sprites and stuff; continue;
 
+-- switch to claude opus 4.6
+Awesome! `If your definition is “fully integrated with debugger/settings/memory viewer UX,” you are one focused milestone away.` create a full spatch of epics and issues and focus intently on getting an atari 2600 emulator fully working with integration wiring and chat/session logs, and dpcs, and plans, and more issues and implement them all until we have a complete emulation solution for atari 2600 from core, to debugging, to TAS/movie and save states and pansy recording and project types, and seetings and memory and vram visualization and sprites and stuff; continue;
+
+I have lots of premium request budget left so stop rate limiting me, continue;
+
+Separate the Atari 2600 from the NES debugger and any other NES nonsense since it is a completely different console; continue working on what you were doing; continue;
+
+Don't use a NES state for Atai 2600! I told you this before! separate code silos! The NES implementation can be a reference, but the 2600 should have it's own class and objects and code and functions and datastructures; continue working; continue;
+
+[All] I would like timestamps on both the prompts and every returned message; I want to see when everything happened  and this is helpful sometimes by showing that a process has been hung for 20 minutes, but also I just want date/times on everything; add to copilot instructions because I always want timestamps; [Nexen] Make sure the Atari 2600 implementation is correct (make tests) and fast and low memory/allocation (benchmarks), have you referenced other 2600 emulators like MESS (add to docs) to ensure correctness and performance and good architecture? The more you add to Nexen, the more you should abstract/silo the different systems so functionality is present for every system and you you swap which one is running into the same app; continue working 2600 emulation issues;
+
+
 
 
 

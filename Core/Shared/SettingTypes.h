@@ -864,6 +864,8 @@ struct DebugConfig {
 
 	bool LynxBreakOnBrk = false;
 
+	bool Atari2600BreakOnBrk = false;
+
 	bool ScriptAllowIoOsAccess = false;
 	bool ScriptAllowNetworkAccess = false;
 	uint32_t ScriptTimeout = 1;
@@ -1107,4 +1109,5 @@ enum class DebuggerFlags {
 	GbaDebuggerEnabled = (1 << 11),
 	WsDebuggerEnabled = (1 << 12),
 	LynxDebuggerEnabled = (1 << 13),
+	Atari2600DebuggerEnabled = (1 << 14),
 };

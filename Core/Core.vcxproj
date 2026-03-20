@@ -838,6 +838,12 @@
     <ClInclude Include="Atari2600\Atari2600Console.h" />
     <ClInclude Include="Atari2600\Atari2600DefaultVideoFilter.h" />
     <ClInclude Include="Atari2600\Atari2600SmokeHarness.h" />
+    <ClInclude Include="Atari2600\Atari2600Types.h" />
+    <ClInclude Include="Atari2600\Debugger\Atari2600DisUtils.h" />
+    <ClInclude Include="Atari2600\Debugger\Atari2600Debugger.h" />
+    <ClInclude Include="Atari2600\Debugger\Atari2600Assembler.h" />
+    <ClInclude Include="Atari2600\Debugger\Atari2600TraceLogger.h" />
+    <ClInclude Include="Atari2600\Debugger\Atari2600EventManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugger\Base6502Assembler.cpp" />
@@ -1166,6 +1172,11 @@
     <ClCompile Include="Lynx\Debugger\DummyLynxCpu.cpp" />
     <ClCompile Include="Atari2600\Atari2600Console.cpp" />
     <ClCompile Include="Atari2600\Atari2600SmokeHarness.cpp" />
+    <ClCompile Include="Atari2600\Debugger\Atari2600DisUtils.cpp" />
+    <ClCompile Include="Atari2600\Debugger\Atari2600Debugger.cpp" />
+    <ClCompile Include="Atari2600\Debugger\Atari2600Assembler.cpp" />
+    <ClCompile Include="Atari2600\Debugger\Atari2600TraceLogger.cpp" />
+    <ClCompile Include="Atari2600\Debugger\Atari2600EventManager.cpp" />
     <ClCompile Include="WS\WsConsole.cpp" />
     <ClCompile Include="WS\WsControlManager.cpp" />
     <ClCompile Include="WS\WsCpu.cpp" />

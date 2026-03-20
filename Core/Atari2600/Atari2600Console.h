@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Shared/Interfaces/IConsole.h"
+#include "Atari2600/Atari2600Types.h"
 
 class Emulator;
 class BaseControlManager;
@@ -195,4 +196,14 @@ public:
 	Atari2600ScanlineRenderState DebugGetScanlineRenderState(uint32_t scanline) const;
 	uint8_t DebugGetMapperBankIndex() const;
 	string DebugGetMapperMode() const;
+
+	// Debugger accessors
+	Atari2600CpuState GetCpuState() const;
+	void SetCpuState(const Atari2600CpuState& state);
+	uint8_t DebugRead(uint16_t addr);
+	void DebugWrite(uint16_t addr, uint8_t value);
+	uint32_t GetFrameCount() const;
+	uint32_t GetCurrentScanline() const;
+	uint32_t GetCurrentColorClock() const;
+	uint32_t* GetFrameBuffer();
 };

@@ -1403,7 +1403,7 @@ class Atari2600Riot {
 	class Atari2600ControlManager final : public BaseControlManager {
 	public:
 		explicit Atari2600ControlManager(Emulator* emu)
-			: BaseControlManager(emu, CpuType::Nes) {
+			: BaseControlManager(emu, CpuType::Atari2600) {
 		}
 
 		shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override {
@@ -1528,6 +1528,57 @@ uint8_t Atari2600Console::DebugGetMapperBankIndex() const {
 
 string Atari2600Console::DebugGetMapperMode() const {
 	return _mapper ? _mapper->GetModeName() : "none";
+}
+
+Atari2600CpuState Atari2600Console::GetCpuState() const {
+	Atari2600CpuState state;
+	uint16_t pc = 0;
+	uint64_t cycles = 0;
+	uint8_t a = 0, x = 0, y = 0, sp = 0, ps = 0, remaining = 0;
+	_cpu->ExportState(pc, cycles, a, x, y, sp, ps, remaining);
+	state.PC = pc;
+	state.CycleCount = cycles;
+	state.A = a;
+	state.X = x;
+	state.Y = y;
+	state.SP = sp;
+	state.PS = ps;
+	state.IRQFlag = 0;
+	state.NmiFlag = false;
+	return state;
+}
+
+void Atari2600Console::SetCpuState(const Atari2600CpuState& state) {
+	_cpu->ImportState(state.PC, state.CycleCount, state.A, state.X, state.Y, state.SP, state.PS, 0);
+}
+
+uint8_t Atari2600Console::DebugRead(uint16_t addr) {
+	if (!_bus) {
+		return 0xFF;
+	}
+	return _bus->Read(addr & 0x1FFF);
+}
+
+void Atari2600Console::DebugWrite(uint16_t addr, uint8_t value) {
+	if (_bus) {
+		_bus->Write(addr & 0x1FFF, value);
+	}
+}
+
+uint32_t Atari2600Console::GetFrameCount() const {
+	return _tia ? _tia->GetState().FrameCount : 0;
+}
+
+uint32_t Atari2600Console::GetCurrentScanline() const {
+	return _tia ? _tia->GetState().Scanline : 0;
+}
+
+uint32_t Atari2600Console::GetCurrentColorClock() const {
+	return _tia ? _tia->GetState().ColorClock : 0;
+}
+
+uint32_t* Atari2600Console::GetFrameBuffer() {
+	return nullptr;
 }
 
 void Atari2600Console::RenderDebugFrame() {
@@ -1707,7 +1758,7 @@ ConsoleType Atari2600Console::GetConsoleType() {
 }
 
 vector<CpuType> Atari2600Console::GetCpuTypes() {
-	return {CpuType::Nes};
+	return {CpuType::Atari2600};
 }
 
 uint64_t Atari2600Console::GetMasterClock() {
