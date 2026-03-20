@@ -721,7 +721,13 @@ git ignore the artifacts folder; implement several issues in a row;
 
 implement several issues in a row
 
+Push branch to remote; How far away are we from a working Atari 2600 emulator? ; implement several issues in a row
+
 How far away are we from a working Atari 2600 emulator?
+
+continue;
+
+Awesome! `If your definition is “fully integrated with debugger/settings/memory viewer UX,” you are one focused milestone away.` create a full spatch of epics and issues and focus intently on getting an atari 2600 emulator fully working with integration wiring and chat/session logs, and dpcs, and plans, and more issues and implement them all until we have a complete emulation solution for atari 2600 from core, to debugging, to TAS/movie and save states and pansy recording and project types, and seetings and memory and vram visualization and sprites and stuff; continue;
 
 
 

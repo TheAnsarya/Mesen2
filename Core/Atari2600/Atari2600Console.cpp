@@ -259,6 +259,22 @@ public:
 		return _rom[offset];
 	}
 
+	[[nodiscard]] bool TryGetRomOffset(uint16_t addr, int32_t& offset) const {
+		addr &= 0x1FFF;
+		if (_rom.empty() || addr < 0x1000) {
+			offset = -1;
+			return false;
+		}
+
+		size_t romOffset = GetOffset(addr);
+		if (romOffset >= _rom.size()) {
+			romOffset %= _rom.size();
+		}
+
+		offset = (int32_t)romOffset;
+		return true;
+	}
+
 	void Write(uint16_t addr, uint8_t value) {
 		if (_mode == MapperMode::Mapper3F && (addr & 0x003F) == 0x003F && _fallbackBankCount > 0) {
 			_activeBank = SelectBankFromValue(value, _fallbackBankCount);
@@ -1756,15 +1772,67 @@ void Atari2600Console::ProcessAudioPlayerAction(AudioPlayerActionParams p) {
 }
 
 AddressInfo Atari2600Console::GetAbsoluteAddress(AddressInfo& relAddress) {
-	return relAddress;
+	if (relAddress.Address < 0) {
+		return {-1, MemoryType::None};
+	}
+
+	if (relAddress.Type == MemoryType::Atari2600PrgRom || relAddress.Type == MemoryType::Atari2600Ram || relAddress.Type == MemoryType::Atari2600TiaRegisters) {
+		return relAddress;
+	}
+
+	if (relAddress.Type != MemoryType::Atari2600Memory && relAddress.Type != MemoryType::NesMemory) {
+		return relAddress;
+	}
+
+	uint16_t addr = (uint16_t)relAddress.Address & 0x1FFF;
+	if ((addr & 0x1000) == 0x1000) {
+		int32_t romOffset = -1;
+		if (_mapper && _mapper->TryGetRomOffset(addr, romOffset)) {
+			return {romOffset, MemoryType::Atari2600PrgRom};
+		}
+		return {-1, MemoryType::Atari2600PrgRom};
+	}
+
+	if ((addr & 0x1080) == 0x0080) {
+		if ((addr & 0x0200) == 0) {
+			return {(int32_t)(addr & 0x7F), MemoryType::Atari2600Ram};
+		}
+		return {(int32_t)(addr & 0x07), MemoryType::Atari2600Ram};
+	}
+
+	if ((addr & 0x1080) == 0x0000) {
+		return {(int32_t)(addr & 0x3F), MemoryType::Atari2600TiaRegisters};
+	}
+
+	return {(int32_t)addr, MemoryType::Atari2600Memory};
 }
 
 AddressInfo Atari2600Console::GetPcAbsoluteAddress() {
-	return {(int32_t)_cpu->GetProgramCounter(), MemoryType::Atari2600PrgRom};
+	int32_t romOffset = -1;
+	if (_mapper && _mapper->TryGetRomOffset(_cpu->GetProgramCounter(), romOffset)) {
+		return {romOffset, MemoryType::Atari2600PrgRom};
+	}
+	return {-1, MemoryType::Atari2600PrgRom};
 }
 
 AddressInfo Atari2600Console::GetRelativeAddress(AddressInfo& absAddress, CpuType cpuType) {
 	(void)cpuType;
+
+	if (absAddress.Type == MemoryType::Atari2600PrgRom) {
+		if (absAddress.Address < 0) {
+			return {-1, MemoryType::Atari2600Memory};
+		}
+		return {(int32_t)(0x1000 | (absAddress.Address & 0x0FFF)), MemoryType::Atari2600Memory};
+	}
+
+	if (absAddress.Type == MemoryType::Atari2600Ram) {
+		return {(int32_t)(0x0080 | (absAddress.Address & 0x7F)), MemoryType::Atari2600Memory};
+	}
+
+	if (absAddress.Type == MemoryType::Atari2600TiaRegisters) {
+		return {(int32_t)(absAddress.Address & 0x3F), MemoryType::Atari2600Memory};
+	}
+
 	return absAddress;
 }
 

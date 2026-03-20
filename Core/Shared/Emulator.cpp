@@ -1083,6 +1083,13 @@ void Emulator::StartLightweightCdl() {
 	CpuType mainCpu = cpuTypes[0];
 	MemoryType prgRomType = DebugUtilities::GetPrgRomMemoryType(mainCpu);
 	ConsoleMemoryInfo memInfo = GetMemory(prgRomType);
+	if (memInfo.Size == 0) {
+		AddressInfo pcAddress = _console->GetPcAbsoluteAddress();
+		if (pcAddress.Type != MemoryType::None) {
+			prgRomType = pcAddress.Type;
+			memInfo = GetMemory(prgRomType);
+		}
+	}
 
 	if (memInfo.Size == 0) {
 		return; // No PRG ROM registered
