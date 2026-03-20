@@ -116,4 +116,89 @@ namespace {
 		EXPECT_NE(nonBlankReference, 0u);
 		EXPECT_EQ(framePixels[Atari2600Console::ScreenWidth], nonBlankReference);
 	}
+
+	TEST(Atari2600RenderPhaseATests, PlayfieldDuplicateAndReflectModesRenderExpectedHalves) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "render-playfield-reflect.a26");
+
+		console.DebugWriteCartridge(0x0009, 0x01); // colubk
+		console.DebugWriteCartridge(0x0008, 0x2F); // colupf
+		console.DebugWriteCartridge(0x000D, 0x10); // pf0 bit 4 only (left-most nibble pixel)
+		console.DebugWriteCartridge(0x000E, 0x00);
+		console.DebugWriteCartridge(0x000F, 0x00);
+
+		console.DebugWriteCartridge(0x000A, 0x00); // duplicate mode
+		console.RunFrame();
+		const uint16_t* duplicateFrame = GetFramePixels(console);
+		uint16_t backgroundPixel = duplicateFrame[4];
+		EXPECT_NE(duplicateFrame[0], backgroundPixel);
+		EXPECT_NE(duplicateFrame[80], backgroundPixel);
+		EXPECT_EQ(duplicateFrame[156], backgroundPixel);
+
+		console.DebugWriteCartridge(0x000A, 0x01); // reflect mode
+		console.RunFrame();
+		const uint16_t* reflectFrame = GetFramePixels(console);
+		EXPECT_NE(reflectFrame[0], backgroundPixel);
+		EXPECT_EQ(reflectFrame[80], backgroundPixel);
+		EXPECT_NE(reflectFrame[156], backgroundPixel);
+	}
+
+	TEST(Atari2600RenderPhaseATests, ScoreModeUsesPlayerColorsForPlayfieldHalves) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "render-playfield-score.a26");
+
+		console.DebugWriteCartridge(0x0009, 0x01); // colubk
+		console.DebugWriteCartridge(0x0008, 0x2F); // colupf
+		console.DebugWriteCartridge(0x0006, 0xAE); // colup0
+		console.DebugWriteCartridge(0x0007, 0x4C); // colup1
+		console.DebugWriteCartridge(0x000D, 0xF0);
+		console.DebugWriteCartridge(0x000E, 0xFF);
+		console.DebugWriteCartridge(0x000F, 0xFF);
+
+		console.DebugWriteCartridge(0x000A, 0x00); // score mode off
+		console.RunFrame();
+		const uint16_t* baseFrame = GetFramePixels(console);
+		uint16_t baseLeft = baseFrame[0];
+		uint16_t baseRight = baseFrame[120];
+		EXPECT_EQ(baseLeft, baseRight);
+
+		console.DebugWriteCartridge(0x000A, 0x02); // score mode on
+		console.RunFrame();
+		const uint16_t* scoreFrame = GetFramePixels(console);
+		uint16_t scoreLeft = scoreFrame[0];
+		uint16_t scoreRight = scoreFrame[120];
+		EXPECT_NE(scoreLeft, scoreRight);
+		EXPECT_NE(scoreLeft, baseLeft);
+		EXPECT_NE(scoreRight, baseRight);
+	}
+
+	TEST(Atari2600RenderPhaseATests, PriorityBitPlacesPlayfieldAbovePlayers) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "render-playfield-priority.a26");
+
+		console.DebugWriteCartridge(0x0009, 0x01); // colubk
+		console.DebugWriteCartridge(0x0008, 0x3E); // colupf
+		console.DebugWriteCartridge(0x0006, 0xAE); // colup0
+		console.DebugWriteCartridge(0x000D, 0xF0);
+		console.DebugWriteCartridge(0x000E, 0xFF);
+		console.DebugWriteCartridge(0x000F, 0xFF);
+		console.DebugWriteCartridge(0x0010, 0x00); // resp0 at x=0
+		console.DebugWriteCartridge(0x001B, 0xFF); // grp0 enabled
+
+		console.DebugWriteCartridge(0x000A, 0x00); // priority off
+		console.RunFrame();
+		const uint16_t* playerPriorityFrame = GetFramePixels(console);
+		uint16_t playerDominantPixel = playerPriorityFrame[0];
+
+		console.DebugWriteCartridge(0x000A, 0x04); // priority on
+		console.RunFrame();
+		const uint16_t* playfieldPriorityFrame = GetFramePixels(console);
+		uint16_t playfieldDominantPixel = playfieldPriorityFrame[0];
+
+		EXPECT_NE(playfieldDominantPixel, playerDominantPixel);
+		EXPECT_EQ(playfieldDominantPixel, playfieldPriorityFrame[4]);
+	}
 }

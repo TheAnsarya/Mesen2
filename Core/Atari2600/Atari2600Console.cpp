@@ -444,6 +444,7 @@ class Atari2600Riot {
 	private:
 		Atari2600TiaState _state = {};
 		std::array<uint8_t, Atari2600Console::ScreenHeight> _hmoveBlankScanlines = {};
+		std::array<Atari2600ScanlineRenderState, Atari2600Console::ScreenHeight> _scanlineRenderState = {};
 		static constexpr uint32_t HmoveBlankColorClocks = 8;
 		static constexpr uint32_t HmoveLateCycleThreshold = 73;
 
@@ -457,6 +458,39 @@ class Atari2600Riot {
 
 		void MarkAudioDirty() {
 			_state.AudioRevision++;
+		}
+
+		[[nodiscard]] Atari2600ScanlineRenderState BuildScanlineRenderState() const {
+			Atari2600ScanlineRenderState scanline = {};
+			scanline.ColorBackground = _state.ColorBackground;
+			scanline.ColorPlayfield = _state.ColorPlayfield;
+			scanline.ColorPlayer0 = _state.ColorPlayer0;
+			scanline.ColorPlayer1 = _state.ColorPlayer1;
+			scanline.Playfield0 = _state.Playfield0;
+			scanline.Playfield1 = _state.Playfield1;
+			scanline.Playfield2 = _state.Playfield2;
+			scanline.PlayfieldReflect = _state.PlayfieldReflect;
+			scanline.PlayfieldScoreMode = _state.PlayfieldScoreMode;
+			scanline.PlayfieldPriority = _state.PlayfieldPriority;
+			scanline.Player0Graphics = _state.Player0Graphics;
+			scanline.Player1Graphics = _state.Player1Graphics;
+			scanline.Missile0Enabled = _state.Missile0Enabled;
+			scanline.Missile1Enabled = _state.Missile1Enabled;
+			scanline.BallEnabled = _state.BallEnabled;
+			scanline.Player0X = _state.Player0X;
+			scanline.Player1X = _state.Player1X;
+			scanline.BallX = _state.BallX;
+			return scanline;
+		}
+
+		void CaptureScanlineState(uint32_t scanline) {
+			if (scanline < Atari2600Console::ScreenHeight) {
+				_scanlineRenderState[scanline] = BuildScanlineRenderState();
+			}
+		}
+
+		void CaptureCurrentScanlineState() {
+			CaptureScanlineState(_state.Scanline);
 		}
 
 		[[nodiscard]] static uint8_t ComputeChannelSample(uint8_t control, uint8_t phase, uint8_t volume) {
@@ -506,6 +540,7 @@ class Atari2600Riot {
 				_state.Scanline = 0;
 				_state.FrameCount++;
 			}
+			CaptureCurrentScanlineState();
 		}
 
 		void StepColorClocks(uint32_t colorClocks) {
@@ -522,15 +557,20 @@ class Atari2600Riot {
 		void Reset() {
 			_state = {};
 			_hmoveBlankScanlines.fill(0);
+			_scanlineRenderState.fill({});
 			_state.Player0X = 24;
 			_state.Player1X = 96;
 			_state.BallX = 80;
 			_state.AudioCounter0 = 1;
 			_state.AudioCounter1 = 1;
+			CaptureCurrentScanlineState();
 		}
 
 		void BeginFrameCapture() {
 			_hmoveBlankScanlines.fill(0);
+			Atari2600ScanlineRenderState currentState = BuildScanlineRenderState();
+			_scanlineRenderState.fill(currentState);
+			CaptureCurrentScanlineState();
 		}
 
 		void StepCpuCycles(uint32_t cpuCycles) {
@@ -576,13 +616,23 @@ class Atari2600Riot {
 			return _hmoveBlankScanlines[scanline] != 0;
 		}
 
+		[[nodiscard]] Atari2600ScanlineRenderState GetScanlineRenderState(uint32_t scanline) const {
+			if (scanline >= _scanlineRenderState.size()) {
+				return BuildScanlineRenderState();
+			}
+			return _scanlineRenderState[scanline];
+		}
+
 		uint8_t ReadRegister(uint16_t addr) const {
 			switch (NormalizeRegisterAddress(addr)) {
 				case 0x06: return _state.ColorPlayer0;
 				case 0x07: return _state.ColorPlayer1;
 				case 0x08: return _state.ColorPlayfield;
 				case 0x09: return _state.ColorBackground;
-				case 0x0A: return _state.PlayfieldReflect ? 0x01 : 0x00;
+				case 0x0A:
+					return (uint8_t)((_state.PlayfieldReflect ? 0x01 : 0x00)
+						| (_state.PlayfieldScoreMode ? 0x02 : 0x00)
+						| (_state.PlayfieldPriority ? 0x04 : 0x00));
 				case 0x0D: return _state.Playfield0;
 				case 0x0E: return _state.Playfield1;
 				case 0x0F: return _state.Playfield2;
@@ -637,37 +687,46 @@ class Atari2600Riot {
 
 				case 0x0A:
 					_state.PlayfieldReflect = (value & 0x01) != 0;
+					_state.PlayfieldScoreMode = (value & 0x02) != 0;
+					_state.PlayfieldPriority = (value & 0x04) != 0;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x0D:
 					_state.Playfield0 = value;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x0E:
 					_state.Playfield1 = value;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x0F:
 					_state.Playfield2 = value;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x10:
 					_state.Player0X = (uint8_t)(_state.ColorClock % Atari2600Console::ScreenWidth);
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x11:
 					_state.Player1X = (uint8_t)(_state.ColorClock % Atari2600Console::ScreenWidth);
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x14:
 					_state.BallX = (uint8_t)(_state.ColorClock % Atari2600Console::ScreenWidth);
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x15:
@@ -705,26 +764,31 @@ class Atari2600Riot {
 				case 0x1B:
 					_state.Player0Graphics = value;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x1C:
 					_state.Player1Graphics = value;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x1D:
 					_state.Missile0Enabled = (value & 0x02) != 0;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x1E:
 					_state.Missile1Enabled = (value & 0x02) != 0;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				case 0x1F:
 					_state.BallEnabled = (value & 0x02) != 0;
 					MarkRenderDirty();
+					CaptureCurrentScanlineState();
 					break;
 
 				default:
@@ -739,6 +803,9 @@ class Atari2600Riot {
 		void SetState(const Atari2600TiaState& state) {
 			_state = state;
 			_hmoveBlankScanlines.fill(0);
+			Atari2600ScanlineRenderState currentState = BuildScanlineRenderState();
+			_scanlineRenderState.fill(currentState);
+			CaptureCurrentScanlineState();
 			if (_state.AudioCounter0 == 0) {
 				_state.AudioCounter0 = (uint16_t)(_state.AudioFrequency0 + 1);
 			}
@@ -1188,6 +1255,10 @@ void Atari2600Console::DebugWriteCartridge(uint16_t addr, uint8_t value) {
 	}
 }
 
+Atari2600ScanlineRenderState Atari2600Console::DebugGetScanlineRenderState(uint32_t scanline) const {
+	return _tia->GetScanlineRenderState(scanline);
+}
+
 uint8_t Atari2600Console::DebugGetMapperBankIndex() const {
 	return _mapper ? _mapper->GetActiveBank() : 0;
 }
@@ -1197,7 +1268,6 @@ string Atari2600Console::DebugGetMapperMode() const {
 }
 
 void Atari2600Console::RenderDebugFrame() {
-	Atari2600TiaState tiaState = _tia->GetState();
 	auto toRgb565 = [](uint8_t tiaColor) {
 		uint8_t hue = (uint8_t)((tiaColor >> 4) & 0x0F);
 		uint8_t lum = (uint8_t)(tiaColor & 0x0F);
@@ -1207,15 +1277,15 @@ void Atari2600Console::RenderDebugFrame() {
 		return (uint16_t)((red << 11) | (green << 5) | blue);
 	};
 
-	auto getPlayfieldBit = [&tiaState](uint32_t index) {
+	auto getPlayfieldBit = [](const Atari2600ScanlineRenderState& scanlineState, uint32_t index) {
 		index %= 20;
 		if (index < 4) {
-			return ((tiaState.Playfield0 >> (4 + index)) & 0x01) != 0;
+			return ((scanlineState.Playfield0 >> (4 + index)) & 0x01) != 0;
 		}
 		if (index < 12) {
-			return ((tiaState.Playfield1 >> (11 - index)) & 0x01) != 0;
+			return ((scanlineState.Playfield1 >> (11 - index)) & 0x01) != 0;
 		}
-		return ((tiaState.Playfield2 >> (19 - index)) & 0x01) != 0;
+		return ((scanlineState.Playfield2 >> (19 - index)) & 0x01) != 0;
 	};
 
 	auto isPlayerPixel = [](uint8_t graphics, uint32_t x, uint32_t originX) {
@@ -1226,45 +1296,64 @@ void Atari2600Console::RenderDebugFrame() {
 		return ((graphics >> bit) & 0x01) != 0;
 	};
 
-	uint16_t colorBackground = toRgb565(tiaState.ColorBackground);
-	uint16_t colorPlayfield = toRgb565(tiaState.ColorPlayfield);
-	uint16_t colorPlayer0 = toRgb565(tiaState.ColorPlayer0);
-	uint16_t colorPlayer1 = toRgb565(tiaState.ColorPlayer1);
-
 	for (uint32_t y = 0; y < ScreenHeight; y++) {
+		Atari2600ScanlineRenderState scanlineState = _tia->GetScanlineRenderState(y);
+		uint16_t colorBackground = toRgb565(scanlineState.ColorBackground);
+		uint16_t colorPlayfield = toRgb565(scanlineState.ColorPlayfield);
+		uint16_t colorPlayer0 = toRgb565(scanlineState.ColorPlayer0);
+		uint16_t colorPlayer1 = toRgb565(scanlineState.ColorPlayer1);
+
 		for (uint32_t x = 0; x < ScreenWidth; x++) {
 			if (_tia->IsHmoveBlankScanline(y) && x < 8) {
 				_frameBuffer[y * ScreenWidth + x] = 0;
 				continue;
 			}
 
-			uint16_t pixel = colorBackground;
-
 			uint32_t coarsePixel = (x / 4);
 			uint32_t halfIndex = coarsePixel % 20;
-			if (coarsePixel >= 20 && tiaState.PlayfieldReflect) {
+			if (coarsePixel >= 20 && scanlineState.PlayfieldReflect) {
 				halfIndex = 19 - halfIndex;
 			}
 
-			if (getPlayfieldBit(halfIndex)) {
-				pixel = colorPlayfield;
+			bool playfieldPixel = getPlayfieldBit(scanlineState, halfIndex);
+			bool missile0Pixel = scanlineState.Missile0Enabled && x == (uint32_t)((scanlineState.Player0X + 8) % ScreenWidth);
+			bool missile1Pixel = scanlineState.Missile1Enabled && x == (uint32_t)((scanlineState.Player1X + 8) % ScreenWidth);
+			bool ballPixel = scanlineState.BallEnabled && x >= scanlineState.BallX && x < (uint32_t)(scanlineState.BallX + 4);
+			bool player0Pixel = isPlayerPixel(scanlineState.Player0Graphics, x, scanlineState.Player0X);
+			bool player1Pixel = isPlayerPixel(scanlineState.Player1Graphics, x, scanlineState.Player1X);
+
+			uint16_t playfieldPixelColor = colorPlayfield;
+			if (scanlineState.PlayfieldScoreMode) {
+				playfieldPixelColor = x < (ScreenWidth / 2) ? colorPlayer0 : colorPlayer1;
 			}
 
-			if (tiaState.Missile0Enabled && x == (uint32_t)((tiaState.Player0X + 8) % ScreenWidth)) {
-				pixel = colorPlayfield;
-			}
-			if (tiaState.Missile1Enabled && x == (uint32_t)((tiaState.Player1X + 8) % ScreenWidth)) {
-				pixel = colorPlayfield;
-			}
-			if (tiaState.BallEnabled && x >= tiaState.BallX && x < (uint32_t)(tiaState.BallX + 4)) {
-				pixel = colorPlayfield;
-			}
-
-			if (isPlayerPixel(tiaState.Player0Graphics, x, tiaState.Player0X)) {
-				pixel = colorPlayer0;
-			}
-			if (isPlayerPixel(tiaState.Player1Graphics, x, tiaState.Player1X)) {
-				pixel = colorPlayer1;
+			uint16_t pixel = colorBackground;
+			if (scanlineState.PlayfieldPriority) {
+				if (missile0Pixel || player0Pixel) {
+					pixel = colorPlayer0;
+				}
+				if (missile1Pixel || player1Pixel) {
+					pixel = colorPlayer1;
+				}
+				if (playfieldPixel) {
+					pixel = playfieldPixelColor;
+				}
+				if (ballPixel) {
+					pixel = colorPlayfield;
+				}
+			} else {
+				if (playfieldPixel) {
+					pixel = playfieldPixelColor;
+				}
+				if (ballPixel) {
+					pixel = colorPlayfield;
+				}
+				if (missile0Pixel || player0Pixel) {
+					pixel = colorPlayer0;
+				}
+				if (missile1Pixel || player1Pixel) {
+					pixel = colorPlayer1;
+				}
 			}
 
 			_frameBuffer[y * ScreenWidth + x] = pixel;
@@ -1442,6 +1531,8 @@ void Atari2600Console::Serialize(Serializer& s) {
 	SV(tiaState.Playfield1);
 	SV(tiaState.Playfield2);
 	SV(tiaState.PlayfieldReflect);
+	SV(tiaState.PlayfieldScoreMode);
+	SV(tiaState.PlayfieldPriority);
 	SV(tiaState.Player0Graphics);
 	SV(tiaState.Player1Graphics);
 	SV(tiaState.Missile0Enabled);

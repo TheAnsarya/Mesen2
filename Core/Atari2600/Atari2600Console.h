@@ -44,6 +44,8 @@ struct Atari2600TiaState {
 	uint8_t Playfield1 = 0;
 	uint8_t Playfield2 = 0;
 	bool PlayfieldReflect = false;
+	bool PlayfieldScoreMode = false;
+	bool PlayfieldPriority = false;
 	uint8_t Player0Graphics = 0;
 	uint8_t Player1Graphics = 0;
 	bool Missile0Enabled = false;
@@ -68,6 +70,27 @@ struct Atari2600TiaState {
 	uint64_t AudioSampleCount = 0;
 	uint32_t AudioRevision = 0;
 	uint64_t TotalColorClocks = 0;
+};
+
+struct Atari2600ScanlineRenderState {
+	uint8_t ColorBackground = 0;
+	uint8_t ColorPlayfield = 0;
+	uint8_t ColorPlayer0 = 0;
+	uint8_t ColorPlayer1 = 0;
+	uint8_t Playfield0 = 0;
+	uint8_t Playfield1 = 0;
+	uint8_t Playfield2 = 0;
+	bool PlayfieldReflect = false;
+	bool PlayfieldScoreMode = false;
+	bool PlayfieldPriority = false;
+	uint8_t Player0Graphics = 0;
+	uint8_t Player1Graphics = 0;
+	bool Missile0Enabled = false;
+	bool Missile1Enabled = false;
+	bool BallEnabled = false;
+	uint8_t Player0X = 24;
+	uint8_t Player1X = 96;
+	uint8_t BallX = 80;
 };
 
 struct Atari2600FrameStepSummary {
@@ -134,6 +157,7 @@ public:
 	Atari2600FrameStepSummary GetLastFrameSummary() const { return _lastFrameSummary; }
 	uint8_t DebugReadCartridge(uint16_t addr) const;
 	void DebugWriteCartridge(uint16_t addr, uint8_t value);
+	Atari2600ScanlineRenderState DebugGetScanlineRenderState(uint32_t scanline) const;
 	uint8_t DebugGetMapperBankIndex() const;
 	string DebugGetMapperMode() const;
 };

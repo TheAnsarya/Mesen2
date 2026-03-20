@@ -69,6 +69,35 @@ namespace {
 		EXPECT_EQ(tiaState.ColorClock, 11u);
 	}
 
+	TEST(Atari2600TiaPhaseATests, CtrlpfBitsPopulateReflectScoreAndPriorityFlags) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		console.Reset();
+		console.DebugWriteCartridge(0x000A, 0x07);
+
+		Atari2600TiaState tiaState = console.GetTiaState();
+		EXPECT_TRUE(tiaState.PlayfieldReflect);
+		EXPECT_TRUE(tiaState.PlayfieldScoreMode);
+		EXPECT_TRUE(tiaState.PlayfieldPriority);
+		EXPECT_EQ(console.DebugReadCartridge(0x000A), 0x07u);
+	}
+
+	TEST(Atari2600TiaPhaseATests, PlayfieldRegisterWritesLatchPerScanline) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		console.Reset();
+		console.DebugWriteCartridge(0x000D, 0x10);
+		console.StepCpuCycles(76);
+		console.DebugWriteCartridge(0x000D, 0x20);
+
+		Atari2600ScanlineRenderState line0 = console.DebugGetScanlineRenderState(0);
+		Atari2600ScanlineRenderState line1 = console.DebugGetScanlineRenderState(1);
+		EXPECT_EQ(line0.Playfield0, 0x10u);
+		EXPECT_EQ(line1.Playfield0, 0x20u);
+	}
+
 	TEST(Atari2600TiaPhaseATests, ColorClockWrapCarriesToNextScanlineAtBoundary) {
 		Emulator emu;
 		Atari2600Console console(&emu);
