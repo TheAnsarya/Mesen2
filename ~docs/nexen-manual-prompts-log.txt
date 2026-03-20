@@ -717,6 +717,7 @@ implement several issues in a row
 
 implement several issues in a row
 
+git ignore the artifacts folder; implement several issues in a row;
 
 
 
