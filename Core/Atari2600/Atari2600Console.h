@@ -53,6 +53,8 @@ struct Atari2600TiaState {
 	uint8_t Player1Graphics = 0;
 	bool Player0Reflect = false;
 	bool Player1Reflect = false;
+	bool Missile0ResetToPlayer = false;
+	bool Missile1ResetToPlayer = false;
 	bool Missile0Enabled = false;
 	bool Missile1Enabled = false;
 	bool BallEnabled = false;

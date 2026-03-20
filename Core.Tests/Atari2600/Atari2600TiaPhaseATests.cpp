@@ -122,6 +122,45 @@ namespace {
 		EXPECT_EQ(console.DebugReadCartridge(0x000C), 0x08u);
 	}
 
+	TEST(Atari2600TiaPhaseATests, Resmp0TracksPlayer0PositionWhenEnabled) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		console.Reset();
+		console.DebugWriteCartridge(0x0028, 0x02); // resmp0 on
+		EXPECT_EQ(console.DebugReadCartridge(0x0028), 0x02u);
+
+		console.StepCpuCycles(8);                  // color clock 24
+		console.DebugWriteCartridge(0x0010, 0x00); // resp0 => x=24
+		Atari2600TiaState tiaState = console.GetTiaState();
+		EXPECT_EQ(tiaState.Player0X, 24u);
+		EXPECT_EQ(tiaState.Missile0X, 24u);
+
+		console.StepCpuCycles(8);                  // color clock 48
+		console.DebugWriteCartridge(0x0010, 0x00); // resp0 => x=48
+		tiaState = console.GetTiaState();
+		EXPECT_EQ(tiaState.Player0X, 48u);
+		EXPECT_EQ(tiaState.Missile0X, 48u);
+	}
+
+	TEST(Atari2600TiaPhaseATests, Resmp0OffAllowsIndependentMissilePosition) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+
+		console.Reset();
+		console.DebugWriteCartridge(0x0028, 0x02); // lock on
+		console.DebugWriteCartridge(0x0028, 0x00); // lock off
+		EXPECT_EQ(console.DebugReadCartridge(0x0028), 0x00u);
+
+		console.DebugWriteCartridge(0x0010, 0x00); // resp0 at color clock 0 => x=0
+		console.StepCpuCycles(8);                  // color clock 24
+		console.DebugWriteCartridge(0x0012, 0x00); // resm0 => x=24
+
+		Atari2600TiaState tiaState = console.GetTiaState();
+		EXPECT_EQ(tiaState.Player0X, 0u);
+		EXPECT_EQ(tiaState.Missile0X, 24u);
+	}
+
 	TEST(Atari2600TiaPhaseATests, PlayfieldRegisterWritesLatchPerScanline) {
 		Emulator emu;
 		Atari2600Console console(&emu);

@@ -95,6 +95,31 @@ namespace {
 		EXPECT_NE(reflected[31], backgroundPixel);
 	}
 
+	TEST(Atari2600RenderPhaseATests, Resmp0LockRepositionsMissileToPlayer0) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "render-resmp0-lock.a26");
+
+		console.DebugWriteCartridge(0x0009, 0x01); // colubk
+		console.DebugWriteCartridge(0x0006, 0xAE); // colup0
+		console.DebugWriteCartridge(0x001B, 0x00); // grp0 off
+		console.DebugWriteCartridge(0x001D, 0x02); // enam0 on
+		console.DebugWriteCartridge(0x0010, 0x00); // resp0 => x=0
+
+		console.DebugWriteCartridge(0x0028, 0x00); // resmp0 off
+		console.RunFrame();
+		const uint16_t* unlockedFrame = GetFramePixels(console);
+		uint16_t backgroundPixel = unlockedFrame[8];
+		EXPECT_EQ(unlockedFrame[0], backgroundPixel);
+		EXPECT_NE(unlockedFrame[32], backgroundPixel);
+
+		console.DebugWriteCartridge(0x0028, 0x02); // resmp0 on
+		console.RunFrame();
+		const uint16_t* lockedFrame = GetFramePixels(console);
+		EXPECT_NE(lockedFrame[0], backgroundPixel);
+		EXPECT_EQ(lockedFrame[32], backgroundPixel);
+	}
+
 	TEST(Atari2600RenderPhaseATests, BallEnableProducesDeterministicPlayfieldColoredPixels) {
 		Emulator emu;
 		Atari2600Console console(&emu);

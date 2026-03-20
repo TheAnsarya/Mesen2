@@ -500,12 +500,22 @@ class Atari2600Riot {
 			return (uint8_t)wrapped;
 		}
 
+		void SyncLockedMissilesToPlayers() {
+			if (_state.Missile0ResetToPlayer) {
+				_state.Missile0X = _state.Player0X;
+			}
+			if (_state.Missile1ResetToPlayer) {
+				_state.Missile1X = _state.Player1X;
+			}
+		}
+
 		void ApplyHmoveDisplacements() {
 			_state.Player0X = WrapHorizontal((int32_t)_state.Player0X + _state.MotionPlayer0);
 			_state.Player1X = WrapHorizontal((int32_t)_state.Player1X + _state.MotionPlayer1);
 			_state.Missile0X = WrapHorizontal((int32_t)_state.Missile0X + _state.MotionMissile0);
 			_state.Missile1X = WrapHorizontal((int32_t)_state.Missile1X + _state.MotionMissile1);
 			_state.BallX = WrapHorizontal((int32_t)_state.BallX + _state.MotionBall);
+			SyncLockedMissilesToPlayers();
 			CaptureCurrentScanlineState();
 		}
 
@@ -769,6 +779,8 @@ class Atari2600Riot {
 				case 0x25: return _state.VdelPlayer0 ? 0x01 : 0x00;
 				case 0x26: return _state.VdelPlayer1 ? 0x01 : 0x00;
 				case 0x27: return _state.VdelBall ? 0x01 : 0x00;
+				case 0x28: return _state.Missile0ResetToPlayer ? 0x02 : 0x00;
+				case 0x29: return _state.Missile1ResetToPlayer ? 0x02 : 0x00;
 				case 0x15: return _state.AudioControl0;
 				case 0x16: return _state.AudioControl1;
 				case 0x17: return _state.AudioFrequency0;
@@ -870,12 +882,14 @@ class Atari2600Riot {
 
 				case 0x10:
 					_state.Player0X = (uint8_t)(_state.ColorClock % Atari2600Console::ScreenWidth);
+					SyncLockedMissilesToPlayers();
 					MarkRenderDirty();
 					CaptureCurrentScanlineState();
 					break;
 
 				case 0x11:
 					_state.Player1X = (uint8_t)(_state.ColorClock % Atari2600Console::ScreenWidth);
+					SyncLockedMissilesToPlayers();
 					MarkRenderDirty();
 					CaptureCurrentScanlineState();
 					break;
@@ -994,6 +1008,20 @@ class Atari2600Riot {
 
 				case 0x27:
 					_state.VdelBall = (value & 0x01) != 0;
+					MarkRenderDirty();
+					CaptureCurrentScanlineState();
+					break;
+
+				case 0x28:
+					_state.Missile0ResetToPlayer = (value & 0x02) != 0;
+					SyncLockedMissilesToPlayers();
+					MarkRenderDirty();
+					CaptureCurrentScanlineState();
+					break;
+
+				case 0x29:
+					_state.Missile1ResetToPlayer = (value & 0x02) != 0;
+					SyncLockedMissilesToPlayers();
 					MarkRenderDirty();
 					CaptureCurrentScanlineState();
 					break;
@@ -1814,6 +1842,8 @@ void Atari2600Console::Serialize(Serializer& s) {
 	SV(tiaState.Player1Graphics);
 	SV(tiaState.Player0Reflect);
 	SV(tiaState.Player1Reflect);
+	SV(tiaState.Missile0ResetToPlayer);
+	SV(tiaState.Missile1ResetToPlayer);
 	SV(tiaState.Missile0Enabled);
 	SV(tiaState.Missile1Enabled);
 	SV(tiaState.BallEnabled);
