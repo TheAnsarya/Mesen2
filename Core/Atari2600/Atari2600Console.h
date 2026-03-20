@@ -190,7 +190,7 @@ public:
 	Atari2600RiotState GetRiotState() const;
 	Atari2600TiaState GetTiaState() const;
 	Atari2600FrameStepSummary GetLastFrameSummary() const { return _lastFrameSummary; }
-	uint8_t DebugReadCartridge(uint16_t addr) const;
+	uint8_t DebugReadCartridge(uint16_t addr);
 	void DebugWriteCartridge(uint16_t addr, uint8_t value);
 	Atari2600ScanlineRenderState DebugGetScanlineRenderState(uint32_t scanline) const;
 	uint8_t DebugGetMapperBankIndex() const;

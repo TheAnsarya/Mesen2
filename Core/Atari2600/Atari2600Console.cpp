@@ -369,7 +369,7 @@ class Atari2600Riot {
 			}
 		}
 
-		uint8_t ReadRegister(uint16_t addr) const {
+		uint8_t ReadRegister(uint16_t addr) {
 			if (!(addr & 0x0200)) {
 				return _ram[addr & 0x7F];
 			}
@@ -378,10 +378,22 @@ class Atari2600Riot {
 				case 0x01: return ReadPortValue(_state.PortB, _state.PortBInput, _state.PortBDirection);
 				case 0x02: return _state.PortADirection;
 				case 0x03: return _state.PortBDirection;
-				case 0x04: return (uint8_t)(_state.Timer & 0xFF);
+				case 0x04: {
+					uint8_t timerValue = (uint8_t)(_state.Timer & 0xFF);
+					_state.TimerUnderflow = false;
+					return timerValue;
+				}
 				case 0x05: return (uint8_t)((_state.Timer >> 8) & 0xFF);
-				case 0x06: return _state.InterruptFlag ? 1 : 0;
-				case 0x07: return _state.TimerUnderflow ? 1 : 0;
+				case 0x06: {
+					uint8_t interruptValue = _state.InterruptFlag ? 1 : 0;
+					_state.InterruptFlag = false;
+					return interruptValue;
+				}
+				case 0x07: {
+					uint8_t underflowValue = _state.TimerUnderflow ? 1 : 0;
+					_state.TimerUnderflow = false;
+					return underflowValue;
+				}
 				default: return 0;
 			}
 		}
@@ -1073,7 +1085,7 @@ class Atari2600Riot {
 			_mapper = mapper;
 		}
 
-		uint8_t Read(uint16_t addr) const {
+		uint8_t Read(uint16_t addr) {
 			addr &= 0x1FFF;
 			if ((addr & 0x1000) == 0x1000 && _mapper) {
 				return _mapper->Read(addr);
@@ -1477,7 +1489,7 @@ Atari2600TiaState Atari2600Console::GetTiaState() const {
 	return _tia->GetState();
 }
 
-uint8_t Atari2600Console::DebugReadCartridge(uint16_t addr) const {
+uint8_t Atari2600Console::DebugReadCartridge(uint16_t addr) {
 	if (!_bus) {
 		return 0xFF;
 	}
