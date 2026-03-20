@@ -310,6 +310,121 @@ namespace {
 		EXPECT_EQ(tiaState.ColorClock, 2u);
 	}
 
+	TEST(Atari2600TiaPhaseATests, WsyncHmoveNarrowWindowMatrixAssertsApplyGateAndCarry) {
+		for (uint32_t preCycles = 70; preCycles <= 76; preCycles++) {
+			SCOPED_TRACE(string("pre_cycles=") + std::to_string(preCycles));
+
+			Emulator emu;
+			Atari2600Console console(&emu);
+			console.Reset();
+
+			console.StepCpuCycles(preCycles);
+			console.RequestHmove();
+			console.StepCpuCycles(1);
+
+			Atari2600TiaState state = console.GetTiaState();
+			bool expectImmediateApply = preCycles != 74;
+
+			EXPECT_EQ(state.HmoveApplyCount, expectImmediateApply ? 1u : 0u)
+				<< "pre_cycles=" << preCycles << ";scanline=" << state.Scanline << ";clock=" << state.ColorClock;
+			EXPECT_EQ(state.HmovePending, !expectImmediateApply)
+				<< "pre_cycles=" << preCycles << ";pending=" << state.HmovePending;
+
+			if (!expectImmediateApply) {
+				console.StepCpuCycles(1);
+				Atari2600TiaState deferredApplied = console.GetTiaState();
+				EXPECT_EQ(deferredApplied.HmoveApplyCount, 1u)
+					<< "pre_cycles=" << preCycles << ";deferred_scanline=" << deferredApplied.Scanline;
+				EXPECT_FALSE(deferredApplied.HmovePending);
+			}
+		}
+	}
+
+	TEST(Atari2600TiaPhaseATests, WsyncHmoveOrderingDigestIsDeterministicAcrossRuns) {
+		auto mixDigest = [](uint64_t hash, uint64_t value) {
+			hash ^= value + 0x9e3779b97f4a7c15ULL + (hash << 6) + (hash >> 2);
+			return hash;
+		};
+
+		auto runDigest = [&]() {
+			uint64_t digest = 0xcbf29ce484222325ULL;
+
+			for (uint32_t preCycles = 70; preCycles <= 76; preCycles++) {
+				for (uint32_t ordering = 0; ordering < 2; ordering++) {
+					Emulator emu;
+					Atari2600Console console(&emu);
+					console.Reset();
+
+					console.StepCpuCycles(preCycles);
+					if (ordering == 0) {
+						console.RequestWsync();
+						console.RequestHmove();
+					} else {
+						console.RequestHmove();
+						console.RequestWsync();
+					}
+
+					console.StepCpuCycles(1);
+					console.StepCpuCycles(1);
+
+					Atari2600TiaState state = console.GetTiaState();
+					digest = mixDigest(digest, preCycles);
+					digest = mixDigest(digest, ordering);
+					digest = mixDigest(digest, state.Scanline);
+					digest = mixDigest(digest, state.ColorClock);
+					digest = mixDigest(digest, state.WsyncCount);
+					digest = mixDigest(digest, state.HmoveStrobeCount);
+					digest = mixDigest(digest, state.HmoveApplyCount);
+					digest = mixDigest(digest, state.TotalColorClocks);
+				}
+			}
+
+			return digest;
+		};
+
+		uint64_t runA = runDigest();
+		uint64_t runB = runDigest();
+		EXPECT_EQ(runA, runB);
+		EXPECT_NE(runA, 0u);
+	}
+
+	TEST(Atari2600TiaPhaseATests, WsyncHmoveOrderingMatrixKeepsStableJitterWindows) {
+		auto runOrdering = [](uint32_t preCycles, bool wsyncFirst) {
+			Emulator emu;
+			Atari2600Console console(&emu);
+			console.Reset();
+
+			console.StepCpuCycles(preCycles);
+			if (wsyncFirst) {
+				console.RequestWsync();
+				console.RequestHmove();
+			} else {
+				console.RequestHmove();
+				console.RequestWsync();
+			}
+
+			console.StepCpuCycles(1);
+			return console.GetTiaState();
+		};
+
+		for (uint32_t preCycles = 72; preCycles <= 76; preCycles++) {
+			SCOPED_TRACE(string("pre_cycles=") + std::to_string(preCycles));
+			Atari2600TiaState wsyncThenHmove = runOrdering(preCycles, true);
+			Atari2600TiaState hmoveThenWsync = runOrdering(preCycles, false);
+
+			EXPECT_EQ(wsyncThenHmove.Scanline, hmoveThenWsync.Scanline)
+				<< "pre_cycles=" << preCycles << ";field=scanline";
+			EXPECT_EQ(wsyncThenHmove.ColorClock, hmoveThenWsync.ColorClock)
+				<< "pre_cycles=" << preCycles << ";field=color_clock";
+			EXPECT_EQ(wsyncThenHmove.HmoveApplyCount, hmoveThenWsync.HmoveApplyCount)
+				<< "pre_cycles=" << preCycles << ";field=hmove_apply";
+			EXPECT_EQ(wsyncThenHmove.WsyncCount, 1u)
+				<< "pre_cycles=" << preCycles << ";field=wsync_count";
+			EXPECT_EQ(hmoveThenWsync.WsyncCount, 1u)
+				<< "pre_cycles=" << preCycles << ";field=wsync_count_mirrored";
+		}
+	}
+
 	TEST(Atari2600TiaPhaseATests, CollisionRegistersLatchAndCxclrClears) {
 		Emulator emu;
 		Atari2600Console console(&emu);
