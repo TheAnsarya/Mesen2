@@ -7,7 +7,8 @@ class GenesisController : public BaseControlDevice {
 public:
 	enum Buttons {
 		Up = 0, Down, Left, Right,
-		A, B, C, Start
+		A, B, C, Start,
+		X, Y, Z, Mode
 	};
 
 	GenesisController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings)
@@ -32,6 +33,10 @@ protected:
 			SetPressedState(Buttons::B, keyMapping.CustomKeys[Buttons::B]);
 			SetPressedState(Buttons::C, keyMapping.CustomKeys[Buttons::C]);
 			SetPressedState(Buttons::Start, keyMapping.CustomKeys[Buttons::Start]);
+			SetPressedState(Buttons::X, keyMapping.CustomKeys[Buttons::X]);
+			SetPressedState(Buttons::Y, keyMapping.CustomKeys[Buttons::Y]);
+			SetPressedState(Buttons::Z, keyMapping.CustomKeys[Buttons::Z]);
+			SetPressedState(Buttons::Mode, keyMapping.CustomKeys[Buttons::Mode]);
 		}
 	}
 };

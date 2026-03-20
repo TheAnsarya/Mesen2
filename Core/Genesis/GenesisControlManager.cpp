@@ -72,24 +72,39 @@ uint8_t GenesisControlManager::ReadDataPort(uint8_t port) {
 		return 0x7f;
 	}
 
-	bool thHigh = (_dataPortWrite[port] & 0x40) != 0;
+	bool thHigh = (_thState[port] & 0x40) != 0;
+	bool sixButtonIdentified = _thCount[port] >= 4;
 
 	if (thHigh) {
-		// TH = 1: Up, Down, Left, Right, B, C
-		value |= device->IsPressed(GenesisController::Buttons::Up)    ? 0 : 0x01;
-		value |= device->IsPressed(GenesisController::Buttons::Down)  ? 0 : 0x02;
-		value |= device->IsPressed(GenesisController::Buttons::Left)  ? 0 : 0x04;
-		value |= device->IsPressed(GenesisController::Buttons::Right) ? 0 : 0x08;
-		value |= device->IsPressed(GenesisController::Buttons::B)     ? 0 : 0x10;
-		value |= device->IsPressed(GenesisController::Buttons::C)     ? 0 : 0x20;
-		value |= 0x40; // TH readback
+		if (sixButtonIdentified) {
+			// TH = 1 after identification: Z, Y, X, Mode, B, C
+			value |= device->IsPressed(GenesisController::Buttons::Z)    ? 0 : 0x01;
+			value |= device->IsPressed(GenesisController::Buttons::Y)    ? 0 : 0x02;
+			value |= device->IsPressed(GenesisController::Buttons::X)    ? 0 : 0x04;
+			value |= device->IsPressed(GenesisController::Buttons::Mode) ? 0 : 0x08;
+			value |= device->IsPressed(GenesisController::Buttons::B)    ? 0 : 0x10;
+			value |= device->IsPressed(GenesisController::Buttons::C)    ? 0 : 0x20;
+			value |= 0x40;
+		} else {
+			// TH = 1 before identification: Up, Down, Left, Right, B, C
+			value |= device->IsPressed(GenesisController::Buttons::Up)    ? 0 : 0x01;
+			value |= device->IsPressed(GenesisController::Buttons::Down)  ? 0 : 0x02;
+			value |= device->IsPressed(GenesisController::Buttons::Left)  ? 0 : 0x04;
+			value |= device->IsPressed(GenesisController::Buttons::Right) ? 0 : 0x08;
+			value |= device->IsPressed(GenesisController::Buttons::B)     ? 0 : 0x10;
+			value |= device->IsPressed(GenesisController::Buttons::C)     ? 0 : 0x20;
+			value |= 0x40;
+		}
 	} else {
 		// TH = 0: Up, Down, 0, 0, A, Start
 		value |= device->IsPressed(GenesisController::Buttons::Up)    ? 0 : 0x01;
 		value |= device->IsPressed(GenesisController::Buttons::Down)  ? 0 : 0x02;
+		if (sixButtonIdentified) {
+			// Identification signature once 6-button mode is latched.
+			value |= 0x0C;
+		}
 		value |= device->IsPressed(GenesisController::Buttons::A)     ? 0 : 0x10;
 		value |= device->IsPressed(GenesisController::Buttons::Start) ? 0 : 0x20;
-		// Bits 2,3 are 0 when TH=0 (active low, but always pressed → 0)
 	}
 
 	return value;
@@ -99,6 +114,15 @@ void GenesisControlManager::WriteDataPort(uint8_t port, uint8_t value) {
 	if (port > 1) {
 		return;
 	}
+
+	uint8_t newTh = value & 0x40;
+	if (newTh != _thState[port]) {
+		_thState[port] = newTh;
+		if (_thCount[port] < 0xFF) {
+			_thCount[port]++;
+		}
+	}
+
 	_dataPortWrite[port] = value;
 }
 
