@@ -264,4 +264,19 @@ namespace {
 		console.DebugWriteCartridge(0x002C, 0x00);
 		EXPECT_EQ(console.DebugReadCartridge(0x0000), 0u);
 	}
+
+	TEST(Atari2600TiaPhaseATests, NusizMissileCopyModeCanLatchCxm0p) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "tia-collision-nusiz-copy.a26");
+
+		console.DebugWriteCartridge(0x001B, 0x00); // grp0 off
+		console.DebugWriteCartridge(0x001C, 0xFF); // grp1 on at default x=96
+		console.DebugWriteCartridge(0x001D, 0x02); // enam0
+		console.DebugWriteCartridge(0x0004, 0x04); // nusiz0: copies at 0 and +64
+
+		console.RunFrame();
+
+		EXPECT_TRUE((console.DebugReadCartridge(0x0000) & 0x80) != 0); // cxm0p missile0-player1
+	}
 }

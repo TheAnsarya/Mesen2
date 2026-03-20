@@ -237,4 +237,60 @@ namespace {
 
 		EXPECT_TRUE((console.DebugReadCartridge(0x0006) & 0x80) != 0); // cxblpf
 	}
+
+	TEST(Atari2600RenderPhaseATests, NusizPlayerCopyModeRendersExpectedSpacing) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "render-nusiz-player-copy.a26");
+
+		console.DebugWriteCartridge(0x0009, 0x01); // colubk
+		console.DebugWriteCartridge(0x0006, 0xAE); // colup0
+		console.DebugWriteCartridge(0x001B, 0xFF); // grp0
+
+		console.DebugWriteCartridge(0x0004, 0x00); // nusiz0 single copy
+		console.RunFrame();
+		const uint16_t* singleFrame = GetFramePixels(console);
+		uint16_t backgroundPixel = singleFrame[8];
+		EXPECT_NE(singleFrame[24], backgroundPixel);
+		EXPECT_EQ(singleFrame[40], backgroundPixel);
+
+		console.DebugWriteCartridge(0x0004, 0x01); // nusiz0 two close copies (0,+16)
+		console.RunFrame();
+		const uint16_t* copyFrame = GetFramePixels(console);
+		EXPECT_NE(copyFrame[24], backgroundPixel);
+		EXPECT_NE(copyFrame[40], backgroundPixel);
+	}
+
+	TEST(Atari2600RenderPhaseATests, NusizMissileWidthBitsScaleMissileSpan) {
+		Emulator emu;
+		Atari2600Console console(&emu);
+		LoadNopRom(console, "render-nusiz-missile-width.a26");
+
+		console.DebugWriteCartridge(0x0009, 0x01); // colubk
+		console.DebugWriteCartridge(0x0006, 0xAE); // colup0
+		console.DebugWriteCartridge(0x001D, 0x02); // enam0
+
+		console.DebugWriteCartridge(0x0004, 0x00); // nusiz0 missile width 1
+		console.RunFrame();
+		const uint16_t* width1Frame = GetFramePixels(console);
+		uint16_t backgroundPixel = width1Frame[0];
+		size_t width1Count = 0;
+		for (uint32_t x = 32; x < 40; x++) {
+			if (width1Frame[x] != backgroundPixel) {
+				width1Count++;
+			}
+		}
+		EXPECT_EQ(width1Count, 1u);
+
+		console.DebugWriteCartridge(0x0004, 0x30); // nusiz0 missile width 8
+		console.RunFrame();
+		const uint16_t* width8Frame = GetFramePixels(console);
+		size_t width8Count = 0;
+		for (uint32_t x = 32; x < 40; x++) {
+			if (width8Frame[x] != backgroundPixel) {
+				width8Count++;
+			}
+		}
+		EXPECT_EQ(width8Count, 8u);
+	}
 }
