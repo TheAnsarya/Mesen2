@@ -1281,6 +1281,10 @@ public unsafe struct DebugSpriteInfo {
 
 	public UInt32 TileCount;
 	public fixed UInt32 TileAddresses[8 * 8];
+
+	public Int32 ScbAddress;
+	public Int32 ScbNext;
+	public Int32 CollisionNumber;
 }
 
 public enum RawPaletteFormat {
