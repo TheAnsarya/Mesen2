@@ -394,6 +394,7 @@ public sealed class DebugApi {
 	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropSmsEventViewerConfig config);
 	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropWsEventViewerConfig config);
 	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropLynxEventViewerConfig config);
+	[DllImport(DllPath)] public static extern void SetEventViewerConfig(CpuType cpuType, InteropAtari2600EventViewerConfig config);
 
 	[DllImport(DllPath, EntryPoint = "GetEventViewerEvent")] private static extern DebugEventInfo GetEventViewerEventWrapper(CpuType cpuType, UInt16 scanline, UInt16 cycle);
 	public static DebugEventInfo? GetEventViewerEvent(CpuType cpuType, UInt16 scanline, UInt16 cycle) {
@@ -1040,6 +1041,19 @@ public sealed class InteropLynxEventViewerConfig {
 	public InteropEventViewerCategoryCfg PaletteWrite;
 	public InteropEventViewerCategoryCfg TimerWrite;
 	public InteropEventViewerCategoryCfg TimerRead;
+
+	[MarshalAs(UnmanagedType.I1)] public bool ShowPreviousFrameEvents;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public sealed class InteropAtari2600EventViewerConfig {
+	public InteropEventViewerCategoryCfg Irq;
+	public InteropEventViewerCategoryCfg MarkedBreakpoints;
+
+	public InteropEventViewerCategoryCfg TiaWrite;
+	public InteropEventViewerCategoryCfg TiaRead;
+	public InteropEventViewerCategoryCfg RiotWrite;
+	public InteropEventViewerCategoryCfg RiotRead;
 
 	[MarshalAs(UnmanagedType.I1)] public bool ShowPreviousFrameEvents;
 }

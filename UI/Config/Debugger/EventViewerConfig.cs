@@ -26,4 +26,5 @@ public sealed class EventViewerConfig : BaseWindowConfig<EventViewerConfig> {
 	[Reactive] public SmsEventViewerConfig SmsConfig { get; set; } = new SmsEventViewerConfig();
 	[Reactive] public WsEventViewerConfig WsConfig { get; set; } = new WsEventViewerConfig();
 	[Reactive] public LynxEventViewerConfig LynxConfig { get; set; } = new LynxEventViewerConfig();
+	[Reactive] public Atari2600EventViewerConfig Atari2600Config { get; set; } = new Atari2600EventViewerConfig();
 }
