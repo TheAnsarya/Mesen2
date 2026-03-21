@@ -7,6 +7,7 @@
 #include "Atari2600/Atari2600BoosterGrip.h"
 #include "Atari2600/Atari2600DefaultVideoFilter.h"
 #include "Shared/BaseControlManager.h"
+#include "Shared/Audio/SoundMixer.h"
 #include "Shared/CpuType.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
@@ -479,8 +480,10 @@ class Atari2600Riot {
 		Atari2600TiaState _state = {};
 		std::array<uint8_t, Atari2600Console::ScreenHeight> _hmoveBlankScanlines = {};
 		std::array<Atari2600ScanlineRenderState, Atari2600Console::ScreenHeight> _scanlineRenderState = {};
+		vector<int16_t> _audioBuffer;
 		static constexpr uint32_t HmoveBlankColorClocks = 8;
 		static constexpr uint32_t HmoveLateCycleThreshold = 73;
+		static constexpr uint32_t FrameAudioSampleCapacity = Atari2600Console::CpuCyclesPerFrame;
 
 		// Input ports for TIA reads (INPT0-INPT5)
 		// INPT0-3: Paddle/pot, keypad column, or booster grip button inputs
@@ -619,6 +622,12 @@ class Atari2600Riot {
 		}
 
 		void StepAudio() {
+			auto toSignedSample = [](uint8_t sample5bit) {
+				int32_t centered = (int32_t)sample5bit - 15;
+				int32_t scaled = centered * 2048;
+				return (int16_t)std::clamp(scaled, (int32_t)INT16_MIN, (int32_t)INT16_MAX);
+			};
+
 			auto advanceChannel = [](uint16_t& counter, uint8_t frequency, uint8_t& phase, uint8_t control) {
 				if (counter > 0) {
 					counter--;
@@ -637,6 +646,10 @@ class Atari2600Riot {
 			_state.LastMixedSample = (uint8_t)std::min<uint16_t>(31, (uint16_t)sample0 + sample1);
 			_state.AudioMixAccumulator += _state.LastMixedSample;
 			_state.AudioSampleCount++;
+
+			int16_t outputSample = toSignedSample(_state.LastMixedSample);
+			_audioBuffer.push_back(outputSample);
+			_audioBuffer.push_back(outputSample);
 		}
 
 		void AdvanceScanline() {
@@ -664,10 +677,15 @@ class Atari2600Riot {
 		}
 
 	public:
+		Atari2600Tia() {
+			_audioBuffer.reserve(FrameAudioSampleCapacity * 2);
+		}
+
 		void Reset() {
 			_state = {};
 			_hmoveBlankScanlines.fill(0);
 			_scanlineRenderState.fill({});
+			_audioBuffer.clear();
 			_state.Player0X = 24;
 			_state.Player1X = 96;
 			_state.Missile0X = 32;
@@ -696,6 +714,7 @@ class Atari2600Riot {
 			Atari2600ScanlineRenderState currentState = BuildScanlineRenderState();
 			_scanlineRenderState.fill(currentState);
 			CaptureCurrentScanlineState();
+			_audioBuffer.clear();
 		}
 
 		void StepCpuCycles(uint32_t cpuCycles) {
@@ -1129,6 +1148,11 @@ class Atari2600Riot {
 			_state.LastMixedSample = 0;
 			_state.AudioMixAccumulator = 0;
 			_state.AudioSampleCount = 0;
+			_audioBuffer.clear();
+		}
+
+		[[nodiscard]] const vector<int16_t>& GetAudioBuffer() const {
+			return _audioBuffer;
 		}
 	};
 
@@ -2039,6 +2063,10 @@ void Atari2600Console::RunFrame() {
 	_lastFrameSummary.ScanlineAtFrameEnd = tiaState.Scanline;
 	_lastFrameSummary.ColorClockAtFrameEnd = tiaState.ColorClock;
 	RenderDebugFrame();
+	const vector<int16_t>& audioBuffer = _tia->GetAudioBuffer();
+	if (!audioBuffer.empty()) {
+		_emu->GetSoundMixer()->PlayAudioBuffer(const_cast<int16_t*>(audioBuffer.data()), (uint32_t)audioBuffer.size() / 2, GetMasterClockRate());
+	}
 	if (_controlManager) {
 		_controlManager->ProcessEndOfFrame();
 	}

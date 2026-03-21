@@ -756,8 +756,10 @@ Is there a VSCode extension that adds timestamps to chat responses? add that, th
 
 [Nexen] (Atari 2600) continue working issues, making tests and benchmarks for everything! and update/make docs plans designs issues logs, etc; Also, create new epics and issues and docs and designs and plans for the fully implementing the Atari 2600 in pansy/poppy/peony; continue;
 
+[All] you can remove timestamps from the co-pilot instructions for the chat until either the vscode chat or the AI understands the current date/time since they're all made up; please continue working through 2600 issues to make a fully functional app/emulator; double check that TAS/movie input functionality for the 2600 works with all 6 controller types; continue;
 
-
+--- chatgpt-codex-5.3
+[All] please continue working through 2600 issues to make a fully functional app/emulator; double check that TAS/movie input functionality for the 2600 works with all 6 controller types; continue;
 
 
 
