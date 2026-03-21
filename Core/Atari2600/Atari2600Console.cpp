@@ -2155,6 +2155,8 @@ void Atari2600Console::RenderDebugFrame() {
 		return false;
 	};
 
+	Atari2600Config& layerCfg = _emu->GetSettings()->GetAtari2600Config();
+
 	for (uint32_t y = 0; y < ScreenHeight; y++) {
 		Atari2600ScanlineRenderState scanlineState = _tia->GetScanlineRenderState(y);
 		uint16_t colorBackground = toRgb565(scanlineState.ColorBackground);
@@ -2182,6 +2184,14 @@ void Atari2600Console::RenderDebugFrame() {
 			bool player0Pixel = isPlayerPixel(scanlineState.Player0Graphics, scanlineState.Player0Reflect, scanlineState.Nusiz0, x, scanlineState.Player0X);
 			bool player1Pixel = isPlayerPixel(scanlineState.Player1Graphics, scanlineState.Player1Reflect, scanlineState.Nusiz1, x, scanlineState.Player1X);
 			_tia->LatchCollisionPixel(missile0Pixel, missile1Pixel, player0Pixel, player1Pixel, ballPixel, playfieldPixel);
+
+			// Apply layer visibility toggles (after collision detection to preserve accuracy)
+			if (layerCfg.HidePlayfield) playfieldPixel = false;
+			if (layerCfg.HidePlayer0) player0Pixel = false;
+			if (layerCfg.HidePlayer1) player1Pixel = false;
+			if (layerCfg.HideMissile0) missile0Pixel = false;
+			if (layerCfg.HideMissile1) missile1Pixel = false;
+			if (layerCfg.HideBall) ballPixel = false;
 
 			uint16_t playfieldPixelColor = colorPlayfield;
 			if (scanlineState.PlayfieldScoreMode) {

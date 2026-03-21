@@ -784,6 +784,13 @@ struct Atari2600Config {
 
 	uint32_t Channel0Vol = 100;
 	uint32_t Channel1Vol = 100;
+
+	bool HidePlayfield = false;
+	bool HidePlayer0 = false;
+	bool HidePlayer1 = false;
+	bool HideMissile0 = false;
+	bool HideMissile1 = false;
+	bool HideBall = false;
 };
 
 struct AudioPlayerConfig {

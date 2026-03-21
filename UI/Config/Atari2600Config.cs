@@ -20,6 +20,13 @@ public sealed class Atari2600Config : BaseConfig<Atari2600Config> {
 	[Reactive][MinMax(0, 100)] public UInt32 Channel0Vol { get; set; } = 100;
 	[Reactive][MinMax(0, 100)] public UInt32 Channel1Vol { get; set; } = 100;
 
+	[Reactive] public bool HidePlayfield { get; set; } = false;
+	[Reactive] public bool HidePlayer0 { get; set; } = false;
+	[Reactive] public bool HidePlayer1 { get; set; } = false;
+	[Reactive] public bool HideMissile0 { get; set; } = false;
+	[Reactive] public bool HideMissile1 { get; set; } = false;
+	[Reactive] public bool HideBall { get; set; } = false;
+
 	public void ApplyConfig() {
 		ConfigManager.Config.Video.ApplyConfig();
 
@@ -35,6 +42,13 @@ public sealed class Atari2600Config : BaseConfig<Atari2600Config> {
 
 			Channel0Vol = Channel0Vol,
 			Channel1Vol = Channel1Vol,
+
+			HidePlayfield = HidePlayfield,
+			HidePlayer0 = HidePlayer0,
+			HidePlayer1 = HidePlayer1,
+			HideMissile0 = HideMissile0,
+			HideMissile1 = HideMissile1,
+			HideBall = HideBall,
 		});
 	}
 
@@ -56,4 +70,11 @@ public struct InteropAtari2600Config {
 
 	public UInt32 Channel0Vol;
 	public UInt32 Channel1Vol;
+
+	[MarshalAs(UnmanagedType.I1)] public bool HidePlayfield;
+	[MarshalAs(UnmanagedType.I1)] public bool HidePlayer0;
+	[MarshalAs(UnmanagedType.I1)] public bool HidePlayer1;
+	[MarshalAs(UnmanagedType.I1)] public bool HideMissile0;
+	[MarshalAs(UnmanagedType.I1)] public bool HideMissile1;
+	[MarshalAs(UnmanagedType.I1)] public bool HideBall;
 }
