@@ -2024,13 +2024,51 @@ uint32_t* Atari2600Console::GetFrameBuffer() {
 }
 
 void Atari2600Console::RenderDebugFrame() {
-	auto toRgb565 = [](uint8_t tiaColor) {
-		uint8_t hue = (uint8_t)((tiaColor >> 4) & 0x0F);
-		uint8_t lum = (uint8_t)(tiaColor & 0x0F);
-		uint8_t red = (uint8_t)((hue * 3 + lum) & 0x1F);
-		uint8_t green = (uint8_t)((hue * 5 + lum * 2) & 0x3F);
-		uint8_t blue = (uint8_t)((hue * 7 + lum) & 0x1F);
-		return (uint16_t)((red << 11) | (green << 5) | blue);
+	// Standard Stella NTSC TIA palette — 128 colors as 0x00RRGGBB
+	// 16 hues × 8 luminance levels, indexed by (tiaColor >> 1)
+	// Source: Stella emulator standard NTSC palette
+	static constexpr uint32_t ntscPalette[128] = {
+		// Hue 0  — Gray
+		0x000000, 0x404040, 0x6c6c6c, 0x909090, 0xb0b0b0, 0xc8c8c8, 0xdcdcdc, 0xf4f4f4,
+		// Hue 1  — Gold
+		0x444400, 0x646410, 0x848424, 0xa0a034, 0xb8b840, 0xd0d050, 0xe8e85c, 0xfcfc68,
+		// Hue 2  — Orange
+		0x702800, 0x844414, 0x985c28, 0xac783c, 0xbc8c4c, 0xcca05c, 0xdcb468, 0xecc878,
+		// Hue 3  — Red-Orange
+		0x841800, 0x983418, 0xac5030, 0xc06848, 0xd0805c, 0xe09470, 0xeca880, 0xfcbc94,
+		// Hue 4  — Red
+		0x880000, 0x9c2020, 0xb03c3c, 0xc05858, 0xd07070, 0xe08888, 0xeca0a0, 0xfcb4b4,
+		// Hue 5  — Purple-Red
+		0x78005c, 0x8c2074, 0xa03c88, 0xb0589c, 0xc070b0, 0xd084c0, 0xdc9cd0, 0xecb0e0,
+		// Hue 6  — Purple
+		0x480078, 0x602090, 0x783ca4, 0x8c58b8, 0xa070cc, 0xb484dc, 0xc49cec, 0xd4b0fc,
+		// Hue 7  — Blue-Purple
+		0x140084, 0x302098, 0x4c3cac, 0x6858c0, 0x7c70d0, 0x9488e0, 0xa8a0ec, 0xbcb4fc,
+		// Hue 8  — Blue
+		0x000088, 0x1c209c, 0x3840b0, 0x505cc0, 0x6874d0, 0x7c8ce0, 0x90a4ec, 0xa4b8fc,
+		// Hue 9  — Light Blue
+		0x00187c, 0x1c3890, 0x3854a8, 0x5070bc, 0x6888cc, 0x7c9cdc, 0x90b4ec, 0xa4c8fc,
+		// Hue 10 — Cyan
+		0x002c5c, 0x1c4c78, 0x386890, 0x5084ac, 0x689cc0, 0x7cb4d4, 0x90cce8, 0xa4e0fc,
+		// Hue 11 — Teal
+		0x003c2c, 0x1c5c48, 0x387c64, 0x509c80, 0x68b494, 0x7cd0ac, 0x90e4c0, 0xa4fcd4,
+		// Hue 12 — Green
+		0x003c00, 0x205c20, 0x407c40, 0x5c9c5c, 0x74b474, 0x8cd08c, 0xa4e4a4, 0xb8fcb8,
+		// Hue 13 — Yellow-Green
+		0x143800, 0x345c1c, 0x507c38, 0x6c9850, 0x84b468, 0x9ccc7c, 0xb4e490, 0xc8fca4,
+		// Hue 14 — Yellow-Green (warm)
+		0x2c3000, 0x4c501c, 0x687034, 0x848c4c, 0x9ca864, 0xb4c078, 0xccd488, 0xe0ec9c,
+		// Hue 15 — Dark Yellow
+		0x442800, 0x644818, 0x846830, 0xa08444, 0xb89c58, 0xd0b46c, 0xe8cc7c, 0xfce08c,
+	};
+
+	// Convert TIA color index to RGB565 via NTSC palette lookup
+	auto toRgb565 = [](uint8_t tiaColor) -> uint16_t {
+		uint32_t c = ntscPalette[(tiaColor >> 1) & 0x7f];
+		uint8_t r = (uint8_t)((c >> 16) & 0xff);
+		uint8_t g = (uint8_t)((c >> 8) & 0xff);
+		uint8_t b = (uint8_t)(c & 0xff);
+		return (uint16_t)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
 	};
 
 	auto getPlayfieldBit = [](const Atari2600ScanlineRenderState& scanlineState, uint32_t index) {
