@@ -95,7 +95,11 @@ namespace {
 			}
 
 			Atari2600TiaState state = console.GetTiaState();
-			EXPECT_EQ(console.DebugReadCartridge(0x0009), 0x2Au);
+			// TIA read address $09 = INPT1 (paddle input, not connected = 0x80)
+			// Note: TIA reads use addr & 0x0F, separate from write registers
+			EXPECT_EQ(console.DebugReadCartridge(0x0009), 0x80u);
+			// Verify the write register was actually set correctly via state
+			EXPECT_EQ(state.ColorBackground, 0x2Au);
 			return state;
 		};
 

@@ -91,7 +91,7 @@ namespace {
 		EXPECT_TRUE(tiaState.PlayfieldReflect);
 		EXPECT_TRUE(tiaState.PlayfieldScoreMode);
 		EXPECT_TRUE(tiaState.PlayfieldPriority);
-		EXPECT_EQ(console.DebugReadCartridge(0x000A), 0x07u);
+		// TIA reads at $0A return INPT2 (addr & 0x0F), not CTRLPF. State verified above.
 	}
 
 	TEST(Atari2600TiaPhaseATests, CtrlpfBallSizeBitsPopulateDecodedWidth) {
@@ -103,12 +103,11 @@ namespace {
 
 		Atari2600TiaState tiaState = console.GetTiaState();
 		EXPECT_EQ(tiaState.BallSize, 8u);
-		EXPECT_EQ(console.DebugReadCartridge(0x000A), 0x30u);
+		// TIA reads at $0A return INPT2, not CTRLPF. State verified above.
 
 		console.DebugWriteCartridge(0x000A, 0x10);
 		tiaState = console.GetTiaState();
 		EXPECT_EQ(tiaState.BallSize, 2u);
-		EXPECT_EQ(console.DebugReadCartridge(0x000A), 0x10u);
 	}
 
 	TEST(Atari2600TiaPhaseATests, RefpBitsPopulatePerScanlineReflectionState) {
@@ -122,8 +121,8 @@ namespace {
 		Atari2600ScanlineRenderState line0 = console.DebugGetScanlineRenderState(0);
 		EXPECT_TRUE(line0.Player0Reflect);
 		EXPECT_TRUE(line0.Player1Reflect);
-		EXPECT_EQ(console.DebugReadCartridge(0x000B), 0x08u);
-		EXPECT_EQ(console.DebugReadCartridge(0x000C), 0x08u);
+		// TIA reads at $0B/$0C return INPT3/INPT4 (addr & 0x0F), not REFP0/REFP1 write values.
+		// Reflection state verified via DebugGetScanlineRenderState above.
 	}
 
 	TEST(Atari2600TiaPhaseATests, Resmp0TracksPlayer0PositionWhenEnabled) {
@@ -132,7 +131,8 @@ namespace {
 
 		console.Reset();
 		console.DebugWriteCartridge(0x0028, 0x02); // resmp0 on
-		EXPECT_EQ(console.DebugReadCartridge(0x0028), 0x02u);
+		// Note: TIA reads at $28 return INPT0 (addr & 0x0F = $08), not RESMP0 write value.
+		// Verify RESMP0 state via GetTiaState() instead.
 
 		console.StepCpuCycles(8);                  // color clock 24
 		console.DebugWriteCartridge(0x0010, 0x00); // resp0 => x=24
@@ -154,7 +154,8 @@ namespace {
 		console.Reset();
 		console.DebugWriteCartridge(0x0028, 0x02); // lock on
 		console.DebugWriteCartridge(0x0028, 0x00); // lock off
-		EXPECT_EQ(console.DebugReadCartridge(0x0028), 0x00u);
+		// Note: TIA reads at $28 return INPT0 (addr & 0x0F = $08), not RESMP0 write value.
+		// Verify RESMP0 state via position checks below.
 
 		console.DebugWriteCartridge(0x0010, 0x00); // resp0 at color clock 0 => x=0
 		console.StepCpuCycles(8);                  // color clock 24

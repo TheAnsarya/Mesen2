@@ -1,6 +1,6 @@
 using System;
 
-namespace Nexen.Interop; 
+namespace Nexen.Interop;
 public static class MemoryTypeExtensions {
 	public static CpuType ToCpuType(this MemoryType memType) {
 		switch (memType) {

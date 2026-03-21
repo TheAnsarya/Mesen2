@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "Atari2600/Atari2600Console.h"
+#include "Atari2600/Atari2600Controller.h"
 #include "Atari2600/Atari2600DefaultVideoFilter.h"
 #include "Shared/BaseControlManager.h"
 #include "Shared/CpuType.h"
 #include "Shared/Emulator.h"
+#include "Shared/EmuSettings.h"
 #include "Shared/MemoryType.h"
 #include "Utilities/VirtualFile.h"
 #include "Utilities/Serializer.h"
@@ -476,6 +478,12 @@ class Atari2600Riot {
 		static constexpr uint32_t HmoveBlankColorClocks = 8;
 		static constexpr uint32_t HmoveLateCycleThreshold = 73;
 
+		// Input ports for TIA reads (INPT0-INPT5)
+		// INPT0-3: Paddle/pot inputs (bit 7, dumped capacitor)
+		// INPT4-5: Fire buttons (bit 7: 0=pressed, 1=released)
+		uint8_t _inputPort4 = 0x80; // P0 fire (not pressed)
+		uint8_t _inputPort5 = 0x80; // P1 fire (not pressed)
+
 		[[nodiscard]] static uint16_t NormalizeRegisterAddress(uint16_t addr) {
 			return addr & 0x3F;
 		}
@@ -666,6 +674,11 @@ class Atari2600Riot {
 			CaptureCurrentScanlineState();
 		}
 
+		void SetFireButtonState(uint8_t port0Fire, uint8_t port1Fire) {
+			_inputPort4 = port0Fire;
+			_inputPort5 = port1Fire;
+		}
+
 		void BeginFrameCapture() {
 			_hmoveBlankScanlines.fill(0);
 			Atari2600ScanlineRenderState currentState = BuildScanlineRenderState();
@@ -778,7 +791,11 @@ class Atari2600Riot {
 		}
 
 		uint8_t ReadRegister(uint16_t addr) const {
-			switch (NormalizeRegisterAddress(addr)) {
+			// TIA read registers only decode bits 0-3 of the address
+			// Addresses 0x00-0x07: Collision latches
+			// Addresses 0x08-0x0B: Pot/paddle inputs (INPT0-3)
+			// Addresses 0x0C-0x0D: Fire button inputs (INPT4-5)
+			switch (addr & 0x0f) {
 				case 0x00: return _state.CollisionCxm0p;
 				case 0x01: return _state.CollisionCxm1p;
 				case 0x02: return _state.CollisionCxp0fb;
@@ -787,6 +804,21 @@ class Atari2600Riot {
 				case 0x05: return _state.CollisionCxm1fb;
 				case 0x06: return _state.CollisionCxblpf;
 				case 0x07: return _state.CollisionCxppmm;
+				case 0x08: return 0x80; // INPT0 — paddle 0 (not connected)
+				case 0x09: return 0x80; // INPT1 — paddle 1 (not connected)
+				case 0x0a: return 0x80; // INPT2 — paddle 2 (not connected)
+				case 0x0b: return 0x80; // INPT3 — paddle 3 (not connected)
+				case 0x0c: return _inputPort4; // INPT4 — P0 fire button
+				case 0x0d: return _inputPort5; // INPT5 — P1 fire button
+				default: return 0;
+			}
+		}
+
+		// Debug read that returns write register state for the register viewer
+		uint8_t DebugReadWriteRegister(uint16_t addr) const {
+			switch (NormalizeRegisterAddress(addr)) {
+				case 0x06: return _state.ColorPlayer0;
+				case 0x07: return _state.ColorPlayer1;
 				case 0x08: return _state.ColorPlayfield;
 				case 0x09: return _state.ColorBackground;
 				case 0x0A:
@@ -1688,19 +1720,125 @@ class Atari2600Riot {
 	};
 
 	class Atari2600ControlManager final : public BaseControlManager {
+	private:
+		Atari2600Config _prevConfig = {};
+		// Cached input state for hardware to read
+		uint8_t _swcha = 0xff;     // Joystick directions (active-low, all released)
+		uint8_t _swchb = 0xff;     // Console switches
+		uint8_t _fireP0 = 0x80;    // P0 fire button (bit 7: 0=pressed, 1=released)
+		uint8_t _fireP1 = 0x80;    // P1 fire button
+
 	public:
 		explicit Atari2600ControlManager(Emulator* emu)
 			: BaseControlManager(emu, CpuType::Atari2600) {
 		}
 
 		shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override {
-			(void)type;
-			(void)port;
-			return nullptr;
+			shared_ptr<BaseControlDevice> device;
+			Atari2600Config& cfg = _emu->GetSettings()->GetAtari2600Config();
+
+			switch (type) {
+				default:
+				case ControllerType::None:
+					break;
+				case ControllerType::Atari2600Joystick:
+					if (port == 0) {
+						device = std::make_shared<Atari2600Controller>(_emu, port, cfg.Port1.Keys);
+					} else if (port == 1) {
+						device = std::make_shared<Atari2600Controller>(_emu, port, cfg.Port2.Keys);
+					}
+					break;
+			}
+			return device;
+		}
+
+		void UpdateControlDevices() override {
+			Atari2600Config cfg = _emu->GetSettings()->GetAtari2600Config();
+			if (_emu->GetSettings()->IsEqual(_prevConfig, cfg) && _controlDevices.size() > 0) {
+				return;
+			}
+			_prevConfig = cfg;
+
+			auto lock = _deviceLock.AcquireSafe();
+
+			// Rebuild device list: re-register valid system devices and add controllers.
+			// ClearDevices() is not used here because _systemDevices may contain a
+			// null entry when the Emulator was not fully initialized (e.g., unit tests
+			// that create a bare Emulator without calling Initialize()).
+			_controlDevices.clear();
+			for (const shared_ptr<BaseControlDevice>& sysDevice : _systemDevices) {
+				if (sysDevice) {
+					RegisterControlDevice(sysDevice);
+				}
+			}
+
+			// Port 1 controller
+			shared_ptr<BaseControlDevice> dev0(CreateControllerDevice(cfg.Port1.Type, 0));
+			if (dev0) {
+				RegisterControlDevice(dev0);
+			}
+
+			// Port 2 controller
+			shared_ptr<BaseControlDevice> dev1(CreateControllerDevice(cfg.Port2.Type, 1));
+			if (dev1) {
+				RegisterControlDevice(dev1);
+			}
 		}
 
 		void UpdateInputState() override {
-			SetInputReadFlag();
+			BaseControlManager::UpdateInputState();
+
+			// Build SWCHA byte from both controllers
+			// Bits 7-4: P0 directions (Right=7, Left=6, Down=5, Up=4)
+			// Bits 3-0: P1 directions (Right=3, Left=2, Down=1, Up=0)
+			uint8_t swcha = 0xff;
+			_fireP0 = 0x80;
+			_fireP1 = 0x80;
+
+			for (shared_ptr<BaseControlDevice>& controller : _controlDevices) {
+				if (controller->GetControllerType() != ControllerType::Atari2600Joystick) {
+					continue;
+				}
+				auto* joystick = static_cast<Atari2600Controller*>(controller.get());
+				uint8_t nibble = joystick->GetDirectionNibble();
+
+				if (controller->GetPort() == 0) {
+					// P0 directions go in upper nibble (bits 4-7)
+					swcha = (uint8_t)((swcha & 0x0f) | (nibble << 4));
+					_fireP0 = joystick->GetFireState();
+				} else if (controller->GetPort() == 1) {
+					// P1 directions go in lower nibble (bits 0-3)
+					swcha = (uint8_t)((swcha & 0xf0) | nibble);
+					_fireP1 = joystick->GetFireState();
+				}
+			}
+			_swcha = swcha;
+
+			// Build SWCHB from config
+			// Bit 0: Reset (1=not pressed), Bit 1: Select (1=not pressed)
+			// Bit 3: P0 Difficulty (1=B/Amateur, 0=A/Pro)
+			// Bit 6: P1 Difficulty (1=B/Amateur, 0=A/Pro)
+			// Bit 7: Color/BW (1=Color, 0=BW)
+			Atari2600Config& cfg = _emu->GetSettings()->GetAtari2600Config();
+			uint8_t swchb = 0x37; // Reset=1, Select=1, unused bits=1
+			if (cfg.P0DifficultyB) swchb |= 0x08;
+			if (cfg.P1DifficultyB) swchb |= 0x40;
+			if (cfg.ColorMode) swchb |= 0x80;
+
+			_swchb = swchb;
+		}
+
+		[[nodiscard]] uint8_t GetSwcha() const { return _swcha; }
+		[[nodiscard]] uint8_t GetSwchb() const { return _swchb; }
+		[[nodiscard]] uint8_t GetFireP0() const { return _fireP0; }
+		[[nodiscard]] uint8_t GetFireP1() const { return _fireP1; }
+
+		void Serialize(Serializer& s) override {
+			BaseControlManager::Serialize(s);
+			SV(_swcha);
+			SV(_swchb);
+			SV(_fireP0);
+			SV(_fireP1);
 		}
 	};
 
@@ -1760,6 +1898,20 @@ void Atari2600Console::RunFrame() {
 		return;
 	}
 
+	// Update controller devices and poll input BEFORE executing the frame
+	if (_controlManager) {
+		_controlManager->UpdateControlDevices();
+		_controlManager->UpdateInputState();
+
+		// Wire input state to hardware
+		auto* ctrlMgr = static_cast<Atari2600ControlManager*>(_controlManager.get());
+		Atari2600RiotState riotState = _riot->GetState();
+		riotState.PortAInput = ctrlMgr->GetSwcha();
+		riotState.PortBInput = ctrlMgr->GetSwchb();
+		_riot->SetState(riotState);
+		_tia->SetFireButtonState(ctrlMgr->GetFireP0(), ctrlMgr->GetFireP1());
+	}
+
 	_tia->BeginFrameCapture();
 	uint64_t startCycles = _cpu->GetCycleCount();
 	StepCpuCycles(CpuCyclesPerFrame);
@@ -1770,8 +1922,6 @@ void Atari2600Console::RunFrame() {
 	_lastFrameSummary.ColorClockAtFrameEnd = tiaState.ColorClock;
 	RenderDebugFrame();
 	if (_controlManager) {
-		_controlManager->UpdateControlDevices();
-		_controlManager->UpdateInputState();
 		_controlManager->ProcessEndOfFrame();
 	}
 }

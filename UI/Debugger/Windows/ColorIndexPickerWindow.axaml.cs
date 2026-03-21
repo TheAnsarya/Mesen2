@@ -10,7 +10,7 @@ using Nexen.Interop;
 using Nexen.Utilities;
 using ReactiveUI.Fody.Helpers;
 
-namespace Nexen.Debugger.Windows; 
+namespace Nexen.Debugger.Windows;
 public class ColorIndexPickerWindow : NexenWindow {
 	public UInt32[] Palette { get; set; } = [];
 	public int SelectedPalette { get; set; }
