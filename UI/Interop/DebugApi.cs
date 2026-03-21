@@ -121,6 +121,7 @@ public sealed class DebugApi {
 			CpuType.Gba => GetPpuState<GbaPpuState>(cpuType),
 			CpuType.Ws => GetPpuState<WsPpuState>(cpuType),
 			CpuType.Lynx => GetPpuState<LynxPpuState>(cpuType),
+			CpuType.Atari2600 => GetPpuState<Atari2600TiaState>(cpuType),
 			_ => throw new Exception("Unsupported cpu type")
 		};
 	}
@@ -142,6 +143,7 @@ public sealed class DebugApi {
 			CpuType.Gba => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
 			CpuType.Ws => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
 			CpuType.Lynx => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
+			CpuType.Atari2600 => GetPpuToolsState<EmptyPpuToolsState>(cpuType),
 			_ => throw new Exception("Unsupported cpu type")
 		};
 	}
@@ -530,6 +532,7 @@ public sealed class DebugApi {
 			CpuType.Gba => state is GbaCpuState,
 			CpuType.Ws => state is WsCpuState,
 			CpuType.Lynx => state is LynxCpuState,
+			CpuType.Atari2600 => state is Atari2600CpuState,
 			_ => false
 		};
 	}
@@ -544,6 +547,7 @@ public sealed class DebugApi {
 			ConsoleType.Gba => state is GbaPpuState,
 			ConsoleType.Ws => state is WsPpuState,
 			ConsoleType.Lynx => state is LynxPpuState,
+			ConsoleType.Atari2600 => state is Atari2600TiaState,
 			_ => false
 		};
 	}
@@ -1477,7 +1481,9 @@ public enum CpuType : byte {
 	Sms,
 	Gba,
 	Ws,
-	Lynx
+	Lynx,
+	Genesis,
+	Atari2600
 }
 
 public enum StepType {

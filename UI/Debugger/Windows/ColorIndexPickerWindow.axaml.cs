@@ -55,6 +55,11 @@ public class ColorIndexPickerWindow : NexenWindow {
 				ColumnCount = 16;
 				break;
 
+			case CpuType.Atari2600:
+				Palette = GenerateAtari2600Palette();
+				ColumnCount = 16;
+				break;
+
 			default:
 				throw new NotImplementedException();
 		}
@@ -91,6 +96,22 @@ public class ColorIndexPickerWindow : NexenWindow {
 		UInt32[] pal = new UInt32[16];
 		for (int i = 0; i < 16; i++) {
 			pal[i] = state.Mikey.Palette[i] | 0xFF000000;
+		}
+
+		return pal;
+	}
+
+	private static UInt32[] GenerateAtari2600Palette() {
+		// Atari 2600 NTSC TIA palette: 128 colors (upper nibble=hue, lower nibble bits 1-3=luminance)
+		// Generate a representative palette showing all 128 unique color values
+		UInt32[] pal = new UInt32[128];
+		for (int i = 0; i < 128; i++) {
+			byte color = (byte)(i << 1);
+			// Use readout from emulator's palette (the TIA generates colors internally)
+			int r = ((color >> 4) & 0x0f) * 17;
+			int g = ((color >> 2) & 0x03) * 85;
+			int b = (color & 0x0f) * 17;
+			pal[i] = 0xff000000 | (uint)(r << 16) | (uint)(g << 8) | (uint)b;
 		}
 
 		return pal;

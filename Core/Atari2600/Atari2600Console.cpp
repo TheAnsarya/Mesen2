@@ -1865,7 +1865,12 @@ uint32_t Atari2600Console::GetCurrentColorClock() const {
 }
 
 uint32_t* Atari2600Console::GetFrameBuffer() {
-	return nullptr;
+	if (_frameBuffer.empty()) {
+		return nullptr;
+	}
+	// Frame buffer is stored as uint16_t (RGB565), but the interface
+	// expects uint32_t*. Reinterpret the underlying storage.
+	return reinterpret_cast<uint32_t*>(_frameBuffer.data());
 }
 
 void Atari2600Console::RenderDebugFrame() {
@@ -2082,7 +2087,7 @@ PpuFrameInfo Atari2600Console::GetPpuFrame() {
 }
 
 RomFormat Atari2600Console::GetRomFormat() {
-	return RomFormat::Unknown;
+	return RomFormat::Atari2600;
 }
 
 AudioTrackInfo Atari2600Console::GetAudioTrackInfo() {
@@ -2175,8 +2180,10 @@ AddressInfo Atari2600Console::GetRelativeAddress(AddressInfo& absAddress, CpuTyp
 }
 
 void Atari2600Console::GetConsoleState(BaseState& state, ConsoleType consoleType) {
-	(void)state;
-	(void)consoleType;
+	Atari2600State& s = reinterpret_cast<Atari2600State&>(state);
+	s.Cpu = GetCpuState();
+	s.Tia = _tia ? _tia->GetState() : Atari2600TiaState{};
+	s.Riot = _riot ? _riot->GetState() : Atari2600RiotState{};
 }
 
 void Atari2600Console::Serialize(Serializer& s) {

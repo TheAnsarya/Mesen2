@@ -136,6 +136,12 @@ struct Atari2600FrameStepSummary {
 	uint32_t ColorClockAtFrameEnd = 0;
 };
 
+struct Atari2600State : BaseState {
+	Atari2600CpuState Cpu = {};
+	Atari2600TiaState Tia = {};
+	Atari2600RiotState Riot = {};
+};
+
 class Atari2600Console final : public IConsole {
 private:
 	Emulator* _emu = nullptr;
