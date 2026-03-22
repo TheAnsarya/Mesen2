@@ -761,6 +761,7 @@ Is there a VSCode extension that adds timestamps to chat responses? add that, th
 --- chatgpt-codex-5.3
 [All] please continue working through 2600 issues to make a fully functional app/emulator; double check that TAS/movie input functionality for the 2600 works with all 6 controller types; continue;
 
+work as many 2600 issues as can for as long as you can, do like 10 issues in order; update and make issues, plans, docs, designs, chat/session logs, epics, etc; make fully working 2600 emulator and pansy output and tas and debugging with full UI and everything; continue for a long time, many issues in a row; continue;
 
 
 

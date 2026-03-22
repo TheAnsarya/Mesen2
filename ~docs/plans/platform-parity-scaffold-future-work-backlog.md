@@ -104,3 +104,14 @@ All issues in this backlog remain parked as future work unless one of the follow
 
 - [Q3 Platform Parity Research Program](platform-parity-research-program-2026-q3.md)
 - [Nexen Future Work Index](../../docs/FUTURE-WORK.md)
+
+## 2026-03-21 Active Atari 2600 Queue Refresh
+
+The following Atari 2600 issues were promoted/created for immediate production hardening work:
+
+- [#873](https://github.com/TheAnsarya/Nexen/issues/873): TAS editor controller subtype detection and paddle-coordinate gap tracking.
+- [#874](https://github.com/TheAnsarya/Nexen/issues/874): TAS editor paddle coordinate editing support.
+- [#875](https://github.com/TheAnsarya/Nexen/issues/875): 6507 opcode and addressing conformance corpus expansion.
+- [#876](https://github.com/TheAnsarya/Nexen/issues/876): Production-readiness validation matrix and checklist documentation.
+- [#877](https://github.com/TheAnsarya/Nexen/issues/877): Atari2600Console monolith refactor into split implementation units.
+- [#878](https://github.com/TheAnsarya/Nexen/issues/878): Atari 2600 Pansy metadata export parity.

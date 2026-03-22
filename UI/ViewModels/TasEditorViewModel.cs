@@ -3135,12 +3135,21 @@ tas.finishSearch(true) -- Load best result</pre>
 	};
 
 	/// <summary>
-	/// Returns the Atari 2600 joystick button layout (default/most common controller).
-	/// The specific controller type (Paddle, Keypad, etc.) is stored in the C++ settings
-	/// but not directly accessible via MovieData.PortTypes. Future enhancement could parse
-	/// the GameSettings.txt to detect sub-controller types.
+	/// Returns Atari 2600 button layout based on controller subtype stored in port 1.
 	/// </summary>
-	private static List<ControllerButtonInfo> GetAtari2600Buttons() => GetAtari2600JoystickButtons();
+	private List<ControllerButtonInfo> GetAtari2600Buttons() {
+		MovieConverter.ControllerType portType = (Movie?.PortTypes is { Length: > 0 })
+			? Movie.PortTypes[0]
+			: MovieConverter.ControllerType.Atari2600Joystick;
+
+		return portType switch {
+			MovieConverter.ControllerType.Atari2600Paddle => GetAtari2600PaddleButtons(),
+			MovieConverter.ControllerType.Atari2600Keypad => GetAtari2600KeypadButtons(),
+			MovieConverter.ControllerType.Atari2600DrivingController => GetAtari2600DrivingButtons(),
+			MovieConverter.ControllerType.Atari2600BoosterGrip => GetAtari2600BoosterGripButtons(),
+			_ => GetAtari2600JoystickButtons(),
+		};
+	}
 
 	private static List<ControllerButtonInfo> GetAtari2600JoystickButtons() => new() {
 		new("FIRE", "Fire", 0, 0),

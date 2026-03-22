@@ -93,6 +93,27 @@ public class ConverterTests {
 	}
 
 	[Fact]
+	public void NexenConverter_RoundTripsAtari2600PortTypes() {
+		var movie = new MovieData {
+			SystemType = SystemType.A2600,
+			ControllerCount = 2
+		};
+		movie.PortTypes[0] = ControllerType.Atari2600Keypad;
+		movie.PortTypes[1] = ControllerType.Atari2600DrivingController;
+
+		using var stream = new MemoryStream();
+		var converter = new Converters.NexenMovieConverter();
+		converter.Write(movie, stream);
+
+		stream.Position = 0;
+		var loaded = converter.Read(stream);
+
+		Assert.Equal(SystemType.A2600, loaded.SystemType);
+		Assert.Equal(ControllerType.Atari2600Keypad, loaded.PortTypes[0]);
+		Assert.Equal(ControllerType.Atari2600DrivingController, loaded.PortTypes[1]);
+	}
+
+	[Fact]
 	public void Fm2Converter_ParsesHeader() {
 		// Create a minimal FM2 file content
 		string fm2Content = """

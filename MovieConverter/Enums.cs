@@ -208,7 +208,22 @@ public enum ControllerType {
 	BarcodeReader,
 
 	/// <summary>Satellaview</summary>
-	Satellaview
+	Satellaview,
+
+	/// <summary>Atari 2600 joystick</summary>
+	Atari2600Joystick,
+
+	/// <summary>Atari 2600 paddle controller</summary>
+	Atari2600Paddle,
+
+	/// <summary>Atari 2600 keypad controller</summary>
+	Atari2600Keypad,
+
+	/// <summary>Atari 2600 driving controller</summary>
+	Atari2600DrivingController,
+
+	/// <summary>Atari 2600 booster grip controller</summary>
+	Atari2600BoosterGrip
 }
 
 /// <summary>
