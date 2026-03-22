@@ -125,6 +125,15 @@ public sealed class InputFrame : IEquatable<InputFrame> {
 			sb.Append(Controllers[i].ToNexenFormat());
 		}
 
+		for (int i = 0; i < portCount && i < Controllers.Length; i++) {
+			if (Controllers[i].PaddlePosition is byte paddlePosition) {
+				sb.Append("|P");
+				sb.Append(i + 1);
+				sb.Append("X:");
+				sb.Append(paddlePosition);
+			}
+		}
+
 		// Lag frame marker
 		if (IsLagFrame) {
 			sb.Append("|LAG");
@@ -185,6 +194,11 @@ public sealed class InputFrame : IEquatable<InputFrame> {
 				continue;
 			}
 
+			if (TryParsePaddleMetadata(part, out int paddlePort, out byte paddlePosition)) {
+				frame.Controllers[paddlePort].PaddlePosition = paddlePosition;
+				continue;
+			}
+
 			// Controller input
 			if (portIndex < MaxPorts && part.Length >= 8) {
 				frame.Controllers[portIndex] = ControllerInput.FromNexenFormat(part);
@@ -193,6 +207,37 @@ public sealed class InputFrame : IEquatable<InputFrame> {
 		}
 
 		return frame;
+	}
+
+	private static bool TryParsePaddleMetadata(ReadOnlySpan<char> part, out int port, out byte value) {
+		port = -1;
+		value = 0;
+
+		if (part.Length < 5 || part[0] != 'P') {
+			return false;
+		}
+
+		int xMarker = part.IndexOf("X:", StringComparison.Ordinal);
+		if (xMarker <= 1) {
+			return false;
+		}
+
+		if (!int.TryParse(part[1..xMarker], out int portOneBased)) {
+			return false;
+		}
+
+		port = portOneBased - 1;
+		if (port < 0 || port >= MaxPorts) {
+			port = -1;
+			return false;
+		}
+
+		if (!byte.TryParse(part[(xMarker + 2)..], out value)) {
+			port = -1;
+			return false;
+		}
+
+		return true;
 	}
 
 	/// <summary>

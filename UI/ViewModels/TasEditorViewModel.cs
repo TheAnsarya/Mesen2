@@ -124,6 +124,12 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 	/// <summary>Gets the grid column count for the visual input preview.</summary>
 	[Reactive] public int InputPreviewColumns { get; private set; } = 4;
 
+	/// <summary>Gets whether paddle coordinate editing is visible for the selected frame/controller.</summary>
+	[Reactive] public bool IsPaddleCoordinateEditorVisible { get; private set; }
+
+	/// <summary>Gets or sets the selected paddle position (0-255) for port 1 on the selected frame.</summary>
+	[Reactive] public int SelectedPaddlePosition { get; set; }
+
 	/// <summary>Gets the piano roll button labels derived from the current controller layout.</summary>
 	public IReadOnlyList<string> PianoRollButtonLabels =>
 		ControllerButtons.Select(b => b.Label).ToList();
@@ -180,6 +186,7 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 	private Windows.TasEditorWindow? _window;
 	private DispatcherTimer? _autoSaveTimer;
 	private bool _isAutoSaving;
+	private bool _isUpdatingSelectedPaddlePosition;
 	private Func<string, System.Threading.Tasks.Task<DialogResult>>? _recoveryPromptOverride;
 
 	/// <summary>Gets the greenzone manager for savestate management.</summary>
@@ -280,6 +287,7 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 			this.RaisePropertyChanged(nameof(SelectedFrameIsLag));
 			RefreshSelectedFramePreview();
 		}));
+		AddDisposable(this.WhenAnyValue(x => x.SelectedPaddlePosition).Subscribe(ApplySelectedPaddlePosition));
 		AddDisposable(this.WhenAnyValue(x => x.AutoSaveEnabled).Subscribe(_ => RestartAutoSaveTimer()));
 		AddDisposable(this.WhenAnyValue(x => x.MarkerEntryFilter).Subscribe(_ => RefreshMarkerEntries()));
 		AddDisposable(this.WhenAnyValue(x => x.AutoSaveIntervalMinutes).Subscribe(minutes => {
@@ -300,6 +308,15 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 
 		InputPreviewButtons.Clear();
 		ControllerInput? selectedController = GetSelectedControllerInput(0);
+		IsPaddleCoordinateEditorVisible = CurrentLayout == ControllerLayout.Atari2600
+			&& (Movie?.PortTypes is { Length: > 0 })
+			&& Movie.PortTypes[0] == MovieConverter.ControllerType.Atari2600Paddle
+			&& selectedController is not null;
+
+		_isUpdatingSelectedPaddlePosition = true;
+		SelectedPaddlePosition = selectedController?.PaddlePosition ?? 0;
+		_isUpdatingSelectedPaddlePosition = false;
+
 		List<ControllerButtonPreviewViewModel> previewButtons = BuildInputPreviewButtons(ControllerButtons, selectedController);
 		foreach (ControllerButtonPreviewViewModel previewButton in previewButtons) {
 			InputPreviewButtons.Add(previewButton);
@@ -308,6 +325,30 @@ public sealed class TasEditorViewModel : DisposableViewModel {
 		InputPreviewColumns = Math.Max(1, ControllerButtons.Count > 0
 			? ControllerButtons.Max(button => button.Column) + 1
 			: 1);
+	}
+
+	private void ApplySelectedPaddlePosition(int position) {
+		if (_isUpdatingSelectedPaddlePosition || Movie is null || !IsPaddleCoordinateEditorVisible) {
+			return;
+		}
+
+		if (SelectedFrameIndex < 0 || SelectedFrameIndex >= Movie.InputFrames.Count) {
+			return;
+		}
+
+		InputFrame frame = Movie.InputFrames[SelectedFrameIndex];
+		if (frame.Controllers.Length == 0) {
+			return;
+		}
+
+		byte clamped = (byte)Math.Clamp(position, 0, 255);
+		ControllerInput newInput = CloneControllerInput(frame.Controllers[0]);
+		if (newInput.PaddlePosition == clamped) {
+			return;
+		}
+
+		newInput.PaddlePosition = clamped;
+		ExecuteAction(new ModifyInputAction(frame, SelectedFrameIndex, 0, newInput));
 	}
 
 	private ControllerInput? GetSelectedControllerInput(int port) {

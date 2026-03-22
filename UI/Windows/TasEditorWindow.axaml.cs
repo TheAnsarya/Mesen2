@@ -734,6 +734,8 @@ public class TasEditorWindow : NexenWindow, IDisposable {
 			"→" => "RIGHT",
 			"ST" => "START",
 			"SE" => "SELECT",
+			"*" => "STAR",
+			"#" => "POUND",
 			_ => label.ToUpperInvariant()
 		};
 	}

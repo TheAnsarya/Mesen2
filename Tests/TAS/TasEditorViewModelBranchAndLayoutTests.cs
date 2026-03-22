@@ -212,6 +212,7 @@ public class TasEditorViewModelBranchAndLayoutTests : IDisposable {
 	[InlineData(SystemType.Pce, ControllerLayout.PcEngine)]
 	[InlineData(SystemType.Ws, ControllerLayout.WonderSwan)]
 	[InlineData(SystemType.Lynx, ControllerLayout.Lynx)]
+	[InlineData(SystemType.A2600, ControllerLayout.Atari2600)]
 	public void DetectControllerLayout_SystemType(SystemType system, ControllerLayout expected) {
 		SetMovie(CreateTestMovie(1, system));
 
@@ -301,6 +302,7 @@ public class TasEditorViewModelBranchAndLayoutTests : IDisposable {
 	[InlineData(ControllerLayout.PcEngine, 8)]
 	[InlineData(ControllerLayout.WonderSwan, 11)]
 	[InlineData(ControllerLayout.Lynx, 9)]
+	[InlineData(ControllerLayout.Atari2600, 5)]
 	public void ControllerButtons_CorrectCount(ControllerLayout layout, int expectedCount) {
 		_vm.CurrentLayout = layout;
 
@@ -367,6 +369,21 @@ public class TasEditorViewModelBranchAndLayoutTests : IDisposable {
 
 		_vm.CurrentLayout = ControllerLayout.MasterSystem;
 		Assert.Equal(6, _vm.ControllerButtons.Count);
+	}
+
+	[Fact]
+	public void PaddleEditor_VisibleAndEditable_ForAtariPaddlePort() {
+		var movie = CreateTestMovie(2, SystemType.A2600);
+		movie.PortTypes = [ControllerType.Atari2600Paddle, ControllerType.None];
+		movie.InputFrames[0].Controllers[0].PaddlePosition = 32;
+		SetMovie(movie);
+
+		_vm.SelectedFrameIndex = 0;
+		Assert.True(_vm.IsPaddleCoordinateEditorVisible);
+		Assert.Equal(32, _vm.SelectedPaddlePosition);
+
+		_vm.SelectedPaddlePosition = 200;
+		Assert.Equal((byte)200, _vm.Movie!.InputFrames[0].Controllers[0].PaddlePosition);
 	}
 
 	[Fact]
